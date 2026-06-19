@@ -1,0 +1,131 @@
+.profile-info-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1250;
+  backdrop-filter: blur(4px);
+}
+
+.profile-info-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 420px;
+  max-height: min(90dvh, calc(100vh - 2rem));
+  z-index: 1251;
+  display: flex;
+  flex-direction: column;
+  background: #0f0f12;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+.profile-info-modal-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.85rem 0.75rem;
+  padding-top: max(0.85rem, env(safe-area-inset-top, 0));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.profile-info-back {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.profile-info-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.profile-info-modal-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.profile-info-header-spacer {
+  width: 44px;
+  height: 44px;
+  justify-self: end;
+}
+
+.profile-info-modal-body {
+  overflow-y: auto;
+  padding: 1rem 1.25rem 1.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.profile-info-modal-body .profile-info-action,
+.profile-info-modal-body .profile-wishlist-block.profile-info-action {
+  width: 100%;
+  margin-top: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-sizing: border-box;
+}
+
+.profile-info-modal-body .profile-info-action:first-of-type,
+.profile-info-modal-body .profile-wishlist-block.profile-info-action:first-of-type {
+  margin-top: 0;
+}
+
+.profile-info-app-stores {
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .profile-info-overlay {
+    background: #0a0a0a;
+    backdrop-filter: none;
+  }
+
+  .profile-info-modal {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .profile-info-modal-header {
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0));
+  }
+
+  .profile-info-modal-body {
+    padding-left: max(1.25rem, env(safe-area-inset-left, 0));
+    padding-right: max(1.25rem, env(safe-area-inset-right, 0));
+    flex: 1;
+    min-height: 0;
+  }
+}

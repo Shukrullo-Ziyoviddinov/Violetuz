@@ -1,0 +1,102 @@
+.feed-category-wrap {
+  margin-bottom: 0.9rem;
+}
+
+.feed-category {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  margin-bottom: 0;
+  padding-bottom: 0.2rem;
+}
+
+.feed-category-messages-entry {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .feed-category-wrap .feed-category .feed-category-messages-entry {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .feed-category-wrap .feed-category .feed-category-messages-entry-icon {
+    font-size: 0.85rem;
+    opacity: 0.95;
+  }
+}
+
+.feed-category-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.42rem 0.8rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.feed-category-btn-icon {
+  font-size: 0.65rem;
+}
+
+.feed-category-btn--active {
+  background: #0313ea;
+  border-color: #0313ea;
+}
+
+@media (min-width: 900px) {
+  .feed-category-wrap {
+    margin-bottom: 0;
+  }
+
+  .feed-category-wrap .feed-category {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    flex-direction: column;
+    overflow-x: visible;
+    gap: 0.5rem;
+    padding: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+  }
+
+  .feed-category-wrap .feed-category .feed-category-messages-entry {
+    margin-top: auto;
+  }
+
+  .feed-category-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: left;
+    border-radius: 10px;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .feed-category-btn-icon {
+    width: 14px;
+    text-align: center;
+    font-size: 0.68rem;
+  }
+}

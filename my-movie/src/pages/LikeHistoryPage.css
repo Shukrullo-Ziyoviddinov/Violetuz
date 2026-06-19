@@ -1,0 +1,15 @@
+.like-history-page {
+  margin-top: 2rem;
+  min-height: calc(100vh - 180px);
+  padding: 1.2rem 0 2rem;
+}
+
+.like-history-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+

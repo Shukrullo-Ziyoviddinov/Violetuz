@@ -1,0 +1,38 @@
+/* Umumiy videoli klip kartochkalar - barcha klip bo'limlari uchun */
+.clips-cards.music-cards {
+  padding: 0.5rem 0 0.25rem 0;
+}
+
+.clips-cards .clips-item {
+  width: 240px;
+}
+
+.clips-cards .clips-image-wrapper {
+  padding-top: 56.25%;
+}
+
+.clips-cards .music-cards-item-image {
+  object-fit: cover;
+}
+
+.clips-cards .music-button-more {
+  width: 240px;
+}
+
+.clips-cards .music-button-more-wrapper {
+  padding-top: 56.25%;
+}
+
+@media (max-width: 500px) {
+  .clips-cards .clips-item,
+  .clips-cards .music-button-more {
+    width: 220px;
+  }
+}
+
+@media (max-width: 390px) {
+  .clips-cards .clips-item,
+  .clips-cards .music-button-more {
+    width: 200px;
+  }
+}

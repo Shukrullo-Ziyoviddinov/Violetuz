@@ -1,0 +1,334 @@
+.music-filter {
+  margin-bottom: 1.5rem;
+}
+
+.music-filter .scroll-touch,
+.music-filter-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.music-filter .scroll-touch::-webkit-scrollbar,
+.music-filter-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.music-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.music-filter-item {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.music-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.music-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.music-filter-btn.open {
+  background: rgba(192, 78, 221, 0.3);
+  border-color: rgba(192, 78, 221, 0.6);
+  color: #fff;
+}
+
+.music-filter-label {
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+}
+
+.music-filter-value {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.music-filter-arrow {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: transform 0.2s;
+}
+
+.music-filter-btn.open .music-filter-arrow {
+  transform: rotate(180deg);
+}
+
+.music-filter-dropdown {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  min-width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(18, 14, 24, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  padding: 0.25rem;
+}
+
+.music-filter-option {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.music-filter-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.music-filter-option.active {
+  background: rgba(192, 78, 221, 0.35);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* MusicFilterModal - default: mobile (bottom sheet) */
+.music-filter-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 2000;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.music-filter-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.music-filter-modal {
+  width: 100%;
+  max-height: 70vh;
+  background: linear-gradient(180deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%);
+  border-radius: 16px 16px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.28s ease-out;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.music-filter-modal-overlay.open .music-filter-modal {
+  transform: translateY(0);
+}
+
+.music-filter-modal-drag {
+  display: flex;
+  justify-content: center;
+  padding: 0.6rem 0;
+  flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.music-filter-modal-drag:active {
+  cursor: grabbing;
+}
+
+.music-filter-modal-drag-bar {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+}
+
+.music-filter-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.music-filter-modal-header-draggable {
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.music-filter-modal-header-draggable:active {
+  cursor: grabbing;
+}
+
+.music-filter-modal-drag-bar {
+  display: none;
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin: 0 auto;
+}
+
+.music-filter-modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.music-filter-modal-close {
+  width: 40px;
+  height: 40px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.music-filter-modal-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.music-filter-modal-list {
+  padding: 0.5rem;
+  overflow-y: auto;
+  max-height: 60vh;
+  -webkit-overflow-scrolling: touch;
+}
+
+.music-filter-modal-option {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.music-filter-modal-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.music-filter-modal-option.active {
+  background: rgba(192, 78, 221, 0.35);
+  color: #fff;
+  font-weight: 600;
+}
+
+.music-filter-modal-option.has-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.music-filter-modal-option-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.music-filter-modal-option.active .music-filter-modal-option-icon {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.music-filter-modal-option-text {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.music-filter-btn-barchasi.active {
+  background: rgba(30, 3, 210, 0.3);
+  border-color: rgba(31, 22, 204, 0.6);
+  color: #fff;
+}
+
+/* Desktop: modal o'rtada, yopish tugmasi ko'rinadi */
+@media (min-width: 768px) {
+  .music-filter-modal-overlay {
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .music-filter-modal {
+    width: 100%;
+    max-width: 420px;
+    max-height: 75vh;
+    border-radius: 16px;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.28s ease-out, opacity 0.25s ease;
+  }
+
+  .music-filter-modal-overlay.open .music-filter-modal {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .music-filter-modal-drag {
+    display: none;
+  }
+
+  .music-filter-modal-close {
+    display: flex;
+  }
+}
+
+/* Mobile: pastdan bottom sheet, drag orqali yopiladi, yopish tugmasi yashirin */
+@media (max-width: 767px) {
+  .music-filter-modal-close {
+    display: none;
+  }
+}

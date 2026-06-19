@@ -1,0 +1,82 @@
+.comentaria-history-text-edit-wrap {
+  width: 100%;
+  min-width: 0;
+}
+
+.comentaria-history-text-edit-wrap .comentaria-history-comment-actions-row {
+  margin-top: 0.35rem;
+}
+
+.comentaria-history-text-edit-area {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0 0 0.35rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 200, 140, 0.45);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 3.2rem;
+  font-family: inherit;
+}
+
+.comentaria-history-text-edit-area:focus {
+  outline: none;
+  border-color: rgba(100, 200, 130, 0.75);
+  box-shadow: 0 0 0 1px rgba(100, 200, 130, 0.35);
+}
+
+.comentaria-history-comment-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+/* Blok kartochkasidan keyin — alohida qatorda */
+.comentaria-history-comment-entry .comentaria-history-comment-actions-row {
+  margin-top: 0.45rem;
+}
+
+.comentaria-history-btn-edit,
+.comentaria-history-btn-save {
+  border: 1px solid rgba(80, 190, 120, 0.75);
+  background: rgba(20, 60, 35, 0.35);
+  color: rgba(180, 255, 200, 0.98);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.comentaria-history-btn-edit:hover,
+.comentaria-history-btn-save:hover:not(:disabled) {
+  background: rgba(30, 90, 50, 0.45);
+  border-color: rgba(100, 220, 140, 0.9);
+}
+
+.comentaria-history-btn-save:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.comentaria-history-btn-cancel {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.65rem;
+  padding: 0.26rem 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.comentaria-history-btn-cancel:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.35);
+}

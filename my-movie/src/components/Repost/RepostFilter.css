@@ -1,0 +1,30 @@
+.repost-filter {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  margin-bottom: 1.1rem;
+}
+
+.repost-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.repost-filter-btn i {
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0.92;
+}
+
+.repost-filter-btn.active {
+  background: #0313ea;
+  border-color: #0313ea;
+}

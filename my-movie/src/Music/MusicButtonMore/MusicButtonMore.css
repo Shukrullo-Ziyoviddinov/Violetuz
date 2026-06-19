@@ -1,0 +1,38 @@
+.music-button-more {
+  flex-shrink: 0;
+  width: 160px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.music-button-more:hover {
+  transform: scale(1.02);
+}
+
+.music-button-more-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-button-more-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.2s;
+}
+
+.music-button-more:hover .music-button-more-icon {
+  color: rgba(192, 78, 221, 0.9);
+}
+
+.music-button-more-icon svg {
+  width: 48px;
+  height: 48px;
+}
+

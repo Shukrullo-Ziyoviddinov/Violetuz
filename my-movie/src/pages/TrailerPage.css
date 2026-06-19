@@ -1,0 +1,147 @@
+.trailer-page {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.trailer-page-overlay {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.98) 0%,
+    rgba(10, 5, 15, 0.96) 50%,
+    rgba(5, 0, 10, 0.98) 100%
+  );
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-out;
+  overflow: hidden;
+}
+
+.trailer-page .trailer-modal {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+body.trailer-page-active {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trailer-page-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Desktop: navbar ko'rinadi, scroll yo'q — kontent navbar ostida sig'adi */
+@media (min-width: 970px) {
+  body.trailer-page-active .App {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body.trailer-page-active .App-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    max-height: calc(100dvh - 72px);
+    overflow: hidden;
+    padding-bottom: 0 !important;
+    margin: 0;
+  }
+
+  .trailer-page {
+    height: 100%;
+    max-height: calc(100dvh - 72px);
+  }
+
+  .trailer-page-overlay {
+    height: 100%;
+    max-height: calc(100dvh - 72px);
+  }
+
+  .trailer-page .trailer-modal {
+    height: calc(100dvh - 72px - 4rem);
+    max-height: calc(100dvh - 72px - 4rem);
+    min-height: 480px;
+  }
+}
+
+/* Mobil: navbar yashiriladi, to'liq ekran */
+@media (max-width: 969px) {
+  body.trailer-page-active {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  body.trailer-page-active .navbar,
+  body.trailer-page-active .navbar-mobile {
+    display: none !important;
+  }
+
+  body.trailer-page-active .App {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  body.trailer-page-active .App-main {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 0 !important;
+    margin: 0;
+  }
+
+  .trailer-page {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    height: 100%;
+    max-height: 100%;
+  }
+
+  .trailer-page-overlay {
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .trailer-page .trailer-modal {
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    border-radius: 0;
+  }
+}
+
+@media (min-width: 970px) and (max-width: 1289px) {
+  .trailer-page-overlay {
+    padding: 1rem;
+  }
+
+  .trailer-page .trailer-modal {
+    height: calc(100dvh - 72px - 2rem);
+    max-height: calc(100dvh - 72px - 2rem);
+  }
+}

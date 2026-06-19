@@ -1,0 +1,279 @@
+.like-history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.like-history-movie-item .movies-item-image-wrapper {
+  padding-top: 130%;
+}
+
+.like-history-clip-item .music-more-page-item-image-wrapper {
+  padding-top: 56.25%;
+}
+
+.like-history-card {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 0;
+  color: #fff;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.like-history-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(202, 78, 221, 0.6);
+  background: rgba(202, 78, 221, 0.09);
+}
+
+.like-history-card-image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #181818;
+}
+
+.like-history-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.like-history-card-image-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.like-history-card-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.like-history-card-info {
+  padding: 0.7rem 0.8rem 0.85rem;
+}
+
+.like-history-card-title {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.like-history-card-meta {
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.like-history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: calc(100vh - 400px);
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.like-history-empty-img {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  object-fit: contain;
+}
+
+.like-history-empty-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+.like-history-empty-btn {
+  flex: 1 1 calc(50% - 0.5rem);
+  min-width: 120px;
+  max-width: 170px;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(214, 78, 221, 0.45);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.like-history-empty-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(214, 78, 221, 0.55);
+}
+
+.like-history-empty-btn:active {
+  transform: translateY(0);
+}
+
+.like-history-empty-btn--music {
+  background: linear-gradient(135deg, #202ef1 0%, #0d1df4 100%);
+  box-shadow: 0 4px 16px rgba(32, 46, 241, 0.45);
+}
+
+.like-history-empty-btn--music:hover {
+  box-shadow: 0 6px 20px rgba(32, 46, 241, 0.55);
+}
+
+@media (max-width: 768px) {
+  .like-history-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .like-history-clip-item .music-more-page-item-image-wrapper {
+    padding-top: 58%;
+  }
+
+  .like-history-clip-item .music-more-page-item-wishlist-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .like-history-clip-item .music-more-page-item-wishlist-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .like-history-card-info {
+    padding: 0.6rem 0.65rem 0.75rem;
+  }
+
+  .like-history-card-title {
+    font-size: 0.84rem;
+  }
+
+  .like-history-card-meta {
+    font-size: 0.7rem;
+  }
+
+  .music-more-page-item-title {
+    font-size: 0.8rem;
+  }
+
+  .music-more-page-item-artist {
+    font-size: 0.6rem;
+  }
+
+  .music-more-page-item-play {
+    width: 28px;
+    height: 28px;
+}
+
+.music-more-page-item-wishlist-btn {
+  position: absolute;
+  top: 0.1rem;
+  right: 0.3rem;
+  width: 30px;
+  height: 30px;
+}
+   
+}
+
+@media (max-width: 480px) {
+  .like-history-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .like-history-grid.like-history-grid--media {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .like-history-clip-item .music-more-page-item-image-wrapper {
+    padding-top: 52%;
+  }
+
+  .like-history-clip-item .music-more-page-item-wishlist-btn {
+    width: 30px;
+    height: 30px;
+    top: 0.35rem;
+    right: 0.35rem;
+  }
+
+  .like-history-clip-item .music-more-page-item-play {
+    width: 28px;
+    height: 28px;
+    right: 0.35rem;
+    bottom: 0.35rem;
+  }
+
+  .like-history-clip-item .music-more-page-item-title {
+    font-size: 0.9rem;
+  }
+
+  .like-history-clip-item .music-more-page-item-artist {
+    font-size: 0.72rem;
+  }
+
+  .like-history-card-badge {
+    top: 0.35rem;
+    right: 0.35rem;
+    font-size: 0.66rem;
+    padding: 0.15rem 0.42rem;
+  }
+
+  .like-history-movie-item .movies-item-wishlist-btn {
+    width: 30px;
+    height: 30px;
+    top: 0.35rem;
+    right: 0.35rem;
+  }
+
+  .like-history-movie-item .movies-item-badge {
+    font-size: 0.62rem;
+    padding: 0.18rem 0.34rem;
+  }
+
+  .like-history-movie-item .movies-item-badge-fhd {
+    top: 0.35rem;
+    left: 0.35rem;
+  }
+
+  .like-history-movie-item .movies-item-badge-age {
+    left: 0.35rem;
+    bottom: 0.35rem;
+  }
+
+  .like-history-movie-item .movies-item-rating {
+    right: 0.35rem;
+    bottom: 0.35rem;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.34rem;
+  }
+}

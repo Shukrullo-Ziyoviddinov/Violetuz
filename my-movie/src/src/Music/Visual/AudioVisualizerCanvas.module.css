@@ -1,0 +1,30 @@
+.visualizer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 1rem;
+  margin-left: auto;
+  height: 44px;
+}
+
+.canvas {
+  height: 100%;
+  max-width: 200px;
+  border-radius: 8px;
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .visualizer {
+    flex: 1;
+    min-width: 60px;
+    padding-left: 0.5rem;
+  }
+
+  .canvas {
+    max-width: 120px;
+    margin-left: auto;
+  }
+}

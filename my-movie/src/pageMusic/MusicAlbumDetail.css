@@ -1,0 +1,155 @@
+/* MusicAlbumDetail – albom sahifa uchun qo‘shimcha stillar */
+
+.music-album-detail-top {
+  margin-bottom: 1rem;
+}
+
+.music-album-artist-block {
+  cursor: default;
+}
+
+.music-album-artist-block:hover {
+  background: transparent;
+}
+
+.music-album-songs-list {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+}
+
+.music-album-songs-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.75rem 0;
+}
+
+.music-album-songs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.music-album-song-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.2s;
+}
+
+.music-album-song-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.music-album-song-row.active {
+  background: rgba(31, 3, 210, 0.192);
+  border: 1px solid rgba(31, 22, 204, 0.6);
+}
+
+.music-album-song-headphone-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.music-album-song-row:hover .music-album-song-headphone-icon,
+.music-album-song-row.active .music-album-song-headphone-icon {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.music-album-song-row.active .music-album-song-headphone-icon {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.music-album-song-index {
+  flex-shrink: 0;
+  width: 24px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.music-album-song-row.active .music-album-song-index {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.music-album-song-visual-wrap {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.music-album-song-visual-wrap > div {
+  position: relative !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+}
+
+.music-album-song-visual-wrap canvas {
+  width: 20px !important;
+  height: 16px !important;
+}
+
+.music-album-song-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.music-album-song-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-album-song-artist {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-album-song-duration {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Boshqa albom kartochkalari – .music-detail-right-scroll ichida */
+.music-album-detail-card .music-detail-trend-card-img-wrap {
+  width: 80px;
+  height: 80px;
+}
+
+@media (max-width: 641px) {
+  .music-album-songs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .music-album-song-row {
+    padding: 0.5rem 0.6rem;
+  }
+}

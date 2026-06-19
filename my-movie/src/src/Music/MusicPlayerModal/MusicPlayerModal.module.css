@@ -1,0 +1,620 @@
+/* MusicPlayerModal - scoped component styles, boshqa sahifalarda xavfsiz ishlatish uchun */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 2001;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.overlay.entered {
+  opacity: 1;
+}
+
+.overlay.closing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: linear-gradient(180deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%);
+  border-radius: 0;
+  padding: 1.5rem 1.5rem calc(env(safe-area-inset-bottom) + 5rem);
+  overflow-y: auto;
+  box-shadow: none;
+  border: none;
+  transform: translateY(100%);
+  transition: transform 0.28s ease-out;
+}
+
+.modal.entered {
+  transform: translateY(0);
+}
+
+.modal.closing {
+  transform: translateY(100%);
+}
+
+.hasDominantColor {
+  /* Dominant color applied via inline style */
+}
+
+.close {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.artwork {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1;
+  margin: 2rem auto 1.5rem;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.artwork img {
+  width: 100%;
+  height: 100%;
+}
+
+.artwork.showControls > img,
+.artwork.showLyrics > img,
+.artwork.showTrendGrid > img {
+  display: none;
+}
+
+.artworkLyrics {
+  display: none;
+  position: absolute;
+  text-align: center;
+  inset: 0;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.artworkLyrics::-webkit-scrollbar {
+  display: none;
+}
+
+.artworkLyrics p {
+  margin: 0 0 0.5rem 0;
+}
+
+.artwork.showLyrics .artworkLyrics {
+  display: block;
+}
+
+.artworkTrendGrid {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.4);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.artworkTrendGrid::-webkit-scrollbar {
+  display: none;
+}
+
+.artwork.showTrendGrid .artworkTrendGrid {
+  display: flex;
+}
+
+.trendCard {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.trendCard:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.trendCard.active {
+  background: rgba(192, 78, 221, 0.25);
+}
+
+.trendCardImgWrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.trendCardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trendCardInfo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.trendCardTitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.trendCardArtist {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.trendCardVisual {
+  flex-shrink: 0;
+  margin-left: auto;
+  position: relative;
+  align-self: stretch;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trendToggle {
+  position: absolute;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.trendToggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.trendToggle.active {
+  background: rgba(192, 78, 221, 0.9);
+  color: #fff;
+}
+
+.audioControls {
+  display: none;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.artwork.showControls .audioControls {
+  display: flex;
+}
+
+.controlsTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.controlRow {
+  margin-bottom: 1rem;
+}
+
+.controlLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.35rem;
+}
+
+.controlSliderWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.controlSlider {
+  flex: 1;
+  min-width: 60px;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 3px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.controlSlider:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.controlSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.controlSlider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: rgba(192, 78, 221, 0.9);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.controlLock {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.controlLock:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.controlLock.locked {
+  background: rgba(192, 78, 221, 0.3);
+  color: rgba(192, 78, 221, 1);
+}
+
+.classicBtn {
+  margin-top: auto;
+  padding: 0.6rem 1.2rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.classicBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.volumeInControls {
+  margin-top: 1.6rem;
+  width: 100%;
+}
+
+.audioControls .volume {
+  margin-top: 1.6rem;
+  width: 100%;
+}
+
+.classicBtn.active {
+  background: rgba(192, 78, 221, 0.9);
+  color: #fff;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.infoText {
+  flex: 1;
+  min-width: 0;
+}
+
+.wishlistBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.wishlistBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.wishlistBtn.active {
+  color: rgba(192, 78, 221, 1);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.progress {
+  margin-bottom: 1.5rem;
+}
+
+.progressBar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.playBtn {
+  width: 64px;
+  height: 64px;
+  background: rgba(192, 78, 221, 0.9);
+  color: #fff;
+}
+
+.playBtn:hover {
+  background: rgba(192, 78, 221, 1);
+}
+
+.btn.active {
+  color: rgba(192, 78, 221, 1);
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.volumeBtn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.volumeBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.volumeBtn.muted {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.volumeBar {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.volumeBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volumeBar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: rgba(192, 78, 221, 0.9);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.lyricsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  position: relative;
+  padding: 0 1.5rem;
+}
+
+.artworkToggle {
+  position: absolute;
+  left: 0;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.artworkToggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.artworkToggle.active {
+  background: rgba(192, 78, 221, 0.9);
+  color: #fff;
+}
+
+.lyricsBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin: 0 auto;
+  gap: 0.5rem;
+  width: auto;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lyricsBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.lyricsBtn.active {
+  background: rgba(192, 78, 221, 0.9);
+  color: #fff;
+}

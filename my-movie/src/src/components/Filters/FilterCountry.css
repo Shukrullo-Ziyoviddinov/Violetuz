@@ -1,0 +1,141 @@
+.filters-modal-country {
+  background-image: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%), linear-gradient(135deg, rgb(15, 15, 18), rgb(45, 45, 50), rgb(25, 25, 28), rgb(15, 15, 18));
+  border: 1px solid rgba(70, 65, 80, 0.5);
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.filters-modal-country-drag-area {
+  touch-action: none;
+  cursor: grab;
+}
+
+.filters-modal-country-drag-handle {
+  display: none;
+}
+
+.filters-modal-country-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(70, 65, 80, 0.4);
+}
+
+.filters-modal-country-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.filters-modal-country-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.75rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.filters-modal-country-close:hover {
+  color: #ffffff;
+}
+
+.filters-modal-country-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filters-modal-country-body::-webkit-scrollbar {
+  display: none;
+}
+
+.filters-modal-country-option {
+  padding: 1rem 1.25rem;
+  background-color: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.4);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filters-modal-country-option:hover {
+  background-color: rgba(3, 19, 234, 0.2);
+  border-color: rgb(3, 19, 234);
+}
+
+.filters-modal-country-option--active {
+  background-color: rgba(3, 19, 234, 0.4);
+  border-color: rgb(3, 19, 234);
+}
+
+@media (max-width: 768px) {
+  .filters-modal-country {
+    max-width: none;
+    width: 100%;
+    max-height: 70vh;
+    border-radius: 20px 20px 0 0;
+    border: none;
+    border-top: 1px solid rgba(70, 65, 80, 0.5);
+    animation: filtersModalCountrySlideUp 0.3s ease-out;
+  }
+
+  .filters-modal-country--dragging {
+    transition: none;
+  }
+
+  .filters-modal-country:not(.filters-modal-country--dragging) {
+    transition: transform 0.2s ease-out;
+  }
+
+  @keyframes filtersModalCountrySlideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .filters-modal-country-drag-handle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    margin: 0.75rem auto 0;
+  }
+
+  .filters-modal-country-header {
+    padding-top: 0.5rem;
+    vertical-align: inherit;
+  }
+
+  .filters-modal-country-title {
+    flex: 1;
+    text-align: center;
+    vertical-align: inherit;
+  }
+
+  .filters-modal-country-close {
+    display: none;
+  }
+
+  .filters-modal-country-body {
+    max-height: 50vh;
+  }
+}

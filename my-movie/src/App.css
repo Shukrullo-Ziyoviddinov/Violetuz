@@ -1,0 +1,81 @@
+.App {
+  min-height: 100vh;
+  background: black;
+
+
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+
+}
+
+/* Asosiy sahifa scrollbar yashirish */
+html,
+body {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Barcha elementlar (modallar, sheet'lar va boshqalar) uchun scrollbar yashirish */
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* movie-detail-comments-modal uchun scrollbar yashirish va copy bloklash */
+.movie-detail-comments-modal,
+.shorts-modal-content,
+.shorts-music-modal,
+.shorts-comments-modal,
+.shorts-share-modal-desktop,
+.music-filter-modal,
+.music-detail-lyrics-modal,
+.filters-modal-overlay,
+.video-modal--desktop,
+.video-modal--sheet,
+.global-modal-dialog,
+.comentaria-delete-confirm-panel,
+.message-modal--open,
+.message-search-modal--open,
+.share-modal-content,
+.comentaria-history-modal,
+.movie-detail-comments-modal * {
+  scrollbar-width: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+.movie-detail-comments-modal-body::-webkit-scrollbar,
+.movie-detail-comments-modal *::-webkit-scrollbar {
+  display: none !important;
+}
+
+.App-main {
+  min-height: calc(100vh - 80px);
+}
+
+/* Desktop: MusicMiniPlayer ko'ringanda (mobil navbar yuq, faqat mini player uchun) */
+@media (min-width: 769px) {
+  body.mini-player-visible .App-main {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0));
+  }
+}
+
+@media (max-width: 768px) {
+  .App-main {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0));
+  }
+  /* MusicMiniPlayer + NavbarMobile ko'ringanda */
+  body.mini-player-visible .App-main {
+    padding-bottom: calc(155px + env(safe-area-inset-bottom, 0));
+  }
+}

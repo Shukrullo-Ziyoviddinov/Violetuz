@@ -1,0 +1,511 @@
+/* Shorts sahifasi (ShortsVideos) z-index ~100000; modal doim ustida bo‘lishi kerak */
+.comentaria-history-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200100;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.comentaria-history-modal {
+  position: fixed;
+  z-index: 200101;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(520px, calc(100vw - 1.5rem));
+  max-height: min(86vh, 720px);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(165deg, rgba(28, 26, 36, 0.98) 0%, rgba(12, 11, 18, 0.99) 100%);
+  border: 1px solid rgba(120, 100, 160, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  color: #fff;
+  overflow: hidden;
+}
+
+.comentaria-history-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem 0.5rem;
+  flex-shrink: 0;
+}
+
+.comentaria-history-modal-back {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.comentaria-history-modal-back:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.comentaria-history-modal-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.comentaria-history-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.comentaria-history-modal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: calc(100vh - 400px);
+  padding: 0 1rem;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0;
+}
+
+.comentaria-history-modal-empty-img {
+  display: block;
+  width: auto;
+  max-width: min(260px, 100%);
+  height: auto;
+}
+
+.comentaria-history-modal-empty-text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.comentaria-history-modal-empty-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+.comentaria-history-modal-empty-btn {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: calc(50% - 0.5rem);
+  min-width: 120px;
+  max-width: 170px;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.comentaria-history-modal-empty-btn--movie {
+  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  box-shadow: 0 4px 16px rgba(214, 78, 221, 0.45);
+}
+
+.comentaria-history-modal-empty-btn--movie:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(214, 78, 221, 0.55);
+}
+
+.comentaria-history-modal-empty-btn--music {
+  background: linear-gradient(135deg, #202ef1 0%, #0d1df4 100%);
+  box-shadow: 0 4px 16px rgba(32, 46, 241, 0.45);
+}
+
+.comentaria-history-modal-empty-btn--music:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(32, 46, 241, 0.55);
+}
+
+.comentaria-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.comentaria-history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* Rasm / video — sarlavha yonma-yon */
+.comentaria-history-item-top {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.comentaria-history-item-media {
+  flex-shrink: 0;
+}
+
+/* Klip / konsert — kenglik boshqaradi (16:9); flex column ichida aspect-ratio ishlashi uchun flex: none */
+.comentaria-history-item-media--video {
+  width: 172px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.comentaria-history-item-media--video .comentaria-video-card {
+  width: 100%;
+}
+
+.comentaria-history-item-media--video .comentaria-video-card-img-wrap {
+  width: 100%;
+  flex: none;
+  aspect-ratio: 16 / 7;
+  height: auto;
+  min-width: 0;
+}
+
+/* Kino va shorts — chap ustun balandligi o‘ng ustun bilan teng; poster pastga */
+.comentaria-history-item-media--movie,
+.comentaria-history-item-media--shorts {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+/* Kino — balandlik 120px, kenglik 7:9 nisbattan */
+.comentaria-history-item-media--movie .comentaria-movie-card {
+  width: max-content;
+  max-width: 100%;
+  align-items: flex-start;
+}
+
+.comentaria-history-item-media--movie .comentaria-movie-card-img-wrap {
+  box-sizing: border-box;
+  height: 120px;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  aspect-ratio: 7 / 9;
+  border-radius: 12px;
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
+.comentaria-history-item-media--shorts .comentaria-short-card {
+  width: auto;
+}
+
+.comentaria-history-item-media--shorts .comentaria-short-card-img-wrap {
+  box-sizing: border-box;
+  height: 120px;
+  width: auto;
+  max-height: none;
+  margin: 0;
+  aspect-ratio: 7 / 9;
+}
+
+/* Sarlavha + (klip) artist + like — poster yonida ustun */
+.comentaria-history-item-head-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 0.45rem;
+}
+
+.comentaria-history-comment-head {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(230, 235, 255, 0.98);
+  line-height: 1.35;
+  margin: 0;
+  padding-top: 0.1rem;
+}
+
+/* Kino tavsifi — bitta qator, ortiqcha ... */
+.comentaria-history-modal .comentaria-history-item-head-col .comentaria-history-movie-desc-one-line.movie-detail-description-modal-text {
+  margin-bottom: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.comentaria-history-modal
+  .comentaria-history-item-head-col
+  .comentaria-history-movie-desc-one-line.movie-detail-description-modal-text
+  p {
+  margin: 0;
+  font-size: 0.6rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.72);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Shorts — ShortsVideos bilan bir xil qator; modaldan ixcham */
+.comentaria-history-modal .comentaria-history-item-head-col .shorts-modal-description-row {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.comentaria-history-modal .comentaria-history-item-head-col .shorts-modal-description.comentaria-history-shorts-desc {
+  margin-bottom: 0;
+  cursor: default;
+  font-size: 0.78rem;
+  /* ShortsVideos.css dagi 2 qator clamp o‘rniga: faqat 1 qator, qolgani … */
+  display: block;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Shorts — tavsifdan keyin like / repost / saqlash; yon ustun pastiga */
+.comentaria-history-shorts-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: auto;
+  padding-top: 0.22rem;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-action-btn {
+  background: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.238);
+  color: rgba(255, 255, 255, 0.95);
+  min-width: 34px;
+  padding: 3px 2px;
+  gap: 1px;
+  border-radius: 16px;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-action-btn svg {
+  color: inherit;
+  width: 18px;
+  height: 18px;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-like-btn.active,
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-save-btn.active {
+  color: #ca4edd;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-like-btn.active svg,
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-save-btn.active svg {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-like-btn.active svg path,
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-save-btn.active svg path {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-like-btn.active .shorts-modal-action-count {
+  color: #ca4edd;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-action-count {
+  font-size: 0.65rem;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .repost-btn.shorts-modal-action-btn.active {
+  color: #ca4edd;
+}
+
+.comentaria-history-modal .comentaria-history-shorts-actions .repost-btn.shorts-modal-action-btn i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.comentaria-history-video-artist {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(180, 195, 255, 0.92);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.comentaria-history-video-like.like-button {
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  max-width: 100%;
+}
+
+.comentaria-history-video-like.like-button .like-button-btn {
+  padding: 0.22rem 0.45rem;
+  gap: 0.22rem;
+  font-size: 0.72rem;
+}
+
+.comentaria-history-video-like.like-button .like-button-icon-wrap svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Kino — MovieDetail janr/reyting/like; modaldan minimal px */
+.comentaria-history-modal .comentaria-history-item-head-col .movie-detail-genres {
+  gap: 0.14rem;
+}
+
+.comentaria-history-modal .comentaria-history-item-head-col .movie-detail-genre-badge {
+  padding: 0.14rem 0.32rem;
+  font-size: 0.6rem;
+  border-radius: 8px;
+}
+
+.comentaria-history-modal .comentaria-history-item-head-col .movie-detail-rating {
+  gap: 0.38rem;
+}
+
+.comentaria-history-modal .comentaria-history-item-head-col .movie-detail-rating-logo {
+  width: 20px;
+  height: 20px;
+}
+
+.comentaria-history-modal .comentaria-history-item-head-col .movie-detail-rating-item {
+  gap: 0.28rem;
+  font-size: 0.8rem;
+}
+
+.comentaria-history-movie-detail-actions.movie-detail-actions {
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  width: auto;
+  max-width: 100%;
+}
+
+.comentaria-history-movie-detail-actions .movie-detail-action-btn {
+  padding: 0.2rem 0.38rem;
+  font-size: 0.68rem;
+}
+
+.comentaria-history-movie-detail-actions .movie-detail-action-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.comentaria-history-movie-detail-actions .movie-detail-action-count {
+  font-size: 0.68rem;
+  min-width: 1.1em;
+}
+
+.comentaria-history-item-comment {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.comentaria-history-comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.comentaria-history-comment-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.comentaria-history-comment-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.55rem 0.6rem;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+}
+
+/* `display: flex` [hidden] atributining display:none ni bekor qiladi — qayta majburiy */
+.comentaria-history-comment-entry[hidden] {
+  display: none !important;
+}
+
+.comentaria-history-comment-body {
+  margin: 0;
+}
+
+.comentaria-history-comment-text {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+  word-break: break-word;
+}
+
+.comentaria-history-comment-time {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.48);
+  margin-top: 0.05rem;
+}
+
+@media (max-width: 480px) {
+  .comentaria-history-modal {
+    width: 100vw;
+    max-height: 100vh;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    transform: none;
+    border-radius: 0;
+    border: none;
+  }
+
+  /* Poster va sarlavha yonma-yon (desktop bilan bir xil qator) */
+  .comentaria-history-item-top {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .comentaria-history-item-media--video .comentaria-video-card,
+  .comentaria-history-item-media--video .comentaria-video-card-img-wrap {
+    width: 100%;
+  }
+
+  .comentaria-history-item-media--video .comentaria-video-card-img-wrap {
+    flex: none;
+    aspect-ratio: 16 / 7;
+    height: auto;
+  }
+}

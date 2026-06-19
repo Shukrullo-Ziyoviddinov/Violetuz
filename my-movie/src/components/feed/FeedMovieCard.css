@@ -1,0 +1,162 @@
+.feed-movie-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+
+.feed-movie-card-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.6rem;
+  min-width: 0;
+}
+
+.feed-movie-card-profile-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.feed-movie-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.feed-movie-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+  max-width: 100%;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.feed-movie-card-name-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-movie-card-name-verified {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 3px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.feed-movie-card-type {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+}
+
+.feed-movie-card-cover {
+  width: 100%;
+  height: 380px;
+  border-radius: 10px;
+  display: block;
+}
+
+.feed-movie-card-actions {
+  margin-top: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.feed-movie-card-actions-like-group {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  min-width: 0;
+  align-items: center;
+}
+
+/* Feed: ixcham tugma, icon chapda — yonida son */
+.feed-movie-card-actions .movie-detail-action-btn {
+  background: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.238);
+  color: #ffffff;
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.35rem;
+  transition: all 0.3s;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.feed-movie-card-actions .movie-detail-action-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.feed-movie-card-actions .movie-detail-action-btn.active {
+  color: #ca4edd;
+}
+
+.feed-movie-card-actions .movie-detail-action-count {
+  font-weight: 700;
+  min-width: 0;
+  text-align: left;
+  line-height: 1;
+}
+
+.feed-movie-card-fav {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.feed-movie-card-fav i {
+  font-size: 0.72rem;
+}
+
+.feed-movie-card-fav.active {
+  background: rgba(192, 78, 221, 0.2);
+  color: rgba(192, 78, 221, 1);
+}
+
+@media (min-width: 900px) {
+  .feed-movie-card-cover {
+    height: 300px;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 751px) {
+  .feed-movie-card-cover {
+    height: 290px;
+  }
+}
+
+@media (max-width: 750px) and (min-width: 501px) {
+  .feed-movie-card-cover {
+    height: 290px;
+  }
+}

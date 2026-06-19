@@ -1,0 +1,253 @@
+/* ShortsShare - ShareButton bilan bir xil stillar, alohida class nomlar */
+.shorts-share-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.shorts-share-trigger-btn {
+  min-width: 48px;
+  padding: 8px 4px;
+  border-radius: 24px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.shorts-share-trigger-btn:hover {
+  background: transparent;
+  transform: scale(1.05);
+}
+
+.shorts-share-trigger-btn svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Desktop dropdown */
+.shorts-share-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  background: rgba(28, 22, 36, 0.98);
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 180px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  z-index: 20;
+}
+
+.shorts-share-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+}
+
+.shorts-share-dropdown-item:hover {
+  background: rgba(192, 78, 221, 0.2);
+}
+
+.shorts-share-dropdown-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shorts-share-dropdown-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Overlay */
+.shorts-share-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 100002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.shorts-share-overlay-mobile {
+  align-items: flex-end;
+}
+
+.shorts-share-overlay-desktop {
+  align-items: center;
+  justify-content: center;
+}
+
+.shorts-share-modal-content {
+  background: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%);
+  border: 1px solid rgba(70, 65, 80, 0.5);
+  width: 100%;
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: shortsShareSlideUp 0.3s ease-out;
+}
+
+.shorts-share-modal-desktop {
+  width: 90%;
+  max-width: 400px;
+  border-radius: 16px;
+  max-height: 60vh;
+  animation: shortsShareFadeIn 0.25s ease-out;
+}
+
+@keyframes shortsShareFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.shorts-share-modal-mobile {
+  touch-action: none;
+  cursor: grab;
+}
+
+.shorts-share-modal-mobile:active {
+  cursor: grabbing;
+}
+
+.shorts-share-modal-dragging {
+  transition: none;
+}
+
+.shorts-share-modal-content:not(.shorts-share-modal-dragging) {
+  transition: transform 0.2s ease-out;
+}
+
+@keyframes shortsShareSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.shorts-share-drag-zone {
+  flex-shrink: 0;
+}
+
+.shorts-share-drag-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 0.75rem auto 0;
+}
+
+.shorts-share-modal-desktop .shorts-share-drag-handle {
+  display: none;
+}
+
+.shorts-share-header {
+  padding: 0.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shorts-share-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.shorts-share-body {
+  padding: 1rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.shorts-share-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.4);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.shorts-share-item:active {
+  background: rgba(192, 78, 221, 0.2);
+  border-color: rgba(192, 78, 221, 0.5);
+}
+
+.shorts-share-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.shorts-share-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Sidebar ichida - action btn bilan bir xil ko'rinish */
+.shorts-modal-actions-sidebar .shorts-share-wrapper .shorts-share-trigger-btn {
+  min-width: 48px;
+  padding: 8px 4px;
+}
+
+.shorts-modal-actions-mobile .shorts-share-wrapper .shorts-share-trigger-btn {
+  min-width: 44px;
+  padding: 6px 4px;
+}
+
+.shorts-modal-actions-mobile .shorts-share-wrapper .shorts-share-trigger-btn svg {
+  width: 24px;
+  height: 24px;
+}

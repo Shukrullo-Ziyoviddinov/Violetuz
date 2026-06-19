@@ -1,0 +1,795 @@
+.artist-detail {
+  min-height: 100vh;
+  padding: 2rem 0;
+  background: linear-gradient(to bottom, rgba(10, 10, 10, 0.95), #0a0a0a);
+}
+
+.artist-detail-container {
+  max-width: 1400px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.artist-detail-header {
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  width: calc(100% + 2.5rem);
+  margin-left: -1.25rem;
+  margin-right: -1.25rem;
+}
+
+.artist-detail-header--has-color .artist-detail-stats {
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--header-r, 50), var(--header-g, 50), var(--header-b, 50), 0.7),
+    transparent
+  );
+}
+
+.artist-detail-img-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  padding: 0;
+}
+
+.artist-detail-img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  display: block;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+}
+
+.artist-detail-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem 1.4rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.artist-detail-name {
+  display: inline-flex;
+  align-items: center;
+  font-size: 4.45rem;
+  font-weight: 700;
+  font-family: 'Arial Narrow', Arial, sans-serif;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  order: 1;
+}
+
+.artist-detail-name-verified {
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.artist-detail-description {
+  margin: 0;
+  padding: 0;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.85);
+  order: 2;
+}
+
+@media (max-width: 700px) {
+  .artist-detail-description {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .artist-detail-name-verified {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.artist-detail-info {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem 1.5rem;
+  margin-top: 0.75rem;
+  order: 3;
+}
+
+.artist-detail-info-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.artist-detail-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.artist-detail-info-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.artist-detail-info-value {
+  line-height: 1.3;
+}
+
+/* Biography & Photo Gallery */
+.artist-detail-bio-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.artist-detail-bio-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.artist-detail-bio-section .artist-detail-bio-text,
+.artist-detail-bio-section .more-text {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.artist-detail-bio-title,
+.artist-detail-gallery-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 1rem 0;
+}
+
+.artist-detail-bio-text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.artist-detail-bio-section .more-text-content {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.artist-detail-gallery-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-height: 0;
+  min-width: 0;
+}
+
+.artist-detail-gallery-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.5rem;
+  aspect-ratio: 16 / 10;
+  min-height: 200px;
+}
+
+.artist-detail-gallery-cell {
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.artist-detail-gallery-cell--tall {
+  grid-row: span 2;
+}
+
+.artist-detail-gallery-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.artist-detail-bio-gallery--single {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 769px) {
+  .artist-detail-bio-gallery {
+    align-items: stretch;
+  }
+
+  .artist-detail-bio-section {
+    min-height: 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .artist-detail-bio-section .artist-detail-bio-text,
+  .artist-detail-bio-section .more-text {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .artist-detail-gallery-section {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .artist-detail-gallery-grid {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .artist-detail-bio-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .artist-detail-bio-section {
+    min-height: 0;
+    max-height: 400px;
+    order: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1rem;
+  }
+
+  .artist-detail-bio-section .more-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .artist-detail-bio-section .more-text-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .artist-detail-bio-section .more-text-trigger {
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+  }
+
+  .artist-detail-gallery-section {
+    order: 2;
+  }
+
+  .artist-detail-gallery-grid {
+    aspect-ratio: 5 / 3;
+    min-height: 180px;
+  }
+}
+
+.artist-detail-stats {
+  margin-top: 0;
+  padding: 1rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.artist-detail-stats-items {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.artist-detail-stats-items .artist-detail-stat-item {
+  flex-shrink: 0;
+}
+
+.artist-detail-stats-follow {
+  flex-shrink: 0;
+}
+
+.artist-detail-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+@media (max-width: 525px) {
+  .artist-detail-header--has-color .artist-detail-stats {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .artist-detail-header--has-color .artist-detail-stats-items {
+    order: 1;
+    width: 100%;
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .artist-detail-header--has-color .artist-detail-stats-follow {
+    order: 2;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 450px) {
+  .artist-detail-header--has-color .artist-detail-stats-follow {
+    width: 100%;
+  }
+
+  .artist-detail-header--has-color .artist-detail-stats-follow .following-btn {
+    width: 100%;
+  }
+}
+
+.artist-detail-track-num {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
+}
+
+.artist-detail-track-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* HorizontalScroll ichida: har ustun 4 ta track */
+.artist-detail-tracks-wrap {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.artist-detail-albums-wrap {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Bo'lim sarlavhalari - Musiqalar, Albomlar, Kliplar (desktop va mobil bir xil) */
+.artist-detail-tracks-title,
+.artist-detail-albums-title,
+.artist-detail-clips-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1rem 0;
+}
+
+/* Kliplar - konteyner ichida, sarlavha va kontent ko'rinadi */
+.artist-detail-clips-wrap {
+  width: 100%;
+  margin: 1rem 0 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.artist-detail-clips-wrap .artist-detail-clips-title {
+  margin: 0 0 1rem;
+}
+
+.artist-detail-clips-wrap .clips-item {
+  width: 240px;
+}
+
+.artist-detail-clips-wrap .clips-image-wrapper {
+  padding-top: 56.25%;
+}
+
+.artist-detail-clips-wrap .music-cards-item-image {
+  object-fit: cover;
+}
+
+@media (max-width: 500px) {
+  .artist-detail-clips-wrap .clips-item {
+    width: 220px;
+  }
+
+  .artist-detail-albums-grid .music-cards-item-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid #d786e48f;
+}
+
+.artist-detail-tracks-title,
+.artist-detail-albums-title,
+.artist-detail-clips-title {
+  font-size: 1.2rem;
+}
+}
+
+@media (max-width: 390px) {
+  .artist-detail-clips-wrap .clips-item {
+    width: 200px;
+  }
+}
+
+.artist-detail-clips-wrap .clips-item {
+  width: 240px;
+}
+
+.artist-detail-clips-wrap .clips-image-wrapper {
+  padding-top: 60.25%;
+}
+
+.artist-detail-clips-wrap .music-cards-item-image {
+  object-fit: cover;
+}
+
+@media (max-width: 500px) {
+  .artist-detail-clips-wrap .clips-item {
+    width: 220px;
+  }
+
+  .artist-detail-clips-wrap .clips-image-wrapper {
+    padding-top: 56.25%;
+  }
+
+  .artist-detail-shorts-wrap .artist-detail-shorts-card {
+    min-width: 160px;
+    width: 160px;
+    max-width: 160px;
+  }
+}
+
+@media (max-width: 390px) {
+  .artist-detail-clips-wrap .clips-item {
+    width: 200px;
+  }
+}
+
+/* Filterlanganda: gorizontalsiz grid */
+.artist-detail-section--filtered {
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+}
+
+.artist-detail-tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.artist-detail-tracks-grid .artist-detail-track {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.artist-detail-albums-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.artist-detail-albums-grid .music-cards-item {
+  width: 100%;
+}
+
+.artist-detail-clips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.artist-detail-clips-grid .music-cards-item {
+  width: 100%;
+}
+
+.artist-detail-tracks-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 280px;
+  flex-shrink: 0;
+}
+
+.artist-detail-track {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.45rem 0.45rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 30px;
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+.artist-detail-track--playing {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.artist-detail-track-img-wrap {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.artist-detail-track-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.artist-detail-track--spinning .artist-detail-track-img {
+  animation: artist-detail-spin-disk 3s linear infinite;
+}
+
+@keyframes artist-detail-spin-disk {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.artist-detail-track-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.artist-detail-track-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artist-detail-track-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artist-detail-play-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(192, 78, 221, 0.9);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.artist-detail-play-btn:hover {
+  background: rgba(192, 78, 221, 1);
+  transform: scale(1.05);
+}
+
+.artist-detail-error {
+  text-align: center;
+  padding: 4rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+/* Shorts section */
+.artist-detail-shorts-wrap .artist-detail-shorts-card {
+  min-width: 160px;
+  width: 160px;
+  max-width: 160px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  height: fit-content;
+}
+
+.artist-detail-shorts-wrap .music-cards-item-play {
+  display: none;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-thumb,
+.artist-detail-shorts-wrap .clips-image-wrapper.artist-detail-shorts-thumb {
+  padding-top: 0 !important;
+  aspect-ratio: 9 / 10;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Info thumb ichida, pastda overlay. Mobilda doim ko'rinadi, desktopda hover da */
+.artist-detail-shorts-wrap .artist-detail-shorts-thumb .artist-detail-shorts-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 0.5rem 0.5rem 0.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  border-radius: 0 0 8px 8px;
+  z-index: 2;
+  transform: translateY(0);
+  transition: transform 0.25s ease;
+}
+
+@media (min-width: 769px) {
+  .artist-detail-shorts-wrap .artist-detail-shorts-thumb .artist-detail-shorts-info {
+    transform: translateY(100%);
+  }
+
+  .artist-detail-shorts-wrap .artist-detail-shorts-card:hover .artist-detail-shorts-info {
+    transform: translateY(0);
+  }
+}
+
+.artist-detail-shorts-thumb {
+  aspect-ratio: 9 / 16;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.artist-detail-shorts-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-grid .artist-detail-shorts-card {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-grid .music-cards-item-image-wrapper.artist-detail-shorts-thumb {
+  padding-top: 0 !important;
+  aspect-ratio: 9 / 16;
+}
+
+/* Filterlanganda (grid): shorts kartochkalar to'g'ri chiqishi uchun */
+.artist-detail-shorts-wrap.artist-detail-section--filtered .artist-detail-shorts-grid .artist-detail-shorts-card {
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.artist-detail-shorts-wrap.artist-detail-section--filtered .artist-detail-shorts-grid .artist-detail-shorts-thumb,
+.artist-detail-shorts-wrap.artist-detail-section--filtered .artist-detail-shorts-grid .music-cards-item-image-wrapper.artist-detail-shorts-thumb {
+  padding-top: 0 !important;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 11;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #000;
+  height: auto;
+  min-height: 0;
+}
+
+.artist-detail-shorts-wrap.artist-detail-section--filtered .artist-detail-shorts-grid .artist-detail-shorts-thumb {
+  width: 100%;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-grid .clips-item {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .artist-detail {
+    padding: 1.5rem 0;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .artist-detail-container {
+    padding: 0 1rem;
+    max-width: 100%;
+  }
+
+  .artist-detail-header {
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
+    margin-right: -1rem;
+  }
+
+  .artist-detail-img-wrap {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .artist-detail-img {
+    height: 170px;
+  }
+
+  .artist-detail-name {
+    font-size: 2rem;
+  }
+}

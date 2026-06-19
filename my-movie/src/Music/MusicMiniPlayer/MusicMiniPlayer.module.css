@@ -1,0 +1,330 @@
+/* MusicMiniPlayer - scoped styles, boshqa sahifalarda xavfsiz ishlatish uchun */
+
+.miniPlayer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15, 15, 15, 0.98);
+  backdrop-filter: blur(12px);
+  padding: 1rem 1.25rem;
+  z-index: 1000;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.miniPlayerRow {
+  width: 100%;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 2rem;
+}
+
+.miniPlayerInner {
+  max-width: 550px;
+  width: 100%;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-self: center;
+}
+
+.miniInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.miniImg {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.miniText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.miniTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniArtist {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progressWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 540px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.playBtn {
+  background: rgba(192, 78, 221, 0.9);
+  color: #fff;
+}
+
+.playBtn:hover {
+  background: rgba(192, 78, 221, 1);
+}
+
+.shuffleBtn.active,
+.repeatBtn.active {
+  color: rgba(192, 78, 221, 1);
+}
+
+.shuffleBtn.active:hover,
+.repeatBtn.active:hover {
+  color: rgba(192, 78, 221, 0.9);
+}
+
+.time {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  min-width: 36px;
+}
+
+.time:last-child {
+  text-align: right;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.volumeWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-self: end;
+}
+
+.lyricsBtn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lyricsBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 100px;
+}
+
+.volumeBtn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.volumeBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.volumeBtn.muted {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.volumeBar {
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.volumeBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.volumeBar::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.volumeBar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: rgba(192, 78, 221, 0.9);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Tablet / mobil */
+@media (max-width: 800px) {
+  .miniPlayer.hasDominantColor .miniPlayerRow {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--dominant-r), var(--dominant-g), var(--dominant-b), 0.5) 0%,
+      rgba(var(--dominant-r), var(--dominant-g), var(--dominant-b), 0.35) 50%,
+      rgba(var(--dominant-r), var(--dominant-g), var(--dominant-b), 0.2) 100%
+    );
+    border-radius: 30px;
+    padding: 0.5rem 1rem;
+  }
+
+  .miniPlayerRow {
+    grid-template-columns: auto 1fr auto;
+    gap: 0;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .miniPlayerInner {
+    display: contents;
+  }
+
+  .volumeWrap .volume {
+    display: none;
+  }
+
+  .controls {
+    justify-self: end;
+  }
+
+  .controls .shuffleBtn,
+  .controls .repeatBtn {
+    display: none;
+  }
+
+  .progressWrap {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .progressBar {
+    flex: 1;
+    min-width: 40px;
+  }
+}
+
+@media (max-width: 769px) {
+  .miniPlayer {
+    position: fixed;
+    bottom: 90px;
+    left: 16px;
+    right: 16px;
+    padding: 0;
+    border-radius: 30px;
+  }
+}
+
+@media (max-width: 500px) {
+  .miniPlayer.hasDominantColor .miniPlayerRow .progressWrap {
+    display: none;
+  }
+
+  .controls {
+    justify-self: end;
+    gap: 0.5rem;
+  }
+
+  .controls .btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .controls .playBtn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .controls .btn:not(.playBtn) svg {
+    width: 20px;
+    height: 20px;
+  }
+}

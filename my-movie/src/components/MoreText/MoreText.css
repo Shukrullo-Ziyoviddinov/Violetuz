@@ -1,0 +1,81 @@
+.more-text {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.more-text-content {
+  display: block;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.more-text-content--collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: var(--line-clamp, 11);
+  line-clamp: var(--line-clamp, 11);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (min-width: 769px) {
+  .more-text-content,
+  .more-text-content--collapsed {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 768px) {
+  .more-text-content,
+  .more-text-content--collapsed {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .more-text-trigger {
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+  }
+}
+
+.more-text-trigger {
+  display: inline;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.more-text-trigger:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.more-text-bioimg-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.more-text-bioimg {
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  min-height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+}

@@ -1,0 +1,92 @@
+.repost-btn {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+}
+
+.repost-btn.active {
+  color: #c04edd;
+}
+
+/* Shorts sidebar: boshqa ikonlar bilan bir xil px */
+.shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn i {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.shorts-modal-actions-mobile .repost-btn.shorts-modal-action-btn i {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn.active {
+  color: #ca4edd;
+}
+
+/* Movie detail action tugmalari bilan bir xil ko'rinish */
+.movie-detail-actions .repost-btn.movie-detail-action-btn {
+  background: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.238);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  transition: all 0.3s;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.movie-detail-actions .repost-btn.movie-detail-action-btn i {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.movie-detail-actions .repost-btn.movie-detail-action-btn.active {
+  color: #ca4edd;
+}
+
+/* Video detail action tugmalari bilan bir xil px */
+.video-detail-actions .repost-btn.video-detail-save-btn i {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.video-detail-actions .repost-btn.video-detail-save-btn.active {
+  color: rgba(192, 78, 221, 1);
+}
+
+/* Music detail audio player: download / wishlist / share bilan bir xil — 44px tugma, 22px ikonka */
+.music-detail-audio-player .repost-btn.music-detail-action-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.music-detail-audio-player .repost-btn.music-detail-action-btn i {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.music-detail-audio-player .repost-btn.music-detail-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.music-detail-audio-player .repost-btn.music-detail-action-btn.active {
+  color: rgba(192, 78, 221, 1);
+}

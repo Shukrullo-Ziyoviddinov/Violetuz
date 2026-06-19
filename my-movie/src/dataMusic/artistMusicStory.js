@@ -1,0 +1,86 @@
+/**
+ * Qisqa musiqa story'lari – ArtistDetail sahifasida ko'rinadi.
+ * artistMusicId – trendMusicData dagi musiqa id (MusicDetail sahifasiga o'tish uchun).
+ */
+export const artistMusicStory = [
+  {
+    id: 1,
+    artistId: 'jah-khalib',
+    artistMusicId: 911,
+    img: '/img/movie1.jpg',
+    title: 'Life',
+    audio: '/music/Zivert - Life.mp3',
+  },
+  {
+    id: 2,
+    artistId: 'jah-khalib',
+    artistMusicId: 102,
+    img: '/img/movie2.jpg',
+    title: 'Face love',
+    audio: '/music/Official Arctic Monkeys - I Wanna Be Yours.mp3',
+  },
+  {
+    id: 3,
+    artistId: 'jah-khalib',
+    artistMusicId: 104,
+    img: '/img/movie2.jpg',
+    title: 'Sariq devona',
+    audio: '/music/Reed Wonder - When I Dream Of You.mp3',
+  },
+  {
+    id: 4,
+    artistId: 'jah-khalib',
+    artistMusicId: 105,
+    img: '/img/movie-4.5-2.jpeg',
+    title: 'Monkeys',
+    audio: '/music/Official Arctic Monkeys - I Wanna Be Yours.mp3',
+  },
+  {
+    id: 5,
+    artistId: 'jah-khalib',
+    artistMusicId: 106,
+    img: '/img/movie5.jpg',
+    title: 'Red wonder',
+    audio: '/music/Reed Wonder - When I Dream Of You.mp3',
+  },
+  {
+    id: 6,
+    artistId: 'shohruhxon',
+    artistMusicId: 103,
+    img: '/img/movie1.jpg',
+    title: 'Wrong',
+    audio: '/music/Chris Grey - WRONG (Official Lyric Video).mp3',
+  },
+  {
+    id: 7,
+    artistId: 'shohruhxon',
+    artistMusicId: 103,
+    img: '/img/movie2.jpg',
+    title: 'Wrong',
+    audio: '/music/Chris Grey - WRONG (Official Lyric Video).mp3',
+  },
+  {
+    id: 8,
+    artistId: 'jah-khalib',
+    artistMusicId: 101,
+    img: '/img/movie1.jpg',
+    title: 'Life',
+    audio: '/music/Zivert - Life.mp3',
+  },
+  {
+    id: 9,
+    artistId: 'jah-khalib',
+    artistMusicId: 101,
+    img: '/img/movie1.jpg',
+    title: 'Life',
+    audio: '/music/Zivert - Life.mp3',
+  },
+  {
+    id: 10,
+    artistId: 'jah-khalib',
+    artistMusicId: 101,
+    img: '/img/movie1.jpg',
+    title: 'Life',
+    audio: '/music/Zivert - Life.mp3',
+  },
+];

@@ -1,0 +1,220 @@
+.video-banner {
+  width: 100%;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.video-banner-container {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  container-type: inline-size;
+  container-name: video-banner;
+}
+
+.video-banner-counter {
+  position: absolute;
+  top: 1rem;
+  left: 7.5rem;
+  z-index: 10;
+  padding: 0.35rem 0.6rem;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.video-banner-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 100cqw;
+  min-width: 100cqw;
+  flex: 0 0 100cqw;
+  aspect-ratio: 25 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #111;
+}
+
+.video-banner-video-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.video-banner-sound-btn {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.75rem;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.video-banner-sound-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.video-banner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.video-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.3) 40%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.video-banner-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.video-banner-title-img {
+  max-width: 100%;
+  max-height: 100px;
+  object-fit: contain;
+  object-position: left;
+}
+
+.video-banner-name-img {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  object-position: left;
+}
+
+.video-banner-ratings {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.video-banner-rating-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.video-banner-rating-item img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.video-banner-rating-vl img {
+  width: 36px;
+  height: 36px;
+}
+
+/* VideoBanner uchun scroll tugmalari yuqori chapda */
+.video-banner .horizontal-scroll-btn {
+  top: 0.75rem;
+  transform: none;
+}
+
+.video-banner .horizontal-scroll-btn:hover {
+  transform: scale(1.1);
+}
+
+.video-banner .horizontal-scroll-btn:active {
+  transform: scale(0.95);
+}
+
+.video-banner .horizontal-scroll-btn-left {
+  left: 1rem;
+  right: auto;
+}
+
+.video-banner .horizontal-scroll-btn-right {
+  left: 4.5rem;
+  right: auto;
+}
+
+.video-banner .horizontal-scroll-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .video-banner {
+    padding: 0 1rem;
+  }
+
+  .video-banner-counter {
+    left: 1rem;
+  }
+
+  .video-banner-card {
+    aspect-ratio: 22 / 9;
+  }
+  
+
+  .video-banner-content {
+    padding: 0.5rem 0.8rem;
+  }
+
+  .video-banner-title-img {
+    max-height: 40px;
+  }
+
+  .video-banner-name-img {
+    max-height: 32px;
+  }
+
+  .video-banner-ratings {
+    gap: 0.65rem;
+  }
+
+  .video-banner-rating-item {
+    gap: 0.3rem;
+    font-size: 0.85rem;
+  }
+
+  .video-banner-rating-item img {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+  }
+
+  .video-banner-rating-vl img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .video-banner-counter {
+    font-size: 0.65rem;
+}
+}

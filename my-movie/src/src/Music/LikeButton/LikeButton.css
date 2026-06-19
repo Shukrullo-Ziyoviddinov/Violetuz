@@ -1,0 +1,53 @@
+/* LikeButton - like/dislike tugmalar */
+
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.like-button-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.like-button-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.03);
+}
+
+.like-button-like.active,
+.like-button-dislike.active {
+  color: rgba(192, 78, 221, 1);
+}
+
+.like-button-dislike.active {
+  color: rgba(255, 100, 100, 0.95);
+}
+
+.like-button-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.like-button-count {
+  min-width: 1.2em;
+  text-align: center;
+}
+
+/* Raqam 0 bo'lganda yashirish */
+.like-button-count.empty {
+  display: none;
+}

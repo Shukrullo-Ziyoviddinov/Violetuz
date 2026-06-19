@@ -1,0 +1,230 @@
+.share-button-wrapper {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.share-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.share-button:hover {
+  background-color: rgba(192, 78, 221, 0.9);
+  border-color: #c54edd;
+  transform: scale(1.1);
+}
+
+.share-button:active {
+  transform: scale(0.95);
+}
+
+.share-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Desktop dropdown */
+.share-button-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(28, 22, 36, 0.98);
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 180px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.share-button-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+}
+
+.share-button-dropdown-item:hover {
+  background: rgba(192, 78, 221, 0.2);
+}
+
+.share-button-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-button-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Mobile bottom sheet modal */
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 99999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.share-modal-overlay--desktop {
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.share-modal-content {
+  background: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%);
+  border: 1px solid rgba(70, 65, 80, 0.5);
+  width: 100%;
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: shareModalSlideUp 0.3s ease-out;
+}
+
+.share-modal-content--desktop {
+  border-radius: 20px;
+  max-width: 400px;
+  max-height: 85vh;
+  animation: shareModalFadeIn 0.25s ease-out;
+}
+
+@keyframes shareModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.share-modal-content--mobile {
+  touch-action: none;
+  cursor: grab;
+}
+
+.share-modal-content--mobile:active {
+  cursor: grabbing;
+}
+
+.share-modal-content--dragging {
+  transition: none;
+}
+
+.share-modal-content:not(.share-modal-content--dragging) {
+  transition: transform 0.2s ease-out;
+}
+
+@keyframes shareModalSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.share-modal-drag-zone {
+  flex-shrink: 0;
+}
+
+.share-modal-drag-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 0.75rem auto 0;
+}
+
+.share-modal-header {
+  padding: 0.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.share-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.share-modal-body {
+  padding: 1rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.share-modal-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.4);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.share-modal-item:active {
+  background: rgba(192, 78, 221, 0.2);
+  border-color: rgba(192, 78, 221, 0.5);
+}
+
+.share-modal-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.share-modal-icon svg {
+  width: 24px;
+  height: 24px;
+}

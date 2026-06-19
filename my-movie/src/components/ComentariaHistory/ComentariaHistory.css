@@ -1,0 +1,16 @@
+.comentaria-history-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+  border: 2px solid rgba(149, 213, 178, 0.85);
+  color: #d8f3dc;
+}
+
+.comentaria-history-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+}

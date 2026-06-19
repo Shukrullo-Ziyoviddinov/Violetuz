@@ -1,0 +1,74 @@
+.repost-movie-card {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 0;
+  text-align: left;
+  color: #fff;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.repost-movie-card:hover {
+  border-color: rgba(202, 78, 221, 0.55);
+  background: rgba(202, 78, 221, 0.08);
+}
+
+.repost-movie-card-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 130%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.repost-movie-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.repost-movie-card-badge {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 0.18rem 0.34rem;
+}
+
+.repost-movie-card-badge-fhd {
+  top: 0.35rem;
+  left: 0.35rem;
+}
+
+.repost-movie-card-rating {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.34rem;
+}
+
+@media (max-width: 480px) {
+  .repost-movie-card-badge {
+    font-size: 0.62rem;
+    padding: 0.18rem 0.34rem;
+  }
+
+  .repost-movie-card-rating {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.34rem;
+  }
+}

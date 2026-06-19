@@ -1,0 +1,179 @@
+.music-cards {
+  padding: 0.5rem 0;
+}
+
+.music-cards-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.music-cards-header {
+  margin-bottom: 1rem;
+}
+
+.music-cards-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.music-cards-title-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.music-cards-title-icon svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.music-cards-title-text {
+  background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 30%, #c0c0c0 60%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.music-cards-item {
+  flex-shrink: 0;
+  width: 160px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.music-cards-item:hover {
+  transform: scale(1.02);
+}
+
+.music-cards-item-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 115%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #d786e48f;
+}
+
+.music-cards-item-wishlist-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.music-cards-item-wishlist-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+}
+
+.music-cards-item-wishlist-btn.active {
+  color: #ca4edd;
+}
+
+.music-cards-item-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.music-cards-item-play {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 50%;
+  color: #fff;
+  z-index: 2;
+}
+
+.music-cards-item-play svg {
+  width: 20px;
+  height: 20px;
+}
+
+.music-cards-item-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 3rem 0.5rem 0.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  border-radius: 0 0 12px 12px;
+  z-index: 1;
+}
+
+.music-cards-item-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-cards-item-artist {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+  .music-cards-item {
+    width: 160px;
+  }
+
+  .music-cards-item-image-wrapper {
+    padding-top: 115%;
+  }
+}
+
+@media (max-width: 500px) {
+  .music-cards-title {
+    font-size: 1.2rem;
+  }
+
+  .music-cards-title-icon {
+    width: 1.1em;
+    height: 1.1em;
+  }
+}
+
+@media (max-width: 390px) {
+  .music-cards-item {
+    width: 135px;
+  }
+}

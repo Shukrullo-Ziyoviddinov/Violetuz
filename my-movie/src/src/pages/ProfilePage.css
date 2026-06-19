@@ -1,0 +1,334 @@
+
+.profile-page {
+  min-height: calc(100vh - 80px);
+  background: #0a0a0a;
+  overflow-x: hidden;
+}
+
+.profile-page-header {
+  position: relative;
+  height: 320px;
+  flex-shrink: 0;
+}
+
+.profile-page-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 320px;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+.profile-page-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80%;
+  background: linear-gradient(to top, #000 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.profile-page-content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.profile-page-top {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.profile-wishlist-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  /* background: rgba(255, 255, 255, 0.06); */
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+  box-sizing: border-box;
+}
+
+.profile-wishlist-block:first-of-type {
+  margin-top: 1.5rem;
+}
+
+.profile-page-top-skeleton .loader-skeleton,
+.profile-wishlist-block-skeleton .loader-skeleton {
+  width: 100%;
+}
+
+.profile-app-stores {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-app-store-link {
+  flex: 1;
+  min-width: 120px;
+  max-width: 160px;
+  transition: opacity 0.25s;
+}
+
+.profile-app-store-link:hover {
+  opacity: 0.85;
+}
+
+.profile-app-store-skeleton {
+  flex: 1;
+  min-width: 120px;
+  max-width: 160px;
+}
+
+.profile-app-store-img {
+  width: 100%;
+  height: auto;
+  /* max-height: 44px; */
+  object-fit: contain;
+  display: block;
+}
+
+.profile-wishlist-block:hover {
+  background-color: #0312ea38;
+  border-color: #0312eaa5;
+}
+
+.profile-wishlist-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.profile-wishlist-left svg {
+  color: #0313ea;
+  flex-shrink: 0;
+}
+
+.profile-wishlist-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.profile-wishlist-flag {
+  width: 24px;
+  height: 17px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.profile-violet-market-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.profile-violet-market-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.profile-wishlist-left span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-wishlist-arrow {
+  color: rgba(255, 255, 255, 0.6) !important;
+  flex-shrink: 0;
+}
+
+.profile-avatar-wrap {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid #0313ea;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  overflow: hidden;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-username {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+.profile-bio {
+  font-size: 0.73rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.profile-username:empty,
+.profile-bio:empty {
+  display: none;
+}
+
+.profile-edit-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #0312ea6f;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.25s, color 0.25s;
+}
+
+.profile-edit-btn:hover {
+  background: #0312eaa5;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    min-height: calc(100vh - 150px);
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .profile-page-header {
+    height: 280px;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    width: calc(100% + 2rem);
+  }
+
+  .profile-page-bg {
+    height: 280px;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+
+  .profile-page-content {
+    /* padding: 1.5rem 0 1rem; */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    margin: 0 auto;
+  }
+
+  .profile-avatar-wrap {
+    width: 70px;
+    height: 70px;
+  }
+
+  .profile-name {
+    font-size: 1.05rem;
+  }
+
+  .profile-username {
+    font-size: 0.78rem;
+  }
+
+  .profile-bio {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .profile-wishlist-block {
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .profile-wishlist-block:first-of-type {
+    margin-top: 1.25rem;
+  }
+
+  .profile-wishlist-left {
+    font-size: 0.95rem;
+  }
+
+  .profile-wishlist-flag {
+    width: 22px;
+    height: 15px;
+  }
+
+  .profile-violet-market-logo {
+    width: 24px;
+    height: 24px;
+    padding: 2px;
+  }
+}

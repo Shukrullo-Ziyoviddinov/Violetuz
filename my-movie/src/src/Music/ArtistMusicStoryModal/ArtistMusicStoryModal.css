@@ -1,0 +1,243 @@
+.artist-music-story-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.artist-music-story-modal {
+  position: relative;
+  max-width: 520px;
+  width: 100%;
+  background: #0a0a0a;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.artist-music-story-modal--has-color {
+  background: linear-gradient(
+    180deg,
+    rgb(var(--modal-r, 40), var(--modal-g, 40), var(--modal-b, 60)) 0%,
+    #0d0d0d 45%,
+    #0a0a0a 100%
+  );
+  border-color: rgba(var(--modal-r, 50), var(--modal-g, 50), var(--modal-b, 50), 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(var(--modal-r, 50), var(--modal-g, 50), var(--modal-b, 50), 0.2);
+}
+
+.artist-music-story-modal--has-color .artist-music-story-modal-progress-fill {
+  background: rgba(192, 78, 221, 0.8);
+}
+
+
+.artist-music-story-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s;
+}
+
+.artist-music-story-modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.artist-music-story-modal-img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.artist-music-story-modal-img {
+  width: 180px;
+  height: 180px;
+  display: block;
+  border-radius: 12px;
+}
+
+.artist-music-story-modal-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 1.5rem 0;
+}
+
+.artist-music-story-modal-time {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 2.5rem;
+}
+
+.artist-music-story-modal-time-current {
+  text-align: left;
+}
+
+.artist-music-story-modal-time-duration {
+  text-align: right;
+}
+
+.artist-music-story-modal-progress {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.artist-music-story-modal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c04edd, #7c3aed);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.artist-music-story-modal-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem 0;
+}
+
+.artist-music-story-modal-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.artist-music-story-modal-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.artist-music-story-modal-btn-play {
+  width: 52px;
+  height: 52px;
+  background: rgba(192, 78, 221, 0.8);
+}
+
+.artist-music-story-modal-btn-play:hover {
+  background: rgba(192, 78, 221, 1);
+}
+
+.artist-music-story-modal-title-wrap {
+  padding: 1rem 1.5rem 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.artist-music-story-modal-music-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.artist-music-story-modal-music-btn:hover {
+  background: rgba(192, 78, 221, 0.6);
+  color: #fff;
+}
+
+.artist-music-story-modal-title {
+  display: inline;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.artist-music-story-modal-title:hover {
+  color: #c04edd;
+  text-decoration: underline;
+}
+
+.artist-music-story-modal-handle {
+  display: none;
+}
+
+@media (max-width: 500px) {
+  .artist-music-story-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .artist-music-story-modal {
+    width: 100%;
+    max-width: none;
+    max-height: 90vh;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(0);
+    transition: transform 0.25s ease-out;
+  }
+
+  .artist-music-story-modal--dragging {
+    transition: none;
+  }
+
+  .artist-music-story-modal-handle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 0;
+    cursor: grab;
+    touch-action: none;
+    flex-shrink: 0;
+  }
+
+  .artist-music-story-modal-handle:active {
+    cursor: grabbing;
+  }
+
+  .artist-music-story-modal-handle-bar {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .artist-music-story-modal-close {
+    display: none;
+  }
+}

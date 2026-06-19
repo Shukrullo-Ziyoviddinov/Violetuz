@@ -1,0 +1,41 @@
+.comentaria-text-more-btn {
+  margin-top: 0.52rem;
+  padding: 0.22rem 0.48rem 0.22rem 0.52rem;
+  border: 1px solid rgba(120, 100, 160, 0.38);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(210, 200, 255, 0.96);
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+}
+
+.comentaria-text-more-btn-label {
+  line-height: 1.2;
+}
+
+.comentaria-text-more-btn-icon {
+  flex-shrink: 0;
+  display: block;
+  opacity: 0.92;
+}
+
+.comentaria-text-more-btn:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(150, 130, 200, 0.45);
+}
+
+.comentaria-text-more-btn:hover .comentaria-text-more-btn-icon {
+  opacity: 1;
+}
+
+.comentaria-text-more-btn:focus-visible {
+  outline: 2px solid rgba(180, 160, 230, 0.65);
+  outline-offset: 2px;
+}

@@ -1,0 +1,12 @@
+.rating-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 1rem 0 6rem;
+  margin-top: 2rem;
+}
+
+.rating-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}

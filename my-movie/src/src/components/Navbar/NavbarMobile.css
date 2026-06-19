@@ -1,0 +1,198 @@
+.navbar-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-mobile {
+    display: flex;
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0));
+    left: 16px;
+    right: 16px;
+    height: 64px;
+    border-radius: 30px;
+    z-index: 1001;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 0.5rem;
+    background-image:
+      linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%),
+      linear-gradient(135deg, rgb(15, 15, 18), rgb(45, 45, 50), rgb(25, 25, 28), rgb(15, 15, 18));
+    background-origin: padding-box, border-box;
+    background-clip: padding-box, border-box;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 2px solid #320343;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .navbar-mobile-skeleton-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navbar-mobile-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+    border-radius: 8px;
+    min-width: 0;
+  }
+
+  .navbar-mobile-item span {
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+
+  .navbar-mobile-item-active {
+    color: #8b008b !important;
+    background: none !important;
+    transition: color 0.25s ease;
+  }
+
+  .navbar-mobile-item-active span {
+    font-weight: 700;
+    color: #8b008b;
+  }
+
+  .navbar-mobile-item-active svg {
+    color: #8b008b;
+  }
+
+  .navbar-mobile-item svg {
+    flex-shrink: 0;
+  }
+
+  /* Search overlay - full screen */
+  .navbar-mobile-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .navbar-mobile-search-box {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    background: rgba(10, 10, 10, 0.98);
+    border-radius: 0;
+    padding: 1rem;
+    padding-top: calc(38px + 0.25rem);
+    border: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow-y: auto;
+  }
+
+  .navbar-mobile-search-form-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .navbar-mobile-search-form {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 25px;
+    padding: 1rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .navbar-mobile-search-back {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  }
+
+  .navbar-mobile-search-back:hover {
+    color: #ca4edd;
+  }
+
+  .navbar-mobile-search-input-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-mobile-search-input-wrap .navbar-mobile-search-input {
+    padding-right: 3rem;
+  }
+
+  .navbar-mobile-search-icon-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .navbar-mobile-search-icon-btn:hover {
+    color: rgba(192, 78, 221, 0.9);
+    background: rgba(157, 78, 221, 0.2);
+  }
+
+  .navbar-mobile-search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .navbar-mobile-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}

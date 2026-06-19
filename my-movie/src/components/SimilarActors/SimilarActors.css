@@ -1,0 +1,32 @@
+.actor-similar-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 12px;
+  min-width: 0;
+  width: 100%;
+}
+
+.actor-similar-head .actor-extra-block__title {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actor-similar-head .show-more-btn {
+  flex-shrink: 0;
+  align-self: center;
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.actor-similar-list--modal {
+  padding-bottom: 0.25rem;
+}

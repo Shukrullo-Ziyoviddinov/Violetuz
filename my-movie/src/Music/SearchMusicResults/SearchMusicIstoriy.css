@@ -1,0 +1,116 @@
+.navbar-search-modal-music-empty {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.search-music-istoriy {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.search-music-istoriy-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-music-istoriy-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-music-istoriy-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-music-istoriy-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.489);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.search-music-istoriy-media {
+  flex-shrink: 0;
+  width: 64px;
+  height: 44px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-music-istoriy-img {
+  width: 100%;
+  height: 100%;
+}
+
+.search-music-istoriy-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.search-music-istoriy-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.search-music-istoriy-sep {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+}
+
+.search-music-istoriy-artist {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.search-music-istoriy-remove {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.search-music-istoriy-remove:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}

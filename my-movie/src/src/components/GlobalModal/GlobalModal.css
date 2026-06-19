@@ -1,0 +1,259 @@
+.global-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  background: rgba(6, 6, 12, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: globalModalOverlayIn 0.25s ease-out;
+}
+
+@keyframes globalModalOverlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.global-modal-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(960px, 100%);
+  max-height: min(88vh, 900px);
+  background: linear-gradient(165deg, rgba(28, 26, 36, 0.98) 0%, rgba(12, 11, 18, 0.99) 100%);
+  border: 1px solid rgba(120, 100, 160, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.global-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.global-modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.global-modal-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.global-modal-close:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.global-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 1rem 1.25rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.global-modal-body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.global-modal-gallery-section {
+  margin-bottom: 1.25rem;
+}
+
+.global-modal-gallery-section:last-child {
+  margin-bottom: 0;
+}
+
+/*
+  Sahifadagi `.actors-page-media-row--split .actors-page-photo-gallery-grid` bilan bir xil:
+  hero | mid | o‘ng ustun (2 kichik + keng).
+*/
+.global-modal-gallery-section .actors-page-photo-gallery-grid.global-modal-split-photo-gallery-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.65fr) minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
+  height: clamp(240px, 40vw, 360px);
+  max-height: clamp(240px, 40vw, 360px);
+  min-height: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  align-content: stretch;
+  box-sizing: border-box;
+}
+
+.global-modal-gallery-section .global-modal-split-photo-gallery-grid .actors-page-pg-cell img {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 520px) {
+  .global-modal-gallery-section .actors-page-photo-gallery-grid.global-modal-split-photo-gallery-grid {
+    height: clamp(200px, 52vw, 280px);
+    max-height: clamp(200px, 52vw, 280px);
+  }
+}
+
+/*
+ * Mobil (≤500px, JS): MoreModal bilan bir xil — o‘ngdan suriladigan panel, body scroll qulflash.
+ */
+.global-modal-overlay--mobile {
+  padding: 0;
+  align-items: stretch;
+  justify-content: flex-end;
+  animation: globalModalOverlayFadeIn 0.35s ease-out;
+}
+
+.global-modal-overlay--mobile.global-modal-overlay--closing {
+  animation: globalModalOverlayFadeOut 0.3s ease-in forwards;
+}
+
+@keyframes globalModalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes globalModalOverlayFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.global-modal-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.global-modal-panel--open {
+  transform: translateX(0);
+}
+
+.global-modal-panel--closing {
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.global-modal-panel .global-modal-dialog {
+  animation: none !important;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  min-height: 0;
+  flex: 1 1 auto;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.global-modal-panel .global-modal-header {
+  padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+  padding-left: calc(1rem + env(safe-area-inset-left, 0px));
+  padding-right: calc(1rem + env(safe-area-inset-right, 0px));
+}
+
+.global-modal-panel .global-modal-body {
+  padding-left: calc(1rem + env(safe-area-inset-left, 0px));
+  padding-right: calc(1rem + env(safe-area-inset-right, 0px));
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ≤759px: to‘liq ekran (desktop kenglikda panel yo‘q) */
+@media (max-width: 759px) {
+  .global-modal-overlay:not(.global-modal-overlay--mobile) {
+    padding: 0;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  .global-modal-overlay:not(.global-modal-overlay--mobile) .global-modal-dialog {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    overflow: hidden;
+  }
+
+  .global-modal-overlay:not(.global-modal-overlay--mobile) .global-modal-header {
+    padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+    padding-left: calc(1rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(1rem + env(safe-area-inset-right, 0px));
+  }
+
+  .global-modal-overlay:not(.global-modal-overlay--mobile) .global-modal-body {
+    padding-left: calc(1rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(1rem + env(safe-area-inset-right, 0px));
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+}

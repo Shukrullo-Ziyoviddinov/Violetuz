@@ -1,0 +1,107 @@
+.repost-video-card {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.repost-video-card:hover {
+  transform: scale(1.02);
+}
+
+.repost-video-card .music-more-page-item-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 52%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #d786e48f;
+}
+
+.repost-video-card .music-more-page-item-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.repost-video-card .music-more-page-item-play {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 50%;
+  color: #fff;
+  z-index: 2;
+}
+
+.repost-video-card .music-more-page-item-play svg {
+  width: 16px;
+  height: 16px;
+}
+
+.repost-video-card .music-more-page-item-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 3rem 0.5rem 0.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  border-radius: 0 0 12px 12px;
+  z-index: 1;
+}
+
+.repost-video-card .music-more-page-item-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repost-video-card .music-more-page-item-artist {
+  margin: 0;
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .repost-video-card .music-more-page-item-play {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .repost-video-card .music-more-page-item-image-wrapper {
+    padding-top: 52%;
+  }
+
+  .repost-video-card .music-more-page-item-play {
+    width: 28px;
+    height: 28px;
+    right: 0.35rem;
+    bottom: 0.35rem;
+  }
+
+  .repost-video-card .music-more-page-item-title { font-size: 0.9rem; }
+  .repost-video-card .music-more-page-item-artist { font-size: 0.72rem; }
+}

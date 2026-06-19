@@ -1,0 +1,173 @@
+.more-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(6, 6, 12, 0.82);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1.5rem;
+  animation: moreModalFadeIn 0.25s ease-out;
+}
+
+@keyframes moreModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.more-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  background: linear-gradient(165deg, rgba(28, 26, 36, 0.98) 0%, rgba(12, 11, 18, 0.99) 100%);
+  border: 1px solid rgba(120, 100, 160, 0.25);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: moreModalSlideUp 0.3s ease-out;
+}
+
+@keyframes moreModalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.more-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.more-modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.more-modal-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color 0.2s;
+}
+
+.more-modal-close:hover {
+  color: #fff;
+}
+
+.more-modal-body {
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.more-modal-body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.more-modal-bioimg-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.more-modal-bioimg {
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  min-height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.more-modal-text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Mobile overlay - applied via class when window <= 500px */
+.more-modal-overlay--mobile {
+  padding: 0;
+  align-items: stretch;
+  justify-content: flex-end;
+  animation: moreModalOverlayFadeIn 0.35s ease-out;
+}
+
+.more-modal-overlay--mobile.more-modal-overlay--closing {
+  animation: moreModalOverlayFadeOut 0.3s ease-in forwards;
+}
+
+@keyframes moreModalOverlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes moreModalOverlayFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Mobile panel - slides from right, uses transition (no animation conflict) */
+.more-modal-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 2001;
+}
+
+.more-modal-panel--open {
+  transform: translateX(0);
+}
+
+.more-modal-panel--closing {
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.more-modal-panel .more-modal {
+  animation: none !important;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  border: none;
+}

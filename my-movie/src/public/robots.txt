@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap - deploy qilganda o'z domeningizni qo'ying (masalan: https://violetmovie.com/sitemap.xml)
+Sitemap: https://violetmovie.com/sitemap.xml

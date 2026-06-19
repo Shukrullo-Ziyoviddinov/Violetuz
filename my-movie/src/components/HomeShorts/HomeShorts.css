@@ -1,0 +1,110 @@
+.home-shorts {
+  margin-bottom: 2rem;
+  padding: 0 2rem;
+}
+
+/* Music sahifasida: music-cards bilan bir xil bo'shliqlar, 160px va 9/10 */
+.home-shorts--music {
+  padding: 0.5rem 0;
+}
+.home-shorts--music .home-shorts-container.music-cards-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.home-shorts--music .home-shorts-card {
+  min-width: 160px;
+  width: 160px;
+  max-width: 160px;
+}
+.home-shorts--music .home-shorts-card .shorts-video-thumb {
+  aspect-ratio: 9 / 10;
+}
+
+.home-shorts-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.home-shorts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.home-shorts-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 30%, #c0c0c0 60%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.home-shorts-title-skeleton {
+  flex-shrink: 0;
+}
+
+.home-shorts-more-skeleton {
+  flex-shrink: 0;
+}
+
+.home-shorts-more {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+  text-decoration: none;
+
+}
+
+.home-shorts-more:hover {
+  opacity: 0.8;
+}
+
+/* Kino kartochkalari bilan bir xil o'lcham: mobile 150px, desktop 200px */
+.home-shorts-card {
+  flex-shrink: 0;
+  width: 150px;
+  text-decoration: none;
+}
+
+.home-shorts-card .shorts-video-thumb {
+  aspect-ratio: 9 / 12;
+}
+
+@media (min-width: 769px) {
+  .home-shorts-card {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-shorts {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .home-shorts-title {
+    font-size: 1.2rem;
+  }
+
+  .home-shorts-more {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 0.35rem 1rem;
+    font-size: 0.7rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+}

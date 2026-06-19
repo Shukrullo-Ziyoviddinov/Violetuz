@@ -1,0 +1,739 @@
+.video-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  animation: video-modal-overlay-in 0.26s ease-out forwards;
+}
+
+.video-modal-overlay--closing {
+  animation: video-modal-overlay-out 0.34s ease forwards;
+}
+
+@keyframes video-modal-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes video-modal-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.video-modal {
+  position: fixed;
+  z-index: 1401;
+  box-sizing: border-box;
+  background: linear-gradient(145deg, rgb(22, 18, 28) 0%, rgb(12, 10, 16) 100%);
+  border: 1px solid rgba(80, 70, 95, 0.45);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+.video-modal--desktop {
+  container-type: inline-size;
+  container-name: video-modal;
+}
+
+/* 902px+: katta ekran — klassik markazdagi modal */
+@media (min-width: 902px) {
+  .video-modal--desktop {
+    left: 50%;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: min(95vw, 1100px);
+    max-width: min(95vw, 1100px);
+    max-height: min(96vh, 1040px);
+    min-height: 0;
+    height: auto;
+    border-radius: 16px;
+    padding: 0.75rem 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: video-modal-desktop-in 0.22s ease;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+/* 760px–901px: to‘liq ekran (tablet / tor desktop) */
+@media (min-width: 760px) and (max-width: 901px) {
+  .video-modal--desktop {
+    inset: 0;
+    transform: none;
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    min-height: 100%;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+    border-radius: 0;
+    padding: max(0.5rem, env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px))
+      max(0.75rem, env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: video-modal-fullscreen-in 0.2s ease;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-shadow: none;
+    border: none;
+  }
+}
+
+@keyframes video-modal-fullscreen-in {
+  from {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes video-modal-desktop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes video-modal-desktop-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sheet: pastdan chiqadi / yopilganda pastga (JS: --sheet-active, --sheet-exiting) */
+.video-modal--sheet {
+  left: 0;
+  right: 0;
+  top: max(0.85rem, env(safe-area-inset-top, 0px), min(18dvh, 120px));
+  bottom: max(0.85rem, calc(env(safe-area-inset-bottom, 0px) + 0.35rem));
+  width: 100%;
+  max-height: none;
+  min-height: 0;
+  height: auto;
+  border-radius: 46px 46px 0 0;
+  padding: 0 0.75rem calc(0.65rem + env(safe-area-inset-bottom, 0));
+  padding-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transform: translate3d(0, 100%, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+  will-change: transform;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.video-modal--sheet.video-modal--sheet-active {
+  transform: translate3d(0, 0, 0);
+}
+
+.video-modal--sheet.video-modal--sheet-exiting {
+  transform: translate3d(0, 100%, 0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.video-modal--sheet.video-modal--dragging {
+  transition: none;
+}
+
+/* Sheet yuqori qismi: butun headerdan pastga tortish (drag-handle + toolbar) */
+.video-modal-sheet-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  touch-action: none;
+  cursor: grab;
+  padding: 0 0.1rem 0.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.video-modal--sheet.video-modal--dragging .video-modal-sheet-header {
+  cursor: grabbing;
+}
+
+.video-modal--sheet .video-modal-toolbar--sheet {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  min-height: 2.25rem;
+  padding: 0 0.15rem 0;
+  flex-shrink: 0;
+}
+
+.video-modal-drag-handle {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.28);
+  margin: 0.35rem auto 0.25rem;
+  flex-shrink: 0;
+}
+
+.video-modal-drag-handle:active {
+  cursor: grabbing;
+}
+
+.video-modal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding: 0 0.15rem 0.35rem;
+  min-height: 2.25rem;
+}
+
+.video-modal-content-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.video-modal-content-wrap--desktop {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.75rem;
+  min-width: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.video-modal-primary {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  gap: 0.5rem;
+}
+
+.video-modal-content-wrap--desktop .video-modal-primary {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.video-modal-content-wrap--desktop .video-modal-body {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 0;
+}
+
+.video-modal-content-wrap--desktop .video-modal-footer {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.video-modal-related {
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  padding: 0.35rem 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.video-modal-content-wrap--desktop .video-modal-related {
+  position: relative;
+  z-index: 0;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: clamp(360px, 36%, 380px);
+  min-width: 260px;
+  max-width: 380px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0 0 0.75rem;
+  margin-top: 0;
+  border-top: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  contain: layout;
+}
+
+.video-modal-related-heading {
+  margin: 0 0 0.65rem;
+}
+
+.video-modal--sheet .video-modal-related-row.actors-page-media-row--split {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.video-modal--sheet .video-modal-related {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.video-modal--sheet .video-modal-related-heading {
+  flex-shrink: 0;
+}
+
+.video-modal--sheet .video-modal-related-draphy-block.actors-page-video-draphy-block {
+  flex: 1 1 auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.video-modal--sheet .video-modal-related .actors-page-video-draphy-list {
+  gap: 0.75rem;
+}
+
+/* ActorsPage .actors-page-media-row--split .actors-page-video-draphy-block (46% / flex) modalda ustunni sindiradi; to‘liq yo‘l bilan bekor qilinadi */
+.video-modal-content-wrap--desktop .video-modal-related .video-modal-related-row.actors-page-media-row--split {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  gap: 0;
+  overflow-x: hidden;
+}
+
+.video-modal-content-wrap--desktop
+  .video-modal-related
+  .actors-page-media-row--split
+  .actors-page-video-draphy-block.video-modal-related-draphy-block {
+  flex: 1 1 auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  align-self: stretch !important;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.video-modal--desktop .video-modal-related-row.actors-page-media-row--split {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  gap: 0;
+}
+
+.video-modal--desktop .video-modal-related-draphy-block.actors-page-video-draphy-block {
+  flex: 1 1 auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.video-modal--desktop .video-modal-related .actors-page-video-draphy-list {
+  gap: 0.75rem;
+}
+
+/* Tor o‘ng ustunda thumb min-width (38% / clamp) chapga chiqib ketmasin */
+.video-modal-content-wrap--desktop .video-modal-related .actors-page-video-draphy-item {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Related ro‘yxatda hozir ijro etilayotgan video kartochkasi */
+.video-modal .video-modal-related .actors-page-media-row--split .actors-page-video-draphy-item {
+  border: 2px solid transparent;
+  box-sizing: border-box;
+}
+
+.video-modal .video-modal-related .actors-page-video-draphy-item.video-modal-related-item--active {
+  background-color: rgba(192, 78, 221, 0.323);
+}
+
+.video-modal-content-wrap--desktop
+  .video-modal-related
+  .actors-page-media-row--split
+  .actors-page-video-draphy-video-wrap {
+  min-width: 0 !important;
+  flex: 1 1 0 !important;
+}
+
+.video-modal-related--desktop-scroll {
+  max-height: min(46vh, 400px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.video-modal-content-wrap--desktop .video-modal-related.video-modal-related--desktop-scroll {
+  max-height: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.video-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.25rem 0.15rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.video-modal-footer-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+/* ShareButton default: absolute top/right (film poster uchun) — modalda like yonida qator bo‘lsin */
+.video-modal-footer-actions .share-button-wrapper {
+  position: relative;
+  top: auto;
+  right: auto;
+  inset: auto;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* Share — Like tugmasi bilan bir xil pill va ikonka (LikeButton .like-button-btn) */
+.video-modal-footer-actions .share-button {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: none;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.video-modal-footer-actions .share-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.03);
+  border-color: transparent;
+}
+
+.video-modal-footer-actions .share-button:active {
+  transform: scale(0.98);
+}
+
+.video-modal-footer-actions .share-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Like/dislike — LikeButton asl stillari (LikeButton.css); faqat ikonkalar bir xil o‘lchamda */
+.video-modal-footer-actions .video-modal-like-btn {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.video-modal-footer-actions .video-modal-like-btn .like-button-icon-wrap {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.video-modal-footer-actions .video-modal-like-btn .like-button-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.video-modal-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.35;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.video-modal-close {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.video-modal-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.video-modal-body {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.video-modal-music-shell {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-modal--desktop .video-modal-music-shell .music-vp-video-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  min-height: 0 !important;
+  max-height: min(88vh, 900px);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+.video-modal--desktop .video-modal-music-shell .music-vp-video-wrapper:hover {
+  box-shadow: none;
+}
+
+.video-modal--sheet .video-modal-music-shell .music-vp-video-wrapper {
+  width: 100%;
+  flex: 0 0 auto;
+  min-height: 0 !important;
+  max-height: min(90vh, 920px);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.video-modal--sheet .video-modal-music-shell .music-vp-video-wrapper:hover {
+  box-shadow: none;
+}
+
+/* Modal ichida pleyer atrofida qora gradient / fon yo‘q */
+.video-modal .music-vp-video-wrapper {
+  background: transparent;
+}
+
+.video-modal .music-vp-video {
+  background-color: transparent;
+}
+
+/* Tor modal: ikki ustun ustma-ust emas — video yuqorida, related pastda */
+@container video-modal (max-width: 680px) {
+  .video-modal-content-wrap--desktop {
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .video-modal-content-wrap--desktop .video-modal-primary {
+    position: relative;
+    z-index: auto;
+    flex: 0 0 auto;
+    max-width: none;
+    overflow: visible;
+  }
+
+  .video-modal-content-wrap--desktop .video-modal-related {
+    position: relative;
+    z-index: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-left: 0;
+    padding-top: 0.5rem;
+    contain: none;
+  }
+
+  .video-modal-content-wrap--desktop .video-modal-related.video-modal-related--desktop-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+}
+
+/*
+  760–901px to‘liq ekran: modal kengligi odatda >680px — container query ishlamaydi,
+  yonma-yon ustunlar siqilib related primary ustiga chiqishi mumkin.
+  ≤901px viewportda desktop modalni vertikal qilib yechamiz.
+*/
+@media (max-width: 901px) {
+  .video-modal--desktop .video-modal-content-wrap--desktop {
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .video-modal--desktop .video-modal-content-wrap--desktop .video-modal-primary {
+    position: relative;
+    z-index: auto;
+    flex: 0 0 auto;
+    max-width: none;
+    overflow: visible;
+  }
+
+  .video-modal--desktop .video-modal-content-wrap--desktop .video-modal-related {
+    position: relative;
+    z-index: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-left: 0;
+    padding-top: 0.5rem;
+    contain: none;
+  }
+
+  .video-modal--desktop .video-modal-content-wrap--desktop .video-modal-related.video-modal-related--desktop-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+}
+
+/* ≤759px: sheet — 70vh emas; top/dvh bilan balandlik; asosiy .video-modal--sheet qoidalarini buzmaslik */
+@media (max-width: 759px) {
+  .video-modal-close {
+    display: none !important;
+  }
+
+  .video-modal--desktop {
+    left: 0;
+    right: 0;
+    top: max(0.85rem, env(safe-area-inset-top, 0px), min(18dvh, 160px));
+    bottom: max(0.85rem, calc(env(safe-area-inset-bottom, 0px) + 0.35rem));
+    transform: none;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    min-height: 0;
+    height: auto;
+    border-radius: 16px 16px 0 0;
+    padding: 0 0.75rem calc(0.65rem + env(safe-area-inset-bottom, 0));
+    padding-top: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: video-modal-desktop-sheet-in 0.22s ease;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(80, 70, 95, 0.45);
+  }
+
+  .video-modal--sheet {
+    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.5);
+  }
+
+  .video-modal--sheet .video-modal-content-wrap {
+    flex: 0 0 auto;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .video-modal--sheet .video-modal-related {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+  }
+}
+
+@media (min-width: 760px) {
+  .video-modal--desktop .video-modal-toolbar {
+    padding-top: 0.1rem;
+  }
+}

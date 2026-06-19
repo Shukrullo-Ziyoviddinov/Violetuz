@@ -1,0 +1,122 @@
+.feed-music-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 0.6rem;
+}
+
+.feed-music-card-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.6rem;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.feed-music-card-profile-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.feed-music-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.feed-music-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+  max-width: 100%;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.feed-music-card-name-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-artist-name-verified {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.feed-music-card-type {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+}
+
+.feed-music-card-track {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.feed-music-card-cover {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.feed-music-card-track-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.feed-music-card-artist {
+  color: #fff;
+  font-size: 0.82rem;
+}
+
+.feed-music-card-track-name {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.74rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-music-card-play {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(192, 78, 221, 0.9);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+@media (min-width: 900px) {
+  .feed-music-card {
+    min-height: 0;
+  }
+
+  .feed-music-card-cover {
+    width: 50px;
+    height: 50px;
+  }
+
+  .feed-music-card-track {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.55rem;
+  }
+}

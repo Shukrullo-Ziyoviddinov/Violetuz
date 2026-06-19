@@ -1,0 +1,144 @@
+.feed-video-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+
+.feed-video-card-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.6rem;
+  min-width: 0;
+}
+
+.feed-video-card-profile-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.feed-video-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.feed-video-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+  max-width: 100%;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.feed-video-card-name-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-artist-name-verified {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 3px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.feed-video-card-type {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+}
+
+.feed-video-card-media-wrap {
+  position: relative;
+}
+
+.feed-video-card-cover {
+  width: 100%;
+  height: 155px;
+  border-radius: 10px;
+}
+
+@media (min-width: 900px) {
+  .feed-video-card-cover {
+    height: 105px;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 751px) {
+  .feed-video-card-cover {
+    height: 105px;
+  }
+}
+
+@media (max-width: 750px) and (min-width: 501px)  {
+  .feed-video-card-cover {
+    height: 105px;
+  }
+}
+
+
+.feed-video-card-badge {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.68rem;
+}
+
+.feed-video-card-actions {
+  margin-top: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.feed-video-like-button.like-button {
+  margin-right: auto;
+}
+
+.feed-video-card-fav {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.feed-video-card-fav i {
+  font-size: 0.72rem;
+}
+
+.feed-video-card-fav.active {
+  background: rgba(192, 78, 221, 0.2);
+  color: rgba(192, 78, 221, 1);
+}
+
+.feed-video-like-button .like-button-btn {
+  padding: 0.28rem 0.52rem;
+  font-size: 0.78rem;
+}
+
+.feed-video-like-button .like-button-icon-wrap svg {
+  width: 16px;
+  height: 16px;
+}

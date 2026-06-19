@@ -1,0 +1,273 @@
+.wishlist-page {
+  min-height: calc(100vh - 200px);
+  padding: 3rem 0;
+}
+
+.wishlist-tabs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  padding: 0 1rem 0.15rem;
+  box-sizing: border-box;
+  scroll-padding-left: 1rem;
+  scroll-padding-right: 1rem;
+}
+
+.wishlist-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.wishlist-tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wishlist-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.wishlist-tab.active {
+  color: #fff;
+  background: rgba(30, 3, 210, 0.3);
+  border-color: rgba(31, 22, 204, 0.6);
+}
+
+@media (max-width: 768px) {
+  .wishlist-tabs {
+    justify-content: flex-start;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+.wishlist-music {
+  padding: 0 1rem;
+}
+
+.wishlist-music-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.wishlist-music-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.wishlist-music-item {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.wishlist-music-item:hover {
+  transform: scale(1.02);
+}
+
+.wishlist-music-item-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #d786e48f;
+}
+
+.wishlist-music-item-wishlist-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  color: #ca4edd;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.wishlist-music-item-wishlist-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #e85ef0;
+}
+
+.wishlist-music-item-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Klip - ClipsCards bilan bir xil o'lchamlar (240px, 16:9) */
+.wishlist-music-grid--clips {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.wishlist-music-item--klip .wishlist-music-item-image-wrapper {
+  padding-top: 56.25%; /* 16:9 */
+}
+
+@media (max-width: 500px) {
+  .wishlist-music-grid--clips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wishlist-music-item--klip .wishlist-music-item-image-wrapper {
+    padding-top: 58%;
+  }
+
+  .wishlist-music-item-wishlist-btn {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.3rem;
+    width: 30px;
+    height: 30px;
+;
+    color: #ca4edd;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+}
+
+@media (max-width: 390px) {
+  .wishlist-music-grid--clips {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .wishlist-music-item--klip .wishlist-music-item-image-wrapper {
+    padding-top: 43%;
+}
+}
+
+.wishlist-music-item-play {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(192, 78, 221, 0.9);
+  border-radius: 50%;
+  color: #fff;
+  z-index: 3;
+}
+
+.wishlist-music-item-play svg {
+  width: 14px;
+  height: 14px;
+}
+
+.wishlist-music-item-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 0.65rem 0.65rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4) 60%, transparent);
+  border-radius: 0 0 12px 12px;
+  z-index: 1;
+}
+
+.wishlist-music-item-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wishlist-music-item-artist {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.wishlist-page--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
+  padding: 2rem 1rem;
+}
+
+.wishlist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 420px;
+}
+
+.wishlist-empty-img {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 1.5rem;
+}
+
+.wishlist-empty-text {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.wishlist-empty-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(214, 78, 221, 0.5);
+
+  box-shadow: 8px 0 10px rgba(214, 78, 221, 0.5),
+  -8px 0 10px rgba(214, 78, 221, 0.5),
+  0 8px 10px rgba(214, 78, 221, 0.5),
+  0 -8px 10px rgba(214, 78, 221, 0.5);
+}
+
+.wishlist-empty-btn:hover {
+  transform: translateY(-2px);
+}
+
+.wishlist-empty-btn:active {
+  transform: translateY(0);
+}

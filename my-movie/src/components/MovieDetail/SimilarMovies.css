@@ -1,0 +1,168 @@
+.similar-movies {
+  width: 100%;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.similar-movies-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.similar-movies-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #e8e8e8 30%,
+    #c0c0c0 60%,
+    #a0a0a0 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.similar-movies-header .show-more-btn {
+  flex-shrink: 0;
+}
+
+.similar-movies .horizontal-scroll-wrapper {
+  width: 100%;
+}
+
+.similar-movies-item {
+  flex-shrink: 0;
+  width: 180px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.similar-movies-item-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 150%;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.similar-movies-item-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.similar-movies-item-wishlist-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.similar-movies-item-wishlist-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.similar-movies-item-wishlist-btn.active {
+  color: #ca4edd;
+}
+
+.similar-movies-item-badge {
+  position: absolute;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.similar-movies-item-badge-fhd {
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.similar-movies-item-badge-soon {
+  top: 0.5rem;
+  left: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.similar-movies-item-badge-age {
+  bottom: 0.5rem;
+  left: 0.5rem;
+  background-color: rgba(255, 0, 0, 0.8);
+}
+
+.similar-movies-item-rating {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.similar-movies-item-rating svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 768px) {
+  .similar-movies-item {
+    width: 150px;
+  }
+
+  .similar-movies-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .similar-movies-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .similar-movies-header {
+    margin-bottom: 0.8rem;
+  }
+
+  .similar-movies-title {
+    font-size: 1.2rem;
+  }
+
+  .similar-movies-item-image-wrapper {
+    padding-top: 135%;
+  }
+}

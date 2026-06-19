@@ -1,0 +1,97 @@
+.hover-modal-audio {
+  width: 100%;
+  max-width: 380px;
+}
+
+.hover-modal-audio-card {
+  display: flex;
+  padding: 0.4rem 0.5rem;
+  background: rgba(20, 20, 24, 0.97);
+  border-radius: 12px;
+  border: 1px solid rgba(215, 134, 228, 0.35);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.hover-modal-audio-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.hover-modal-audio-cover {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hover-modal-audio-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hover-modal-audio-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.hover-modal-audio-artist {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-modal-audio-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-modal-audio-progress {
+  flex: 1;
+  min-width: 60px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.hover-modal-audio-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c04edd, #a03dcc);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.hover-modal-audio-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(192, 78, 221, 0.4);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.hover-modal-audio-btn:hover {
+  background: rgba(192, 78, 221, 0.7);
+}

@@ -1,0 +1,123 @@
+/* Reytingi baland kinolar — faqat bu komponentda yuklanadi (ActorsPage.css bilan aralashmasin) */
+.actor-toprated-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.actor-toprated-head .actor-extra-block__title {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.actor-toprated-head .show-more-btn {
+  flex-shrink: 0;
+}
+
+.actor-toprated-scroll {
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.actor-toprated ul.actor-toprated-list {
+  --actor-toprated-gap: clamp(8px, 2vw, 14px);
+  display: grid;
+  /* To‘liq kenglik — yonlarda ortiqcha bo‘sh joy yo‘q; posterlar ustun bo‘yicha cho‘ziladi */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: stretch;
+  column-gap: var(--actor-toprated-gap);
+  row-gap: clamp(10px, 2vw, 18px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.actor-toprated-card {
+  min-width: 0;
+  width: 100%;
+}
+
+.actor-toprated .actor-toprated-card__btn {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  border-radius: 8px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.actor-toprated .actor-toprated-card__btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+.actor-toprated .actor-toprated-card__btn:focus-visible {
+  outline: 2px solid rgba(167, 139, 250, 0.7);
+  outline-offset: 2px;
+}
+
+.actor-toprated .actor-toprated-card__img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.actor-toprated .actor-toprated-card__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.actor-toprated .actor-toprated-card__imdb {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  padding: 2px 4px;
+  font-size: clamp(0.55rem, 1.8vw, 0.65rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #f5c518;
+}
+
+/* Mobil: 3 ustun, posterlar ustunni to‘liq to‘ldiradi; oraliq qisqa */
+@media (max-width: 768px) {
+  .actor-toprated ul.actor-toprated-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    --actor-toprated-gap: 8px;
+    column-gap: 8px;
+    row-gap: 10px;
+  }
+
+  .actor-toprated .actor-toprated-card__img-wrap {
+    border-radius: 5px;
+  }
+
+  .actor-toprated .actor-toprated-card__imdb {
+    font-size: 0.5rem;
+    padding: 1px 3px;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+  }
+}

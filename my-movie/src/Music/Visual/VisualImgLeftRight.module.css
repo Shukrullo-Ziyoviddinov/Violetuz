@@ -1,0 +1,12 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.canvas {
+  width: 60px;
+  height: 180px;
+  border-radius: 8px;
+}

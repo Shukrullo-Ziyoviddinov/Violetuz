@@ -1,0 +1,90 @@
+.feed-header {
+  margin-bottom: 1rem;
+}
+
+.feed-header-scroll {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding-bottom: 0.15rem;
+}
+
+.feed-header-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+  width: 4.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #fff;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+
+.feed-header-person--account {
+  width: 4.5rem;
+}
+
+/* Profil sahifasidagi .profile-avatar-wrap bilan mos (60px, #0313ea hoshiya) */
+.feed-header-account-avatar {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #0313ea;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.feed-header-account-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feed-header-account-avatar-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.feed-header-account-name {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-header-person-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.feed-header-person-name {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

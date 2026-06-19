@@ -1,0 +1,319 @@
+.profile-edit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1300;
+  backdrop-filter: blur(4px);
+}
+
+.profile-edit-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 400px;
+  --drag-y: 0;
+  background-image: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%), linear-gradient(135deg, rgb(15, 15, 18), rgb(45, 45, 50), rgb(25, 25, 28), rgb(15, 15, 18));
+  border-radius: 16px;
+  padding: 0.5rem 1.5rem;
+  z-index: 1301;
+  border: 1px solid rgba(70, 65, 80, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  padding-bottom: env(safe-area-inset-bottom, 1.5rem);
+}
+
+.profile-edit-drag-handle {
+  display: none;
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 0.75rem auto;
+}
+
+.profile-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.profile-edit-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.profile-edit-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.25s, color 0.25s;
+}
+
+.profile-edit-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-bottom: 1.5rem;
+}
+
+.profile-edit-avatar-field {
+  gap: 0.75rem;
+}
+
+.profile-edit-avatar-heading {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.profile-edit-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-edit-avatar-preview {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid rgba(157, 78, 221, 0.55);
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-edit-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-edit-avatar-placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.profile-edit-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.profile-edit-avatar-btn-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-edit-avatar-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.profile-edit-avatar-btn {
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  background-color: rgba(3, 19, 234, 0.3);
+  border-color: rgb(3, 19, 234);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.profile-edit-avatar-btn:hover {
+  background-color: rgba(3, 19, 234, 0.3);
+  border-color: rgb(3, 19, 234);
+}
+
+.profile-edit-avatar-remove {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: #c62828;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.profile-edit-avatar-remove:hover {
+  background: #b71c1c;
+}
+
+.profile-edit-avatar-remove:active {
+  transform: scale(0.97);
+}
+
+.profile-edit-avatar-remove-icon {
+  display: block;
+  pointer-events: none;
+}
+
+.profile-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-edit-field label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.profile-edit-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.4);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  box-sizing: border-box;
+}
+
+.profile-edit-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.profile-edit-input:focus {
+  border-color: rgba(157, 78, 221, 0.7);
+  box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.15);
+}
+
+.profile-edit-input-invalid {
+  border-color: #e53935 !important;
+  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.25);
+}
+
+.profile-edit-input-invalid:focus {
+  border-color: #e53935 !important;
+  box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.3);
+}
+
+.profile-edit-textarea {
+  min-height: 5rem;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.45;
+}
+
+.profile-edit-save {
+  margin-top: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  background: #ca4edd;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.25s, transform 0.2s;
+}
+
+.profile-edit-save:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.profile-edit-save:active {
+  transform: translateY(0);
+}
+
+.profile-edit-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.profile-edit-save:disabled:hover {
+  opacity: 0.5;
+  transform: none;
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+  .profile-edit-modal {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Mobile - pastdan chiqadigan modal, drag bilan yopish */
+@media (max-width: 768px) {
+  .profile-edit-modal {
+    top: auto;
+    bottom: 0;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw;
+    transform: translateY(var(--drag-y, 0));
+    border-radius: 40px 40px 0 0;
+    border-bottom: none;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    max-height: 85vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  .profile-edit-drag-handle {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .profile-edit-close-desktop {
+    display: none !important;
+  }
+
+  .profile-edit-header {
+    justify-content: center;
+  }
+
+  .profile-edit-title {
+    text-align: center;
+  }
+}
