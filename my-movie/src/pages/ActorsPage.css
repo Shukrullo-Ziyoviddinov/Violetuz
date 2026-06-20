@@ -175,7 +175,7 @@
   .actors-page-follow-btn--mobile {
     display: block;
     width: 100%;
-    padding: 0 1rem;
+    padding: 0 0.7rem;
     box-sizing: border-box;
     margin-top: 0.5rem;
   }
@@ -192,7 +192,7 @@
 
   .actors-page {
     min-height: calc(100vh - 200px);
-    margin-top: 1.5rem;
+    margin-top: 1rem;
   }
   
 }
@@ -211,7 +211,7 @@
 /* Bio block - general container with background */
 .actors-page-bio {
   max-width: 1350px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
   padding: 0 1rem;
   box-sizing: border-box;
 }
@@ -402,6 +402,7 @@
     max-width: none;
     padding: 0 1rem;
   }
+
 }
 
 @media (max-width: 768px) {
@@ -1160,3 +1161,4 @@
   display: block;
   margin-top: 2px;
 }
+
