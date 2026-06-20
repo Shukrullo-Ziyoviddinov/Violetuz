@@ -107,6 +107,7 @@ img {
   user-drag: none;
   pointer-events: auto; /* yoki bu qatorni umuman o‘chirib tashlang */
   user-select: none;
+  pointer-events: none; /* Rasm ustida pointer eventlarni o'chirish */
 }
 
 /* Link va buttonlarda ham highlight chiqmasin */
