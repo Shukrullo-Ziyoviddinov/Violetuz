@@ -1,5 +1,5 @@
 .recommended-clips {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   padding: 0.5rem 0;
 }
 
@@ -133,6 +133,7 @@
 @media (max-width: 500px) {
   .recommended-clips-title {
     font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
   }
 }
 
