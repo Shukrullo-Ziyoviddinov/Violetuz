@@ -170,7 +170,7 @@
 
 @media (max-width: 768px) {
   .video-banner {
-    padding: 0 1rem;
+    padding: 0 0.7rem;
   }
 
   .video-banner-counter {

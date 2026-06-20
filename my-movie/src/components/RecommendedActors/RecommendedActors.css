@@ -79,6 +79,12 @@
   font-size: 0.7rem;
 }
 
+@media (max-width: 768px) {
+  .recommended-actors-container {
+    padding: 0 0.7rem;
+  }
+}
+
 @media (max-width: 500px) {
   .recommended-actors-title {
     font-size: 1.2rem;

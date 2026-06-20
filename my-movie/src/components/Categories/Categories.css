@@ -40,7 +40,7 @@
 
 @media (max-width: 768px) {
   .categories {
-    padding: 0 1rem;
+    padding: 0 0.7rem;
   }
 
   .categories-item {
