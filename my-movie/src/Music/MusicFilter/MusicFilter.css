@@ -331,4 +331,9 @@
   .music-filter-modal-close {
     display: none;
   }
+
+  .music-filter {
+  margin-bottom: 1rem;
+}
+
 }

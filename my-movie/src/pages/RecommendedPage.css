@@ -3,3 +3,8 @@
   margin-top: 3rem;
 }
 
+@media (max-width: 500px) {
+  .recommended-page {
+    margin-top: 1rem;
+  }
+}

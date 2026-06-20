@@ -114,3 +114,11 @@
     margin-bottom: 1rem;
   }
 }
+
+@media (max-width: 400px) {
+  .home-shorts--music .home-shorts-card {
+  min-width: 135px;
+  width: 135px;
+  max-width: 135px;
+}
+}

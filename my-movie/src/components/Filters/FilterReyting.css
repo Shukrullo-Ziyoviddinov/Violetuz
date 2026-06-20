@@ -209,8 +209,8 @@
 
 @media (max-width: 768px) {
   .filters {
-    padding: 0 1rem;
-    margin-bottom: 1.5rem;
+    padding: 0 0.7rem;
+    margin-bottom: 1rem;
   }
 
   .filters-btn {

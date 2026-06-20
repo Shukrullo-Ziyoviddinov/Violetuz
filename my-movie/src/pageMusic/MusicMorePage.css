@@ -34,14 +34,21 @@
   }
 }
 
-@media (max-width: 390px) {
-  .music-more-page--clips .music-more-page-grid {
+@media (max-width: 400px) {
+  /* .music-more-page--clips .music-more-page-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 
   .music-more-page--clips .music-more-page-item-image-wrapper {
     padding-top: 43%;
-}
+} */
+
+  .music-more-page--clips .music-more-page-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .music-more-page--clips .music-more-page-item-image-wrapper {
+    padding-top: 58%;
+  }
 }
 
 /* Artist bo'limi - dumaloq rasm, info pastda */
@@ -301,5 +308,19 @@
 .music-more-page-item-wishlist-btn {
   width: 30px;
   height: 30px;
+}
+
+.music-more-page-header {
+    margin-bottom: 1rem;
+}
+
+.music-more-page{
+  padding: 1rem 0;
+}
+}
+
+@media (max-width: 768px) {
+    .music-more-page-container {
+    padding: 0 0.7rem;
 }
 }
