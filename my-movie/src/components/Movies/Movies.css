@@ -211,7 +211,7 @@
 
 @media (max-width: 768px) {
   .movies {
-    padding: 0 1rem;
+    padding: 0 0.7rem;
   }
 
   .movies-grid {
