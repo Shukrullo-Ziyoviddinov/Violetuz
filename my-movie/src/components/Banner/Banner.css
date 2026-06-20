@@ -257,6 +257,7 @@
 
     .banner {
         padding: 0 ;
+        margin-bottom: 1rem;
     }
 
     .manga-carousel {
@@ -278,10 +279,10 @@
 
 @media (max-width: 400px) {
     .manga-carousel {
-        height: 340px;
+        height: 350px;
     }
     .manga-image {
-        width: 78%;
+        width: 75%;
     }
 }
 

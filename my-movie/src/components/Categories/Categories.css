@@ -48,3 +48,9 @@
     font-size: 0.9rem;
   }
 }
+
+@media (max-width: 470px) {
+.categories {
+    margin-bottom: 1rem;
+  }
+}

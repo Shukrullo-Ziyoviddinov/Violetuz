@@ -106,6 +106,7 @@ img {
   -webkit-user-drag: none;
   user-drag: none;
   pointer-events: auto; /* yoki bu qatorni umuman o‘chirib tashlang */
+  user-select: none;
 }
 
 /* Link va buttonlarda ham highlight chiqmasin */
