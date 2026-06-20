@@ -256,7 +256,7 @@
 
   .miniPlayerRow {
     grid-template-columns: auto 1fr auto;
-    gap: 0;
+    gap: 0.3rem;
     align-items: center;
     cursor: pointer;
   }
@@ -296,8 +296,8 @@
   .miniPlayer {
     position: fixed;
     bottom: 80px;
-    left: 16px;
-    right: 16px;
+    left: 10px;
+    right: 10px;
     padding: 0;
     border-radius: 30px;
   }
