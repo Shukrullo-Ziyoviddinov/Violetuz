@@ -220,7 +220,7 @@
 /* Responsive - Kichik Telefon (max-width: 400px) */
 @media (max-width: 400px) {
   .music-carousel {
-    height: 140px;
+    height: 160px;
   }
   .music-image {
     width: 80%;

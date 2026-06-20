@@ -107,6 +107,10 @@
     cursor: pointer;
     transition: all 0.3s;
 }
+
+.home-shorts--music .home-shorts-container.music-cards-container {
+    padding: 0 0.7rem;
+}
 }
 
 @media (max-width: 470px) {
