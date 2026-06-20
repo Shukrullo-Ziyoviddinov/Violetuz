@@ -102,7 +102,7 @@ body::-webkit-scrollbar {
 }
 
 /* Rasmni drag va select qilishni o'chirish */
-img, video {
+img{
   -webkit-user-drag: none;
   user-drag: none;
   pointer-events: auto; /* yoki bu qatorni umuman o‘chirib tashlang */
@@ -110,7 +110,13 @@ img, video {
   pointer-events: none; /* Rasm ustida pointer eventlarni o'chirish */
 }
 
-
+video {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: auto; /* yoki bu qatorni umuman o‘chirib tashlang */
+  user-select: none;
+  pointer-events: none; /* Video ustida pointer eventlarni o'chirish */
+}
 
 /* Link va buttonlarda ham highlight chiqmasin */
 a,
