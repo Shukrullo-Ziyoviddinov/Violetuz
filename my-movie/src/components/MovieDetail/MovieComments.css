@@ -560,3 +560,10 @@
     justify-content: flex-start;
   }
 }
+
+@media (max-width: 500px) {
+  .movie-detail-comments-modal-body,
+  .movie-detail-comments-modal-footer {
+  padding: 1rem 0.6rem;
+}
+}

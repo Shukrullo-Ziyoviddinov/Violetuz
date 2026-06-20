@@ -742,6 +742,15 @@
   .music-detail-trend-grid {
     grid-template-columns: 1fr;
   }
+
+  .music-detail {
+  padding: 1rem 0;
+}
+
+.music-detail-container {
+  padding: 0 0.7rem;
+}
+
 }
 
 @media (max-width: 640px) {
@@ -756,7 +765,7 @@
   .music-detail-top {
     margin: 0;
     padding: 1rem 0 0;
-    border-radius: 0;
+    border-radius: 0; 
   }
 
   .music-detail-top-row {

@@ -28,3 +28,11 @@
     margin-left: auto;
   }
 }
+
+@media (max-width: 400px) {
+    .canvas {
+        max-width: 70px;
+        margin-left: auto;
+    }
+
+}
