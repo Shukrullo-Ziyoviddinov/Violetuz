@@ -79,3 +79,50 @@ body::-webkit-scrollbar {
     padding-bottom: calc(155px + env(safe-area-inset-bottom, 0));
   }
 }
+
+
+
+/* ===== GLOBAL BLOCK ===== */
+/* Matn belgilanishini o'chirish */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Mobile bosilganda ko'k highlightni o'chirish */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Focus outline ni o'chirish */
+*:focus {
+  outline: none !important;
+}
+
+/* Rasmni drag va select qilishni o'chirish */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: auto; /* yoki bu qatorni umuman o‘chirib tashlang */
+}
+
+/* Link va buttonlarda ham highlight chiqmasin */
+a,
+button,
+.mb-nav__link {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+/* Input yozishiga ta'sir qilmasligi uchun */
+input,
+textarea,
+select,
+[contenteditable='true'] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
