@@ -84,7 +84,7 @@
 .manga-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* object-fit: cover; */
     object-position: center center;
     pointer-events: none;
     user-select: none;
@@ -241,7 +241,7 @@
     }
 
     .manga-carousel {
-        margin-top: 2rem;
+        margin-top: 1rem;
     }
     
     .manga-carousel {
@@ -273,6 +273,15 @@
     .manga-dot {
         width: 4px;
         height: 4px;
+    }
+}
+
+@media (max-width: 400px) {
+    .manga-carousel {
+        height: 320px;
+    }
+    .manga-image {
+        width: 78%;
     }
 }
 
