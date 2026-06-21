@@ -132,6 +132,25 @@ video.shorts-music-modal-video {
   touch-action: manipulation;
 }
 
+/* Shorts grid preview: iOS video long-press brauzer ochmasin */
+.shorts-video-thumb {
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+video.shorts-video-preview {
+  pointer-events: none !important;
+}
+
+.shorts-video-thumb-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
 /* Link va buttonlarda ham highlight chiqmasin */
 a,
 button,
