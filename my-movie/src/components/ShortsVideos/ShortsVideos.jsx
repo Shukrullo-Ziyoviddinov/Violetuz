@@ -186,6 +186,7 @@ const ShortsVideos = ({
   const [modalVideoState, setModalVideoState] = useState({ isPlaying: true, currentTime: 0, duration: 0 });
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [mobilePlayPauseVisible, setMobilePlayPauseVisible] = useState(false);
+  const [modalVideoMuted, setModalVideoMuted] = useState(false);
   const [desktopHover, setDesktopHover] = useState(false);
   const [shortsCommentCount, setShortsCommentCount] = useState(0);
   const [loadedPreviews, setLoadedPreviews] = useState({});
@@ -304,6 +305,7 @@ const ShortsVideos = ({
     setModalOpen(false);
     setSlideState(null);
     setMusicModalOpen(false);
+    setModalVideoMuted(false);
   }, [onCloseFromHome]);
 
   // "Tomosha qilish" bosilganda faqat modal yopiladi, onCloseFromHome chaqirilmaydi
@@ -319,6 +321,11 @@ const ShortsVideos = ({
     if (!v) return;
     if (v.paused) { v.play().catch(() => {}); }
     else { v.pause(); }
+  }, []);
+
+  const toggleModalVideoMute = useCallback((e) => {
+    e.stopPropagation();
+    setModalVideoMuted((prev) => !prev);
   }, []);
 
   const handleModalVideoProgress = useCallback((e) => {
@@ -362,7 +369,7 @@ const ShortsVideos = ({
 
     const v = modalVideoRef.current;
     if (v) {
-      if (v.muted) v.muted = false;
+      v.muted = modalVideoMuted;
       if (v.paused) v.play().catch(() => {});
       setModalVideoState((s) => ({
         ...s,
@@ -371,7 +378,13 @@ const ShortsVideos = ({
         duration: v.duration || s.duration,
       }));
     }
-  }, [activeIndex]);
+  }, [activeIndex, modalVideoMuted]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    const v = modalVideoRef.current;
+    if (v) v.muted = modalVideoMuted;
+  }, [modalVideoMuted, modalOpen, activeIndex]);
 
   const handleShortsCommentClick = useCallback((e) => {
     e.stopPropagation();
@@ -649,7 +662,7 @@ const ShortsVideos = ({
           autoPlay
           playsInline
           loop
-          muted={!isCenter}
+          muted={isCenter ? modalVideoMuted : true}
           preload="auto"
           className="shorts-modal-video shorts-modal-mobile-video-el"
           onTouchStart={isCenter ? (e) => {
@@ -823,6 +836,7 @@ const ShortsVideos = ({
     shortsCommentCount,
     toggleDescriptionExpanded,
     toggleModalVideoPlay,
+    modalVideoMuted,
   ]);
 
   const handleOverlayClick = (e) => { if (e.target === e.currentTarget) closeModal(); };
@@ -857,17 +871,45 @@ const ShortsVideos = ({
 
   const slideStyles = getSlideStyles();
 
+  const modalMuteButton = (
+    <button
+      type="button"
+      className="shorts-modal-mute-btn"
+      onClick={toggleModalVideoMute}
+      aria-label={modalVideoMuted
+        ? (contentLang === 'ru' ? 'Включить звук' : 'Ovozni yoqish')
+        : (contentLang === 'ru' ? 'Выключить звук' : 'Ovozni o\'chirish')}
+    >
+      {modalVideoMuted ? (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <line x1="23" y1="9" x2="17" y2="15" />
+          <line x1="17" y1="9" x2="23" y2="15" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+        </svg>
+      )}
+    </button>
+  );
+
   const modalContent = modalOpen && (
     <div className="shorts-modal-overlay" onClick={handleOverlayClick}>
       <div className="shorts-modal-content" onClick={(e) => e.stopPropagation()}>
         {isMobileView ? (
           // ============ MOBILE ============
           <div className="shorts-modal-video-wrapper shorts-modal-mobile" style={{ position: 'relative', overflow: 'hidden' }}>
-            <button className="shorts-modal-close shorts-modal-close-mobile" onClick={closeModal} aria-label="Ortga">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-              </svg>
-            </button>
+            <div className="shorts-modal-top-bar">
+              <button className="shorts-modal-close shorts-modal-close-mobile" onClick={closeModal} aria-label="Ortga">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                </svg>
+              </button>
+              {modalMuteButton}
+            </div>
             <VertikalDrag
               className="shorts-modal-vertikal-drag"
               items={shortsList}
@@ -879,11 +921,14 @@ const ShortsVideos = ({
         ) : (
           // ============ DESKTOP ============
           <div className="shorts-modal-desktop">
-            <button className="shorts-modal-close shorts-modal-close-desktop" onClick={closeModal} aria-label="Ortga">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-              </svg>
-            </button>
+            <div className="shorts-modal-top-bar shorts-modal-top-bar-desktop">
+              <button className="shorts-modal-close shorts-modal-close-desktop" onClick={closeModal} aria-label="Ortga">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                </svg>
+              </button>
+              {modalMuteButton}
+            </div>
             <div className="shorts-modal-nav-buttons">
               <button className="shorts-modal-nav-btn shorts-modal-nav-up" onClick={goPrev} aria-label="Oldingi">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" /></svg>
@@ -912,6 +957,7 @@ const ShortsVideos = ({
                   autoPlay
                   playsInline
                   loop
+                  muted={modalVideoMuted}
                   className="shorts-modal-video shorts-modal-desktop-video-el"
                   onClick={() => { collapseDescription(); toggleModalVideoPlay(); }}
                 />

@@ -243,6 +243,59 @@
   right: auto;
 }
 
+.shorts-modal-top-bar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.shorts-modal-top-bar > button {
+  pointer-events: auto;
+}
+
+.shorts-modal-top-bar .shorts-modal-close-mobile,
+.shorts-modal-top-bar .shorts-modal-close-desktop {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+}
+
+.shorts-modal-top-bar-desktop {
+  z-index: 15;
+}
+
+.shorts-modal-mute-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.shorts-modal-mute-btn:hover {
+  background: rgba(155, 79, 231, 0.5);
+  border-color: #9b4fe7;
+}
+
+.shorts-modal-mute-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
 .shorts-modal-close-desktop svg,
 .shorts-modal-close-mobile svg {
   width: 24px;
