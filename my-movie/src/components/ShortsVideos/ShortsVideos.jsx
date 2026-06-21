@@ -13,6 +13,8 @@ import ShortsShare from './ShortsShare';
 import Repost from '../Repost/Repost';
 import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import LikeButton from '../../Music/LikeButton/LikeButton';
+import ShortsMovieHead from './ShortsMovieHead';
+import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import './ShortsVideos.css';
 
 const MOBILE_BREAKPOINT = 768;
@@ -52,9 +54,18 @@ const formatTime = (seconds) => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
+const renderShortsModalTitle = (item, contentLang, isMusicSlide = false) => {
+  if (!isMusicSlide && item?.movieId) {
+    return <ShortsMovieHead item={item} contentLang={contentLang} />;
+  }
+  return (
+    <h3 className="shorts-modal-title">{getLocalizedField(item?.title, contentLang)}</h3>
+  );
+};
+
 // Bitta video player card (desktop animatsiya uchun)
 const VideoSlide = React.forwardRef(({ item, contentLang, videoState, onVideoClick, onProgressClick, onDescriptionClick, onWatchClick, descriptionExpanded, showPlayPause, onMouseEnter, onMouseLeave }, ref) => {
-  const getTitle = (it) => it.title?.[contentLang] || it.title?.uz || '';
+  const getTitle = (it) => getLocalizedField(it?.title, contentLang);
   const getDescription = (it) => it.description?.[contentLang] || it.description?.uz || '';
   const getVideo = (it) => it.video?.[contentLang] || it.video?.uz || '';
 
@@ -95,7 +106,7 @@ const VideoSlide = React.forwardRef(({ item, contentLang, videoState, onVideoCli
           <Link to={`/movie/${item.movieId}`} className="shorts-modal-watch-btn" onClick={onWatchClick}>
             {contentLang === 'ru' ? 'Смотреть' : 'Tomosha qilish'}
           </Link>
-          <h3 className="shorts-modal-title">{getTitle(item)}</h3>
+          {renderShortsModalTitle(item, contentLang)}
           <p
             className={`shorts-modal-description ${descriptionExpanded ? 'shorts-modal-description-expanded' : ''}`}
             onClick={onDescriptionClick}
@@ -640,7 +651,7 @@ const ShortsVideos = ({
     }
   }, [mobilePlayPauseVisible, collapseDescription]);
 
-  const getTitle = (item) => item.title?.[contentLang] || item.title?.uz || '';
+  const getTitle = (item) => getLocalizedField(item?.title, contentLang);
   const getDescription = (item) => item.description?.[contentLang] || item.description?.uz || '';
 
   const isItemMusicSlide = useCallback((item) => (
@@ -696,7 +707,7 @@ const ShortsVideos = ({
           <>
         <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-mobile ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
           <div className="shorts-modal-info-content">
-            <h3 className="shorts-modal-title">{getTitle(item)}</h3>
+            {renderShortsModalTitle(item, contentLang, itemMusic)}
             <div className="shorts-modal-caption-music-wrap">
               <div className="shorts-modal-description-row">
                 <p
@@ -976,7 +987,7 @@ const ShortsVideos = ({
                 )}
                 <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
                   <div className="shorts-modal-info-content">
-                    <h3 className="shorts-modal-title">{getTitle(shortsList[activeIndex])}</h3>
+                    {renderShortsModalTitle(shortsList[activeIndex], contentLang, slideMusic)}
                     <div className="shorts-modal-caption-music-wrap">
                       <div className="shorts-modal-description-row">
                         <p
@@ -1323,7 +1334,7 @@ const IncomingSlide = ({ item, contentLang, direction, duration }) => {
   }, [duration]);
 
   const getVideo = (it) => it.video?.[contentLang] || it.video?.uz || '';
-  const getTitle = (it) => it.title?.[contentLang] || it.title?.uz || '';
+  const getTitle = (it) => getLocalizedField(it?.title, contentLang);
 
   return (
     <div className="shorts-modal-video-inner shorts-modal-desktop-inner" style={style}>
@@ -1337,7 +1348,7 @@ const IncomingSlide = ({ item, contentLang, direction, duration }) => {
       />
       <div className="shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop">
         <div className="shorts-modal-info-content">
-          <h3 className="shorts-modal-title">{getTitle(item)}</h3>
+          {renderShortsModalTitle(item, contentLang)}
         </div>
       </div>
     </div>
