@@ -111,7 +111,7 @@ img {
 }
 
 /* Video: bosish ishlaydi, sudrash va uzoq bosish callout blok */
-video {
+video, .shorts-video-preview, .shorts-modal-mobile .shorts-modal-mobile-video-el {
   -webkit-user-drag: none;
   user-drag: none;
   user-select: none;
