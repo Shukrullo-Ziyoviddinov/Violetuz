@@ -98,7 +98,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  border: 3px solid rgba(157, 78, 221, 0.55);
+  border: 3px solid rgba(155, 79, 231, 0.55);
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
@@ -220,8 +220,8 @@
 }
 
 .profile-edit-input:focus {
-  border-color: rgba(157, 78, 221, 0.7);
-  box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.15);
+  border-color: rgba(155, 79, 231, 0.7);
+  box-shadow: 0 0 0 3px rgba(155, 79, 231, 0.15);
 }
 
 .profile-edit-input-invalid {
@@ -244,7 +244,7 @@
 .profile-edit-save {
   margin-top: 0.5rem;
   padding: 0.85rem 1.5rem;
-  background: #ca4edd;
+  background: #9b4fe7;
   border: none;
   border-radius: 12px;
   color: #fff;

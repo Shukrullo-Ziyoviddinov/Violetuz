@@ -78,27 +78,27 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  background: linear-gradient(135deg, #b87ff7 0%, #9b4fe7 100%);
   
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow:
-    8px 0 10px rgba(214, 78, 221, 0.5),
-    -8px 0 10px rgba(214, 78, 221, 0.5),
-    0 8px 10px rgba(214, 78, 221, 0.5),
-    0 -8px 10px rgba(214, 78, 221, 0.5);
+    8px 0 10px rgba(155, 79, 231, 0.5),
+    -8px 0 10px rgba(155, 79, 231, 0.5),
+    0 8px 10px rgba(155, 79, 231, 0.5),
+    0 -8px 10px rgba(155, 79, 231, 0.5);
   -webkit-tap-highlight-color: transparent;
 }
 
 .rating-page-empty-btn:hover {
   transform: translateY(-2px);
   box-shadow:
-    8px 0 14px rgba(214, 78, 221, 0.6),
-    -8px 0 14px rgba(214, 78, 221, 0.6),
-    0 8px 14px rgba(214, 78, 221, 0.6),
-    0 -8px 14px rgba(214, 78, 221, 0.6);
+    8px 0 14px rgba(155, 79, 231, 0.6),
+    -8px 0 14px rgba(155, 79, 231, 0.6),
+    0 8px 14px rgba(155, 79, 231, 0.6),
+    0 -8px 14px rgba(155, 79, 231, 0.6);
 }
 
 .rating-page-empty-btn:active {

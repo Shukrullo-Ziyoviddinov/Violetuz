@@ -32,7 +32,7 @@
 }
 
 .artist-music-story-modal--has-color .artist-music-story-modal-progress-fill {
-  background: rgba(192, 78, 221, 0.8);
+  background: rgba(155, 79, 231, 0.8);
 }
 
 
@@ -105,7 +105,7 @@
 
 .artist-music-story-modal-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #c04edd, #7c3aed);
+  background: linear-gradient(90deg, #9b4fe7, #7c3aed);
   border-radius: 3px;
   transition: width 0.1s linear;
 }
@@ -140,11 +140,11 @@
 .artist-music-story-modal-btn-play {
   width: 52px;
   height: 52px;
-  background: rgba(192, 78, 221, 0.8);
+  background: rgba(155, 79, 231, 0.8);
 }
 
 .artist-music-story-modal-btn-play:hover {
-  background: rgba(192, 78, 221, 1);
+  background: rgba(155, 79, 231, 1);
 }
 
 .artist-music-story-modal-title-wrap {
@@ -171,7 +171,7 @@
 }
 
 .artist-music-story-modal-music-btn:hover {
-  background: rgba(192, 78, 221, 0.6);
+  background: rgba(155, 79, 231, 0.6);
   color: #fff;
 }
 
@@ -188,7 +188,7 @@
 }
 
 .artist-music-story-modal-title:hover {
-  color: #c04edd;
+  color: #9b4fe7;
   text-decoration: underline;
 }
 

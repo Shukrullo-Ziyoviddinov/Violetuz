@@ -310,7 +310,7 @@
 }
 
 .actors-page-bio-grid-item:focus-visible {
-  outline: 2px solid rgba(197, 78, 221, 0.9);
+  outline: 2px solid rgba(155, 79, 231, 0.9);
   outline-offset: 2px;
 }
 
@@ -373,7 +373,7 @@
 
 .actors-page-error button {
   padding: 0.75rem 1.5rem;
-  background: #c54edd;
+  background: #9b4fe7;
   border: none;
   border-radius: 8px;
   color: #ffffff;
@@ -382,7 +382,7 @@
 }
 
 .actors-page-error button:hover {
-  background: #b03dd4;
+  background: #8550c5;
 }
 
 @media (max-width: 968px) {

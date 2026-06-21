@@ -56,18 +56,18 @@
 
 
   .navbar-mobile-item-active {
-    color: #8b008b !important;
+    color: #9b4fe7 !important;
     background: none !important;
     transition: color 0.25s ease;
   }
 
   .navbar-mobile-item-active span {
     font-weight: 700;
-    color: #8b008b;
+    color: #9b4fe7;
   }
 
   .navbar-mobile-item-active svg {
-    color: #8b008b;
+    color: #9b4fe7;
   }
 
   .navbar-mobile-item svg {
@@ -86,7 +86,7 @@
   }
 
   .navbar-mobile-item-active .fa-film {
-    color: #8b008b;
+    color: #9b4fe7;
   }
 
   /* Search overlay - full screen */
@@ -154,7 +154,7 @@
   }
 
   .navbar-mobile-search-back:hover {
-    color: #ca4edd;
+    color: #9b4fe7;
   }
 
   .navbar-mobile-search-back i,
@@ -193,8 +193,8 @@
   }
 
   .navbar-mobile-search-icon-btn:hover {
-    color: rgba(192, 78, 221, 0.9);
-    background: rgba(157, 78, 221, 0.2);
+    color: rgba(155, 79, 231, 0.9);
+    background: rgba(155, 79, 231, 0.2);
   }
 
   .navbar-mobile-search-input {

@@ -29,7 +29,7 @@
 
 .like-button-like.active,
 .like-button-dislike.active {
-  color: rgba(192, 78, 221, 1);
+  color: rgba(155, 79, 231, 1);
 }
 
 .like-button-dislike.active {

@@ -44,12 +44,12 @@
 }
 
 .language-modal-flag-item:hover {
-  background-color: rgba(157, 78, 221, 0.2);
-  border-color: rgba(157, 78, 221, 0.5);
+  background-color: rgba(155, 79, 231, 0.2);
+  border-color: rgba(155, 79, 231, 0.5);
 }
 
 .language-modal-flag-item.active {
-  background-color: rgba(200, 78, 221, 0.3);
+  background-color: rgba(155, 79, 231, 0.3);
   border-color: white;
 }
 

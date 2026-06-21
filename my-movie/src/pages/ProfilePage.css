@@ -178,7 +178,7 @@
   justify-content: center;
   background: linear-gradient(135deg, #ffffff 0%, #d9e4ff 45%, #9cb8ff 100%);
   border: 2px solid rgba(3, 19, 234, 0.75);
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .profile-page-likes-icon-wrap svg {
@@ -306,7 +306,7 @@
 }
 
 .profile-page-repost-empty-btn--movie {
-  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  background: linear-gradient(135deg, #b87ff7 0%, #9b4fe7 100%);
 }
 
 .profile-page-repost-empty-btn--music {

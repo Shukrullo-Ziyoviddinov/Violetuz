@@ -39,9 +39,9 @@
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 
-              0 0 100px rgba(157, 78, 221, 0.15),
+              0 0 100px rgba(155, 79, 231, 0.15),
               inset 0 1px 2px rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(157, 78, 221, 0.2);
+  border: 1px solid rgba(155, 79, 231, 0.2);
   animation: modalSlideUp 0.4s ease-out;
 }
 
@@ -75,9 +75,9 @@
   right: 2rem;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, rgba(202, 78, 221, 0.2), rgba(231, 125, 255, 0.2));
+  background: linear-gradient(135deg, rgba(155, 79, 231, 0.2), rgba(184, 127, 247, 0.2));
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(190, 78, 221, 0.6);
+  border: 1px solid rgba(155, 79, 231, 0.6);
   border-radius: 50%;
   color: #ffffff;
   font-size: 28px;
@@ -92,7 +92,7 @@
 }
 
 .watch-modal-close:hover {
-  background: linear-gradient(135deg, #bd02bd 0%, #8b008b 100%);
+  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
   border-color: #bd02bd;
   transform: scale(1.1) rotate(90deg);
 }
@@ -189,14 +189,14 @@
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8),
-              0 0 80px rgba(157, 78, 221, 0.2);
-  border: 1px solid rgba(157, 78, 221, 0.3);
+              0 0 80px rgba(155, 79, 231, 0.2);
+  border: 1px solid rgba(155, 79, 231, 0.3);
   transition: all 0.3s ease;
 }
 
 .watch-modal-video-wrapper:hover {
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9),
-              0 0 100px rgba(157, 78, 221, 0.3);
+              0 0 100px rgba(155, 79, 231, 0.3);
 }
 
 /* Video Element */
@@ -260,7 +260,7 @@
   height: 50px;
   background: linear-gradient(135deg, rgba(187, 42, 201, 0.3), rgba(214, 88, 234, 0.3));
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(214, 78, 221, 0.8);
+  border: 1px solid rgba(155, 79, 231, 0.8);
   border-radius: 50%;
   color: #ffffff;
   cursor: pointer;
@@ -272,7 +272,7 @@
 }
 
 .watch-modal-control-btn:hover {
-  border-color: #8b008b;
+  border-color: #9b4fe7;
   transform: scale(1.1);
 }
 
@@ -284,7 +284,7 @@
   width: 60px;
   height: 60px;
   background: linear-gradient(135deg, rgba(187, 42, 201, 0.5), rgba(214, 88, 234, 0.5));
-  border: 2px solid #8b008b;
+  border: 2px solid #9b4fe7;
 }
 
 .watch-modal-control-btn-play:hover {
@@ -339,7 +339,7 @@
 
 .watch-modal-progress-filled {
   height: 100%;
-  background: linear-gradient(135deg, #bd02bd 0%, #8b008b 100%);
+  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
   border-radius: 8px;
   transition: width 0.1s linear;
   position: relative;
@@ -352,7 +352,7 @@
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  background: linear-gradient(135deg, #bd02bd 0%, #6604b0 50%, #8b008b 100%);
+  background: linear-gradient(135deg, #bd02bd 0%, #6604b0 50%, #9b4fe7 100%);
   border-radius: 50%;
   border: 3px solid #ffffff;
   transition: all 0.2s ease;
@@ -369,7 +369,7 @@
   position: absolute;
   top: -50px;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #bd02bd 0%, #8b008b 100%);
+  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
   backdrop-filter: blur(10px);
   padding: 0.6rem 1rem;
   border-radius: 10px;
@@ -436,7 +436,7 @@
 }
 
 .watch-modal-icon-btn:hover {
-  background: linear-gradient(135deg, #bd02bd 0%, #8b008b 100%);
+  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
   border-color: #bd02bd;
 }
 
@@ -449,7 +449,7 @@
   width: 100px;
   height: 6px;
   cursor: pointer;
-  accent-color: #8b008b;
+  accent-color: #9b4fe7;
   background: transparent;
   outline: none;
 }
@@ -467,7 +467,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #bd02bd, #8b008b);
+  background: linear-gradient(135deg, #bd02bd, #9b4fe7);
   cursor: pointer;
   border: 3px solid #ffffff;
   box-shadow: 0 0 10px rgba(189, 2, 189, 0.7);
@@ -485,7 +485,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #bd02bd, #8b008b);
+  background: linear-gradient(135deg, #bd02bd, #9b4fe7);
   cursor: pointer;
   border: 3px solid #ffffff;
   box-shadow: 0 0 10px rgba(189, 2, 189, 0.7);
@@ -560,12 +560,12 @@
 }
 
 .watch-modal-speed-option:hover {
-  background: linear-gradient(135deg, #bd02bd 0%, #8b008b 100%);
+  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
   transform: translateX(5px);
 }
 
 .watch-modal-speed-option.active {
-  background: linear-gradient(135deg, #bd02bd 0%, #8b008b 100%);
+  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
   font-weight: 700;
   color: #ffffff;
 }

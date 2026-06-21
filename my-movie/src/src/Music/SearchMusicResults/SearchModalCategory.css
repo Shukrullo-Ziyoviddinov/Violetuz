@@ -37,8 +37,8 @@
 }
 
 .search-modal-category-item:hover {
-  background: rgba(157, 78, 221, 0.25);
-  border-color: rgba(157, 78, 221, 0.5);
+  background: rgba(155, 79, 231, 0.25);
+  border-color: rgba(155, 79, 231, 0.5);
   transform: translateY(-1px);
 }
 

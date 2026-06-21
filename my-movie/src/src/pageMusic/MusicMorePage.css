@@ -167,7 +167,7 @@
   overflow: hidden;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid #d786e48f;
+  border: 1px solid #9b4fe78f;
 }
 
 .music-more-page-item-wishlist-btn {
@@ -194,7 +194,7 @@
 }
 
 .music-more-page-item-wishlist-btn.active {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .music-more-page-item-image {
@@ -214,7 +214,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border-radius: 50%;
   color: #fff;
   z-index: 2;

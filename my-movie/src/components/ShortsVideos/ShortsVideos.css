@@ -151,7 +151,7 @@
   pointer-events: auto;
 }
 
-/* Mobil: play/pause markazda, rang #ca4edd */
+/* Mobil: play/pause markazda, rang #9b4fe7 */
 .shorts-modal-play-pause-mobile {
   position: absolute;
   top: 50%;
@@ -227,8 +227,8 @@
 }
 
 .shorts-modal-close:hover {
-  background: rgba(197, 78, 221, 0.5);
-  border-color: #c54edd;
+  background: rgba(155, 79, 231, 0.5);
+  border-color: #9b4fe7;
 }
 
 .shorts-modal-close-desktop,
@@ -277,8 +277,8 @@
 }
 
 .shorts-modal-nav-btn:hover {
-  background: rgba(197, 78, 221, 0.5);
-  border-color: #c54edd;
+  background: rgba(155, 79, 231, 0.5);
+  border-color: #9b4fe7;
 }
 
 .shorts-modal-nav-btn svg {
@@ -311,7 +311,7 @@
   background: #000;
 }
 
-/* Play/Pause - video markazida, rang #ca4edd */
+/* Play/Pause - video markazida, rang #9b4fe7 */
 .shorts-modal-play-pause-center {
   position: absolute;
   top: 50%;
@@ -321,7 +321,7 @@
   height: 72px;
   border-radius: 50%;
   border: none;
-  background: rgba(202, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -338,7 +338,7 @@
 }
 
 .shorts-modal-play-pause-center:hover {
-  background: #ca4edd;
+  background: #9b4fe7;
   transform: translate(-50%, -50%) scale(1.05);
 }
 
@@ -396,7 +396,7 @@
 
 .shorts-modal-progress-fill {
   height: 100%;
-  background: #ca4edd;
+  background: #9b4fe7;
   border-radius: 3px;
   transition: width 0.1s linear;
 }
@@ -424,7 +424,7 @@
 }
 
 .shorts-modal-comment-input:hover {
-  border-color: rgba(202, 78, 221, 0.5);
+  border-color: rgba(155, 79, 231, 0.5);
   background: rgba(45, 45, 50, 0.6);
 }
 
@@ -433,7 +433,7 @@
   align-items: center;
   gap: 6px;
   padding: 5px 15px;
-  background: linear-gradient(135deg, #c54edd 0%, #8b2cb8 100%);
+  background: linear-gradient(135deg, #9b4fe7 0%, #9b4fe7 100%);
   color: #fff;
   border-radius: 24px;
   font-size: 0.75rem;
@@ -451,7 +451,7 @@
 }
 
 .shorts-modal-watch-btn:hover {
-  background: linear-gradient(135deg, #d96aed 0%, #9b3cc9 100%);
+  background: linear-gradient(135deg, #b87ff7 0%, #9b4fe7 100%);
 }
 
 .shorts-modal-buttons-row {
@@ -567,14 +567,14 @@
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  background: rgba(202, 78, 221, 0.3);
+  background: rgba(155, 79, 231, 0.3);
   border: 1px solid #ccc;
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .shorts-modal-music-block:hover {
   transform: scale(1.05);
-  background: rgba(202, 78, 221, 0.5);
+  background: rgba(155, 79, 231, 0.5);
 }
 
 .shorts-modal-music-img {
@@ -604,7 +604,7 @@
   max-width: 480px;
   max-height: 90vh;
   width: 100%;
-  border: 1px solid rgba(202, 78, 221, 0.3);
+  border: 1px solid rgba(155, 79, 231, 0.3);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -628,7 +628,7 @@
 }
 
 .shorts-music-modal-close:hover {
-  background: rgba(202, 78, 221, 0.5);
+  background: rgba(155, 79, 231, 0.5);
 }
 
 .shorts-music-modal-close svg {
@@ -687,7 +687,7 @@
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: rgba(202, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -706,7 +706,7 @@
 }
 
 .shorts-music-modal-clip-play-btn:hover {
-  background: #ca4edd;
+  background: #9b4fe7;
   transform: translate(-50%, -50%) scale(1.08);
   opacity: 1;
 }
@@ -761,7 +761,7 @@
 
 .shorts-music-modal-clip-progress-fill {
   height: 100%;
-  background: #ca4edd;
+  background: #9b4fe7;
   border-radius: 3px;
   transition: width 0.1s linear;
 }
@@ -794,11 +794,11 @@
 }
 
 .shorts-music-modal-clip-size-btn:hover {
-  background: rgba(202, 78, 221, 0.5);
+  background: rgba(155, 79, 231, 0.5);
 }
 
 .shorts-music-modal-clip-size-btn.active {
-  background: rgba(202, 78, 221, 0.6);
+  background: rgba(155, 79, 231, 0.6);
   color: #fff;
 }
 
@@ -973,8 +973,8 @@
 }
 
 .shorts-music-modal-download-btn:hover {
-  background: rgba(202, 78, 221, 0.4);
-  border-color: #ca4edd;
+  background: rgba(155, 79, 231, 0.4);
+  border-color: #9b4fe7;
   color: #fff;
 }
 
@@ -996,7 +996,7 @@
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #c54edd 0%, #8b2cb8 100%);
+  background: linear-gradient(135deg, #9b4fe7 0%, #9b4fe7 100%);
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -1032,7 +1032,7 @@
 
 .shorts-music-modal-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #c54edd, #8b2cb8);
+  background: linear-gradient(90deg, #9b4fe7, #9b4fe7);
   border-radius: 3px;
   transition: width 0.1s linear;
 }
@@ -1099,7 +1099,7 @@
 }
 
 .shorts-modal-like-btn.active {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .shorts-modal-like-btn.active svg {
@@ -1115,11 +1115,11 @@
 
 .shorts-modal-like-btn.active .shorts-modal-action-count,
 .shorts-modal-comment-btn .shorts-modal-action-count {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .shorts-modal-save-btn.active {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .shorts-modal-save-btn.active svg {

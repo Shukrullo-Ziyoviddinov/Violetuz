@@ -11,8 +11,8 @@
 }
 
 .repost-movie-card:hover {
-  border-color: rgba(202, 78, 221, 0.55);
-  background: rgba(202, 78, 221, 0.08);
+  border-color: rgba(155, 79, 231, 0.55);
+  background: rgba(155, 79, 231, 0.08);
 }
 
 .repost-movie-card-image-wrapper {

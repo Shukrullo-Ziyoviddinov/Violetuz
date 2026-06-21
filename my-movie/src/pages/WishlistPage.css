@@ -88,7 +88,7 @@
   overflow: hidden;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid #d786e48f;
+  border: 1px solid #9b4fe78f;
 }
 
 .wishlist-music-item-wishlist-btn {
@@ -103,7 +103,7 @@
   background-color: rgba(0, 0, 0, 0.7);
   border: none;
   border-radius: 50%;
-  color: #ca4edd;
+  color: #9b4fe7;
   cursor: pointer;
   z-index: 2;
   transition: all 0.3s ease;
@@ -111,7 +111,7 @@
 
 .wishlist-music-item-wishlist-btn:hover {
   background-color: rgba(0, 0, 0, 0.8);
-  color: #e85ef0;
+  color: #b87ff7;
 }
 
 .wishlist-music-item-image {
@@ -147,7 +147,7 @@
     width: 30px;
     height: 30px;
 ;
-    color: #ca4edd;
+    color: #9b4fe7;
     cursor: pointer;
     z-index: 2;
     transition: all 0.3s ease;
@@ -173,7 +173,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border-radius: 50%;
   color: #fff;
   z-index: 3;
@@ -251,17 +251,17 @@
   font-size: 1rem;
   font-weight: 500;
   color: #ffffff;
-  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  background: linear-gradient(135deg, #b87ff7 0%, #9b4fe7 100%);
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(214, 78, 221, 0.5);
+  box-shadow: 0 6px 20px rgba(155, 79, 231, 0.5);
 
-  box-shadow: 8px 0 10px rgba(214, 78, 221, 0.5),
-  -8px 0 10px rgba(214, 78, 221, 0.5),
-  0 8px 10px rgba(214, 78, 221, 0.5),
-  0 -8px 10px rgba(214, 78, 221, 0.5);
+  box-shadow: 8px 0 10px rgba(155, 79, 231, 0.5),
+  -8px 0 10px rgba(155, 79, 231, 0.5),
+  0 8px 10px rgba(155, 79, 231, 0.5),
+  0 -8px 10px rgba(155, 79, 231, 0.5);
 }
 
 .wishlist-empty-btn:hover {

@@ -121,13 +121,13 @@
 }
 
 .comentaria-history-modal-empty-btn--movie {
-  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
-  box-shadow: 0 4px 16px rgba(214, 78, 221, 0.45);
+  background: linear-gradient(135deg, #b87ff7 0%, #9b4fe7 100%);
+  box-shadow: 0 4px 16px rgba(155, 79, 231, 0.45);
 }
 
 .comentaria-history-modal-empty-btn--movie:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(214, 78, 221, 0.55);
+  box-shadow: 0 6px 20px rgba(155, 79, 231, 0.55);
 }
 
 .comentaria-history-modal-empty-btn--music {
@@ -321,7 +321,7 @@
 
 .comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-like-btn.active,
 .comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-save-btn.active {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-like-btn.active svg,
@@ -337,7 +337,7 @@
 }
 
 .comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-like-btn.active .shorts-modal-action-count {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .comentaria-history-modal .comentaria-history-shorts-actions .shorts-modal-action-count {
@@ -345,7 +345,7 @@
 }
 
 .comentaria-history-modal .comentaria-history-shorts-actions .repost-btn.shorts-modal-action-btn.active {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .comentaria-history-modal .comentaria-history-shorts-actions .repost-btn.shorts-modal-action-btn i {

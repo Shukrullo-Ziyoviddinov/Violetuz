@@ -18,7 +18,7 @@
   background-image: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%), linear-gradient(135deg, rgb(15, 15, 18), rgb(45, 45, 50), rgb(25, 25, 28), rgb(15, 15, 18));
   border-radius: 16px 16px 0 0;
   z-index: 1301;
-  border: 1px solid rgba(157, 78, 221, 0.3);
+  border: 1px solid rgba(155, 79, 231, 0.3);
   border-bottom: none;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
   padding-bottom: env(safe-area-inset-bottom, 0);
@@ -103,13 +103,13 @@
 }
 
 .profile-lang-modal-item:hover {
-  background: #ca4edd3a ;
-  border-color: #ca4edd ;
+  background: #9b4fe73a ;
+  border-color: #9b4fe7 ;
 }
 
 .profile-lang-modal-item.active {
-  background: #ca4edd3a ;
-  border-color: #ca4edd ;
+  background: #9b4fe73a ;
+  border-color: #9b4fe7 ;
 }
 
 .profile-lang-modal-flag {
@@ -127,7 +127,7 @@
 .profile-lang-modal-save {
   width: 100%;
   padding: 0.85rem 1.5rem;
-  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  background: linear-gradient(135deg, #b87ff7 0%, #9b4fe7 100%);
   border: none;
   border-radius: 12px;
   color: #fff;
@@ -149,7 +149,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 16px;
-    border: 1px solid rgba(157, 78, 221, 0.3);
+    border: 1px solid rgba(155, 79, 231, 0.3);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   }
 

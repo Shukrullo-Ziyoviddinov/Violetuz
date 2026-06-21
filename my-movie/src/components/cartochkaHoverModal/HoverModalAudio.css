@@ -72,7 +72,7 @@
 
 .hover-modal-audio-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #c04edd, #a03dcc);
+  background: linear-gradient(90deg, #9b4fe7, #8550c5);
   border-radius: 3px;
   transition: width 0.1s linear;
 }
@@ -84,7 +84,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(192, 78, 221, 0.4);
+  background: rgba(155, 79, 231, 0.4);
   border: none;
   border-radius: 50%;
   color: #fff;
@@ -93,5 +93,5 @@
 }
 
 .hover-modal-audio-btn:hover {
-  background: rgba(192, 78, 221, 0.7);
+  background: rgba(155, 79, 231, 0.7);
 }

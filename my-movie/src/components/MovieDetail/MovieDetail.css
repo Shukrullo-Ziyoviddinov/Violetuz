@@ -107,8 +107,8 @@
 }
 
 .video-control-btn:hover {
-  background-color: rgba(192, 78, 221, 0.9);
-  border-color: #c54edd;
+  background-color: rgba(155, 79, 231, 0.9);
+  border-color: #9b4fe7;
   transform: scale(1.1);
 }
 
@@ -335,7 +335,7 @@
 }
 
 .movie-detail-action-btn.active {
-  color: #ca4edd ;
+  color: #9b4fe7 ;
 }
 
 .movie-detail-action-count {
@@ -415,7 +415,7 @@
 }
 
 .movie-detail-btn-primary {
-  background: linear-gradient(135deg, #d85de8 0%, #ca4edd 100%);
+  background: linear-gradient(135deg, #b87ff7 0%, #9b4fe7 100%);
   color: white;
 }
 
@@ -533,13 +533,13 @@
 }
 
 .movie-detail-season-btn:hover {
-  border-color: #c54edd;
+  border-color: #9b4fe7;
   color: #ffffff;
 }
 
 .movie-detail-season-btn.active {
-  border-color: #c54edd;
-  background: rgba(197, 78, 221, 0.2);
+  border-color: #9b4fe7;
+  background: rgba(155, 79, 231, 0.2);
   color: #ffffff;
 }
 
@@ -556,13 +556,13 @@
 }
 
 .movie-detail-seasons-tab:hover {
-  border-color: #c54edd;
+  border-color: #9b4fe7;
   color: #ffffff;
 }
 
 .movie-detail-seasons-tab.active {
-  border-color: #c54edd;
-  background: rgba(197, 78, 221, 0.2);
+  border-color: #9b4fe7;
+  background: rgba(155, 79, 231, 0.2);
   color: #ffffff;
 }
 
@@ -591,8 +591,8 @@
 }
 
 .movie-detail-episode-item:hover {
-  border-color: #c54edd;
-  box-shadow: 0 4px 20px rgba(197, 78, 221, 0.3);
+  border-color: #9b4fe7;
+  box-shadow: 0 4px 20px rgba(155, 79, 231, 0.3);
 }
 
 .movie-detail-episode-video {
@@ -651,8 +651,8 @@
 }
 
 .movie-detail-scene-item:hover {
-  border-color: #c54edd;
-  box-shadow: 0 4px 20px rgba(197, 78, 221, 0.3);
+  border-color: #9b4fe7;
+  box-shadow: 0 4px 20px rgba(155, 79, 231, 0.3);
 }
 
 .movie-detail-scene-img {
@@ -678,8 +678,8 @@
 }
 
 .movie-detail-clip-item:hover {
-  border-color: #c54edd;
-  box-shadow: 0 4px 20px rgba(197, 78, 221, 0.3);
+  border-color: #9b4fe7;
+  box-shadow: 0 4px 20px rgba(155, 79, 231, 0.3);
 }
 
 .movie-detail-clip-media {
@@ -1001,8 +1001,8 @@
 }
 
 .movie-detail-description-modal-close:hover {
-  border-color: #8b008b;
-  background-color: rgba(157, 78, 221, 0.2);
+  border-color: #9b4fe7;
+  background-color: rgba(155, 79, 231, 0.2);
 }
 
 .movie-detail-description-modal-body {
@@ -1056,7 +1056,7 @@
 
 .movie-detail-error button {
   padding: 1rem 2rem;
-  background-color: #9d4edd;
+  background-color: #9b4fe7;
   color: #ffffff;
   border: none;
   border-radius: 8px;

@@ -182,7 +182,7 @@ const MusicPlayerModal = ({
                   onChange={(e) => !bassLocked && setBassVal(parseFloat(e.target.value) / 100)}
                   disabled={bassLocked}
                   style={{
-                    background: `linear-gradient(to right, rgba(192, 78, 221, 0.9) 0%, rgba(192, 78, 221, 0.9) ${bassVal * 100}%, rgba(255, 255, 255, 0.2) ${bassVal * 100}%, rgba(255, 255, 255, 0.2) 100%)`,
+                    background: `linear-gradient(to right, rgba(155, 79, 231, 0.9) 0%, rgba(155, 79, 231, 0.9) ${bassVal * 100}%, rgba(255, 255, 255, 0.2) ${bassVal * 100}%, rgba(255, 255, 255, 0.2) 100%)`,
                   }}
                 />
                 <button
@@ -215,7 +215,7 @@ const MusicPlayerModal = ({
                   onChange={(e) => !trebleLocked && setTrebleVal(parseFloat(e.target.value) / 100)}
                   disabled={trebleLocked}
                   style={{
-                    background: `linear-gradient(to right, rgba(192, 78, 221, 0.9) 0%, rgba(192, 78, 221, 0.9) ${trebleVal * 100}%, rgba(255, 255, 255, 0.2) ${trebleVal * 100}%, rgba(255, 255, 255, 0.2) 100%)`,
+                    background: `linear-gradient(to right, rgba(155, 79, 231, 0.9) 0%, rgba(155, 79, 231, 0.9) ${trebleVal * 100}%, rgba(255, 255, 255, 0.2) ${trebleVal * 100}%, rgba(255, 255, 255, 0.2) 100%)`,
                   }}
                 />
                 <button
@@ -279,7 +279,7 @@ const MusicPlayerModal = ({
                 onChange={onVolumeChange}
                 aria-label="Ovoz"
                 style={{
-                  background: `linear-gradient(to right, rgba(192, 78, 221, 0.9) 0%, rgba(192, 78, 221, 0.9) ${(isMuted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) ${(isMuted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) 100%)`,
+                  background: `linear-gradient(to right, rgba(155, 79, 231, 0.9) 0%, rgba(155, 79, 231, 0.9) ${(isMuted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) ${(isMuted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) 100%)`,
                 }}
               />
             </div>

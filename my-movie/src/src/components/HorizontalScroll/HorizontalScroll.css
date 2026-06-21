@@ -73,11 +73,11 @@
 
 .horizontal-scroll-btn:active {
   transform: translateY(-50%) scale(0.95);
-  background-color: rgba(197, 78, 221, 0.9);
+  background-color: rgba(155, 79, 231, 0.9);
 }
 
 .horizontal-scroll-btn:focus {
-  outline: 2px solid rgba(207, 78, 221, 0.5);
+  outline: 2px solid rgba(155, 79, 231, 0.5);
   outline-offset: 2px;
 }
 

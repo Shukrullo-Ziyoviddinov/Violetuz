@@ -161,7 +161,7 @@
 }
 
 .trendCard.active {
-  background: rgba(192, 78, 221, 0.25);
+  background: rgba(155, 79, 231, 0.25);
 }
 
 .trendCardImgWrap {
@@ -238,7 +238,7 @@
 }
 
 .trendToggle.active {
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
 }
 
@@ -304,7 +304,7 @@
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border-radius: 50%;
   cursor: pointer;
 }
@@ -312,7 +312,7 @@
 .controlSlider::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -338,8 +338,8 @@
 }
 
 .controlLock.locked {
-  background: rgba(192, 78, 221, 0.3);
-  color: rgba(192, 78, 221, 1);
+  background: rgba(155, 79, 231, 0.3);
+  color: rgba(155, 79, 231, 1);
 }
 
 .classicBtn {
@@ -369,7 +369,7 @@
 }
 
 .classicBtn.active {
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
 }
 
@@ -408,7 +408,7 @@
 }
 
 .wishlistBtn.active {
-  color: rgba(192, 78, 221, 1);
+  color: rgba(155, 79, 231, 1);
 }
 
 .title {
@@ -442,7 +442,7 @@
 
 .progressFill {
   height: 100%;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border-radius: 3px;
   transition: width 0.1s linear;
 }
@@ -485,16 +485,16 @@
 .playBtn {
   width: 64px;
   height: 64px;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
 }
 
 .playBtn:hover {
-  background: rgba(192, 78, 221, 1);
+  background: rgba(155, 79, 231, 1);
 }
 
 .btn.active {
-  color: rgba(192, 78, 221, 1);
+  color: rgba(155, 79, 231, 1);
 }
 
 .volume {
@@ -541,7 +541,7 @@
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border-radius: 50%;
   cursor: pointer;
 }
@@ -549,7 +549,7 @@
 .volumeBar::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -587,7 +587,7 @@
 }
 
 .artworkToggle.active {
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
 }
 
@@ -615,7 +615,7 @@
 }
 
 .lyricsBtn.active {
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
 }
 

@@ -117,7 +117,7 @@
 }
 
 .video-detail-artist-name:hover {
-  color: rgba(192, 78, 221, 1);
+  color: rgba(155, 79, 231, 1);
 }
 
 .video-detail-info-sep {
@@ -127,7 +127,7 @@
 }
 
 .video-detail-artist-name:hover {
-  color: rgba(192, 78, 221, 1);
+  color: rgba(155, 79, 231, 1);
 }
 
 .video-detail-top-row {
@@ -227,7 +227,7 @@
 }
 
 .video-detail-save-btn.active {
-  color: rgba(192, 78, 221, 1);
+  color: rgba(155, 79, 231, 1);
 }
 
 .video-detail .movie-detail-comments {
@@ -331,7 +331,7 @@
   height: 48px;
   object-fit: cover;
   border-radius: 50%;
-  border: 2px solid rgba(192, 78, 221, 0.5);
+  border: 2px solid rgba(155, 79, 231, 0.5);
 }
 
 .video-detail-artist-info {

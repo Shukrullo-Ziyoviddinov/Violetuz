@@ -105,22 +105,22 @@
 }
 
 .playBtn {
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   color: #fff;
 }
 
 .playBtn:hover {
-  background: rgba(192, 78, 221, 1);
+  background: rgba(155, 79, 231, 1);
 }
 
 .shuffleBtn.active,
 .repeatBtn.active {
-  color: rgba(192, 78, 221, 1);
+  color: rgba(155, 79, 231, 1);
 }
 
 .shuffleBtn.active:hover,
 .repeatBtn.active:hover {
-  color: rgba(192, 78, 221, 0.9);
+  color: rgba(155, 79, 231, 0.9);
 }
 
 .time {
@@ -145,7 +145,7 @@
 
 .progressFill {
   height: 100%;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border-radius: 3px;
   transition: width 0.1s linear;
 }
@@ -222,7 +222,7 @@
   -webkit-appearance: none;
   width: 12px;
   height: 12px;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.2s;
@@ -235,7 +235,7 @@
 .volumeBar::-moz-range-thumb {
   width: 12px;
   height: 12px;
-  background: rgba(192, 78, 221, 0.9);
+  background: rgba(155, 79, 231, 0.9);
   border: none;
   border-radius: 50%;
   cursor: pointer;

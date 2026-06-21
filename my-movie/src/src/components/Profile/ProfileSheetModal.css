@@ -102,8 +102,8 @@
 }
 
 .profile-sheet-modal-link:hover {
-  background: #ca4edd3a ;
-  border-color: #ca4edd ;
+  background: #9b4fe73a ;
+  border-color: #9b4fe7 ;
 }
 
 .profile-sheet-modal-icon {
@@ -119,7 +119,7 @@
 }
 
 .profile-sheet-modal-email-link {
-  color: #ca4edd;
+  color: #9b4fe7;
   text-decoration: none;
   word-break: break-all;
 }

@@ -50,8 +50,8 @@
 }
 
 .music-filter-btn.open {
-  background: rgba(192, 78, 221, 0.3);
-  border-color: rgba(192, 78, 221, 0.6);
+  background: rgba(155, 79, 231, 0.3);
+  border-color: rgba(155, 79, 231, 0.6);
   color: #fff;
 }
 
@@ -112,7 +112,7 @@
 }
 
 .music-filter-option.active {
-  background: rgba(192, 78, 221, 0.35);
+  background: rgba(155, 79, 231, 0.35);
   color: #fff;
   font-weight: 600;
 }
@@ -260,7 +260,7 @@
 }
 
 .music-filter-modal-option.active {
-  background: rgba(192, 78, 221, 0.35);
+  background: rgba(155, 79, 231, 0.35);
   color: #fff;
   font-weight: 600;
 }

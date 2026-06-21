@@ -129,8 +129,8 @@
 }
 
 .feed-video-card-fav.active {
-  background: rgba(192, 78, 221, 0.2);
-  color: rgba(192, 78, 221, 1);
+  background: rgba(155, 79, 231, 0.2);
+  color: rgba(155, 79, 231, 1);
 }
 
 .feed-video-like-button .like-button-btn {

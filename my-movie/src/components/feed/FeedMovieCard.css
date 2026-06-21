@@ -109,7 +109,7 @@
 }
 
 .feed-movie-card-actions .movie-detail-action-btn.active {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 .feed-movie-card-actions .movie-detail-action-count {
@@ -139,8 +139,8 @@
 }
 
 .feed-movie-card-fav.active {
-  background: rgba(192, 78, 221, 0.2);
-  color: rgba(192, 78, 221, 1);
+  background: rgba(155, 79, 231, 0.2);
+  color: rgba(155, 79, 231, 1);
 }
 
 @media (min-width: 900px) {

@@ -65,7 +65,7 @@
 }
 
 .shorts-share-dropdown-item:hover {
-  background: rgba(192, 78, 221, 0.2);
+  background: rgba(155, 79, 231, 0.2);
 }
 
 .shorts-share-dropdown-icon {
@@ -218,8 +218,8 @@
 }
 
 .shorts-share-item:active {
-  background: rgba(192, 78, 221, 0.2);
-  border-color: rgba(192, 78, 221, 0.5);
+  background: rgba(155, 79, 231, 0.2);
+  border-color: rgba(155, 79, 231, 0.5);
 }
 
 .shorts-share-icon {

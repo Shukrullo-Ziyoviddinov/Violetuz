@@ -102,8 +102,8 @@
 }
 
 .navbar-search-input:focus {
-  border-color: rgba(192, 78, 221, 0.7);
-  box-shadow: 0 0 0 3px rgba(197, 78, 221, 0.15), inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-color: rgba(155, 79, 231, 0.7);
+  box-shadow: 0 0 0 3px rgba(155, 79, 231, 0.15), inset 0 1px 2px rgba(0, 0, 0, 0.1);
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
 }
 
@@ -125,13 +125,13 @@
 }
 
 .navbar-search-icon:hover {
-  color: rgba(192, 78, 221, 0.9);
-  background: rgba(157, 78, 221, 0.2);
+  color: rgba(155, 79, 231, 0.9);
+  background: rgba(155, 79, 231, 0.2);
 }
 
 .navbar-search-wrap:focus-within .navbar-search-icon {
-  color: rgba(192, 78, 221, 0.7);
-  background: rgba(157, 78, 221, 0.2);
+  color: rgba(155, 79, 231, 0.7);
+  background: rgba(155, 79, 231, 0.2);
 }
 
 .navbar-right {
@@ -173,13 +173,13 @@
 }
 
 .navbar-icon-btn:hover {
-  color: #ca4edd;
-  background-color: rgba(157, 78, 221, 0.1);
+  color: #9b4fe7;
+  background-color: rgba(155, 79, 231, 0.1);
 }
 
 .navbar-icon-active {
-  color: #ca4edd !important;
-  background-color: rgba(157, 78, 221, 0.15) !important;
+  color: #9b4fe7 !important;
+  background-color: rgba(155, 79, 231, 0.15) !important;
 }
 
 .navbar-language-wrapper {
@@ -200,8 +200,8 @@
 }
 
 .navbar-language-btn:hover {
-  background-color: rgba(192, 78, 221, 0.178);
-  border-color: rgba(192, 78, 221, 0.7);
+  background-color: rgba(155, 79, 231, 0.178);
+  border-color: rgba(155, 79, 231, 0.7);
   transform: scale(1.05);
 }
 
@@ -242,7 +242,7 @@
   background: rgba(20, 20, 20, 0.98);
   border-radius: 12px;
   padding: 1rem;
-  border: 1px solid rgba(157, 78, 221, 0.3);
+  border: 1px solid rgba(155, 79, 231, 0.3);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
@@ -299,7 +299,7 @@
 }
 
 .navbar-search-modal-back:hover {
-  color: #ca4edd;
+  color: #9b4fe7;
 }
 
 /* Desktop: modal ichida input ko'rinadi, qidiruv natijalari modaldagi */
@@ -346,13 +346,13 @@
 }
 
 .navbar-search-icon-btn:hover {
-  color: rgba(192, 78, 221, 0.9);
-  background: rgba(157, 78, 221, 0.2);
+  color: rgba(155, 79, 231, 0.9);
+  background: rgba(155, 79, 231, 0.2);
 }
 
 .navbar-search-input-wrap:focus-within .navbar-search-icon-btn {
-  color: rgba(192, 78, 221, 0.7);
-  background: rgba(157, 78, 221, 0.2);
+  color: rgba(155, 79, 231, 0.7);
+  background: rgba(155, 79, 231, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -365,7 +365,7 @@
     overflow: visible;
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
-    border-bottom: 2px solid #df76ef98;
+    border-bottom: 2px solid #9b4fe7;
   }
 
   .navbar-container {
@@ -455,7 +455,7 @@
   }
 
   .navbar-mobile-search-trigger:hover {
-    color: #ca4edd;
+    color: #9b4fe7;
   }
 
   /* Search modal - mobile butun ekran */
@@ -555,7 +555,7 @@
   }
 
   .navbar.navbar--feed-page .navbar-feed-messages-mobile:hover {
-    background: rgba(192, 78, 221, 0.22);
+    background: rgba(155, 79, 231, 0.22);
     color: #fff;
   }
 
