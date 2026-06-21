@@ -695,15 +695,11 @@
   overflow: visible;
 }
 
-/* Tavsif va musiqa: musiqa alohida sibling — matn kengayganda pastda qoladi, scroll faqat matnda */
+/* Tavsif bloki */
 .shorts-modal-caption-music-wrap {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 0.75rem;
-  margin-bottom: 10px;
   width: 100%;
   min-width: 0;
+  margin-bottom: 10px;
 }
 
 .shorts-modal-description-row {
@@ -723,22 +719,20 @@
 }
 
 .shorts-modal-music-block {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   padding: 0;
-  border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   overflow: hidden;
-  cursor: pointer;
-  background: rgba(155, 79, 231, 0.3);
-  border: 1px solid #ccc;
-  transition: transform 0.2s ease, background 0.2s ease;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
 }
 
 .shorts-modal-music-block:hover {
   transform: scale(1.05);
-  background: rgba(155, 79, 231, 0.5);
+  border-color: #9b4fe7;
 }
 
 .shorts-modal-music-img {
@@ -746,6 +740,17 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 5%;
+  border: 2px solid #fff;
+}
+
+.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .shorts-modal-music-block {
+  width: 45px;
+  height: 45px;
+  min-width: 40px;
+  position: relative;
+  top: 50px;
+  margin-top: 0;
 }
 
 /* Music modal */

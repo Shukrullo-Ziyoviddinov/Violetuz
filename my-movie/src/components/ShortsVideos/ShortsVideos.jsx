@@ -465,6 +465,20 @@ const ShortsVideos = ({
     setMusicModalOpen(true);
   }, []);
 
+  const renderMusicSidebarButton = useCallback((item, isMusicSlide) => {
+    if (isMusicSlide || !item?.musics?.img) return null;
+    return (
+      <button
+        type="button"
+        className="shorts-modal-action-btn shorts-modal-music-block"
+        onClick={handleMusicBlockClick}
+        aria-label="Musiqa"
+      >
+        <img src={item.musics.img} alt="" className="shorts-modal-music-img" />
+      </button>
+    );
+  }, [handleMusicBlockClick]);
+
   const closeMusicModal = useCallback(() => setMusicModalOpen(false), []);
 
   const getMusicTitle = (musics) => {
@@ -717,20 +731,6 @@ const ShortsVideos = ({
                   {getDescription(item)}
                 </p>
               </div>
-              {!itemMusic && item?.musics && (
-                <button
-                  type="button"
-                  className="shorts-modal-music-block"
-                  onClick={handleMusicBlockClick}
-                  aria-label="Musiqa"
-                >
-                  <img
-                    src={item.musics.img}
-                    alt=""
-                    className="shorts-modal-music-img"
-                  />
-                </button>
-              )}
             </div>
             <div className="shorts-modal-buttons-row">
               {itemMusic ? (
@@ -824,6 +824,7 @@ const ShortsVideos = ({
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
           </button>
+          {renderMusicSidebarButton(item, itemMusic)}
         </div>
           </>
         )}
@@ -843,6 +844,7 @@ const ShortsVideos = ({
     isItemMusicSlide,
     mobilePlayPauseVisible,
     modalVideoState,
+    renderMusicSidebarButton,
     repostShareRoute,
     shortsCommentCount,
     toggleDescriptionExpanded,
@@ -997,20 +999,6 @@ const ShortsVideos = ({
                           {getDescription(shortsList[activeIndex])}
                         </p>
                       </div>
-                      {!slideMusic && shortsList[activeIndex]?.musics && (
-                        <button
-                          type="button"
-                          className="shorts-modal-music-block"
-                          onClick={handleMusicBlockClick}
-                          aria-label="Musiqa"
-                        >
-                          <img
-                            src={shortsList[activeIndex].musics.img}
-                            alt=""
-                            className="shorts-modal-music-img"
-                          />
-                        </button>
-                      )}
                     </div>
                     <div className="shorts-modal-buttons-row">
                       {slideMusic ? (
@@ -1104,6 +1092,7 @@ const ShortsVideos = ({
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                     </svg>
                   </button>
+                  {renderMusicSidebarButton(shortsList[activeIndex], slideMusic)}
                 </div>
               </div>
 
