@@ -54,9 +54,9 @@ const formatTime = (seconds) => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-const renderShortsModalTitle = (item, contentLang, isMusicSlide = false) => {
+const renderShortsModalTitle = (item, contentLang, isMusicSlide = false, onWatchClick) => {
   if (!isMusicSlide && item?.movieId) {
-    return <ShortsMovieHead item={item} contentLang={contentLang} />;
+    return <ShortsMovieHead item={item} contentLang={contentLang} onWatchClick={onWatchClick} />;
   }
   return (
     <h3 className="shorts-modal-title">{getLocalizedField(item?.title, contentLang)}</h3>
@@ -106,7 +106,7 @@ const VideoSlide = React.forwardRef(({ item, contentLang, videoState, onVideoCli
           <Link to={`/movie/${item.movieId}`} className="shorts-modal-watch-btn" onClick={onWatchClick}>
             {contentLang === 'ru' ? 'Смотреть' : 'Tomosha qilish'}
           </Link>
-          {renderShortsModalTitle(item, contentLang)}
+          {renderShortsModalTitle(item, contentLang, false, onWatchClick)}
           <p
             className={`shorts-modal-description ${descriptionExpanded ? 'shorts-modal-description-expanded' : ''}`}
             onClick={onDescriptionClick}
@@ -707,7 +707,7 @@ const ShortsVideos = ({
           <>
         <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-mobile ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
           <div className="shorts-modal-info-content">
-            {renderShortsModalTitle(item, contentLang, itemMusic)}
+            {renderShortsModalTitle(item, contentLang, itemMusic, handleWatchClick)}
             <div className="shorts-modal-caption-music-wrap">
               <div className="shorts-modal-description-row">
                 <p
@@ -987,7 +987,7 @@ const ShortsVideos = ({
                 )}
                 <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
                   <div className="shorts-modal-info-content">
-                    {renderShortsModalTitle(shortsList[activeIndex], contentLang, slideMusic)}
+                    {renderShortsModalTitle(shortsList[activeIndex], contentLang, slideMusic, handleWatchClick)}
                     <div className="shorts-modal-caption-music-wrap">
                       <div className="shorts-modal-description-row">
                         <p
@@ -1114,6 +1114,7 @@ const ShortsVideos = ({
                   contentLang={contentLang}
                   direction={slideState.direction}
                   duration={SLIDE_DURATION}
+                  onWatchClick={handleWatchClick}
                 />
               )}
             </div>
@@ -1311,7 +1312,8 @@ const ShortsVideos = ({
 };
 
 // Desktop: kelayotgan video componenti — mount bo'lgandan keyin animate qiladi
-const IncomingSlide = ({ item, contentLang, direction, duration }) => {
+const IncomingSlide = (props) => {
+  const { item, contentLang, direction, duration, onWatchClick } = props;
   const [style, setStyle] = useState({
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
@@ -1334,7 +1336,6 @@ const IncomingSlide = ({ item, contentLang, direction, duration }) => {
   }, [duration]);
 
   const getVideo = (it) => it.video?.[contentLang] || it.video?.uz || '';
-  const getTitle = (it) => getLocalizedField(it?.title, contentLang);
 
   return (
     <div className="shorts-modal-video-inner shorts-modal-desktop-inner" style={style}>
@@ -1348,7 +1349,7 @@ const IncomingSlide = ({ item, contentLang, direction, duration }) => {
       />
       <div className="shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop">
         <div className="shorts-modal-info-content">
-          {renderShortsModalTitle(item, contentLang)}
+          {renderShortsModalTitle(item, contentLang, false, onWatchClick)}
         </div>
       </div>
     </div>

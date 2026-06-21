@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { getLocalizedField, getShortsSpecValues } from '../../utils/shortsMovieUtils';
 
-const ShortsMovieHead = ({ item, contentLang = 'uz' }) => {
+const ShortsMovieHead = ({ item, contentLang = 'uz', onWatchClick }) => {
   const title = getLocalizedField(item?.title, contentLang);
   const img = getLocalizedField(item?.homeImg, contentLang);
   const rating = item?.rating;
@@ -9,8 +10,13 @@ const ShortsMovieHead = ({ item, contentLang = 'uz' }) => {
 
   if (!title && !img && rating == null && !specValues.length) return null;
 
-  return (
-    <div className="shorts-modal-movie-head">
+  const handleClick = (e) => {
+    e.stopPropagation();
+    onWatchClick?.();
+  };
+
+  const inner = (
+    <>
       {img ? (
         <img src={img} alt="" className="shorts-modal-movie-poster" />
       ) : null}
@@ -36,7 +42,22 @@ const ShortsMovieHead = ({ item, contentLang = 'uz' }) => {
           </div>
         ) : null}
       </div>
-    </div>
+    </>
+  );
+
+  if (item?.movieId == null) {
+    return <div className="shorts-modal-movie-head">{inner}</div>;
+  }
+
+  return (
+    <Link
+      to={`/movie/${item.movieId}`}
+      className="shorts-modal-movie-head"
+      onClick={handleClick}
+      aria-label={title || undefined}
+    >
+      {inner}
+    </Link>
   );
 };
 
