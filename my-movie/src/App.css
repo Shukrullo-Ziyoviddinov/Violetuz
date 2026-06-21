@@ -101,21 +101,14 @@ body::-webkit-scrollbar {
   outline: none !important;
 }
 
-/* Rasmni drag va select qilishni o'chirish */
-img{
+/* Rasm va videoni brauzerga sudrab olishni o'chirish — click ishlaydi */
+img,
+video,
+.shorts-video-thumb {
   -webkit-user-drag: none;
   user-drag: none;
-  pointer-events: auto; /* yoki bu qatorni umuman o‘chirib tashlang */
   user-select: none;
-  pointer-events: none; /* Rasm ustida pointer eventlarni o'chirish */
-}
-
-video, .shorts-video-thumb, video * {
-  -webkit-user-drag: none;
-  user-drag: none;
-  pointer-events: auto; /* yoki bu qatorni umuman o‘chirib tashlang */
-  user-select: none;
-  pointer-events: none; /* Video ustida pointer eventlarni o'chirish */
+  -webkit-touch-callout: none;
 }
 
 /* Link va buttonlarda ham highlight chiqmasin */
