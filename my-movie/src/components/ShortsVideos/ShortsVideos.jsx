@@ -181,6 +181,7 @@ const ShortsVideos = ({
   const slideTimeoutRef = useRef(null);
 
   const modalVideoRef = useRef(null);
+  const mobileVideoTapRef = useRef({ startY: 0, moved: false });
   const shortsCommentsRef = useRef(null);
   const [modalVideoState, setModalVideoState] = useState({ isPlaying: true, currentTime: 0, duration: 0 });
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
@@ -283,9 +284,13 @@ const ShortsVideos = ({
     setActiveIndex((i) => Math.min(i, shortsList.length - 1));
   }, [shortsList.length]);
 
-  // Mobile va Desktop: bir xil animatsiya
   const goPrev = useCallback(() => desktopNavigate('up'), [desktopNavigate]);
   const goNext = useCallback(() => desktopNavigate('down'), [desktopNavigate]);
+
+  const handleMobileIndexChange = useCallback((newIndex) => {
+    if (newIndex < 0 || newIndex >= shortsList.length) return;
+    setActiveIndex(newIndex);
+  }, [shortsList.length]);
 
   const openModal = useCallback((index) => {
     setActiveIndex(index);
@@ -348,13 +353,24 @@ const ShortsVideos = ({
   }, [modalOpen, activeIndex]);
 
   useEffect(() => {
-    setModalVideoState({ isPlaying: true, currentTime: 0, duration: 0 });
     setDescriptionExpanded(false);
     setMobilePlayPauseVisible(false);
     setDesktopHover(false);
     setMusicModalOpen(false);
     setClipControlsVisible(false);
     setClipVideoFullscreen(false);
+
+    const v = modalVideoRef.current;
+    if (v) {
+      if (v.muted) v.muted = false;
+      if (v.paused) v.play().catch(() => {});
+      setModalVideoState((s) => ({
+        ...s,
+        isPlaying: !v.paused,
+        currentTime: v.currentTime,
+        duration: v.duration || s.duration,
+      }));
+    }
   }, [activeIndex]);
 
   const handleShortsCommentClick = useCallback((e) => {
@@ -610,6 +626,201 @@ const ShortsVideos = ({
   const getTitle = (item) => item.title?.[contentLang] || item.title?.uz || '';
   const getDescription = (item) => item.description?.[contentLang] || item.description?.uz || '';
 
+  const isItemMusicSlide = useCallback((item) => (
+    repostShortsEntries?.length ? item?.type === 'musicshorts' : isMusicShorts
+  ), [repostShortsEntries, isMusicShorts]);
+
+  const renderMobileShortSlide = useCallback((item, index, { isCenter = false } = {}) => {
+    const itemMusic = isItemMusicSlide(item);
+
+    return (
+      <div className="shorts-modal-video-inner shorts-modal-mobile-inner">
+        <video
+          ref={(el) => {
+            if (isCenter) {
+              modalVideoRef.current = el;
+            }
+          }}
+          src={getVideo(item)}
+          autoPlay
+          playsInline
+          loop
+          muted={!isCenter}
+          preload="auto"
+          className="shorts-modal-video shorts-modal-mobile-video-el"
+          onTouchStart={isCenter ? (e) => {
+            mobileVideoTapRef.current = { startY: e.touches[0].clientY, moved: false };
+          } : undefined}
+          onTouchMove={isCenter ? (e) => {
+            if (Math.abs(e.touches[0].clientY - mobileVideoTapRef.current.startY) > 12) {
+              mobileVideoTapRef.current.moved = true;
+            }
+          } : undefined}
+          onClick={isCenter ? (e) => {
+            e.stopPropagation();
+            if (mobileVideoTapRef.current.moved) return;
+            handleMobileVideoTap();
+          } : undefined}
+        />
+        {isCenter && mobilePlayPauseVisible && (
+          <button
+            className="shorts-modal-play-pause-center shorts-modal-play-pause-mobile"
+            onClick={(e) => { e.stopPropagation(); toggleModalVideoPlay(); }}
+            aria-label={modalVideoState.isPlaying ? 'Pauza' : 'Ijro'}
+          >
+            {modalVideoState.isPlaying ? (
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+            )}
+          </button>
+        )}
+        {isCenter && (
+          <>
+        <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-mobile ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
+          <div className="shorts-modal-info-content">
+            <h3 className="shorts-modal-title">{getTitle(item)}</h3>
+            <div className="shorts-modal-caption-music-wrap">
+              <div className="shorts-modal-description-row">
+                <p
+                  className={`shorts-modal-description ${descriptionExpanded ? 'shorts-modal-description-expanded' : ''}`}
+                  onClick={toggleDescriptionExpanded}
+                >
+                  {getDescription(item)}
+                </p>
+              </div>
+              {!itemMusic && item?.musics && (
+                <button
+                  type="button"
+                  className="shorts-modal-music-block"
+                  onClick={handleMusicBlockClick}
+                  aria-label="Musiqa"
+                >
+                  <img
+                    src={item.musics.img}
+                    alt=""
+                    className="shorts-modal-music-img"
+                  />
+                </button>
+              )}
+            </div>
+            <div className="shorts-modal-buttons-row">
+              {itemMusic ? (
+                <>
+                  <Link to={getMusicLinkPath(item)} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
+                    {(() => {
+                      const { label, iconType } = getMusicWatchButtonContent(item);
+                      return (
+                        <>
+                          {renderMusicWatchButtonIcon(iconType)}
+                          <span>{label}</span>
+                        </>
+                      );
+                    })()}
+                  </Link>
+                  {item?.movieId != null && (
+                    <Link to={`/movie/${item.movieId}`} className="shorts-modal-kino-btn" onClick={handleWatchClick}>
+                      <svg className="shorts-modal-watch-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="23 7 16 12 23 17 23 7" />
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                      </svg>
+                      <span>{contentLang === 'ru' ? 'Фильм' : 'Kino'}</span>
+                    </Link>
+                  )}
+                </>
+              ) : (
+                <Link to={`/movie/${item?.movieId}`} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
+                  {contentLang === 'ru' ? 'Смотреть' : 'Tomosha qilish'}
+                </Link>
+              )}
+            </div>
+          </div>
+          <div className="shorts-modal-progress-area">
+            <div className="shorts-modal-progress-wrap shorts-modal-progress-fixed">
+              <div className="shorts-modal-progress-bar" onClick={handleModalVideoProgress}>
+                <div
+                  className="shorts-modal-progress-fill"
+                  style={{ width: `${(modalVideoState.currentTime / (modalVideoState.duration || 1)) * 100}%` }}
+                />
+              </div>
+              <span className="shorts-modal-duration">
+                {formatTime(modalVideoState.currentTime)} / {formatTime(modalVideoState.duration)}
+              </span>
+            </div>
+            <input
+              type="text"
+              className="shorts-modal-comment-input"
+              placeholder={contentLang === 'ru' ? 'Написать комментарий...' : 'Izoh yozing...'}
+              readOnly
+              onClick={(e) => { e.stopPropagation(); handleShortsCommentClick(e); }}
+            />
+          </div>
+        </div>
+        <div className="shorts-modal-actions-sidebar shorts-modal-actions-mobile">
+          <LikeButton
+            key={item.id}
+            variant="shorts"
+            contentId={item.id}
+            stopPropagation
+          />
+          <button
+            type="button"
+            className="shorts-modal-action-btn shorts-modal-comment-btn"
+            onClick={handleShortsCommentClick}
+            aria-label="Izohlar"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            {shortsCommentCount > 0 && <span className="shorts-modal-action-count">{shortsCommentCount}</span>}
+          </button>
+          <ShortsShare shortItem={item} />
+          <Repost
+            className="shorts-modal-action-btn"
+            item={{
+              id: item.id,
+              type: itemMusic ? 'musicshorts' : 'movieShorts',
+              title: getTitle(item),
+              image: '/img/movie1.jpg',
+              videoUrl: getVideo(item),
+              route: repostShareRoute,
+            }}
+          />
+          <button
+            type="button"
+            className={`shorts-modal-action-btn shorts-modal-save-btn ${itemMusic ? (isInWishlist(item?.musicId, getMusicWishlistType(item)) ? 'active' : '') : (isInWishlist(item?.movieId, 'movie') ? 'active' : '')}`}
+            onClick={handleShortsSaveClick}
+            aria-label="Saqlash"
+          >
+            <svg viewBox="0 0 24 24" fill={itemMusic ? (isInWishlist(item?.musicId, getMusicWishlistType(item)) ? 'currentColor' : 'none') : (isInWishlist(item?.movieId, 'movie') ? 'currentColor' : 'none')} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
+        </div>
+          </>
+        )}
+      </div>
+    );
+  }, [
+    contentLang,
+    descriptionExpanded,
+    getVideo,
+    handleMobileVideoTap,
+    handleModalVideoProgress,
+    handleMusicBlockClick,
+    handleShortsCommentClick,
+    handleShortsSaveClick,
+    handleWatchClick,
+    isInWishlist,
+    isItemMusicSlide,
+    mobilePlayPauseVisible,
+    modalVideoState,
+    repostShareRoute,
+    shortsCommentCount,
+    toggleDescriptionExpanded,
+    toggleModalVideoPlay,
+  ]);
+
   const handleOverlayClick = (e) => { if (e.target === e.currentTarget) closeModal(); };
 
   // Desktop slide animation styles
@@ -647,182 +858,20 @@ const ShortsVideos = ({
       <div className="shorts-modal-content" onClick={(e) => e.stopPropagation()}>
         {isMobileView ? (
           // ============ MOBILE ============
-          <VertikalDrag
-            className="shorts-modal-vertikal-drag"
-            onSwipeUp={goNext}
-            onSwipeDown={goPrev}
-          >
-            <div className="shorts-modal-video-wrapper shorts-modal-mobile" style={{ position: 'relative', overflow: 'hidden' }}>
-              <button className="shorts-modal-close shorts-modal-close-mobile" onClick={closeModal} aria-label="Ortga">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                </svg>
-              </button>
-              {/* Joriy video — chiqib ketadi (animatsiya paytida) */}
-              <div
-                className="shorts-modal-video-inner shorts-modal-mobile-inner"
-                style={slideState ? {
-                  transform: `translateY(${slideState.direction === 'down' ? '-100%' : '100%'})`,
-                  transition: `transform ${SLIDE_DURATION}ms cubic-bezier(0.4,0,0.2,1)`,
-                  position: 'absolute',
-                  top: 0, left: 0, right: 0, bottom: 0,
-                } : {}}
-              >
-                <video
-                  ref={modalVideoRef}
-                  key={activeIndex}
-                  src={getVideo(shortsList[activeIndex])}
-                  autoPlay
-                  playsInline
-                  loop
-                  className="shorts-modal-video shorts-modal-mobile-video-el"
-                  onClick={(e) => { e.stopPropagation(); handleMobileVideoTap(); }}
-                />
-                {mobilePlayPauseVisible && (
-                  <button
-                    className="shorts-modal-play-pause-center shorts-modal-play-pause-mobile"
-                    onClick={(e) => { e.stopPropagation(); toggleModalVideoPlay(); }}
-                    aria-label={modalVideoState.isPlaying ? 'Pauza' : 'Ijro'}
-                  >
-                    {modalVideoState.isPlaying ? (
-                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                    )}
-                  </button>
-                )}
-                <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-mobile ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
-                  <div className="shorts-modal-info-content">
-                    <h3 className="shorts-modal-title">{getTitle(shortsList[activeIndex])}</h3>
-                    <div className="shorts-modal-caption-music-wrap">
-                      <div className="shorts-modal-description-row">
-                        <p
-                          className={`shorts-modal-description ${descriptionExpanded ? 'shorts-modal-description-expanded' : ''}`}
-                          onClick={toggleDescriptionExpanded}
-                        >
-                          {getDescription(shortsList[activeIndex])}
-                        </p>
-                      </div>
-                      {!slideMusic && shortsList[activeIndex]?.musics && (
-                        <button
-                          type="button"
-                          className="shorts-modal-music-block"
-                          onClick={handleMusicBlockClick}
-                          aria-label="Musiqa"
-                        >
-                          <img
-                            src={shortsList[activeIndex].musics.img}
-                            alt=""
-                            className="shorts-modal-music-img"
-                          />
-                        </button>
-                      )}
-                    </div>
-                    <div className="shorts-modal-buttons-row">
-                      {slideMusic ? (
-                        <>
-                          <Link to={getMusicLinkPath(shortsList[activeIndex])} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
-                            {(() => {
-                              const { label, iconType } = getMusicWatchButtonContent(shortsList[activeIndex]);
-                              return (
-                                <>
-                                  {renderMusicWatchButtonIcon(iconType)}
-                                  <span>{label}</span>
-                                </>
-                              );
-                            })()}
-                          </Link>
-                          {shortsList[activeIndex]?.movieId != null && (
-                            <Link to={`/movie/${shortsList[activeIndex].movieId}`} className="shorts-modal-kino-btn" onClick={handleWatchClick}>
-                              <svg className="shorts-modal-watch-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polygon points="23 7 16 12 23 17 23 7" />
-                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                              </svg>
-                              <span>{contentLang === 'ru' ? 'Фильм' : 'Kino'}</span>
-                            </Link>
-                          )}
-                        </>
-                      ) : (
-                        <Link to={`/movie/${shortsList[activeIndex]?.movieId}`} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
-                          {contentLang === 'ru' ? 'Смотреть' : 'Tomosha qilish'}
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                  <div className="shorts-modal-progress-area">
-                    <div className="shorts-modal-progress-wrap shorts-modal-progress-fixed">
-                      <div className="shorts-modal-progress-bar" onClick={handleModalVideoProgress}>
-                        <div
-                          className="shorts-modal-progress-fill"
-                          style={{ width: `${(modalVideoState.currentTime / (modalVideoState.duration || 1)) * 100}%` }}
-                        />
-                      </div>
-                      <span className="shorts-modal-duration">
-                        {formatTime(modalVideoState.currentTime)} / {formatTime(modalVideoState.duration)}
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      className="shorts-modal-comment-input"
-                      placeholder={contentLang === 'ru' ? 'Написать комментарий...' : 'Izoh yozing...'}
-                      readOnly
-                      onClick={(e) => { e.stopPropagation(); handleShortsCommentClick(e); }}
-                    />
-                  </div>
-                </div>
-                <div className="shorts-modal-actions-sidebar shorts-modal-actions-mobile">
-                  <LikeButton
-                    key={shortsList[activeIndex]?.id}
-                    variant="shorts"
-                    contentId={shortsList[activeIndex]?.id}
-                    stopPropagation
-                  />
-                  <button
-                    type="button"
-                    className="shorts-modal-action-btn shorts-modal-comment-btn"
-                    onClick={handleShortsCommentClick}
-                    aria-label="Izohlar"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                    {shortsCommentCount > 0 && <span className="shorts-modal-action-count">{shortsCommentCount}</span>}
-                  </button>
-                  <ShortsShare shortItem={shortsList[activeIndex]} />
-                  <Repost
-                    className="shorts-modal-action-btn"
-                    item={{
-                      id: shortsList[activeIndex]?.id,
-                      type: slideMusic ? 'musicshorts' : 'movieShorts',
-                      title: getTitle(shortsList[activeIndex]),
-                      image: '/img/movie1.jpg',
-                      videoUrl: getVideo(shortsList[activeIndex]),
-                      route: repostShareRoute,
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className={`shorts-modal-action-btn shorts-modal-save-btn ${slideMusic ? (isInWishlist(shortsList[activeIndex]?.musicId, getMusicWishlistType(shortsList[activeIndex])) ? 'active' : '') : (isInWishlist(shortsList[activeIndex]?.movieId, 'movie') ? 'active' : '')}`}
-                    onClick={handleShortsSaveClick}
-                    aria-label="Saqlash"
-                  >
-                    <svg viewBox="0 0 24 24" fill={slideMusic ? (isInWishlist(shortsList[activeIndex]?.musicId, getMusicWishlistType(shortsList[activeIndex])) ? 'currentColor' : 'none') : (isInWishlist(shortsList[activeIndex]?.movieId, 'movie') ? 'currentColor' : 'none')} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              {/* Kelayotgan video — kirib keladi (faqat animatsiya paytida) */}
-              {slideState && (
-                <IncomingSlideMobile
-                  item={shortsList[slideState.toIndex]}
-                  contentLang={contentLang}
-                  direction={slideState.direction}
-                  duration={SLIDE_DURATION}
-                />
-              )}
-            </div>
-          </VertikalDrag>
+          <div className="shorts-modal-video-wrapper shorts-modal-mobile" style={{ position: 'relative', overflow: 'hidden' }}>
+            <button className="shorts-modal-close shorts-modal-close-mobile" onClick={closeModal} aria-label="Ortga">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+              </svg>
+            </button>
+            <VertikalDrag
+              className="shorts-modal-vertikal-drag"
+              items={shortsList}
+              activeIndex={activeIndex}
+              onIndexChange={handleMobileIndexChange}
+              renderItem={renderMobileShortSlide}
+            />
+          </div>
         ) : (
           // ============ DESKTOP ============
           <div className="shorts-modal-desktop">
@@ -1196,52 +1245,6 @@ const ShortsVideos = ({
         </div>
       </div>
       {modalOpen && createPortal(modalContent, document.body)}
-    </div>
-  );
-};
-
-// Mobil: kelayotgan video
-const IncomingSlideMobile = ({ item, contentLang, direction, duration }) => {
-  const [style, setStyle] = useState({
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    transform: direction === 'down' ? 'translateY(100%)' : 'translateY(-100%)',
-    transition: 'none',
-  });
-
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setStyle((s) => ({
-          ...s,
-          transform: 'translateY(0)',
-          transition: `transform ${duration}ms cubic-bezier(0.4,0,0.2,1)`,
-        }));
-      });
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [duration]);
-
-  const getVideo = (it) => it.video?.[contentLang] || it.video?.uz || '';
-  const getTitle = (it) => it.title?.[contentLang] || it.title?.uz || '';
-  const getDescription = (it) => it.description?.[contentLang] || it.description?.uz || '';
-
-  return (
-    <div className="shorts-modal-video-inner shorts-modal-mobile-inner" style={style}>
-      <video
-        src={getVideo(item)}
-        autoPlay
-        playsInline
-        loop
-        muted
-        className="shorts-modal-video shorts-modal-mobile-video-el"
-      />
-      <div className="shorts-modal-info shorts-modal-info-overlay shorts-modal-info-mobile">
-        <div className="shorts-modal-info-content">
-          <h3 className="shorts-modal-title">{getTitle(item)}</h3>
-          <p className="shorts-modal-description">{getDescription(item)}</p>
-        </div>
-      </div>
     </div>
   );
 };

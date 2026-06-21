@@ -108,9 +108,8 @@
 .shorts-modal-vertikal-drag {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1;
+  min-height: 0;
 }
 
 .shorts-modal-mobile {
@@ -133,8 +132,9 @@
 
 .shorts-modal-mobile-inner {
   position: relative;
-  flex: 1;
   width: 100%;
+  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -143,9 +143,14 @@
 }
 
 .shorts-modal-mobile .shorts-modal-mobile-video-el {
-  flex: 1;
+  display: block;
   width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  flex: 0 0 auto;
   object-fit: contain;
+  object-position: center center;
   background: #000;
   touch-action: none;
   pointer-events: auto;

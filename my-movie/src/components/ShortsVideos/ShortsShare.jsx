@@ -81,7 +81,6 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
     onOpenChange?.(false);
   };
 
-
   useEffect(() => {
     if (isShortsShareOpen && isShortsMobileView) {
       document.body.style.overflow = 'hidden';
