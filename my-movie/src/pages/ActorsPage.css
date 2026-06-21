@@ -1162,3 +1162,13 @@
   margin-top: 2px;
 }
 
+@media (max-width: 500px) {
+  .actors-page-extras-wrap, .actors-page-media-wrap, .actors-page-bio {
+    padding: 0 0.7rem;
+    gap:  1rem;
+  }
+
+  .actors-page-media-wrap {
+    margin: 0 auto 1rem;
+  }
+}
