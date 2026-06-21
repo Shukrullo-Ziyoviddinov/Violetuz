@@ -10,3 +10,10 @@
   margin: 0 auto;
   padding: 0 1rem;
 }
+
+@media (max-width: 500px) {
+  .rating-page {
+    margin-top: 1rem;
+  }
+  
+}

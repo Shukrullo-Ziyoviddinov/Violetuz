@@ -242,12 +242,17 @@
   padding: 8px 4px;
 }
 
-.shorts-modal-actions-mobile .shorts-share-wrapper .shorts-share-trigger-btn {
+.shorts-modal-actions-sidebar .shorts-share-wrapper .shorts-share-trigger-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .shorts-share-wrapper .shorts-share-trigger-btn {
   min-width: 44px;
   padding: 6px 4px;
 }
 
-.shorts-modal-actions-mobile .shorts-share-wrapper .shorts-share-trigger-btn svg {
-  width: 34px;
-  height: 34px;
+.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .shorts-share-wrapper .shorts-share-trigger-btn svg {
+  width: 28px;
+  height: 28px;
 }

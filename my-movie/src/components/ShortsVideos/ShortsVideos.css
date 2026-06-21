@@ -560,8 +560,8 @@
 
 .shorts-modal-music-block {
   flex-shrink: 0;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   border: none;
   border-radius: 8px;
@@ -1092,9 +1092,9 @@
   transform: scale(1.05);
 }
 
-.shorts-modal-action-btn svg {
-  width: 26px;
-  height: 26px;
+.shorts-modal-actions-sidebar .shorts-modal-action-btn svg {
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
 }
 
@@ -1131,7 +1131,7 @@
   padding: 6px 4px;
 }
 
-.shorts-modal-actions-mobile .shorts-modal-action-btn svg {
-  width: 34px;
-  height: 34px;
+.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .shorts-modal-action-btn svg {
+  width: 28px;
+  height: 28px;
 }

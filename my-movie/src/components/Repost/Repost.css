@@ -11,12 +11,12 @@
 
 /* Shorts sidebar: boshqa ikonlar bilan bir xil px */
 .shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn i {
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1;
 }
 
-.shorts-modal-actions-mobile .repost-btn.shorts-modal-action-btn i {
-  font-size: 34px;
+.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .repost-btn.shorts-modal-action-btn i {
+  font-size: 28px;
   line-height: 1;
 }
 
