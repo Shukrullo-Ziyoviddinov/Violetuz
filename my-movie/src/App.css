@@ -110,12 +110,25 @@ img {
   pointer-events: none;
 }
 
-/* Video: bosish ishlaydi, sudrash va uzoq bosish callout blok */
-video, .shorts-video-preview, .shorts-modal-mobile .shorts-modal-mobile-video-el {
+/* Video preview: rasmdagidek — click ota (card/wrapper) orqali o'tadi */
+video {
   -webkit-user-drag: none;
   user-drag: none;
   user-select: none;
   -webkit-touch-callout: none;
+  pointer-events: none;
+}
+
+/* To'g'ridan-to'g'ri boshqariladigan playerlar */
+video.music-vp-video,
+video.watch-modal-video,
+video.trailer-modal-video,
+video.movie-detail-video,
+video.ads-movie-video,
+video.shorts-modal-mobile-video-el,
+video.shorts-modal-desktop-video-el,
+video.shorts-music-modal-video {
+  pointer-events: auto;
   touch-action: manipulation;
 }
 
