@@ -443,7 +443,11 @@ const ShortsVideos = ({
 
   const closeMusicModal = useCallback(() => setMusicModalOpen(false), []);
 
-  const getMusicTitle = (musics) => musics?.title?.[contentLang] || musics?.title?.uz || '';
+  const getMusicTitle = (musics) => {
+    const t = musics?.title;
+    if (typeof t === 'string') return t;
+    return t?.[contentLang] || t?.uz || '';
+  };
 
   const toggleMusicPlayPause = useCallback(() => {
     const a = musicAudioRef.current;

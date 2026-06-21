@@ -9,15 +9,16 @@
   color: #9b4fe7;
 }
 
-/* Shorts sidebar: boshqa ikonlar bilan bir xil px */
-.shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn i {
-  font-size: 22px;
-  line-height: 1;
+/* Shorts sidebar: boshqa ikonlar bilan bir xil px va stroke */
+.shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
-.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .repost-btn.shorts-modal-action-btn i {
-  font-size: 28px;
-  line-height: 1;
+.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .repost-btn.shorts-modal-action-btn svg {
+  width: 28px;
+  height: 28px;
 }
 
 .shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn.active {

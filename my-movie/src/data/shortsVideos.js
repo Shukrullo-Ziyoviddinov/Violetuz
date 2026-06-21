@@ -1,6 +1,8 @@
 import { getFilterByMovieId } from '../utils/getFilterByMovieId';
+import { resolveShortsMusics } from '../utils/resolveShortsMusics';
 
-export const shortsVideos = [
+/** musics: { musicId, videoId? } — img/title/audio klip musiqa bo'limidan keladi */
+const rawShortsVideos = [
   {
     id: 1,
     video: {
@@ -18,10 +20,8 @@ export const shortsVideos = [
     movieId: 1,
     type: 'movieShorts',
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(1)
   },
@@ -41,10 +41,8 @@ export const shortsVideos = [
     },
     movieId: 2,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(2)
   },
@@ -64,10 +62,8 @@ export const shortsVideos = [
     },
     movieId: 3,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(3)
   },
@@ -87,10 +83,8 @@ export const shortsVideos = [
     },
     movieId: 4,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(4)
   },
@@ -127,10 +121,8 @@ export const shortsVideos = [
     },
     movieId: 6,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(6)
   },
@@ -150,10 +142,8 @@ export const shortsVideos = [
     },
     movieId: 7,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(7)
   },
@@ -190,10 +180,8 @@ export const shortsVideos = [
     },
     movieId: 9,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(9)
   },
@@ -213,10 +201,8 @@ export const shortsVideos = [
     },
     movieId: 10,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(10)
   },
@@ -236,10 +222,8 @@ export const shortsVideos = [
     },
     movieId: 11,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(11)
   },
@@ -276,10 +260,8 @@ export const shortsVideos = [
     },
     movieId: 10,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(10)
   },
@@ -299,10 +281,8 @@ export const shortsVideos = [
     },
     movieId: 9,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(9)
   },
@@ -313,10 +293,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 1,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(1)
   },
@@ -327,10 +305,8 @@ export const shortsVideos = [
     description: { uz: "Batman Gotham shahrini qutqarish uchun kurashadi.", ru: "Бэтмен борется за спасение Готэма." },
     movieId: 2,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(2)
   },
@@ -341,10 +317,8 @@ export const shortsVideos = [
     description: { uz: "Romantik va jangari sarguzasht.", ru: "Романтическое и боевик приключение." },
     movieId: 3,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(3)
   },
@@ -355,10 +329,8 @@ export const shortsVideos = [
     description: { uz: "Do'stlik va ta'lim haqida hind komediya.", ru: "Индийская комедия о дружбе и образовании." },
     movieId: 4,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(4)
   },
@@ -377,10 +349,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 6,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(6)
   },
@@ -391,10 +361,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 7,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(7)
   },
@@ -413,10 +381,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 9,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(9)
   },
@@ -427,10 +393,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 10,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(10)
   },
@@ -441,10 +405,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 11,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(11)
   },
@@ -455,10 +417,8 @@ export const shortsVideos = [
     description: { uz: "Malakali o'g'ri inceptionning mumkin bo'lmagan vazifasini bajarishga harakat qiladi.", ru: "Опытный вор пытается выполнить невозможную задачу инцепции." },
     movieId: 1,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(1)
   },
@@ -469,10 +429,8 @@ export const shortsVideos = [
     description: { uz: "Batman Gotham shahrini qutqarish uchun kurashadi.", ru: "Бэтмен борется за спасение Готэма." },
     movieId: 2,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(2)
   },
@@ -483,10 +441,8 @@ export const shortsVideos = [
     description: { uz: "Romantik va jangari sarguzasht.", ru: "Романтическое и боевик приключение." },
     movieId: 3,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(3)
   },
@@ -497,10 +453,8 @@ export const shortsVideos = [
     description: { uz: "Do'stlik va ta'lim haqida hind komediya.", ru: "Индийская комедия о дружбе и образовании." },
     movieId: 4,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(4)
   },
@@ -519,10 +473,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 6,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(6)
   },
@@ -533,10 +485,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 7,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(7)
   },
@@ -555,10 +505,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 9,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(9)
   },
@@ -569,10 +517,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 10,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(10)
   },
@@ -583,10 +529,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 11,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(11)
   },
@@ -597,10 +541,8 @@ export const shortsVideos = [
     description: { uz: "Malakali o'g'ri inceptionning mumkin bo'lmagan vazifasini bajarishga harakat qiladi.", ru: "Опытный вор пытается выполнить невозможную задачу инцепции." },
     movieId: 1,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(1)
   },
@@ -611,10 +553,8 @@ export const shortsVideos = [
     description: { uz: "Batman Gotham shahrini qutqarish uchun kurashadi.", ru: "Бэтмен борется за спасение Готэма." },
     movieId: 2,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(2)
   },
@@ -625,10 +565,8 @@ export const shortsVideos = [
     description: { uz: "Romantik va jangari sarguzasht.", ru: "Романтическое и боевик приключение." },
     movieId: 3,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(3)
   },
@@ -639,10 +577,8 @@ export const shortsVideos = [
     description: { uz: "Do'stlik va ta'lim haqida hind komediya.", ru: "Индийская комедия о дружбе и образовании." },
     movieId: 4,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(4)
   },
@@ -661,10 +597,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 6,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(6)
   },
@@ -675,10 +609,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 7,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(7)
   },
@@ -697,10 +629,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 9,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(9)
   },
@@ -711,10 +641,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 10,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(10)
   },
@@ -725,10 +653,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 11,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(11)
   },
@@ -747,10 +673,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 10,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(10)
   },
@@ -761,10 +685,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 9,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(9)
   },
@@ -775,10 +697,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 1,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(1)
   },
@@ -789,10 +709,8 @@ export const shortsVideos = [
     description: { uz: "Batman Gotham shahrini qutqarish uchun kurashadi.", ru: "Бэтмен борется за спасение Готэма." },
     movieId: 2,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(2)
   },
@@ -803,10 +721,8 @@ export const shortsVideos = [
     description: { uz: "Romantik va jangari sarguzasht.", ru: "Романтическое и боевик приключение." },
     movieId: 3,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(3)
   },
@@ -817,10 +733,8 @@ export const shortsVideos = [
     description: { uz: "Do'stlik va ta'lim haqida hind komediya.", ru: "Индийская комедия о дружбе и образовании." },
     movieId: 4,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(4)
   },
@@ -839,10 +753,8 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 6,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(6)
   },
@@ -853,11 +765,15 @@ export const shortsVideos = [
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 11,
     musics: {
-      music: "/music/Zivert - Life.mp3",
-      video: "/video/shorts1.mp4",
-      img: "/img/movie12.jpg",
-      title: { uz: "Ummon - Qanday unutding", ru: "Уммон - Как ты забыл" }
+      musicId: 602,
+      videoId: 1203,
     },
     ...getFilterByMovieId(11)
   },
 ];
+
+export const shortsVideos = rawShortsVideos.map((item) => {
+  if (!item.musics) return item;
+  const resolved = resolveShortsMusics(item.musics);
+  return resolved ? { ...item, musics: resolved } : item;
+});

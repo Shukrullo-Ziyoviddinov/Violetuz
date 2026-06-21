@@ -20,9 +20,19 @@ export const toggleRepostItem = (item) => {
 
 export const isRepostedItem = (items, id, type) => isRepostedInList(items, id, type);
 
+const RepostIconOutline = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polyline points="17 1 21 5 17 9" />
+    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+    <polyline points="7 23 3 19 7 15" />
+    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+  </svg>
+);
+
 const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Repost' }) => {
   const { toggleRepost: dispatchToggle } = useReposts();
   const active = useIsReposted(item?.id, item?.type);
+  const useOutlineIcon = className.includes('shorts-modal-action-btn');
 
   const handleClick = useCallback(
     (e) => {
@@ -40,7 +50,7 @@ const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Rep
       aria-label={ariaLabel}
       title="Repost"
     >
-      <i className="fa-solid fa-repeat" aria-hidden="true" />
+      {useOutlineIcon ? <RepostIconOutline /> : <i className="fa-solid fa-repeat" aria-hidden="true" />}
     </button>
   );
 };

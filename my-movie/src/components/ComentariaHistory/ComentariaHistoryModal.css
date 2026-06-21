@@ -348,9 +348,9 @@
   color: #9b4fe7;
 }
 
-.comentaria-history-modal .comentaria-history-shorts-actions .repost-btn.shorts-modal-action-btn i {
-  font-size: 16px;
-  line-height: 1;
+.comentaria-history-modal .comentaria-history-shorts-actions .repost-btn.shorts-modal-action-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .comentaria-history-video-artist {
