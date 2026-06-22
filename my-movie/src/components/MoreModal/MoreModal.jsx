@@ -68,16 +68,22 @@ const MoreModal = ({ isOpen, onClose, text, bioImg, title = '' }) => {
           {bioImgList.length > 0 && (
             <ScrollTouch className="more-modal-bioimg-row">
               {bioImgList.map((src, i) => (
-                <img
+                <div
                   key={i}
-                  src={src}
-                  alt=""
-                  className="more-modal-bioimg"
+                  className="more-modal-bioimg-item"
                   role="button"
                   tabIndex={0}
                   onClick={(e) => { e.stopPropagation(); setImgModalIndex(i); setImgModalOpen(true); }}
-                  onKeyDown={(e) => e.key === 'Enter' && (setImgModalIndex(i), setImgModalOpen(true))}
-                />
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setImgModalIndex(i);
+                      setImgModalOpen(true);
+                    }
+                  }}
+                >
+                  <img src={src} alt="" className="more-modal-bioimg" />
+                </div>
               ))}
             </ScrollTouch>
           )}
