@@ -369,6 +369,10 @@
   .artist-detail-header--has-color .artist-detail-stats-follow .following-btn {
     width: 100%;
   }
+
+  .artist-detail-bio-section, .artist-detail-gallery-section{
+    padding: 1rem;
+  }
 }
 
 .artist-detail-track-num {
