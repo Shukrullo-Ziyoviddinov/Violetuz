@@ -154,6 +154,7 @@ video.shorts-video-preview {
 /* Shorts link bloklari: uzoq bosishda brauzer ochilmasin */
 .home-shorts-more,
 .shorts-modal-movie-head,
+.shorts-modal-music-head,
 .shorts-modal-buttons-row .shorts-modal-watch-btn,
 .shorts-modal-buttons-row .shorts-modal-kino-btn {
   -webkit-user-drag: none;

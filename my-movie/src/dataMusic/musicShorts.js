@@ -1,18 +1,16 @@
 /**
  * Music Shorts - Musiqa bo'limi uchun qisqa videolar.
- * musicId - musiqa/klip/konsert ID; artistId - artist sahifasiga; movieId - kinoga (ixtiyoriy).
- * contentType - 'music' (trek) | 'klip' | 'konsert' – musicId qaysi sahifaga borishini aniqlaydi.
+ * musicId + contentType orqali title/artist/img resolveShortsMusicMeta dan olinadi.
+ * contentType: 'music' | 'klip' | 'konsert'.
  */
-export const musicShorts = [
+import { resolveShortsMusicMeta } from '../utils/resolveShortsMusicMeta';
+
+const rawMusicShorts = [
   {
     id: 10001,
     video: {
       uz: '/video/shorts1.mp4',
       ru: '/video/shorts1.mp4',
-    },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
     },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
@@ -30,10 +28,6 @@ export const musicShorts = [
       uz: '/video/shorts2.mp4',
       ru: '/video/shorts2.mp4',
     },
-    title: {
-      uz: 'Shohruhxon - Seni kutdim',
-      ru: 'Шохрухон - Я тебя ждал',
-    },
     description: {
       uz: "Shohruhxonning romantik qo'shig'i - sevgi va orzu haqida.",
       ru: 'Романтическая песня Шохрухона - о любви и мечтах.',
@@ -49,10 +43,6 @@ export const musicShorts = [
     video: {
       uz: '/video/shorts3.mp4',
       ru: '/video/shorts3.mp4',
-    },
-    title: {
-      uz: 'Michael Jackson - Beat It',
-      ru: 'Майкл Джексон - Beat It',
     },
     description: {
       uz: "King of Pop - Michael Jacksonning legendaviy qo'shig'i.",
@@ -70,10 +60,6 @@ export const musicShorts = [
       uz: '/video/shorts4.mp4',
       ru: '/video/shorts4.mp4',
     },
-    title: {
-      uz: 'Maher Zain - Rahmat',
-      ru: 'Махер Зайн - Спасибо',
-    },
     description: {
       uz: "Maher Zainning ilohiy qo'shig'i - shukr va minnatdorchilik haqida.",
       ru: 'Божественная песня Махера Зайна - о благодарности.',
@@ -88,10 +74,6 @@ export const musicShorts = [
     video: {
       uz: '/video/shorts6.mp4',
       ru: '/video/shorts1.mp4',
-    },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
     },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
@@ -109,10 +91,6 @@ export const musicShorts = [
       uz: '/video/shorts1.mp4',
       ru: '/video/shorts1.mp4',
     },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
-    },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
       ru: 'Узбекская поп-песня - один из самых популярных треков группы Уммон.',
@@ -128,10 +106,6 @@ export const musicShorts = [
     video: {
       uz: '/video/shorts7.mp4',
       ru: '/video/shorts1.mp4',
-    },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
     },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
@@ -149,10 +123,6 @@ export const musicShorts = [
       uz: '/video/shorts8.mp4',
       ru: '/video/shorts1.mp4',
     },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
-    },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
       ru: 'Узбекская поп-песня - один из самых популярных треков группы Уммон.',
@@ -168,10 +138,6 @@ export const musicShorts = [
     video: {
       uz: '/video/shorts9.mp4',
       ru: '/video/shorts1.mp4',
-    },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
     },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
@@ -189,10 +155,6 @@ export const musicShorts = [
       uz: '/video/shorts10.mp4',
       ru: '/video/shorts1.mp4',
     },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
-    },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
       ru: 'Узбекская поп-песня - один из самых популярных треков группы Уммон.',
@@ -208,10 +170,6 @@ export const musicShorts = [
     video: {
       uz: '/video/shorts11.mp4',
       ru: '/video/shorts1.mp4',
-    },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
     },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
@@ -229,10 +187,6 @@ export const musicShorts = [
       uz: 'video/shorts12.mp4',
       ru: '/video/shorts1.mp4',
     },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
-    },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
       ru: 'Узбекская поп-песня - один из самых популярных треков группы Уммон.',
@@ -248,10 +202,6 @@ export const musicShorts = [
     video: {
       uz: '/video/shorts13.mp4',
       ru: '/video/shorts1.mp4',
-    },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
     },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
@@ -269,10 +219,6 @@ export const musicShorts = [
       uz: '/video/shorts15.mp4',
       ru: '/video/shorts1.mp4',
     },
-    title: {
-      uz: 'Ummon - Qanday unutding',
-      ru: 'Уммон - Как ты забыл',
-    },
     description: {
       uz: "O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri. O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.O'zbek pop qo'shig'i - Ummon guruhining eng mashhur treklaridan biri.",
       ru: 'Узбекская поп-песня - один из самых популярных треков группы Уммон.',
@@ -284,3 +230,5 @@ export const musicShorts = [
     type: 'musicshorts',
   },
 ];
+
+export const musicShorts = rawMusicShorts.map(resolveShortsMusicMeta);

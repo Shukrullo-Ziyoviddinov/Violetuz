@@ -14,6 +14,7 @@ import Repost from '../Repost/Repost';
 import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShortsMovieHead from './ShortsMovieHead';
+import ShortsMusicHead from './ShortsMusicHead';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import './ShortsVideos.css';
 
@@ -55,6 +56,9 @@ const formatTime = (seconds) => {
 };
 
 const renderShortsModalTitle = (item, contentLang, isMusicSlide = false, onWatchClick) => {
+  if (isMusicSlide && item?.musicId) {
+    return <ShortsMusicHead item={item} contentLang={contentLang} onWatchClick={onWatchClick} />;
+  }
   if (!isMusicSlide && item?.movieId) {
     return <ShortsMovieHead item={item} contentLang={contentLang} onWatchClick={onWatchClick} />;
   }

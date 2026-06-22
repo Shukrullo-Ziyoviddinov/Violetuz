@@ -669,6 +669,60 @@
   gap: 0.35rem 0.5rem;
 }
 
+.shorts-modal-music-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.shorts-modal-music-head:hover {
+  opacity: 0.9;
+}
+
+.shorts-modal-music-poster {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.shorts-modal-music-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.shorts-modal-music-title-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.shorts-modal-music-title-row .shorts-modal-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.shorts-modal-music-artist {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.72);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .shorts-modal-movie-spec {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.78);

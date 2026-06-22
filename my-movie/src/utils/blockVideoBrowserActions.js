@@ -9,6 +9,7 @@ const SHIELD_CLASS = 'shorts-video-thumb-shield';
 const LONG_PRESS_BLOCK_SELECTORS = [
   '.home-shorts-more',
   '.shorts-modal-movie-head',
+  '.shorts-modal-music-head',
   '.shorts-modal-buttons-row .shorts-modal-watch-btn',
   '.shorts-modal-buttons-row .shorts-modal-kino-btn',
 ].join(',');
