@@ -40,49 +40,55 @@ const NavbarMobile = () => {
         <button
           className={`navbar-mobile-item ${isHomeActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => navigate('/feed')}
-          aria-label={t('navbar.home')}
+          aria-label={t('navbar.mobileHome')}
         >
           <i className="fa-solid fa-house" aria-hidden="true" />
+          <span>{t('navbar.mobileHome')}</span>
         </button>
 
         <button
           className={`navbar-mobile-item ${isSearchActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => setShowSearch(true)}
-          aria-label={t('navbar.search')}
+          aria-label={t('navbar.mobileSearch')}
         >
           <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+          <span>{t('navbar.mobileSearch')}</span>
         </button>
 
         <button
           className={`navbar-mobile-item ${isMusicActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => navigate('/music')}
-          aria-label={t('navbar.music')}
+          aria-label={t('navbar.mobileMusic')}
         >
           <i className="fa-solid fa-music" aria-hidden="true" />
+          <span>{t('navbar.mobileMusic')}</span>
         </button>
 
         <button
           className={`navbar-mobile-item ${isMoviesActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => navigate('/')}
-          aria-label={t('navbar.movies')}
+          aria-label={t('navbar.mobileMovies')}
         >
           <i className="fa-solid fa-film" aria-hidden="true" />
+          <span>{t('navbar.mobileMovies')}</span>
         </button>
 
         <button
           className={`navbar-mobile-item ${isShortsActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => setShowShortsPicker(true)}
-          aria-label={t('navbar.shorts')}
+          aria-label={t('navbar.mobileShorts')}
         >
           <i className="fa-solid fa-clapperboard" aria-hidden="true" />
+          <span>{t('navbar.mobileShorts')}</span>
         </button>
 
         <button
           className={`navbar-mobile-item ${isProfileActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => navigate('/profile')}
-          aria-label={t('navbar.profile')}
+          aria-label={t('navbar.mobileProfile')}
         >
           <i className="fa-solid fa-user" aria-hidden="true" />
+          <span>{t('navbar.mobileProfile')}</span>
         </button>
       </nav>
 
