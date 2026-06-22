@@ -350,8 +350,8 @@
   .artist-detail-header--has-color .artist-detail-stats-items {
     order: 1;
     width: 100%;
-    margin: 0 -0.5rem;
-    padding: 0 0.5rem;
+    /* margin: 0 -0.5rem;
+    padding: 0 0.5rem; */
   }
 
   .artist-detail-header--has-color .artist-detail-stats-follow {
@@ -799,6 +799,10 @@
   .artist-detail-container {
     padding: 0 0.7rem;
     max-width: 100%;
+}
+
+.artist-detail-stats{
+  padding: 1rem 0.9rem 1.25rem ; 
 }
 }
 
