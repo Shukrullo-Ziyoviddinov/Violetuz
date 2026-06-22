@@ -107,6 +107,7 @@
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
+  pointer-events: auto; /* App.css img { pointer-events: none } dan override */
 }
 
 .more-modal-text {
