@@ -794,3 +794,18 @@
     font-size: 2rem;
   }
 }
+
+@media (max-width: 500px) {
+  .artist-detail-container {
+    padding: 0 0.7rem;
+    max-width: 100%;
+}
+}
+
+@media (max-width: 400px) {
+  .artist-detail-shorts-wrap .artist-detail-shorts-card {
+    min-width: 135px;
+    width: 135px;
+    max-width: 135px;
+  }
+}
