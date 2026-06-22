@@ -6,12 +6,23 @@
 const SHORTS_THUMB_SELECTOR = '.shorts-video-thumb';
 const SHIELD_CLASS = 'shorts-video-thumb-shield';
 
+const LONG_PRESS_BLOCK_SELECTORS = [
+  '.home-shorts-more',
+  '.shorts-modal-movie-head',
+  '.shorts-modal-buttons-row .shorts-modal-watch-btn',
+  '.shorts-modal-buttons-row .shorts-modal-kino-btn',
+].join(',');
+
 function findVideo(target) {
   return target instanceof Element ? target.closest('video') : null;
 }
 
+function isLongPressBlockTarget(target) {
+  return target instanceof Element && Boolean(target.closest(LONG_PRESS_BLOCK_SELECTORS));
+}
+
 function blockNativeMenu(event) {
-  if (findVideo(event.target)) {
+  if (findVideo(event.target) || isLongPressBlockTarget(event.target)) {
     event.preventDefault();
   }
 }
@@ -43,6 +54,12 @@ function protectShortsVideoThumb(thumb) {
   thumb.addEventListener('contextmenu', (event) => event.preventDefault(), true);
 }
 
+function protectLongPressBlock(el) {
+  if (!(el instanceof Element) || el.dataset.longPressBlockReady === '1') return;
+  el.dataset.longPressBlockReady = '1';
+  el.addEventListener('contextmenu', (event) => event.preventDefault(), true);
+}
+
 function scanVideos(root = document) {
   if (!(root instanceof Element || root instanceof Document)) return;
   root.querySelectorAll?.('video').forEach(strengthenVideo);
@@ -53,9 +70,15 @@ function scanShortsThumbs(root = document) {
   root.querySelectorAll?.(SHORTS_THUMB_SELECTOR).forEach(protectShortsVideoThumb);
 }
 
+function scanLongPressBlocks(root = document) {
+  if (!(root instanceof Element || root instanceof Document)) return;
+  root.querySelectorAll?.(LONG_PRESS_BLOCK_SELECTORS).forEach(protectLongPressBlock);
+}
+
 function scanAll(root = document) {
   scanVideos(root);
   scanShortsThumbs(root);
+  scanLongPressBlocks(root);
 }
 
 function initBlockVideoBrowserActions() {
