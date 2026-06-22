@@ -373,6 +373,10 @@
   .artist-detail-bio-section, .artist-detail-gallery-section{
     padding: 1rem;
   }
+
+  .artist-detail-header{
+    margin-bottom: 1rem;
+  }
 }
 
 .artist-detail-track-num {
