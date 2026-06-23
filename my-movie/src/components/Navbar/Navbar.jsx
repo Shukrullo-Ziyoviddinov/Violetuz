@@ -28,7 +28,9 @@ const Navbar = () => {
   const isMovieDetailPage = /^\/movie\/\d+$/.test(location.pathname);
   const isMusicDetailPage = /^\/music\/\d+$/.test(location.pathname);
   const isVideoDetailPage = /^\/music\/video\/[^/]+$/.test(location.pathname);
-  const hideTopNavbarOnMobile = isMovieDetailPage || isMusicDetailPage || isVideoDetailPage;
+  const isMusicAlbumDetailPage = /^\/music\/album\/[^/]+$/.test(location.pathname);
+  const hideTopNavbarOnMobile =
+    isMovieDetailPage || isMusicDetailPage || isVideoDetailPage || isMusicAlbumDetailPage;
   const [searchQuery, setSearchQuery] = useState('');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);

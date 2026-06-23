@@ -1399,7 +1399,8 @@ button.trailer-modal-controls-dislike {
   }
   
   .trailer-modal-controls-info {
-    /* padding: 0.8rem 0.9rem; */
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
     flex-shrink: 0;
     min-height: fit-content;
     position: relative;

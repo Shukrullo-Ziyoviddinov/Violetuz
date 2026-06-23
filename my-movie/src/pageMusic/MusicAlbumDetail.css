@@ -152,4 +152,9 @@
   .music-album-song-row {
     padding: 0.5rem 0.6rem;
   }
+
+  .music-album-songs-list {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+  }
 }

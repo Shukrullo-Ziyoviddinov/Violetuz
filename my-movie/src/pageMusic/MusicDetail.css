@@ -712,7 +712,7 @@
 
   .music-detail-layout {
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     height: auto;
     min-height: 0;
   }
