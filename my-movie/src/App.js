@@ -22,6 +22,7 @@ import LikeHistoryPage from './pages/LikeHistoryPage';
 import RatingPage from './pages/RatingPage';
 import TrailerPage from './pages/TrailerPage';
 import MovieDetail from './components/MovieDetail/MovieDetail';
+import PullToRefresh from './components/PullToRefresh/PullToRefresh';
 import { ViewedMoviesProvider } from './context/ViewedMoviesContext';
 import { ContentLanguageProvider } from './context/ContentLanguageContext';
 import { MusicPlayerProvider } from './context/MusicPlayerContext';
@@ -42,35 +43,37 @@ function App() {
               <ContentLanguageProvider>
                 <MusicPlayerProvider>
                   <LoadingProvider>
-                    <div className="App">
-                      <Navbar />
-                      <main className="App-main">
-                        <Routes>
-                          <Route path="/" element={<Home />} />
-                          <Route path="/feed" element={<FeedPage />} />
-                          <Route path="/category/:categoryId" element={<RecommendedPage />} />
-                          <Route path="/similar-movies/:movieId" element={<RecommendedPage />} />
-                          <Route path="/movie/:id" element={<MovieDetail />} />
-                          <Route path="/movie/:id/trailer" element={<TrailerPage />} />
-                          <Route path="/recommended" element={<RecommendedPage />} />
-                          <Route path="/wishlist" element={<WishlistPage />} />
-                          <Route path="/profile" element={<ProfilePage />} />
-                          <Route path="/shorts" element={<ShortsPage />} />
-                          <Route path="/music" element={<MusicPage />} />
-                          <Route path="/music/shorts" element={<MusicShortsPage />} />
-                          <Route path="/music/more" element={<MusicMorePage />} />
-                          <Route path="/music/more/:section" element={<MusicMorePage />} />
-                          <Route path="/music/artist/:id" element={<ArtistDetail />} />
-                          <Route path="/music/album/:id" element={<MusicAlbumDetail />} />
-                          <Route path="/music/video/:id" element={<VideoPage />} />
-                          <Route path="/music/:id" element={<MusicDetailWithKey />} />
-                          <Route path="/actor/:id" element={<ActorsPage />} />
-                          <Route path="/like-history" element={<LikeHistoryPage />} />
-                          <Route path="/rating-page" element={<RatingPage />} />
-                        </Routes>
-                      </main>
-                      <NavbarMobile />
-                    </div>
+                    <PullToRefresh>
+                      <div className="App">
+                        <Navbar />
+                        <main className="App-main">
+                          <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/feed" element={<FeedPage />} />
+                            <Route path="/category/:categoryId" element={<RecommendedPage />} />
+                            <Route path="/similar-movies/:movieId" element={<RecommendedPage />} />
+                            <Route path="/movie/:id" element={<MovieDetail />} />
+                            <Route path="/movie/:id/trailer" element={<TrailerPage />} />
+                            <Route path="/recommended" element={<RecommendedPage />} />
+                            <Route path="/wishlist" element={<WishlistPage />} />
+                            <Route path="/profile" element={<ProfilePage />} />
+                            <Route path="/shorts" element={<ShortsPage />} />
+                            <Route path="/music" element={<MusicPage />} />
+                            <Route path="/music/shorts" element={<MusicShortsPage />} />
+                            <Route path="/music/more" element={<MusicMorePage />} />
+                            <Route path="/music/more/:section" element={<MusicMorePage />} />
+                            <Route path="/music/artist/:id" element={<ArtistDetail />} />
+                            <Route path="/music/album/:id" element={<MusicAlbumDetail />} />
+                            <Route path="/music/video/:id" element={<VideoPage />} />
+                            <Route path="/music/:id" element={<MusicDetailWithKey />} />
+                            <Route path="/actor/:id" element={<ActorsPage />} />
+                            <Route path="/like-history" element={<LikeHistoryPage />} />
+                            <Route path="/rating-page" element={<RatingPage />} />
+                          </Routes>
+                        </main>
+                        <NavbarMobile />
+                      </div>
+                    </PullToRefresh>
                   </LoadingProvider>
                 </MusicPlayerProvider>
               </ContentLanguageProvider>
