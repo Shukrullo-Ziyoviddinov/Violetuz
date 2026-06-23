@@ -34,7 +34,7 @@ export const movies = [
       uz: {
         video: {
           type: "video",
-          src: "/video/video4.5.mp4"
+          src: "/img/4-5yangi.mp4"
         }
       },
       ru: {
