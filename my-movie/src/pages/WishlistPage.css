@@ -1,6 +1,6 @@
 .wishlist-page {
   min-height: calc(100vh - 200px);
-  padding: 3rem 0;
+  padding: 1rem 0;
 }
 
 .wishlist-tabs {
@@ -154,14 +154,14 @@
 }
 }
 
-@media (max-width: 390px) {
+@media (max-width: 400px) {
   .wishlist-music-grid--clips {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .wishlist-music-item--klip .wishlist-music-item-image-wrapper {
-    padding-top: 43%;
-}
+    padding-top: 58%;
+  }
 }
 
 .wishlist-music-item-play {
