@@ -1136,12 +1136,21 @@
   }
 
   .movie-detail-image-block {
-    width: 100%;
-    max-width: 100%;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
   }
 
   .movie-detail-image {
     height: 750px;
+    border-radius: 0;
+  }
+
+  .movie-detail-video-wrapper {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .movie-detail-video-controls {
@@ -1298,7 +1307,12 @@
   }
 
   .movie-detail-content {
-    padding: 0.4rem 0.4rem 0.7rem 0.4rem;
+    padding: 0.4rem 0 0.7rem 0;
+  }
+
+  .movie-detail-info-block {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
   }
 
   .movie-detail-image {
