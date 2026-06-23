@@ -1,104 +1,163 @@
 import React, { useRef, useEffect } from 'react';
 import './ScrollTouch.css';
 
+const DRAG_THRESHOLD = 3;
+const MOMENTUM_MIN_VELOCITY = 0.3;
+const MOMENTUM_FRICTION = 0.92;
+
 const ScrollTouch = ({ children, className = '', ...props }) => {
   const scrollRef = useRef(null);
   const isDown = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
+  const lastClientX = useRef(0);
   const hasDragged = useRef(false);
+  const momentumFrame = useRef(null);
 
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
 
+    const stopMomentum = () => {
+      if (momentumFrame.current !== null) {
+        cancelAnimationFrame(momentumFrame.current);
+        momentumFrame.current = null;
+      }
+    };
+
+    const applyMomentum = (velocity) => {
+      stopMomentum();
+      if (Math.abs(velocity) < MOMENTUM_MIN_VELOCITY) return;
+
+      let v = velocity;
+      const step = () => {
+        if (Math.abs(v) < MOMENTUM_MIN_VELOCITY) {
+          momentumFrame.current = null;
+          return;
+        }
+        element.scrollLeft -= v;
+        v *= MOMENTUM_FRICTION;
+        momentumFrame.current = requestAnimationFrame(step);
+      };
+      momentumFrame.current = requestAnimationFrame(step);
+    };
+
+    const scrollByDelta = (deltaX) => {
+      if (deltaX === 0) return;
+      totalDrag += Math.abs(deltaX);
+      if (totalDrag > DRAG_THRESHOLD) hasDragged.current = true;
+      element.scrollLeft -= deltaX;
+    };
+
+    let velocityX = 0;
+    let lastMoveTime = 0;
+    let totalDrag = 0;
+
+    const trackVelocity = (clientX) => {
+      const now = performance.now();
+      const dt = now - lastMoveTime;
+      if (dt > 0 && dt < 100) {
+        velocityX = (clientX - lastClientX.current) / dt;
+      }
+      lastClientX.current = clientX;
+      lastMoveTime = now;
+    };
+
     const handleMouseDown = (e) => {
       if (e.target.closest('img')) {
-        e.preventDefault(); // img uchun brauzer drag'ini oldini olish — mouseup to'g'ri ishlashi uchun
+        e.preventDefault();
       }
+      stopMomentum();
       isDown.current = true;
       hasDragged.current = false;
+      totalDrag = 0;
+      velocityX = 0;
+      lastMoveTime = performance.now();
+      lastClientX.current = e.clientX;
       element.style.cursor = 'grabbing';
-      startX.current = e.pageX - element.offsetLeft;
-      scrollLeft.current = element.scrollLeft;
+      element.setPointerCapture?.(e.pointerId);
     };
 
     const handleMouseLeave = () => {
+      if (!isDown.current) return;
       isDown.current = false;
       element.style.cursor = 'grab';
+      applyMomentum(velocityX * 16);
     };
 
-    const handleMouseUp = () => {
-      if (isDown.current) element.style.cursor = 'grab';
+    const handleMouseUp = (e) => {
+      if (!isDown.current) return;
       isDown.current = false;
+      element.style.cursor = 'grab';
+      element.releasePointerCapture?.(e.pointerId);
+      applyMomentum(velocityX * 16);
     };
 
     const handleMouseMove = (e) => {
       if (!isDown.current) return;
       e.preventDefault();
-      const x = e.pageX - element.offsetLeft;
-      const walk = (x - startX.current) * 2;
-      if (Math.abs(walk) > 3) hasDragged.current = true;
-      element.scrollLeft = scrollLeft.current - walk;
+      const deltaX = e.clientX - lastClientX.current;
+      trackVelocity(e.clientX);
+      scrollByDelta(deltaX);
     };
 
     const handleClick = (e) => {
       if (hasDragged.current) {
-        // Foydalanuvchi scroll qildi — hech qachon click qilmasin (masalan actor kartochkalariga tasodifiy kirish oldini olish)
         e.preventDefault();
         e.stopPropagation();
         hasDragged.current = false;
       }
     };
 
-    // Touch events
     let touchStartX = 0;
-    let touchStartY = 0; // ← YANGI: vertikal yo'nalish uchun
-    let touchScrollLeft = 0;
+    let touchStartY = 0;
     let isTouching = false;
-    let isHorizontal = null; // ← YANGI: null = aniqlanmagan, true/false = yo'nalish
+    let isHorizontal = null;
 
     const handleTouchStart = (e) => {
+      stopMomentum();
       isTouching = true;
-      isHorizontal = null; // ← har safar reset
+      isHorizontal = null;
       hasDragged.current = false;
-      touchStartX = e.touches[0].pageX - element.offsetLeft;
-      touchStartY = e.touches[0].clientY; // ← Y koordinatani saqlash
-      touchScrollLeft = element.scrollLeft;
+      totalDrag = 0;
+      velocityX = 0;
+      lastMoveTime = performance.now();
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      lastClientX.current = touchStartX;
     };
 
     const handleTouchMove = (e) => {
       if (!isTouching) return;
 
-      const currentX = e.touches[0].pageX - element.offsetLeft;
+      const currentX = e.touches[0].clientX;
       const currentY = e.touches[0].clientY;
       const deltaX = Math.abs(currentX - touchStartX);
       const deltaY = Math.abs(currentY - touchStartY);
 
-      // Yo'nalishni birinchi marta aniqlash
       if (isHorizontal === null) {
-        if (deltaX < 5 && deltaY < 5) return; // hali aniqlab bo'lmaydi
+        if (deltaX < 5 && deltaY < 5) return;
 
         if (deltaY > deltaX) {
-          // Vertikal scroll — brauzerga qo'yib ber
           isHorizontal = false;
           isTouching = false;
           return;
-        } else {
-          // Gorizontal drag — biz boshqaramiz
-          isHorizontal = true;
         }
+        isHorizontal = true;
+        lastClientX.current = currentX;
+        lastMoveTime = performance.now();
       }
 
       if (!isHorizontal) return;
 
-      e.preventDefault(); // ← faqat gorizontal bo'lsa bloklash
-      const walk = (currentX - touchStartX) * 2;
-      if (Math.abs(walk) > 3) hasDragged.current = true;
-      element.scrollLeft = touchScrollLeft - walk;
+      e.preventDefault();
+      const moveDelta = currentX - lastClientX.current;
+      trackVelocity(currentX);
+      scrollByDelta(moveDelta);
     };
 
     const handleTouchEnd = () => {
+      if (isHorizontal) {
+        applyMomentum(velocityX * 16);
+      }
       isTouching = false;
       isHorizontal = null;
     };
@@ -125,6 +184,7 @@ const ScrollTouch = ({ children, className = '', ...props }) => {
     element.style.cursor = 'grab';
 
     return () => {
+      stopMomentum();
       element.removeEventListener('click', handleClick, true);
       element.removeEventListener('mousedown', handleMouseDown);
       element.removeEventListener('mouseleave', handleMouseLeave);
