@@ -478,9 +478,9 @@
   background-color: #0313ea;
   color: #ffffff;
   border: none;
-  padding: 0.45rem 1.3rem;
+  padding: 0.25rem 1rem;
   border-radius: 25px;
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;

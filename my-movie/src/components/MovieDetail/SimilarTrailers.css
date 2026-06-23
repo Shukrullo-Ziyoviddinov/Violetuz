@@ -264,9 +264,9 @@ button.similar-trailer-dislike {
   }
 
   .similar-trailer-video {
-    width: 140px;
-    min-width: 140px;
-    height: 80px;
+    width: 170px;
+    min-width: 170px;
+    height: 100px;
   }
 
   .similar-trailer-info {
@@ -274,11 +274,11 @@ button.similar-trailer-dislike {
   }
 
   .similar-trailer-title {
-    font-size: 13px;
+    font-size: 18px;
   }
 
   .similar-trailer-text {
-    font-size: 11px;
+    font-size: 16px;
     -webkit-line-clamp: 2;
   }
 
@@ -344,17 +344,17 @@ button.similar-trailer-dislike {
   }
 
   .similar-trailer-video {
-    width: 100px;
-    min-width: 100px;
-    height: 72px;
+    width: 150px;
+    min-width: 150px;
+    height: 90px;
   }
 
   .similar-trailer-title {
-    font-size: 11px;
+    font-size: 17px;
   }
 
   .similar-trailer-text {
-    font-size: 10px;
+    font-size: 15px;
     -webkit-line-clamp: 1;
   }
 
@@ -393,17 +393,17 @@ button.similar-trailer-dislike {
   }
 
   .similar-trailer-video {
-    width: 90px;
-    min-width: 90px;
-    height: 70px;
+    width: 150px;
+    min-width: 150px;
+    height: 90px;
   }
 
   .similar-trailer-title {
-    font-size: 10px;
+    font-size: 14px;
   }
 
   .similar-trailer-text {
-    font-size: 9px;
+    font-size: 13px;
   }
 
   .similar-trailer-play {
