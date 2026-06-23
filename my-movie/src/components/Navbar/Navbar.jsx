@@ -25,6 +25,7 @@ const Navbar = () => {
   const isShortsPage =
     location.pathname === '/shorts' || location.pathname === '/music/shorts';
   const isProfilePage = location.pathname === '/profile';
+  const isMovieDetailPage = /^\/movie\/\d+$/.test(location.pathname);
   const [searchQuery, setSearchQuery] = useState('');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -128,7 +129,7 @@ const Navbar = () => {
 
   return (
     <>
-    <nav className={`navbar${isProfilePage ? ' navbar--profile-page' : ''}${isFeedPage ? ' navbar--feed-page' : ''}`}>
+    <nav className={`navbar${isProfilePage ? ' navbar--profile-page' : ''}${isFeedPage ? ' navbar--feed-page' : ''}${isMovieDetailPage ? ' navbar--movie-detail-page' : ''}`}>
       <div className="navbar-container">
         <div className="navbar-left">
           <div className="navbar-logo" onClick={() => navigate('/')}>

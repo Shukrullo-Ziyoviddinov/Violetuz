@@ -533,6 +533,18 @@
     position: relative;
   }
 
+  .navbar.navbar--movie-detail-page {
+    height: 0;
+    min-height: 0;
+    max-height: 0;
+    overflow: hidden;
+    border-bottom: none;
+  }
+
+  .navbar.navbar--movie-detail-page .navbar-container {
+    display: none !important;
+  }
+
   .navbar.navbar--feed-page .navbar-feed-messages-mobile {
     display: inline-flex !important;
     position: absolute;
