@@ -1136,21 +1136,12 @@
   }
 
   .movie-detail-image-block {
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
+    width: 100%;
+    max-width: 100%;
   }
 
   .movie-detail-image {
     height: 750px;
-    border-radius: 0;
-  }
-
-  .movie-detail-video-wrapper {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
   }
 
   .movie-detail-video-controls {
@@ -1296,6 +1287,38 @@
 
 }
 
+/* Video to‘liq kenglik — faqat 450px dan kichik ekranlar */
+@media (max-width: 449px) {
+  .movie-detail-content {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .movie-detail-image-block {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
+
+  .movie-detail-image {
+    border-radius: 0;
+  }
+
+  .movie-detail-video-wrapper {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .movie-detail-info-block {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+}
+
 /* Small mobile version */
 @media (max-width: 480px) {
   .movie-detail {
@@ -1310,13 +1333,8 @@
     padding: 0.4rem 0 0.7rem 0;
   }
 
-  .movie-detail-info-block {
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
-  }
-
   .movie-detail-image {
-    height: 500px;
+    height: 420px;
   }
 
   .movie-detail-btn {
