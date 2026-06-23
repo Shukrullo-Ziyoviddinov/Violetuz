@@ -672,7 +672,6 @@
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
   background: rgba(0, 0, 0, 0.25);
 }
@@ -698,7 +697,7 @@
 }
 
 .movie-detail-clip-info {
-  padding: 0.35rem 0.45rem 0.5rem;
+  padding: 0;
   min-width: 0;
   width: 100%;
   overflow: hidden;
