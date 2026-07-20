@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchAllMovies, fetchMovieById, fetchMovieSections, fetchHomeContent } from '../api/moviesApi';
-import fallbackMovies from '../data/movie.json';
 
 const MoviesApiContext = createContext(null);
 
@@ -26,10 +25,7 @@ export const MoviesApiProvider = ({ children }) => {
     retry: 1,
   });
 
-  const allMovies = useMemo(
-    () => (moviesQuery.data?.length ? moviesQuery.data : fallbackMovies),
-    [moviesQuery.data]
-  );
+  const allMovies = useMemo(() => moviesQuery.data || [], [moviesQuery.data]);
   const sections = useMemo(
     () => (sectionsQuery.data?.length ? sectionsQuery.data : []),
     [sectionsQuery.data]
