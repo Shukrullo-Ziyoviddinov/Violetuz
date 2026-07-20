@@ -6,6 +6,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "seed:movies": "node seeds/seedMovies.js",
+    "seed:music": "node seeds/seedMusic.js",
+    "seed:albums": "node seeds/seedAlbums.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

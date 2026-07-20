@@ -4,13 +4,8 @@
  * Musiqa/klip/konsert: title va artist bo'yicha qidiradi.
  * Stop words va minimal moslik – faqat aniq natijalar chiqadi.
  */
-import { allMusicData } from '../dataMusic/allMusicData';
 import { ensureArray } from '../dataMusic/musicDataUtils';
 import { artists } from '../dataMusic/artists';
-import { TopAlbums } from '../dataMusic/topAlbumsData';
-import { musicDropsData } from '../dataMusic/musicDropsData';
-import { sevgiVaMusiqaData } from '../dataMusic/sevgiVaMusiqaData';
-import { hitCollectionsData } from '../dataMusic/hitCollectionsData';
 import { trendClipsData } from '../dataMusic/trendClipsData';
 import { jaxonConcertsData } from '../dataMusic/jaxonConcertsData';
 import { visualBeatsData } from '../dataMusic/visualBeatsData';
@@ -19,13 +14,6 @@ import { trendVideosData } from '../dataMusic/trendVideosData';
 import { stageCreationData } from '../dataMusic/stageCreationData';
 import { liveStagesData } from '../dataMusic/liveStagesData';
 import { starsStageData } from '../dataMusic/starsStageData';
-
-const allAlbumsData = [
-  ...(TopAlbums || []),
-  ...(musicDropsData || []),
-  ...(sevgiVaMusiqaData || []),
-  ...(hitCollectionsData || []),
-];
 
 const allClipsData = [
   ...(trendClipsData || []),
@@ -232,16 +220,16 @@ export const removeMusicSearchHistory = (historyId) => {
   } catch {}
 };
 
-export const searchMusicByQuery = (query, contentLang = 'uz', limit = 20) => {
+export const searchMusicByQuery = (query, contentLang = 'uz', limit = 20, musicList = [], albumsList = []) => {
   const q = normalize(query);
   if (!q) return [];
 
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
   const significantWords = getSignificantWords(queryWords);
 
-  const musicWithScore = searchPool(ensureArray(allMusicData), 'music', q, queryWords, significantWords);
+  const musicWithScore = searchPool(ensureArray(musicList), 'music', q, queryWords, significantWords);
   const albumWithScore = searchPool(
-    ensureArray(allAlbumsData),
+    ensureArray(albumsList),
     'album',
     q,
     queryWords,

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "trend",
+    "slug": "trend",
+    "categoryNameMusic": "trendMusicData",
+    "titleKey": "music.trendMusic",
+    "titleDefault": "Trend Musiqa",
+    "moreTo": "/music/more/trend",
+    "wishlistType": "music",
+    "initialCount": 10
+  },
+  {
+    "id": "albums",
+    "slug": "top-albums",
+    "categoryNameMusic": "TopAlbums",
+    "titleKey": "music.topAlbums",
+    "titleDefault": "Top Albomlar",
+    "moreTo": "/music/more/top-albums",
+    "wishlistType": "album",
+    "initialCount": 10,
+    "detailPathType": "album"
+  },
+  {
+    "id": "music-drops",
+    "slug": "music-drops",
+    "categoryNameMusic": "musicDropsData",
+    "titleKey": "music.musicDrops",
+    "titleDefault": "Music Drops",
+    "moreTo": "/music/more/music-drops",
+    "wishlistType": "album",
+    "initialCount": 10,
+    "detailPathType": "album"
+  },
+  {
+    "id": "discover-music",
+    "slug": "discover-music",
+    "categoryNameMusic": "discoverMusicData",
+    "titleKey": "music.discoverMusic",
+    "titleDefault": "Discover Music",
+    "moreTo": "/music/more/discover-music",
+    "wishlistType": "music",
+    "initialCount": 10
+  },
+  {
+    "id": "sevgi-va-musiqa",
+    "slug": "sevgi-va-musiqa",
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "titleKey": "music.sevgiVaMusiqa",
+    "titleDefault": "Sevgi va musiqa",
+    "moreTo": "/music/more/sevgi-va-musiqa",
+    "wishlistType": "album",
+    "initialCount": 10,
+    "detailPathType": "album"
+  },
+  {
+    "id": "music-library",
+    "slug": "music-library",
+    "categoryNameMusic": "musicLibraryData",
+    "titleKey": "music.musicLibrary",
+    "titleDefault": "Music Library",
+    "moreTo": "/music/more/music-library",
+    "wishlistType": "music",
+    "initialCount": 10
+  },
+  {
+    "id": "music-hub",
+    "slug": "music-hub",
+    "categoryNameMusic": "musicHubData",
+    "titleKey": "music.musicHub",
+    "titleDefault": "Music Hub",
+    "moreTo": "/music/more/music-hub",
+    "wishlistType": "music",
+    "initialCount": 10
+  },
+  {
+    "id": "hit-collections",
+    "slug": "hit-collections",
+    "categoryNameMusic": "hitCollectionsData",
+    "titleKey": "music.hitCollections",
+    "titleDefault": "Mashhur to'plamlar",
+    "moreTo": "/music/more/hit-collections",
+    "wishlistType": "album",
+    "initialCount": 10,
+    "detailPathType": "album"
+  },
+  {
+    "id": "bass-music",
+    "slug": "bass-music",
+    "categoryNameMusic": "bassMusicData",
+    "titleKey": "music.bassMusic",
+    "titleDefault": "Bass music",
+    "moreTo": "/music/more/bass-music",
+    "wishlistType": "music",
+    "initialCount": 10
+  },
+  {
+    "id": "top-nasheeds",
+    "slug": "top-nasheeds",
+    "categoryNameMusic": "topNasheedsData",
+    "titleKey": "music.topNasheeds",
+    "titleDefault": "Top Nashidalar",
+    "moreTo": "/music/more/top-nasheeds",
+    "wishlistType": "music",
+    "initialCount": 10
+  }
+]

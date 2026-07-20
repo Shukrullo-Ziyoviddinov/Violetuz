@@ -1,11 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicPlayer } from '../context/MusicPlayerContext';
-import { allMusicData } from '../dataMusic/allMusicData';
+import { useMusicApi } from '../context/MusicApiContext';
 import { ensureArray, matchId } from '../dataMusic/musicDataUtils';
-import { MUSIC_SECTIONS } from '../dataMusic/musicSectionsConfig';
 import { artists } from '../dataMusic/artists';
 import AudioDuration from '../Music/AudioDuration/AudioDuration';
 import ShareButton from '../components/ShareButton/ShareButton';
@@ -19,27 +18,35 @@ import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
 import './MusicDetail.css';
 
-const musicTrackSections = (MUSIC_SECTIONS || []).filter((s) => s.wishlistType === 'music');
-const sectionById = Object.fromEntries(musicTrackSections.map((s) => [s.id, s]));
-
-/** fromSection bo'lmaganda (masalan Music Shorts dan) – musiqani qaysi bo'limda topish */
-const findSectionForMusicId = (musicId) => {
-  if (musicId == null) return null;
-  return musicTrackSections.find((s) =>
-    ensureArray(s.data).some((item) => matchId(item.id, musicId))
-  ) || null;
-};
-
 const MusicDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { allMusic, getMusicByCategory, sections } = useMusicApi();
+
+  const musicTrackSections = useMemo(
+    () => (sections || []).filter((s) => s.wishlistType === 'music'),
+    [sections]
+  );
+  const sectionById = useMemo(
+    () => Object.fromEntries(musicTrackSections.map((s) => [s.id, s])),
+    [musicTrackSections]
+  );
 
   const [searchParams] = useSearchParams();
   const fromSection = searchParams.get('section') || location.state?.fromSection;
-  const music = ensureArray(allMusicData).find((m) => matchId(m.id, id));
+  const music = ensureArray(allMusic).find((m) => matchId(m.id, id));
+
+  const findSectionForMusicId = (musicId) => {
+    if (musicId == null) return null;
+    return musicTrackSections.find((s) => {
+      if (!s.categoryNameMusic) return false;
+      return getMusicByCategory(s.categoryNameMusic).some((item) => matchId(item.id, musicId));
+    }) || null;
+  };
+
   const sectionConfig = fromSection ? sectionById[fromSection] : (music ? findSectionForMusicId(music.id) : null);
   const resolvedSection = fromSection || sectionConfig?.id;
   const {
@@ -119,7 +126,9 @@ const MusicDetail = () => {
 
   // Bo'lim playlistini player contextga o'tkazish – prev/next shu ro'yxat bo'yicha ishlaydi
   useEffect(() => {
-    if (sectionConfig && Array.isArray(sectionConfig.data) && sectionConfig.data.length) {
+    if (sectionConfig?.categoryNameMusic) {
+      setPlaylistFromPage(getMusicByCategory(sectionConfig.categoryNameMusic));
+    } else if (sectionConfig && Array.isArray(sectionConfig.data) && sectionConfig.data.length) {
       setPlaylistFromPage(ensureArray(sectionConfig.data));
     } else {
       setPlaylistFromPage(null);
@@ -211,7 +220,11 @@ const MusicDetail = () => {
 
   // Bo'lim bo'yicha ro'yxat va title (Trend, Musiqani kashf eting, va hokazo)
   const trendList =
-    sectionConfig && Array.isArray(sectionConfig.data) ? ensureArray(sectionConfig.data) : ensureArray(allMusicData);
+    sectionConfig?.categoryNameMusic
+      ? getMusicByCategory(sectionConfig.categoryNameMusic)
+      : sectionConfig && Array.isArray(sectionConfig.data)
+        ? ensureArray(sectionConfig.data)
+        : ensureArray(allMusic);
   const sectionTitle = sectionConfig ? t(sectionConfig.titleKey, sectionConfig.titleDefault) : t('music.trendMusic', 'Trend Musiqa');
 
   return (

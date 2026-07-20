@@ -1,4 +1,3 @@
-import { allMusicData } from '../dataMusic/allMusicData';
 import { allClipsData, allConcertsData } from '../dataMusic/wishlistDataConfig';
 import { matchId } from '../dataMusic/musicDataUtils';
 
@@ -16,8 +15,10 @@ const normalizeTitle = (title) => {
 /**
  * Kino shorts `musics` maydoni: faqat musicId / videoId beriladi,
  * audio, klip, rasm va sarlavha musiqa bo'limidan olinadi.
+ * @param {Object} musicsRef
+ * @param {Array} musicList - API/DB dan kelgan musiqa ro'yxati
  */
-export function resolveShortsMusics(musicsRef) {
+export function resolveShortsMusics(musicsRef, musicList = []) {
   if (!musicsRef) return null;
 
   if (musicsRef.music || musicsRef.img) {
@@ -29,7 +30,7 @@ export function resolveShortsMusics(musicsRef) {
 
   const { musicId, videoId } = musicsRef;
   const musicItem = musicId != null
-    ? allMusicData.find((m) => matchId(m.id, musicId))
+    ? (musicList || []).find((m) => matchId(m.id, musicId))
     : null;
   const videoItem = videoId != null
     ? allVideoItems.find((v) => matchId(v.id, videoId))

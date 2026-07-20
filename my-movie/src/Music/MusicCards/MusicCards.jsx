@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useMusicApi } from '../../context/MusicApiContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import MusicButtonMore from '../MusicButtonMore/MusicButtonMore';
 import MusicSectionIcons from '../MusicSectionIcons';
@@ -20,18 +21,25 @@ const MusicCards = ({ section }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { getSectionItems } = useMusicApi();
 
   const {
     id,
-    data,
     titleKey,
     titleDefault,
     moreTo,
     wishlistType = 'music',
     initialCount,
-    getDetailPath = (id) => `/music/${id}`,
-    getArtistDisplay,
+    detailPathType,
   } = section;
+
+  const getDetailPath = (itemId) =>
+    detailPathType === 'album' ? `/music/album/${itemId}` : `/music/${itemId}`;
+
+  const resolvedData = useMemo(
+    () => getSectionItems(section),
+    [getSectionItems, section]
+  );
 
   const getTitle = (item) => {
     if (!item?.title) return '';
@@ -52,7 +60,7 @@ const MusicCards = ({ section }) => {
   };
 
   const getArtistText = (item) => {
-    if (getArtistDisplay) return getArtistDisplay(item);
+    if (wishlistType === 'album' && item.artist) return item.artist;
     return getArtistName(item.artistId) || item.artist || '';
   };
 
@@ -61,7 +69,7 @@ const MusicCards = ({ section }) => {
     toggleWishlist(id, wishlistType);
   };
 
-  const safeData = Array.isArray(data) ? data : [];
+  const safeData = Array.isArray(resolvedData) ? resolvedData : [];
   const displayItems = safeData.slice(0, initialCount);
 
   return (

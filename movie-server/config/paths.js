@@ -14,4 +14,6 @@ module.exports = {
   COMMENTS_JSON: path.join(ROOT, 'data', 'comments.json'),
   MOVIE_SECTIONS_JSON: path.join(ROOT, 'data', 'movieSections.json'),
   HOME_CONTENT_JSON: path.join(ROOT, 'data', 'homeContent.json'),
+  MUSIC_SECTIONS_JSON: path.join(ROOT, 'data', 'musicSections.json'),
+  MUSIC_PAGE_CONTENT_JSON: path.join(ROOT, 'data', 'musicPageContent.json'),
 };

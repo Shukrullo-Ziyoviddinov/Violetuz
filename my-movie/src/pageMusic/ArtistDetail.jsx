@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { artists } from '../dataMusic/artists';
 import { allMovies } from '../data/movies';
-import { allMusicData } from '../dataMusic/allMusicData';
 import { artistMusicStory } from '../dataMusic/artistMusicStory';
-import { allAlbums, allClipsData, allConcertsData } from '../dataMusic/wishlistDataConfig';
+import { allClipsData, allConcertsData } from '../dataMusic/wishlistDataConfig';
 import { musicShorts } from '../dataMusic/musicShorts';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import HorizontalScroll from '../components/HorizontalScroll/HorizontalScroll';
@@ -16,6 +15,7 @@ import MoreText from '../components/MoreText/MoreText';
 import ArtistMusicStory from '../Music/ArtistMusicStory/ArtistMusicStory';
 import ArtistDetailElementFilter, { FILTER_ALL, FILTER_MUSIC, FILTER_ALBUM, FILTER_KLIP, FILTER_SHORTS, FILTER_KONSERT, FILTER_MOVIES } from '../Music/ArtistDetailElementFilter/ArtistDetailElementFilter';
 import { useMusicPlayer } from '../context/MusicPlayerContext';
+import { useMusicApi } from '../context/MusicApiContext';
 import { useWishlist } from '../context/WishlistContext';
 import { getDominantColor } from '../utils/dominantColor';
 import { formatCount } from '../utils/utils';
@@ -33,6 +33,7 @@ const ArtistDetail = () => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { loadAndPlayTrack, togglePlay, currentMusic, isPlaying } = useMusicPlayer();
+  const { allMusic, getAlbumsByArtist } = useMusicApi();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [playingTrackColor, setPlayingTrackColor] = useState(null);
   const [artistHeaderColor, setArtistHeaderColor] = useState(null);
@@ -76,9 +77,9 @@ const ArtistDetail = () => {
     };
   }, [artist?.bio]);
 
-  const artistTracks = allMusicData.filter((tr) => tr.artistId === id);
+  const artistTracks = allMusic.filter((tr) => tr.artistId === id);
   const artistStories = artistMusicStory.filter((s) => s.artistId === id);
-  const artistAlbums = allAlbums.filter((a) => a.artistId === id);
+  const artistAlbums = getAlbumsByArtist(id);
   const artistClips = allClipsData.filter((clip) => clip.artistId === id);
   const artistShorts = musicShorts.filter((s) => s.artistId === id);
   const artistConcerts = allConcertsData.filter((clip) => clip.artistId === id);

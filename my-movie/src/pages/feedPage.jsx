@@ -11,8 +11,8 @@ import { getFeedHeaderFollowedPeople } from '../store/slices/followingUtils';
 import { actors } from '../data/actors';
 import { artists } from '../dataMusic/artists';
 import { allMovies } from '../data/movies';
-import { MUSIC_SECTIONS } from '../dataMusic/musicSectionsConfig';
 import { CLIPS_SECTIONS } from '../dataMusic/clipsSectionsConfig';
+import { useMusicApi } from '../context/MusicApiContext';
 import './feedPage.css';
 
 const resolveSortKey = (item, fallbackId = 0) => {
@@ -41,6 +41,7 @@ const FeedPage = () => {
   const followingIds = useFollowingIds();
   const feedProfileUser = useFeedProfile();
   const [messagesOpen, setMessagesOpen] = useState(false);
+  const { sections, getMusicByCategory, getAlbumsByCategory } = useMusicApi();
 
   const openMessages = useCallback(() => setMessagesOpen(true), []);
 
@@ -87,8 +88,10 @@ const FeedPage = () => {
 
     const musicItemsRaw = [];
 
-    MUSIC_SECTIONS.forEach((section) => {
-      const rows = Array.isArray(section.data) ? section.data : [];
+    (sections || []).forEach((section) => {
+      const rows = section.wishlistType === 'album'
+        ? getAlbumsByCategory(section.categoryNameMusic)
+        : getMusicByCategory(section.categoryNameMusic);
       const isAlbum = section.wishlistType === 'album';
 
       rows.forEach((item) => {
@@ -155,7 +158,7 @@ const FeedPage = () => {
       });
 
     return [...movieItems, ...musicItems, ...videoItems].sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-  }, [followingIds]);
+  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory]);
 
   const filteredItems = useMemo(() => {
     if (activeCategory === 'all') return feedItems;

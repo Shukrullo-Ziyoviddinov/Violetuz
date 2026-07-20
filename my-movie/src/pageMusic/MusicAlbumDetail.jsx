@@ -6,12 +6,8 @@ import { useMusicPlayer } from '../context/MusicPlayerContext';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { useAlbumTotalDuration } from '../hooks/useAlbumTotalDuration';
 import { useAlbumTrackDurations } from '../hooks/useAlbumTrackDurations';
-import { TopAlbums } from '../dataMusic/topAlbumsData';
-import { musicDropsData } from '../dataMusic/musicDropsData';
-import { sevgiVaMusiqaData } from '../dataMusic/sevgiVaMusiqaData';
-import { hitCollectionsData } from '../dataMusic/hitCollectionsData';
 import { matchId } from '../dataMusic/musicDataUtils';
-import { MUSIC_SECTIONS } from '../dataMusic/musicSectionsConfig';
+import { useMusicApi } from '../context/MusicApiContext';
 import ShareButton from '../components/ShareButton/ShareButton';
 import AlbumsForYou from '../Music/AlbumsForYou/AlbumsForYou';
 import SimilarSongs from '../Music/SimilarSongs/SimilarSongs';
@@ -21,9 +17,6 @@ import './MusicDetail.css';
 import './MusicAlbumDetail.css';
 
 const ALBUM_TRACK_ID_OFFSET = 50000;
-
-const albumSections = (MUSIC_SECTIONS || []).filter((s) => s.wishlistType === 'album');
-const albumSectionById = Object.fromEntries(albumSections.map((s) => [s.id, s]));
 
 const albumSongToTrack = (album, song) => ({
   id: ALBUM_TRACK_ID_OFFSET + album.id * 100 + song.id,
@@ -38,11 +31,16 @@ const albumSongToTrack = (album, song) => ({
 
 const MusicAlbumDetail = () => {
   const { id } = useParams();
+  const { sections, allAlbums, getAlbumsByCategory } = useMusicApi();
+  const albumSections = (sections || []).filter((s) => s.wishlistType === 'album');
+  const topAlbums = getAlbumsByCategory('TopAlbums');
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const fromSection = searchParams.get('section') || location.state?.fromSection;
-  const sectionConfig = fromSection ? albumSectionById[fromSection] : null;
+  const sectionConfig = fromSection
+    ? albumSections.find((s) => s.id === fromSection || s.slug === fromSection) || null
+    : null;
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
@@ -108,11 +106,12 @@ const MusicAlbumDetail = () => {
     }
   }, [lyricsModalOpen]);
 
-  const allAlbums = [...TopAlbums, ...musicDropsData, ...sevgiVaMusiqaData, ...hitCollectionsData];
   const album = allAlbums.find((a) => matchId(a.id, id));
 
   /* Bo'lim bo'yicha ro'yxat va sarlavha – Music Drops, Top Albomlar va hokazo */
-  const albumList = sectionConfig && Array.isArray(sectionConfig.data) ? sectionConfig.data : TopAlbums;
+  const albumList = sectionConfig?.categoryNameMusic
+    ? getAlbumsByCategory(sectionConfig.categoryNameMusic)
+    : topAlbums;
   const sectionTitle = sectionConfig ? t(sectionConfig.titleKey, sectionConfig.titleDefault) : t('music.topAlbums', 'Top Albomlar');
   const albumDominantColor = useDominantColor(album?.img);
   const albumTotalDuration = useAlbumTotalDuration(album?.songs);

@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useMusicApi } from '../../context/MusicApiContext';
 import { searchMusicByQuery, addMusicSearchHistory } from '../../utils/searchMusic';
 import { artists } from '../../dataMusic/artists';
 import ScrollTouch from '../../components/ScrollTouch/ScrollTouch';
@@ -10,9 +11,10 @@ import './SearchMusicResults.css';
 const SearchMusicResults = ({ query, onItemClick }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { allMusic, allAlbums } = useMusicApi();
   const navigate = useNavigate();
 
-  const results = searchMusicByQuery(query, contentLang, 40);
+  const results = searchMusicByQuery(query, contentLang, 40, allMusic, allAlbums);
 
   const getTitle = (item) => {
     if (item?.itemType === 'artist') return item.name || '';

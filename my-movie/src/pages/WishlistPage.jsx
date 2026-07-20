@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useContentLanguage } from '../context/ContentLanguageContext';
-import { allMovies } from '../data/movies';
-import { allMusicData } from '../dataMusic/allMusicData';
-import { allAlbums, allClipsData, allConcertsData } from '../dataMusic/wishlistDataConfig';
+import { allConcertsData } from '../dataMusic/wishlistDataConfig';
+import { allClipsData } from '../dataMusic/wishlistDataConfig';
 import { artists } from '../dataMusic/artists';
+import { useMoviesApi } from '../context/MoviesApiContext';
+import { useMusicApi } from '../context/MusicApiContext';
 import Movies from '../components/Movies/Movies';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import './WishlistPage.css';
@@ -59,6 +60,8 @@ const WishlistPage = () => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { wishlistItems, toggleWishlist } = useWishlist();
+  const { allMovies: apiMovies } = useMoviesApi();
+  const { allMusic, allAlbums } = useMusicApi();
   const [activeTab, setActiveTab] = useState('movie');
 
   const normalizeType = (raw) => {
@@ -74,9 +77,10 @@ const WishlistPage = () => {
   const matchWishlist = (itemId, type) =>
     wishlistItems.some((x) => x.id == itemId && normalizeType(x.type) === normalizeType(type));
 
-  const wishlistMovies = allMovies.filter((m) => matchWishlist(m.id, normalizeType(m.type) || 'movie'));
+  const moviesSource = apiMovies?.length ? apiMovies : [];
+  const wishlistMovies = moviesSource.filter((m) => matchWishlist(m.id, normalizeType(m.type) || 'movie'));
   const wishlistAlbums = allAlbums.filter((a) => matchWishlist(a.id, 'album'));
-  const wishlistMusic = allMusicData.filter((m) => matchWishlist(m.id, 'music'));
+  const wishlistMusic = allMusic.filter((m) => matchWishlist(m.id, 'music'));
   const wishlistClips = allClipsData.filter((c) => matchWishlist(c.id, normalizeType(c.type) || 'klip'));
   const wishlistConcerts = allConcertsData.filter((c) => matchWishlist(c.id, normalizeType(c.type) || 'konsert'));
 

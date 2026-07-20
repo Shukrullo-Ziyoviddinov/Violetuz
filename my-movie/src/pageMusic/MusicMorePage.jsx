@@ -3,16 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
-import { trendMusicData } from '../dataMusic/trendMusicData';
-import { discoverMusicData } from '../dataMusic/discoverMusicData';
-import { musicLibraryData } from '../dataMusic/musicLibraryData';
-import { musicHubData } from '../dataMusic/musicHubData';
-import { bassMusicData } from '../dataMusic/bassMusicData';
-import { topNasheedsData } from '../dataMusic/topNasheedsData';
-import { TopAlbums } from '../dataMusic/topAlbumsData';
-import { musicDropsData } from '../dataMusic/musicDropsData';
-import { sevgiVaMusiqaData } from '../dataMusic/sevgiVaMusiqaData';
-import { hitCollectionsData } from '../dataMusic/hitCollectionsData';
+import { useMusicApi } from '../context/MusicApiContext';
 import { trendClipsData } from '../dataMusic/trendClipsData';
 import { jaxonConcertsData } from '../dataMusic/jaxonConcertsData';
 import { visualBeatsData } from '../dataMusic/visualBeatsData';
@@ -27,22 +18,6 @@ import '../Music/MusicFilter/MusicFilter.css';
 import './MusicMorePage.css';
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
-
-const allMusicSectionsData = [
-  ...ensureArray(trendMusicData),
-  ...ensureArray(discoverMusicData),
-  ...ensureArray(musicLibraryData),
-  ...ensureArray(musicHubData),
-  ...ensureArray(bassMusicData),
-  ...ensureArray(topNasheedsData),
-];
-
-const allAlbumsSectionsData = [
-  ...ensureArray(TopAlbums),
-  ...ensureArray(musicDropsData),
-  ...ensureArray(sevgiVaMusiqaData),
-  ...ensureArray(hitCollectionsData),
-];
 
 const allClipsSectionsData = [
   ...ensureArray(trendClipsData),
@@ -80,7 +55,7 @@ const getItemWishlistType = (item) => {
  */
 const SECTIONS = {
   songs: {
-    data: allMusicSectionsData,
+    categoryNameMusic: '__all__',
     titleKey: 'music.searchTypeMusic',
     titleDefault: 'Musiqa',
     wishlistType: 'music',
@@ -88,7 +63,7 @@ const SECTIONS = {
     isAggregate: true,
   },
   albums: {
-    data: allAlbumsSectionsData,
+    categoryNameMusic: '__all_albums__',
     titleKey: 'music.searchTypeAlbum',
     titleDefault: 'Albom',
     wishlistType: 'album',
@@ -114,56 +89,56 @@ const SECTIONS = {
     isAggregate: true,
   },
   trend: {
-    data: trendMusicData,
+    categoryNameMusic: 'trendMusicData',
     titleKey: 'music.trendMusic',
     titleDefault: 'Trend Musiqa',
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
   },
   'top-albums': {
-    data: TopAlbums,
+    categoryNameMusic: 'TopAlbums',
     titleKey: 'music.topAlbums',
     titleDefault: "Top Albomlar",
     wishlistType: 'album',
     getDetailPath: (id) => `/music/album/${id}`,
   },
   'music-drops': {
-    data: musicDropsData,
+    categoryNameMusic: 'musicDropsData',
     titleKey: 'music.musicDrops',
     titleDefault: 'Music Drops',
     wishlistType: 'album',
     getDetailPath: (id) => `/music/album/${id}`,
   },
   'discover-music': {
-    data: discoverMusicData,
+    categoryNameMusic: 'discoverMusicData',
     titleKey: 'music.discoverMusic',
     titleDefault: 'Discover Music',
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
   },
   'music-library': {
-    data: musicLibraryData,
+    categoryNameMusic: 'musicLibraryData',
     titleKey: 'music.musicLibrary',
     titleDefault: 'Music Library',
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
   },
   'music-hub': {
-    data: musicHubData,
+    categoryNameMusic: 'musicHubData',
     titleKey: 'music.musicHub',
     titleDefault: 'Music Hub',
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
   },
   'bass-music': {
-    data: bassMusicData,
+    categoryNameMusic: 'bassMusicData',
     titleKey: 'music.bassMusic',
     titleDefault: 'Bass music',
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
   },
   'top-nasheeds': {
-    data: topNasheedsData,
+    categoryNameMusic: 'topNasheedsData',
     titleKey: 'music.topNasheeds',
     titleDefault: 'Top Nashidalar',
     wishlistType: 'music',
@@ -178,14 +153,15 @@ const SECTIONS = {
     isArtist: true,
   },
   'sevgi-va-musiqa': {
-    data: sevgiVaMusiqaData,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     titleKey: 'music.sevgiVaMusiqa',
     titleDefault: 'Sevgi va musiqa',
+    moreTo: '/music/more/sevgi-va-musiqa',
     wishlistType: 'album',
     getDetailPath: (id) => `/music/album/${id}`,
   },
   'hit-collections': {
-    data: hitCollectionsData,
+    categoryNameMusic: 'hitCollectionsData',
     titleKey: 'music.hitCollections',
     titleDefault: "Mashhur to'plamlar",
     wishlistType: 'album',
@@ -263,10 +239,19 @@ const MusicMorePage = () => {
   const { section = 'trend' } = useParams();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { allMusic, allAlbums, getMusicByCategory, getAlbumsByCategory } = useMusicApi();
 
   const config = SECTIONS[section] || SECTIONS.trend;
-  const { data: sectionData, titleKey, titleDefault, wishlistType, getDetailPath, isAggregate } = config;
-  const safeSectionData = Array.isArray(sectionData) ? sectionData : [];
+  const { data: sectionData, categoryNameMusic, titleKey, titleDefault, wishlistType, getDetailPath, isAggregate } = config;
+  const safeSectionData = categoryNameMusic === '__all__'
+    ? allMusic
+    : categoryNameMusic === '__all_albums__'
+      ? allAlbums
+      : categoryNameMusic
+        ? (wishlistType === 'album'
+            ? getAlbumsByCategory(categoryNameMusic)
+            : getMusicByCategory(categoryNameMusic))
+        : (Array.isArray(sectionData) ? sectionData : []);
 
   const [filteredItems, setFilteredItems] = useState(safeSectionData);
   const allItems = filteredItems;

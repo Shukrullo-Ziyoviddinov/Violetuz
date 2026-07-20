@@ -1,13 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { allMusicData } from '../../dataMusic/allMusicData';
+import { useMusicApi } from '../../context/MusicApiContext';
 import { artists } from '../../dataMusic/artists';
 import './RepostMusicCard.css';
 
 const RepostMusicCard = ({ item }) => {
   const navigate = useNavigate();
+  const { getMusicByIdLocal } = useMusicApi();
   const open = () => navigate(item.route || `/music/${item.id}`);
-  const music = allMusicData.find((m) => String(m.id) === String(item.id));
+  const music = getMusicByIdLocal(item.id);
   const artistName =
     item.artistName ||
     (music?.artistId ? artists.find((a) => a.id === music.artistId)?.name || '' : '');

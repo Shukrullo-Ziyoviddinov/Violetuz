@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { allMusicData } from '../dataMusic/allMusicData';
 import { ensureArray, matchId } from '../dataMusic/musicDataUtils';
-import { TopAlbums } from '../dataMusic/topAlbumsData';
 import { artists } from '../dataMusic/artists';
 import { useContentLanguage } from './ContentLanguageContext';
+import { useMusicApi } from './MusicApiContext';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { useWishlist } from './WishlistContext';
 import MusicMiniPlayer from '../Music/MusicMiniPlayer/MusicMiniPlayer';
@@ -31,6 +30,8 @@ export const MusicPlayerProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { contentLang } = useContentLanguage();
+  const { allMusic, getAlbumsByCategory } = useMusicApi();
+  const topAlbums = getAlbumsByCategory('TopAlbums');
 
   const isMiniPlayerForbidden = MINI_PLAYER_FORBIDDEN_PATHS.some(
     (p) => location.pathname === p || (p !== '/movie' && location.pathname.startsWith(p + '/'))
@@ -156,7 +157,7 @@ export const MusicPlayerProvider = ({ children }) => {
   }, [contentLang]);
 
   const loadTrack = useCallback((musicId, shouldAutoplay = false) => {
-    const music = ensureArray(allMusicData).find((m) => matchId(m.id, musicId));
+    const music = ensureArray(allMusic).find((m) => matchId(m.id, musicId));
     if (!music?.audio) return;
 
     setCurrentMusic(music);
@@ -183,7 +184,7 @@ export const MusicPlayerProvider = ({ children }) => {
         });
       }
     }
-  }, []);
+  }, [allMusic]);
 
   const tryAutoplay = useCallback(() => {
     if (!pendingAutoplayRef.current || !audioRef.current) return;
@@ -435,7 +436,7 @@ export const MusicPlayerProvider = ({ children }) => {
       }
       setIsPlaying(true);
     } else {
-      const list = playlistRef.current?.length ? playlistRef.current : allMusicData;
+      const list = playlistRef.current?.length ? playlistRef.current : allMusic;
       const isAlbumPlaylist = list.length && list[0]?.albumId != null;
       const syncDetail = isAlbumPlaylist ? !playlistRef.current?.length : isOnMusicDetailPage;
       const idx = list.findIndex((m) => m.id === music.id);
@@ -443,9 +444,9 @@ export const MusicPlayerProvider = ({ children }) => {
 
       /* Oxirgi qo'shiq tugaganda keyingi albomga o'tish */
       if (isLastTrackOfAlbum && music.albumId) {
-        const currentAlbumIndex = TopAlbums.findIndex((a) => a.id === music.albumId);
+        const currentAlbumIndex = topAlbums.findIndex((a) => a.id === music.albumId);
         const nextAlbumIndex = currentAlbumIndex >= 0 ? currentAlbumIndex + 1 : 0;
-        const nextAlbum = TopAlbums[nextAlbumIndex] ?? TopAlbums[0];
+        const nextAlbum = topAlbums[nextAlbumIndex] ?? topAlbums[0];
         if (nextAlbum?.songs?.length) {
           const firstSong = nextAlbum.songs[0];
           const track = albumSongToTrack(nextAlbum, firstSong);
@@ -474,11 +475,11 @@ export const MusicPlayerProvider = ({ children }) => {
         }
       }
     }
-  }, [currentMusic, isRepeat, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage]);
+  }, [currentMusic, isRepeat, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic]);
 
   const handlePrevTrack = useCallback(() => {
     if (!currentMusic) return;
-    const list = playlistRef.current?.length ? playlistRef.current : allMusicData;
+    const list = playlistRef.current?.length ? playlistRef.current : allMusic;
     const isAlbumPlaylist = list.length && list[0]?.albumId != null;
     const syncDetail = isAlbumPlaylist ? !playlistRef.current?.length : isOnMusicDetailPage;
     if (isShuffle) {
@@ -499,11 +500,11 @@ export const MusicPlayerProvider = ({ children }) => {
         loadAndPlayTrack(prev.id, { autoplay: isPlaying, syncMusicDetail: syncDetail, playlist: playlistRef.current || undefined });
       }
     }
-  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, isOnMusicDetailPage]);
+  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, isOnMusicDetailPage, allMusic]);
 
   const handleNextTrack = useCallback(() => {
     if (!currentMusic) return;
-    const list = playlistRef.current?.length ? playlistRef.current : allMusicData;
+    const list = playlistRef.current?.length ? playlistRef.current : allMusic;
     const isAlbumPlaylist = list.length && list[0]?.albumId != null;
     const syncDetail = isAlbumPlaylist ? !playlistRef.current?.length : isOnMusicDetailPage;
     const idx = list.findIndex((m) => m.id === currentMusic.id);
@@ -512,9 +513,9 @@ export const MusicPlayerProvider = ({ children }) => {
     /* Oxirgi qo'shiqda oldinga bossa keyingi albomga o'tish */
     const albumIdForNext = currentMusic?.albumId ?? list[0]?.albumId;
     if (isLastTrackOfAlbum && albumIdForNext) {
-      const currentAlbumIndex = TopAlbums.findIndex((a) => a.id === albumIdForNext);
+      const currentAlbumIndex = topAlbums.findIndex((a) => a.id === albumIdForNext);
       const nextAlbumIndex = currentAlbumIndex >= 0 ? currentAlbumIndex + 1 : 0;
-      const nextAlbum = TopAlbums[nextAlbumIndex] ?? TopAlbums[0];
+      const nextAlbum = topAlbums[nextAlbumIndex] ?? topAlbums[0];
       if (nextAlbum?.songs?.length) {
         const firstSong = nextAlbum.songs[0];
         const track = albumSongToTrack(nextAlbum, firstSong);
@@ -542,7 +543,7 @@ export const MusicPlayerProvider = ({ children }) => {
         loadAndPlayTrack(next.id, { autoplay: isPlaying, syncMusicDetail: syncDetail, playlist: playlistRef.current || undefined });
       }
     }
-  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage]);
+  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic]);
 
   const toggleRepeat = useCallback(() => {
     const next = !isRepeat;
@@ -787,7 +788,7 @@ export const MusicPlayerProvider = ({ children }) => {
               dominantColor={dominantColor}
               getTitle={getTitle}
               getLyricsText={getLyricsText}
-              trendList={allMusicData}
+              trendList={allMusic}
               analyserRef={analyserRef}
               audioGraphReady={audioGraphReady}
               artists={artists}
