@@ -5,14 +5,29 @@ const morgan = require('morgan');
 const routes = require('./routes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
-const { CLIENT_URL, NODE_ENV } = require('./config/env');
+const { ALLOWED_ORIGINS, NODE_ENV } = require('./config/env');
 
 const app = express();
 
-app.use(cors({
-  origin: CLIENT_URL,
-  credentials: true,
-}));
+const allowedOrigins = new Set(ALLOWED_ORIGINS);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow server-to-server requests and non-browser clients.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.has(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
