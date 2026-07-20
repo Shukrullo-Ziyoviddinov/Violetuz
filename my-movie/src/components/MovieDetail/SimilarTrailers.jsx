@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
-import { allMovies } from '../../data/movies';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { formatActionCount } from '../../utils/utils';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import VerticalScroll from './VerticalScroll';
@@ -17,6 +17,7 @@ const SimilarTrailers = ({
 }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
 
   const currentTypeTrailers = selectedTrailer?.typeTrailers || '';
 
@@ -37,7 +38,7 @@ const SimilarTrailers = ({
         }
         return true;
       });
-  }, [currentMovie?.id, currentTypeTrailers, selectedTrailer?.id]);
+  }, [allMovies, currentMovie?.id, currentTypeTrailers, selectedTrailer?.id]);
 
   const titleClassName = `similar-trailers-title${hideTitleOnMobile ? ' similar-trailers-title--desktop-only' : ''}`;
 

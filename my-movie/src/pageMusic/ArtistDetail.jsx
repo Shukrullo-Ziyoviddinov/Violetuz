@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { artists } from '../dataMusic/artists';
-import { allMovies } from '../data/movies';
-import { artistMusicStory } from '../dataMusic/artistMusicStory';
+import { useMoviesApi } from '../context/MoviesApiContext';
 import { musicShorts } from '../dataMusic/musicShorts';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import HorizontalScroll from '../components/HorizontalScroll/HorizontalScroll';
@@ -32,7 +31,8 @@ const ArtistDetail = () => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { loadAndPlayTrack, togglePlay, currentMusic, isPlaying } = useMusicPlayer();
-  const { allMusic, getAlbumsByArtist, getClipsByArtist, getConcertsByArtist } = useMusicApi();
+  const { allMusic, getAlbumsByArtist, getClipsByArtist, getConcertsByArtist, getArtistMusicStoriesByArtist } = useMusicApi();
+  const { allMovies } = useMoviesApi();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [playingTrackColor, setPlayingTrackColor] = useState(null);
   const [artistHeaderColor, setArtistHeaderColor] = useState(null);
@@ -77,7 +77,7 @@ const ArtistDetail = () => {
   }, [artist?.bio]);
 
   const artistTracks = allMusic.filter((tr) => tr.artistId === id);
-  const artistStories = artistMusicStory.filter((s) => s.artistId === id);
+  const artistStories = getArtistMusicStoriesByArtist(id);
   const artistAlbums = getAlbumsByArtist(id);
   const artistClips = getClipsByArtist(id);
   const artistShorts = musicShorts.filter((s) => s.artistId === id);
@@ -86,7 +86,7 @@ const ArtistDetail = () => {
     () => allMovies.filter(
       (movie) => Array.isArray(movie?.actors) && movie.actors.some((castId) => String(castId) === String(id)),
     ),
-    [id],
+    [id, allMovies],
   );
 
   useEffect(() => {

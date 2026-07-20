@@ -2,7 +2,6 @@
  * Kinolar + aktyorlar bo'yicha qidiruv (filterGenre, filterCountry, typeCategory)
  * So'zma-so'z va imlo xatolariga chidamli (fuzzy). Aktyorlar natijada doim yuqorida.
  */
-import { allMovies as localMoviesFallback } from '../data/movies';
 
 const normalize = (s) => (s || '').toLowerCase().trim();
 
@@ -17,7 +16,9 @@ const getTitleForLang = (movie, lang) => {
 const levenshtein = (a, b) => {
   const m = a.length;
   const n = b.length;
-  const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+  const dp = Array(m + 1)
+    .fill(null)
+    .map(() => Array(n + 1).fill(0));
   for (let i = 0; i <= m; i++) dp[i][0] = i;
   for (let j = 0; j <= n; j++) dp[0][j] = j;
   for (let i = 1; i <= m; i++) {
@@ -40,65 +41,41 @@ const fuzzyMatch = (queryWord, titleWord) => {
   return false;
 };
 
-/** Kinolar: istalgan so'z mos kelsa (oldingi xulq) */
-const titleMatchesAnyWord = (titleUz, titleRu, queryWords) => {
-  const meaningful = queryWords.filter((w) => w.length >= 2);
-  if (meaningful.length === 0) return false;
-  const titleWordsUz = titleUz.split(/\s+/).filter(Boolean);
-  const titleWordsRu = titleRu.split(/\s+/).filter(Boolean);
-  for (const qw of meaningful) {
-    const inUz = titleWordsUz.some((tw) => fuzzyMatch(qw, tw)) || titleUz.includes(qw);
-    const inRu = titleWordsRu.some((tw) => fuzzyMatch(qw, tw)) || titleRu.includes(qw);
-    if (inUz || inRu) return true;
-  }
-  return false;
-};
-
-/** Aktyorlar / bio: barcha so'zlar mos kelishi kerak — aks holda umumiy so'zlar barcha natijalarni beradi */
-const titleMatchesAllWords = (titleUz, titleRu, queryWords) => {
-  const meaningful = queryWords.filter((w) => w.length >= 2);
-  if (meaningful.length === 0) return false;
-  const titleWordsUz = titleUz.split(/\s+/).filter(Boolean);
-  const titleWordsRu = titleRu.split(/\s+/).filter(Boolean);
-  for (const qw of meaningful) {
-    const inUz = titleWordsUz.some((tw) => fuzzyMatch(qw, tw)) || titleUz.includes(qw);
-    const inRu = titleWordsRu.some((tw) => fuzzyMatch(qw, tw)) || titleRu.includes(qw);
-    if (!inUz && !inRu) return false;
-  }
-  return true;
-};
-
-const metaMatchesQuery = (movie, queryWords) => {
-  for (const qw of queryWords) {
-    if (qw.length < 2) continue;
-    const genres = Array.isArray(movie.filterGenre) ? movie.filterGenre : movie.filterGenre ? [movie.filterGenre] : [];
-    for (const g of genres) {
-      if (fuzzyMatch(qw, normalize(g))) return true;
-    }
-    if (movie.filterCountry && fuzzyMatch(qw, normalize(movie.filterCountry))) return true;
-    const types = Array.isArray(movie.typeCategory) ? movie.typeCategory : movie.typeCategory ? [movie.typeCategory] : [];
-    for (const t of types) {
-      if (fuzzyMatch(qw, normalize(String(t)))) return true;
-    }
-  }
-  return false;
+const titleMatchesAllWords = (textA, textB, queryWords) => {
+  const wordsA = normalize(textA).split(/\s+/).filter(Boolean);
+  const wordsB = normalize(textB).split(/\s+/).filter(Boolean);
+  const pool = [...wordsA, ...wordsB];
+  return queryWords.every(
+    (qw) => pool.some((tw) => tw.includes(qw) || qw.includes(tw) || fuzzyMatch(qw, tw))
+  );
 };
 
 const titleMatchScore = (movie, q, queryWords) => {
-  const titleUz = normalize(getTitleForLang(movie, 'uz'));
-  const titleRu = normalize(getTitleForLang(movie, 'ru'));
-  if (titleUz.includes(q) || titleRu.includes(q)) return 2; // aniq sarlavha
-  if (titleMatchesAnyWord(titleUz, titleRu, queryWords)) return 1; // so'zma-so'z/fuzzy
+  const uz = normalize(getTitleForLang(movie, 'uz'));
+  const ru = normalize(getTitleForLang(movie, 'ru'));
+  if (uz.includes(q) || ru.includes(q)) return 2;
+  if (titleMatchesAllWords(uz, ru, queryWords)) return 1;
   return 0;
 };
 
-const getActorName = (actor, lang) => {
-  const raw = actor?.name?.[lang];
-  if (typeof raw === 'string' && raw.trim()) return raw.trim();
-  return '';
+const metaMatchesQuery = (movie, queryWords) => {
+  const genreUz = (movie.filterGenre || movie.genre?.uz || []).join(' ').toLowerCase();
+  const genreRu = (movie.genre?.ru || []).join(' ').toLowerCase();
+  const country = String(movie.filterCountry || '').toLowerCase();
+  const typeCat = (movie.typeCategory || []).join(' ').toLowerCase();
+  const blob = `${genreUz} ${genreRu} ${country} ${typeCat}`;
+  return queryWords.some((w) => blob.includes(w));
 };
 
-/** Ism + bio (kirillcha ism bo'lmasa ham bio dan topiladi). Bio uchun faqat aniq/fuzzy so'zlar ketma-ketligi — umumiy so'zlar barcha yozuvchilarni bermasligi uchun */
+const getActorName = (actor, lang) => {
+  if (!actor?.name) return '';
+  if (typeof actor.name === 'object') {
+    return actor.name[lang] || actor.name.uz || actor.name.ru || '';
+  }
+  return String(actor.name);
+};
+
+/** Ism + bio */
 const actorMatchScore = (actor, q, queryWords) => {
   const nameUz = normalize(getActorName(actor, 'uz'));
   const nameRu = normalize(getActorName(actor, 'ru'));
@@ -112,10 +89,10 @@ const actorMatchScore = (actor, q, queryWords) => {
   return 0;
 };
 
-const searchMoviesOrdered = (q, queryWords, moviesList = localMoviesFallback) => {
+const searchMoviesOrdered = (q, queryWords, moviesList = []) => {
   const byTitle = [];
   const byMeta = [];
-  const movies = Array.isArray(moviesList) ? moviesList : localMoviesFallback;
+  const movies = Array.isArray(moviesList) ? moviesList : [];
 
   for (const m of movies) {
     const score = titleMatchScore(m, q, queryWords);
@@ -137,7 +114,7 @@ export const searchContentByQuery = (
   query,
   contentLang = 'uz',
   limit = 20,
-  { actors: actorsList = [], movies: moviesList } = {}
+  { actors: actorsList = [], movies: moviesList = [] } = {}
 ) => {
   const q = normalize(query);
   if (!q) return { actors: [], movies: [] };
@@ -162,8 +139,8 @@ export const searchContentByQuery = (
   return { actors: actorSlice, movies: movieSlice };
 };
 
-/** Faqat kinolar ro'yxati (oldingi API) */
-export const searchMoviesByQuery = (query, contentLang = 'uz', limit = 20, moviesList) => {
+/** Faqat kinolar ro'yxati */
+export const searchMoviesByQuery = (query, contentLang = 'uz', limit = 20, moviesList = []) => {
   const q = normalize(query);
   if (!q) return [];
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);

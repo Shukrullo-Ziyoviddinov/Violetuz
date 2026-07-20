@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { allMovies } from '../../data/movies';
 import { artists } from '../../dataMusic/artists';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useMusicApi } from '../../context/MusicApiContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import '../Movies/Movies.css';
 import '../../pageMusic/MusicMorePage.css';
 import './LikeHistory.css';
@@ -31,6 +31,7 @@ const LikeHistory = ({ items = [], activeCategory = '' }) => {
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { allClips, allConcerts } = useMusicApi();
+  const { allMovies } = useMoviesApi();
 
   if (!items.length) {
     return (

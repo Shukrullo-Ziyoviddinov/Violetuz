@@ -1,4 +1,3 @@
-import { getFilterByMovieId } from '../utils/getFilterByMovieId';
 import { resolveShortsMusics } from '../utils/resolveShortsMusics';
 import { resolveShortsMovieMeta } from '../utils/resolveShortsMovieMeta';
 
@@ -20,7 +19,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(1)
   },
   {
     id: 2,
@@ -37,7 +35,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(2)
   },
   {
     id: 3,
@@ -54,7 +51,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(3)
   },
   {
     id: 4,
@@ -71,7 +67,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(4)
   },
   {
     id: 5,
@@ -84,7 +79,6 @@ const rawShortsVideos = [
       ru: "Поиск нового места для жизни в космосе."
     },
     movieId: 5,
-    ...getFilterByMovieId(5)
   },
   {
     id: 6,
@@ -101,7 +95,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(6)
   },
   {
     id: 7,
@@ -118,7 +111,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(7)
   },
   {
     id: 8,
@@ -131,7 +123,6 @@ const rawShortsVideos = [
       ru: "О надежде и свободе в тюрьме."
     },
     movieId: 8,
-    ...getFilterByMovieId(8)
   },
   {
     id: 9,
@@ -148,7 +139,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(9)
   },
   {
     id: 10,
@@ -165,7 +155,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(10)
   },
   {
     id: 11,
@@ -182,7 +171,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(11)
   },
   {
     id: 12,
@@ -195,7 +183,6 @@ const rawShortsVideos = [
       ru: "Поиск нового места для жизни в космосе."
     },
     movieId: 5,
-    ...getFilterByMovieId(5)
   },
   {
     id: 13,
@@ -212,7 +199,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(10)
   },
   {
     id: 14,
@@ -229,7 +215,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(9)
   },
   {
     id: 15,
@@ -240,7 +225,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(1)
   },
   {
     id: 16,
@@ -251,7 +235,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(2)
   },
   {
     id: 17,
@@ -262,7 +245,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(3)
   },
   {
     id: 18,
@@ -273,14 +255,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(4)
   },
   {
     id: 19,
     video: { uz: "/video/shorts17.mp4", ru: "/video/shorts17.mp4" },
     description: { uz: "Kosmosda yangi yashash joyi qidirish.", ru: "Поиск нового места для жизни в космосе." },
     movieId: 5,
-    ...getFilterByMovieId(5)
   },
   {
     id: 20,
@@ -291,7 +271,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(6)
   },
   {
     id: 21,
@@ -302,14 +281,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(7)
   },
   {
     id: 22,
     video: { uz: "/video/shorts20.mp4", ru: "/video/shorts20.mp4" },
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 8,
-    ...getFilterByMovieId(8)
   },
   {
     id: 23,
@@ -320,7 +297,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(9)
   },
   {
     id: 24,
@@ -331,7 +307,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(10)
   },
   {
     id: 25,
@@ -342,7 +317,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(11)
   },
   {
     id: 26,
@@ -353,7 +327,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(1)
   },
   {
     id: 27,
@@ -364,7 +337,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(2)
   },
   {
     id: 28,
@@ -375,7 +347,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(3)
   },
   {
     id: 29,
@@ -386,14 +357,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(4)
   },
   {
     id: 30,
     video: { uz: "/video/shorts28.mp4", ru: "/video/shorts28.mp4" },
     description: { uz: "Kosmosda yangi yashash joyi qidirish.", ru: "Поиск нового места для жизни в космосе." },
     movieId: 5,
-    ...getFilterByMovieId(5)
   },
   {
     id: 31,
@@ -404,7 +373,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(6)
   },
   {
     id: 32,
@@ -415,14 +383,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(7)
   },
   {
     id: 33,
     video: { uz: "/video/shorts31.mp4", ru: "/video/shorts31.mp4" },
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 8,
-    ...getFilterByMovieId(8)
   },
   {
     id: 34,
@@ -433,7 +399,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(9)
   },
   {
     id: 35,
@@ -444,7 +409,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(10)
   },
   {
     id: 36,
@@ -455,7 +419,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(11)
   },
   {
     id: 37,
@@ -466,7 +429,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(1)
   },
   {
     id: 38,
@@ -477,7 +439,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(2)
   },
   {
     id: 39,
@@ -488,7 +449,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(3)
   },
   {
     id: 40,
@@ -499,14 +459,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(4)
   },
   {
     id: 41,
     video: { uz: "/video/shorts39.mp4", ru: "/video/shorts39.mp4" },
     description: { uz: "Kosmosda yangi yashash joyi qidirish.", ru: "Поиск нового места для жизни в космосе." },
     movieId: 5,
-    ...getFilterByMovieId(5)
   },
   {
     id: 42,
@@ -517,7 +475,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(6)
   },
   {
     id: 43,
@@ -528,14 +485,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(7)
   },
   {
     id: 44,
     video: { uz: "/video/shorts42.mp4", ru: "/video/shorts42.mp4" },
     description: { uz: "Qamoqxonada umid va ozodlik haqida.", ru: "О надежде и свободе в тюрьме." },
     movieId: 8,
-    ...getFilterByMovieId(8)
   },
   {
     id: 45,
@@ -546,7 +501,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(9)
   },
   {
     id: 46,
@@ -557,7 +511,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(10)
   },
   {
     id: 47,
@@ -568,14 +521,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(11)
   },
   {
     id: 48,
     video: { uz: "/video/shorts46.mp4", ru: "/video/shorts46.mp4" },
     description: { uz: "Kosmosda yangi yashash joyi qidirish.", ru: "Поиск нового места для жизни в космосе." },
     movieId: 5,
-    ...getFilterByMovieId(5)
   },
   {
     id: 49,
@@ -586,7 +537,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(10)
   },
   {
     id: 50,
@@ -597,7 +547,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(9)
   },
   {
     id: 51,
@@ -608,7 +557,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(1)
   },
   {
     id: 52,
@@ -619,7 +567,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(2)
   },
   {
     id: 53,
@@ -630,7 +577,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(3)
   },
   {
     id: 54,
@@ -641,14 +587,12 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(4)
   },
   {
     id: 55,
     video: { uz: "/video/shorts53.mp4", ru: "/video/shorts53.mp4" },
     description: { uz: "Kosmosda yangi yashash joyi qidirish.", ru: "Поиск нового места для жизни в космосе." },
     movieId: 5,
-    ...getFilterByMovieId(5)
   },
   {
     id: 56,
@@ -659,7 +603,6 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(6)
   },
   {
     id: 57,
@@ -670,12 +613,23 @@ const rawShortsVideos = [
       musicId: 602,
       videoId: 1203,
     },
-    ...getFilterByMovieId(11)
   },
 ];
 
+/** movie meta API/DB dan */
+export const resolveShortsWithMovies = (moviesList = []) =>
+  rawShortsVideos.map((item) => {
+    let next = item.movieId != null ? resolveShortsMovieMeta(item, moviesList) : { ...item };
+    if (item.musics) {
+      const musics = resolveShortsMusics(item.musics);
+      if (musics) next = { ...next, musics };
+    }
+    return next;
+  });
+
+/** Katalog — title/homeImg runtime da resolveShortsWithMovies orqali */
 export const shortsVideos = rawShortsVideos.map((item) => {
-  let next = item.movieId != null ? resolveShortsMovieMeta(item) : item;
+  let next = { ...item };
   if (item.musics) {
     const musics = resolveShortsMusics(item.musics);
     if (musics) next = { ...next, musics };

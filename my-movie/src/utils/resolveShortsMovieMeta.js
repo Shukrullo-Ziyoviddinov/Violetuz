@@ -1,13 +1,13 @@
-import { allMovies } from '../data/movies';
 import { matchId } from './musicDataUtils';
 
 /**
  * Kino shorts: movieId orqali title, homeImg, rating, specs kinodan olinadi.
  */
-export function resolveShortsMovieMeta(shortItem) {
+export function resolveShortsMovieMeta(shortItem, moviesList = []) {
   if (!shortItem?.movieId) return shortItem;
 
-  const movie = allMovies.find((m) => matchId(m.id, shortItem.movieId));
+  const movies = Array.isArray(moviesList) ? moviesList : [];
+  const movie = movies.find((m) => matchId(m.id, shortItem.movieId));
   if (!movie) return shortItem;
 
   return {
@@ -16,5 +16,7 @@ export function resolveShortsMovieMeta(shortItem) {
     homeImg: movie.homeImg,
     rating: movie.rating,
     specs: movie.specs,
+    filterGenre: movie.filterGenre || shortItem.filterGenre,
+    filterCountry: movie.filterCountry || shortItem.filterCountry,
   };
 }

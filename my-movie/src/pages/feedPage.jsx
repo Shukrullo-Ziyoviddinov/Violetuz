@@ -9,8 +9,8 @@ import { useFeedProfile } from '../context/AuthContext';
 import { useFollowingIds } from '../context/FollowingContext';
 import { getFeedHeaderFollowedPeople } from '../store/slices/followingUtils';
 import { useActorsApi } from '../context/ActorsApiContext';
+import { useMoviesApi } from '../context/MoviesApiContext';
 import { artists } from '../dataMusic/artists';
-import { allMovies } from '../data/movies';
 import { useMusicApi } from '../context/MusicApiContext';
 import './feedPage.css';
 
@@ -42,6 +42,7 @@ const FeedPage = () => {
   const [messagesOpen, setMessagesOpen] = useState(false);
   const { sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts } = useMusicApi();
   const { allActors } = useActorsApi();
+  const { allMovies } = useMoviesApi();
 
   const openMessages = useCallback(() => setMessagesOpen(true), []);
 
@@ -159,7 +160,7 @@ const FeedPage = () => {
       });
 
     return [...movieItems, ...musicItems, ...videoItems].sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allActors]);
+  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allActors, allMovies]);
 
   const filteredItems = useMemo(() => {
     if (activeCategory === 'all') return feedItems;

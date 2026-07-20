@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { allMovies } from '../../data/movies';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { calculateMovieRating, formatMovieRating, getMovieLastVote } from './CalculateRating';
 import '../Movies/Movies.css';
@@ -19,6 +19,7 @@ const RatingPageLogica = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
 
   const ratedMovies = useMemo(() => {
     return allMovies
@@ -34,7 +35,7 @@ const RatingPageLogica = () => {
         };
       })
       .filter(Boolean);
-  }, []);
+  }, [allMovies]);
 
   if (!ratedMovies.length) {
     return (

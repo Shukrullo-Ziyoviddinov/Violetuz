@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { allMovies } from '../../data/movies';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { actorPageSectionLabels } from '../../data/actorPageLabels';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import ShowMoreButton from '../ShowMoreButton/ShowMoreButton';
@@ -26,6 +26,7 @@ const TOP_RATED_VISIBLE_COUNT = 6;
 const ActorTopRatedKinolar = ({ actorId }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
 
   const list = useMemo(() => {
     const aid = Number(actorId);
@@ -34,7 +35,7 @@ const ActorTopRatedKinolar = ({ actorId }) => {
       .filter((m) => Array.isArray(m.actors) && m.actors.includes(aid))
       .filter((m) => m.ratingImdb != null && Number(m.ratingImdb) > 0)
       .sort((a, b) => Number(b.ratingImdb) - Number(a.ratingImdb));
-  }, [actorId]);
+  }, [actorId, allMovies]);
 
   const visible = useMemo(() => list.slice(0, TOP_RATED_VISIBLE_COUNT), [list]);
   const hasMore = list.length > TOP_RATED_VISIBLE_COUNT;

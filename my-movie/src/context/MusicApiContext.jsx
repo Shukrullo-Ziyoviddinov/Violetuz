@@ -17,6 +17,7 @@ import {
   fetchConcertById,
   fetchConcertSections,
 } from '../api/concertsApi';
+import { fetchAllArtistMusicStories } from '../api/artistMusicStoriesApi';
 
 const MusicApiContext = createContext(null);
 
@@ -47,6 +48,13 @@ export const MusicApiProvider = ({ children }) => {
   const concertsQuery = useQuery({
     queryKey: ['concerts'],
     queryFn: fetchAllConcerts,
+    staleTime: 60_000,
+    retry: 1,
+  });
+
+  const artistMusicStoriesQuery = useQuery({
+    queryKey: ['artist-music-stories'],
+    queryFn: fetchAllArtistMusicStories,
     staleTime: 60_000,
     retry: 1,
   });
@@ -95,6 +103,10 @@ export const MusicApiProvider = ({ children }) => {
     () => (Array.isArray(concertsQuery.data) ? concertsQuery.data : []),
     [concertsQuery.data]
   );
+  const allArtistMusicStories = useMemo(
+    () => (Array.isArray(artistMusicStoriesQuery.data) ? artistMusicStoriesQuery.data : []),
+    [artistMusicStoriesQuery.data]
+  );
   const sections = useMemo(
     () => (Array.isArray(sectionsQuery.data) ? sectionsQuery.data : []),
     [sectionsQuery.data]
@@ -117,6 +129,7 @@ export const MusicApiProvider = ({ children }) => {
     albumsQuery.isLoading ||
     clipsQuery.isLoading ||
     concertsQuery.isLoading ||
+    artistMusicStoriesQuery.isLoading ||
     sectionsQuery.isLoading ||
     clipSectionsQuery.isLoading ||
     concertSectionsQuery.isLoading ||
@@ -126,6 +139,7 @@ export const MusicApiProvider = ({ children }) => {
     albumsQuery.error?.message ||
     clipsQuery.error?.message ||
     concertsQuery.error?.message ||
+    artistMusicStoriesQuery.error?.message ||
     sectionsQuery.error?.message ||
     clipSectionsQuery.error?.message ||
     concertSectionsQuery.error?.message ||
@@ -137,6 +151,7 @@ export const MusicApiProvider = ({ children }) => {
     allAlbums,
     allClips,
     allConcerts,
+    allArtistMusicStories,
     sections,
     clipSections,
     concertSections,
@@ -172,6 +187,8 @@ export const MusicApiProvider = ({ children }) => {
       allClips.filter((item) => item.artistId === artistId),
     getConcertsByArtist: (artistId) =>
       allConcerts.filter((item) => item.artistId === artistId),
+    getArtistMusicStoriesByArtist: (artistId) =>
+      allArtistMusicStories.filter((item) => item.artistId === artistId),
     getSectionById: (id) => sections.find((s) => s.id === id) || null,
     getClipSectionById: (id) => clipSections.find((s) => s.id === id) || null,
     getConcertSectionById: (id) => concertSections.find((s) => s.id === id) || null,
@@ -211,6 +228,13 @@ export const MusicApiProvider = ({ children }) => {
       });
       return concerts;
     },
+    refreshArtistMusicStories: async () => {
+      const stories = await queryClient.fetchQuery({
+        queryKey: ['artist-music-stories'],
+        queryFn: fetchAllArtistMusicStories,
+      });
+      return stories;
+    },
     fetchMusicByIdRemote: fetchMusicById,
     fetchAlbumByIdRemote: fetchAlbumById,
     fetchClipByIdRemote: fetchClipById,
@@ -220,6 +244,7 @@ export const MusicApiProvider = ({ children }) => {
     allAlbums,
     allClips,
     allConcerts,
+    allArtistMusicStories,
     sections,
     clipSections,
     concertSections,

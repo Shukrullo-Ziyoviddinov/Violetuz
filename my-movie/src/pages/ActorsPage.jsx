@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { actorPageSectionLabels } from '../data/actorPageLabels';
 import { useActorsApi } from '../context/ActorsApiContext';
-import { allMovies } from '../data/movies';
+import { useMoviesApi } from '../context/MoviesApiContext';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import Movies from '../components/Movies/Movies';
 import MoreText from '../components/MoreText/MoreText';
@@ -216,6 +216,7 @@ const ActorsPage = () => {
   const { i18n } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { getActorById } = useActorsApi();
+  const { allMovies } = useMoviesApi();
   const bioSectionRef = useRef(null);
   const [bioLineClamp, setBioLineClamp] = useState(5);
   const [bioImgModalOpen, setBioImgModalOpen] = useState(false);

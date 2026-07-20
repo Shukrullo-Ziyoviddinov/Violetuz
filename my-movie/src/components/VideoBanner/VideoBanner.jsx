@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import { banners } from '../../data/VideoBannerData';
-import { allMovies } from '../../data/movies';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { normalizeImagePath } from '../../utils/utils';
 import './VideoBanner.css';
 
@@ -17,6 +17,7 @@ const RATING_IMGS = {
 const VideoBanner = ({ typeFilter }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
   const videoRefs = useRef({});
   const cardRefs = useRef({});
   const scrollToIndexRef = useRef(null);

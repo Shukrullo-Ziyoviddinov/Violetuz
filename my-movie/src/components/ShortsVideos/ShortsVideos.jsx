@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { shortsVideos } from '../../data/shortsVideos';
+import { useMoviesApi } from '../../context/MoviesApiContext';
+import { resolveShortsWithMovies } from '../../data/shortsVideos';
 import { musicShorts as musicShortsCatalog } from '../../dataMusic/musicShorts';
 import { addWatch, getWatchHistory } from '../../api/shortsWatchHistory';
 import { getShortsRecommendations } from '../../algo/shortsRecommendationAlgo';
@@ -144,11 +145,16 @@ const ShortsVideos = ({
 }) => {
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const baseList = initialShorts || shortsVideos;
+  const { allMovies } = useMoviesApi();
+  const movieShortsCatalog = useMemo(
+    () => resolveShortsWithMovies(allMovies),
+    [allMovies]
+  );
+  const baseList = initialShorts || movieShortsCatalog;
   const isMusicShorts = variant === 'music';
   const [shortsList, setShortsList] = useState(() => {
     if (repostShortsEntries?.length) {
-      return buildRepostShortsList(repostShortsEntries, shortsVideos, musicShortsCatalog);
+      return buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog);
     }
     return orderShortsByRepostIds(baseList, repostIds);
   });
@@ -159,14 +165,14 @@ const ShortsVideos = ({
 
   useEffect(() => {
     if (repostShortsEntries?.length) {
-      setShortsList(buildRepostShortsList(repostShortsEntries, shortsVideos, musicShortsCatalog));
+      setShortsList(buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog));
       hasLoadedMore.current = true;
     } else {
       setShortsList(orderShortsByRepostIds(baseList, repostIds));
       if (repostIds?.length) hasLoadedMore.current = true;
       else hasLoadedMore.current = false;
     }
-  }, [baseList, repostIds, repostShortsEntries]);
+  }, [baseList, repostIds, repostShortsEntries, movieShortsCatalog]);
 
   const slideMusic = useMemo(() => {
     if (repostShortsEntries?.length) {
@@ -262,7 +268,7 @@ const ShortsVideos = ({
     if (repostShortsEntries?.length || repostIds?.length || isMusicShorts || !modalOpen || activeIndex < 11 || hasLoadedMore.current) return;
     hasLoadedMore.current = true;
     const history = getWatchHistory();
-    const recs = getShortsRecommendations(shortsVideos, history, 10);
+    const recs = getShortsRecommendations(movieShortsCatalog, history, 10);
     const existingIds = new Set(shortsList.map((s) => s.id));
     const toAdd = recs.filter((s) => !existingIds.has(s.id));
     if (toAdd.length > 0) setShortsList((prev) => [...prev, ...toAdd]);

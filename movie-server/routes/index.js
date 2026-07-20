@@ -10,6 +10,7 @@ const clipSectionRoutes = require('./clipSection.routes');
 const concertRoutes = require('./concert.routes');
 const concertSectionRoutes = require('./concertSection.routes');
 const actorRoutes = require('./actor.routes');
+const artistMusicStoryRoutes = require('./artistMusicStory.routes');
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use('/clips', clipRoutes);
 router.use('/clip-sections', clipSectionRoutes);
 router.use('/concerts', concertRoutes);
 router.use('/concert-sections', concertSectionRoutes);
+router.use('/artist-music-stories', artistMusicStoryRoutes);
 
 module.exports = router;

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useActorsApi } from '../../context/ActorsApiContext';
 import { actorPageSectionLabels } from '../../data/actorPageLabels';
-import { allMovies } from '../../data/movies';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import ShowMoreButton from '../ShowMoreButton/ShowMoreButton';
@@ -19,6 +19,7 @@ const SimilarActors = ({ currentActorId, actorsGenre }) => {
   const { i18n } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { getActorsByGenre } = useActorsApi();
+  const { allMovies } = useMoviesApi();
   const [modalOpen, setModalOpen] = useState(false);
 
   const videoCountByActorId = useMemo(() => {
@@ -31,7 +32,7 @@ const SimilarActors = ({ currentActorId, actorsGenre }) => {
       }
     }
     return map;
-  }, []);
+  }, [allMovies]);
 
   const list = useMemo(() => {
     if (actorsGenre == null || actorsGenre === '') return [];

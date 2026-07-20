@@ -303,6 +303,38 @@ const validateActorListQuery = (req, _res, next) => {
   next();
 };
 
+const validateArtistMusicStoryIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid artist music story id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateArtistMusicStoryListQuery = (req, _res, next) => {
+  const { artistId, search } = req.query;
+
+  if (artistId != null && !String(artistId).trim()) {
+    return next(badRequest('artistId query cannot be empty.'));
+  }
+
+  if (search != null && !String(search).trim()) {
+    return next(badRequest('search query cannot be empty.'));
+  }
+
+  if (artistId != null) {
+    req.query.artistId = String(artistId).trim();
+  }
+
+  if (search != null) {
+    req.query.search = String(search).trim();
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -320,4 +352,6 @@ module.exports = {
   validateActorIdParam,
   validateActorsGenreParam,
   validateActorListQuery,
+  validateArtistMusicStoryIdParam,
+  validateArtistMusicStoryListQuery,
 };

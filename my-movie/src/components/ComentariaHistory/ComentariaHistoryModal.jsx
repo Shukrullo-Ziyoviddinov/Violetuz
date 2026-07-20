@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMusicApi } from '../../context/MusicApiContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { buildCommentHistoryEntries, getShortsRouteFromHistory } from './commentHistoryAggregator';
 import ComentariaHistoryFilter from './ComentariaHistoryFilter';
 import ComentariaMovieCard from './ComentariaMovieCard';
@@ -82,6 +83,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { allClips, allConcerts } = useMusicApi();
+  const { allMovies } = useMoviesApi();
   const lang = contentLang === 'ru' ? 'ru' : 'uz';
   const [filter, setFilter] = useState('all');
   const [tick, setTick] = useState(0);
@@ -118,8 +120,8 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
 
   useEffect(() => {
     if (!open) return;
-    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts));
-  }, [open, lang, tick, allClips, allConcerts]);
+    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts, allMovies));
+  }, [open, lang, tick, allClips, allConcerts, allMovies]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return entries;

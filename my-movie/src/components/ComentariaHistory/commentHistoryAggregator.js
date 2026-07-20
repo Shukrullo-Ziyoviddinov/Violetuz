@@ -4,7 +4,6 @@
  */
 import * as commentsApi from '../../api/commentsApi';
 import * as shortsCommentsApi from '../../api/shortsCommentsApi';
-import { allMovies } from '../../data/movies';
 import { shortsVideos } from '../../data/shortsVideos';
 import { musicShorts } from '../../dataMusic/musicShorts';
 import { artists } from '../../dataMusic/artists';
@@ -120,8 +119,13 @@ function getShortsVideoSrc(item, lang) {
  * movieShorts (kino bo‘limi) va musicshorts (musiqa bo‘limi) bir xil playlistda aralash;
  * scroll keyingi/prev video shu yagona ro‘yxat bo‘yicha (ShortsVideos buildRepostShortsList).
  */
-export function buildShortsHistoryPlaylist(lang = 'uz', clipsList = [], concertsList = []) {
-  const all = buildCommentHistoryEntries(lang, clipsList, concertsList);
+export function buildShortsHistoryPlaylist(
+  lang = 'uz',
+  clipsList = [],
+  concertsList = [],
+  moviesList = []
+) {
+  const all = buildCommentHistoryEntries(lang, clipsList, concertsList, moviesList);
   const shortsRows = all.filter((e) => e.filter === 'shorts');
   const seen = new Set();
   const playlist = [];
@@ -158,9 +162,15 @@ export function getShortsRouteFromHistory(target, lang = 'uz', clipsList = [], c
   return `/shorts?${p.toString()}`;
 }
 
-export function buildCommentHistoryEntries(lang = 'uz', clipsList = [], concertsList = []) {
+export function buildCommentHistoryEntries(
+  lang = 'uz',
+  clipsList = [],
+  concertsList = [],
+  moviesList = []
+) {
   const entries = [];
   const allVideoData = uniqueVideosById(clipsList, concertsList);
+  const allMovies = Array.isArray(moviesList) ? moviesList : [];
 
   for (const m of allMovies) {
     if (!isMovieRecord(m)) continue;

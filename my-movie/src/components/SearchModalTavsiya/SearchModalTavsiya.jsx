@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { fetchRecommendations } from '../../api/recommendationsApi';
 import './SearchModalTavsiya.css';
 
@@ -11,12 +12,13 @@ const SearchModalTavsiya = ({ onMovieClick }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { getViewedItems } = useViewedMovies();
+  const { allMovies } = useMoviesApi();
   const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     const viewedItems = getViewedItems();
-    fetchRecommendations(viewedItems, 12).then(setRecommendations);
-  }, [getViewedItems]);
+    fetchRecommendations(viewedItems, 12, allMovies).then(setRecommendations);
+  }, [getViewedItems, allMovies]);
 
   const getTitle = (m) => {
     if (m?.title && typeof m.title === 'object') {

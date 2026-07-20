@@ -2,7 +2,8 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
-import { shortsVideos } from '../../data/shortsVideos';
+import { useMoviesApi } from '../../context/MoviesApiContext';
+import { resolveShortsWithMovies } from '../../data/shortsVideos';
 import { musicShorts } from '../../dataMusic/musicShorts';
 import { getWatchHistory } from '../../api/shortsWatchHistory';
 import { getShortsForHomeBlock } from '../../algo/shortsRecommendationAlgo';
@@ -18,11 +19,16 @@ const shouldAutoPlay = (index) => (index + 1) % 2 === 0;
 const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
   const [loadedPreviews, setLoadedPreviews] = useState({});
   const containerRef = useRef(null);
 
   const isMusic = source === 'music';
-  const allShorts = isMusic ? musicShorts : shortsVideos;
+  const movieShortsCatalog = useMemo(
+    () => resolveShortsWithMovies(allMovies),
+    [allMovies]
+  );
+  const allShorts = isMusic ? musicShorts : movieShortsCatalog;
   const moreTo = isMusic ? '/music/shorts' : '/shorts';
 
   const homeShorts = useMemo(() => {
