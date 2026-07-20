@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
-import { resolveShortsWithMovies } from '../../data/shortsVideos';
 import { musicShorts as musicShortsCatalog } from '../../dataMusic/musicShorts';
 import { addWatch, getWatchHistory } from '../../api/shortsWatchHistory';
 import { getShortsRecommendations } from '../../algo/shortsRecommendationAlgo';
@@ -145,11 +144,7 @@ const ShortsVideos = ({
 }) => {
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allMovies } = useMoviesApi();
-  const movieShortsCatalog = useMemo(
-    () => resolveShortsWithMovies(allMovies),
-    [allMovies]
-  );
+  const { movieShortsCatalog } = useMoviesApi();
   const baseList = initialShorts || movieShortsCatalog;
   const isMusicShorts = variant === 'music';
   const [shortsList, setShortsList] = useState(() => {

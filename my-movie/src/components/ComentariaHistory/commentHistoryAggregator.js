@@ -4,10 +4,10 @@
  */
 import * as commentsApi from '../../api/commentsApi';
 import * as shortsCommentsApi from '../../api/shortsCommentsApi';
-import { shortsVideos } from '../../data/shortsVideos';
 import { musicShorts } from '../../dataMusic/musicShorts';
 import { artists } from '../../dataMusic/artists';
 import { formatMovieRating } from '../Rating/CalculateRating';
+import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 
 function uniqueVideosById(clipList = [], concertList = []) {
   const seen = new Set();
@@ -123,9 +123,10 @@ export function buildShortsHistoryPlaylist(
   lang = 'uz',
   clipsList = [],
   concertsList = [],
-  moviesList = []
+  moviesList = [],
+  movieShortsList = []
 ) {
-  const all = buildCommentHistoryEntries(lang, clipsList, concertsList, moviesList);
+  const all = buildCommentHistoryEntries(lang, clipsList, concertsList, moviesList, movieShortsList);
   const shortsRows = all.filter((e) => e.filter === 'shorts');
   const seen = new Set();
   const playlist = [];
@@ -144,9 +145,22 @@ export function buildShortsHistoryPlaylist(
 /**
  * Sharh tarixidan ochilganda: barcha shorts playlist + bosilgan short indeksi.
  */
-export function getShortsRouteFromHistory(target, lang = 'uz', clipsList = [], concertsList = []) {
+export function getShortsRouteFromHistory(
+  target,
+  lang = 'uz',
+  clipsList = [],
+  concertsList = [],
+  moviesList = [],
+  movieShortsList = []
+) {
   if (target?.kind !== 'shorts' || target.shortsId == null) return '/shorts';
-  const playlist = buildShortsHistoryPlaylist(lang, clipsList, concertsList);
+  const playlist = buildShortsHistoryPlaylist(
+    lang,
+    clipsList,
+    concertsList,
+    moviesList,
+    movieShortsList
+  );
   const repostType = target.shortsSource === 'musicshorts' ? 'musicshorts' : 'movieShorts';
   const idx = playlist.findIndex(
     (p) => p.type === repostType && String(p.id) === String(target.shortsId)
@@ -166,11 +180,13 @@ export function buildCommentHistoryEntries(
   lang = 'uz',
   clipsList = [],
   concertsList = [],
-  moviesList = []
+  moviesList = [],
+  movieShortsList = []
 ) {
   const entries = [];
   const allVideoData = uniqueVideosById(clipsList, concertsList);
   const allMovies = Array.isArray(moviesList) ? moviesList : [];
+  const movieShortsCatalog = resolveShortsWithMovies(movieShortsList, allMovies);
 
   for (const m of allMovies) {
     if (!isMovieRecord(m)) continue;
@@ -230,7 +246,7 @@ export function buildCommentHistoryEntries(
     }
   }
 
-  shortsVideos.forEach((s) => {
+  movieShortsCatalog.forEach((s) => {
     const raw = shortsCommentsApi.getComments(s.id);
     const flat = flattenCommentTree(raw);
     for (const c of flat) {

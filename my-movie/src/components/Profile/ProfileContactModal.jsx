@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CONTACT_DATA } from '../../data/socialLinks';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import './ProfileSheetModal.css';
 
 const ProfileContactModal = ({ onClose, skipBodyScrollRestore = false }) => {
   const { t } = useTranslation();
+  const { contactData } = useMoviesApi();
   const [dragY, setDragY] = useState(0);
   const startYRef = useRef(0);
 
@@ -60,25 +61,25 @@ const ProfileContactModal = ({ onClose, skipBodyScrollRestore = false }) => {
         </div>
         <div className="profile-sheet-modal-content">
           <a
-            href={CONTACT_DATA.telegram.link}
+            href={contactData.telegram?.link || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="profile-sheet-modal-item profile-sheet-modal-link"
           >
             <img
-              src={CONTACT_DATA.telegram.icon}
+              src={contactData.telegram?.icon || ''}
               alt="Telegram"
               className="profile-sheet-modal-icon"
             />
-            <span>{CONTACT_DATA.telegram.label}</span>
+            <span>{contactData.telegram?.label || 'Telegram'}</span>
           </a>
           <div className="profile-sheet-modal-item profile-sheet-modal-email">
             <svg className="profile-sheet-modal-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
-            <a href={`mailto:${CONTACT_DATA.email.address}`} className="profile-sheet-modal-email-link">
-              {CONTACT_DATA.email.address}
+            <a href={`mailto:${contactData.email?.address || ''}`} className="profile-sheet-modal-email-link">
+              {contactData.email?.address || ''}
             </a>
           </div>
         </div>

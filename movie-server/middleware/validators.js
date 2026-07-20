@@ -435,6 +435,90 @@ const validateAdListQuery = (req, _res, next) => {
   next();
 };
 
+const validateShortVideoIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid short id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateShortVideoMovieIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.movieId);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid movie id. It must be a positive integer.'));
+  }
+
+  req.params.movieId = String(numericId);
+  next();
+};
+
+const validateShortVideoListQuery = (req, _res, next) => {
+  const { movieId, type } = req.query;
+
+  if (movieId != null) {
+    const numericId = Number(movieId);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return next(badRequest('movieId query must be a positive integer.'));
+    }
+    req.query.movieId = String(numericId);
+  }
+
+  if (type != null) {
+    const normalized = String(type).trim();
+    if (!normalized) {
+      return next(badRequest('type query must be a non-empty string.'));
+    }
+    req.query.type = normalized;
+  }
+
+  next();
+};
+
+const validateVideoBannerIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid video banner id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateVideoBannerTypeParam = (req, _res, next) => {
+  const type = String(req.params.type || '').trim().toLowerCase();
+  if (type !== 'movie' && type !== 'music') {
+    return next(badRequest('Invalid type. Allowed values: movie, music.'));
+  }
+
+  req.params.type = type;
+  next();
+};
+
+const validateVideoBannerListQuery = (req, _res, next) => {
+  const { type, refId } = req.query;
+
+  if (type != null) {
+    const normalized = String(type).trim().toLowerCase();
+    if (normalized !== 'movie' && normalized !== 'music') {
+      return next(badRequest('type query must be movie or music.'));
+    }
+    req.query.type = normalized;
+  }
+
+  if (refId != null) {
+    const numericId = Number(refId);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return next(badRequest('refId query must be a positive integer.'));
+    }
+    req.query.refId = String(numericId);
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -462,4 +546,10 @@ module.exports = {
   validateActorPageLabelIdParam,
   validateAdIdParam,
   validateAdListQuery,
+  validateShortVideoIdParam,
+  validateShortVideoMovieIdParam,
+  validateShortVideoListQuery,
+  validateVideoBannerIdParam,
+  validateVideoBannerTypeParam,
+  validateVideoBannerListQuery,
 };

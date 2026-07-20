@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SOCIAL_LINKS } from '../../data/socialLinks';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import './ProfileSheetModal.css';
 
 const ProfileSocialModal = ({ onClose, skipBodyScrollRestore = false }) => {
   const { t } = useTranslation();
+  const { socialLinks } = useMoviesApi();
   const [dragY, setDragY] = useState(0);
   const startYRef = useRef(0);
 
@@ -37,10 +38,10 @@ const ProfileSocialModal = ({ onClose, skipBodyScrollRestore = false }) => {
   }, [skipBodyScrollRestore]);
 
   const socialItems = [
-    { key: 'telegram', ...SOCIAL_LINKS.telegram },
-    { key: 'instagram', ...SOCIAL_LINKS.instagram },
-    { key: 'youtube', ...SOCIAL_LINKS.youtube },
-    { key: 'tiktok', ...SOCIAL_LINKS.tiktok },
+    { key: 'telegram', ...(socialLinks.telegram || {}) },
+    { key: 'instagram', ...(socialLinks.instagram || {}) },
+    { key: 'youtube', ...(socialLinks.youtube || {}) },
+    { key: 'tiktok', ...(socialLinks.tiktok || {}) },
   ];
 
   return (

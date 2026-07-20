@@ -2,7 +2,6 @@ import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
-import { banners } from '../../data/VideoBannerData';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { normalizeImagePath } from '../../utils/utils';
 import './VideoBanner.css';
@@ -17,17 +16,17 @@ const RATING_IMGS = {
 const VideoBanner = ({ typeFilter }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
-  const { allMovies } = useMoviesApi();
+  const { allMovies, getVideoBannersByType } = useMoviesApi();
   const videoRefs = useRef({});
   const cardRefs = useRef({});
   const scrollToIndexRef = useRef(null);
   const [unmutedIds, setUnmutedIds] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const filteredBanners = useMemo(() => {
-    if (!typeFilter) return banners;
-    return banners.filter((b) => b.type === typeFilter);
-  }, [typeFilter]);
+  const filteredBanners = useMemo(
+    () => getVideoBannersByType(typeFilter),
+    [getVideoBannersByType, typeFilter]
+  );
 
   const getNavigatePath = (banner) => {
     if (banner.type === 'movie') {

@@ -16,6 +16,9 @@
     "seed:banners": "node seeds/seedBanners.js",
     "seed:genres": "node seeds/seedGenres.js",
     "seed:ads": "node seeds/seedAds.js",
+    "seed:shorts": "node seeds/seedShortVideos.js",
+    "seed:site-links": "node seeds/seedSiteLinks.js",
+    "seed:video-banners": "node seeds/seedVideoBanners.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

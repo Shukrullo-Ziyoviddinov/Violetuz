@@ -4,6 +4,10 @@ import { fetchAllMovies, fetchMovieById, fetchMovieSections, fetchHomeContent } 
 import { fetchAllBanners } from '../api/bannersApi';
 import { fetchAllGenres } from '../api/genresApi';
 import { fetchAllAds } from '../api/adsApi';
+import { fetchAllShorts } from '../api/shortsApi';
+import { fetchSiteLinks } from '../api/siteLinksApi';
+import { fetchAllVideoBanners } from '../api/videoBannersApi';
+import { resolveShortsWithMovies } from '../utils/resolveShortsWithMovies';
 
 const MoviesApiContext = createContext(null);
 
@@ -45,6 +49,24 @@ export const MoviesApiProvider = ({ children }) => {
     staleTime: 60_000,
     retry: 1,
   });
+  const shortsQuery = useQuery({
+    queryKey: ['shorts'],
+    queryFn: fetchAllShorts,
+    staleTime: 60_000,
+    retry: 1,
+  });
+  const siteLinksQuery = useQuery({
+    queryKey: ['site-links'],
+    queryFn: fetchSiteLinks,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+  const videoBannersQuery = useQuery({
+    queryKey: ['video-banners'],
+    queryFn: fetchAllVideoBanners,
+    staleTime: 60_000,
+    retry: 1,
+  });
 
   const allMovies = useMemo(
     () => (Array.isArray(moviesQuery.data) ? moviesQuery.data : []),
@@ -70,13 +92,38 @@ export const MoviesApiProvider = ({ children }) => {
     () => (Array.isArray(adsQuery.data) ? adsQuery.data : []),
     [adsQuery.data]
   );
+  const allShortsVideos = useMemo(
+    () => (Array.isArray(shortsQuery.data) ? shortsQuery.data : []),
+    [shortsQuery.data]
+  );
+  const movieShortsCatalog = useMemo(
+    () => resolveShortsWithMovies(allShortsVideos, allMovies),
+    [allShortsVideos, allMovies]
+  );
+  const siteLinks = useMemo(
+    () =>
+      siteLinksQuery.data && typeof siteLinksQuery.data === 'object'
+        ? siteLinksQuery.data
+        : { id: 'site', contact: {}, socialLinks: {}, appStoreLinks: {} },
+    [siteLinksQuery.data]
+  );
+  const contactData = useMemo(() => siteLinks.contact || {}, [siteLinks]);
+  const socialLinks = useMemo(() => siteLinks.socialLinks || {}, [siteLinks]);
+  const appStoreLinks = useMemo(() => siteLinks.appStoreLinks || {}, [siteLinks]);
+  const allVideoBanners = useMemo(
+    () => (Array.isArray(videoBannersQuery.data) ? videoBannersQuery.data : []),
+    [videoBannersQuery.data]
+  );
   const loading =
     moviesQuery.isLoading ||
     sectionsQuery.isLoading ||
     homeContentQuery.isLoading ||
     bannersQuery.isLoading ||
     genresQuery.isLoading ||
-    adsQuery.isLoading;
+    adsQuery.isLoading ||
+    shortsQuery.isLoading ||
+    siteLinksQuery.isLoading ||
+    videoBannersQuery.isLoading;
   const error =
     moviesQuery.error?.message ||
     sectionsQuery.error?.message ||
@@ -84,6 +131,9 @@ export const MoviesApiProvider = ({ children }) => {
     bannersQuery.error?.message ||
     genresQuery.error?.message ||
     adsQuery.error?.message ||
+    shortsQuery.error?.message ||
+    siteLinksQuery.error?.message ||
+    videoBannersQuery.error?.message ||
     null;
 
   const value = useMemo(() => ({
@@ -93,12 +143,23 @@ export const MoviesApiProvider = ({ children }) => {
     allBanners,
     allGenres,
     allAds,
+    allShortsVideos,
+    movieShortsCatalog,
+    siteLinks,
+    contactData,
+    socialLinks,
+    appStoreLinks,
+    allVideoBanners,
     loading,
     error,
     getMoviesByCategory: (categoryName) => allMovies.filter((m) => m.categoryName === categoryName),
     getBannersByLang: (lang) => allBanners.filter((b) => b.lang === lang),
+    getVideoBannersByType: (type) =>
+      type ? allVideoBanners.filter((b) => b.type === type) : allVideoBanners,
     getGenreById: (id) => allGenres.find((g) => g.id === id) || null,
     getActiveAd: () => allAds.find((ad) => ad.isActive) || allAds[0] || null,
+    getShortByIdLocal: (id) =>
+      movieShortsCatalog.find((s) => String(s.id) === String(id)) || null,
     getSectionById: (id) => sections.find((s) => s.id === id) || null,
     getMovieByIdLocal: (id) => allMovies.find((m) => String(m.id) === String(id)) || null,
     refreshMovies: async () => {
@@ -129,8 +190,46 @@ export const MoviesApiProvider = ({ children }) => {
       });
       return ads;
     },
+    refreshShorts: async () => {
+      const shorts = await queryClient.fetchQuery({
+        queryKey: ['shorts'],
+        queryFn: fetchAllShorts,
+      });
+      return shorts;
+    },
+    refreshSiteLinks: async () => {
+      const links = await queryClient.fetchQuery({
+        queryKey: ['site-links'],
+        queryFn: fetchSiteLinks,
+      });
+      return links;
+    },
+    refreshVideoBanners: async () => {
+      const videoBanners = await queryClient.fetchQuery({
+        queryKey: ['video-banners'],
+        queryFn: fetchAllVideoBanners,
+      });
+      return videoBanners;
+    },
     fetchMovieByIdRemote: fetchMovieById,
-  }), [allMovies, sections, homeContent, allBanners, allGenres, allAds, loading, error, queryClient]);
+  }), [
+    allMovies,
+    sections,
+    homeContent,
+    allBanners,
+    allGenres,
+    allAds,
+    allShortsVideos,
+    movieShortsCatalog,
+    siteLinks,
+    contactData,
+    socialLinks,
+    appStoreLinks,
+    allVideoBanners,
+    loading,
+    error,
+    queryClient,
+  ]);
 
   return (
     <MoviesApiContext.Provider value={value}>

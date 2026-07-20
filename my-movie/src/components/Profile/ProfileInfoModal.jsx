@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { APP_STORE_LINKS } from '../../data/socialLinks';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import './ProfileInfoModal.css';
 
 const ProfileInfoModal = ({
@@ -13,6 +13,7 @@ const ProfileInfoModal = ({
   onSocial,
 }) => {
   const { t } = useTranslation();
+  const { appStoreLinks } = useMoviesApi();
 
   useEffect(() => {
     if (window.innerWidth <= 768) {
@@ -131,20 +132,20 @@ const ProfileInfoModal = ({
 
           <div className="profile-app-stores profile-info-app-stores">
                 <a
-                  href={APP_STORE_LINKS.android.link}
+                  href={appStoreLinks.android?.link || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="profile-app-store-link"
                 >
-                  <img src={APP_STORE_LINKS.android.icon} alt="Google Play" className="profile-app-store-img" />
+                  <img src={appStoreLinks.android?.icon || ''} alt="Google Play" className="profile-app-store-img" />
                 </a>
                 <a
-                  href={APP_STORE_LINKS.ios.link}
+                  href={appStoreLinks.ios?.link || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="profile-app-store-link"
                 >
-                  <img src={APP_STORE_LINKS.ios.icon} alt="App Store" className="profile-app-store-img" />
+                  <img src={appStoreLinks.ios?.icon || ''} alt="App Store" className="profile-app-store-img" />
                 </a>
           </div>
         </div>
