@@ -807,8 +807,8 @@
 .shorts-modal-music-corner-mobile {
   right: 12px;
   bottom: 6.75rem;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
 }
 
 .shorts-modal-music-corner-desktop {
@@ -818,8 +818,8 @@
 
 @media (max-width: 500px) {
   .shorts-modal-music-corner-mobile {
-    right: 10px;
-    bottom: 6.5rem;
+    right: 18px;
+    bottom: 8.5rem;
   }
 }
 
@@ -1301,7 +1301,7 @@
 .shorts-modal-actions-sidebar {
   position: absolute;
   right: 16px;
-  top: 50%;
+  top: 47%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
