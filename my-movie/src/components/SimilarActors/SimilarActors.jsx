@@ -2,7 +2,6 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useActorsApi } from '../../context/ActorsApiContext';
-import { actorPageSectionLabels } from '../../data/actorPageLabels';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -18,7 +17,7 @@ const SimilarActors = ({ currentActorId, actorsGenre }) => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { getActorsByGenre } = useActorsApi();
+  const { getActorsByGenre, actorPageSectionLabels } = useActorsApi();
   const { allMovies } = useMoviesApi();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -45,7 +44,9 @@ const SimilarActors = ({ currentActorId, actorsGenre }) => {
   const hasMore = list.length > SIMILAR_VISIBLE;
 
   const sectionTitle =
-    actorPageSectionLabels.similarActors[contentLang] || actorPageSectionLabels.similarActors.uz;
+    actorPageSectionLabels?.similarActors?.[contentLang] ||
+    actorPageSectionLabels?.similarActors?.uz ||
+    '';
 
   const renderActorRow = useCallback(
     (a) => {

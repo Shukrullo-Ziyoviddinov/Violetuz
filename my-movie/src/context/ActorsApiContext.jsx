@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchAllActors, fetchActorById } from '../api/actorsApi';
+import {
+  fetchAllActorPageLabels,
+  toActorPageSectionLabelsMap,
+} from '../api/actorPageLabelsApi';
 
 const ActorsApiContext = createContext(null);
 
@@ -12,17 +16,33 @@ export const ActorsApiProvider = ({ children }) => {
     staleTime: 60_000,
     retry: 1,
   });
+  const labelsQuery = useQuery({
+    queryKey: ['actor-page-labels'],
+    queryFn: fetchAllActorPageLabels,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
 
   const allActors = useMemo(
     () => (Array.isArray(actorsQuery.data) ? actorsQuery.data : []),
     [actorsQuery.data]
   );
+  const actorPageLabels = useMemo(
+    () => (Array.isArray(labelsQuery.data) ? labelsQuery.data : []),
+    [labelsQuery.data]
+  );
+  const actorPageSectionLabels = useMemo(
+    () => toActorPageSectionLabelsMap(actorPageLabels),
+    [actorPageLabels]
+  );
 
   const value = useMemo(
     () => ({
       allActors,
-      loading: actorsQuery.isLoading,
-      error: actorsQuery.error?.message || null,
+      actorPageLabels,
+      actorPageSectionLabels,
+      loading: actorsQuery.isLoading || labelsQuery.isLoading,
+      error: actorsQuery.error?.message || labelsQuery.error?.message || null,
       getActorById: (id) =>
         allActors.find((a) => String(a.id) === String(id)) || null,
       getActorsByIds: (ids = []) => {
@@ -43,9 +63,23 @@ export const ActorsApiProvider = ({ children }) => {
           queryKey: ['actors'],
           queryFn: fetchAllActors,
         }),
+      refreshActorPageLabels: async () =>
+        queryClient.fetchQuery({
+          queryKey: ['actor-page-labels'],
+          queryFn: fetchAllActorPageLabels,
+        }),
       fetchActorByIdRemote: fetchActorById,
     }),
-    [allActors, actorsQuery.isLoading, actorsQuery.error, queryClient]
+    [
+      allActors,
+      actorPageLabels,
+      actorPageSectionLabels,
+      actorsQuery.isLoading,
+      labelsQuery.isLoading,
+      actorsQuery.error,
+      labelsQuery.error,
+      queryClient,
+    ]
   );
 
   return (

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMoviesApi } from '../../context/MoviesApiContext';
-import { actorPageSectionLabels } from '../../data/actorPageLabels';
+import { useActorsApi } from '../../context/ActorsApiContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import ShowMoreButton from '../ShowMoreButton/ShowMoreButton';
 import './ActorTopRatedKinolar.css';
@@ -27,6 +27,7 @@ const ActorTopRatedKinolar = ({ actorId }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { allMovies } = useMoviesApi();
+  const { actorPageSectionLabels } = useActorsApi();
 
   const list = useMemo(() => {
     const aid = Number(actorId);
@@ -46,7 +47,9 @@ const ActorTopRatedKinolar = ({ actorId }) => {
     <section className="actor-toprated actor-extra-block actor-extra-block--top-rated">
       <div className="actor-toprated-head">
         <h3 className="actor-extra-block__title">
-          {actorPageSectionLabels.topRatedKinolar[contentLang] || actorPageSectionLabels.topRatedKinolar.uz}
+          {actorPageSectionLabels?.topRatedKinolar?.[contentLang] ||
+            actorPageSectionLabels?.topRatedKinolar?.uz ||
+            ''}
         </h3>
         {hasMore && (
           <ShowMoreButton to="/recommended" className="actor-toprated-show-more" />

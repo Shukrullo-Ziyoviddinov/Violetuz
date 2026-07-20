@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
-import { adsData } from '../../data/adsData';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import AdsMovie from './AdsMovie';
 import './WatchModal.css';
 
@@ -76,8 +76,8 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   const [modalTranslateY, setModalTranslateY] = useState(0);
 
   const speedOptions = [1, 1.5, 2];
-
-  const activeAd = adsData.find((ad) => ad.isActive) || adsData[0];
+  const { getActiveAd } = useMoviesApi();
+  const activeAd = getActiveAd();
 
   const handleAdEnded = () => {
     if (!hasUserStartedWatchingRef.current) {

@@ -11,9 +11,11 @@
     "seed:clips": "node seeds/seedClips.js",
     "seed:concerts": "node seeds/seedConcerts.js",
     "seed:actors": "node seeds/seedActors.js",
+    "seed:actor-page-labels": "node seeds/seedActorPageLabels.js",
     "seed:artist-music-stories": "node seeds/seedArtistMusicStories.js",
     "seed:banners": "node seeds/seedBanners.js",
     "seed:genres": "node seeds/seedGenres.js",
+    "seed:ads": "node seeds/seedAds.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

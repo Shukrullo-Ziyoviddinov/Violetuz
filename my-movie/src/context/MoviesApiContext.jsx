@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchAllMovies, fetchMovieById, fetchMovieSections, fetchHomeContent } from '../api/moviesApi';
 import { fetchAllBanners } from '../api/bannersApi';
 import { fetchAllGenres } from '../api/genresApi';
+import { fetchAllAds } from '../api/adsApi';
 
 const MoviesApiContext = createContext(null);
 
@@ -38,6 +39,12 @@ export const MoviesApiProvider = ({ children }) => {
     staleTime: 5 * 60_000,
     retry: 1,
   });
+  const adsQuery = useQuery({
+    queryKey: ['ads'],
+    queryFn: fetchAllAds,
+    staleTime: 60_000,
+    retry: 1,
+  });
 
   const allMovies = useMemo(
     () => (Array.isArray(moviesQuery.data) ? moviesQuery.data : []),
@@ -59,18 +66,24 @@ export const MoviesApiProvider = ({ children }) => {
     () => (Array.isArray(genresQuery.data) ? genresQuery.data : []),
     [genresQuery.data]
   );
+  const allAds = useMemo(
+    () => (Array.isArray(adsQuery.data) ? adsQuery.data : []),
+    [adsQuery.data]
+  );
   const loading =
     moviesQuery.isLoading ||
     sectionsQuery.isLoading ||
     homeContentQuery.isLoading ||
     bannersQuery.isLoading ||
-    genresQuery.isLoading;
+    genresQuery.isLoading ||
+    adsQuery.isLoading;
   const error =
     moviesQuery.error?.message ||
     sectionsQuery.error?.message ||
     homeContentQuery.error?.message ||
     bannersQuery.error?.message ||
     genresQuery.error?.message ||
+    adsQuery.error?.message ||
     null;
 
   const value = useMemo(() => ({
@@ -79,11 +92,13 @@ export const MoviesApiProvider = ({ children }) => {
     homeContent,
     allBanners,
     allGenres,
+    allAds,
     loading,
     error,
     getMoviesByCategory: (categoryName) => allMovies.filter((m) => m.categoryName === categoryName),
     getBannersByLang: (lang) => allBanners.filter((b) => b.lang === lang),
     getGenreById: (id) => allGenres.find((g) => g.id === id) || null,
+    getActiveAd: () => allAds.find((ad) => ad.isActive) || allAds[0] || null,
     getSectionById: (id) => sections.find((s) => s.id === id) || null,
     getMovieByIdLocal: (id) => allMovies.find((m) => String(m.id) === String(id)) || null,
     refreshMovies: async () => {
@@ -107,8 +122,15 @@ export const MoviesApiProvider = ({ children }) => {
       });
       return genres;
     },
+    refreshAds: async () => {
+      const ads = await queryClient.fetchQuery({
+        queryKey: ['ads'],
+        queryFn: fetchAllAds,
+      });
+      return ads;
+    },
     fetchMovieByIdRemote: fetchMovieById,
-  }), [allMovies, sections, homeContent, allBanners, allGenres, loading, error, queryClient]);
+  }), [allMovies, sections, homeContent, allBanners, allGenres, allAds, loading, error, queryClient]);
 
   return (
     <MoviesApiContext.Provider value={value}>

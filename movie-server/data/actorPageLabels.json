@@ -1,0 +1,23 @@
+[
+  {
+    "id": "awards",
+    "title": {
+      "uz": "Mukofotlar va nominatsiyalar",
+      "ru": "Награды и номинации"
+    }
+  },
+  {
+    "id": "similarActors",
+    "title": {
+      "uz": "O'xshash aktyorlar",
+      "ru": "Похожие актёры"
+    }
+  },
+  {
+    "id": "topRatedKinolar",
+    "title": {
+      "uz": "Reytingi baland kinolar",
+      "ru": "Фильмы с высоким рейтингом"
+    }
+  }
+]

@@ -1,12 +1,12 @@
 import React, { forwardRef, useRef, useState, useImperativeHandle, useCallback } from 'react';
-import { adsData } from '../../data/adsData';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import './AdsMovie.css';
 
 const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) => {
   const adVideoRef = useRef(null);
   const [showAdOverlay, setShowAdOverlay] = useState(false);
-
-  const activeAd = adsData.find((ad) => ad.isActive) || adsData[0];
+  const { getActiveAd } = useMoviesApi();
+  const activeAd = getActiveAd();
 
   const showAd = useCallback(() => {
     if (!activeAd || !activeAd.isActive) return;

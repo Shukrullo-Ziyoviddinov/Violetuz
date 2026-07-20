@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { actorPageSectionLabels } from '../data/actorPageLabels';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import { useContentLanguage } from '../context/ContentLanguageContext';
@@ -215,7 +214,7 @@ const ActorsPage = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { getActorById } = useActorsApi();
+  const { getActorById, actorPageSectionLabels } = useActorsApi();
   const { allMovies } = useMoviesApi();
   const bioSectionRef = useRef(null);
   const [bioLineClamp, setBioLineClamp] = useState(5);
@@ -670,8 +669,9 @@ const ActorsPage = () => {
           <ActorAwardsSection
             awards={actor.awards}
             title={
-              actorPageSectionLabels.awards[contentLang] ||
-              actorPageSectionLabels.awards.uz
+              actorPageSectionLabels?.awards?.[contentLang] ||
+              actorPageSectionLabels?.awards?.uz ||
+              ''
             }
           />
           <SimilarActors currentActorId={actor.id} actorsGenre={actor.actorsGenre} />

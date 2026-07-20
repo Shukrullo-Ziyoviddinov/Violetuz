@@ -401,6 +401,40 @@ const validateGenreListQuery = (req, _res, next) => {
   next();
 };
 
+const validateActorPageLabelIdParam = (req, _res, next) => {
+  const labelId = String(req.params.id || '').trim();
+  if (!labelId) {
+    return next(badRequest('Invalid actor page label id. It is required.'));
+  }
+
+  req.params.id = labelId;
+  next();
+};
+
+const validateAdIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid ad id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateAdListQuery = (req, _res, next) => {
+  const { isActive } = req.query;
+
+  if (isActive != null) {
+    const raw = String(isActive).trim().toLowerCase();
+    if (raw !== 'true' && raw !== 'false') {
+      return next(badRequest('isActive query must be true or false.'));
+    }
+    req.query.isActive = raw;
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -425,4 +459,7 @@ module.exports = {
   validateBannerListQuery,
   validateGenreIdParam,
   validateGenreListQuery,
+  validateActorPageLabelIdParam,
+  validateAdIdParam,
+  validateAdListQuery,
 };
