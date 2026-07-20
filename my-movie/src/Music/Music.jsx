@@ -19,7 +19,7 @@ const Music = () => {
       <div className="music-section">
         <MusicBanner />
         <div className="music-container">
-          {pageContent.map((block, idx) => {
+          {(Array.isArray(pageContent) ? pageContent : []).map((block, idx) => {
             if (block.type === 'shorts') {
               return (
                 <HomeShorts

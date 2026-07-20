@@ -11,7 +11,8 @@ const MusicBanner = () => {
     const { i18n } = useTranslation();
     const lang = i18n.language || 'uz';
     const images = useMemo(() => {
-        return musicBanner.map((item) => ({
+        const banners = Array.isArray(musicBanner) ? musicBanner : [];
+        return banners.map((item) => ({
             id: item.id,
             src: typeof item.img === 'object' ? getLocalizedText(item.img, lang) : item.img,
             link: item.buttonId ? `/music/${item.buttonId}` : null

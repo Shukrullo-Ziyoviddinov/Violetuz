@@ -231,4 +231,4 @@ const rawMusicShorts = [
   },
 ];
 
-export const musicShorts = rawMusicShorts.map(resolveShortsMusicMeta);
+export const musicShorts = rawMusicShorts.map((item) => resolveShortsMusicMeta(item, []));

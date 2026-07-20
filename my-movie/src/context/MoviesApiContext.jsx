@@ -25,13 +25,16 @@ export const MoviesApiProvider = ({ children }) => {
     retry: 1,
   });
 
-  const allMovies = useMemo(() => moviesQuery.data || [], [moviesQuery.data]);
+  const allMovies = useMemo(
+    () => (Array.isArray(moviesQuery.data) ? moviesQuery.data : []),
+    [moviesQuery.data]
+  );
   const sections = useMemo(
-    () => (sectionsQuery.data?.length ? sectionsQuery.data : []),
+    () => (Array.isArray(sectionsQuery.data) ? sectionsQuery.data : []),
     [sectionsQuery.data]
   );
   const homeContent = useMemo(
-    () => (homeContentQuery.data?.length ? homeContentQuery.data : []),
+    () => (Array.isArray(homeContentQuery.data) ? homeContentQuery.data : []),
     [homeContentQuery.data]
   );
   const loading = moviesQuery.isLoading || sectionsQuery.isLoading || homeContentQuery.isLoading;

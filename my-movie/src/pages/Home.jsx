@@ -19,7 +19,7 @@ const Home = () => {
     <div className="home">
       <Banner />
       <Categories />
-      {homeContent.map((block, idx) => {
+      {(Array.isArray(homeContent) ? homeContent : []).map((block, idx) => {
         if (block.type === 'shorts') {
           return (
             <HomeShorts

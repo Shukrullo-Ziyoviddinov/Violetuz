@@ -41,14 +41,20 @@ export const MusicApiProvider = ({ children }) => {
     retry: 1,
   });
 
-  const allMusic = useMemo(() => musicQuery.data || [], [musicQuery.data]);
-  const allAlbums = useMemo(() => albumsQuery.data || [], [albumsQuery.data]);
+  const allMusic = useMemo(
+    () => (Array.isArray(musicQuery.data) ? musicQuery.data : []),
+    [musicQuery.data]
+  );
+  const allAlbums = useMemo(
+    () => (Array.isArray(albumsQuery.data) ? albumsQuery.data : []),
+    [albumsQuery.data]
+  );
   const sections = useMemo(
-    () => (sectionsQuery.data?.length ? sectionsQuery.data : []),
+    () => (Array.isArray(sectionsQuery.data) ? sectionsQuery.data : []),
     [sectionsQuery.data]
   );
   const pageContent = useMemo(
-    () => (pageContentQuery.data?.length ? pageContentQuery.data : []),
+    () => (Array.isArray(pageContentQuery.data) ? pageContentQuery.data : []),
     [pageContentQuery.data]
   );
 

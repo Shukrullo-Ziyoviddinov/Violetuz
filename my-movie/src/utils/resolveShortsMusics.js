@@ -30,10 +30,10 @@ export function resolveShortsMusics(musicsRef, musicList = []) {
 
   const { musicId, videoId } = musicsRef;
   const musicItem = musicId != null
-    ? (musicList || []).find((m) => matchId(m.id, musicId))
+    ? (Array.isArray(musicList) ? musicList : []).find((m) => matchId(m.id, musicId))
     : null;
   const videoItem = videoId != null
-    ? allVideoItems.find((v) => matchId(v.id, videoId))
+    ? (Array.isArray(allVideoItems) ? allVideoItems : []).find((v) => matchId(v.id, videoId))
     : null;
 
   if (!musicItem && !videoItem) return null;

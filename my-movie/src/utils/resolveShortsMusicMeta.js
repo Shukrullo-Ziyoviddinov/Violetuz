@@ -12,9 +12,9 @@ const normalizeLocalized = (value) => {
 };
 
 const getSourceByContentType = (contentType, musicList = []) => {
-  if (contentType === 'klip') return allClipsData || [];
-  if (contentType === 'konsert') return allConcertsData || [];
-  return musicList || [];
+  if (contentType === 'klip') return Array.isArray(allClipsData) ? allClipsData : [];
+  if (contentType === 'konsert') return Array.isArray(allConcertsData) ? allConcertsData : [];
+  return Array.isArray(musicList) ? musicList : [];
 };
 
 const resolveArtist = (item) => {

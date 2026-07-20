@@ -5,7 +5,11 @@ export const isMovieLike = (item) =>
   typeof item.categoryName === 'string';
 
 export const normalizeMoviesPayload = (payload) => {
-  const list = Array.isArray(payload?.data) ? payload.data : [];
+  const list = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.data)
+      ? payload.data
+      : [];
   return list.filter(isMovieLike);
 };
 
@@ -17,7 +21,11 @@ export const isMovieSectionLike = (item) =>
   typeof item.titleKey === 'string';
 
 export const normalizeMovieSectionsPayload = (payload) => {
-  const list = Array.isArray(payload?.data) ? payload.data : [];
+  const list = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.data)
+      ? payload.data
+      : [];
   return list.filter(isMovieSectionLike);
 };
 
@@ -27,6 +35,10 @@ export const isHomeBlockLike = (item) =>
   typeof item.type === 'string';
 
 export const normalizeHomeContentPayload = (payload) => {
-  const list = Array.isArray(payload?.data) ? payload.data : [];
+  const list = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.data)
+      ? payload.data
+      : [];
   return list.filter(isHomeBlockLike);
 };

@@ -98,7 +98,9 @@ const VideoBanner = ({ typeFilter }) => {
         >
         {filteredBanners.map((banner, index) => {
           const isMovie = banner.type === 'movie';
-          const movie = isMovie ? allMovies.find((m) => m.id === banner.refId) : null;
+          const movie = isMovie
+            ? (Array.isArray(allMovies) ? allMovies : []).find((m) => m.id === banner.refId)
+            : null;
 
           const titleImgSrc = isMovie
             ? (movie?.titleImg?.[contentLang] || movie?.titleImg?.uz || movie?.titleImg?.ru)

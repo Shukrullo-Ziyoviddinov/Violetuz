@@ -13,8 +13,9 @@ const Banner = () => {
     const currentBanners = bannerImages[contentLang] || bannerImages.uz || bannerImages.ru || [];
 
     const images = useMemo(() => {
+        const movies = Array.isArray(allMovies) ? allMovies : [];
         return currentBanners.map((banner) => {
-            const movie = allMovies.find((m) => m.id === banner.movieId);
+            const movie = movies.find((m) => m.id === banner.movieId);
             const movieImg = movie?.homeImg?.[contentLang] || movie?.homeImg?.uz || movie?.homeImg?.ru;
             const src = banner.image || movieImg || '';
             return {
@@ -23,7 +24,7 @@ const Banner = () => {
                 link: banner.movieId ? `/movie/${banner.movieId}` : null
             };
         }).filter((img) => img.src);
-    }, [currentBanners, contentLang]);
+    }, [currentBanners, contentLang, allMovies]);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [dragOffset, setDragOffset] = useState(0);
