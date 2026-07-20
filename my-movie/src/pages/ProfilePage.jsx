@@ -11,6 +11,7 @@ import GlobalModal from '../components/GlobalModal/GlobalModal';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import { useFollowingIds } from '../context/FollowingContext';
 import { getFollowedPeople } from '../store/slices/followingUtils';
+import { useActorsApi } from '../context/ActorsApiContext';
 import { useRepostItems } from '../context/RepostsContext';
 import { normalizeRepostType, repostMatchesFilter } from '../components/Repost/repostTypes';
 import RepostFilter from '../components/Repost/RepostFilter';
@@ -47,6 +48,7 @@ const ProfilePage = () => {
   const [statsModalType, setStatsModalType] = useState('following');
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage);
   const followingIds = useFollowingIds();
+  const { allActors } = useActorsApi();
   const repostItems = useRepostItems();
   const [repostFilter, setRepostFilter] = useState('all');
 
@@ -60,7 +62,7 @@ const ProfilePage = () => {
     return () => clearProfileInfoMenuHandler(open);
   }, []);
 
-  const followedPeople = getFollowedPeople(followingIds, currentLanguage);
+  const followedPeople = getFollowedPeople(followingIds, currentLanguage, allActors);
   const followersPeople = [];
 
   /** Kino + musiqa shortslari profil tartibida (scroll ikkalasini ham o‘z ichiga oladi) */

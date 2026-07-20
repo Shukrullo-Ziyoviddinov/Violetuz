@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicPlayer } from '../context/MusicPlayerContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { ensureArray, matchId } from '../dataMusic/musicDataUtils';
+import { ensureArray, matchId } from '../utils/musicDataUtils';
 import { artists } from '../dataMusic/artists';
 import AudioDuration from '../Music/AudioDuration/AudioDuration';
 import ShareButton from '../components/ShareButton/ShareButton';

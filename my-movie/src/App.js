@@ -29,6 +29,7 @@ import { ContentLanguageProvider } from './context/ContentLanguageContext';
 import { MusicPlayerProvider } from './context/MusicPlayerContext';
 import { LoadingProvider } from './context/LoadingContext';
 import { MoviesApiProvider } from './context/MoviesApiContext';
+import { ActorsApiProvider } from './context/ActorsApiContext';
 import { MusicApiProvider } from './context/MusicApiContext';
 import { store, persistor } from './store/store';
 import './App.css';
@@ -46,6 +47,7 @@ function App() {
         <PersistGate loading={null} persistor={persistor}>
           <ViewedMoviesProvider>
             <MoviesApiProvider>
+              <ActorsApiProvider>
               <MusicApiProvider>
                 <Router>
                   <ContentLanguageProvider>
@@ -87,6 +89,7 @@ function App() {
                   </ContentLanguageProvider>
                 </Router>
               </MusicApiProvider>
+              </ActorsApiProvider>
             </MoviesApiProvider>
           </ViewedMoviesProvider>
         </PersistGate>

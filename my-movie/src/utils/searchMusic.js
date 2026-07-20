@@ -4,7 +4,7 @@
  * Musiqa/klip/konsert: title va artist bo'yicha qidiradi.
  * Stop words va minimal moslik – faqat aniq natijalar chiqadi.
  */
-import { ensureArray } from '../dataMusic/musicDataUtils';
+import { ensureArray } from './musicDataUtils';
 import { artists } from '../dataMusic/artists';
 
 const normalize = (s) => (s || '').toLowerCase().trim().replace(/\s+/g, ' ');

@@ -1,4 +1,4 @@
-import { matchId } from '../dataMusic/musicDataUtils';
+import { matchId } from './musicDataUtils';
 
 const normalizeTitle = (title) => {
   if (!title) return { uz: '', ru: '' };

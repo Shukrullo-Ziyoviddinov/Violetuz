@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getActorById, actorPageSectionLabels } from '../data/actors';
+import { actorPageSectionLabels } from '../data/actorPageLabels';
+import { useActorsApi } from '../context/ActorsApiContext';
 import { allMovies } from '../data/movies';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import Movies from '../components/Movies/Movies';
@@ -214,6 +215,7 @@ const ActorsPage = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { getActorById } = useActorsApi();
   const bioSectionRef = useRef(null);
   const [bioLineClamp, setBioLineClamp] = useState(5);
   const [bioImgModalOpen, setBioImgModalOpen] = useState(false);

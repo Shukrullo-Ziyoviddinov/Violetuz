@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { allMovies } from '../../data/movies';
-import { actorPageSectionLabels } from '../../data/actors';
+import { actorPageSectionLabels } from '../../data/actorPageLabels';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import ShowMoreButton from '../ShowMoreButton/ShowMoreButton';
 import './ActorTopRatedKinolar.css';

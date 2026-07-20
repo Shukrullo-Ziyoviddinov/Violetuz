@@ -10,6 +10,7 @@
     "seed:albums": "node seeds/seedAlbums.js",
     "seed:clips": "node seeds/seedClips.js",
     "seed:concerts": "node seeds/seedConcerts.js",
+    "seed:actors": "node seeds/seedActors.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

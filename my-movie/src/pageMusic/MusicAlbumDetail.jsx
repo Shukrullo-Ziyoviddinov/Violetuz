@@ -6,7 +6,7 @@ import { useMusicPlayer } from '../context/MusicPlayerContext';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { useAlbumTotalDuration } from '../hooks/useAlbumTotalDuration';
 import { useAlbumTrackDurations } from '../hooks/useAlbumTrackDurations';
-import { matchId } from '../dataMusic/musicDataUtils';
+import { matchId } from '../utils/musicDataUtils';
 import { useMusicApi } from '../context/MusicApiContext';
 import ShareButton from '../components/ShareButton/ShareButton';
 import AlbumsForYou from '../Music/AlbumsForYou/AlbumsForYou';

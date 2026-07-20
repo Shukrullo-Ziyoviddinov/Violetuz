@@ -8,7 +8,7 @@ import { OPEN_MESSAGES_EVENT } from '../messagesModalBridge';
 import { useFeedProfile } from '../context/AuthContext';
 import { useFollowingIds } from '../context/FollowingContext';
 import { getFeedHeaderFollowedPeople } from '../store/slices/followingUtils';
-import { actors } from '../data/actors';
+import { useActorsApi } from '../context/ActorsApiContext';
 import { artists } from '../dataMusic/artists';
 import { allMovies } from '../data/movies';
 import { useMusicApi } from '../context/MusicApiContext';
@@ -41,6 +41,7 @@ const FeedPage = () => {
   const feedProfileUser = useFeedProfile();
   const [messagesOpen, setMessagesOpen] = useState(false);
   const { sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts } = useMusicApi();
+  const { allActors } = useActorsApi();
 
   const openMessages = useCallback(() => setMessagesOpen(true), []);
 
@@ -51,14 +52,14 @@ const FeedPage = () => {
   }, []);
 
   const headerFollowedPeople = useMemo(
-    () => getFeedHeaderFollowedPeople(followingIds, feedLang),
-    [followingIds, feedLang]
+    () => getFeedHeaderFollowedPeople(followingIds, feedLang, allActors),
+    [followingIds, feedLang, allActors]
   );
 
   const feedItems = useMemo(() => {
     const normalized = new Set(followingIds.map((id) => String(id)));
     const followedActorIds = new Set(
-      actors.filter((actor) => normalized.has(String(actor.id))).map((actor) => actor.id)
+      allActors.filter((actor) => normalized.has(String(actor.id))).map((actor) => actor.id)
     );
     const followedArtistIds = new Set(
       artists.filter((artist) => normalized.has(String(artist.id))).map((artist) => artist.id)
@@ -69,7 +70,7 @@ const FeedPage = () => {
       .slice(0, 30)
       .map((movie) => {
         const actorId = movie.actors?.find((id) => followedActorIds.has(id));
-        const actor = actors.find((a) => a.id === actorId);
+        const actor = allActors.find((a) => a.id === actorId);
         return {
           id: `movie-${movie.id}`,
           type: normalizeType(movie?.type) || 'movie',
@@ -158,7 +159,7 @@ const FeedPage = () => {
       });
 
     return [...movieItems, ...musicItems, ...videoItems].sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts]);
+  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allActors]);
 
   const filteredItems = useMemo(() => {
     if (activeCategory === 'all') return feedItems;

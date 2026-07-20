@@ -9,11 +9,13 @@ const clipRoutes = require('./clip.routes');
 const clipSectionRoutes = require('./clipSection.routes');
 const concertRoutes = require('./concert.routes');
 const concertSectionRoutes = require('./concertSection.routes');
+const actorRoutes = require('./actor.routes');
 
 const router = Router();
 
 router.use('/health', healthRoutes);
 router.use('/movies', movieRoutes);
+router.use('/actors', actorRoutes);
 router.use('/movie-sections', movieSectionRoutes);
 router.use('/music', musicRoutes);
 router.use('/music-sections', musicSectionRoutes);

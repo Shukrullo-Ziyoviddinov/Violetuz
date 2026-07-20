@@ -238,6 +238,71 @@ const validateConcertListQuery = (req, _res, next) => {
   next();
 };
 
+const validateActorIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid actor id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateActorsGenreParam = (req, _res, next) => {
+  const actorsGenre = String(req.params.actorsGenre || '').trim();
+  if (!actorsGenre) {
+    return next(badRequest('Invalid actorsGenre. It is required.'));
+  }
+
+  req.params.actorsGenre = actorsGenre;
+  next();
+};
+
+const validateActorListQuery = (req, _res, next) => {
+  const { actorsGenre, search, ids } = req.query;
+
+  if (actorsGenre != null && !String(actorsGenre).trim()) {
+    return next(badRequest('actorsGenre query cannot be empty.'));
+  }
+
+  if (search != null && !String(search).trim()) {
+    return next(badRequest('search query cannot be empty.'));
+  }
+
+  if (ids != null) {
+    const raw = String(ids).trim();
+    if (!raw) {
+      return next(badRequest('ids query cannot be empty.'));
+    }
+
+    const parts = raw.split(',').map((value) => value.trim()).filter(Boolean);
+    if (parts.length === 0) {
+      return next(badRequest('ids query cannot be empty.'));
+    }
+
+    const invalid = parts.find((value) => {
+      const numericId = Number(value);
+      return !Number.isInteger(numericId) || numericId <= 0;
+    });
+
+    if (invalid != null) {
+      return next(badRequest('ids query must be a comma-separated list of positive integers.'));
+    }
+
+    req.query.ids = parts.join(',');
+  }
+
+  if (actorsGenre != null) {
+    req.query.actorsGenre = String(actorsGenre).trim();
+  }
+
+  if (search != null) {
+    req.query.search = String(search).trim();
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -252,4 +317,7 @@ module.exports = {
   validateClipListQuery,
   validateConcertIdParam,
   validateConcertListQuery,
+  validateActorIdParam,
+  validateActorsGenreParam,
+  validateActorListQuery,
 };

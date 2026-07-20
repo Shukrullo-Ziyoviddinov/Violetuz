@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
-import { actors } from '../../data/actors';
+import { useActorsApi } from '../../context/ActorsApiContext';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import './RecommendedActors.css';
 
@@ -19,8 +19,9 @@ const RecommendedActors = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const lang = i18n.language === 'ru' ? 'ru' : 'uz';
+  const { allActors } = useActorsApi();
 
-  const displayActors = useMemo(() => uniqueActorsById(actors), []);
+  const displayActors = useMemo(() => uniqueActorsById(allActors), [allActors]);
 
   const actorDisplayName = (actor) => {
     const n = actor?.name?.[lang] ?? actor?.name?.uz ?? actor?.name?.ru ?? '';

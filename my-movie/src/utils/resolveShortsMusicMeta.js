@@ -1,5 +1,5 @@
 import { artists } from '../dataMusic/artists';
-import { matchId } from '../dataMusic/musicDataUtils';
+import { matchId } from './musicDataUtils';
 
 const normalizeLocalized = (value) => {
   if (!value) return { uz: '', ru: '' };

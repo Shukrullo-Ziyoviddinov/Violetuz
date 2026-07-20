@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ensureArray, matchId } from '../dataMusic/musicDataUtils';
+import { ensureArray, matchId } from '../utils/musicDataUtils';
 import { artists } from '../dataMusic/artists';
 import { useContentLanguage } from './ContentLanguageContext';
 import { useMusicApi } from './MusicApiContext';

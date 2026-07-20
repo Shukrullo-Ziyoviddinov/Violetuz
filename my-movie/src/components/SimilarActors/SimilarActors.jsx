@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { actors, actorPageSectionLabels } from '../../data/actors';
+import { useActorsApi } from '../../context/ActorsApiContext';
+import { actorPageSectionLabels } from '../../data/actorPageLabels';
 import { allMovies } from '../../data/movies';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -17,6 +18,7 @@ const SimilarActors = ({ currentActorId, actorsGenre }) => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { getActorsByGenre } = useActorsApi();
   const [modalOpen, setModalOpen] = useState(false);
 
   const videoCountByActorId = useMemo(() => {
@@ -33,11 +35,10 @@ const SimilarActors = ({ currentActorId, actorsGenre }) => {
 
   const list = useMemo(() => {
     if (actorsGenre == null || actorsGenre === '') return [];
-    const g = String(actorsGenre).toLowerCase();
-    return actors
-      .filter((a) => a.id !== currentActorId && String(a.actorsGenre || '').toLowerCase() === g)
+    return getActorsByGenre(actorsGenre)
+      .filter((a) => a.id !== currentActorId)
       .slice(0, 12);
-  }, [currentActorId, actorsGenre]);
+  }, [currentActorId, actorsGenre, getActorsByGenre]);
 
   const visible = useMemo(() => list.slice(0, SIMILAR_VISIBLE), [list]);
   const hasMore = list.length > SIMILAR_VISIBLE;

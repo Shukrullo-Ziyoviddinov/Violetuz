@@ -2,6 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useActorsApi } from '../../context/ActorsApiContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import { searchContentByQuery } from '../../utils/searchMovies';
 import './SearchModalResults.css';
@@ -10,8 +12,15 @@ const SearchModalResults = ({ query, onMovieClick }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
+  const { allActors } = useActorsApi();
+  const { allMovies } = useMoviesApi();
 
-  const { actors: actorResults, movies: movieResults } = searchContentByQuery(query, contentLang, 20);
+  const { actors: actorResults, movies: movieResults } = searchContentByQuery(
+    query,
+    contentLang,
+    20,
+    { actors: allActors, movies: allMovies }
+  );
 
   const getTitle = (m) => {
     if (m?.title && typeof m.title === 'object') {

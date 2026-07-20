@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { actors } from '../../data/actors';
+import { useActorsApi } from '../../context/ActorsApiContext';
 import { artists } from '../../dataMusic/artists';
 import { useWishlist } from '../../context/WishlistContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
@@ -50,6 +50,7 @@ const MovieDetail = () => {
   const [movieRatingValue, setMovieRatingValue] = useState(0);
   const [userLastVote, setUserLastVote] = useState(null);
   const { allMovies, loading: moviesLoading } = useMoviesApi();
+  const { allActors } = useActorsApi();
   const modalHeaderRef = React.useRef(null);
   const isDraggingRef = React.useRef(false);
   const modalStartYRef = React.useRef(0);
@@ -118,7 +119,9 @@ const MovieDetail = () => {
 
     const castItems = movie.actors.map((castId) => {
       const normalizedId = typeof castId === 'number' ? castId : parseInt(castId, 10);
-      const actor = Number.isNaN(normalizedId) ? undefined : actors.find((item) => item.id === normalizedId);
+      const actor = Number.isNaN(normalizedId)
+        ? undefined
+        : allActors.find((item) => item.id === normalizedId);
 
       if (actor) {
         return {
@@ -147,7 +150,7 @@ const MovieDetail = () => {
     }).filter(Boolean);
 
     return castItems;
-  }, [movie?.actors]);
+  }, [movie?.actors, allActors]);
 
   useEffect(() => {
     if (!movie?.seasons?.length) {

@@ -7,6 +7,7 @@ module.exports = {
   ROOT,
   DATA_DIR: path.join(ROOT, 'data'),
   MOVIES_JSON: path.join(FRONTEND_DATA, 'data', 'movie.json'),
+  ACTORS_JSON: path.join(FRONTEND_DATA, 'data', 'actors.json'),
   MUSIC_JSON: path.join(FRONTEND_DATA, 'dataMusic', 'music.json'),
   MUSIC_ALBUM_JSON: path.join(FRONTEND_DATA, 'dataMusic', 'musicAlbom.json'),
   KLIPS_JSON: path.join(FRONTEND_DATA, 'dataMusic', 'klips.json'),

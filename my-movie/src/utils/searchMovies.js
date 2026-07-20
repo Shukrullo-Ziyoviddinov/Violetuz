@@ -1,10 +1,8 @@
 /**
  * Kinolar + aktyorlar bo'yicha qidiruv (filterGenre, filterCountry, typeCategory)
  * So'zma-so'z va imlo xatolariga chidamli (fuzzy). Aktyorlar natijada doim yuqorida.
- * Backend qo'shilganda API ga almashtiriladi
  */
-import { actors } from '../data/actors';
-import { allMovies } from '../data/movies';
+import { allMovies as localMoviesFallback } from '../data/movies';
 
 const normalize = (s) => (s || '').toLowerCase().trim();
 
@@ -114,11 +112,12 @@ const actorMatchScore = (actor, q, queryWords) => {
   return 0;
 };
 
-const searchMoviesOrdered = (q, queryWords) => {
+const searchMoviesOrdered = (q, queryWords, moviesList = localMoviesFallback) => {
   const byTitle = [];
   const byMeta = [];
+  const movies = Array.isArray(moviesList) ? moviesList : localMoviesFallback;
 
-  for (const m of allMovies) {
+  for (const m of movies) {
     const score = titleMatchScore(m, q, queryWords);
     if (score > 0) byTitle.push({ movie: m, score });
     else if (metaMatchesQuery(m, queryWords)) byMeta.push(m);
@@ -134,11 +133,17 @@ const searchMoviesOrdered = (q, queryWords) => {
 /**
  * Aktyorlar birinchi, keyin kinolar. `limit` jami elementlar soni.
  */
-export const searchContentByQuery = (query, contentLang = 'uz', limit = 20) => {
+export const searchContentByQuery = (
+  query,
+  contentLang = 'uz',
+  limit = 20,
+  { actors: actorsList = [], movies: moviesList } = {}
+) => {
   const q = normalize(query);
   if (!q) return { actors: [], movies: [] };
 
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
+  const actors = Array.isArray(actorsList) ? actorsList : [];
 
   const actorScored = [];
   for (const a of actors) {
@@ -148,7 +153,7 @@ export const searchContentByQuery = (query, contentLang = 'uz', limit = 20) => {
   actorScored.sort((x, y) => y.score - x.score);
   const matchedActors = actorScored.map((x) => x.actor);
 
-  const allMoviesOrdered = searchMoviesOrdered(q, queryWords);
+  const allMoviesOrdered = searchMoviesOrdered(q, queryWords, moviesList);
 
   const actorSlice = matchedActors.slice(0, limit);
   const rest = limit - actorSlice.length;
@@ -158,9 +163,9 @@ export const searchContentByQuery = (query, contentLang = 'uz', limit = 20) => {
 };
 
 /** Faqat kinolar ro'yxati (oldingi API) */
-export const searchMoviesByQuery = (query, contentLang = 'uz', limit = 20) => {
+export const searchMoviesByQuery = (query, contentLang = 'uz', limit = 20, moviesList) => {
   const q = normalize(query);
   if (!q) return [];
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
-  return searchMoviesOrdered(q, queryWords).slice(0, limit);
+  return searchMoviesOrdered(q, queryWords, moviesList).slice(0, limit);
 };

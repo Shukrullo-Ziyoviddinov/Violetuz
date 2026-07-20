@@ -1,5 +1,5 @@
 import { allMovies } from '../data/movies';
-import { matchId } from '../dataMusic/musicDataUtils';
+import { matchId } from './musicDataUtils';
 
 /**
  * Kino shorts: movieId orqali title, homeImg, rating, specs kinodan olinadi.
