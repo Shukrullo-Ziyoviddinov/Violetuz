@@ -5,6 +5,7 @@
 export const visualBeatsData = [
   {
     id: 1001,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-1.avif',
     title: 'Die With A Smile',
@@ -19,6 +20,7 @@ export const visualBeatsData = [
   },
   {
     id: 1002,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-2.jpeg',
     title: 'The Amateur',
@@ -33,6 +35,7 @@ export const visualBeatsData = [
   },
   {
     id: 1003,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-3.jpg',
     title: 'Life',
@@ -47,6 +50,7 @@ export const visualBeatsData = [
   },
   {
     id: 1004,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-4.webp',
     title: 'Die With A Smile (Live)',
@@ -61,6 +65,7 @@ export const visualBeatsData = [
   },
   {
     id: 1005,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-5.jpg',
     title: 'The Amateur Trailer',
@@ -75,6 +80,7 @@ export const visualBeatsData = [
   },
   {
     id: 1006,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Life - Premiere',
@@ -89,6 +95,7 @@ export const visualBeatsData = [
   },
   {
     id: 1007,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Life - Premiere',
@@ -103,6 +110,7 @@ export const visualBeatsData = [
   },
   {
     id: 1008,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Life - Premiere',
@@ -117,6 +125,7 @@ export const visualBeatsData = [
   },
   {
     id: 1009,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Life - Premiere',
@@ -131,6 +140,7 @@ export const visualBeatsData = [
   },
   {
     id: 1010,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Life - Premiere',
@@ -145,6 +155,7 @@ export const visualBeatsData = [
   },
   {
     id: 1011,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-4.webp',
     title: 'Die With A Smile (Live)',
@@ -159,6 +170,7 @@ export const visualBeatsData = [
   },
   {
     id: 1012,
+    categoryNameMusic: 'visualBeatsData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-4.webp',
     title: 'Die With A Smile (Live)',

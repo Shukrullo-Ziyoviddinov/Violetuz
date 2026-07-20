@@ -5,6 +5,7 @@
 export const bassMusicData = [
   {
     id: 801,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Deep Bass',
@@ -18,6 +19,7 @@ export const bassMusicData = [
   },
   {
     id: 802,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'Subwoofer',
@@ -31,6 +33,7 @@ export const bassMusicData = [
   },
   {
     id: 803,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Bass Drop',
@@ -44,6 +47,7 @@ export const bassMusicData = [
   },
   {
     id: 804,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: 'Low Frequency',
@@ -57,6 +61,7 @@ export const bassMusicData = [
   },
   {
     id: 805,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-2.jpeg',
     title: 'Heavy Bass',
@@ -70,6 +75,7 @@ export const bassMusicData = [
   },
   {
     id: 806,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-3.jpg',
     title: 'Bassline',
@@ -83,6 +89,7 @@ export const bassMusicData = [
   },
   {
     id: 807,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'michael-jackson',
     img: '/img/movie1.jpg',
     title: 'Earthquake',
@@ -96,6 +103,7 @@ export const bassMusicData = [
   },
   {
     id: 808,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie2.jpg',
     title: 'Bass Cannon',
@@ -109,6 +117,7 @@ export const bassMusicData = [
   },
   {
     id: 809,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Sub Bass',
@@ -122,6 +131,7 @@ export const bassMusicData = [
   },
   {
     id: 810,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Bass Boost',
@@ -135,6 +145,7 @@ export const bassMusicData = [
   },
   {
     id: 811,
+    categoryNameMusic: 'bassMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'Rumble',

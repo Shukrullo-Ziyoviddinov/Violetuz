@@ -5,6 +5,7 @@
 export const discoverMusicData = [
   {
     id: 501,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Face love',
@@ -18,6 +19,7 @@ export const discoverMusicData = [
   },
   {
     id: 502,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'Summer Vibes',
@@ -31,6 +33,7 @@ export const discoverMusicData = [
   },
   {
     id: 503,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: 'Night Drive',
@@ -44,6 +47,7 @@ export const discoverMusicData = [
   },
   {
     id: 504,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Moonlight',
@@ -57,6 +61,7 @@ export const discoverMusicData = [
   },
   {
     id: 505,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Dream State',
@@ -70,6 +75,7 @@ export const discoverMusicData = [
   },
   {
     id: 506,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'City Lights',
@@ -83,6 +89,7 @@ export const discoverMusicData = [
   },
   {
     id: 507,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-2.jpeg',
     title: 'Ocean View',
@@ -96,6 +103,7 @@ export const discoverMusicData = [
   },
   {
     id: 508,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-3.jpg',
     title: 'Golden Hour',
@@ -109,6 +117,7 @@ export const discoverMusicData = [
   },
   {
     id: 509,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie2.jpg',
     title: 'Rainy Days',
@@ -122,6 +131,7 @@ export const discoverMusicData = [
   },
   {
     id: 510,
+    categoryNameMusic: 'discoverMusicData',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Starlight',

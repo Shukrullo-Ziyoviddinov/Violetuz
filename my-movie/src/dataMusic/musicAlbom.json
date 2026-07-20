@@ -1,0 +1,1185 @@
+[
+  {
+    "id": 1001,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Best of 2025",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie1.jpg",
+    "year": 2025,
+    "genre": "Pop",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Hit One",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Hit Two",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1002,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Summer Hits",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie2.jpg",
+    "year": 2024,
+    "genre": "Pop",
+    "language": "english",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Sun",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Beach",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1003,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Night Vibes",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2024,
+    "genre": "Rap",
+    "language": "english",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Midnight",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 1004,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Top Mix",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie5.jpg",
+    "year": 2023,
+    "genre": "Pop",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Mix",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Top",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1005,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Golden Era",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2023,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Golden",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1006,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Urban Sound",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie-4.5-3.jpg",
+    "year": 2024,
+    "genre": "Pop",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Urban",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Sound",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 1007,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Chart Toppers",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/jah-khalib.jpg",
+    "year": 2025,
+    "genre": "Pop",
+    "language": "english",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Chart",
+        "artist": "Jonny",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1008,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Electric Pulse",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie1.jpg",
+    "year": 2024,
+    "genre": "electronic",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Electric",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Pulse",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1009,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Rhythm Collection",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie2.jpg",
+    "year": 2023,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Rhythm",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 1010,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Ultimate Hits",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2025,
+    "genre": "Pop",
+    "language": "english",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Ultimate",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Hits",
+        "artist": "Jonny",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1011,
+    "categoryNameMusic": "hitCollectionsData",
+    "title": "Star Collection",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie5.jpg",
+    "year": 2024,
+    "genre": "Pop",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Star",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Collection",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 801,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Top Hits 2025",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie1.jpg",
+    "year": 2025,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Kometa",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Alleya",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      },
+      {
+        "id": 3,
+        "title": "Kamin",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 802,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Summer Vibes",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie2.jpg",
+    "year": 2024,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Sunset",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Ocean",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 803,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Night Dreams",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2023,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Moonlight",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Stars",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 804,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Classic Collection",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie5.jpg",
+    "year": 2022,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Melody",
+        "artist": "Artist C",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 805,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Electric Soul",
+    "artist": "michael-jackson",
+    "artistId": "michael-jackson",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2024,
+    "genre": "jazz",
+    "language": "english",
+    "country": "usa",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Soul",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Electric",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      }
+    ]
+  },
+  {
+    "id": 806,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Neon Hearts",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-3.jpg",
+    "year": 2023,
+    "genre": "Rock",
+    "language": "english",
+    "country": "kanada",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Neon",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      },
+      {
+        "id": 2,
+        "title": "Hearts",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 807,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Golden Hour",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/jah-khalib.jpg",
+    "year": 2024,
+    "genre": "jazz",
+    "language": "english",
+    "country": "usa",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Golden",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 808,
+    "categoryNameMusic": "musicDropsData",
+    "title": "City Lights",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie1.jpg",
+    "year": 2023,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "City",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Lights",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 809,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Ocean View",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie2.jpg",
+    "year": 2022,
+    "genre": "pop",
+    "language": "english",
+    "country": "kanada",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Ocean",
+        "artist": "Jonny",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 810,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Starlight",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2024,
+    "genre": "Rock",
+    "language": "english",
+    "country": "usa",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Star",
+        "artist": "Artist B",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      },
+      {
+        "id": 2,
+        "title": "Light",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      }
+    ]
+  },
+  {
+    "id": 811,
+    "categoryNameMusic": "musicDropsData",
+    "title": "Dream State",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2025,
+    "genre": "electronic",
+    "language": "english",
+    "country": "britaniya",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Dream",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "State",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 901,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Love Stories",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie1.jpg",
+    "year": 2025,
+    "genre": "Pop",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "First Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Forever Yours",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      },
+      {
+        "id": 3,
+        "title": "Heartbeat",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 902,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Romantic Nights",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie2.jpg",
+    "year": 2024,
+    "genre": "Pop",
+    "language": "english",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Moonlight",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Stargazing",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      }
+    ]
+  },
+  {
+    "id": 903,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Soul Connection",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2023,
+    "genre": "Rap",
+    "language": "english",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Soul",
+        "artist": "Jonny",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Connection",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 904,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Sweet Melodies",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie5.jpg",
+    "year": 2024,
+    "genre": "Pop",
+    "language": "english",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Sweet",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 905,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Eternal Love",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2022,
+    "genre": "Jazz",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Eternal",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 906,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Eternal Love",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2022,
+    "genre": "Jazz",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Eternal",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 907,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Eternal Love",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2022,
+    "genre": "Jazz",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Eternal",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 908,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Eternal Love",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2022,
+    "genre": "Jazz",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Eternal",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 909,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Eternal Love",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2022,
+    "genre": "Jazz",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Eternal",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 910,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Eternal Love",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2022,
+    "genre": "Jazz",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Eternal",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 911,
+    "categoryNameMusic": "sevgiVaMusiqaData",
+    "title": "Eternal Love",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie-4.5-1.avif",
+    "year": 2022,
+    "genre": "Jazz",
+    "language": "english",
+    "country": "USA",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Eternal",
+        "artist": "Artist B",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Love",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Top Hits 2025",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie1.jpg",
+    "year": 2025,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Kometa",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Alleya",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      },
+      {
+        "id": 3,
+        "title": "Kamin",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Summer Vibes",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie2.jpg",
+    "year": 2024,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Sunset",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Ocean",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Night Dreams",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2023,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Moonlight",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Stars",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Classic Collection",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie5.jpg",
+    "year": 2022,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Melody",
+        "artist": "Artist C",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Top Hits 2025",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie1.jpg",
+    "year": 2025,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Kometa",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Alleya",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      },
+      {
+        "id": 3,
+        "title": "Kamin",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Summer Vibes",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie2.jpg",
+    "year": 2024,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Sunset",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3",
+        "lyricsText": "Leyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman \n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman"
+      },
+      {
+        "id": 2,
+        "title": "Ocean",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Night Dreams",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2023,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Moonlight",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+      },
+      {
+        "id": 2,
+        "title": "Stars",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3",
+        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Classic Collection",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie5.jpg",
+    "year": 2022,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Melody",
+        "artist": "Artist C",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Top Hits 2025",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie1.jpg",
+    "year": 2025,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Kometa",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Alleya",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      },
+      {
+        "id": 3,
+        "title": "Kamin",
+        "artist": "Jonny",
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Summer Vibes",
+    "artist": "Jah Khalib",
+    "artistId": "jah-khalib",
+    "img": "/img/movie2.jpg",
+    "year": 2024,
+    "genre": "Rap",
+    "language": "russian",
+    "country": "Russia",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Sunset",
+        "artist": "Artist B",
+        "audio": "/music/Zivert - Life.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Ocean",
+        "artist": "Artist B",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Night Dreams",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie-4.5-2.jpeg",
+    "year": 2023,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Moonlight",
+        "artist": "Jonny",
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+      },
+      {
+        "id": 2,
+        "title": "Stars",
+        "artist": "Jonny",
+        "audio": "/music/Zivert - Life.mp3"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "categoryNameMusic": "TopAlbums",
+    "title": "Classic Collection",
+    "artist": "shohruhxon",
+    "artistId": "shohruhxon",
+    "img": "/img/movie5.jpg",
+    "year": 2022,
+    "genre": "Pop",
+    "language": "uzbek",
+    "country": "Uzbekistan",
+    "type": "musicAlbom",
+    "songs": [
+      {
+        "id": 1,
+        "title": "Melody",
+        "artist": "Artist C",
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+      }
+    ]
+  }
+]

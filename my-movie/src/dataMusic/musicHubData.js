@@ -5,6 +5,7 @@
 export const musicHubData = [
   {
     id: 701,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Violet Dreams',
@@ -18,6 +19,7 @@ export const musicHubData = [
   },
   {
     id: 702,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'City Soul',
@@ -31,6 +33,7 @@ export const musicHubData = [
   },
   {
     id: 703,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Midnight Groove',
@@ -44,6 +47,7 @@ export const musicHubData = [
   },
   {
     id: 704,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: 'Sunset Boulevard',
@@ -57,6 +61,7 @@ export const musicHubData = [
   },
   {
     id: 705,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-2.jpeg',
     title: 'Echo Valley',
@@ -70,6 +75,7 @@ export const musicHubData = [
   },
   {
     id: 706,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-3.jpg',
     title: 'Neon Lights',
@@ -83,6 +89,7 @@ export const musicHubData = [
   },
   {
     id: 707,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'michael-jackson',
     img: '/img/movie1.jpg',
     title: 'Smooth Operator',
@@ -96,6 +103,7 @@ export const musicHubData = [
   },
   {
     id: 708,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'shohruhxon',
     img: '/img/movie2.jpg',
     title: 'River Flow',
@@ -109,6 +117,7 @@ export const musicHubData = [
   },
   {
     id: 709,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Sky High',
@@ -122,6 +131,7 @@ export const musicHubData = [
   },
   {
     id: 710,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Thunder Storm',
@@ -135,6 +145,7 @@ export const musicHubData = [
   },
   {
     id: 711,
+    categoryNameMusic: 'musicHubData ',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'Desert Wind',

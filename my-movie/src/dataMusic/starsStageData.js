@@ -5,6 +5,7 @@
 export const starsStageData = [
   {
     id: 1601,
+    categoryNameMusic: 'starsStageData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Die With A Smile',
@@ -19,6 +20,7 @@ export const starsStageData = [
   },
   {
     id: 1602,
+    categoryNameMusic: 'starsStageData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-2.jpeg',
     title: 'Stars Stage Performance',
@@ -33,6 +35,7 @@ export const starsStageData = [
   },
   {
     id: 1603,
+    categoryNameMusic: 'starsStageData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-3.jpg',
     title: 'Life on Stage',
@@ -47,6 +50,7 @@ export const starsStageData = [
   },
   {
     id: 1604,
+    categoryNameMusic: 'starsStageData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-4.webp',
     title: 'Stars Concert',
@@ -61,6 +65,7 @@ export const starsStageData = [
   },
   {
     id: 1605,
+    categoryNameMusic: 'starsStageData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-5.jpg',
     title: 'Stars Stage Special',
@@ -75,6 +80,7 @@ export const starsStageData = [
   },
   {
     id: 1606,
+    categoryNameMusic: 'starsStageData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Premiere Stars',
@@ -89,6 +95,7 @@ export const starsStageData = [
   },
   {
     id: 1607,
+    categoryNameMusic: 'starsStageData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-7.jpg',
     title: 'Official Stars Stage',
@@ -103,6 +110,7 @@ export const starsStageData = [
   },
   {
     id: 1608,
+    categoryNameMusic: 'starsStageData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-8.jpg',
     title: 'Concert Stars',
@@ -117,6 +125,7 @@ export const starsStageData = [
   },
   {
     id: 1609,
+    categoryNameMusic: 'starsStageData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-9.jpg',
     title: 'Stars Live',
@@ -131,6 +140,7 @@ export const starsStageData = [
   },
   {
     id: 1610,
+    categoryNameMusic: 'starsStageData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-10.jpg',
     title: 'Stars Stage Live',

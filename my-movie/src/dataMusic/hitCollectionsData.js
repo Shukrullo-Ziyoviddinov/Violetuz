@@ -5,6 +5,7 @@
 export const hitCollectionsData = [
   {
     id: 1001,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Best of 2025",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -21,6 +22,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1002,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Summer Hits",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -37,6 +39,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1003,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Night Vibes",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -52,6 +55,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1004,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Top Mix",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -68,6 +72,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1005,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Golden Era",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -83,6 +88,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1006,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Urban Sound",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -99,6 +105,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1007,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Chart Toppers",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -114,6 +121,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1008,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Electric Pulse",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -130,6 +138,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1009,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Rhythm Collection",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -145,6 +154,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1010,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Ultimate Hits",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -161,6 +171,7 @@ export const hitCollectionsData = [
   },
   {
     id: 1011,
+    categoryNameMusic: 'hitCollectionsData',
     title: "Star Collection",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',

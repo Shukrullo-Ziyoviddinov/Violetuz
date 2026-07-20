@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { bannerImages } from '../../data/banners';
-import { allMovies } from '../../data/movies';
 import { normalizeImagePath } from '../../utils/utils';
 import './Banner.css';
 
 const Banner = () => {
     const navigate = useNavigate();
     const { contentLang } = useContentLanguage();
+    const { allMovies } = useMoviesApi();
     const currentBanners = bannerImages[contentLang] || bannerImages.uz || bannerImages.ru || [];
 
     const images = useMemo(() => {

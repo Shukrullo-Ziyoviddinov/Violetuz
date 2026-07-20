@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { allMovies } from '../../data/movies';
 import { actors } from '../../data/actors';
 import { artists } from '../../dataMusic/artists';
 import { useWishlist } from '../../context/WishlistContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import WatchModal from './WatchModal';
 import MovieComments from './MovieComments';
 import SimilarMovies from './SimilarMovies';
@@ -49,6 +49,7 @@ const MovieDetail = () => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [movieRatingValue, setMovieRatingValue] = useState(0);
   const [userLastVote, setUserLastVote] = useState(null);
+  const { allMovies, loading: moviesLoading } = useMoviesApi();
   const modalHeaderRef = React.useRef(null);
   const isDraggingRef = React.useRef(false);
   const modalStartYRef = React.useRef(0);
@@ -290,6 +291,13 @@ const MovieDetail = () => {
   }, [showDescriptionModal]);
 
   if (!movie) {
+    if (moviesLoading) {
+      return (
+        <div className="movie-detail-error">
+          <h2>Loading...</h2>
+        </div>
+      );
+    }
     return (
       <div className="movie-detail-error">
         <h2>Movie not found</h2>

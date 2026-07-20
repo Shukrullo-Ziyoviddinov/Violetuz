@@ -5,6 +5,7 @@
 export const musicDropsData = [
   {
     id: 801,
+    categoryNameMusic: 'musicDropsData',
     title: "Top Hits 2025",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -37,6 +38,7 @@ export const musicDropsData = [
   },
   {
     id: 802,
+    categoryNameMusic: 'musicDropsData',
     title: "Summer Vibes",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -63,6 +65,7 @@ export const musicDropsData = [
   },
   {
     id: 803,
+    categoryNameMusic: 'musicDropsData',
     title: "Night Dreams",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -89,6 +92,7 @@ export const musicDropsData = [
   },
   {
     id: 804,
+    categoryNameMusic: 'musicDropsData',
     title: "Classic Collection",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -109,6 +113,7 @@ export const musicDropsData = [
   },
   {
     id: 805,
+    categoryNameMusic: 'musicDropsData',
     title: "Electric Soul",
     artist: "michael-jackson",
     artistId: 'michael-jackson',
@@ -135,6 +140,7 @@ export const musicDropsData = [
   },
   {
     id: 806,
+    categoryNameMusic: 'musicDropsData',
     title: "Neon Hearts",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -161,6 +167,7 @@ export const musicDropsData = [
   },
   {
     id: 807,
+    categoryNameMusic: 'musicDropsData',
     title: "Golden Hour",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -181,6 +188,7 @@ export const musicDropsData = [
   },
   {
     id: 808,
+    categoryNameMusic: 'musicDropsData',
     title: "City Lights",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -207,6 +215,7 @@ export const musicDropsData = [
   },
   {
     id: 809,
+    categoryNameMusic: 'musicDropsData',
     title: "Ocean View",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -227,6 +236,7 @@ export const musicDropsData = [
   },
   {
     id: 810,
+    categoryNameMusic: 'musicDropsData',
     title: "Starlight",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -253,6 +263,7 @@ export const musicDropsData = [
   },
   {
     id: 811,
+    categoryNameMusic: 'musicDropsData',
     title: "Dream State",
     artist: "shohruhxon",
     artistId: 'shohruhxon',

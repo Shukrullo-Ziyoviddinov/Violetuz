@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useSearchParams } from 'react-router-dom';
-import { allMovies, recommendedMovies } from '../data/movies';
 import { genres as genresConfig } from '../data/genres';
 import { getTopRatedMovies } from '../components/TopRatedContent/TopRatedContent';
 import { useLoading } from '../context/LoadingContext';
+import { useMoviesApi } from '../context/MoviesApiContext';
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
 import './RecommendedPage.css';
@@ -84,6 +84,7 @@ const RecommendedPage = () => {
     return [g];
   };
   const { recommendedLoading, setLoading } = useLoading();
+  const { allMovies } = useMoviesApi();
   const [selectedRatingType, setSelectedRatingType] = useState('rating');
   const [selectedRating, setSelectedRating] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
@@ -115,14 +116,16 @@ const RecommendedPage = () => {
     : useAllMoviesForGenre
     ? allMovies
     : location.pathname === '/recommended'
-    ? recommendedMovies
+    ? allMovies.filter((movie) => movie.categoryName === 'movies')
     : categoryId === 'topRated'
       ? getTopRatedMovies(allMovies)
       : isGenreCategory
         ? filterMoviesByGenreCategory(allMovies, categoryId)
         : categoryId
           ? allMovies.filter(movie =>
-              movie.typeCategory?.includes(categoryId) || movie.category === categoryId
+              movie.typeCategory?.includes(categoryId) ||
+              movie.category === categoryId ||
+              movie.categoryName === categoryId
             )
           : allMovies;
 

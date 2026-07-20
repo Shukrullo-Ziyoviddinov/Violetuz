@@ -1,6 +1,7 @@
 export const trendMusicData = [
   {
     id: 101,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/TheWeeknd_Banner_Mobile.webp',
     title: "Life",
@@ -14,6 +15,7 @@ export const trendMusicData = [
   },
   {
     id: 103,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: "Wrong",
@@ -27,6 +29,7 @@ export const trendMusicData = [
   },
   {
     id: 104,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Sariq devona",
@@ -40,6 +43,7 @@ export const trendMusicData = [
   },
   {
     id: 105,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-2.jpeg',
     title: "Monkeys",
@@ -53,6 +57,7 @@ export const trendMusicData = [
   },
   {
     id: 106,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie5.jpg',
     title: "Red wonder",
@@ -66,6 +71,7 @@ export const trendMusicData = [
   },
   {
     id: 107,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Under loves",
@@ -79,6 +85,7 @@ export const trendMusicData = [
   },
   {
     id: 108,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -92,6 +99,7 @@ export const trendMusicData = [
   },
   {
     id: 109,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -105,6 +113,7 @@ export const trendMusicData = [
   },
   {
     id: 1010,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -118,6 +127,7 @@ export const trendMusicData = [
   },
   {
     id: 1011,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -131,6 +141,7 @@ export const trendMusicData = [
   },
   {
     id: 1012,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -144,6 +155,7 @@ export const trendMusicData = [
   },
   {
     id: 1013,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -157,6 +169,7 @@ export const trendMusicData = [
   },
   {
     id: 1014,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -170,6 +183,7 @@ export const trendMusicData = [
   },
   {
     id: 1015,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -183,6 +197,7 @@ export const trendMusicData = [
   },
   {
     id: 1016,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -196,6 +211,7 @@ export const trendMusicData = [
   },
   {
     id: 1017,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",
@@ -209,6 +225,7 @@ export const trendMusicData = [
   },
   {
     id: 1018,
+    categoryNameMusic: 'trendMusicData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: "Face love",

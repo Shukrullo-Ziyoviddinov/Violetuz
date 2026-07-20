@@ -5,6 +5,7 @@
 export const liveStagesData = [
   {
     id: 1501,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Die With A Smile',
@@ -19,6 +20,7 @@ export const liveStagesData = [
   },
   {
     id: 1502,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-2.jpeg',
     title: 'Live Performance',
@@ -33,6 +35,7 @@ export const liveStagesData = [
   },
   {
     id: 1503,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-3.jpg',
     title: 'Life',
@@ -47,6 +50,7 @@ export const liveStagesData = [
   },
   {
     id: 1504,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-4.webp',
     title: 'Concert Highlights',
@@ -61,6 +65,7 @@ export const liveStagesData = [
   },
   {
     id: 1505,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-5.jpg',
     title: 'Live At Stadium',
@@ -75,6 +80,7 @@ export const liveStagesData = [
   },
   {
     id: 1506,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Premiere Live',
@@ -89,6 +95,7 @@ export const liveStagesData = [
   },
   {
     id: 1507,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-7.jpg',
     title: 'Official Live',
@@ -103,6 +110,7 @@ export const liveStagesData = [
   },
   {
     id: 1508,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-8.jpg',
     title: 'Concert Special',
@@ -117,6 +125,7 @@ export const liveStagesData = [
   },
   {
     id: 1509,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-9.jpg',
     title: 'Zivert Live',
@@ -131,6 +140,7 @@ export const liveStagesData = [
   },
   {
     id: 1510,
+    categoryNameMusic: 'liveStagesData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-10.jpg',
     title: 'Music Video Live',

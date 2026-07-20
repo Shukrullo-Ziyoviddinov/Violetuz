@@ -5,6 +5,7 @@
 export const jaxonConcertsData = [
   {
     id: 401,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Die With A Smile',
@@ -19,6 +20,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 402,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-2.jpeg',
     title: 'The Amateur',
@@ -33,6 +35,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 403,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-3.jpg',
     title: 'Life',
@@ -47,6 +50,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 404,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-4.webp',
     title: 'Die With A Smile (Live)',
@@ -61,6 +65,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 405,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-5.jpg',
     title: 'The Amateur Trailer',
@@ -75,6 +80,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 406,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-6.avif',
     title: 'Life - Premiere',
@@ -89,6 +95,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 407,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-7.jpg',
     title: 'Die With A Smile - Official',
@@ -103,6 +110,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 408,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-8.jpg',
     title: 'The Amateur - Official Trailer',
@@ -117,6 +125,7 @@ export const jaxonConcertsData = [
   },
   {
     id: 409,
+    categoryNameMusic: 'jaxonConcertsData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-9.jpg',
     title: 'Life - Zivert',

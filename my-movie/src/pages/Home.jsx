@@ -8,17 +8,18 @@ import Categories from '../components/Categories';
 import Movies from '../components/Movies/Movies';
 import TopRatedContent from '../components/TopRatedContent/TopRatedContent';
 import RecommendedActors from '../components/RecommendedActors/RecommendedActors';
-import { HOME_CONTENT, MOVIE_SECTIONS_BY_ID } from '../data/moviesSectionsConfig';
+import { useMoviesApi } from '../context/MoviesApiContext';
 import './Home.css';
 
 const Home = () => {
   const { t } = useTranslation();
+  const { getMoviesByCategory, getSectionById, homeContent } = useMoviesApi();
 
   return (
     <div className="home">
       <Banner />
       <Categories />
-      {HOME_CONTENT.map((block, idx) => {
+      {homeContent.map((block, idx) => {
         if (block.type === 'shorts') {
           return (
             <HomeShorts
@@ -43,15 +44,16 @@ const Home = () => {
         if (block.type === 'recommendedActors') {
           return <RecommendedActors key="recommendedActors" />;
         }
-        const section = MOVIE_SECTIONS_BY_ID[block.sectionId];
+        const section = getSectionById(block.sectionId);
         if (!section) return null;
         const {
           id: sectionType,
-          data: filteredMovies,
+          categoryName,
           titleKey,
           moreTo,
           showHorizontalScroll,
         } = section;
+        const filteredMovies = getMoviesByCategory(categoryName);
         return (
           <Movies
             key={sectionType}

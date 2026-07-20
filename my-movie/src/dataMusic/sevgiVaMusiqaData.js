@@ -5,6 +5,7 @@
 export const sevgiVaMusiqaData = [
   {
     id: 901,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Love Stories",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -37,6 +38,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 902,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Romantic Nights",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -63,6 +65,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 903,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Soul Connection",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -89,6 +92,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 904,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Sweet Melodies",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -109,6 +113,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 905,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Eternal Love",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -135,6 +140,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 906,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Eternal Love",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -161,6 +167,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 907,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Eternal Love",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -187,6 +194,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 908,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Eternal Love",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -213,6 +221,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 909,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Eternal Love",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -239,6 +248,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 910,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Eternal Love",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -265,6 +275,7 @@ export const sevgiVaMusiqaData = [
   },
   {
     id: 911,
+    categoryNameMusic: 'sevgiVaMusiqaData',
     title: "Eternal Love",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',

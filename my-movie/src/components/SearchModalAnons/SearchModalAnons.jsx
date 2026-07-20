@@ -3,14 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton from '../ShowMoreButton/ShowMoreButton';
-import { anonslar } from '../../data/anonslar';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import './SearchModalAnons.css';
 
 const SearchModalAnons = ({ onAnonsClick }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
+  const { getMoviesByCategory } = useMoviesApi();
+  const anonslar = getMoviesByCategory('anonslar');
 
   const getTitle = (item) => {
     if (item.title && typeof item.title === 'object') {

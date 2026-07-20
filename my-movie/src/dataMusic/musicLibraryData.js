@@ -5,6 +5,7 @@
 export const musicLibraryData = [
   {
     id: 601,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Silent Night',
@@ -18,6 +19,7 @@ export const musicLibraryData = [
   },
   {
     id: 602,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'Old Town Road',
@@ -31,6 +33,7 @@ export const musicLibraryData = [
   },
   {
     id: 603,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Dancing Stars',
@@ -44,6 +47,7 @@ export const musicLibraryData = [
   },
   {
     id: 604,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'jah-khalib',
     img: '/img/movie2.jpg',
     title: 'Blue Skies',
@@ -57,6 +61,7 @@ export const musicLibraryData = [
   },
   {
     id: 605,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'shohruhxon',
     img: '/img/movie1.jpg',
     title: 'Winter Dreams',
@@ -70,6 +75,7 @@ export const musicLibraryData = [
   },
   {
     id: 606,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'jah-khalib',
     img: '/img/jah-khalib.jpg',
     title: 'Sunset Boulevard',
@@ -83,6 +89,7 @@ export const musicLibraryData = [
   },
   {
     id: 607,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-2.jpeg',
     title: 'Electric Soul',
@@ -96,6 +103,7 @@ export const musicLibraryData = [
   },
   {
     id: 608,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'shohruhxon',
     img: '/img/movie2.jpg',
     title: 'Morning Light',
@@ -109,6 +117,7 @@ export const musicLibraryData = [
   },
   {
     id: 609,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-3.jpg',
     title: 'Neon Hearts',
@@ -122,6 +131,7 @@ export const musicLibraryData = [
   },
   {
     id: 610,
+    categoryNameMusic: 'musicLibraryData',
     artistId: 'michael-jackson',
     img: '/img/movie-4.5-1.avif',
     title: 'Paradise Lost',

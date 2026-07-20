@@ -5,6 +5,7 @@
 export const trendClipsData = [
   {
     id: 301,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-1.avif',
     title: 'Die With A Smile',
@@ -19,6 +20,7 @@ export const trendClipsData = [
   },
   {
     id: 302,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-2.jpeg',
     title: 'The Amateur',
@@ -33,6 +35,7 @@ export const trendClipsData = [
   },
   {
     id: 303,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-3.jpg',
     title: 'Life',
@@ -47,6 +50,7 @@ export const trendClipsData = [
   },
   {
     id: 304,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-4.webp',
     title: 'Die With A Smile (Live)',
@@ -61,6 +65,7 @@ export const trendClipsData = [
   },
   {
     id: 305,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-5.jpg',
     title: 'The Amateur Trailer',
@@ -75,6 +80,7 @@ export const trendClipsData = [
   },
   {
     id: 306,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-6.avif',
     title: 'Life - Premiere',
@@ -89,6 +95,7 @@ export const trendClipsData = [
   },
   {
     id: 307,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-7.jpg',
     title: 'Die With A Smile - Official',
@@ -103,6 +110,7 @@ export const trendClipsData = [
   },
   {
     id: 308,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'shohruhxon',
     img: '/img/movie-4.5-8.jpg',
     title: 'The Amateur - Official Trailer',
@@ -117,6 +125,7 @@ export const trendClipsData = [
   },
   {
     id: 309,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-9.jpg',
     title: 'Life - Zivert',
@@ -131,6 +140,7 @@ export const trendClipsData = [
   },
   {
     id: 310,
+    categoryNameMusic: 'trendClipsData',
     artistId: 'jah-khalib',
     img: '/img/movie-4.5-10.jpg',
     title: 'Die With A Smile - Music Video',

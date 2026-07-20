@@ -6,6 +6,7 @@
 export const TopAlbums = [
   {
     id: 1,
+    categoryNameMusic: 'TopAlbums',
     title: "Top Hits 2025",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -38,6 +39,7 @@ export const TopAlbums = [
   },
   {
     id: 2,
+    categoryNameMusic: 'TopAlbums',
     title: "Summer Vibes",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -64,6 +66,7 @@ export const TopAlbums = [
   },
   {
     id: 3,
+    categoryNameMusic: 'TopAlbums',
     title: "Night Dreams",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -90,6 +93,7 @@ export const TopAlbums = [
   },
   {
     id: 4,
+    categoryNameMusic: 'TopAlbums',
     title: "Classic Collection",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -108,10 +112,9 @@ export const TopAlbums = [
       },
     ],
   },
-  
-
   {
     id: 5,
+    categoryNameMusic: 'TopAlbums',
     title: "Top Hits 2025",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -144,6 +147,7 @@ export const TopAlbums = [
   },
   {
     id: 6,
+    categoryNameMusic: 'TopAlbums',
     title: "Summer Vibes",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -172,6 +176,7 @@ export const TopAlbums = [
   },
   {
     id: 7,
+    categoryNameMusic: 'TopAlbums',
     title: "Night Dreams",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -200,6 +205,7 @@ export const TopAlbums = [
   },
   {
     id: 8,
+    categoryNameMusic: 'TopAlbums',
     title: "Classic Collection",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -221,6 +227,7 @@ export const TopAlbums = [
 
   {
     id: 9,
+    categoryNameMusic: 'TopAlbums',
     title: "Top Hits 2025",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -253,6 +260,7 @@ export const TopAlbums = [
   },
   {
     id: 10,
+    categoryNameMusic: 'TopAlbums',
     title: "Summer Vibes",
     artist: "Jah Khalib",
     artistId: 'jah-khalib',
@@ -279,6 +287,7 @@ export const TopAlbums = [
   },
   {
     id: 11,
+    categoryNameMusic: 'TopAlbums',
     title: "Night Dreams",
     artist: "shohruhxon",
     artistId: 'shohruhxon',
@@ -305,6 +314,7 @@ export const TopAlbums = [
   },
   {
     id: 12,
+    categoryNameMusic: 'TopAlbums',
     title: "Classic Collection",
     artist: "shohruhxon",
     artistId: 'shohruhxon',

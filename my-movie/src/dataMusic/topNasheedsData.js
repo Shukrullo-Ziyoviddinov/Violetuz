@@ -5,6 +5,7 @@
 export const topNasheedsData = [
   {
     id: 901,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'maher-zain',
     img: '/img/nasheedsimg1.jpg',
     title: 'Bismillah',
@@ -18,6 +19,7 @@ export const topNasheedsData = [
   },
   {
     id: 902,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'sami-yusuf',
     img: '/img/nasheedsimg2.jpg',
     title: 'Al-Quran Al-Kareem',
@@ -31,6 +33,7 @@ export const topNasheedsData = [
   },
   {
     id: 903,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'maher-zain',
     img: '/img/nasheedsimg3.jpg',
     title: 'نشيد',
@@ -44,6 +47,7 @@ export const topNasheedsData = [
   },
   {
     id: 904,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'sami-yusuf',
     img: '/img/nasheedsimg4.jpg',
     title: 'Oydin tun',
@@ -57,6 +61,7 @@ export const topNasheedsData = [
   },
   {
     id: 905,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'maher-zain',
     img: '/img/nasheedsimg5.jpg',
     title: "Cho'l va oy",
@@ -70,6 +75,7 @@ export const topNasheedsData = [
   },
   {
     id: 906,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'sami-yusuf',
     img: '/img/nasheedsimg6.jpg',
     title: 'Masjid va fonus',
@@ -83,6 +89,7 @@ export const topNasheedsData = [
   },
   {
     id: 907,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'maher-zain',
     img: '/img/nasheedsimg7.jpg',
     title: 'Eid Mubarak',
@@ -96,6 +103,7 @@ export const topNasheedsData = [
   },
   {
     id: 908,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'sami-yusuf',
     img: '/img/nasheedsimg8.jpg',
     title: "Qur'on va suv",
@@ -109,6 +117,7 @@ export const topNasheedsData = [
   },
   {
     id: 909,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'maher-zain',
     img: '/img/nasheedsimg9.jpg',
     title: 'Dua qollari',
@@ -122,6 +131,7 @@ export const topNasheedsData = [
   },
   {
     id: 910,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'sami-yusuf',
     img: '/img/nasheedsimg10.jpg',
     title: 'Bismillah va masjid',
@@ -135,6 +145,7 @@ export const topNasheedsData = [
   },
   {
     id: 911,
+    categoryNameMusic: 'topNasheedsData',
     artistId: 'maher-zain',
     img: '/img/nasheedsimg11.jpg',
     title: 'Ummat birdamligi',

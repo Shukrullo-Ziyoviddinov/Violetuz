@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { recommendedMovies, allMovies } from '../../data/movies';
 import { useWishlist } from '../../context/WishlistContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton, { getDisplayItems, shouldShowMore, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import './Movies.css';
@@ -13,12 +13,10 @@ const Movies = ({ sectionType = 'recommended', limit = DEFAULT_LIMIT, filteredMo
   const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
   const isLoading = isLoadingProp ?? false;
 
-  let allMoviesData = filteredMovies || allMovies;
-  if (sectionType === 'recommended' && !filteredMovies) {
-    allMoviesData = recommendedMovies;
-  }
+  const allMoviesData = filteredMovies || allMovies;
 
   const shouldShowLimit = limit != null;
   const displayMovies = getDisplayItems(allMoviesData, shouldShowLimit ? limit : null);

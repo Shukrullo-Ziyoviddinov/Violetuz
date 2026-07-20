@@ -2,6 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navbar from './components/Navbar/Navbar';
 import NavbarMobile from './components/Navbar/NavbarMobile';
 import Home from './pages/Home';
@@ -27,8 +28,11 @@ import { ViewedMoviesProvider } from './context/ViewedMoviesContext';
 import { ContentLanguageProvider } from './context/ContentLanguageContext';
 import { MusicPlayerProvider } from './context/MusicPlayerContext';
 import { LoadingProvider } from './context/LoadingContext';
+import { MoviesApiProvider } from './context/MoviesApiContext';
 import { store, persistor } from './store/store';
 import './App.css';
+
+const queryClient = new QueryClient();
 
 function MusicDetailWithKey() {
   return <MusicDetail />;
@@ -37,49 +41,53 @@ function MusicDetailWithKey() {
 function App() {
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ViewedMoviesProvider>
-            <Router>
-              <ContentLanguageProvider>
-                <MusicPlayerProvider>
-                  <LoadingProvider>
-                    <PullToRefresh>
-                      <div className="App">
-                        <Navbar />
-                        <main className="App-main">
-                          <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/feed" element={<FeedPage />} />
-                            <Route path="/category/:categoryId" element={<RecommendedPage />} />
-                            <Route path="/similar-movies/:movieId" element={<RecommendedPage />} />
-                            <Route path="/movie/:id" element={<MovieDetail />} />
-                            <Route path="/movie/:id/trailer" element={<TrailerPage />} />
-                            <Route path="/recommended" element={<RecommendedPage />} />
-                            <Route path="/wishlist" element={<WishlistPage />} />
-                            <Route path="/profile" element={<ProfilePage />} />
-                            <Route path="/shorts" element={<ShortsPage />} />
-                            <Route path="/music" element={<MusicPage />} />
-                            <Route path="/music/shorts" element={<MusicShortsPage />} />
-                            <Route path="/music/more" element={<MusicMorePage />} />
-                            <Route path="/music/more/:section" element={<MusicMorePage />} />
-                            <Route path="/music/artist/:id" element={<ArtistDetail />} />
-                            <Route path="/music/album/:id" element={<MusicAlbumDetail />} />
-                            <Route path="/music/video/:id" element={<VideoPage />} />
-                            <Route path="/music/:id" element={<MusicDetailWithKey />} />
-                            <Route path="/actor/:id" element={<ActorsPage />} />
-                            <Route path="/like-history" element={<LikeHistoryPage />} />
-                            <Route path="/rating-page" element={<RatingPage />} />
-                          </Routes>
-                        </main>
-                        <NavbarMobile />
-                      </div>
-                    </PullToRefresh>
-                  </LoadingProvider>
-                </MusicPlayerProvider>
-              </ContentLanguageProvider>
-            </Router>
+      <QueryClientProvider client={queryClient}>
+        <PersistGate loading={null} persistor={persistor}>
+          <ViewedMoviesProvider>
+            <MoviesApiProvider>
+              <Router>
+                <ContentLanguageProvider>
+                  <MusicPlayerProvider>
+                    <LoadingProvider>
+                      <PullToRefresh>
+                        <div className="App">
+                          <Navbar />
+                          <main className="App-main">
+                            <Routes>
+                              <Route path="/" element={<Home />} />
+                              <Route path="/feed" element={<FeedPage />} />
+                              <Route path="/category/:categoryId" element={<RecommendedPage />} />
+                              <Route path="/similar-movies/:movieId" element={<RecommendedPage />} />
+                              <Route path="/movie/:id" element={<MovieDetail />} />
+                              <Route path="/movie/:id/trailer" element={<TrailerPage />} />
+                              <Route path="/recommended" element={<RecommendedPage />} />
+                              <Route path="/wishlist" element={<WishlistPage />} />
+                              <Route path="/profile" element={<ProfilePage />} />
+                              <Route path="/shorts" element={<ShortsPage />} />
+                              <Route path="/music" element={<MusicPage />} />
+                              <Route path="/music/shorts" element={<MusicShortsPage />} />
+                              <Route path="/music/more" element={<MusicMorePage />} />
+                              <Route path="/music/more/:section" element={<MusicMorePage />} />
+                              <Route path="/music/artist/:id" element={<ArtistDetail />} />
+                              <Route path="/music/album/:id" element={<MusicAlbumDetail />} />
+                              <Route path="/music/video/:id" element={<VideoPage />} />
+                              <Route path="/music/:id" element={<MusicDetailWithKey />} />
+                              <Route path="/actor/:id" element={<ActorsPage />} />
+                              <Route path="/like-history" element={<LikeHistoryPage />} />
+                              <Route path="/rating-page" element={<RatingPage />} />
+                            </Routes>
+                          </main>
+                          <NavbarMobile />
+                        </div>
+                      </PullToRefresh>
+                    </LoadingProvider>
+                  </MusicPlayerProvider>
+                </ContentLanguageProvider>
+              </Router>
+            </MoviesApiProvider>
           </ViewedMoviesProvider>
-      </PersistGate>
+        </PersistGate>
+      </QueryClientProvider>
     </Provider>
   );
 }

@@ -1,0 +1,17 @@
+[
+  { "id": "recommended", "slug": "recommended", "categoryName": "movies", "titleKey": "movies.recommended", "moreTo": "/recommended", "showHorizontalScroll": true },
+  { "id": "koreaDrama", "slug": "korea-drama", "categoryName": "koreaDrama", "titleKey": "movies.koreaDrama", "moreTo": "/category/koreaDrama", "showHorizontalScroll": true },
+  { "id": "kinolar", "slug": "kinolar", "categoryName": "kinolar", "titleKey": "movies.kinolar", "moreTo": "/category/kinolar", "showHorizontalScroll": true },
+  { "id": "worldMovies", "slug": "world-movies", "categoryName": "worldMovies", "titleKey": "movies.worldMovies", "moreTo": "/category/worldMovies", "showHorizontalScroll": true },
+  { "id": "animations", "slug": "animations", "categoryName": "animations", "titleKey": "movies.animations", "moreTo": "/category/animations", "showHorizontalScroll": true },
+  { "id": "turkishSeries", "slug": "turkish-series", "categoryName": "turkishSeries", "titleKey": "movies.turkishSeries", "moreTo": "/category/turkishSeries", "showHorizontalScroll": true },
+  { "id": "russianMovies", "slug": "russian-movies", "categoryName": "russianMovies", "titleKey": "movies.russianMovies", "moreTo": "/category/russianMovies", "showHorizontalScroll": true },
+  { "id": "tvSeries", "slug": "tv-series", "categoryName": "tvSeries", "titleKey": "movies.tvSeries", "moreTo": "/category/tvSeries", "showHorizontalScroll": true },
+  { "id": "actionMovies", "slug": "action-movies", "categoryName": "actionMovies", "titleKey": "movies.actionMovies", "moreTo": "/category/actionMovies", "showHorizontalScroll": true },
+  { "id": "horrorMovies", "slug": "horror-movies", "categoryName": "horrorMovies", "titleKey": "movies.horrorMovies", "moreTo": "/category/horrorMovies", "showHorizontalScroll": true },
+  { "id": "anime", "slug": "anime", "categoryName": "anime", "titleKey": "movies.anime", "moreTo": "/category/anime", "showHorizontalScroll": true },
+  { "id": "adventureMovies", "slug": "adventure-movies", "categoryName": "adventureMovies", "titleKey": "movies.adventureMovies", "moreTo": "/category/adventureMovies", "showHorizontalScroll": true },
+  { "id": "romanceMovies", "slug": "romance-movies", "categoryName": "romanceMovies", "titleKey": "movies.romanceMovies", "moreTo": "/category/romanceMovies", "showHorizontalScroll": true },
+  { "id": "retroMovies", "slug": "retro-movies", "categoryName": "retroMovies", "titleKey": "movies.retroMovies", "moreTo": "/category/retroMovies", "showHorizontalScroll": true },
+  { "id": "uzbekMovies", "slug": "uzbek-movies", "categoryName": "uzbekMovies", "titleKey": "movies.uzbekMovies", "moreTo": "/category/uzbekMovies", "showHorizontalScroll": true }
+]
