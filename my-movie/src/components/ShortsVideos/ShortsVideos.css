@@ -763,7 +763,7 @@
 }
 
 .shorts-modal-description-row .shorts-modal-description {
-  width: 87%;
+  width: 84%;
 }
 
 .shorts-modal-info-expanded .shorts-modal-description-row {
@@ -1306,7 +1306,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   z-index: 10;
 }
 
