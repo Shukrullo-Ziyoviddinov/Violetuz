@@ -142,6 +142,102 @@ const validateAlbumListQuery = (req, _res, next) => {
   next();
 };
 
+const validateClipIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid clip id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateClipListQuery = (req, _res, next) => {
+  const { categoryNameMusic, artistId, type, search } = req.query;
+
+  if (categoryNameMusic != null && !String(categoryNameMusic).trim()) {
+    return next(badRequest('categoryNameMusic query cannot be empty.'));
+  }
+
+  if (artistId != null && !String(artistId).trim()) {
+    return next(badRequest('artistId query cannot be empty.'));
+  }
+
+  if (type != null && !String(type).trim()) {
+    return next(badRequest('type query cannot be empty.'));
+  }
+
+  if (search != null && !String(search).trim()) {
+    return next(badRequest('search query cannot be empty.'));
+  }
+
+  if (categoryNameMusic != null) {
+    req.query.categoryNameMusic = String(categoryNameMusic).trim();
+  }
+
+  if (artistId != null) {
+    req.query.artistId = String(artistId).trim();
+  }
+
+  if (type != null) {
+    req.query.type = String(type).trim();
+  }
+
+  if (search != null) {
+    req.query.search = String(search).trim();
+  }
+
+  next();
+};
+
+const validateConcertIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid concert id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateConcertListQuery = (req, _res, next) => {
+  const { categoryNameMusic, artistId, type, search } = req.query;
+
+  if (categoryNameMusic != null && !String(categoryNameMusic).trim()) {
+    return next(badRequest('categoryNameMusic query cannot be empty.'));
+  }
+
+  if (artistId != null && !String(artistId).trim()) {
+    return next(badRequest('artistId query cannot be empty.'));
+  }
+
+  if (type != null && !String(type).trim()) {
+    return next(badRequest('type query cannot be empty.'));
+  }
+
+  if (search != null && !String(search).trim()) {
+    return next(badRequest('search query cannot be empty.'));
+  }
+
+  if (categoryNameMusic != null) {
+    req.query.categoryNameMusic = String(categoryNameMusic).trim();
+  }
+
+  if (artistId != null) {
+    req.query.artistId = String(artistId).trim();
+  }
+
+  if (type != null) {
+    req.query.type = String(type).trim();
+  }
+
+  if (search != null) {
+    req.query.search = String(search).trim();
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -152,4 +248,8 @@ module.exports = {
   validateMusicListQuery,
   validateAlbumIdParam,
   validateAlbumListQuery,
+  validateClipIdParam,
+  validateClipListQuery,
+  validateConcertIdParam,
+  validateConcertListQuery,
 };

@@ -11,7 +11,6 @@ import { getFeedHeaderFollowedPeople } from '../store/slices/followingUtils';
 import { actors } from '../data/actors';
 import { artists } from '../dataMusic/artists';
 import { allMovies } from '../data/movies';
-import { CLIPS_SECTIONS } from '../dataMusic/clipsSectionsConfig';
 import { useMusicApi } from '../context/MusicApiContext';
 import './feedPage.css';
 
@@ -41,7 +40,7 @@ const FeedPage = () => {
   const followingIds = useFollowingIds();
   const feedProfileUser = useFeedProfile();
   const [messagesOpen, setMessagesOpen] = useState(false);
-  const { sections, getMusicByCategory, getAlbumsByCategory } = useMusicApi();
+  const { sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts } = useMusicApi();
 
   const openMessages = useCallback(() => setMessagesOpen(true), []);
 
@@ -134,9 +133,10 @@ const FeedPage = () => {
 
     const musicItems = musicItemsRaw.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0)).slice(0, 100);
 
-    const videoSource = CLIPS_SECTIONS.flatMap((section) =>
-      Array.isArray(section.data) ? section.data : []
-    );
+    const videoSource = [
+      ...(Array.isArray(allClips) ? allClips : []),
+      ...(Array.isArray(allConcerts) ? allConcerts : []),
+    ];
     const videoItems = videoSource
       .filter((item) => followedArtistIds.has(item.artistId))
       .slice(0, 40)
@@ -158,7 +158,7 @@ const FeedPage = () => {
       });
 
     return [...movieItems, ...musicItems, ...videoItems].sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory]);
+  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts]);
 
   const filteredItems = useMemo(() => {
     if (activeCategory === 'all') return feedItems;

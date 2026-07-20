@@ -1,4 +1,3 @@
-import { allClipsData, allConcertsData } from '../dataMusic/wishlistDataConfig';
 import { artists } from '../dataMusic/artists';
 import { matchId } from '../dataMusic/musicDataUtils';
 
@@ -11,9 +10,9 @@ const normalizeLocalized = (value) => {
   };
 };
 
-const getSourceByContentType = (contentType, musicList = []) => {
-  if (contentType === 'klip') return Array.isArray(allClipsData) ? allClipsData : [];
-  if (contentType === 'konsert') return Array.isArray(allConcertsData) ? allConcertsData : [];
+const getSourceByContentType = (contentType, musicList = [], clipList = [], concertList = []) => {
+  if (contentType === 'klip') return Array.isArray(clipList) ? clipList : [];
+  if (contentType === 'konsert') return Array.isArray(concertList) ? concertList : [];
   return Array.isArray(musicList) ? musicList : [];
 };
 
@@ -29,14 +28,12 @@ const resolveArtist = (item) => {
 
 /**
  * Music shorts: contentType + musicId orqali title, artist, img olinadi.
- * @param {Object} shortItem
- * @param {Array} musicList - API/DB dan kelgan musiqa ro'yxati
  */
-export function resolveShortsMusicMeta(shortItem, musicList = []) {
+export function resolveShortsMusicMeta(shortItem, musicList = [], clipList = [], concertList = []) {
   if (!shortItem?.musicId) return shortItem;
 
   const contentType = shortItem.contentType || 'music';
-  const source = getSourceByContentType(contentType, musicList);
+  const source = getSourceByContentType(contentType, musicList, clipList, concertList);
   const musicItem = source.find((m) => matchId(m.id, shortItem.musicId));
   if (!musicItem) return shortItem;
 

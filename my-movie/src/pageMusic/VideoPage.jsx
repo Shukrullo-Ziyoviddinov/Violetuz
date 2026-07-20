@@ -1,15 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
-import { trendClipsData } from '../dataMusic/trendClipsData';
-import { jaxonConcertsData } from '../dataMusic/jaxonConcertsData';
-import { visualBeatsData } from '../dataMusic/visualBeatsData';
-import { loveAndDesireData } from '../dataMusic/loveAndDesireData';
-import { trendVideosData } from '../dataMusic/trendVideosData';
-import { stageCreationData } from '../dataMusic/stageCreationData';
-import { liveStagesData } from '../dataMusic/liveStagesData';
-import { starsStageData } from '../dataMusic/starsStageData';
+import { useMusicApi } from '../context/MusicApiContext';
 import { artists } from '../dataMusic/artists';
 import { matchId } from '../dataMusic/musicDataUtils';
 import ShareButton from '../components/ShareButton/ShareButton';
@@ -26,32 +19,62 @@ import AlbumsForYou from '../Music/AlbumsForYou/AlbumsForYou';
 import { formatCount } from '../utils/utils';
 import './VideoPage.css';
 
-const CLIP_SOURCES = [
-  { data: trendClipsData, titleKey: 'music.trendClips', titleDefault: 'Trend Kliplar' },
-  { data: jaxonConcertsData, titleKey: 'music.jacksonConcerts', titleDefault: 'Jaxon konsertlari' },
-  { data: liveStagesData, titleKey: 'music.liveStages', titleDefault: 'Jonli sahnalar' },
-  { data: starsStageData, titleKey: 'music.starsStage', titleDefault: 'Yulduzlar sahasi' },
-  { data: visualBeatsData, titleKey: 'music.visualBeats', titleDefault: 'Visual Beats' },
-  { data: loveAndDesireData, titleKey: 'music.sevgiVaIchq', titleDefault: 'Sevgi va ichq' },
-  { data: trendVideosData, titleKey: 'music.trendVideos', titleDefault: 'Trenddagi kliplar' },
-  { data: stageCreationData, titleKey: 'music.sahnadagiIjod', titleDefault: 'Sahnadagi ijod' },
-];
-const allVideoData = CLIP_SOURCES.flatMap((s) => s.data);
-
 const VideoPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { allClips, allConcerts, clipSections, concertSections, getClipsByCategory, getConcertsByCategory } = useMusicApi();
   const videoRef = useRef(null);
   const commentsRef = useRef(null);
 
+  const allVideoData = useMemo(
+    () => [...(Array.isArray(allClips) ? allClips : []), ...(Array.isArray(allConcerts) ? allConcerts : [])],
+    [allClips, allConcerts]
+  );
+
   const video = allVideoData.find((v) => matchId(v.id, id));
   const artist = video ? artists.find((a) => a.id === video.artistId) : null;
-  const source = CLIP_SOURCES.find((s) => s.data.some((v) => v.id === video?.id));
-  const relatedList = source?.data || trendClipsData;
-  const relatedTitleKey = source?.titleKey || 'music.trendClips';
-  const relatedTitleDefault = source?.titleDefault || 'Trend Kliplar';
+
+  const relatedMeta = useMemo(() => {
+    if (!video) {
+      return { list: [], titleKey: 'music.trendClips', titleDefault: 'Trend Kliplar' };
+    }
+
+    const apiClipSection = (clipSections || []).find(
+      (s) => s.categoryNameMusic === video.categoryNameMusic
+    );
+    if (apiClipSection) {
+      return {
+        list: getClipsByCategory(apiClipSection.categoryNameMusic),
+        titleKey: apiClipSection.titleKey,
+        titleDefault: apiClipSection.titleDefault,
+      };
+    }
+
+    const apiConcertSection = (concertSections || []).find(
+      (s) => s.categoryNameMusic === video.categoryNameMusic
+    );
+    if (apiConcertSection) {
+      return {
+        list: getConcertsByCategory(apiConcertSection.categoryNameMusic),
+        titleKey: apiConcertSection.titleKey,
+        titleDefault: apiConcertSection.titleDefault,
+      };
+    }
+
+    return {
+      list: video.type === 'konsert'
+        ? getConcertsByCategory(video.categoryNameMusic)
+        : getClipsByCategory(video.categoryNameMusic),
+      titleKey: 'music.trendClips',
+      titleDefault: 'Trend Kliplar',
+    };
+  }, [video, clipSections, concertSections, getClipsByCategory, getConcertsByCategory]);
+
+  const relatedList = relatedMeta.list?.length ? relatedMeta.list : allVideoData;
+  const relatedTitleKey = relatedMeta.titleKey;
+  const relatedTitleDefault = relatedMeta.titleDefault;
   const wishlistType = video?.type === 'konsert' ? 'konsert' : 'klip';
 
   useEffect(() => {

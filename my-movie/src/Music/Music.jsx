@@ -6,13 +6,18 @@ import ClipsCards from './ClipsCards/ClipsCards';
 import HomeShorts from '../components/HomeShorts/HomeShorts';
 import RecommendedArtists from './RecommendedArtists/RecommendedArtists';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
-import { CLIPS_SECTIONS } from '../dataMusic/clipsSectionsConfig';
 import { useMusicApi } from '../context/MusicApiContext';
 import './Music.css';
 
 const Music = () => {
-  const { getSectionById, pageContent } = useMusicApi();
-  const clipsById = Object.fromEntries((CLIPS_SECTIONS || []).map((s) => [s.id, s]));
+  const {
+    getSectionById,
+    getClipSectionById,
+    getConcertSectionById,
+    getClipsByCategory,
+    getConcertsByCategory,
+    pageContent,
+  } = useMusicApi();
 
   return (
     <ActiveClipProvider>
@@ -44,9 +49,30 @@ const Music = () => {
             }
 
             if (block.type === 'clips') {
-              const clipSection = clipsById[block.sectionId];
-              if (!clipSection) return null;
-              return <ClipsCards key={clipSection.id} section={clipSection} />;
+              const clipSection = getClipSectionById(block.sectionId);
+              if (clipSection) {
+                return (
+                  <ClipsCards
+                    key={clipSection.id}
+                    section={{
+                      ...clipSection,
+                      data: getClipsByCategory(clipSection.categoryNameMusic),
+                    }}
+                  />
+                );
+              }
+
+              const concertSection = getConcertSectionById(block.sectionId);
+              if (!concertSection) return null;
+              return (
+                <ClipsCards
+                  key={concertSection.id}
+                  section={{
+                    ...concertSection,
+                    data: getConcertsByCategory(concertSection.categoryNameMusic),
+                  }}
+                />
+              );
             }
 
             if (block.type === 'music') {

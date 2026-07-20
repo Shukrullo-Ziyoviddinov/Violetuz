@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useMusicApi } from '../../context/MusicApiContext';
 import { buildCommentHistoryEntries, getShortsRouteFromHistory } from './commentHistoryAggregator';
 import ComentariaHistoryFilter from './ComentariaHistoryFilter';
 import ComentariaMovieCard from './ComentariaMovieCard';
@@ -80,6 +81,7 @@ function getCommentPersistence(target) {
 const ComentariaHistoryModal = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
+  const { allClips, allConcerts } = useMusicApi();
   const lang = contentLang === 'ru' ? 'ru' : 'uz';
   const [filter, setFilter] = useState('all');
   const [tick, setTick] = useState(0);
@@ -116,8 +118,8 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
 
   useEffect(() => {
     if (!open) return;
-    setEntries(buildCommentHistoryEntries(lang));
-  }, [open, lang, tick]);
+    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts));
+  }, [open, lang, tick, allClips, allConcerts]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return entries;
@@ -193,7 +195,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                 const t = group.target;
                 const f = group.filter;
                 const cardClick = () =>
-                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t, lang) : t.route);
+                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t, lang, allClips, allConcerts) : t.route);
 
                 let media = null;
                 if (t.kind === 'movie') {
@@ -249,7 +251,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                             movieId={t.movieId}
                             musicId={t.musicId}
                             contentType={t.contentType}
-                            repostRoute={getShortsRouteFromHistory(t, lang)}
+                            repostRoute={getShortsRouteFromHistory(t, lang, allClips, allConcerts)}
                             repostTitle={t.title || ''}
                             videoSrc={t.videoSrc || ''}
                           />

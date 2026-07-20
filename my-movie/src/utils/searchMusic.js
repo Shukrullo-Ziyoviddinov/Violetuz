@@ -6,25 +6,6 @@
  */
 import { ensureArray } from '../dataMusic/musicDataUtils';
 import { artists } from '../dataMusic/artists';
-import { trendClipsData } from '../dataMusic/trendClipsData';
-import { jaxonConcertsData } from '../dataMusic/jaxonConcertsData';
-import { visualBeatsData } from '../dataMusic/visualBeatsData';
-import { loveAndDesireData } from '../dataMusic/loveAndDesireData';
-import { trendVideosData } from '../dataMusic/trendVideosData';
-import { stageCreationData } from '../dataMusic/stageCreationData';
-import { liveStagesData } from '../dataMusic/liveStagesData';
-import { starsStageData } from '../dataMusic/starsStageData';
-
-const allClipsData = [
-  ...(trendClipsData || []),
-  ...(jaxonConcertsData || []),
-  ...(visualBeatsData || []),
-  ...(loveAndDesireData || []),
-  ...(trendVideosData || []),
-  ...(stageCreationData || []),
-  ...(liveStagesData || []),
-  ...(starsStageData || []),
-];
 
 const normalize = (s) => (s || '').toLowerCase().trim().replace(/\s+/g, ' ');
 
@@ -220,12 +201,25 @@ export const removeMusicSearchHistory = (historyId) => {
   } catch {}
 };
 
-export const searchMusicByQuery = (query, contentLang = 'uz', limit = 20, musicList = [], albumsList = []) => {
+export const searchMusicByQuery = (
+  query,
+  contentLang = 'uz',
+  limit = 20,
+  musicList = [],
+  albumsList = [],
+  clipsList = [],
+  concertsList = []
+) => {
   const q = normalize(query);
   if (!q) return [];
 
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
   const significantWords = getSignificantWords(queryWords);
+
+  const videoPool = [
+    ...ensureArray(clipsList),
+    ...ensureArray(concertsList),
+  ];
 
   const musicWithScore = searchPool(ensureArray(musicList), 'music', q, queryWords, significantWords);
   const albumWithScore = searchPool(
@@ -238,7 +232,7 @@ export const searchMusicByQuery = (query, contentLang = 'uz', limit = 20, musicL
     albumMatchScore
   );
   const clipWithScore = searchPool(
-    ensureArray(allClipsData),
+    videoPool,
     'clip',
     q,
     queryWords,

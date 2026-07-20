@@ -5,7 +5,6 @@ import { useContentLanguage } from '../context/ContentLanguageContext';
 import { artists } from '../dataMusic/artists';
 import { allMovies } from '../data/movies';
 import { artistMusicStory } from '../dataMusic/artistMusicStory';
-import { allClipsData, allConcertsData } from '../dataMusic/wishlistDataConfig';
 import { musicShorts } from '../dataMusic/musicShorts';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import HorizontalScroll from '../components/HorizontalScroll/HorizontalScroll';
@@ -33,7 +32,7 @@ const ArtistDetail = () => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { loadAndPlayTrack, togglePlay, currentMusic, isPlaying } = useMusicPlayer();
-  const { allMusic, getAlbumsByArtist } = useMusicApi();
+  const { allMusic, getAlbumsByArtist, getClipsByArtist, getConcertsByArtist } = useMusicApi();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [playingTrackColor, setPlayingTrackColor] = useState(null);
   const [artistHeaderColor, setArtistHeaderColor] = useState(null);
@@ -80,9 +79,9 @@ const ArtistDetail = () => {
   const artistTracks = allMusic.filter((tr) => tr.artistId === id);
   const artistStories = artistMusicStory.filter((s) => s.artistId === id);
   const artistAlbums = getAlbumsByArtist(id);
-  const artistClips = allClipsData.filter((clip) => clip.artistId === id);
+  const artistClips = getClipsByArtist(id);
   const artistShorts = musicShorts.filter((s) => s.artistId === id);
-  const artistConcerts = allConcertsData.filter((clip) => clip.artistId === id);
+  const artistConcerts = getConcertsByArtist(id);
   const artistMovies = useMemo(
     () => allMovies.filter(
       (movie) => Array.isArray(movie?.actors) && movie.actors.some((castId) => String(castId) === String(id)),

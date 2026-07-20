@@ -2,10 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { allMovies } from '../../data/movies';
-import { allClipsData, allConcertsData } from '../../dataMusic/wishlistDataConfig';
 import { artists } from '../../dataMusic/artists';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useMusicApi } from '../../context/MusicApiContext';
 import '../Movies/Movies.css';
 import '../../pageMusic/MusicMorePage.css';
 import './LikeHistory.css';
@@ -30,6 +30,7 @@ const LikeHistory = ({ items = [], activeCategory = '' }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { allClips, allConcerts } = useMusicApi();
 
   if (!items.length) {
     return (
@@ -122,7 +123,7 @@ const LikeHistory = ({ items = [], activeCategory = '' }) => {
 
         if (item.category === 'clip' || item.category === 'concert') {
           const videoIdFromRoute = item.route?.startsWith('/music/video/') ? Number(item.route.split('/music/video/')[1]) : null;
-          const sourceList = item.category === 'concert' ? allConcertsData : allClipsData;
+          const sourceList = item.category === 'concert' ? allConcerts : allClips;
           const mediaItem = Number.isFinite(videoIdFromRoute)
             ? sourceList.find((v) => Number(v.id) === videoIdFromRoute)
             : null;

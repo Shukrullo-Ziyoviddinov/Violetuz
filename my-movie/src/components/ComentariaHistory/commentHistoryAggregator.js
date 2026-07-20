@@ -7,27 +7,24 @@ import * as shortsCommentsApi from '../../api/shortsCommentsApi';
 import { allMovies } from '../../data/movies';
 import { shortsVideos } from '../../data/shortsVideos';
 import { musicShorts } from '../../dataMusic/musicShorts';
-import { trendClipsData } from '../../dataMusic/trendClipsData';
-import { jaxonConcertsData } from '../../dataMusic/jaxonConcertsData';
-import { visualBeatsData } from '../../dataMusic/visualBeatsData';
-import { loveAndDesireData } from '../../dataMusic/loveAndDesireData';
-import { trendVideosData } from '../../dataMusic/trendVideosData';
-import { stageCreationData } from '../../dataMusic/stageCreationData';
-import { liveStagesData } from '../../dataMusic/liveStagesData';
-import { starsStageData } from '../../dataMusic/starsStageData';
 import { artists } from '../../dataMusic/artists';
 import { formatMovieRating } from '../Rating/CalculateRating';
 
-const CLIP_SOURCES = [
-  trendClipsData,
-  jaxonConcertsData,
-  liveStagesData,
-  starsStageData,
-  visualBeatsData,
-  loveAndDesireData,
-  trendVideosData,
-  stageCreationData,
-];
+function uniqueVideosById(clipList = [], concertList = []) {
+  const seen = new Set();
+  const out = [];
+  for (const v of [
+    ...(Array.isArray(clipList) ? clipList : []),
+    ...(Array.isArray(concertList) ? concertList : []),
+  ]) {
+    if (!v || v.id == null) continue;
+    const id = String(v.id);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(v);
+  }
+  return out;
+}
 
 export function flattenCommentTree(list) {
   const out = [];
@@ -41,23 +38,6 @@ export function flattenCommentTree(list) {
   walk(list);
   return out;
 }
-
-function uniqueVideosById() {
-  const seen = new Set();
-  const out = [];
-  for (const data of CLIP_SOURCES) {
-    for (const v of data || []) {
-      if (!v || v.id == null) continue;
-      const id = String(v.id);
-      if (seen.has(id)) continue;
-      seen.add(id);
-      out.push(v);
-    }
-  }
-  return out;
-}
-
-const ALL_VIDEO_DATA = uniqueVideosById();
 
 function getVideoArtistName(video) {
   if (!video?.artistId) return '';
@@ -140,8 +120,8 @@ function getShortsVideoSrc(item, lang) {
  * movieShorts (kino bo‘limi) va musicshorts (musiqa bo‘limi) bir xil playlistda aralash;
  * scroll keyingi/prev video shu yagona ro‘yxat bo‘yicha (ShortsVideos buildRepostShortsList).
  */
-export function buildShortsHistoryPlaylist(lang = 'uz') {
-  const all = buildCommentHistoryEntries(lang);
+export function buildShortsHistoryPlaylist(lang = 'uz', clipsList = [], concertsList = []) {
+  const all = buildCommentHistoryEntries(lang, clipsList, concertsList);
   const shortsRows = all.filter((e) => e.filter === 'shorts');
   const seen = new Set();
   const playlist = [];
@@ -160,9 +140,9 @@ export function buildShortsHistoryPlaylist(lang = 'uz') {
 /**
  * Sharh tarixidan ochilganda: barcha shorts playlist + bosilgan short indeksi.
  */
-export function getShortsRouteFromHistory(target, lang = 'uz') {
+export function getShortsRouteFromHistory(target, lang = 'uz', clipsList = [], concertsList = []) {
   if (target?.kind !== 'shorts' || target.shortsId == null) return '/shorts';
-  const playlist = buildShortsHistoryPlaylist(lang);
+  const playlist = buildShortsHistoryPlaylist(lang, clipsList, concertsList);
   const repostType = target.shortsSource === 'musicshorts' ? 'musicshorts' : 'movieShorts';
   const idx = playlist.findIndex(
     (p) => p.type === repostType && String(p.id) === String(target.shortsId)
@@ -178,8 +158,9 @@ export function getShortsRouteFromHistory(target, lang = 'uz') {
   return `/shorts?${p.toString()}`;
 }
 
-export function buildCommentHistoryEntries(lang = 'uz') {
+export function buildCommentHistoryEntries(lang = 'uz', clipsList = [], concertsList = []) {
   const entries = [];
+  const allVideoData = uniqueVideosById(clipsList, concertsList);
 
   for (const m of allMovies) {
     if (!isMovieRecord(m)) continue;
@@ -213,7 +194,7 @@ export function buildCommentHistoryEntries(lang = 'uz') {
     }
   }
 
-  for (const v of ALL_VIDEO_DATA) {
+  for (const v of allVideoData) {
     const storageKey = `music:${String(v.id)}`;
     const raw = commentsApi.getComments(storageKey);
     const flat = flattenCommentTree(raw);

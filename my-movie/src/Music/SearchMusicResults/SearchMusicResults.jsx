@@ -11,10 +11,10 @@ import './SearchMusicResults.css';
 const SearchMusicResults = ({ query, onItemClick }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { allMusic, allAlbums } = useMusicApi();
+  const { allMusic, allAlbums, allClips, allConcerts } = useMusicApi();
   const navigate = useNavigate();
 
-  const results = searchMusicByQuery(query, contentLang, 40, allMusic, allAlbums);
+  const results = searchMusicByQuery(query, contentLang, 40, allMusic, allAlbums, allClips, allConcerts);
 
   const getTitle = (item) => {
     if (item?.itemType === 'artist') return item.name || '';

@@ -4,34 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { trendClipsData } from '../dataMusic/trendClipsData';
-import { jaxonConcertsData } from '../dataMusic/jaxonConcertsData';
-import { visualBeatsData } from '../dataMusic/visualBeatsData';
-import { loveAndDesireData } from '../dataMusic/loveAndDesireData';
-import { trendVideosData } from '../dataMusic/trendVideosData';
-import { stageCreationData } from '../dataMusic/stageCreationData';
-import { liveStagesData } from '../dataMusic/liveStagesData';
-import { starsStageData } from '../dataMusic/starsStageData';
 import { artists } from '../dataMusic/artists';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import '../Music/MusicFilter/MusicFilter.css';
 import './MusicMorePage.css';
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
-
-const allClipsSectionsData = [
-  ...ensureArray(trendClipsData),
-  ...ensureArray(visualBeatsData),
-  ...ensureArray(loveAndDesireData),
-  ...ensureArray(trendVideosData),
-  ...ensureArray(stageCreationData),
-];
-
-const allConcertsSectionsData = [
-  ...ensureArray(jaxonConcertsData),
-  ...ensureArray(liveStagesData),
-  ...ensureArray(starsStageData),
-];
 
 const getItemDetailPath = (item) => {
   const type = item?.type || 'music';
@@ -50,8 +28,7 @@ const getItemWishlistType = (item) => {
 
 /**
  * Universal bo'lim konfiguratsiyasi.
- * Yangi bo'lim qo'shish: SECTIONS ga yangi key va config qo'shing.
- * Alohida sahifa YARATMASDAN, kerakli ma'lumotni shu yerda import qiling.
+ * Musiqa/albom/klip/konsert: categoryNameMusic orqali API dan.
  */
 const SECTIONS = {
   songs: {
@@ -71,7 +48,7 @@ const SECTIONS = {
     isAggregate: true,
   },
   clips: {
-    data: allClipsSectionsData,
+    categoryNameMusic: '__all_clips__',
     titleKey: 'music.searchTypeClip',
     titleDefault: 'Klip',
     wishlistType: 'klip',
@@ -80,7 +57,7 @@ const SECTIONS = {
     isAggregate: true,
   },
   concerts: {
-    data: allConcertsSectionsData,
+    categoryNameMusic: '__all_concerts__',
     titleKey: 'music.searchTypeConcert',
     titleDefault: 'Konsert',
     wishlistType: 'konsert',
@@ -168,39 +145,15 @@ const SECTIONS = {
     getDetailPath: (id) => `/music/album/${id}`,
   },
   'trend-clips': {
-    data: trendClipsData,
+    categoryNameMusic: 'trendClipsData',
     titleKey: 'music.trendClips',
     titleDefault: 'Trend Kliplar',
     wishlistType: 'klip',
     getDetailPath: (id) => `/music/video/${id}`,
     isClips: true,
   },
-  'jaxon-concerts': {
-    data: jaxonConcertsData,
-    titleKey: 'music.jacksonConcerts',
-    titleDefault: 'Jaxon konsertlari',
-    wishlistType: 'konsert',
-    getDetailPath: (id) => `/music/video/${id}`,
-    isClips: true,
-  },
-  'live-stages': {
-    data: liveStagesData,
-    titleKey: 'music.liveStages',
-    titleDefault: 'Jonli sahnalar',
-    wishlistType: 'konsert',
-    getDetailPath: (id) => `/music/video/${id}`,
-    isClips: true,
-  },
-  'stars-stage': {
-    data: starsStageData,
-    titleKey: 'music.starsStage',
-    titleDefault: 'Yulduzlar sahasi',
-    wishlistType: 'konsert',
-    getDetailPath: (id) => `/music/video/${id}`,
-    isClips: true,
-  },
   'visual-beats': {
-    data: visualBeatsData,
+    categoryNameMusic: 'visualBeatsData',
     titleKey: 'music.visualBeats',
     titleDefault: 'Visual Beats',
     wishlistType: 'klip',
@@ -208,7 +161,7 @@ const SECTIONS = {
     isClips: true,
   },
   'sevgi-va-ichq': {
-    data: loveAndDesireData,
+    categoryNameMusic: 'loveAndDesireData',
     titleKey: 'music.sevgiVaIchq',
     titleDefault: 'Sevgi va ichq',
     wishlistType: 'klip',
@@ -216,7 +169,7 @@ const SECTIONS = {
     isClips: true,
   },
   'trend-videos': {
-    data: trendVideosData,
+    categoryNameMusic: 'trendVideosData',
     titleKey: 'music.trendVideos',
     titleDefault: 'Trenddagi kliplar',
     wishlistType: 'klip',
@@ -224,10 +177,34 @@ const SECTIONS = {
     isClips: true,
   },
   'sahnadagi-ijod': {
-    data: stageCreationData,
+    categoryNameMusic: 'stageCreationData',
     titleKey: 'music.sahnadagiIjod',
     titleDefault: 'Sahnadagi ijod',
     wishlistType: 'klip',
+    getDetailPath: (id) => `/music/video/${id}`,
+    isClips: true,
+  },
+  'live-stages': {
+    categoryNameMusic: 'liveStagesData',
+    titleKey: 'music.liveStages',
+    titleDefault: 'Jonli sahnalar',
+    wishlistType: 'konsert',
+    getDetailPath: (id) => `/music/video/${id}`,
+    isClips: true,
+  },
+  'jaxon-concerts': {
+    categoryNameMusic: 'jaxonConcertsData',
+    titleKey: 'music.jacksonConcerts',
+    titleDefault: 'Jaxon konsertlari',
+    wishlistType: 'konsert',
+    getDetailPath: (id) => `/music/video/${id}`,
+    isClips: true,
+  },
+  'stars-stage': {
+    categoryNameMusic: 'starsStageData',
+    titleKey: 'music.starsStage',
+    titleDefault: 'Yulduzlar sahasi',
+    wishlistType: 'konsert',
     getDetailPath: (id) => `/music/video/${id}`,
     isClips: true,
   },
@@ -239,19 +216,38 @@ const MusicMorePage = () => {
   const { section = 'trend' } = useParams();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allMusic, allAlbums, getMusicByCategory, getAlbumsByCategory } = useMusicApi();
+  const {
+    allMusic,
+    allAlbums,
+    allClips,
+    allConcerts,
+    getMusicByCategory,
+    getAlbumsByCategory,
+    getClipsByCategory,
+    getConcertsByCategory,
+  } = useMusicApi();
 
   const config = SECTIONS[section] || SECTIONS.trend;
   const { data: sectionData, categoryNameMusic, titleKey, titleDefault, wishlistType, getDetailPath, isAggregate } = config;
-  const safeSectionData = categoryNameMusic === '__all__'
-    ? allMusic
-    : categoryNameMusic === '__all_albums__'
-      ? allAlbums
-      : categoryNameMusic
-        ? (wishlistType === 'album'
-            ? getAlbumsByCategory(categoryNameMusic)
-            : getMusicByCategory(categoryNameMusic))
-        : (Array.isArray(sectionData) ? sectionData : []);
+
+  const safeSectionData =
+    categoryNameMusic === '__all__'
+      ? allMusic
+      : categoryNameMusic === '__all_albums__'
+        ? allAlbums
+        : categoryNameMusic === '__all_clips__'
+          ? allClips
+          : categoryNameMusic === '__all_concerts__'
+            ? allConcerts
+            : categoryNameMusic
+              ? (wishlistType === 'album'
+                  ? getAlbumsByCategory(categoryNameMusic)
+                  : wishlistType === 'klip'
+                    ? getClipsByCategory(categoryNameMusic)
+                    : wishlistType === 'konsert'
+                      ? getConcertsByCategory(categoryNameMusic)
+                      : getMusicByCategory(categoryNameMusic))
+              : ensureArray(sectionData);
 
   const [filteredItems, setFilteredItems] = useState(safeSectionData);
   const allItems = filteredItems;

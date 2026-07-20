@@ -1,14 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { allClipsData, allConcertsData } from '../../dataMusic/wishlistDataConfig';
 import { artists } from '../../dataMusic/artists';
+import { useMusicApi } from '../../context/MusicApiContext';
 import './RepostVideoCard.css';
 
 const RepostVideoCard = ({ item }) => {
   const navigate = useNavigate();
+  const { allClips, allConcerts } = useMusicApi();
   const open = () => navigate(item.route || `/music/video/${item.id}`);
-  const source = item.type === 'konsert' ? allConcertsData : allClipsData;
-  const raw = source.find((v) => Number(v.id) === Number(item.id));
+  const source = item.type === 'konsert' ? allConcerts : allClips;
+  const raw = (Array.isArray(source) ? source : []).find((v) => Number(v.id) === Number(item.id));
   const artistName =
     item.artistName ||
     (raw?.artistId ? artists.find((a) => a.id === raw.artistId)?.name || '' : '');
@@ -22,7 +23,7 @@ const RepostVideoCard = ({ item }) => {
           </svg>
         </div>
         <div className="music-more-page-item-info">
-          <h3 className="music-more-page-item-title">{item.title || 'Nomsiz element'}</h3>
+          <h3 className="music-more-page-item-title">{item.title || ''}</h3>
           <p className="music-more-page-item-artist">{artistName}</p>
         </div>
       </div>

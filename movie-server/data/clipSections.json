@@ -1,0 +1,52 @@
+[
+  {
+    "id": "trend-clips",
+    "slug": "trend-clips",
+    "categoryNameMusic": "trendClipsData",
+    "titleKey": "music.trendClips",
+    "titleDefault": "Trend Kliplar",
+    "moreTo": "/music/more/trend-clips",
+    "wishlistType": "klip",
+    "initialCount": 10
+  },
+  {
+    "id": "visual-beats",
+    "slug": "visual-beats",
+    "categoryNameMusic": "visualBeatsData",
+    "titleKey": "music.visualBeats",
+    "titleDefault": "Visual Beats",
+    "moreTo": "/music/more/visual-beats",
+    "wishlistType": "klip",
+    "initialCount": 10
+  },
+  {
+    "id": "sevgi-va-ichq",
+    "slug": "sevgi-va-ichq",
+    "categoryNameMusic": "loveAndDesireData",
+    "titleKey": "music.sevgiVaIchq",
+    "titleDefault": "Sevgi va ichq",
+    "moreTo": "/music/more/sevgi-va-ichq",
+    "wishlistType": "klip",
+    "initialCount": 10
+  },
+  {
+    "id": "trend-videos",
+    "slug": "trend-videos",
+    "categoryNameMusic": "trendVideosData",
+    "titleKey": "music.trendVideos",
+    "titleDefault": "Trenddagi kliplar",
+    "moreTo": "/music/more/trend-videos",
+    "wishlistType": "klip",
+    "initialCount": 10
+  },
+  {
+    "id": "sahnadagi-ijod",
+    "slug": "sahnadagi-ijod",
+    "categoryNameMusic": "stageCreationData",
+    "titleKey": "music.sahnadagiIjod",
+    "titleDefault": "Sahnadagi ijod",
+    "moreTo": "/music/more/sahnadagi-ijod",
+    "wishlistType": "klip",
+    "initialCount": 10
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "jaxon-concerts",
+    "slug": "jaxon-concerts",
+    "categoryNameMusic": "jaxonConcertsData",
+    "titleKey": "music.jacksonConcerts",
+    "titleDefault": "Jaxon konsertlari",
+    "moreTo": "/music/more/jaxon-concerts",
+    "wishlistType": "konsert",
+    "initialCount": 10
+  },
+  {
+    "id": "live-stages",
+    "slug": "live-stages",
+    "categoryNameMusic": "liveStagesData",
+    "titleKey": "music.liveStages",
+    "titleDefault": "Jonli sahnalar",
+    "moreTo": "/music/more/live-stages",
+    "wishlistType": "konsert",
+    "initialCount": 10
+  },
+  {
+    "id": "stars-stage",
+    "slug": "stars-stage",
+    "categoryNameMusic": "starsStageData",
+    "titleKey": "music.starsStage",
+    "titleDefault": "Yulduzlar sahasi",
+    "moreTo": "/music/more/stars-stage",
+    "wishlistType": "konsert",
+    "initialCount": 10
+  }
+]
