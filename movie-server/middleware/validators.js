@@ -377,6 +377,30 @@ const validateBannerListQuery = (req, _res, next) => {
   next();
 };
 
+const validateGenreIdParam = (req, _res, next) => {
+  const genreId = String(req.params.id || '').trim();
+  if (!genreId) {
+    return next(badRequest('Invalid genre id. It is required.'));
+  }
+
+  req.params.id = genreId;
+  next();
+};
+
+const validateGenreListQuery = (req, _res, next) => {
+  const { search } = req.query;
+
+  if (search != null && !String(search).trim()) {
+    return next(badRequest('search query cannot be empty.'));
+  }
+
+  if (search != null) {
+    req.query.search = String(search).trim();
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -399,4 +423,6 @@ module.exports = {
   validateBannerIdParam,
   validateBannerLangParam,
   validateBannerListQuery,
+  validateGenreIdParam,
+  validateGenreListQuery,
 };

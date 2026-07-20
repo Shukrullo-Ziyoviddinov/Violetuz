@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
-import { genres } from '../../data/genres';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import './SearchModalGenre.css';
 
@@ -10,6 +10,7 @@ const SearchModalGenre = ({ onGenreClick }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
+  const { allGenres } = useMoviesApi();
 
   const getGenreTitle = (genre) => {
     if (genre.title && typeof genre.title === 'object') {
@@ -30,7 +31,7 @@ const SearchModalGenre = ({ onGenreClick }) => {
     <div className="search-modal-genre">
       <h3 className="search-modal-genre-title">{t('filters.genre', 'Janr')}</h3>
       <HorizontalScroll scrollAmount={320}>
-        {genres.map((genre) => (
+        {allGenres.map((genre) => (
           <div
             key={genre.id}
             className="search-modal-genre-item"

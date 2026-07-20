@@ -14,6 +14,7 @@ module.exports = {
   KONSERT_JSON: path.join(ROOT, 'data', 'konsert.json'),
   ARTIST_MUSIC_STORIES_JSON: path.join(ROOT, 'data', 'artistMusicStories.json'),
   BANNERS_JSON: path.join(ROOT, 'data', 'banners.json'),
+  GENRES_JSON: path.join(ROOT, 'data', 'genres.json'),
   COMMENTS_JSON: path.join(ROOT, 'data', 'comments.json'),
   MOVIE_SECTIONS_JSON: path.join(ROOT, 'data', 'movieSections.json'),
   HOME_CONTENT_JSON: path.join(ROOT, 'data', 'homeContent.json'),

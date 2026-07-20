@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useLocation, useSearchParams } from 'react-router-dom';
-import { genres as genresConfig } from '../data/genres';
 import { getTopRatedMovies } from '../components/TopRatedContent/TopRatedContent';
 import { useLoading } from '../context/LoadingContext';
 import { useMoviesApi } from '../context/MoviesApiContext';
@@ -73,31 +72,31 @@ const RecommendedPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const genreFromUrl = searchParams.get('genre');
-  const getGenresFromUrl = (g) => {
+  const { recommendedLoading, setLoading } = useLoading();
+  const { allMovies, allGenres } = useMoviesApi();
+
+  const getGenresFromUrl = useCallback((g) => {
     if (!g) return [];
-    const genreConfig = genresConfig.find(
+    const genreConfig = allGenres.find(
       (c) => c.filterGenre === g || (Array.isArray(c.filterGenre) && c.filterGenre.includes(g))
     );
     if (genreConfig) {
       return Array.isArray(genreConfig.filterGenre) ? [...genreConfig.filterGenre] : [genreConfig.filterGenre];
     }
     return [g];
-  };
-  const { recommendedLoading, setLoading } = useLoading();
-  const { allMovies } = useMoviesApi();
+  }, [allGenres]);
+
   const [selectedRatingType, setSelectedRatingType] = useState('rating');
   const [selectedRating, setSelectedRating] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [selectedGenres, setSelectedGenres] = useState(() =>
-    genreFromUrl ? getGenresFromUrl(genreFromUrl) : []
-  );
+  const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedAge, setSelectedAge] = useState(null);
 
   useEffect(() => {
     if (genreFromUrl) {
       setSelectedGenres(getGenresFromUrl(genreFromUrl));
     }
-  }, [genreFromUrl]);
+  }, [genreFromUrl, getGenresFromUrl]);
 
   const isSimilarMoviesPage = location.pathname.startsWith('/similar-movies/');
 

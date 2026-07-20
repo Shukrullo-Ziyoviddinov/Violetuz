@@ -11,6 +11,7 @@ const concertRoutes = require('./concert.routes');
 const concertSectionRoutes = require('./concertSection.routes');
 const actorRoutes = require('./actor.routes');
 const bannerRoutes = require('./banner.routes');
+const genreRoutes = require('./genre.routes');
 const artistMusicStoryRoutes = require('./artistMusicStory.routes');
 
 const router = Router();
@@ -19,6 +20,7 @@ router.use('/health', healthRoutes);
 router.use('/movies', movieRoutes);
 router.use('/actors', actorRoutes);
 router.use('/banners', bannerRoutes);
+router.use('/genres', genreRoutes);
 router.use('/movie-sections', movieSectionRoutes);
 router.use('/music', musicRoutes);
 router.use('/music-sections', musicSectionRoutes);
