@@ -335,6 +335,48 @@ const validateArtistMusicStoryListQuery = (req, _res, next) => {
   next();
 };
 
+const validateBannerIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid banner id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateBannerLangParam = (req, _res, next) => {
+  const lang = String(req.params.lang || '').trim().toLowerCase();
+  if (lang !== 'uz' && lang !== 'ru') {
+    return next(badRequest('Invalid lang. Allowed values: uz, ru.'));
+  }
+
+  req.params.lang = lang;
+  next();
+};
+
+const validateBannerListQuery = (req, _res, next) => {
+  const { lang, movieId } = req.query;
+
+  if (lang != null) {
+    const normalized = String(lang).trim().toLowerCase();
+    if (normalized !== 'uz' && normalized !== 'ru') {
+      return next(badRequest('lang query must be uz or ru.'));
+    }
+    req.query.lang = normalized;
+  }
+
+  if (movieId != null) {
+    const numericId = Number(movieId);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return next(badRequest('movieId query must be a positive integer.'));
+    }
+    req.query.movieId = String(numericId);
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -354,4 +396,7 @@ module.exports = {
   validateActorListQuery,
   validateArtistMusicStoryIdParam,
   validateArtistMusicStoryListQuery,
+  validateBannerIdParam,
+  validateBannerLangParam,
+  validateBannerListQuery,
 };

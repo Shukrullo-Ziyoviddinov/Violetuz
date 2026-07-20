@@ -12,6 +12,7 @@
     "seed:concerts": "node seeds/seedConcerts.js",
     "seed:actors": "node seeds/seedActors.js",
     "seed:artist-music-stories": "node seeds/seedArtistMusicStories.js",
+    "seed:banners": "node seeds/seedBanners.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

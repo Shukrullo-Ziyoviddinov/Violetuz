@@ -13,6 +13,7 @@ module.exports = {
   KLIPS_JSON: path.join(ROOT, 'data', 'klips.json'),
   KONSERT_JSON: path.join(ROOT, 'data', 'konsert.json'),
   ARTIST_MUSIC_STORIES_JSON: path.join(ROOT, 'data', 'artistMusicStories.json'),
+  BANNERS_JSON: path.join(ROOT, 'data', 'banners.json'),
   COMMENTS_JSON: path.join(ROOT, 'data', 'comments.json'),
   MOVIE_SECTIONS_JSON: path.join(ROOT, 'data', 'movieSections.json'),
   HOME_CONTENT_JSON: path.join(ROOT, 'data', 'homeContent.json'),

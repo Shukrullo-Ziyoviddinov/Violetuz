@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchAllMovies, fetchMovieById, fetchMovieSections, fetchHomeContent } from '../api/moviesApi';
+import { fetchAllBanners } from '../api/bannersApi';
 
 const MoviesApiContext = createContext(null);
 
@@ -24,6 +25,12 @@ export const MoviesApiProvider = ({ children }) => {
     staleTime: 5 * 60_000,
     retry: 1,
   });
+  const bannersQuery = useQuery({
+    queryKey: ['banners'],
+    queryFn: fetchAllBanners,
+    staleTime: 60_000,
+    retry: 1,
+  });
 
   const allMovies = useMemo(
     () => (Array.isArray(moviesQuery.data) ? moviesQuery.data : []),
@@ -37,16 +44,31 @@ export const MoviesApiProvider = ({ children }) => {
     () => (Array.isArray(homeContentQuery.data) ? homeContentQuery.data : []),
     [homeContentQuery.data]
   );
-  const loading = moviesQuery.isLoading || sectionsQuery.isLoading || homeContentQuery.isLoading;
-  const error = moviesQuery.error?.message || sectionsQuery.error?.message || homeContentQuery.error?.message || null;
+  const allBanners = useMemo(
+    () => (Array.isArray(bannersQuery.data) ? bannersQuery.data : []),
+    [bannersQuery.data]
+  );
+  const loading =
+    moviesQuery.isLoading ||
+    sectionsQuery.isLoading ||
+    homeContentQuery.isLoading ||
+    bannersQuery.isLoading;
+  const error =
+    moviesQuery.error?.message ||
+    sectionsQuery.error?.message ||
+    homeContentQuery.error?.message ||
+    bannersQuery.error?.message ||
+    null;
 
   const value = useMemo(() => ({
     allMovies,
     sections,
     homeContent,
+    allBanners,
     loading,
     error,
     getMoviesByCategory: (categoryName) => allMovies.filter((m) => m.categoryName === categoryName),
+    getBannersByLang: (lang) => allBanners.filter((b) => b.lang === lang),
     getSectionById: (id) => sections.find((s) => s.id === id) || null,
     getMovieByIdLocal: (id) => allMovies.find((m) => String(m.id) === String(id)) || null,
     refreshMovies: async () => {
@@ -56,8 +78,15 @@ export const MoviesApiProvider = ({ children }) => {
       });
       return movies;
     },
+    refreshBanners: async () => {
+      const banners = await queryClient.fetchQuery({
+        queryKey: ['banners'],
+        queryFn: fetchAllBanners,
+      });
+      return banners;
+    },
     fetchMovieByIdRemote: fetchMovieById,
-  }), [allMovies, sections, homeContent, loading, error, queryClient]);
+  }), [allMovies, sections, homeContent, allBanners, loading, error, queryClient]);
 
   return (
     <MoviesApiContext.Provider value={value}>
