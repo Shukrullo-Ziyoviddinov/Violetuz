@@ -4,6 +4,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { normalizeImagePath } from '../../utils/utils';
+import { matchId } from '../../utils/musicDataUtils';
 import './VideoBanner.css';
 
 const RATING_IMGS = {
@@ -99,7 +100,7 @@ const VideoBanner = ({ typeFilter }) => {
         {filteredBanners.map((banner, index) => {
           const isMovie = banner.type === 'movie';
           const movie = isMovie
-            ? (Array.isArray(allMovies) ? allMovies : []).find((m) => m.id === banner.refId)
+            ? (Array.isArray(allMovies) ? allMovies : []).find((m) => matchId(m.id, banner.refId))
             : null;
 
           const titleImgSrc = isMovie

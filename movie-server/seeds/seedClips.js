@@ -17,9 +17,18 @@ const seedClips = async () => {
   await Clip.deleteMany({});
 
   let inserted = 0;
+  const seenIds = new Set();
 
   for (const item of clips) {
-    const { id: _oldId, ...clipData } = item;
+    if (item.id != null) {
+      if (seenIds.has(item.id)) {
+        console.warn(`Skipping duplicate clip id: ${item.id}`);
+        continue;
+      }
+      seenIds.add(item.id);
+    }
+
+    const clipData = { ...item };
     if (clipData.categoryNameMusic) {
       clipData.categoryNameMusic = String(clipData.categoryNameMusic).trim();
     }

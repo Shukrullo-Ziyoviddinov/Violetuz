@@ -19,7 +19,7 @@ const seedMusic = async () => {
   let inserted = 0;
 
   for (const item of musicList) {
-    const { id: _oldId, ...musicData } = item;
+    const musicData = { ...item };
     if (musicData.categoryNameMusic) {
       musicData.categoryNameMusic = String(musicData.categoryNameMusic).trim();
     }

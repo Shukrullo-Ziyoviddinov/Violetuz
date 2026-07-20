@@ -82,7 +82,7 @@ function getCommentPersistence(target) {
 const ComentariaHistoryModal = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
-  const { allClips, allConcerts } = useMusicApi();
+  const { allClips, allConcerts, allMusic } = useMusicApi();
   const { allMovies, allShortsVideos } = useMoviesApi();
   const lang = contentLang === 'ru' ? 'ru' : 'uz';
   const [filter, setFilter] = useState('all');
@@ -120,8 +120,8 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
 
   useEffect(() => {
     if (!open) return;
-    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts, allMovies, allShortsVideos));
-  }, [open, lang, tick, allClips, allConcerts, allMovies, allShortsVideos]);
+    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic));
+  }, [open, lang, tick, allClips, allConcerts, allMovies, allShortsVideos, allMusic]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return entries;
@@ -197,7 +197,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                 const t = group.target;
                 const f = group.filter;
                 const cardClick = () =>
-                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos) : t.route);
+                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic) : t.route);
 
                 let media = null;
                 if (t.kind === 'movie') {
@@ -253,7 +253,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                             movieId={t.movieId}
                             musicId={t.musicId}
                             contentType={t.contentType}
-                            repostRoute={getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos)}
+                            repostRoute={getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic)}
                             repostTitle={t.title || ''}
                             videoSrc={t.videoSrc || ''}
                           />

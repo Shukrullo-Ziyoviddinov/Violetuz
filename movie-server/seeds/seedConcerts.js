@@ -19,7 +19,7 @@ const seedConcerts = async () => {
   let inserted = 0;
 
   for (const item of concerts) {
-    const { id: _oldId, ...concertData } = item;
+    const concertData = { ...item };
     if (concertData.categoryNameMusic) {
       concertData.categoryNameMusic = String(concertData.categoryNameMusic).trim();
     }

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
+import { useMusicApi } from '../../context/MusicApiContext';
+import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 import { musicShorts } from '../../dataMusic/musicShorts';
 import { getWatchHistory } from '../../api/shortsWatchHistory';
 import { getShortsForHomeBlock } from '../../algo/shortsRecommendationAlgo';
@@ -18,11 +20,17 @@ const shouldAutoPlay = (index) => (index + 1) % 2 === 0;
 const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { movieShortsCatalog } = useMoviesApi();
+  const { allShortsVideos, allMovies } = useMoviesApi();
+  const { allMusic, allClips, allConcerts } = useMusicApi();
   const [loadedPreviews, setLoadedPreviews] = useState({});
   const containerRef = useRef(null);
 
   const isMusic = source === 'music';
+  const movieShortsCatalog = useMemo(
+    () =>
+      resolveShortsWithMovies(allShortsVideos, allMovies, allMusic, allClips, allConcerts),
+    [allShortsVideos, allMovies, allMusic, allClips, allConcerts]
+  );
   const allShorts = isMusic ? musicShorts : movieShortsCatalog;
   const moreTo = isMusic ? '/music/shorts' : '/shorts';
 

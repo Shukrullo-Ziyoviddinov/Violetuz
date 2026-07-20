@@ -17,10 +17,18 @@ const seedMovies = async () => {
   await Movie.deleteMany({});
 
   let inserted = 0;
+  const seenIds = new Set();
 
   for (const item of movies) {
-    const { id: _oldId, ...movieData } = item;
-    const movie = new Movie(movieData);
+    if (item.id != null) {
+      if (seenIds.has(item.id)) {
+        console.warn(`Skipping duplicate movie id: ${item.id}`);
+        continue;
+      }
+      seenIds.add(item.id);
+    }
+
+    const movie = new Movie(item);
     await movie.save();
     inserted += 1;
   }

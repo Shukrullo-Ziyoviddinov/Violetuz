@@ -124,9 +124,17 @@ export function buildShortsHistoryPlaylist(
   clipsList = [],
   concertsList = [],
   moviesList = [],
-  movieShortsList = []
+  movieShortsList = [],
+  musicList = []
 ) {
-  const all = buildCommentHistoryEntries(lang, clipsList, concertsList, moviesList, movieShortsList);
+  const all = buildCommentHistoryEntries(
+    lang,
+    clipsList,
+    concertsList,
+    moviesList,
+    movieShortsList,
+    musicList
+  );
   const shortsRows = all.filter((e) => e.filter === 'shorts');
   const seen = new Set();
   const playlist = [];
@@ -151,7 +159,8 @@ export function getShortsRouteFromHistory(
   clipsList = [],
   concertsList = [],
   moviesList = [],
-  movieShortsList = []
+  movieShortsList = [],
+  musicList = []
 ) {
   if (target?.kind !== 'shorts' || target.shortsId == null) return '/shorts';
   const playlist = buildShortsHistoryPlaylist(
@@ -159,7 +168,8 @@ export function getShortsRouteFromHistory(
     clipsList,
     concertsList,
     moviesList,
-    movieShortsList
+    movieShortsList,
+    musicList
   );
   const repostType = target.shortsSource === 'musicshorts' ? 'musicshorts' : 'movieShorts';
   const idx = playlist.findIndex(
@@ -181,12 +191,19 @@ export function buildCommentHistoryEntries(
   clipsList = [],
   concertsList = [],
   moviesList = [],
-  movieShortsList = []
+  movieShortsList = [],
+  musicList = []
 ) {
   const entries = [];
   const allVideoData = uniqueVideosById(clipsList, concertsList);
   const allMovies = Array.isArray(moviesList) ? moviesList : [];
-  const movieShortsCatalog = resolveShortsWithMovies(movieShortsList, allMovies);
+  const movieShortsCatalog = resolveShortsWithMovies(
+    movieShortsList,
+    allMovies,
+    musicList,
+    clipsList,
+    concertsList
+  );
 
   for (const m of allMovies) {
     if (!isMovieRecord(m)) continue;
