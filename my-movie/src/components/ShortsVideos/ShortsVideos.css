@@ -772,21 +772,29 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.shorts-modal-music-block {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+.shorts-modal-music-corner {
+  position: absolute;
+  right: 16px;
+  bottom: 5.75rem;
+  z-index: 12;
+  width: 48px;
+  height: 48px;
   padding: 0;
-  border-radius: 50%;
+  border: none;
+  border-radius: 10px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.85);
   background: rgba(0, 0, 0, 0.35);
-  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.shorts-modal-music-block:hover {
+.shorts-modal-music-corner:hover {
   transform: scale(1.05);
-  border-color: #9b4fe7;
+  box-shadow: 0 0 0 2px #9b4fe7;
 }
 
 .shorts-modal-music-img {
@@ -794,17 +802,25 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 5%;
-  border: 2px solid #fff;
 }
 
-.shorts-modal-actions-sidebar.shorts-modal-actions-mobile .shorts-modal-music-block {
-  width: 45px;
-  height: 50px;
-  min-width: 40px;
-  position: relative;
-  top: 58px;
-  margin-top: 0;
+.shorts-modal-music-corner-mobile {
+  right: 12px;
+  bottom: 6.75rem;
+  width: 44px;
+  height: 44px;
+}
+
+.shorts-modal-music-corner-desktop {
+  right: 16px;
+  bottom: 5.5rem;
+}
+
+@media (max-width: 500px) {
+  .shorts-modal-music-corner-mobile {
+    right: 10px;
+    bottom: 6.5rem;
+  }
 }
 
 /* Music modal */

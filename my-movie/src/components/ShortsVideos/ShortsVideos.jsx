@@ -478,12 +478,12 @@ const ShortsVideos = ({
     setMusicModalOpen(true);
   }, []);
 
-  const renderMusicSidebarButton = useCallback((item, isMusicSlide) => {
+  const renderMusicCornerButton = useCallback((item, isMusicSlide, variant = '') => {
     if (isMusicSlide || !item?.musics?.img) return null;
     return (
       <button
         type="button"
-        className="shorts-modal-action-btn shorts-modal-music-block"
+        className={`shorts-modal-music-corner${variant ? ` ${variant}` : ''}`}
         onClick={handleMusicBlockClick}
         aria-label="Musiqa"
       >
@@ -837,8 +837,8 @@ const ShortsVideos = ({
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
           </button>
-          {renderMusicSidebarButton(item, itemMusic)}
         </div>
+        {renderMusicCornerButton(item, itemMusic, 'shorts-modal-music-corner-mobile')}
           </>
         )}
       </div>
@@ -857,7 +857,7 @@ const ShortsVideos = ({
     isItemMusicSlide,
     mobilePlayPauseVisible,
     modalVideoState,
-    renderMusicSidebarButton,
+    renderMusicCornerButton,
     repostShareRoute,
     shortsCommentCount,
     toggleDescriptionExpanded,
@@ -1105,8 +1105,8 @@ const ShortsVideos = ({
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                     </svg>
                   </button>
-                  {renderMusicSidebarButton(shortsList[activeIndex], slideMusic)}
                 </div>
+                {renderMusicCornerButton(shortsList[activeIndex], slideMusic, 'shorts-modal-music-corner-desktop')}
               </div>
 
               {/* Kelayotgan video — kirib keladi (faqat animatsiya paytida) */}
