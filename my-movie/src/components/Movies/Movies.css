@@ -65,6 +65,15 @@
   color: transparent;
 }
 
+.movies-title-skeleton {
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.movies-header--centered .movies-title-skeleton {
+  width: 220px;
+  height: 40px;
+}
 
 .movies-grid {
   display: grid;
@@ -84,6 +93,16 @@
   overflow: hidden;
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.movies-item-image-wrapper .movies-item-image-skeleton,
+.movies-item-image-wrapper .skeleton-loader--movie-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: inherit;
 }
 
 .movies-item-image {
