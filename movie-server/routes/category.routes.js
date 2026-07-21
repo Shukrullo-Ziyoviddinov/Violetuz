@@ -8,7 +8,8 @@ const {
 
 const router = Router();
 
-router.get('/:id', validateNavCategoryIdParam, asyncHandler(categoryController.getCategoryById));
+// Static "/" must be registered before "/:id"
 router.get('/', validateNavCategoryListQuery, asyncHandler(categoryController.getCategories));
+router.get('/:id', validateNavCategoryIdParam, asyncHandler(categoryController.getCategoryById));
 
 module.exports = router;

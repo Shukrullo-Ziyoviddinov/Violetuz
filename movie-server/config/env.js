@@ -12,6 +12,10 @@ const ALLOWED_ORIGINS = Array.from(
   new Set([
     CLIENT_URL,
     ...CLIENT_URLS,
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',
     ...(NODE_ENV === 'production' ? ['https://violetuz.vercel.app'] : []),
   ])
 );

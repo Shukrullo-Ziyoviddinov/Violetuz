@@ -1,6 +1,6 @@
 import { resolveApiBaseUrl } from './apiBase';
 
-const API_BASE_URL = resolveApiBaseUrl();
+const getApiBaseUrl = () => resolveApiBaseUrl();
 
 export const isCategoryLike = (item) =>
   item &&
@@ -32,11 +32,13 @@ const fetchJson = async (url) => {
 };
 
 export const fetchAllCategories = async () => {
-  const data = await fetchJson(`${API_BASE_URL}/categories`);
+  const data = await fetchJson(`${getApiBaseUrl()}/categories`);
   return normalizeCategoriesPayload(data);
 };
 
 export const fetchCategoryById = async (id) => {
-  const data = await fetchJson(`${API_BASE_URL}/categories/${encodeURIComponent(id)}`);
+  const data = await fetchJson(
+    `${getApiBaseUrl()}/categories/${encodeURIComponent(id)}`
+  );
   return isCategoryLike(data?.data) ? data.data : null;
 };

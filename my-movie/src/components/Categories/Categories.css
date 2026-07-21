@@ -1,4 +1,6 @@
 .categories {
+  position: relative;
+  z-index: 5;
   margin-bottom: 3rem;
   padding: 0 2rem;
 }
@@ -20,10 +22,11 @@
 .categories-item {
   flex-shrink: 0;
   padding: 0.75rem 1.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 25px;
-  color: #ffffff;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s;
@@ -32,25 +35,36 @@
 
 .categories-item:hover {
   transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.18);
 }
 
 .categories-item--active {
   background-color: rgba(3, 19, 234, 0.5);
   border-color: rgb(3, 19, 234);
-  color: #ffffff;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.categories-item--skeleton {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 
 .categories-item-skeleton {
-  flex-shrink: 0;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
   border-radius: 25px !important;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.28) 45%,
-    rgba(255, 255, 255, 0.12) 90%
-  ) !important;
-  background-size: 200% 100% !important;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.categories-empty {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
 }
 
 @media (max-width: 768px) {
@@ -65,7 +79,7 @@
 }
 
 @media (max-width: 470px) {
-.categories {
+  .categories {
     margin-bottom: 1rem;
   }
 }
