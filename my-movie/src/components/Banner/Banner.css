@@ -118,6 +118,21 @@
     z-index: 1;
 }
 
+/* DB yuklanayotganda left / center / right skeleton layout */
+.manga-carousel--skeleton {
+    pointer-events: none;
+    cursor: default;
+}
+
+.manga-slides--skeleton {
+    justify-content: center;
+    transform: none !important;
+}
+
+.manga-slides--skeleton .manga-image {
+    opacity: 1;
+}
+
 /* Navigation Tugmalari */
 .manga-nav-btn {
     position: absolute;

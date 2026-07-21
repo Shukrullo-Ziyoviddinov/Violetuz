@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { normalizeImagePath } from '../../utils/utils';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './Banner.css';
+
+const BANNER_SKELETON_SLIDES = ['left', 'center', 'right'];
 
 const Banner = () => {
     const navigate = useNavigate();
     const { contentLang } = useContentLanguage();
-    const { allMovies, getBannersByLang } = useMoviesApi();
+    const { allMovies, getBannersByLang, bannersLoading } = useMoviesApi();
     const currentBanners = useMemo(() => {
         const byLang = getBannersByLang(contentLang);
         if (byLang.length) return byLang;
@@ -43,7 +46,6 @@ const Banner = () => {
     const dragStartTimeRef = useRef(0);
     const wasDragRef = useRef(false);
 
-    // Auto-play funksiyalari
     const startAutoPlay = useCallback(() => {
         stopAutoPlay();
         autoPlayIntervalRef.current = setInterval(() => {
@@ -67,7 +69,6 @@ const Banner = () => {
         }
     }, [isUserInteracting, startAutoPlay, stopAutoPlay]);
 
-    // Slayd o'tish funksiyalari
     const goToSlide = useCallback((index) => {
         if (index >= 0 && index < images.length) {
             setCurrentIndex(index);
@@ -88,7 +89,6 @@ const Banner = () => {
         resetAutoPlay();
     }, [images.length, resetAutoPlay]);
 
-    // Drag boshlanishi
     const handleDragStart = (clientX) => {
         wasDragRef.current = false;
         setIsDragging(true);
@@ -99,7 +99,6 @@ const Banner = () => {
         stopAutoPlay();
     };
 
-    // Drag harakati
     const handleDragMove = (clientX) => {
         if (!isDragging) return;
         currentXRef.current = clientX;
@@ -113,7 +112,6 @@ const Banner = () => {
         navigate(image.link);
     };
 
-    // Drag tugashi
     const handleDragEnd = () => {
         if (!isDragging) return;
 
@@ -139,13 +137,11 @@ const Banner = () => {
         resetAutoPlay();
     };
 
-    // Mouse drag
     const handleMouseDown = (e) => {
         e.preventDefault();
         handleDragStart(e.pageX);
     };
 
-    // Touch events
     const handleTouchStart = (e) => {
         handleDragStart(e.touches[0].clientX);
     };
@@ -158,7 +154,6 @@ const Banner = () => {
         handleDragEnd();
     };
 
-    // Document event listeners for drag
     useEffect(() => {
         if (!isDragging) return;
 
@@ -179,7 +174,6 @@ const Banner = () => {
         };
     }, [isDragging]);
 
-    // Keyboard navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'ArrowLeft') {
@@ -193,7 +187,6 @@ const Banner = () => {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [prevSlide, nextSlide]);
 
-    // Mouse enter/leave
     const handleMouseEnter = () => {
         setIsUserInteracting(true);
         stopAutoPlay();
@@ -206,15 +199,12 @@ const Banner = () => {
         }
     };
 
-    // Visibility change
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 stopAutoPlay();
-            } else {
-                if (!isUserInteracting) {
-                    startAutoPlay();
-                }
+            } else if (!isUserInteracting) {
+                startAutoPlay();
             }
         };
 
@@ -222,7 +212,6 @@ const Banner = () => {
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [isUserInteracting, startAutoPlay, stopAutoPlay]);
 
-    // Window resize
     useEffect(() => {
         let resizeTimer;
         const handleResize = () => {
@@ -239,7 +228,6 @@ const Banner = () => {
         };
     }, []);
 
-    // Auto-play boshlash
     useEffect(() => {
         if (images.length > 0) {
             startAutoPlay();
@@ -247,7 +235,6 @@ const Banner = () => {
         return () => stopAutoPlay();
     }, [images.length, startAutoPlay, stopAutoPlay]);
 
-    // Rasmlarni markazlash uchun transform hisoblash
     useEffect(() => {
         if (!slidesRef.current || !carouselRef.current || images.length === 0) return;
 
@@ -261,12 +248,10 @@ const Banner = () => {
             const slidesStyle = getComputedStyle(slidesEl);
             const gap = parseFloat(slidesStyle.columnGap) || parseFloat(slidesStyle.gap) || 8;
 
-            // Markazdagi slayd elementini olish (asosiy blokdagi currentIndex)
             const centerSlideIndex = images.length + currentIndex;
             const centerSlide = slidesEl.children[centerSlideIndex];
             const slideWidth = centerSlide?.offsetWidth ?? slidesEl.querySelector('.manga-image')?.offsetWidth ?? containerWidth * 0.44;
 
-            // Markazdagi slaydning chap chetidan viewport markazigacha bo'lgan masofa
             const centerSlideLeft = centerSlideIndex * (slideWidth + gap);
             const centerSlideCenter = centerSlideLeft + slideWidth / 2;
             const viewportCenter = containerWidth / 2;
@@ -281,12 +266,10 @@ const Banner = () => {
             }
         };
 
-        // Layout tugagach hisoblash
         const rafId = requestAnimationFrame(() => {
             requestAnimationFrame(updateTransform);
         });
 
-        // Konteyner o'lchami o'zgarganda qayta hisoblash
         const resizeObserver = new ResizeObserver(() => {
             requestAnimationFrame(updateTransform);
         });
@@ -298,12 +281,10 @@ const Banner = () => {
         };
     }, [currentIndex, dragOffset, isDragging, images.length]);
 
-    // Slayd pozitsiyalarini hisoblash
     const getSlideClass = (index) => {
         const total = images.length;
         if (total === 0) return 'hidden';
 
-        // Check if this slide should be visible
         const diff = index - currentIndex;
 
         if (diff === 0) return 'center';
@@ -312,6 +293,57 @@ const Banner = () => {
 
         return 'hidden';
     };
+
+    const renderSlideContent = (image, index, slideClass) => {
+        const showSkeleton =
+            bannersLoading &&
+            (slideClass === 'center' || slideClass === 'left' || slideClass === 'right');
+
+        if (showSkeleton) {
+            return (
+                <SkeletonLoader
+                    variant="banner-image"
+                    className="manga-image-skeleton loader-skeleton"
+                />
+            );
+        }
+
+        return (
+            <img
+                src={normalizeImagePath(image.src)}
+                alt={`Banner ${index + 1}`}
+                draggable={false}
+                onError={(e) => {
+                    e.target.src = normalizeImagePath('/img/no-image.png');
+                }}
+            />
+        );
+    };
+
+    if (bannersLoading && images.length === 0) {
+        return (
+            <div className="banner">
+                <div className="banner-container">
+                    <div
+                        className="manga-carousel manga-carousel--skeleton"
+                        aria-busy="true"
+                        aria-label="Banner yuklanmoqda"
+                    >
+                        <ul className="manga-slides manga-slides--skeleton">
+                            {BANNER_SKELETON_SLIDES.map((slideClass) => (
+                                <li key={slideClass} className={`manga-image ${slideClass}`}>
+                                    <SkeletonLoader
+                                        variant="banner-image"
+                                        className="manga-image-skeleton loader-skeleton"
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (images.length === 0) return null;
 
@@ -345,7 +377,6 @@ const Banner = () => {
                 </button>
 
                 <ul className="manga-slides" ref={slidesRef}>
-                    {/* Oldingi rasmlar (clone) - infinite effect uchun */}
                     {images.map((image, index) => {
                         const slideClass = getSlideClass(index - images.length);
                         return (
@@ -353,22 +384,14 @@ const Banner = () => {
                             key={`prev-${image.id || index}`}
                             className={`manga-image ${slideClass}`}
                             aria-hidden="true"
-                            onClick={() => handleSlideClick(image)}
+                            onClick={() => !bannersLoading && handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            <img
-                                src={normalizeImagePath(image.src)}
-                                alt={`Banner ${index + 1}`}
-                                draggable={false}
-                                onError={(e) => {
-                                    e.target.src = normalizeImagePath('/img/no-image.png');
-                                }}
-                            />
+                            {renderSlideContent(image, index, slideClass)}
                         </li>
                         );
                     })}
 
-                    {/* Asosiy rasmlar */}
                     {images.map((image, index) => {
                         const slideClass = getSlideClass(index);
                         return (
@@ -376,22 +399,14 @@ const Banner = () => {
                             key={image.id || index}
                             className={`manga-image ${slideClass}`}
                             aria-hidden={index !== currentIndex}
-                            onClick={() => handleSlideClick(image)}
+                            onClick={() => !bannersLoading && handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            <img
-                                src={normalizeImagePath(image.src)}
-                                alt={`Banner ${index + 1}`}
-                                draggable={false}
-                                onError={(e) => {
-                                    e.target.src = normalizeImagePath('/img/no-image.png');
-                                }}
-                            />
+                            {renderSlideContent(image, index, slideClass)}
                         </li>
                         );
                     })}
 
-                    {/* Keyingi rasmlar (clone) - infinite effect uchun */}
                     {images.map((image, index) => {
                         const slideClass = getSlideClass(index + images.length);
                         return (
@@ -399,17 +414,10 @@ const Banner = () => {
                             key={`next-${image.id || index}`}
                             className={`manga-image ${slideClass}`}
                             aria-hidden="true"
-                            onClick={() => handleSlideClick(image)}
+                            onClick={() => !bannersLoading && handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            <img
-                                src={normalizeImagePath(image.src)}
-                                alt={`Banner ${index + 1}`}
-                                draggable={false}
-                                onError={(e) => {
-                                    e.target.src = normalizeImagePath('/img/no-image.png');
-                                }}
-                            />
+                            {renderSlideContent(image, index, slideClass)}
                         </li>
                         );
                     })}
