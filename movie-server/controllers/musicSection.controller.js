@@ -1,16 +1,22 @@
 const fs = require('fs');
-const { MUSIC_SECTIONS_JSON, MUSIC_PAGE_CONTENT_JSON } = require('../config/paths');
+const { MUSIC_PAGE_CONTENT_JSON } = require('../config/paths');
+const musicSectionService = require('../services/musicSection.service');
 const { sendSuccess } = require('../utils/response');
 
-const getMusicSections = (_req, res) => {
-  const raw = fs.readFileSync(MUSIC_SECTIONS_JSON, 'utf8');
-  const sections = JSON.parse(raw);
+const getMusicSections = async (_req, res) => {
+  const sections = await musicSectionService.getAll();
   sendSuccess(res, {
-    count: Array.isArray(sections) ? sections.length : 0,
+    count: sections.length,
     data: sections,
   });
 };
 
+const getMusicSectionById = async (req, res) => {
+  const item = await musicSectionService.getById(req.params.id);
+  sendSuccess(res, { data: item });
+};
+
+/** Music page layout blocks from file (not music section definitions). */
 const getMusicPageContent = (_req, res) => {
   const raw = fs.readFileSync(MUSIC_PAGE_CONTENT_JSON, 'utf8');
   const content = JSON.parse(raw);
@@ -22,5 +28,6 @@ const getMusicPageContent = (_req, res) => {
 
 module.exports = {
   getMusicSections,
+  getMusicSectionById,
   getMusicPageContent,
 };

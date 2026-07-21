@@ -1,26 +1,31 @@
-const fs = require('fs');
-const { MOVIE_SECTIONS_JSON, HOME_CONTENT_JSON } = require('../config/paths');
+const movieSectionService = require('../services/movieSection.service');
+const homeContentService = require('../services/homeContent.service');
 const { sendSuccess } = require('../utils/response');
 
-const getMovieSections = (_req, res) => {
-  const raw = fs.readFileSync(MOVIE_SECTIONS_JSON, 'utf8');
-  const sections = JSON.parse(raw);
+const getMovieSections = async (_req, res) => {
+  const sections = await movieSectionService.getAll();
   sendSuccess(res, {
-    count: Array.isArray(sections) ? sections.length : 0,
+    count: sections.length,
     data: sections,
   });
 };
 
-const getHomeContent = (_req, res) => {
-  const raw = fs.readFileSync(HOME_CONTENT_JSON, 'utf8');
-  const content = JSON.parse(raw);
+const getMovieSectionById = async (req, res) => {
+  const item = await movieSectionService.getById(req.params.id);
+  sendSuccess(res, { data: item });
+};
+
+/** Home page layout blocks from DB (not movie section definitions). */
+const getHomeContent = async (_req, res) => {
+  const content = await homeContentService.getBlocks();
   sendSuccess(res, {
-    count: Array.isArray(content) ? content.length : 0,
+    count: content.length,
     data: content,
   });
 };
 
 module.exports = {
   getMovieSections,
+  getMovieSectionById,
   getHomeContent,
 };

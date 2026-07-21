@@ -1,16 +1,21 @@
-const fs = require('fs');
-const { CONCERT_SECTIONS_JSON } = require('../config/paths');
+const concertSectionService = require('../services/concertSection.service');
 const { sendSuccess } = require('../utils/response');
 
-const getConcertSections = (_req, res) => {
-  const raw = fs.readFileSync(CONCERT_SECTIONS_JSON, 'utf8');
-  const sections = JSON.parse(raw);
+const getConcertSections = async (_req, res) => {
+  const items = await concertSectionService.getAll();
+
   sendSuccess(res, {
-    count: Array.isArray(sections) ? sections.length : 0,
-    data: sections,
+    count: items.length,
+    data: items,
   });
+};
+
+const getConcertSectionById = async (req, res) => {
+  const item = await concertSectionService.getById(req.params.id);
+  sendSuccess(res, { data: item });
 };
 
 module.exports = {
   getConcertSections,
+  getConcertSectionById,
 };

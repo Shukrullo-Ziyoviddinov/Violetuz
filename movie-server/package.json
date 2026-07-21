@@ -22,6 +22,10 @@
     "seed:artists": "node seeds/seedArtists.js",
     "seed:music-shorts": "node seeds/seedMusicShorts.js",
     "seed:music-banners": "node seeds/seedMusicBanners.js",
+    "seed:concert-sections": "node seeds/seedConcertSections.js",
+    "seed:home-content": "node seeds/seedHomeContent.js",
+    "seed:movie-sections": "node seeds/seedMovieSections.js",
+    "seed:music-sections": "node seeds/seedMusicSections.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
