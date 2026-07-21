@@ -401,6 +401,30 @@ const validateGenreListQuery = (req, _res, next) => {
   next();
 };
 
+const validateNavCategoryIdParam = (req, _res, next) => {
+  const categoryId = String(req.params.id || '').trim();
+  if (!categoryId) {
+    return next(badRequest('Invalid category id. It is required.'));
+  }
+
+  req.params.id = categoryId;
+  next();
+};
+
+const validateNavCategoryListQuery = (req, _res, next) => {
+  const { search } = req.query;
+
+  if (search != null && !String(search).trim()) {
+    return next(badRequest('search query cannot be empty.'));
+  }
+
+  if (search != null) {
+    req.query.search = String(search).trim();
+  }
+
+  next();
+};
+
 const validateActorPageLabelIdParam = (req, _res, next) => {
   const labelId = String(req.params.id || '').trim();
   if (!labelId) {
@@ -611,6 +635,8 @@ module.exports = {
   validateBannerListQuery,
   validateGenreIdParam,
   validateGenreListQuery,
+  validateNavCategoryIdParam,
+  validateNavCategoryListQuery,
   validateActorPageLabelIdParam,
   validateAdIdParam,
   validateAdListQuery,

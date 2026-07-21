@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchAllMovies, fetchMovieById, fetchMovieSections, fetchHomeContent } from '../api/moviesApi';
 import { fetchAllBanners } from '../api/bannersApi';
 import { fetchAllGenres } from '../api/genresApi';
+import { fetchAllCategories } from '../api/categoriesApi';
 import { fetchAllAds } from '../api/adsApi';
 import { fetchAllShorts } from '../api/shortsApi';
 import { fetchSiteLinks } from '../api/siteLinksApi';
@@ -40,6 +41,12 @@ export const MoviesApiProvider = ({ children }) => {
   const genresQuery = useQuery({
     queryKey: ['genres'],
     queryFn: fetchAllGenres,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+  const categoriesQuery = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchAllCategories,
     staleTime: 5 * 60_000,
     retry: 1,
   });
@@ -88,6 +95,10 @@ export const MoviesApiProvider = ({ children }) => {
     () => (Array.isArray(genresQuery.data) ? genresQuery.data : []),
     [genresQuery.data]
   );
+  const allCategories = useMemo(
+    () => (Array.isArray(categoriesQuery.data) ? categoriesQuery.data : []),
+    [categoriesQuery.data]
+  );
   const allAds = useMemo(
     () => (Array.isArray(adsQuery.data) ? adsQuery.data : []),
     [adsQuery.data]
@@ -120,6 +131,7 @@ export const MoviesApiProvider = ({ children }) => {
     homeContentQuery.isLoading ||
     bannersQuery.isLoading ||
     genresQuery.isLoading ||
+    categoriesQuery.isLoading ||
     adsQuery.isLoading ||
     shortsQuery.isLoading ||
     siteLinksQuery.isLoading ||
@@ -130,6 +142,7 @@ export const MoviesApiProvider = ({ children }) => {
     homeContentQuery.error?.message ||
     bannersQuery.error?.message ||
     genresQuery.error?.message ||
+    categoriesQuery.error?.message ||
     adsQuery.error?.message ||
     shortsQuery.error?.message ||
     siteLinksQuery.error?.message ||
@@ -142,6 +155,7 @@ export const MoviesApiProvider = ({ children }) => {
     homeContent,
     allBanners,
     allGenres,
+    allCategories,
     allAds,
     allShortsVideos,
     movieShortsCatalog,
@@ -157,6 +171,7 @@ export const MoviesApiProvider = ({ children }) => {
     getVideoBannersByType: (type) =>
       type ? allVideoBanners.filter((b) => b.type === type) : allVideoBanners,
     getGenreById: (id) => allGenres.find((g) => g.id === id) || null,
+    getCategoryById: (id) => allCategories.find((c) => String(c.id) === String(id)) || null,
     getActiveAd: () => allAds.find((ad) => ad.isActive) || allAds[0] || null,
     getShortByIdLocal: (id) =>
       movieShortsCatalog.find((s) => String(s.id) === String(id)) || null,
@@ -182,6 +197,13 @@ export const MoviesApiProvider = ({ children }) => {
         queryFn: fetchAllGenres,
       });
       return genres;
+    },
+    refreshCategories: async () => {
+      const categories = await queryClient.fetchQuery({
+        queryKey: ['categories'],
+        queryFn: fetchAllCategories,
+      });
+      return categories;
     },
     refreshAds: async () => {
       const ads = await queryClient.fetchQuery({
@@ -218,6 +240,7 @@ export const MoviesApiProvider = ({ children }) => {
     homeContent,
     allBanners,
     allGenres,
+    allCategories,
     allAds,
     allShortsVideos,
     movieShortsCatalog,

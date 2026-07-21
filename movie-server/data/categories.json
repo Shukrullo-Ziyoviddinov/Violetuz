@@ -1,0 +1,47 @@
+[
+  {
+    "id": "romantika",
+    "title": { "uz": "Romantika", "ru": "Романтика" },
+    "filterCategory": "Romantika"
+  },
+  {
+    "id": "multfilimlar",
+    "title": { "uz": "Multfilimlar", "ru": "Мультфильмы" },
+    "filterCategory": "Multfilimlar"
+  },
+  {
+    "id": "anime",
+    "title": { "uz": "Anime", "ru": "Аниме" },
+    "filterCategory": "anime"
+  },
+  {
+    "id": "doramalar",
+    "title": { "uz": "Doramalar", "ru": "Дорамы" },
+    "filterCategory": "Doramalar"
+  },
+  {
+    "id": "komediya",
+    "title": { "uz": "Komediya", "ru": "Комедия" },
+    "filterCategory": "Komediya"
+  },
+  {
+    "id": "jangari",
+    "title": { "uz": "Jangari", "ru": "Боевик" },
+    "filterCategory": "Jangari"
+  },
+  {
+    "id": "horror",
+    "title": { "uz": "Horror", "ru": "Ужасы" },
+    "filterCategory": "Horror"
+  },
+  {
+    "id": "sarguzasht",
+    "title": { "uz": "Sarguzasht", "ru": "Приключения" },
+    "filterCategory": "Sarguzasht"
+  },
+  {
+    "id": "fantastika",
+    "title": { "uz": "Fantastika", "ru": "Фантастика" },
+    "filterCategory": "Fantastika"
+  }
+]

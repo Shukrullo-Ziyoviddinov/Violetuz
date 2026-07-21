@@ -15,23 +15,15 @@ const getRatingFilter = (movie, selectedRatingType, selectedRating) => {
   return val != null && val !== '' && val !== 'none' && (val == selectedRating || Number(val) === Number(selectedRating));
 };
 
-// Janr kategoriyalari - categoryId (URL) → category (data)
-const GENRE_CATEGORY_MAP = {
-  romantika: 'Romantika',
-  multfilimlar: 'Multfilimlar',
-  anime: 'anime',
-  doramalar: 'Doramalar',
-  komediya: 'Komediya',
-  jangari: 'Jangari',
-  horror: 'Horror',
-  sarguzasht: 'Sarguzasht',
-  fantastika: 'Fantastika',
+const matchesFilterCategory = (movieCategory, filterCategory) => {
+  if (filterCategory == null) return false;
+  const values = Array.isArray(filterCategory) ? filterCategory : [filterCategory];
+  return values.some((value) => String(movieCategory) === String(value));
 };
 
-const filterMoviesByGenreCategory = (movies, genreCategoryId) => {
-  const categoryValue = GENRE_CATEGORY_MAP[genreCategoryId];
-  if (!categoryValue) return movies;
-  return movies.filter((movie) => movie.category === categoryValue);
+const filterMoviesByNavCategory = (movies, categoryConfig) => {
+  if (!categoryConfig) return movies;
+  return movies.filter((movie) => matchesFilterCategory(movie.category, categoryConfig.filterCategory));
 };
 
 const getSimilarMovies = (currentMovie, movies) => {
@@ -73,7 +65,7 @@ const RecommendedPage = () => {
   const [searchParams] = useSearchParams();
   const genreFromUrl = searchParams.get('genre');
   const { recommendedLoading, setLoading } = useLoading();
-  const { allMovies, allGenres } = useMoviesApi();
+  const { allMovies, allGenres, getCategoryById } = useMoviesApi();
 
   const getGenresFromUrl = useCallback((g) => {
     if (!g) return [];
@@ -103,8 +95,9 @@ const RecommendedPage = () => {
   // Genre filter bo'lsa (URL ?genre=) - barcha kinolardan qidirish (allMovies)
   const useAllMoviesForGenre = genreFromUrl && selectedGenres.length > 0;
 
-  // Janr kategoriyasi (romantika, sarguzasht, fantastika va h.k.) - barcha kinolardan filterGenre bo'yicha filterlash
-  const isGenreCategory = categoryId && GENRE_CATEGORY_MAP[categoryId];
+  // Categories bar (/category/romantika va h.k.) - DB categories.filterCategory
+  const navCategory = categoryId ? getCategoryById(categoryId) : null;
+  const isNavCategory = Boolean(navCategory);
 
   // /similar-movies/:movieId - o'xshash filmlar (detail sahifadagi bilan bir xil); /recommended - tavsiya; /category/topRated - yuqori reytingli; /category/:id - bo'lim kinolari yoki janr
   const categoryFiltered = isSimilarMoviesPage && movieId
@@ -118,8 +111,8 @@ const RecommendedPage = () => {
     ? allMovies.filter((movie) => movie.categoryName === 'movies')
     : categoryId === 'topRated'
       ? getTopRatedMovies(allMovies)
-      : isGenreCategory
-        ? filterMoviesByGenreCategory(allMovies, categoryId)
+      : isNavCategory
+        ? filterMoviesByNavCategory(allMovies, navCategory)
         : categoryId
           ? allMovies.filter(movie =>
               movie.typeCategory?.includes(categoryId) ||

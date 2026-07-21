@@ -16,6 +16,7 @@ module.exports = {
   ARTIST_MUSIC_STORIES_JSON: path.join(ROOT, 'data', 'artistMusicStories.json'),
   BANNERS_JSON: path.join(ROOT, 'data', 'banners.json'),
   GENRES_JSON: path.join(ROOT, 'data', 'genres.json'),
+  CATEGORIES_JSON: path.join(ROOT, 'data', 'categories.json'),
   ADS_JSON: path.join(ROOT, 'data', 'ads.json'),
   SHORTS_VIDEOS_JSON: path.join(ROOT, 'data', 'shortsVideos.json'),
   SOCIAL_LINKS_JSON: path.join(ROOT, 'data', 'socialLinks.json'),

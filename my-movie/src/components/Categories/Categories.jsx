@@ -2,24 +2,16 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
+import { useMoviesApi } from '../../context/MoviesApiContext';
+import { getLocalizedText } from '../../utils/utils';
 import './Categories.css';
 
 const Categories = () => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const categories = [
-    { id: 'romantika', key: 'romantika' },
-    { id: 'multfilimlar', key: 'multfilimlar' },
-    { id: 'anime', key: 'anime' },
-    { id: 'doramalar', key: 'doramalar' },
-    { id: 'komediya', key: 'komediya' },
-    { id: 'jangari', key: 'jangari' },
-    { id: 'horror', key: 'horror' },
-    { id: 'sarguzasht', key: 'sarguzasht' },
-    { id: 'fantastika', key: 'fantastika' },
-  ];
+  const { allCategories } = useMoviesApi();
+  const lang = i18n.language || 'uz';
 
   const handleCategoryClick = (categoryId) => {
     navigate(`/category/${categoryId}`);
@@ -33,13 +25,13 @@ const Categories = () => {
     <div className="categories">
       <div className="categories-container">
         <ScrollTouch className="categories-scroll-touch">
-          {categories.map((category) => (
+          {(Array.isArray(allCategories) ? allCategories : []).map((category) => (
             <button
               key={category.id}
               className={`categories-item ${isActiveCategory(category.id) ? 'categories-item--active' : ''}`}
               onClick={() => handleCategoryClick(category.id)}
             >
-              {t(`categories.${category.key}`)}
+              {getLocalizedText(category.title, lang)}
             </button>
           ))}
         </ScrollTouch>

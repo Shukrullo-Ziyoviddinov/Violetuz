@@ -15,6 +15,7 @@
     "seed:artist-music-stories": "node seeds/seedArtistMusicStories.js",
     "seed:banners": "node seeds/seedBanners.js",
     "seed:genres": "node seeds/seedGenres.js",
+    "seed:categories": "node seeds/seedCategories.js",
     "seed:ads": "node seeds/seedAds.js",
     "seed:shorts": "node seeds/seedShortVideos.js",
     "seed:site-links": "node seeds/seedSiteLinks.js",
