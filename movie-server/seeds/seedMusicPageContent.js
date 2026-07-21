@@ -3,8 +3,8 @@ require('dotenv').config();
 const fs = require('fs');
 
 const connectDB = require('../config/db');
-const HomeContent = require('../models/HomeContent.model');
-const { HOME_CONTENT_JSON } = require('../config/paths');
+const MusicPageContent = require('../models/MusicPageContent.model');
+const { MUSIC_PAGE_CONTENT_JSON } = require('../config/paths');
 
 const normalizeBlock = (block, sortOrder) => {
   if (!block || typeof block !== 'object' || !block.type) return null;
@@ -18,15 +18,21 @@ const normalizeBlock = (block, sortOrder) => {
   if (block.variant != null && String(block.variant).trim() !== '') {
     out.variant = String(block.variant).trim();
   }
+  if (block.source != null && String(block.source).trim() !== '') {
+    out.source = String(block.source).trim();
+  }
+  if (block.typeFilter != null && String(block.typeFilter).trim() !== '') {
+    out.typeFilter = String(block.typeFilter).trim();
+  }
   return out.type ? out : null;
 };
 
-const seedHomeContent = async () => {
-  const raw = fs.readFileSync(HOME_CONTENT_JSON, 'utf8');
+const seedMusicPageContent = async () => {
+  const raw = fs.readFileSync(MUSIC_PAGE_CONTENT_JSON, 'utf8');
   const blocks = JSON.parse(raw);
 
   if (!Array.isArray(blocks) || blocks.length === 0) {
-    throw new Error('homeContent.json is empty or invalid');
+    throw new Error('musicPageContent.json is empty or invalid');
   }
 
   const normalized = blocks
@@ -34,18 +40,18 @@ const seedHomeContent = async () => {
     .filter(Boolean);
 
   if (normalized.length === 0) {
-    throw new Error('homeContent.json has no valid layout blocks');
+    throw new Error('musicPageContent.json has no valid layout blocks');
   }
 
-  await HomeContent.deleteMany({});
+  await MusicPageContent.deleteMany({});
 
-  const doc = new HomeContent({
-    id: 'home',
+  const doc = new MusicPageContent({
+    id: 'music',
     blocks: normalized,
   });
   await doc.save();
 
-  console.log(`Home content seeded: id=${doc.id}`);
+  console.log(`Music page content seeded: id=${doc.id}`);
   console.log(`Layout blocks: ${normalized.length}`);
   console.log(`sortOrder range: 1 - ${normalized.length}`);
   console.log(`Block types: ${[...new Set(normalized.map((b) => b.type))].join(', ')}`);
@@ -59,10 +65,10 @@ const seedHomeContent = async () => {
 const run = async () => {
   try {
     await connectDB();
-    await seedHomeContent();
+    await seedMusicPageContent();
     process.exit(0);
   } catch (error) {
-    console.error('Home content seed failed:', error.message);
+    console.error('Music page content seed failed:', error.message);
     process.exit(1);
   }
 };
@@ -71,4 +77,4 @@ if (require.main === module) {
   run();
 }
 
-module.exports = seedHomeContent;
+module.exports = seedMusicPageContent;

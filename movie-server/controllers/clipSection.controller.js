@@ -1,16 +1,20 @@
-const fs = require('fs');
-const { CLIP_SECTIONS_JSON } = require('../config/paths');
+const clipSectionService = require('../services/clipSection.service');
 const { sendSuccess } = require('../utils/response');
 
-const getClipSections = (_req, res) => {
-  const raw = fs.readFileSync(CLIP_SECTIONS_JSON, 'utf8');
-  const sections = JSON.parse(raw);
+const getClipSections = async (_req, res) => {
+  const sections = await clipSectionService.getAll();
   sendSuccess(res, {
-    count: Array.isArray(sections) ? sections.length : 0,
+    count: sections.length,
     data: sections,
   });
 };
 
+const getClipSectionById = async (req, res) => {
+  const item = await clipSectionService.getById(req.params.id);
+  sendSuccess(res, { data: item });
+};
+
 module.exports = {
   getClipSections,
+  getClipSectionById,
 };

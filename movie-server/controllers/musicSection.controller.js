@@ -1,6 +1,5 @@
-const fs = require('fs');
-const { MUSIC_PAGE_CONTENT_JSON } = require('../config/paths');
 const musicSectionService = require('../services/musicSection.service');
+const musicPageContentService = require('../services/musicPageContent.service');
 const { sendSuccess } = require('../utils/response');
 
 const getMusicSections = async (_req, res) => {
@@ -16,12 +15,11 @@ const getMusicSectionById = async (req, res) => {
   sendSuccess(res, { data: item });
 };
 
-/** Music page layout blocks from file (not music section definitions). */
-const getMusicPageContent = (_req, res) => {
-  const raw = fs.readFileSync(MUSIC_PAGE_CONTENT_JSON, 'utf8');
-  const content = JSON.parse(raw);
+/** Music page layout blocks from DB (not music section definitions). */
+const getMusicPageContent = async (_req, res) => {
+  const content = await musicPageContentService.getBlocks();
   sendSuccess(res, {
-    count: Array.isArray(content) ? content.length : 0,
+    count: content.length,
     data: content,
   });
 };

@@ -26,6 +26,8 @@
     "seed:home-content": "node seeds/seedHomeContent.js",
     "seed:movie-sections": "node seeds/seedMovieSections.js",
     "seed:music-sections": "node seeds/seedMusicSections.js",
+    "seed:music-page-content": "node seeds/seedMusicPageContent.js",
+    "seed:clip-sections": "node seeds/seedClipSections.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

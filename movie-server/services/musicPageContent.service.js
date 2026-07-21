@@ -1,7 +1,7 @@
-const HomeContentModel = require('../models/HomeContent.model');
+const MusicPageContentModel = require('../models/MusicPageContent.model');
 const { notFound } = require('../utils/errors');
 
-const DEFAULT_ID = 'home';
+const DEFAULT_ID = 'music';
 
 const stripMongoId = (doc) => {
   if (!doc) return doc;
@@ -29,21 +29,27 @@ const normalizeBlock = (block, fallbackOrder = 0) => {
   if (block.variant != null && String(block.variant).trim() !== '') {
     out.variant = String(block.variant).trim();
   }
+  if (block.source != null && String(block.source).trim() !== '') {
+    out.source = String(block.source).trim();
+  }
+  if (block.typeFilter != null && String(block.typeFilter).trim() !== '') {
+    out.typeFilter = String(block.typeFilter).trim();
+  }
 
   return out;
 };
 
-class HomeContentService {
+class MusicPageContentService {
   async getDocument(id = DEFAULT_ID) {
     const docId = String(id || DEFAULT_ID).trim() || DEFAULT_ID;
-    const item = await HomeContentModel.findOne({ id: docId }).lean();
+    const item = await MusicPageContentModel.findOne({ id: docId }).lean();
     if (!item) {
-      throw notFound(`Home content not found: ${docId}`);
+      throw notFound(`Music page content not found: ${docId}`);
     }
     return stripMongoId(item);
   }
 
-  /** Ordered layout blocks for the home page (sorted by sortOrder). */
+  /** Ordered layout blocks for the music page (sorted by sortOrder). */
   async getBlocks(id = DEFAULT_ID) {
     const item = await this.getDocument(id);
     const blocks = Array.isArray(item.blocks) ? item.blocks : [];
@@ -61,10 +67,10 @@ class HomeContentService {
       .filter(Boolean)
       .sort((a, b) => a.sortOrder - b.sortOrder);
 
-    const item = new HomeContentModel(rest);
+    const item = new MusicPageContentModel(rest);
     await item.save();
     return stripMongoId(item);
   }
 }
 
-module.exports = new HomeContentService();
+module.exports = new MusicPageContentService();

@@ -17,6 +17,11 @@ const homeContentSchema = new mongoose.Schema(
     blocks: {
       type: [
         {
+          sortOrder: {
+            type: Number,
+            required: true,
+            index: true,
+          },
           type: {
             type: String,
             required: true,
