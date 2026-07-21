@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { artists } from '../../dataMusic/artists';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useMusicApi } from '../../context/MusicApiContext';
@@ -30,7 +29,7 @@ const LikeHistory = ({ items = [], activeCategory = '' }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allClips, allConcerts } = useMusicApi();
+  const { allClips, allConcerts, getArtistById } = useMusicApi();
   const { allMovies } = useMoviesApi();
 
   if (!items.length) {
@@ -129,7 +128,7 @@ const LikeHistory = ({ items = [], activeCategory = '' }) => {
             ? sourceList.find((v) => Number(v.id) === videoIdFromRoute)
             : null;
           const artistName = mediaItem?.artistId
-            ? (artists.find((a) => a.id === mediaItem.artistId)?.name || '')
+            ? (getArtistById(mediaItem.artistId)?.name || '')
             : '';
           const wlType = item.category === 'concert' ? 'konsert' : 'klip';
           const wlId =

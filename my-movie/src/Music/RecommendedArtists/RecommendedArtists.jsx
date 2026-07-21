@@ -2,13 +2,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
-import { artists } from '../../dataMusic/artists';
+import { useMusicApi } from '../../context/MusicApiContext';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import './RecommendedArtists.css';
 
 const RecommendedArtists = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { allArtists } = useMusicApi();
 
   const handleArtistClick = (artistId) => {
     navigate(`/music/artist/${artistId}`);
@@ -24,7 +25,7 @@ const RecommendedArtists = () => {
         </div>
         <div className="recommended-artists-content">
           <HorizontalScroll scrollAmount={140}>
-            {artists.map((artist) => (
+            {allArtists.map((artist) => (
               <div
                 key={artist.id}
                 className="recommended-artists-item"

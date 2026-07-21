@@ -519,6 +519,74 @@ const validateVideoBannerListQuery = (req, _res, next) => {
   next();
 };
 
+const validateArtistIdParam = (req, _res, next) => {
+  const artistId = String(req.params.id || '').trim();
+  if (!artistId) {
+    return next(badRequest('Invalid artist id. It is required.'));
+  }
+
+  req.params.id = artistId;
+  next();
+};
+
+const validateMusicShortIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid music short id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
+const validateMusicShortListQuery = (req, _res, next) => {
+  const { contentType, artistId, musicId, movieId } = req.query;
+
+  if (contentType != null) {
+    const normalized = String(contentType).trim().toLowerCase();
+    if (!['music', 'klip', 'konsert'].includes(normalized)) {
+      return next(badRequest('contentType query must be music, klip, or konsert.'));
+    }
+    req.query.contentType = normalized;
+  }
+
+  if (artistId != null) {
+    const normalized = String(artistId).trim();
+    if (!normalized) {
+      return next(badRequest('artistId query must be a non-empty string.'));
+    }
+    req.query.artistId = normalized;
+  }
+
+  if (musicId != null) {
+    const numericId = Number(musicId);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return next(badRequest('musicId query must be a positive integer.'));
+    }
+    req.query.musicId = String(numericId);
+  }
+
+  if (movieId != null) {
+    const numericId = Number(movieId);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return next(badRequest('movieId query must be a positive integer.'));
+    }
+    req.query.movieId = String(numericId);
+  }
+
+  next();
+};
+
+const validateMusicBannerIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid music banner id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -552,4 +620,8 @@ module.exports = {
   validateVideoBannerIdParam,
   validateVideoBannerTypeParam,
   validateVideoBannerListQuery,
+  validateArtistIdParam,
+  validateMusicShortIdParam,
+  validateMusicShortListQuery,
+  validateMusicBannerIdParam,
 };

@@ -5,7 +5,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import { useRecommendedAlbums } from '../../services/recommendedAlbumsService';
-import { artists } from '../../dataMusic/artists';
+import { useMusicApi } from '../../context/MusicApiContext';
 import './AlbumsForYou.css';
 
 /**
@@ -32,9 +32,11 @@ const AlbumsForYou = ({ music, album, klip, titleKey = 'music.albumsForYou' }) =
     return String(item.title);
   };
 
+  const { getArtistById } = useMusicApi();
+
   const getArtistText = (item) => {
     if (item?.artist) return item.artist;
-    const artist = artists.find((a) => a.id === item?.artistId);
+    const artist = getArtistById(item?.artistId);
     return artist?.name || item?.artistId || '';
   };
 

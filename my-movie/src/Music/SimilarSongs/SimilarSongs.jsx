@@ -5,7 +5,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import { useSimilarSongs } from '../../services/similarSongsService';
-import { artists } from '../../dataMusic/artists';
+import { useMusicApi } from '../../context/MusicApiContext';
 import './SimilarSongs.css';
 
 /**
@@ -30,8 +30,10 @@ const SimilarSongs = ({ music, album, klip, titleKey = 'music.similarSongs' }) =
     return String(item.title);
   };
 
+  const { getArtistById } = useMusicApi();
+
   const getArtistName = (artistId) => {
-    const artist = artists.find((a) => a.id === artistId);
+    const artist = getArtistById(artistId);
     return artist?.name || artistId || '';
   };
 

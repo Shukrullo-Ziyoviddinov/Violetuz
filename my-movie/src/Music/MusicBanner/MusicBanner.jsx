@@ -3,21 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { normalizeImagePath } from '../../utils/utils';
 import { getLocalizedText } from '../../utils/utils';
-import { musicBanner } from '../../dataMusic/musicBanner';
+import { useMusicApi } from '../../context/MusicApiContext';
 import './MusicBanner.css';
 
 const MusicBanner = () => {
     const navigate = useNavigate();
     const { i18n } = useTranslation();
+    const { allMusicBanners } = useMusicApi();
     const lang = i18n.language || 'uz';
     const images = useMemo(() => {
-        const banners = Array.isArray(musicBanner) ? musicBanner : [];
+        const banners = Array.isArray(allMusicBanners) ? allMusicBanners : [];
         return banners.map((item) => ({
             id: item.id,
             src: typeof item.img === 'object' ? getLocalizedText(item.img, lang) : item.img,
             link: item.buttonId ? `/music/${item.buttonId}` : null
         })).filter((img) => img.src);
-    }, [lang]);
+    }, [lang, allMusicBanners]);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [dragOffset, setDragOffset] = useState(0);

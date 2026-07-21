@@ -1,12 +1,14 @@
 import React from 'react';
 import ShortsVideos from '../components/ShortsVideos/ShortsVideos';
-import { musicShorts } from '../dataMusic/musicShorts';
+import { useMusicApi } from '../context/MusicApiContext';
 
 const MusicShorts = ({ startIndex = null, onCloseFromHome = null, repostIds = null, repostShortsEntries = null }) => {
+  const { musicShortsCatalog } = useMusicApi();
+
   return (
     <div className="music-shorts">
       <ShortsVideos
-        initialShorts={musicShorts}
+        initialShorts={musicShortsCatalog}
         startIndex={startIndex}
         onCloseFromHome={onCloseFromHome}
         variant="music"

@@ -6,7 +6,6 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
-import { musicShorts as musicShortsCatalog } from '../../dataMusic/musicShorts';
 import { addWatch, getWatchHistory } from '../../api/shortsWatchHistory';
 import { getShortsRecommendations } from '../../algo/shortsRecommendationAlgo';
 import VertikalDrag from '../VertikalDrag/VertikalDrag';
@@ -147,7 +146,7 @@ const ShortsVideos = ({
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { allShortsVideos, allMovies } = useMoviesApi();
-  const { allMusic, allClips, allConcerts } = useMusicApi();
+  const { allMusic, allClips, allConcerts, musicShortsCatalog } = useMusicApi();
   const movieShortsCatalog = useMemo(
     () =>
       resolveShortsWithMovies(allShortsVideos, allMovies, allMusic, allClips, allConcerts),
@@ -175,7 +174,7 @@ const ShortsVideos = ({
       if (repostIds?.length) hasLoadedMore.current = true;
       else hasLoadedMore.current = false;
     }
-  }, [baseList, repostIds, repostShortsEntries, movieShortsCatalog]);
+  }, [baseList, repostIds, repostShortsEntries, movieShortsCatalog, musicShortsCatalog]);
 
   const slideMusic = useMemo(() => {
     if (repostShortsEntries?.length) {

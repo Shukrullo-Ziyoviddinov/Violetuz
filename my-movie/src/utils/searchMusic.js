@@ -5,7 +5,6 @@
  * Stop words va minimal moslik – faqat aniq natijalar chiqadi.
  */
 import { ensureArray } from './musicDataUtils';
-import { artists } from '../dataMusic/artists';
 
 const normalize = (s) => (s || '').toLowerCase().trim().replace(/\s+/g, ' ');
 
@@ -27,8 +26,8 @@ const getTitleForLang = (item, lang) => {
   return String(item.title);
 };
 
-const getArtistName = (artistId) => {
-  const artist = artists.find((a) => a.id === artistId);
+export const getArtistName = (artistId, artistsList = []) => {
+  const artist = artistsList.find((a) => a.id === artistId);
   return artist?.name || artistId || '';
 };
 
@@ -85,10 +84,10 @@ const metaMatchesQuery = (music, queryWords) => {
   return false;
 };
 
-const titleArtistMatchScore = (music, q, queryWords, significantWords) => {
+const titleArtistMatchScore = (music, q, queryWords, significantWords, artistsList = []) => {
   const titleUz = normalize(getTitleForLang(music, 'uz'));
   const titleRu = normalize(getTitleForLang(music, 'ru'));
-  const artistName = normalize(getArtistName(music.artistId) || music.artist || '');
+  const artistName = normalize(getArtistName(music.artistId, artistsList) || music.artist || '');
   const searchUz = `${titleUz} ${artistName}`;
   const searchRu = `${titleRu} ${artistName}`;
   if (searchUz.includes(q) || searchRu.includes(q)) return 3;
@@ -103,9 +102,9 @@ const titleArtistMatchScore = (music, q, queryWords, significantWords) => {
 };
 
 /** Albom: title + artist + har bir qo'shiqning title va artist bo'yicha qidirish */
-const albumMatchScore = (album, q, queryWords, significantWords) => {
+const albumMatchScore = (album, q, queryWords, significantWords, artistsList = []) => {
   const albumTitle = normalize(String(album.title || ''));
-  const albumArtist = normalize(album.artist || getArtistName(album.artistId) || '');
+  const albumArtist = normalize(album.artist || getArtistName(album.artistId, artistsList) || '');
   const songTexts = ensureArray(album.songs).map(
     (s) => `${normalize(String(s.title || ''))} ${normalize(String(s.artist || ''))}`
   );
@@ -137,11 +136,13 @@ const artistMatchScore = (artist, q, queryWords, significantWords) => {
 };
 
 /** score bilan qaytaradi – natijalar relevance bo'yicha saralanishi uchun */
-const searchPool = (items, itemType, q, queryWords, significantWords, resolveItemType = null, customMatch = null) => {
+const searchPool = (items, itemType, q, queryWords, significantWords, resolveItemType = null, customMatch = null, artistsList = []) => {
   const byTitle = [];
   const byMeta = [];
   const getType = resolveItemType || (() => itemType);
-  const matchFn = customMatch || titleArtistMatchScore;
+  const matchFn = customMatch
+    ? (item, query, words, sigWords) => customMatch(item, query, words, sigWords, artistsList)
+    : (item, query, words, sigWords) => titleArtistMatchScore(item, query, words, sigWords, artistsList);
   for (const m of items) {
     const score = matchFn(m, q, queryWords, significantWords);
     const resolvedType = getType(m);
@@ -208,7 +209,8 @@ export const searchMusicByQuery = (
   musicList = [],
   albumsList = [],
   clipsList = [],
-  concertsList = []
+  concertsList = [],
+  artistsList = []
 ) => {
   const q = normalize(query);
   if (!q) return [];
@@ -221,7 +223,7 @@ export const searchMusicByQuery = (
     ...ensureArray(concertsList),
   ];
 
-  const musicWithScore = searchPool(ensureArray(musicList), 'music', q, queryWords, significantWords);
+  const musicWithScore = searchPool(ensureArray(musicList), 'music', q, queryWords, significantWords, null, null, artistsList);
   const albumWithScore = searchPool(
     ensureArray(albumsList),
     'album',
@@ -229,7 +231,8 @@ export const searchMusicByQuery = (
     queryWords,
     significantWords,
     null,
-    albumMatchScore
+    albumMatchScore,
+    artistsList
   );
   const clipWithScore = searchPool(
     videoPool,
@@ -237,16 +240,19 @@ export const searchMusicByQuery = (
     q,
     queryWords,
     significantWords,
-    (item) => item.type || 'clip'
+    (item) => item.type || 'clip',
+    null,
+    artistsList
   );
   const artistWithScore = searchPool(
-    ensureArray(artists),
+    ensureArray(artistsList),
     'artist',
     q,
     queryWords,
     significantWords,
     null,
-    artistMatchScore
+    artistMatchScore,
+    artistsList
   );
 
   /** Har bir kategoriyadan kamida natija olish – artistlar oraga tushib qolmasin */

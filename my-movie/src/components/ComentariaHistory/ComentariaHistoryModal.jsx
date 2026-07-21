@@ -82,8 +82,9 @@ function getCommentPersistence(target) {
 const ComentariaHistoryModal = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
-  const { allClips, allConcerts, allMusic } = useMusicApi();
+  const { allClips, allConcerts, allMusic, allArtists, musicShortsCatalog } = useMusicApi();
   const { allMovies, allShortsVideos } = useMoviesApi();
+  const musicShortsList = musicShortsCatalog;
   const lang = contentLang === 'ru' ? 'ru' : 'uz';
   const [filter, setFilter] = useState('all');
   const [tick, setTick] = useState(0);
@@ -120,8 +121,8 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
 
   useEffect(() => {
     if (!open) return;
-    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic));
-  }, [open, lang, tick, allClips, allConcerts, allMovies, allShortsVideos, allMusic]);
+    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList));
+  }, [open, lang, tick, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return entries;
@@ -197,7 +198,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                 const t = group.target;
                 const f = group.filter;
                 const cardClick = () =>
-                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic) : t.route);
+                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList) : t.route);
 
                 let media = null;
                 if (t.kind === 'movie') {
@@ -253,7 +254,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                             movieId={t.movieId}
                             musicId={t.musicId}
                             contentType={t.contentType}
-                            repostRoute={getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic)}
+                            repostRoute={getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList)}
                             repostTitle={t.title || ''}
                             videoSrc={t.videoSrc || ''}
                           />

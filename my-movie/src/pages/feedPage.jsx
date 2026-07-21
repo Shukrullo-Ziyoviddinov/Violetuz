@@ -10,7 +10,6 @@ import { useFollowingIds } from '../context/FollowingContext';
 import { getFeedHeaderFollowedPeople } from '../store/slices/followingUtils';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMoviesApi } from '../context/MoviesApiContext';
-import { artists } from '../dataMusic/artists';
 import { useMusicApi } from '../context/MusicApiContext';
 import './feedPage.css';
 
@@ -40,7 +39,7 @@ const FeedPage = () => {
   const followingIds = useFollowingIds();
   const feedProfileUser = useFeedProfile();
   const [messagesOpen, setMessagesOpen] = useState(false);
-  const { sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts } = useMusicApi();
+  const { sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allArtists, getArtistById } = useMusicApi();
   const { allActors } = useActorsApi();
   const { allMovies } = useMoviesApi();
 
@@ -53,8 +52,8 @@ const FeedPage = () => {
   }, []);
 
   const headerFollowedPeople = useMemo(
-    () => getFeedHeaderFollowedPeople(followingIds, feedLang, allActors),
-    [followingIds, feedLang, allActors]
+    () => getFeedHeaderFollowedPeople(followingIds, feedLang, allActors, allArtists),
+    [followingIds, feedLang, allActors, allArtists]
   );
 
   const feedItems = useMemo(() => {
@@ -63,7 +62,7 @@ const FeedPage = () => {
       allActors.filter((actor) => normalized.has(String(actor.id))).map((actor) => actor.id)
     );
     const followedArtistIds = new Set(
-      artists.filter((artist) => normalized.has(String(artist.id))).map((artist) => artist.id)
+      allArtists.filter((artist) => normalized.has(String(artist.id))).map((artist) => artist.id)
     );
 
     const movieItems = allMovies
@@ -97,7 +96,7 @@ const FeedPage = () => {
 
       rows.forEach((item) => {
         if (!item?.artistId || !followedArtistIds.has(item.artistId)) return;
-        const artist = artists.find((a) => a.id === item.artistId);
+        const artist = getArtistById(item.artistId);
 
         if (isAlbum) {
           musicItemsRaw.push({
@@ -143,7 +142,7 @@ const FeedPage = () => {
       .filter((item) => followedArtistIds.has(item.artistId))
       .slice(0, 40)
       .map((item) => {
-        const artist = artists.find((a) => a.id === item.artistId);
+        const artist = getArtistById(item.artistId);
         return {
           id: `video-${item.id}`,
           videoId: item.id,
@@ -160,7 +159,7 @@ const FeedPage = () => {
       });
 
     return [...movieItems, ...musicItems, ...videoItems].sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allActors, allMovies]);
+  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allActors, allMovies, allArtists, getArtistById]);
 
   const filteredItems = useMemo(() => {
     if (activeCategory === 'all') return feedItems;

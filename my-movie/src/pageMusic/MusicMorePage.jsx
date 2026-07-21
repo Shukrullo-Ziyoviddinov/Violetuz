@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { artists } from '../dataMusic/artists';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import '../Music/MusicFilter/MusicFilter.css';
 import './MusicMorePage.css';
@@ -122,12 +121,12 @@ const SECTIONS = {
     getDetailPath: (id) => `/music/${id}`,
   },
   artists: {
-    data: artists.map((a) => ({ ...a, title: a.name, artist: a.description })),
     titleKey: 'music.searchTypeArtist',
     titleDefault: 'Artistlar',
     wishlistType: 'artist',
     getDetailPath: (id) => `/music/artist/${id}`,
     isArtist: true,
+    isAllArtists: true,
   },
   'sevgi-va-musiqa': {
     categoryNameMusic: 'sevgiVaMusiqaData',
@@ -225,13 +224,17 @@ const MusicMorePage = () => {
     getAlbumsByCategory,
     getClipsByCategory,
     getConcertsByCategory,
+    allArtists,
+    getArtistById,
   } = useMusicApi();
 
   const config = SECTIONS[section] || SECTIONS.trend;
   const { data: sectionData, categoryNameMusic, titleKey, titleDefault, wishlistType, getDetailPath, isAggregate } = config;
 
   const safeSectionData =
-    categoryNameMusic === '__all__'
+    config.isAllArtists
+      ? allArtists.map((a) => ({ ...a, title: a.name, artist: a.description }))
+      : categoryNameMusic === '__all__'
       ? allMusic
       : categoryNameMusic === '__all_albums__'
         ? allAlbums
@@ -269,7 +272,7 @@ const MusicMorePage = () => {
 
   const getArtistDisplay = (item) => {
     if (item.artist) return item.artist;
-    const artist = artists.find((a) => a.id === item.artistId);
+    const artist = getArtistById(item.artistId);
     return artist?.name || item.artistId || '';
   };
 

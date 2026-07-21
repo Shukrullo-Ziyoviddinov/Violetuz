@@ -1,18 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { artists } from '../../dataMusic/artists';
 import { useMusicApi } from '../../context/MusicApiContext';
 import './RepostVideoCard.css';
 
 const RepostVideoCard = ({ item }) => {
   const navigate = useNavigate();
-  const { allClips, allConcerts } = useMusicApi();
+  const { allClips, allConcerts, getArtistById } = useMusicApi();
   const open = () => navigate(item.route || `/music/video/${item.id}`);
   const source = item.type === 'konsert' ? allConcerts : allClips;
   const raw = (Array.isArray(source) ? source : []).find((v) => Number(v.id) === Number(item.id));
   const artistName =
     item.artistName ||
-    (raw?.artistId ? artists.find((a) => a.id === raw.artistId)?.name || '' : '');
+    (raw?.artistId ? getArtistById(raw.artistId)?.name || '' : '');
   return (
     <button type="button" className="repost-video-card" onClick={open}>
       <div className="music-more-page-item-image-wrapper">

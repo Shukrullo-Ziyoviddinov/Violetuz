@@ -5,7 +5,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import { useRecommendedClips } from '../../services/recommendedClipsService';
-import { artists } from '../../dataMusic/artists';
+import { useMusicApi } from '../../context/MusicApiContext';
 import './RecommendedClips.css';
 
 /**
@@ -30,8 +30,10 @@ const RecommendedClips = ({ music, album, klip, titleKey = 'music.recommendedCli
     return String(it.title);
   };
 
+  const { getArtistById } = useMusicApi();
+
   const getArtistText = (artistId) => {
-    const artist = artists.find((a) => a.id === artistId);
+    const artist = getArtistById(artistId);
     return artist?.name || artistId || '';
   };
 

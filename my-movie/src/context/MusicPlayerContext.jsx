@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ensureArray, matchId } from '../utils/musicDataUtils';
-import { artists } from '../dataMusic/artists';
 import { useContentLanguage } from './ContentLanguageContext';
 import { useMusicApi } from './MusicApiContext';
 import { useDominantColor } from '../hooks/useDominantColor';
@@ -30,7 +29,7 @@ export const MusicPlayerProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { contentLang } = useContentLanguage();
-  const { allMusic, getAlbumsByCategory } = useMusicApi();
+  const { allMusic, getAlbumsByCategory, allArtists, getArtistById } = useMusicApi();
   const topAlbums = getAlbumsByCategory('TopAlbums');
 
   const isMiniPlayerForbidden = MINI_PLAYER_FORBIDDEN_PATHS.some(
@@ -135,7 +134,7 @@ export const MusicPlayerProvider = ({ children }) => {
 
   const { toggleWishlist, isInWishlist } = useWishlist();
   const artist = currentMusic
-    ? (currentMusic.artistId ? artists.find((a) => a.id === currentMusic.artistId) : (currentMusic.artist ? { name: currentMusic.artist } : null))
+    ? (currentMusic.artistId ? getArtistById(currentMusic.artistId) : (currentMusic.artist ? { name: currentMusic.artist } : null))
     : null;
   const dominantColor = useDominantColor(currentMusic?.img);
 
@@ -791,7 +790,7 @@ export const MusicPlayerProvider = ({ children }) => {
               trendList={allMusic}
               analyserRef={analyserRef}
               audioGraphReady={audioGraphReady}
-              artists={artists}
+              artists={allArtists}
               onTrackSelect={(item) => loadAndPlayTrack(item.id, { autoplay: true, syncMusicDetail: true })}
               toggleWishlist={toggleWishlist}
               isInWishlist={isInWishlist}

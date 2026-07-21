@@ -8,7 +8,6 @@ import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll
 import MusicButtonMore from '../MusicButtonMore/MusicButtonMore';
 import MusicSectionIcons from '../MusicSectionIcons';
 import CartochkaHoverModal from '../../components/cartochkaHoverModal';
-import { artists } from '../../dataMusic/artists';
 import './MusicCards.css';
 
 /**
@@ -21,7 +20,7 @@ const MusicCards = ({ section }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getSectionItems } = useMusicApi();
+  const { getSectionItems, getArtistById } = useMusicApi();
 
   const {
     id,
@@ -50,7 +49,7 @@ const MusicCards = ({ section }) => {
   };
 
   const getArtistName = (artistId) => {
-    const artist = artists.find((a) => a.id === artistId);
+    const artist = getArtistById(artistId);
     return artist?.name || artistId;
   };
 

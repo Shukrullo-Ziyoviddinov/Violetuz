@@ -4,17 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { searchMusicByQuery, addMusicSearchHistory } from '../../utils/searchMusic';
-import { artists } from '../../dataMusic/artists';
 import ScrollTouch from '../../components/ScrollTouch/ScrollTouch';
 import './SearchMusicResults.css';
 
 const SearchMusicResults = ({ query, onItemClick }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { allMusic, allAlbums, allClips, allConcerts } = useMusicApi();
+  const { allMusic, allAlbums, allClips, allConcerts, allArtists, getArtistById } = useMusicApi();
   const navigate = useNavigate();
 
-  const results = searchMusicByQuery(query, contentLang, 40, allMusic, allAlbums, allClips, allConcerts);
+  const results = searchMusicByQuery(query, contentLang, 40, allMusic, allAlbums, allClips, allConcerts, allArtists);
 
   const getTitle = (item) => {
     if (item?.itemType === 'artist') return item.name || '';
@@ -28,7 +27,7 @@ const SearchMusicResults = ({ query, onItemClick }) => {
   const getArtistName = (item) => {
     if (item?.itemType === 'artist') return '';
     if (item?.artistId) {
-      const artist = artists.find((a) => a.id === item.artistId);
+      const artist = getArtistById(item.artistId);
       return artist?.name || item.artistId || '';
     }
     return item?.artist || '';

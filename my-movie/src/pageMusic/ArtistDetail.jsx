@@ -2,9 +2,7 @@ import React, { useMemo, useState, useEffect, useRef, useLayoutEffect } from 're
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../context/ContentLanguageContext';
-import { artists } from '../dataMusic/artists';
 import { useMoviesApi } from '../context/MoviesApiContext';
-import { musicShorts } from '../dataMusic/musicShorts';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import HorizontalScroll from '../components/HorizontalScroll/HorizontalScroll';
 import ImgModal from '../components/ImgModal/ImgModal';
@@ -31,7 +29,7 @@ const ArtistDetail = () => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { loadAndPlayTrack, togglePlay, currentMusic, isPlaying } = useMusicPlayer();
-  const { allMusic, getAlbumsByArtist, getClipsByArtist, getConcertsByArtist, getArtistMusicStoriesByArtist } = useMusicApi();
+  const { allMusic, getAlbumsByArtist, getClipsByArtist, getConcertsByArtist, getArtistMusicStoriesByArtist, musicShortsCatalog, getArtistById } = useMusicApi();
   const { allMovies } = useMoviesApi();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [playingTrackColor, setPlayingTrackColor] = useState(null);
@@ -42,7 +40,9 @@ const ArtistDetail = () => {
   const bioSectionRef = useRef(null);
   const [bioLineClamp, setBioLineClamp] = useState(3);
 
-  const artist = artists.find((a) => a.id === id);
+  const artist = getArtistById(id);
+
+  const musicShorts = musicShortsCatalog;
 
   useLayoutEffect(() => {
     const el = bioSectionRef.current;

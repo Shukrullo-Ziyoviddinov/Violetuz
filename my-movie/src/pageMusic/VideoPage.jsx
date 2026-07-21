@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { artists } from '../dataMusic/artists';
 import { matchId } from '../utils/musicDataUtils';
 import ShareButton from '../components/ShareButton/ShareButton';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
@@ -24,7 +23,7 @@ const VideoPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allClips, allConcerts, clipSections, concertSections, getClipsByCategory, getConcertsByCategory } = useMusicApi();
+  const { allClips, allConcerts, clipSections, concertSections, getClipsByCategory, getConcertsByCategory, getArtistById } = useMusicApi();
   const videoRef = useRef(null);
   const commentsRef = useRef(null);
 
@@ -34,7 +33,7 @@ const VideoPage = () => {
   );
 
   const video = allVideoData.find((v) => matchId(v.id, id));
-  const artist = video ? artists.find((a) => a.id === video.artistId) : null;
+  const artist = video ? getArtistById(video.artistId) : null;
 
   const relatedMeta = useMemo(() => {
     if (!video) {
@@ -96,7 +95,7 @@ const VideoPage = () => {
   };
 
   const getArtistName = (artistId) => {
-    const a = artists.find((x) => x.id === artistId);
+    const a = getArtistById(artistId);
     return a?.name || artistId || '';
   };
 

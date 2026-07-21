@@ -12,6 +12,7 @@ import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import { useFollowingIds } from '../context/FollowingContext';
 import { getFollowedPeople } from '../store/slices/followingUtils';
 import { useActorsApi } from '../context/ActorsApiContext';
+import { useMusicApi } from '../context/MusicApiContext';
 import { useRepostItems } from '../context/RepostsContext';
 import { normalizeRepostType, repostMatchesFilter } from '../components/Repost/repostTypes';
 import RepostFilter from '../components/Repost/RepostFilter';
@@ -49,6 +50,7 @@ const ProfilePage = () => {
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage);
   const followingIds = useFollowingIds();
   const { allActors } = useActorsApi();
+  const { allArtists } = useMusicApi();
   const repostItems = useRepostItems();
   const [repostFilter, setRepostFilter] = useState('all');
 
@@ -62,7 +64,7 @@ const ProfilePage = () => {
     return () => clearProfileInfoMenuHandler(open);
   }, []);
 
-  const followedPeople = getFollowedPeople(followingIds, currentLanguage, allActors);
+  const followedPeople = getFollowedPeople(followingIds, currentLanguage, allActors, allArtists);
   const followersPeople = [];
 
   /** Kino + musiqa shortslari profil tartibida (scroll ikkalasini ham o‘z ichiga oladi) */

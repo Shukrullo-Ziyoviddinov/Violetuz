@@ -18,6 +18,10 @@ import {
   fetchConcertSections,
 } from '../api/concertsApi';
 import { fetchAllArtistMusicStories } from '../api/artistMusicStoriesApi';
+import { fetchAllArtists } from '../api/artistsApi';
+import { fetchAllMusicShorts } from '../api/musicShortsApi';
+import { fetchAllMusicBanners } from '../api/musicBannersApi';
+import { resolveMusicShortsCatalog } from '../utils/resolveMusicShortsCatalog';
 
 const MusicApiContext = createContext(null);
 
@@ -55,6 +59,25 @@ export const MusicApiProvider = ({ children }) => {
   const artistMusicStoriesQuery = useQuery({
     queryKey: ['artist-music-stories'],
     queryFn: fetchAllArtistMusicStories,
+    staleTime: 60_000,
+    retry: 1,
+  });
+
+  const artistsQuery = useQuery({
+    queryKey: ['artists'],
+    queryFn: fetchAllArtists,
+    staleTime: 60_000,
+    retry: 1,
+  });
+  const musicShortsQuery = useQuery({
+    queryKey: ['music-shorts'],
+    queryFn: fetchAllMusicShorts,
+    staleTime: 60_000,
+    retry: 1,
+  });
+  const musicBannersQuery = useQuery({
+    queryKey: ['music-banners'],
+    queryFn: fetchAllMusicBanners,
     staleTime: 60_000,
     retry: 1,
   });
@@ -107,6 +130,23 @@ export const MusicApiProvider = ({ children }) => {
     () => (Array.isArray(artistMusicStoriesQuery.data) ? artistMusicStoriesQuery.data : []),
     [artistMusicStoriesQuery.data]
   );
+  const allArtists = useMemo(
+    () => (Array.isArray(artistsQuery.data) ? artistsQuery.data : []),
+    [artistsQuery.data]
+  );
+  const allMusicShorts = useMemo(
+    () => (Array.isArray(musicShortsQuery.data) ? musicShortsQuery.data : []),
+    [musicShortsQuery.data]
+  );
+  const musicShortsCatalog = useMemo(
+    () =>
+      resolveMusicShortsCatalog(allMusicShorts, allMusic, allClips, allConcerts, allArtists),
+    [allMusicShorts, allMusic, allClips, allConcerts, allArtists]
+  );
+  const allMusicBanners = useMemo(
+    () => (Array.isArray(musicBannersQuery.data) ? musicBannersQuery.data : []),
+    [musicBannersQuery.data]
+  );
   const sections = useMemo(
     () => (Array.isArray(sectionsQuery.data) ? sectionsQuery.data : []),
     [sectionsQuery.data]
@@ -130,6 +170,9 @@ export const MusicApiProvider = ({ children }) => {
     clipsQuery.isLoading ||
     concertsQuery.isLoading ||
     artistMusicStoriesQuery.isLoading ||
+    artistsQuery.isLoading ||
+    musicShortsQuery.isLoading ||
+    musicBannersQuery.isLoading ||
     sectionsQuery.isLoading ||
     clipSectionsQuery.isLoading ||
     concertSectionsQuery.isLoading ||
@@ -140,6 +183,9 @@ export const MusicApiProvider = ({ children }) => {
     clipsQuery.error?.message ||
     concertsQuery.error?.message ||
     artistMusicStoriesQuery.error?.message ||
+    artistsQuery.error?.message ||
+    musicShortsQuery.error?.message ||
+    musicBannersQuery.error?.message ||
     sectionsQuery.error?.message ||
     clipSectionsQuery.error?.message ||
     concertSectionsQuery.error?.message ||
@@ -152,6 +198,10 @@ export const MusicApiProvider = ({ children }) => {
     allClips,
     allConcerts,
     allArtistMusicStories,
+    allArtists,
+    allMusicShorts,
+    musicShortsCatalog,
+    allMusicBanners,
     sections,
     clipSections,
     concertSections,
@@ -189,6 +239,12 @@ export const MusicApiProvider = ({ children }) => {
       allConcerts.filter((item) => item.artistId === artistId),
     getArtistMusicStoriesByArtist: (artistId) =>
       allArtistMusicStories.filter((item) => item.artistId === artistId),
+    getMusicShortsByArtist: (artistId) =>
+      musicShortsCatalog.filter((item) => item.artistId === artistId),
+    getArtistById: (id) =>
+      allArtists.find((item) => String(item.id) === String(id)) || null,
+    getMusicShortByIdLocal: (id) =>
+      musicShortsCatalog.find((item) => String(item.id) === String(id)) || null,
     getSectionById: (id) => sections.find((s) => s.id === id) || null,
     getClipSectionById: (id) => clipSections.find((s) => s.id === id) || null,
     getConcertSectionById: (id) => concertSections.find((s) => s.id === id) || null,
@@ -235,6 +291,27 @@ export const MusicApiProvider = ({ children }) => {
       });
       return stories;
     },
+    refreshArtists: async () => {
+      const artists = await queryClient.fetchQuery({
+        queryKey: ['artists'],
+        queryFn: fetchAllArtists,
+      });
+      return artists;
+    },
+    refreshMusicShorts: async () => {
+      const shorts = await queryClient.fetchQuery({
+        queryKey: ['music-shorts'],
+        queryFn: fetchAllMusicShorts,
+      });
+      return shorts;
+    },
+    refreshMusicBanners: async () => {
+      const banners = await queryClient.fetchQuery({
+        queryKey: ['music-banners'],
+        queryFn: fetchAllMusicBanners,
+      });
+      return banners;
+    },
     fetchMusicByIdRemote: fetchMusicById,
     fetchAlbumByIdRemote: fetchAlbumById,
     fetchClipByIdRemote: fetchClipById,
@@ -245,6 +322,10 @@ export const MusicApiProvider = ({ children }) => {
     allClips,
     allConcerts,
     allArtistMusicStories,
+    allArtists,
+    allMusicShorts,
+    musicShortsCatalog,
+    allMusicBanners,
     sections,
     clipSections,
     concertSections,

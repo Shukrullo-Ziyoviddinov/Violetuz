@@ -1,5 +1,3 @@
-import { artists } from '../../dataMusic/artists';
-
 export const FOLLOWING_STORAGE_KEY = 'violet_following_artists';
 
 export const sameFollowId = (a, b) => String(a) === String(b);
@@ -26,9 +24,10 @@ const uniqueById = (list) => {
 };
 
 /** Profil sahifasi — obuna bo'lgan aktyor/artist ro'yxati */
-export const getFollowedPeople = (ids = [], lang = 'uz', actorsList = []) => {
+export const getFollowedPeople = (ids = [], lang = 'uz', actorsList = [], artistsList = []) => {
   const normalized = new Set(ids.map((id) => String(id)));
   const actors = Array.isArray(actorsList) ? actorsList : [];
+  const artists = Array.isArray(artistsList) ? artistsList : [];
 
   const followedActors = uniqueById(
     actors
@@ -66,9 +65,10 @@ export const getFollowedPeople = (ids = [], lang = 'uz', actorsList = []) => {
 };
 
 /** Feed header — obuna bo'lganlar avatari */
-export const getFeedHeaderFollowedPeople = (ids, lang = 'uz', actorsList = []) => {
+export const getFeedHeaderFollowedPeople = (ids, lang = 'uz', actorsList = [], artistsList = []) => {
   const normalized = new Set(ids.map((id) => String(id)));
   const actors = Array.isArray(actorsList) ? actorsList : [];
+  const artists = Array.isArray(artistsList) ? artistsList : [];
 
   const followedActors = actors
     .filter((actor) => normalized.has(String(actor.id)))

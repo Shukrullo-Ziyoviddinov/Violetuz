@@ -18,6 +18,9 @@ const shortVideoRoutes = require('./shortVideo.routes');
 const siteLinksRoutes = require('./siteLinks.routes');
 const videoBannerRoutes = require('./videoBanner.routes');
 const artistMusicStoryRoutes = require('./artistMusicStory.routes');
+const artistRoutes = require('./artist.routes');
+const musicShortRoutes = require('./musicShort.routes');
+const musicBannerRoutes = require('./musicBanner.routes');
 
 const router = Router();
 
@@ -40,5 +43,8 @@ router.use('/clip-sections', clipSectionRoutes);
 router.use('/concerts', concertRoutes);
 router.use('/concert-sections', concertSectionRoutes);
 router.use('/artist-music-stories', artistMusicStoryRoutes);
+router.use('/artists', artistRoutes);
+router.use('/music-shorts', musicShortRoutes);
+router.use('/music-banners', musicBannerRoutes);
 
 module.exports = router;

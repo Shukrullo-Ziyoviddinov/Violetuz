@@ -6,7 +6,7 @@ import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll
 import CartochkaHoverModal from '../../components/cartochkaHoverModal';
 import CartochkaMobileAutoPlay from '../../components/cartochkaHoverModal/CartochkaMobileAutoPlay';
 import MusicSectionIcons from '../MusicSectionIcons';
-import { artists } from '../../dataMusic/artists';
+import { useMusicApi } from '../../context/MusicApiContext';
 import '../MusicCards/MusicCards.css';
 import '../MusicButtonMore/MusicButtonMore.css';
 import './ClipsCards.css';
@@ -30,8 +30,10 @@ const ClipsCards = ({ section }) => {
     initialCount,
   } = section;
 
+  const { getArtistById } = useMusicApi();
+
   const getArtistName = (artistId) => {
-    const artist = artists.find((a) => a.id === artistId);
+    const artist = getArtistById(artistId);
     return artist?.name || artistId;
   };
 

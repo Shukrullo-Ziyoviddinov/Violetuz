@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useContentLanguage } from '../context/ContentLanguageContext';
-import { artists } from '../dataMusic/artists';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import Movies from '../components/Movies/Movies';
@@ -59,7 +58,7 @@ const WishlistPage = () => {
   const { contentLang } = useContentLanguage();
   const { wishlistItems, toggleWishlist } = useWishlist();
   const { allMovies: apiMovies } = useMoviesApi();
-  const { allMusic, allAlbums, allClips, allConcerts } = useMusicApi();
+  const { allMusic, allAlbums, allClips, allConcerts, getArtistById } = useMusicApi();
   const [activeTab, setActiveTab] = useState('movie');
 
   const normalizeType = (raw) => {
@@ -108,7 +107,7 @@ const WishlistPage = () => {
   };
 
   const getArtistName = (artistId) => {
-    const artist = artists.find((a) => a.id === artistId);
+    const artist = getArtistById(artistId);
     return artist?.name || artistId || '';
   };
 

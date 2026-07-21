@@ -5,7 +5,6 @@ import { useWishlist } from '../context/WishlistContext';
 import { useMusicPlayer } from '../context/MusicPlayerContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { ensureArray, matchId } from '../utils/musicDataUtils';
-import { artists } from '../dataMusic/artists';
 import AudioDuration from '../Music/AudioDuration/AudioDuration';
 import ShareButton from '../components/ShareButton/ShareButton';
 import Repost from '../components/Repost/Repost';
@@ -24,7 +23,7 @@ const MusicDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allMusic, getMusicByCategory, sections } = useMusicApi();
+  const { allMusic, getMusicByCategory, sections, getArtistById } = useMusicApi();
 
   const musicTrackSections = useMemo(
     () => (sections || []).filter((s) => s.wishlistType === 'music'),
@@ -391,7 +390,7 @@ const MusicDetail = () => {
             <h3 className="music-detail-trend-title">{sectionTitle}</h3>
             <div className="music-detail-trend-grid">
               {trendList.map((item) => {
-                const itemArtist = artists.find((a) => a.id === item.artistId);
+                const itemArtist = getArtistById(item.artistId);
                 const isPlayingTrack = item.id === currentMusic?.id;
                 const cardDominantColor = isPlayingTrack ? (pageDominantColor || dominantColor) : null;
                 return (

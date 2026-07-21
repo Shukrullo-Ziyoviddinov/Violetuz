@@ -1,4 +1,3 @@
-import { artists } from '../dataMusic/artists';
 import { matchId } from './musicDataUtils';
 
 const normalizeLocalized = (value) => {
@@ -16,10 +15,10 @@ const getSourceByContentType = (contentType, musicList = [], clipList = [], conc
   return Array.isArray(musicList) ? musicList : [];
 };
 
-const resolveArtist = (item) => {
+const resolveArtist = (item, artistsList = []) => {
   if (item?.artist) return normalizeLocalized(item.artist);
   if (item?.artistId) {
-    const artist = artists.find((a) => a.id === item.artistId);
+    const artist = artistsList.find((a) => a.id === item.artistId);
     const name = artist?.name || item.artistId;
     return { uz: name, ru: name };
   }
@@ -29,7 +28,13 @@ const resolveArtist = (item) => {
 /**
  * Music shorts: contentType + musicId orqali title, artist, img olinadi.
  */
-export function resolveShortsMusicMeta(shortItem, musicList = [], clipList = [], concertList = []) {
+export function resolveShortsMusicMeta(
+  shortItem,
+  musicList = [],
+  clipList = [],
+  concertList = [],
+  artistsList = []
+) {
   if (!shortItem?.musicId) return shortItem;
 
   const contentType = shortItem.contentType || 'music';
@@ -40,7 +45,7 @@ export function resolveShortsMusicMeta(shortItem, musicList = [], clipList = [],
   return {
     ...shortItem,
     title: normalizeLocalized(musicItem.title),
-    artist: resolveArtist(musicItem),
+    artist: resolveArtist(musicItem, artistsList),
     musicImg: musicItem.img || '',
     artistId: musicItem.artistId || shortItem.artistId,
   };

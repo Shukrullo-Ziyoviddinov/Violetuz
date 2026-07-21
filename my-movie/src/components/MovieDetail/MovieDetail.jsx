@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useActorsApi } from '../../context/ActorsApiContext';
-import { artists } from '../../dataMusic/artists';
+import { useMusicApi } from '../../context/MusicApiContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -51,6 +51,7 @@ const MovieDetail = () => {
   const [userLastVote, setUserLastVote] = useState(null);
   const { allMovies, loading: moviesLoading } = useMoviesApi();
   const { allActors } = useActorsApi();
+  const { getArtistById } = useMusicApi();
   const modalHeaderRef = React.useRef(null);
   const isDraggingRef = React.useRef(false);
   const modalStartYRef = React.useRef(0);
@@ -135,7 +136,7 @@ const MovieDetail = () => {
         };
       }
 
-      const artist = artists.find((item) => String(item.id) === String(castId));
+      const artist = getArtistById(castId);
       if (!artist) return null;
 
       return {
@@ -150,7 +151,7 @@ const MovieDetail = () => {
     }).filter(Boolean);
 
     return castItems;
-  }, [movie?.actors, allActors]);
+  }, [movie?.actors, allActors, getArtistById]);
 
   useEffect(() => {
     if (!movie?.seasons?.length) {

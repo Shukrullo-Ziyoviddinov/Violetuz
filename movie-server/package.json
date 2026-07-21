@@ -19,6 +19,9 @@
     "seed:shorts": "node seeds/seedShortVideos.js",
     "seed:site-links": "node seeds/seedSiteLinks.js",
     "seed:video-banners": "node seeds/seedVideoBanners.js",
+    "seed:artists": "node seeds/seedArtists.js",
+    "seed:music-shorts": "node seeds/seedMusicShorts.js",
+    "seed:music-banners": "node seeds/seedMusicBanners.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

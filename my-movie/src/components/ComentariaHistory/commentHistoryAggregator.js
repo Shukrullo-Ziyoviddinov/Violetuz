@@ -4,8 +4,6 @@
  */
 import * as commentsApi from '../../api/commentsApi';
 import * as shortsCommentsApi from '../../api/shortsCommentsApi';
-import { musicShorts } from '../../dataMusic/musicShorts';
-import { artists } from '../../dataMusic/artists';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 
@@ -38,9 +36,9 @@ export function flattenCommentTree(list) {
   return out;
 }
 
-function getVideoArtistName(video) {
+function getVideoArtistName(video, artistsList = []) {
   if (!video?.artistId) return '';
-  const a = artists.find((x) => x.id === video.artistId);
+  const a = artistsList.find((x) => x.id === video.artistId);
   return a?.name || '';
 }
 
@@ -125,7 +123,9 @@ export function buildShortsHistoryPlaylist(
   concertsList = [],
   moviesList = [],
   movieShortsList = [],
-  musicList = []
+  musicList = [],
+  artistsList = [],
+  musicShortsList = []
 ) {
   const all = buildCommentHistoryEntries(
     lang,
@@ -133,7 +133,9 @@ export function buildShortsHistoryPlaylist(
     concertsList,
     moviesList,
     movieShortsList,
-    musicList
+    musicList,
+    artistsList,
+    musicShortsList
   );
   const shortsRows = all.filter((e) => e.filter === 'shorts');
   const seen = new Set();
@@ -160,7 +162,9 @@ export function getShortsRouteFromHistory(
   concertsList = [],
   moviesList = [],
   movieShortsList = [],
-  musicList = []
+  musicList = [],
+  artistsList = [],
+  musicShortsList = []
 ) {
   if (target?.kind !== 'shorts' || target.shortsId == null) return '/shorts';
   const playlist = buildShortsHistoryPlaylist(
@@ -169,7 +173,9 @@ export function getShortsRouteFromHistory(
     concertsList,
     moviesList,
     movieShortsList,
-    musicList
+    musicList,
+    artistsList,
+    musicShortsList
   );
   const repostType = target.shortsSource === 'musicshorts' ? 'musicshorts' : 'movieShorts';
   const idx = playlist.findIndex(
@@ -192,7 +198,9 @@ export function buildCommentHistoryEntries(
   concertsList = [],
   moviesList = [],
   movieShortsList = [],
-  musicList = []
+  musicList = [],
+  artistsList = [],
+  musicShortsList = []
 ) {
   const entries = [];
   const allVideoData = uniqueVideosById(clipsList, concertsList);
@@ -255,7 +263,7 @@ export function buildCommentHistoryEntries(
           image: v.img || '/img/movie1.jpg',
           route: `/music/video/${v.id}`,
           videoId: v.id,
-          artistName: getVideoArtistName(v),
+          artistName: getVideoArtistName(v, artistsList),
           likeCount: parseInt(v.like, 10) || 0,
           dislikeCount: parseInt(v.dislike, 10) || 0,
         },
@@ -288,7 +296,7 @@ export function buildCommentHistoryEntries(
     }
   });
 
-  musicShorts.forEach((s) => {
+  (Array.isArray(musicShortsList) ? musicShortsList : []).forEach((s) => {
     const raw = shortsCommentsApi.getComments(s.id);
     const flat = flattenCommentTree(raw);
     for (const c of flat) {

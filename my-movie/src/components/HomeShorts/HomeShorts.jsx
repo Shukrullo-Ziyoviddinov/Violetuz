@@ -5,7 +5,6 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
-import { musicShorts } from '../../dataMusic/musicShorts';
 import { getWatchHistory } from '../../api/shortsWatchHistory';
 import { getShortsForHomeBlock } from '../../algo/shortsRecommendationAlgo';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
@@ -21,7 +20,7 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { allShortsVideos, allMovies } = useMoviesApi();
-  const { allMusic, allClips, allConcerts } = useMusicApi();
+  const { allMusic, allClips, allConcerts, musicShortsCatalog } = useMusicApi();
   const [loadedPreviews, setLoadedPreviews] = useState({});
   const containerRef = useRef(null);
 
@@ -31,7 +30,7 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
       resolveShortsWithMovies(allShortsVideos, allMovies, allMusic, allClips, allConcerts),
     [allShortsVideos, allMovies, allMusic, allClips, allConcerts]
   );
-  const allShorts = isMusic ? musicShorts : movieShortsCatalog;
+  const allShorts = isMusic ? musicShortsCatalog : movieShortsCatalog;
   const moreTo = isMusic ? '/music/shorts' : '/shorts';
 
   const homeShorts = useMemo(() => {
