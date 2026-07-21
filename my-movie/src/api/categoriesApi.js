@@ -6,8 +6,13 @@ export const isCategoryLike = (item) =>
   item &&
   typeof item === 'object' &&
   typeof item.id === 'string' &&
+  item.id.trim() !== '' &&
   item.title != null &&
-  (typeof item.filterCategory === 'string' || Array.isArray(item.filterCategory));
+  (typeof item.title === 'string' || typeof item.title === 'object') &&
+  (item.filterCategory == null ||
+    typeof item.filterCategory === 'string' ||
+    (Array.isArray(item.filterCategory) &&
+      item.filterCategory.every((value) => typeof value === 'string')));
 
 export const normalizeCategoriesPayload = (payload) => {
   const list = Array.isArray(payload)

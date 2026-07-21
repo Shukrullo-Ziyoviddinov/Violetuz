@@ -294,20 +294,7 @@ const Banner = () => {
         return 'hidden';
     };
 
-    const renderSlideContent = (image, index, slideClass) => {
-        const showSkeleton =
-            bannersLoading &&
-            (slideClass === 'center' || slideClass === 'left' || slideClass === 'right');
-
-        if (showSkeleton) {
-            return (
-                <SkeletonLoader
-                    variant="banner-image"
-                    className="manga-image-skeleton loader-skeleton"
-                />
-            );
-        }
-
+    const renderSlideContent = (image, index) => {
         return (
             <img
                 src={normalizeImagePath(image.src)}
@@ -320,7 +307,7 @@ const Banner = () => {
         );
     };
 
-    if (bannersLoading && images.length === 0) {
+    if (bannersLoading) {
         return (
             <div className="banner">
                 <div className="banner-container">
@@ -387,7 +374,7 @@ const Banner = () => {
                             onClick={() => !bannersLoading && handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            {renderSlideContent(image, index, slideClass)}
+                            {renderSlideContent(image, index)}
                         </li>
                         );
                     })}
@@ -402,7 +389,7 @@ const Banner = () => {
                             onClick={() => !bannersLoading && handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            {renderSlideContent(image, index, slideClass)}
+                            {renderSlideContent(image, index)}
                         </li>
                         );
                     })}
@@ -417,7 +404,7 @@ const Banner = () => {
                             onClick={() => !bannersLoading && handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            {renderSlideContent(image, index, slideClass)}
+                            {renderSlideContent(image, index)}
                         </li>
                         );
                     })}

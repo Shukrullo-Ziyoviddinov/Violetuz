@@ -126,19 +126,20 @@ export const MoviesApiProvider = ({ children }) => {
     [videoBannersQuery.data]
   );
   const loading =
-    moviesQuery.isLoading ||
-    sectionsQuery.isLoading ||
-    homeContentQuery.isLoading ||
-    bannersQuery.isLoading ||
-    genresQuery.isLoading ||
-    categoriesQuery.isLoading ||
-    adsQuery.isLoading ||
-    shortsQuery.isLoading ||
-    siteLinksQuery.isLoading ||
-    videoBannersQuery.isLoading;
-  const bannersLoading = moviesQuery.isLoading || bannersQuery.isLoading;
+    moviesQuery.isPending ||
+    sectionsQuery.isPending ||
+    homeContentQuery.isPending ||
+    bannersQuery.isPending ||
+    genresQuery.isPending ||
+    categoriesQuery.isPending ||
+    adsQuery.isPending ||
+    shortsQuery.isPending ||
+    siteLinksQuery.isPending ||
+    videoBannersQuery.isPending;
+  const bannersLoading = moviesQuery.isPending || bannersQuery.isPending;
   const moviesLoading =
-    moviesQuery.isLoading || sectionsQuery.isLoading || homeContentQuery.isLoading;
+    moviesQuery.isPending || sectionsQuery.isPending || homeContentQuery.isPending;
+  const categoriesLoading = categoriesQuery.isPending;
   const error =
     moviesQuery.error?.message ||
     sectionsQuery.error?.message ||
@@ -170,6 +171,7 @@ export const MoviesApiProvider = ({ children }) => {
     loading,
     bannersLoading,
     moviesLoading,
+    categoriesLoading,
     error,
     getMoviesByCategory: (categoryName) => allMovies.filter((m) => m.categoryName === categoryName),
     getBannersByLang: (lang) => allBanners.filter((b) => b.lang === lang),
@@ -257,6 +259,7 @@ export const MoviesApiProvider = ({ children }) => {
     loading,
     bannersLoading,
     moviesLoading,
+    categoriesLoading,
     error,
     queryClient,
   ]);

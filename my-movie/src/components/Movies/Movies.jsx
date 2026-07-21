@@ -40,6 +40,7 @@ const Movies = ({
 
   const itemsToRender = isLoading && displayMovies.length === 0 ? skeletonItems : displayMovies;
   const showPosterSkeletons = isLoading && displayMovies.length === 0;
+  const showTitleSkeleton = isLoading && displayMovies.length === 0;
 
   const getMovieTitle = (movie) => {
     if (movie.title && typeof movie.title === 'object') {
@@ -137,7 +138,7 @@ const Movies = ({
             {headerCount !== null && (
               <p className="movies-header-count">{headerCount} {t('movies.all')}</p>
             )}
-            {isLoading ? (
+            {showTitleSkeleton ? (
               <SkeletonLoader
                 variant="movies-title"
                 className="movies-title-skeleton"

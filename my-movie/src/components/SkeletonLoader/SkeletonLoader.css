@@ -59,6 +59,13 @@
   border-radius: 8px;
 }
 
+/* Categories chip */
+.skeleton-loader--categories-item {
+  flex-shrink: 0;
+  height: 44px;
+  border-radius: 999px;
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,
