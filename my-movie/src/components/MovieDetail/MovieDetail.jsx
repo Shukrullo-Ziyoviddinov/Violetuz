@@ -135,6 +135,122 @@ const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
   );
 };
 
+/** Clip thumb — skeleton until preview video is ready from server */
+const MovieDetailClipThumb = ({ clip, onOpen }) => {
+  const videoRef = useRef(null);
+  const videoSrc = clip?.src ? encodeURI(clip.src) : '';
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    setFailed(false);
+  }, [videoSrc]);
+
+  useEffect(() => {
+    if (!videoSrc || ready || failed) return undefined;
+    const check = () => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        setReady(true);
+      }
+    };
+    check();
+    const intervalId = window.setInterval(check, 200);
+    const timeoutId = window.setTimeout(() => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        setReady(true);
+      }
+    }, 20000);
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [videoSrc, ready, failed]);
+
+  const markReady = (e) => {
+    const el = e?.currentTarget || videoRef.current;
+    if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setReady(true);
+      setFailed(false);
+    }
+  };
+
+  const markFailed = () => {
+    setFailed(true);
+    setReady(false);
+  };
+
+  const showSkeleton = Boolean(videoSrc) && !ready && !failed;
+
+  return (
+    <div
+      className={`movie-detail-clip-item${showSkeleton ? ' movie-detail-clip-item--loading' : ''}`}
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen?.(clip)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpen?.(clip);
+        }
+      }}
+      onMouseEnter={(e) => {
+        if (showSkeleton) return;
+        const v = e.currentTarget.querySelector('video');
+        if (v) v.play().catch(() => {});
+      }}
+      onMouseLeave={(e) => {
+        const v = e.currentTarget.querySelector('video');
+        if (v) {
+          v.pause();
+          v.currentTime = 0;
+        }
+      }}
+      aria-busy={showSkeleton || undefined}
+    >
+      <div className="movie-detail-clip-media">
+        {showSkeleton && (
+          <SkeletonLoader
+            variant="movie-detail-clip-media"
+            className="movie-detail-clip-media-skeleton"
+          />
+        )}
+        {!failed && videoSrc && (
+          <video
+            ref={videoRef}
+            key={videoSrc}
+            src={videoSrc}
+            preload="auto"
+            muted
+            loop
+            playsInline
+            className={`movie-detail-clip-video${showSkeleton ? ' movie-detail-clip-video--loading' : ''}`}
+            onLoadedData={markReady}
+            onLoadedMetadata={markReady}
+            onCanPlay={markReady}
+            onError={markFailed}
+          />
+        )}
+        {ready && <span className="movie-detail-clip-play" aria-hidden />}
+      </div>
+      {showSkeleton ? (
+        <div className="movie-detail-clip-info movie-detail-clip-info--skeleton">
+          <SkeletonLoader
+            variant="movie-detail-clip-title"
+            className="movie-detail-clip-title-skeleton"
+          />
+        </div>
+      ) : clip.title ? (
+        <div className="movie-detail-clip-info">
+          <span className="movie-detail-clip-title">{clip.title}</span>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -663,6 +779,33 @@ const MovieDetail = () => {
                             </div>
                           ))}
                         </div>
+                      </div>
+                    </div>
+                    <div className="movie-detail-clips movie-detail-clips--skeleton" aria-hidden="true">
+                      <SkeletonLoader
+                        variant="movie-detail-section-title"
+                        className="movie-detail-section-title-skeleton"
+                      />
+                      <div className="movie-detail-clips-scroll">
+                        {Array.from({ length: 4 }, (_, i) => (
+                          <div
+                            key={`clip-sk-${i}`}
+                            className="movie-detail-clip-item movie-detail-clip-item--skeleton"
+                          >
+                            <div className="movie-detail-clip-media">
+                              <SkeletonLoader
+                                variant="movie-detail-clip-media"
+                                className="movie-detail-clip-media-skeleton"
+                              />
+                            </div>
+                            <div className="movie-detail-clip-info movie-detail-clip-info--skeleton">
+                              <SkeletonLoader
+                                variant="movie-detail-clip-title"
+                                className="movie-detail-clip-title-skeleton"
+                              />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -1354,51 +1497,14 @@ const MovieDetail = () => {
                   </h3>
                   <ScrollTouch className="movie-detail-clips-scroll">
                     {clipItems.map((clip) => (
-                      <div
+                      <MovieDetailClipThumb
                         key={String(clip.dataId)}
-                        className="movie-detail-clip-item"
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => {
-                          setActiveClipIdx(clip.index);
+                        clip={clip}
+                        onOpen={(item) => {
+                          setActiveClipIdx(item.index);
                           setClipModalOpen(true);
                         }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            setActiveClipIdx(clip.index);
-                            setClipModalOpen(true);
-                          }
-                        }}
-                        onMouseEnter={(e) => {
-                          const v = e.currentTarget.querySelector('video');
-                          if (v) v.play().catch(() => {});
-                        }}
-                        onMouseLeave={(e) => {
-                          const v = e.currentTarget.querySelector('video');
-                          if (v) {
-                            v.pause();
-                            v.currentTime = 0;
-                          }
-                        }}
-                      >
-                        <div className="movie-detail-clip-media">
-                          <video
-                            src={encodeURI(clip.src)}
-                            preload="metadata"
-                            muted
-                            loop
-                            playsInline
-                            className="movie-detail-clip-video"
-                          />
-                          <span className="movie-detail-clip-play" aria-hidden />
-                        </div>
-                        {clip.title ? (
-                          <div className="movie-detail-clip-info">
-                            <span className="movie-detail-clip-title">{clip.title}</span>
-                          </div>
-                        ) : null}
-                      </div>
+                      />
                     ))}
                   </ScrollTouch>
                 </div>

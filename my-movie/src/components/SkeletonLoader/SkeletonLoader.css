@@ -264,6 +264,50 @@
   border-radius: 4px;
 }
 
+.skeleton-loader--movie-detail-section-title {
+  width: min(10rem, 70%);
+  height: 1.25rem;
+  border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-clip-media {
+  width: 100%;
+  height: 90px;
+  border-radius: 6px;
+}
+
+.skeleton-loader--movie-detail-clip-title {
+  width: 100%;
+  height: calc(0.72rem * 1.25 * 2);
+  border-radius: 4px;
+}
+
+/* VideoModal related thumbs + footer title (not .video-modal-body) */
+.skeleton-loader--video-modal-related-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+.skeleton-loader--video-modal-related-title {
+  width: 85%;
+  max-width: 100%;
+  height: calc(0.95rem * 1.35);
+  border-radius: 6px;
+}
+
+.skeleton-loader--video-modal-title {
+  width: min(16rem, 85%);
+  max-width: 100%;
+  height: calc(1rem * 1.35);
+  border-radius: 6px;
+}
+
 @media (max-width: 500px) {
   .skeleton-loader--home-shorts-title {
     width: 110px;

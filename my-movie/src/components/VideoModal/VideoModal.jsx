@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import MusicVideoPlayer from '../../Music/MusicVideoPlayer/MusicVideoPlayer';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../../components/ShareButton/ShareButton';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import '../../pages/ActorsPage.css';
 import './VideoModal.css';
 import { primeVideoDraphyThumb } from '../../utils/primeVideoDraphyThumb';
@@ -14,6 +15,114 @@ const SHEET_EXIT_MS = 310;
 
 const getIsMobileViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(`(max-width: ${MOBILE_MAX}px)`).matches;
+
+/** Related list thumb — skeleton until preview video is ready (not main .video-modal-body) */
+const VideoModalRelatedItem = ({ item, isActive, onSelect }) => {
+  const videoRef = useRef(null);
+  const videoSrc = item?.src || '';
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    setFailed(false);
+  }, [videoSrc]);
+
+  useEffect(() => {
+    if (!videoSrc || ready || failed) return undefined;
+    const check = () => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        setReady(true);
+        primeVideoDraphyThumb(el);
+      }
+    };
+    check();
+    const intervalId = window.setInterval(check, 200);
+    const timeoutId = window.setTimeout(() => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        setReady(true);
+        primeVideoDraphyThumb(el);
+      }
+    }, 20000);
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [videoSrc, ready, failed]);
+
+  const markReady = (e) => {
+    const el = e?.currentTarget || videoRef.current;
+    if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setReady(true);
+      setFailed(false);
+      primeVideoDraphyThumb(el);
+    }
+  };
+
+  const markFailed = () => {
+    setFailed(true);
+    setReady(false);
+  };
+
+  const showSkeleton = Boolean(videoSrc) && !ready && !failed;
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-current={isActive ? 'true' : undefined}
+      aria-busy={showSkeleton || undefined}
+      className={`actors-page-video-draphy-item actors-page-video-draphy-item--modal-trigger${
+        isActive ? ' video-modal-related-item--active' : ''
+      }${showSkeleton ? ' video-modal-related-item--loading' : ''}`}
+      onClick={() => onSelect?.(item)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect?.(item);
+        }
+      }}
+    >
+      <div className="actors-page-video-draphy-video-wrap">
+        {showSkeleton && (
+          <SkeletonLoader
+            variant="video-modal-related-thumb"
+            className="video-modal-related-thumb-skeleton"
+          />
+        )}
+        {!failed && videoSrc && (
+          <video
+            ref={videoRef}
+            key={videoSrc}
+            className={`actors-page-video-draphy-video${
+              showSkeleton ? ' actors-page-video-draphy-video--loading' : ''
+            }`}
+            src={videoSrc}
+            muted
+            playsInline
+            preload="auto"
+            onLoadedMetadata={markReady}
+            onLoadedData={markReady}
+            onCanPlay={markReady}
+            onError={markFailed}
+          />
+        )}
+      </div>
+      <div className="actors-page-video-draphy-info">
+        {showSkeleton ? (
+          <SkeletonLoader
+            variant="video-modal-related-title"
+            className="actors-page-video-draphy-title-skeleton"
+          />
+        ) : item.title ? (
+          <div className="actors-page-video-draphy-title">{item.title}</div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 const VideoModal = ({
   isOpen,
@@ -36,6 +145,7 @@ const VideoModal = ({
   /** Mobil sheet: pastdan chiqish — birinchi freym 100%, keyin active */
   const [sheetEntered, setSheetEntered] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [titleReady, setTitleReady] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
@@ -97,6 +207,16 @@ const VideoModal = ({
   useEffect(() => {
     if (isExiting) setDragY(0);
   }, [isExiting]);
+
+  useEffect(() => {
+    /* Sarlavha o‘zgarganda qisqa skeleton; asosiy .video-modal-body ga tegilmaydi */
+    setTitleReady(false);
+    if (!title) return undefined;
+    const id = window.requestAnimationFrame(() => {
+      setTitleReady(true);
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [title, src, videoId]);
 
   useLayoutEffect(() => {
     if (!isOpen || !src || !isMobile) {
@@ -182,11 +302,20 @@ const VideoModal = ({
     return item?.src === src;
   };
 
-  const showFooter = Boolean(title) || videoId != null;
+  const showFooter = Boolean(title) || videoId != null || !titleReady;
+  const showTitleSkeleton = Boolean(title) && !titleReady;
+
   const footerBlock =
     showFooter ? (
       <div className="video-modal-footer">
-        {title ? <h2 className="video-modal-title">{title}</h2> : null}
+        {showTitleSkeleton ? (
+          <SkeletonLoader
+            variant="video-modal-title"
+            className="video-modal-title-skeleton"
+          />
+        ) : title ? (
+          <h2 className="video-modal-title">{title}</h2>
+        ) : null}
         {videoId != null && (
           <div className="video-modal-footer-actions">
             <LikeButton
@@ -215,43 +344,14 @@ const VideoModal = ({
         <div className="actors-page-media-row actors-page-media-row--split video-modal-related-row">
           <div className="actors-page-video-draphy-block video-modal-related-draphy-block">
             <div className="actors-page-video-draphy-list">
-              {relatedVideos.map((item, idx) => {
-                const isActive = isSameRelatedItem(item);
-                return (
-                <div
+              {relatedVideos.map((item, idx) => (
+                <VideoModalRelatedItem
                   key={item.id != null ? `rv-${item.id}` : `${item.src}-${idx}`}
-                  role="button"
-                  tabIndex={0}
-                  aria-current={isActive ? 'true' : undefined}
-                  className={`actors-page-video-draphy-item actors-page-video-draphy-item--modal-trigger${
-                    isActive ? ' video-modal-related-item--active' : ''
-                  }`}
-                  onClick={() => onSelectVideo(item)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onSelectVideo(item);
-                    }
-                  }}
-                >
-                  <div className="actors-page-video-draphy-video-wrap">
-                    <video
-                      className="actors-page-video-draphy-video"
-                      src={item.src}
-                      muted
-                      playsInline
-                      preload="auto"
-                      onLoadedMetadata={(e) => primeVideoDraphyThumb(e.currentTarget)}
-                    />
-                  </div>
-                  <div className="actors-page-video-draphy-info">
-                    {item.title ? (
-                      <div className="actors-page-video-draphy-title">{item.title}</div>
-                    ) : null}
-                  </div>
-                </div>
-                );
-              })}
+                  item={item}
+                  isActive={isSameRelatedItem(item)}
+                  onSelect={onSelectVideo}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -314,6 +414,7 @@ const VideoModal = ({
           <>
             <div className="video-modal-content-wrap">
               <div className="video-modal-primary">
+                {/* Asosiy player — skeleton berilmaydi (body) */}
                 <div className="video-modal-body">
                   <div
                     key={videoId != null ? `play-${videoId}` : src}
@@ -330,6 +431,7 @@ const VideoModal = ({
         ) : (
           <div className="video-modal-content-wrap video-modal-content-wrap--desktop">
             <div className="video-modal-primary">
+              {/* Desktop asosiy player — skeleton berilmaydi (.video-modal-body) */}
               <div className="video-modal-body">
                 <div
                   key={videoId != null ? `play-${videoId}` : src}

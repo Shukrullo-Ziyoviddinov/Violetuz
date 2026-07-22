@@ -907,13 +907,27 @@
 .movie-detail-section-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.25rem;
+  line-height: 1.2;
   font-weight: 600;
   color: #ffffff;
+  min-height: 1.25rem;
+}
+
+.movie-detail-section-title-skeleton,
+.skeleton-loader--movie-detail-section-title {
+  width: min(10rem, 70%);
+  height: 1.25rem;
+  border-radius: 8px;
+  margin: 0 0 0.5rem 0;
 }
 
 .movie-detail-scenes,
 .movie-detail-clips {
   width: 100%;
+}
+
+.movie-detail-clips--skeleton {
+  pointer-events: none;
 }
 
 .movie-detail-scenes-scroll,
@@ -964,6 +978,16 @@
   cursor: pointer;
   transition: all 0.3s ease;
   background: rgba(45, 45, 50, 0.3);
+  box-sizing: border-box;
+}
+
+.movie-detail-clip-item--skeleton,
+.movie-detail-clip-item--loading {
+  cursor: pointer;
+}
+
+.movie-detail-clip-item--skeleton {
+  pointer-events: none;
 }
 
 .movie-detail-clip-media {
@@ -972,6 +996,18 @@
   height: 90px;
   flex-shrink: 0;
   overflow: hidden;
+  background: #111;
+  border-radius: 6px;
+}
+
+.movie-detail-clip-media-skeleton,
+.skeleton-loader--movie-detail-clip-media {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit;
+  z-index: 1;
 }
 
 .movie-detail-clip-video {
@@ -981,12 +1017,26 @@
   display: block;
 }
 
+.movie-detail-clip-video--loading {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .movie-detail-clip-info {
   padding: 0;
   min-width: 0;
   width: 100%;
   overflow: hidden;
   box-sizing: border-box;
+  min-height: calc(0.72rem * 1.25 * 2);
+}
+
+.movie-detail-clip-info--skeleton {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 /* Faqat 2 qator + ... ; to'liq matn VideoModal sarlavhasida */
@@ -1007,6 +1057,14 @@
   margin: 0;
 }
 
+.movie-detail-clip-title-skeleton,
+.skeleton-loader--movie-detail-clip-title {
+  display: block;
+  width: 100% !important;
+  height: calc(0.72rem * 1.25 * 2) !important;
+  border-radius: 4px !important;
+}
+
 .movie-detail-clip-play {
   position: absolute;
   inset: 0;
@@ -1015,6 +1073,7 @@
   justify-content: center;
   pointer-events: none;
   background: rgba(0, 0, 0, 0.35);
+  z-index: 2;
 }
 
 .movie-detail-clip-play::after {

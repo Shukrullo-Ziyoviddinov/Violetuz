@@ -407,6 +407,45 @@
   background-color: rgba(155, 79, 231, 0.323);
 }
 
+/* Related item skeleton — asosiy .video-modal-body ga tegilmaydi */
+.video-modal .video-modal-related .actors-page-video-draphy-video-wrap {
+  position: relative;
+}
+
+.video-modal .video-modal-related .video-modal-related-thumb-skeleton,
+.video-modal .video-modal-related .skeleton-loader--video-modal-related-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+.video-modal .video-modal-related .actors-page-video-draphy-video--loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video-modal .video-modal-related .actors-page-video-draphy-title-skeleton,
+.video-modal .video-modal-related .skeleton-loader--video-modal-related-title {
+  display: block;
+  width: 85% !important;
+  max-width: 100%;
+  height: calc(0.95rem * 1.35) !important;
+  border-radius: 6px !important;
+}
+
+.video-modal .video-modal-title-skeleton,
+.video-modal .skeleton-loader--video-modal-title {
+  display: block;
+  width: min(16rem, 85%) !important;
+  max-width: 100%;
+  height: calc(1rem * 1.35) !important;
+  border-radius: 6px !important;
+  margin: 0;
+}
+
 .video-modal-content-wrap--desktop
   .video-modal-related
   .actors-page-media-row--split
