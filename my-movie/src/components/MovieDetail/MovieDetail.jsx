@@ -20,7 +20,19 @@ import { formatActionCount } from '../../utils/utils';
 import RatingModal from '../Rating/RatingModal';
 import { calculateMovieRating, formatMovieRating, getMovieLastVote, submitMovieRating } from '../Rating/CalculateRating';
 import '../Rating/CalculateRating.css';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './MovieDetail.css';
+
+const resolveMovieVideoSrc = (movie, lang) => {
+  if (!movie?.movieMedia || typeof movie.movieMedia !== 'object') return null;
+  const langData = movie.movieMedia[lang] || movie.movieMedia.uz || movie.movieMedia.ru;
+  if (!langData || typeof langData !== 'object') return null;
+  if (langData.video && typeof langData.video === 'object') {
+    const src = langData.video.src;
+    if (src && typeof src === 'string' && src.trim() !== '') return src.trim();
+  }
+  return null;
+};
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -49,14 +61,99 @@ const MovieDetail = () => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [movieRatingValue, setMovieRatingValue] = useState(0);
   const [userLastVote, setUserLastVote] = useState(null);
-  const { allMovies, loading: moviesLoading } = useMoviesApi();
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [titleImgReady, setTitleImgReady] = useState(false);
+  const [titleImgFailed, setTitleImgFailed] = useState(false);
+  const { allMovies, moviesLoading } = useMoviesApi();
   const { allActors } = useActorsApi();
   const { getArtistById } = useMusicApi();
   const modalHeaderRef = React.useRef(null);
   const isDraggingRef = React.useRef(false);
   const modalStartYRef = React.useRef(0);
 
-  const movie = allMovies.find(m => m.id === parseInt(id));
+  const movie = allMovies.find((m) => m.id === parseInt(id, 10));
+  const movieVideoSrc = useMemo(
+    () => resolveMovieVideoSrc(movie, contentLang),
+    [movie, contentLang]
+  );
+
+  // New movie / new video src → keep skeleton until media is actually ready
+  useEffect(() => {
+    setVideoReady(false);
+    setVideoFailed(false);
+  }, [movie?.id, movieVideoSrc]);
+
+  const titleImgSrc = useMemo(() => {
+    if (!movie?.titleImg) return null;
+    const src =
+      movie.titleImg[contentLang] || movie.titleImg.uz || movie.titleImg.ru || null;
+    return src && String(src).trim() ? String(src).trim() : null;
+  }, [movie, contentLang]);
+
+  useEffect(() => {
+    setTitleImgReady(false);
+    setTitleImgFailed(false);
+  }, [movie?.id, titleImgSrc]);
+
+  // Cached title image may already be complete
+  useEffect(() => {
+    if (!titleImgSrc || titleImgReady || titleImgFailed) return undefined;
+    const img = new Image();
+    img.onload = () => setTitleImgReady(true);
+    img.onerror = () => setTitleImgFailed(true);
+    img.src = titleImgSrc;
+    if (img.complete && img.naturalWidth > 0) {
+      setTitleImgReady(true);
+    }
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [titleImgSrc, titleImgReady, titleImgFailed]);
+
+  // Safety: if browser never fires canplay, do not leave skeleton forever after hard failure window
+  useEffect(() => {
+    if (!movieVideoSrc || videoReady || videoFailed) return undefined;
+    const timer = window.setTimeout(() => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+        setVideoReady(true);
+      } else if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        // Soft fallback after long wait: at least show a frame
+        setVideoReady(true);
+      }
+    }, 20000);
+    return () => window.clearTimeout(timer);
+  }, [movieVideoSrc, videoReady, videoFailed]);
+
+  const markVideoReady = (e) => {
+    const el = e?.currentTarget || videoRef.current;
+    // Clear skeleton only when browser can play (readyState >= HAVE_FUTURE_DATA)
+    if (el && el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      setVideoReady(true);
+      setVideoFailed(false);
+    }
+  };
+
+  const markVideoFailed = () => {
+    setVideoFailed(true);
+    setVideoReady(false);
+  };
+
+  // Cached / fast load: events may fire before handlers — poll readyState
+  useEffect(() => {
+    if (!movieVideoSrc || videoReady || videoFailed) return undefined;
+    const check = () => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+        setVideoReady(true);
+      }
+    };
+    check();
+    const id = window.setInterval(check, 200);
+    return () => window.clearInterval(id);
+  }, [movieVideoSrc, videoReady, videoFailed]);
 
   useEffect(() => {
     if (movie) addMovie(movie);
@@ -297,8 +394,64 @@ const MovieDetail = () => {
   if (!movie) {
     if (moviesLoading) {
       return (
-        <div className="movie-detail-error">
-          <h2>Loading...</h2>
+        <div className="movie-detail movie-detail--loading" aria-busy="true">
+          <div className="movie-detail-bg-block">
+            <div className="movie-detail-container">
+              <div className="movie-detail-content">
+                <div className="movie-detail-image-block">
+                  <div className="movie-detail-image">
+                    <div className="movie-detail-video-wrapper movie-detail-video-wrapper--skeleton">
+                      <SkeletonLoader
+                        variant="movie-detail-video"
+                        className="movie-detail-video-skeleton"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="movie-detail-info-block">
+                  <div className="movie-detail-info">
+                    <div className="movie-detail-title-img-wrapper movie-detail-title-img-wrapper--skeleton">
+                      <SkeletonLoader
+                        variant="movie-detail-title-img"
+                        className="movie-detail-title-img-skeleton"
+                      />
+                    </div>
+                    <div className="movie-detail-specs">
+                      <div className="movie-detail-specs-container">
+                        {Array.from({ length: 4 }, (_, i) => (
+                          <div
+                            key={`spec-sk-${i}`}
+                            className="movie-detail-spec-item movie-detail-spec-item--skeleton"
+                            aria-hidden="true"
+                          >
+                            <SkeletonLoader
+                              variant="movie-detail-spec"
+                              className="movie-detail-spec-item-skeleton"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="movie-detail-genre">
+                      <SkeletonLoader
+                        variant="movie-detail-genre-label"
+                        className="movie-detail-genre-label-skeleton"
+                      />
+                      <div className="movie-detail-genres">
+                        {Array.from({ length: 3 }, (_, i) => (
+                          <SkeletonLoader
+                            key={`genre-sk-${i}`}
+                            variant="movie-detail-genre-badge"
+                            className="movie-detail-genre-badge-skeleton"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       );
     }
@@ -361,28 +514,7 @@ const MovieDetail = () => {
     return null;
   };
 
-  const getMovieVideo = () => {
-    const lang = contentLang;
-    
-    if (!movie.movieMedia || typeof movie.movieMedia !== 'object') {
-      return null;
-    }
-    
-    const langData = movie.movieMedia[lang] || movie.movieMedia.uz || movie.movieMedia.ru;
-    
-    if (!langData || typeof langData !== 'object') {
-      return null;
-    }
-    
-    if (langData.video && typeof langData.video === 'object') {
-      const src = langData.video.src;
-      if (src && typeof src === 'string' && src.trim() !== '') {
-        return src;
-      }
-    }
-    
-    return null;
-  };
+  const getMovieVideo = () => movieVideoSrc;
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -423,6 +555,7 @@ const MovieDetail = () => {
   };
 
   const movieVideo = getMovieVideo();
+  const showVideoSkeleton = Boolean(movieVideo) && !videoReady && !videoFailed;
   const descriptionText = getDescriptionText();
   const descriptionData = getDescriptionData();
   const isNewFormat = descriptionData !== null;
@@ -446,39 +579,56 @@ const MovieDetail = () => {
           <div className="movie-detail-content">
           <div className="movie-detail-image-block">
             <div className="movie-detail-image">
-              {movieVideo ? (
-                <div className="movie-detail-video-wrapper">
-                  <ShareButton movie={movie} />
-                  <video 
+              {movieVideo && !videoFailed ? (
+                <div
+                  className={`movie-detail-video-wrapper${showVideoSkeleton ? ' movie-detail-video-wrapper--loading' : ''}`}
+                  aria-busy={showVideoSkeleton || undefined}
+                >
+                  {showVideoSkeleton && (
+                    <SkeletonLoader
+                      variant="movie-detail-video"
+                      className="movie-detail-video-skeleton"
+                    />
+                  )}
+                  {!showVideoSkeleton && <ShareButton movie={movie} />}
+                  <video
                     ref={videoRef}
-                    src={movieVideo} 
+                    key={movieVideo}
+                    src={movieVideo}
                     alt={getMovieTitle()}
-                    className="movie-detail-video"
+                    className={`movie-detail-video${showVideoSkeleton ? ' movie-detail-video--loading' : ''}`}
                     playsInline
                     autoPlay
                     muted={isMuted}
                     loop
+                    preload="auto"
+                    onLoadedData={markVideoReady}
+                    onCanPlay={markVideoReady}
+                    onPlaying={markVideoReady}
+                    onError={markVideoFailed}
                   />
-                  <div className="movie-detail-video-controls">
-                    <button 
-                      className="video-control-btn mute-btn"
-                      onClick={toggleMute}
-                      aria-label={isMuted ? "Unmute" : "Mute"}
-                    >
-                      {isMuted ? (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
-                          <line x1="23" y1="9" x2="17" y2="15" />
-                          <line x1="17" y1="9" x2="23" y2="15" />
-                        </svg>
-                      ) : (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
-                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
+                  {!showVideoSkeleton && (
+                    <div className="movie-detail-video-controls">
+                      <button
+                        className="video-control-btn mute-btn"
+                        onClick={toggleMute}
+                        aria-label={isMuted ? 'Unmute' : 'Mute'}
+                      >
+                        {isMuted ? (
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                            <line x1="23" y1="9" x2="17" y2="15" />
+                            <line x1="17" y1="9" x2="23" y2="15" />
+                          </svg>
+                        ) : (
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="movie-detail-video-placeholder">
@@ -490,12 +640,26 @@ const MovieDetail = () => {
 
           <div className="movie-detail-info-block">
             <div className="movie-detail-info">
-              {movie.titleImg ? (
-                <div className="movie-detail-title-img-wrapper">
+              {titleImgSrc && !titleImgFailed ? (
+                <div
+                  className={`movie-detail-title-img-wrapper${!titleImgReady ? ' movie-detail-title-img-wrapper--loading' : ''}`}
+                  aria-busy={!titleImgReady || undefined}
+                >
+                  {!titleImgReady && (
+                    <SkeletonLoader
+                      variant="movie-detail-title-img"
+                      className="movie-detail-title-img-skeleton"
+                    />
+                  )}
                   <img
-                    src={movie.titleImg[contentLang] || movie.titleImg.uz || movie.titleImg.ru}
+                    src={titleImgSrc}
                     alt={getMovieTitle()}
-                    className="movie-detail-title-img"
+                    className={`movie-detail-title-img${!titleImgReady ? ' movie-detail-title-img--loading' : ''}`}
+                    onLoad={() => setTitleImgReady(true)}
+                    onError={() => {
+                      setTitleImgFailed(true);
+                      setTitleImgReady(false);
+                    }}
                   />
                   <h1 className="movie-detail-title movie-detail-title-sr-only">{getMovieTitle()}</h1>
                 </div>
