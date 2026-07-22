@@ -277,9 +277,9 @@
 }
 
 .skeleton-loader--movie-detail-clip-title {
-  width: 100%;
-  height: calc(0.72rem * 1.25 * 2);
-  border-radius: 4px;
+  width: 92%;
+  height: calc(0.72rem * 1.25);
+  border-radius: 3px;
 }
 
 /* VideoModal related thumbs + footer title (not .video-modal-body) */

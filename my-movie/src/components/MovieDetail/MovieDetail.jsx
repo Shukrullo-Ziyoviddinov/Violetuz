@@ -241,6 +241,10 @@ const MovieDetailClipThumb = ({ clip, onOpen }) => {
             variant="movie-detail-clip-title"
             className="movie-detail-clip-title-skeleton"
           />
+          <SkeletonLoader
+            variant="movie-detail-clip-title"
+            className="movie-detail-clip-title-skeleton movie-detail-clip-title-skeleton--short"
+          />
         </div>
       ) : clip.title ? (
         <div className="movie-detail-clip-info">
@@ -802,6 +806,10 @@ const MovieDetail = () => {
                               <SkeletonLoader
                                 variant="movie-detail-clip-title"
                                 className="movie-detail-clip-title-skeleton"
+                              />
+                              <SkeletonLoader
+                                variant="movie-detail-clip-title"
+                                className="movie-detail-clip-title-skeleton movie-detail-clip-title-skeleton--short"
                               />
                             </div>
                           </div>

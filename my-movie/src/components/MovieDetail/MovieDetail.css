@@ -1026,17 +1026,21 @@
 
 .movie-detail-clip-info {
   padding: 0;
+  margin-top: 0.4rem;
   min-width: 0;
   width: 100%;
   overflow: hidden;
   box-sizing: border-box;
-  min-height: calc(0.72rem * 1.25 * 2);
+  min-height: calc(0.72rem * 1.25 * 2 + 0.25rem);
+  background: transparent;
 }
 
 .movie-detail-clip-info--skeleton {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.25rem;
 }
 
 /* Faqat 2 qator + ... ; to'liq matn VideoModal sarlavhasida */
@@ -1055,14 +1059,32 @@
   line-height: 1.25;
   color: rgba(255, 255, 255, 0.92);
   margin: 0;
+  background: transparent;
 }
 
+/* Matn joyi — solid 2-qator "g‘isht" emas, ikki yupqa chiziq */
 .movie-detail-clip-title-skeleton,
 .skeleton-loader--movie-detail-clip-title {
   display: block;
-  width: 100% !important;
-  height: calc(0.72rem * 1.25 * 2) !important;
-  border-radius: 4px !important;
+  flex-shrink: 0;
+  width: 92% !important;
+  max-width: 100%;
+  height: calc(0.72rem * 1.25) !important;
+  border-radius: 3px !important;
+  opacity: 0.55;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.12) 45%,
+    rgba(255, 255, 255, 0.06) 90%
+  ) !important;
+  background-size: 200% 100% !important;
+}
+
+.movie-detail-clip-title-skeleton--short,
+.skeleton-loader--movie-detail-clip-title.movie-detail-clip-title-skeleton--short {
+  width: 64% !important;
+  opacity: 0.4;
 }
 
 .movie-detail-clip-play {
