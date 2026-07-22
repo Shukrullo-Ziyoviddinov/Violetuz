@@ -10,17 +10,27 @@
 
 .recommended-actors-header {
   margin-bottom: 1rem;
+  min-height: 1.75rem;
 }
 
 .recommended-actors-title {
   font-size: 1.75rem;
   font-weight: 700;
+  line-height: 1.2;
   background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 30%, #c0c0c0 60%, #a0a0a0 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
   margin: 0;
+}
+
+/* Title skeleton: same visual box as .recommended-actors-title */
+.recommended-actors-title-skeleton,
+.skeleton-loader--recommended-actors-title {
+  width: 20rem;
+  height: 1.75rem;
+  border-radius: 8px;
 }
 
 .recommended-actors-item {
@@ -34,11 +44,21 @@
   text-align: center;
 }
 
+.recommended-actors-item--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
 .recommended-actors-item:hover {
   transform: scale(1.02);
 }
 
+.recommended-actors-item--skeleton:hover {
+  transform: none;
+}
+
 .recommended-actors-img-wrap {
+  position: relative;
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -46,23 +66,61 @@
   background: rgba(255, 255, 255, 0.08);
   border: 2px solid rgba(215, 134, 228, 0.56);
   flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Img skeleton fills wrap exactly (120×120 / 100×100) */
+.recommended-actors-img-skeleton,
+.skeleton-loader--recommended-actor-img {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
 }
 
 .recommended-actors-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+.recommended-actors-img--loading {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
 }
 
 .recommended-actors-name {
   font-size: 1rem;
   font-weight: 600;
+  line-height: 1.2;
   color: #fff;
   margin: 0.5rem 0 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  width: 100%;
+  min-height: 1.2rem;
+  box-sizing: border-box;
+}
+
+.recommended-actors-name--skeleton {
+  display: flex;
+  justify-content: center;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Name skeleton: 1rem text line + same top margin via parent */
+.recommended-actors-name-skeleton,
+.skeleton-loader--recommended-actor-name {
+  width: 85% !important;
+  height: 1rem !important;
+  border-radius: 4px !important;
+  margin: 0 !important;
 }
 
 .recommended-actors-follow {
@@ -77,6 +135,24 @@
   box-sizing: border-box;
   padding: 0.35rem 0.5rem;
   font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+/* Follow skeleton: same width/height as .recommended-actors-follow .following-btn */
+.recommended-actors-follow-skeleton,
+.skeleton-loader--recommended-actor-follow.following-btn,
+.recommended-actors-follow .skeleton-loader--recommended-actor-follow {
+  width: 100% !important;
+  box-sizing: border-box;
+  /* padding 0.35*2 + line 0.7*1.2 + border 2px */
+  height: calc(0.7rem * 1.2 + 0.7rem + 2px) !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 24px !important;
+  background-color: transparent !important;
+  color: transparent !important;
+  cursor: default;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
@@ -86,8 +162,18 @@
 }
 
 @media (max-width: 500px) {
+  .recommended-actors-header {
+    min-height: 1.2rem;
+  }
+
   .recommended-actors-title {
     font-size: 1.2rem;
+  }
+
+  .recommended-actors-title-skeleton,
+  .skeleton-loader--recommended-actors-title {
+    width: 14rem;
+    height: 1.2rem;
   }
 
   .recommended-actors-item {

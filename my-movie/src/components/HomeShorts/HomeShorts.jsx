@@ -49,6 +49,7 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
   }, [variant, allShorts]);
 
   const showSectionSkeleton = isDataLoading && homeShorts.length === 0;
+  const showHeaderSkeleton = isDataLoading;
 
   useEffect(() => {
     if (!containerRef.current || showSectionSkeleton) return;
@@ -98,24 +99,22 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
   return (
     <section
       className={`home-shorts ${isMusic ? 'home-shorts--music music-cards' : ''}`}
-      aria-busy={showSectionSkeleton || undefined}
+      aria-busy={showHeaderSkeleton || showSectionSkeleton || undefined}
     >
       <div className={`home-shorts-container ${isMusic ? 'music-cards-container' : ''}`} ref={containerRef}>
-        <div className="home-shorts-header">
-          {showSectionSkeleton ? (
+        <div
+          className={`home-shorts-header${showHeaderSkeleton ? ' home-shorts-header--skeleton' : ''}`}
+          aria-busy={showHeaderSkeleton || undefined}
+        >
+          {showHeaderSkeleton ? (
             <>
               <SkeletonLoader
-                variant="movies-title"
+                variant="home-shorts-title"
                 className="home-shorts-title-skeleton"
-                width={140}
-                height={28}
               />
               <SkeletonLoader
-                variant="block"
+                variant="home-shorts-more"
                 className="home-shorts-more-skeleton"
-                width={88}
-                height={32}
-                style={{ borderRadius: 20 }}
               />
             </>
           ) : (
