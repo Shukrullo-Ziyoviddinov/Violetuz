@@ -15,6 +15,8 @@
   font-size: 1.75rem;
   font-weight: bold;
   margin: 0;
+  line-height: 1.2;
+  min-height: calc(1.75rem * 1.2);
   background: linear-gradient(
     135deg,
     #ffffff 0%,
@@ -28,6 +30,15 @@
   color: transparent;
 }
 
+.similar-movies-title-skeleton,
+.skeleton-loader--similar-movies-title {
+  display: block;
+  width: min(14rem, 72%) !important;
+  height: calc(1.75rem * 1.2) !important;
+  border-radius: 8px !important;
+  margin: 0;
+}
+
 .similar-movies-header .show-more-btn {
   flex-shrink: 0;
 }
@@ -36,11 +47,20 @@
   width: 100%;
 }
 
+.similar-movies--skeleton {
+  pointer-events: none;
+}
+
 .similar-movies-item {
   flex-shrink: 0;
   width: 180px;
   cursor: pointer;
   transition: transform 0.3s ease;
+}
+
+.similar-movies-item--skeleton {
+  cursor: default;
+  pointer-events: none;
 }
 
 .similar-movies-item-image-wrapper {
@@ -53,13 +73,31 @@
   transition: border-color 0.3s ease;
 }
 
+.similar-movies-item-image-skeleton,
+.skeleton-loader--similar-movies-image {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit;
+  z-index: 1;
+}
+
 .similar-movies-item-image {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   transition: transform 0.3s ease;
+}
+
+.similar-movies-item-image--loading {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .similar-movies-item-wishlist-btn {
@@ -150,6 +188,12 @@
 
   .similar-movies-title {
     font-size: 1.5rem;
+    min-height: calc(1.5rem * 1.2);
+  }
+
+  .similar-movies-title-skeleton,
+  .skeleton-loader--similar-movies-title {
+    height: calc(1.5rem * 1.2) !important;
   }
 }
 
@@ -160,6 +204,13 @@
 
   .similar-movies-title {
     font-size: 1.2rem;
+    min-height: calc(1.2rem * 1.2);
+  }
+
+  .similar-movies-title-skeleton,
+  .skeleton-loader--similar-movies-title {
+    width: min(11rem, 75%) !important;
+    height: calc(1.2rem * 1.2) !important;
   }
 
   .similar-movies-item-image-wrapper {

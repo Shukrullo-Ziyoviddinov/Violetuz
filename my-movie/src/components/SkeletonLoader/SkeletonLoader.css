@@ -288,6 +288,18 @@
   border-radius: 3px;
 }
 
+.skeleton-loader--similar-movies-title {
+  width: min(14rem, 72%);
+  height: calc(1.75rem * 1.2);
+  border-radius: 8px;
+}
+
+.skeleton-loader--similar-movies-image {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
 /* VideoModal related thumbs + footer title (not .video-modal-body) */
 .skeleton-loader--video-modal-related-thumb {
   position: absolute;

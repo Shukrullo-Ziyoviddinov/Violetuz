@@ -662,6 +662,7 @@ const MovieDetail = () => {
   if (!movie) {
     if (moviesLoading) {
       return (
+        <>
         <div className="movie-detail movie-detail--loading" aria-busy="true">
           <div className="movie-detail-bg-block">
             <div className="movie-detail-container">
@@ -886,6 +887,10 @@ const MovieDetail = () => {
             </div>
           </div>
         </div>
+        <div className="movie-detail-container movie-detail-similar-wrapper">
+          <SimilarMovies currentMovie={null} />
+        </div>
+      </>
       );
     }
     return (

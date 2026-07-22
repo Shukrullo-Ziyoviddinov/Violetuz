@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -6,53 +6,170 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton, { getDisplayItems, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './SimilarMovies.css';
+
+const SKELETON_COUNT = 6;
+
+/** Poster thumb — skeleton until image loads; fills .similar-movies-item-image-wrapper */
+const SimilarMovieItem = ({ movie, contentLang, getMovieTitle, onOpen, isInWishlist, toggleWishlist, t }) => {
+  const [imgReady, setImgReady] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const imgSrc = movie.homeImg
+    ? movie.homeImg[contentLang] || movie.homeImg.uz || movie.homeImg.ru || ''
+    : '';
+
+  useEffect(() => {
+    setImgReady(false);
+    setImgFailed(false);
+  }, [imgSrc, movie.id]);
+
+  const showImgSkeleton = Boolean(imgSrc) && !imgReady && !imgFailed;
+
+  return (
+    <div
+      className={`similar-movies-item${showImgSkeleton ? ' similar-movies-item--loading' : ''}`}
+      onClick={() => onOpen?.(movie.id)}
+      aria-busy={showImgSkeleton || undefined}
+    >
+      <div className="similar-movies-item-image-wrapper">
+        {showImgSkeleton && (
+          <SkeletonLoader
+            variant="similar-movies-image"
+            className="similar-movies-item-image-skeleton"
+          />
+        )}
+        {!imgFailed && imgSrc && (
+          <img
+            src={imgSrc}
+            alt={getMovieTitle(movie)}
+            className={`similar-movies-item-image${
+              showImgSkeleton ? ' similar-movies-item-image--loading' : ''
+            }`}
+            onLoad={() => {
+              setImgReady(true);
+              setImgFailed(false);
+            }}
+            onError={() => {
+              setImgFailed(true);
+              setImgReady(false);
+            }}
+          />
+        )}
+        {!showImgSkeleton && (
+          <>
+            <button
+              className={`similar-movies-item-wishlist-btn ${
+                isInWishlist(movie.id, 'movie') ? 'active' : ''
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleWishlist(movie.id, 'movie');
+              }}
+              aria-label={t('wishlist.add') || "Sevimlilarga qo'shish"}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill={isInWishlist(movie.id, 'movie') ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+            {movie.category === 'anonslar' ? (
+              <div className="similar-movies-item-badge similar-movies-item-badge-soon">
+                {t('searchModal.tezOrada', 'Tez orada')}
+              </div>
+            ) : (
+              <div className="similar-movies-item-badge similar-movies-item-badge-fhd">
+                FHD
+              </div>
+            )}
+            {movie.ageRestriction != null && (
+              <div className="similar-movies-item-badge similar-movies-item-badge-age">
+                {movie.ageRestriction}+
+              </div>
+            )}
+            {movie.category !== 'anonslar' &&
+              movie.rating != null &&
+              movie.rating !== '' &&
+              movie.rating !== 'none' && (
+                <div className="similar-movies-item-rating">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="#ffd700"
+                    stroke="none"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span>{movie.rating}</span>
+                </div>
+              )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const SimilarMovies = ({ currentMovie }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allMovies } = useMoviesApi();
+  const { allMovies, moviesLoading } = useMoviesApi();
 
-  if (!currentMovie) return null;
+  const showSectionSkeleton = Boolean(moviesLoading);
 
-  const currentTypeCategory = Array.isArray(currentMovie.typeCategory)
-    ? currentMovie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
-    : currentMovie.typeCategory
-    ? [String(currentMovie.typeCategory).toLowerCase().trim()]
+  const currentTypeCategory = currentMovie
+    ? Array.isArray(currentMovie.typeCategory)
+      ? currentMovie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
+      : currentMovie.typeCategory
+        ? [String(currentMovie.typeCategory).toLowerCase().trim()]
+        : []
     : [];
 
-  const currentFilterCountry = currentMovie.filterCountry
+  const currentFilterCountry = currentMovie?.filterCountry
     ? String(currentMovie.filterCountry).toLowerCase().trim()
     : '';
 
-  const similarMovies = allMovies.filter((movie) => {
-    if (movie.id === currentMovie.id) return false;
-    if (!movie.typeCategory && !movie.filterCountry) return false;
+  const similarMovies =
+    !currentMovie || showSectionSkeleton
+      ? []
+      : allMovies.filter((movie) => {
+          if (movie.id === currentMovie.id) return false;
+          if (!movie.typeCategory && !movie.filterCountry) return false;
 
-    const movieTypeCategory = Array.isArray(movie.typeCategory)
-      ? movie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
-      : movie.typeCategory
-      ? [String(movie.typeCategory).toLowerCase().trim()]
-      : [];
+          const movieTypeCategory = Array.isArray(movie.typeCategory)
+            ? movie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
+            : movie.typeCategory
+              ? [String(movie.typeCategory).toLowerCase().trim()]
+              : [];
 
-    const movieFilterCountry = movie.filterCountry
-      ? String(movie.filterCountry).toLowerCase().trim()
-      : '';
+          const movieFilterCountry = movie.filterCountry
+            ? String(movie.filterCountry).toLowerCase().trim()
+            : '';
 
-    const hasMatchingTypeCategory =
-      currentTypeCategory.length > 0 &&
-      movieTypeCategory.length > 0 &&
-      currentTypeCategory.some((ctc) => movieTypeCategory.includes(ctc));
+          const hasMatchingTypeCategory =
+            currentTypeCategory.length > 0 &&
+            movieTypeCategory.length > 0 &&
+            currentTypeCategory.some((ctc) => movieTypeCategory.includes(ctc));
 
-    const hasMatchingFilterCountry =
-      currentFilterCountry &&
-      movieFilterCountry &&
-      currentFilterCountry === movieFilterCountry;
+          const hasMatchingFilterCountry =
+            currentFilterCountry &&
+            movieFilterCountry &&
+            currentFilterCountry === movieFilterCountry;
 
-    return hasMatchingTypeCategory || hasMatchingFilterCountry;
-  });
+          return hasMatchingTypeCategory || hasMatchingFilterCountry;
+        });
 
   const getMovieTitle = (movie) => {
     if (movie.title && typeof movie.title === 'object') {
@@ -65,97 +182,61 @@ const SimilarMovies = ({ currentMovie }) => {
     navigate(`/movie/${movieId}`);
   };
 
-  if (similarMovies.length === 0) {
+  if (!showSectionSkeleton && (!currentMovie || similarMovies.length === 0)) {
     return null;
   }
 
-  const moreToPath = `/similar-movies/${currentMovie.id}`;
-  const displayMovies = getDisplayItems(similarMovies, DEFAULT_LIMIT);
+  const moreToPath = currentMovie ? `/similar-movies/${currentMovie.id}` : '#';
+  const displayMovies = showSectionSkeleton
+    ? []
+    : getDisplayItems(similarMovies, DEFAULT_LIMIT);
 
   return (
-    <div className="similar-movies">
+    <div
+      className={`similar-movies${showSectionSkeleton ? ' similar-movies--skeleton' : ''}`}
+      aria-busy={showSectionSkeleton || undefined}
+    >
       <div className="similar-movies-header">
-        <h3 className="similar-movies-title">
-          {i18n.language === 'uz' ? "O'xshash filimlar" : 'Похожие фильмы'}
-        </h3>
-        <ShowMoreButton to={moreToPath} />
+        {showSectionSkeleton ? (
+          <SkeletonLoader
+            variant="similar-movies-title"
+            className="similar-movies-title-skeleton"
+          />
+        ) : (
+          <h3 className="similar-movies-title">
+            {i18n.language === 'uz' ? "O'xshash filimlar" : 'Похожие фильмы'}
+          </h3>
+        )}
+        {!showSectionSkeleton && <ShowMoreButton to={moreToPath} />}
       </div>
       <HorizontalScroll scrollAmount={300}>
-        {displayMovies.map((movie) => (
-          <div
-            key={movie.id}
-            className="similar-movies-item"
-            onClick={() => handleMovieClick(movie.id)}
-          >
-              <div className="similar-movies-item-image-wrapper">
-                <img
-                  src={
-                    movie.homeImg
-                      ? movie.homeImg[contentLang] ||
-                        movie.homeImg.uz ||
-                        movie.homeImg.ru
-                      : ''
-                  }
-                  alt={getMovieTitle(movie)}
-                  className="similar-movies-item-image"
-                />
-                <button
-                  className={`similar-movies-item-wishlist-btn ${
-                    isInWishlist(movie.id, 'movie') ? 'active' : ''
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleWishlist(movie.id, 'movie');
-                  }}
-                  aria-label={t('wishlist.add') || "Sevimlilarga qo'shish"}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill={isInWishlist(movie.id, 'movie') ? 'currentColor' : 'none'}
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                  </svg>
-                </button>
-                {movie.category === 'anonslar' ? (
-                  <div className="similar-movies-item-badge similar-movies-item-badge-soon">
-                    {t('searchModal.tezOrada', 'Tez orada')}
-                  </div>
-                ) : (
-                  <div className="similar-movies-item-badge similar-movies-item-badge-fhd">
-                    FHD
-                  </div>
-                )}
-                {movie.ageRestriction != null && (
-                  <div className="similar-movies-item-badge similar-movies-item-badge-age">
-                    {movie.ageRestriction}+
-                  </div>
-                )}
-                {movie.category !== 'anonslar' &&
-                  movie.rating != null &&
-                  movie.rating !== '' &&
-                  movie.rating !== 'none' && (
-                    <div className="similar-movies-item-rating">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="#ffd700"
-                        stroke="none"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                      </svg>
-                      <span>{movie.rating}</span>
-                    </div>
-                  )}
+        {showSectionSkeleton
+          ? Array.from({ length: SKELETON_COUNT }, (_, i) => (
+              <div
+                key={`similar-sk-${i}`}
+                className="similar-movies-item similar-movies-item--skeleton"
+                aria-hidden="true"
+              >
+                <div className="similar-movies-item-image-wrapper">
+                  <SkeletonLoader
+                    variant="similar-movies-image"
+                    className="similar-movies-item-image-skeleton"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          : displayMovies.map((movie) => (
+              <SimilarMovieItem
+                key={movie.id}
+                movie={movie}
+                contentLang={contentLang}
+                getMovieTitle={getMovieTitle}
+                onOpen={handleMovieClick}
+                isInWishlist={isInWishlist}
+                toggleWishlist={toggleWishlist}
+                t={t}
+              />
+            ))}
       </HorizontalScroll>
     </div>
   );
