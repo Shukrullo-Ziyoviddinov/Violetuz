@@ -34,6 +34,107 @@ const resolveMovieVideoSrc = (movie, lang) => {
   return null;
 };
 
+/** Season episode thumb — skeleton until preview video is actually ready from server */
+const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
+  const videoRef = useRef(null);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    setFailed(false);
+  }, [videoSrc]);
+
+  useEffect(() => {
+    if (!videoSrc || ready || failed) return undefined;
+    const check = () => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        setReady(true);
+      }
+    };
+    check();
+    const intervalId = window.setInterval(check, 200);
+    const timeoutId = window.setTimeout(() => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        setReady(true);
+      }
+    }, 20000);
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [videoSrc, ready, failed]);
+
+  const markReady = (e) => {
+    const el = e?.currentTarget || videoRef.current;
+    if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setReady(true);
+      setFailed(false);
+    }
+  };
+
+  const markFailed = () => {
+    setFailed(true);
+    setReady(false);
+  };
+
+  const showSkeleton = Boolean(videoSrc) && !ready && !failed;
+
+  return (
+    <div
+      className={`movie-detail-episode-item${showSkeleton ? ' movie-detail-episode-item--loading' : ''}`}
+      onClick={() => onOpen?.(videoSrc)}
+      onMouseEnter={(e) => {
+        if (showSkeleton) return;
+        const v = e.currentTarget.querySelector('video');
+        if (v) v.play().catch(() => {});
+      }}
+      onMouseLeave={(e) => {
+        const v = e.currentTarget.querySelector('video');
+        if (v) {
+          v.pause();
+          v.currentTime = 0;
+        }
+      }}
+      aria-busy={showSkeleton || undefined}
+    >
+      {showSkeleton && (
+        <>
+          <SkeletonLoader
+            variant="movie-detail-episode"
+            className="movie-detail-episode-skeleton"
+          />
+          <SkeletonLoader
+            variant="movie-detail-episode-number"
+            className="movie-detail-episode-number-skeleton"
+          />
+        </>
+      )}
+      {!failed && (
+        <video
+          ref={videoRef}
+          key={videoSrc}
+          src={videoSrc}
+          preload="auto"
+          muted
+          loop
+          playsInline
+          className={`movie-detail-episode-video${showSkeleton ? ' movie-detail-episode-video--loading' : ''}`}
+          onLoadedData={markReady}
+          onLoadedMetadata={markReady}
+          onCanPlay={markReady}
+          onError={markFailed}
+        />
+      )}
+      {ready && (
+        <span className="movie-detail-episode-number">{epIndex + 1}</span>
+      )}
+    </div>
+  );
+};
+
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -518,6 +619,50 @@ const MovieDetail = () => {
                           variant="movie-detail-desc-more"
                           className="movie-detail-description-more-btn-skeleton"
                         />
+                      </div>
+                    </div>
+                    <div className="movie-detail-seasons movie-detail-seasons--skeleton" aria-hidden="true">
+                      <div className="movie-detail-seasons-header">
+                        <div className="movie-detail-seasons-tabs">
+                          <SkeletonLoader
+                            variant="movie-detail-seasons-tab"
+                            className="movie-detail-seasons-tab-skeleton"
+                          />
+                          <SkeletonLoader
+                            variant="movie-detail-seasons-tab"
+                            className="movie-detail-seasons-tab-skeleton"
+                          />
+                        </div>
+                        <div className="movie-detail-season-buttons">
+                          <div className="movie-detail-season-buttons-scroll">
+                            {Array.from({ length: 4 }, (_, i) => (
+                              <SkeletonLoader
+                                key={`season-btn-sk-${i}`}
+                                variant="movie-detail-season-btn"
+                                className={`movie-detail-season-btn-skeleton${i === 0 ? ' movie-detail-season-btn-skeleton--active' : ''}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="movie-detail-season-block">
+                        <div className="movie-detail-episodes-scroll">
+                          {Array.from({ length: 5 }, (_, i) => (
+                            <div
+                              key={`episode-sk-${i}`}
+                              className="movie-detail-episode-item movie-detail-episode-item--skeleton"
+                            >
+                              <SkeletonLoader
+                                variant="movie-detail-episode"
+                                className="movie-detail-episode-skeleton"
+                              />
+                              <SkeletonLoader
+                                variant="movie-detail-episode-number"
+                                className="movie-detail-episode-number-skeleton"
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1022,79 +1167,111 @@ const MovieDetail = () => {
                   : movie.seasons?.[0];
                 const hasUzEpisodes = currentSeason?.episodes?.some((ep) => ep.uz && ep.uz !== 'none');
                 const hasRuEpisodes = currentSeason?.episodes?.some((ep) => ep.ru && ep.ru !== 'none');
+                const showSeasonsChromeSkeleton = selectedSeason == null;
                 return (
                 <div className="movie-detail-seasons">
                   <div className="movie-detail-seasons-header">
                     <div className="movie-detail-seasons-tabs">
-                      {hasUzEpisodes && (
-                        <button
-                          className={`movie-detail-seasons-tab ${seasonsLang === 'uz' ? 'active' : ''}`}
-                          onClick={() => setSeasonsLang('uz')}
-                        >
-                          UZ
-                        </button>
-                      )}
-                      {hasRuEpisodes && (
-                        <button
-                          className={`movie-detail-seasons-tab ${seasonsLang === 'ru' ? 'active' : ''}`}
-                          onClick={() => setSeasonsLang('ru')}
-                        >
-                          RU
-                        </button>
+                      {showSeasonsChromeSkeleton ? (
+                        <>
+                          <SkeletonLoader
+                            variant="movie-detail-seasons-tab"
+                            className="movie-detail-seasons-tab-skeleton"
+                          />
+                          <SkeletonLoader
+                            variant="movie-detail-seasons-tab"
+                            className="movie-detail-seasons-tab-skeleton"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          {hasUzEpisodes && (
+                            <button
+                              className={`movie-detail-seasons-tab ${seasonsLang === 'uz' ? 'active' : ''}`}
+                              onClick={() => setSeasonsLang('uz')}
+                            >
+                              UZ
+                            </button>
+                          )}
+                          {hasRuEpisodes && (
+                            <button
+                              className={`movie-detail-seasons-tab ${seasonsLang === 'ru' ? 'active' : ''}`}
+                              onClick={() => setSeasonsLang('ru')}
+                            >
+                              RU
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                     <div className="movie-detail-season-buttons">
                       <ScrollTouch key={i18n.language} className="movie-detail-season-buttons-scroll">
-                        {movie.seasons?.map((season) => (
-                          <button
-                            key={`${season.seasonNumber}-${i18n.language}`}
-                            className={`movie-detail-season-btn ${selectedSeason === season.seasonNumber ? 'active' : ''}`}
-                            onClick={() => setSelectedSeason(season.seasonNumber)}
-                          >
-                            {season.title ? (season.title[i18n.language] || season.title.uz || season.title.ru) : (i18n.language === 'uz' ? `Mavsum ${season.seasonNumber}` : `Сезон ${season.seasonNumber}`)}
-                          </button>
-                        ))}
+                        {showSeasonsChromeSkeleton
+                          ? Array.from({ length: Math.max(movie.seasons.length, 2) }, (_, i) => (
+                              <SkeletonLoader
+                                key={`season-btn-live-sk-${i}`}
+                                variant="movie-detail-season-btn"
+                                className={`movie-detail-season-btn-skeleton${i === 0 ? ' movie-detail-season-btn-skeleton--active' : ''}`}
+                              />
+                            ))
+                          : movie.seasons?.map((season) => (
+                              <button
+                                key={`${season.seasonNumber}-${i18n.language}`}
+                                className={`movie-detail-season-btn ${selectedSeason === season.seasonNumber ? 'active' : ''}`}
+                                onClick={() => setSelectedSeason(season.seasonNumber)}
+                              >
+                                {season.title
+                                  ? season.title[i18n.language] || season.title.uz || season.title.ru
+                                  : i18n.language === 'uz'
+                                    ? `Mavsum ${season.seasonNumber}`
+                                    : `Сезон ${season.seasonNumber}`}
+                              </button>
+                            ))}
                       </ScrollTouch>
                     </div>
                   </div>
                   <div className="movie-detail-season-block">
-                    {selectedSeason != null && movie.seasons?.filter((s) => s.seasonNumber === selectedSeason)
-                      ?.map((season) => (
-                        <ScrollTouch key={season.seasonNumber} className="movie-detail-episodes-scroll">
-                          {(season.episodes || []).map((ep, epIndex) => {
-                            const videoSrc = ep[seasonsLang];
-                            if (!videoSrc || videoSrc === 'none') return null;
-                            return (
-                              <div
-                                key={epIndex}
-                                className="movie-detail-episode-item"
-                                onClick={() => {
-                                  setSelectedVideoUrl(videoSrc);
-                                  setShowWatchModal(true);
-                                }}
-                                onMouseEnter={(e) => {
-                                  const v = e.currentTarget.querySelector('video');
-                                  if (v) v.play().catch(() => {});
-                                }}
-                                onMouseLeave={(e) => {
-                                  const v = e.currentTarget.querySelector('video');
-                                  if (v) { v.pause(); v.currentTime = 0; }
-                                }}
-                              >
-                                <video
-                                  src={videoSrc}
-                                  preload="metadata"
-                                  muted
-                                  loop
-                                  playsInline
-                                  className="movie-detail-episode-video"
+                    {showSeasonsChromeSkeleton ? (
+                      <div className="movie-detail-episodes-scroll">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <div
+                            key={`episode-wait-sk-${i}`}
+                            className="movie-detail-episode-item movie-detail-episode-item--skeleton"
+                          >
+                            <SkeletonLoader
+                              variant="movie-detail-episode"
+                              className="movie-detail-episode-skeleton"
+                            />
+                            <SkeletonLoader
+                              variant="movie-detail-episode-number"
+                              className="movie-detail-episode-number-skeleton"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      movie.seasons
+                        ?.filter((s) => s.seasonNumber === selectedSeason)
+                        ?.map((season) => (
+                          <ScrollTouch key={season.seasonNumber} className="movie-detail-episodes-scroll">
+                            {(season.episodes || []).map((ep, epIndex) => {
+                              const videoSrc = ep[seasonsLang];
+                              if (!videoSrc || videoSrc === 'none') return null;
+                              return (
+                                <SeasonEpisodeThumb
+                                  key={`${season.seasonNumber}-${epIndex}-${seasonsLang}-${videoSrc}`}
+                                  videoSrc={videoSrc}
+                                  epIndex={epIndex}
+                                  onOpen={(src) => {
+                                    setSelectedVideoUrl(src);
+                                    setShowWatchModal(true);
+                                  }}
                                 />
-                                <span className="movie-detail-episode-number">{epIndex + 1}</span>
-                              </div>
-                            );
-                          })}
-                        </ScrollTouch>
-                      ))}
+                              );
+                            })}
+                          </ScrollTouch>
+                        ))
+                    )}
                   </div>
                 </div>
                 );

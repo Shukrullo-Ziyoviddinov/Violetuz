@@ -240,6 +240,30 @@
   border-radius: 8px;
 }
 
+.skeleton-loader--movie-detail-seasons-tab {
+  width: 3.25rem;
+  height: calc(0.5rem * 2 + 0.95rem * 1.2 + 4px);
+  border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-season-btn {
+  width: 5.5rem;
+  height: calc(0.4rem * 2 + 0.85rem * 1.2 + 4px);
+  border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-episode {
+  width: 160px;
+  height: 90px;
+  border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-episode-number {
+  width: 1.75rem;
+  height: calc(0.875rem * 1.2 + 4px);
+  border-radius: 4px;
+}
+
 @media (max-width: 500px) {
   .skeleton-loader--home-shorts-title {
     width: 110px;

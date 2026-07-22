@@ -699,6 +699,10 @@
   width: 100%;
 }
 
+.movie-detail-seasons--skeleton {
+  pointer-events: none;
+}
+
 .movie-detail-seasons-header {
   margin-bottom: 1rem;
   display: flex;
@@ -723,7 +727,8 @@
   width: 100%;
 }
 
-.movie-detail-season-buttons-scroll .movie-detail-season-btn {
+.movie-detail-season-buttons-scroll .movie-detail-season-btn,
+.movie-detail-season-buttons-scroll .movie-detail-season-btn-skeleton {
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -731,6 +736,7 @@
 .movie-detail-season-btn {
   padding: 0.4rem 1rem;
   font-size: 0.85rem;
+  line-height: 1.2;
   font-weight: 600;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
@@ -738,6 +744,8 @@
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box;
+  min-height: calc(0.4rem * 2 + 0.85rem * 1.2 + 4px);
 }
 
 .movie-detail-season-btn:hover {
@@ -751,9 +759,23 @@
   color: #ffffff;
 }
 
+.movie-detail-season-btn-skeleton,
+.skeleton-loader--movie-detail-season-btn {
+  width: 5.5rem !important;
+  height: calc(0.4rem * 2 + 0.85rem * 1.2 + 4px) !important;
+  border-radius: 8px !important;
+  border: 2px solid transparent !important;
+  box-sizing: border-box;
+}
+
+.movie-detail-season-btn-skeleton--active {
+  box-shadow: inset 0 0 0 2px rgba(155, 79, 231, 0.55);
+}
+
 .movie-detail-seasons-tab {
   padding: 0.5rem 1rem;
   font-size: 0.95rem;
+  line-height: 1.2;
   font-weight: 600;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
@@ -761,6 +783,8 @@
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box;
+  min-height: calc(0.5rem * 2 + 0.95rem * 1.2 + 4px);
 }
 
 .movie-detail-seasons-tab:hover {
@@ -772,6 +796,14 @@
   border-color: #9b4fe7;
   background: rgba(155, 79, 231, 0.2);
   color: #ffffff;
+}
+
+.movie-detail-seasons-tab-skeleton,
+.skeleton-loader--movie-detail-seasons-tab {
+  width: 3.25rem !important;
+  height: calc(0.5rem * 2 + 0.95rem * 1.2 + 4px) !important;
+  border-radius: 8px !important;
+  box-sizing: border-box;
 }
 
 .movie-detail-season-block {
@@ -796,11 +828,37 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+  background: #111;
+}
+
+.movie-detail-episode-item--skeleton {
+  pointer-events: none;
+}
+
+.movie-detail-episode-item--loading {
+  cursor: pointer;
 }
 
 .movie-detail-episode-item:hover {
   border-color: #9b4fe7;
   box-shadow: 0 4px 20px rgba(155, 79, 231, 0.3);
+}
+
+.movie-detail-episode-item--skeleton:hover,
+.movie-detail-episode-item--loading:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+}
+
+.movie-detail-episode-skeleton,
+.skeleton-loader--movie-detail-episode {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit;
+  z-index: 1;
 }
 
 .movie-detail-episode-video {
@@ -810,17 +868,40 @@
   display: block;
 }
 
+.movie-detail-episode-video--loading {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .movie-detail-episode-number {
   position: absolute;
   bottom: 4px;
   left: 8px;
   font-size: 0.875rem;
+  line-height: 1.2;
   font-weight: bold;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   background: rgba(0, 0, 0, 0.5);
   padding: 2px 6px;
   border-radius: 4px;
+  z-index: 2;
+  box-sizing: border-box;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.movie-detail-episode-number-skeleton,
+.skeleton-loader--movie-detail-episode-number {
+  position: absolute !important;
+  bottom: 4px !important;
+  left: 8px !important;
+  width: 1.75rem !important;
+  height: calc(0.875rem * 1.2 + 4px) !important;
+  border-radius: 4px !important;
+  z-index: 2;
 }
 
 .movie-detail-section-title {
