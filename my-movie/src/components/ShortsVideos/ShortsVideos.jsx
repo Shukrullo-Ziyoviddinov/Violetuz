@@ -17,10 +17,12 @@ import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShortsMovieHead from './ShortsMovieHead';
 import ShortsMusicHead from './ShortsMusicHead';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './ShortsVideos.css';
 
 const MOBILE_BREAKPOINT = 768;
 const SLIDE_DURATION = 320; // ms
+const GRID_SKELETON_COUNT = 12;
 
 /** Profil repost playlist: faqat berilgan id lar ketma-ketligi (topilmasa tashlab yuboriladi) */
 function orderShortsByRepostIds(fullList, ids) {
@@ -145,8 +147,14 @@ const ShortsVideos = ({
 }) => {
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allShortsVideos, allMovies } = useMoviesApi();
-  const { allMusic, allClips, allConcerts, musicShortsCatalog } = useMusicApi();
+  const { allShortsVideos, allMovies, shortsLoading } = useMoviesApi();
+  const {
+    allMusic,
+    allClips,
+    allConcerts,
+    musicShortsCatalog,
+    musicShortsLoading,
+  } = useMusicApi();
   const movieShortsCatalog = useMemo(
     () =>
       resolveShortsWithMovies(allShortsVideos, allMovies, allMusic, allClips, allConcerts),
@@ -154,6 +162,8 @@ const ShortsVideos = ({
   );
   const baseList = initialShorts || movieShortsCatalog;
   const isMusicShorts = variant === 'music';
+  const isDataLoading = isMusicShorts ? musicShortsLoading : shortsLoading;
+  const showGridSkeleton = !initialShorts && isDataLoading;
   const [shortsList, setShortsList] = useState(() => {
     if (repostShortsEntries?.length) {
       return buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog);
@@ -1280,17 +1290,35 @@ const ShortsVideos = ({
   );
 
   return (
-    <div className="shorts-videos">
+    <div className="shorts-videos" aria-busy={showGridSkeleton || undefined}>
       <div className="shorts-videos-container">
         <div className="shorts-videos-grid" ref={gridRef}>
-          {shortsList.map((item, index) => (
+          {showGridSkeleton
+            ? Array.from({ length: GRID_SKELETON_COUNT }, (_, index) => (
+                <div
+                  key={`shorts-grid-skeleton-${index}`}
+                  className="shorts-video-card shorts-video-card--skeleton"
+                  aria-hidden="true"
+                >
+                  <div className="shorts-video-thumb">
+                    <SkeletonLoader
+                      variant="shorts-thumb"
+                      className="shorts-video-thumb-skeleton"
+                    />
+                  </div>
+                </div>
+              ))
+            : shortsList.map((item, index) => (
             <div key={item.id} className="shorts-video-card">
               <div
                 className="shorts-video-thumb"
                 onClick={() => openModal(index)}
               >
                 {!loadedPreviews[item.id] && (
-                  <div className="shorts-video-preview-placeholder" aria-hidden="true" />
+                  <SkeletonLoader
+                    variant="shorts-thumb"
+                    className="shorts-video-thumb-skeleton"
+                  />
                 )}
                 <video
                   src={getVideo(item)}

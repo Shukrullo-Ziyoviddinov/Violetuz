@@ -66,6 +66,18 @@
   border-radius: 999px;
 }
 
+/* Shorts video thumb (same plane as .shorts-video-thumb-shield) */
+.skeleton-loader--shorts-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit;
+  z-index: 1;
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,

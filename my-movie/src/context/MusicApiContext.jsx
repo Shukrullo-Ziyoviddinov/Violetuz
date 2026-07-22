@@ -165,18 +165,19 @@ export const MusicApiProvider = ({ children }) => {
   );
 
   const loading =
-    musicQuery.isLoading ||
-    albumsQuery.isLoading ||
-    clipsQuery.isLoading ||
-    concertsQuery.isLoading ||
-    artistMusicStoriesQuery.isLoading ||
-    artistsQuery.isLoading ||
-    musicShortsQuery.isLoading ||
-    musicBannersQuery.isLoading ||
-    sectionsQuery.isLoading ||
-    clipSectionsQuery.isLoading ||
-    concertSectionsQuery.isLoading ||
-    pageContentQuery.isLoading;
+    musicQuery.isPending ||
+    albumsQuery.isPending ||
+    clipsQuery.isPending ||
+    concertsQuery.isPending ||
+    artistMusicStoriesQuery.isPending ||
+    artistsQuery.isPending ||
+    musicShortsQuery.isPending ||
+    musicBannersQuery.isPending ||
+    sectionsQuery.isPending ||
+    clipSectionsQuery.isPending ||
+    concertSectionsQuery.isPending ||
+    pageContentQuery.isPending;
+  const musicShortsLoading = musicShortsQuery.isPending;
   const error =
     musicQuery.error?.message ||
     albumsQuery.error?.message ||
@@ -207,6 +208,7 @@ export const MusicApiProvider = ({ children }) => {
     concertSections,
     pageContent,
     loading,
+    musicShortsLoading,
     error,
     getMusicByCategory: (categoryNameMusic) =>
       allMusic.filter((item) => item.categoryNameMusic === categoryNameMusic),
@@ -331,6 +333,7 @@ export const MusicApiProvider = ({ children }) => {
     concertSections,
     pageContent,
     loading,
+    musicShortsLoading,
     error,
     queryClient,
   ]);

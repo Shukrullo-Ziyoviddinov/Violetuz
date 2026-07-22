@@ -50,6 +50,11 @@
 
 .home-shorts-more-skeleton {
   flex-shrink: 0;
+  border-radius: 20px !important;
+}
+
+.home-shorts-card--skeleton {
+  pointer-events: none;
 }
 
 .home-shorts-more {

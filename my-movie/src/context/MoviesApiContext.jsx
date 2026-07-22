@@ -140,6 +140,7 @@ export const MoviesApiProvider = ({ children }) => {
   const moviesLoading =
     moviesQuery.isPending || sectionsQuery.isPending || homeContentQuery.isPending;
   const categoriesLoading = categoriesQuery.isPending;
+  const shortsLoading = shortsQuery.isPending;
   const error =
     moviesQuery.error?.message ||
     sectionsQuery.error?.message ||
@@ -172,6 +173,7 @@ export const MoviesApiProvider = ({ children }) => {
     bannersLoading,
     moviesLoading,
     categoriesLoading,
+    shortsLoading,
     error,
     getMoviesByCategory: (categoryName) => allMovies.filter((m) => m.categoryName === categoryName),
     getBannersByLang: (lang) => allBanners.filter((b) => b.lang === lang),
@@ -260,6 +262,7 @@ export const MoviesApiProvider = ({ children }) => {
     bannersLoading,
     moviesLoading,
     categoriesLoading,
+    shortsLoading,
     error,
     queryClient,
   ]);

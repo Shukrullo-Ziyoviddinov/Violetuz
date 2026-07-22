@@ -58,11 +58,17 @@
   overflow: hidden;
 }
 
-.shorts-video-preview-placeholder {
+.shorts-video-preview-placeholder,
+.shorts-video-thumb-skeleton {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.shorts-video-preview-placeholder {
   background: #111;
 }
 
