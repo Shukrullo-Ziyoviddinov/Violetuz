@@ -266,8 +266,14 @@
 
 .skeleton-loader--movie-detail-section-title {
   width: min(10rem, 70%);
-  height: 1.25rem;
+  height: calc(1.25rem * 1.2);
   border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-scene {
+  width: 160px;
+  height: 90px;
+  border-radius: 6px;
 }
 
 .skeleton-loader--movie-detail-clip-media {

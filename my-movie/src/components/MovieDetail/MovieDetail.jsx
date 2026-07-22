@@ -255,6 +255,51 @@ const MovieDetailClipThumb = ({ clip, onOpen }) => {
   );
 };
 
+/** Scene still thumb — skeleton until image loads; size matches .movie-detail-scene-item */
+const MovieDetailSceneThumb = ({ src, index, onOpen }) => {
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    setFailed(false);
+  }, [src]);
+
+  const showSkeleton = Boolean(src) && !ready && !failed;
+
+  return (
+    <button
+      type="button"
+      className={`movie-detail-scene-item${showSkeleton ? ' movie-detail-scene-item--loading' : ''}`}
+      onClick={() => onOpen?.(index)}
+      aria-busy={showSkeleton || undefined}
+    >
+      {showSkeleton && (
+        <SkeletonLoader
+          variant="movie-detail-scene"
+          className="movie-detail-scene-skeleton"
+        />
+      )}
+      {!failed && src && (
+        <img
+          src={encodeURI(src)}
+          alt=""
+          className={`movie-detail-scene-img${showSkeleton ? ' movie-detail-scene-img--loading' : ''}`}
+          draggable={false}
+          onLoad={() => {
+            setReady(true);
+            setFailed(false);
+          }}
+          onError={() => {
+            setFailed(true);
+            setReady(false);
+          }}
+        />
+      )}
+    </button>
+  );
+};
+
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -783,6 +828,25 @@ const MovieDetail = () => {
                             </div>
                           ))}
                         </div>
+                      </div>
+                    </div>
+                    <div className="movie-detail-scenes movie-detail-scenes--skeleton" aria-hidden="true">
+                      <SkeletonLoader
+                        variant="movie-detail-section-title"
+                        className="movie-detail-section-title-skeleton"
+                      />
+                      <div className="movie-detail-scenes-scroll">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <div
+                            key={`scene-sk-${i}`}
+                            className="movie-detail-scene-item movie-detail-scene-item--skeleton"
+                          >
+                            <SkeletonLoader
+                              variant="movie-detail-scene"
+                              className="movie-detail-scene-skeleton"
+                            />
+                          </div>
+                        ))}
                       </div>
                     </div>
                     <div className="movie-detail-clips movie-detail-clips--skeleton" aria-hidden="true">
@@ -1477,22 +1541,15 @@ const MovieDetail = () => {
                   </h3>
                   <ScrollTouch className="movie-detail-scenes-scroll">
                     {sceneSrcs.map((src, idx) => (
-                      <button
+                      <MovieDetailSceneThumb
                         key={`${src}-${idx}`}
-                        type="button"
-                        className="movie-detail-scene-item"
-                        onClick={() => {
-                          setImgModalIndex(idx);
+                        src={src}
+                        index={idx}
+                        onOpen={(i) => {
+                          setImgModalIndex(i);
                           setImgModalOpen(true);
                         }}
-                      >
-                        <img
-                          src={encodeURI(src)}
-                          alt=""
-                          className="movie-detail-scene-img"
-                          draggable={false}
-                        />
-                      </button>
+                      />
                     ))}
                   </ScrollTouch>
                 </div>
