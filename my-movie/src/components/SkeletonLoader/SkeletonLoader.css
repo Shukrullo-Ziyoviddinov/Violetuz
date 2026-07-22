@@ -78,6 +78,41 @@
   z-index: 1;
 }
 
+/* VideoBanner blocks */
+.skeleton-loader--video-banner-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.skeleton-loader--video-banner-title {
+  width: min(280px, 55%);
+  height: 56px;
+  max-height: 100px;
+  border-radius: 8px;
+}
+
+.skeleton-loader--video-banner-name {
+  width: min(200px, 40%);
+  height: 40px;
+  max-height: 120px;
+  border-radius: 8px;
+}
+
+.skeleton-loader--video-banner-rating {
+  width: 72px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.skeleton-loader--video-banner-counter {
+  width: 48px;
+  height: 28px;
+  border-radius: 6px;
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,
