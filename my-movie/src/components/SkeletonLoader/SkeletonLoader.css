@@ -183,6 +183,25 @@
   border-radius: 20px;
 }
 
+.skeleton-loader--movie-detail-action {
+  width: calc(1.5rem + 2rem);
+  height: calc(0.75rem * 2 + 1.125rem * 1.2);
+  border-radius: 20px;
+}
+
+.skeleton-loader--movie-detail-action-wide {
+  width: 90px;
+  min-width: 90px;
+  height: calc(0.75rem * 2 + 1.125rem * 1.2);
+  border-radius: 20px;
+}
+
+.skeleton-loader--movie-detail-rating {
+  width: calc(32px + 0.5rem + 2.5rem);
+  height: 32px;
+  border-radius: 8px;
+}
+
 @media (max-width: 500px) {
   .skeleton-loader--home-shorts-title {
     width: 110px;

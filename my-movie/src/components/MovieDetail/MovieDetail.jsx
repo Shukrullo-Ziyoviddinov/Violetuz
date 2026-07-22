@@ -65,6 +65,7 @@ const MovieDetail = () => {
   const [videoFailed, setVideoFailed] = useState(false);
   const [titleImgReady, setTitleImgReady] = useState(false);
   const [titleImgFailed, setTitleImgFailed] = useState(false);
+  const [ratingLogosReady, setRatingLogosReady] = useState({});
   const { allMovies, moviesLoading } = useMoviesApi();
   const { allActors } = useActorsApi();
   const { getArtistById } = useMusicApi();
@@ -94,6 +95,7 @@ const MovieDetail = () => {
   useEffect(() => {
     setTitleImgReady(false);
     setTitleImgFailed(false);
+    setRatingLogosReady({});
   }, [movie?.id, titleImgSrc]);
 
   // Cached title image may already be complete
@@ -447,6 +449,45 @@ const MovieDetail = () => {
                         ))}
                       </div>
                     </div>
+                    <div className="movie-detail-actions movie-detail-actions--skeleton" aria-hidden="true">
+                      <SkeletonLoader
+                        variant="movie-detail-action"
+                        className="movie-detail-action-btn-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-action"
+                        className="movie-detail-action-btn-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-action"
+                        className="movie-detail-action-btn-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-action-wide"
+                        className="movie-detail-action-btn-skeleton movie-detail-action-btn-skeleton--wide"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-action"
+                        className="movie-detail-action-btn-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-action"
+                        className="movie-detail-action-btn-skeleton"
+                      />
+                    </div>
+                    <div className="movie-detail-rating movie-detail-rating--skeleton" aria-hidden="true">
+                      {Array.from({ length: 4 }, (_, i) => (
+                        <div
+                          key={`rating-sk-${i}`}
+                          className="movie-detail-rating-item movie-detail-rating-item--skeleton"
+                        >
+                          <SkeletonLoader
+                            variant="movie-detail-rating"
+                            className="movie-detail-rating-item-skeleton"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -769,27 +810,117 @@ const MovieDetail = () => {
 
               <div className="movie-detail-rating">
                 {movie.category !== 'anonslar' && movie.rating != null && movie.rating !== '' && movie.rating !== 'none' && (
-                  <div className="movie-detail-rating-item">
-                    <img src="/img/photo_2026-02-16_20-30-31_preview_rev_1.png" alt="Rating" className="movie-detail-rating-logo" />
-                    <span className="movie-detail-rating-value rating-value-display">{ratingDisplayValue}</span>
+                  <div
+                    className={`movie-detail-rating-item${!ratingLogosReady.vl ? ' movie-detail-rating-item--loading' : ''}`}
+                    aria-busy={!ratingLogosReady.vl || undefined}
+                  >
+                    {!ratingLogosReady.vl && (
+                      <SkeletonLoader
+                        variant="movie-detail-rating"
+                        className="movie-detail-rating-item-skeleton"
+                      />
+                    )}
+                    <img
+                      src="/img/photo_2026-02-16_20-30-31_preview_rev_1.png"
+                      alt="Rating"
+                      className={`movie-detail-rating-logo${!ratingLogosReady.vl ? ' movie-detail-rating-logo--loading' : ''}`}
+                      onLoad={() =>
+                        setRatingLogosReady((p) => (p.vl ? p : { ...p, vl: true }))
+                      }
+                      onError={() =>
+                        setRatingLogosReady((p) => (p.vl ? p : { ...p, vl: true }))
+                      }
+                    />
+                    {ratingLogosReady.vl && (
+                      <span className="movie-detail-rating-value rating-value-display">
+                        {ratingDisplayValue}
+                      </span>
+                    )}
                   </div>
                 )}
                 {movie.ratingImdb != null && movie.ratingImdb !== '' && movie.ratingImdb !== 'none' && (
-                  <div className="movie-detail-rating-item">
-                    <img src="/img/imdb.jpg" alt="IMDb" className="movie-detail-rating-logo" />
-                    <span className="movie-detail-rating-value">{movie.ratingImdb}</span>
+                  <div
+                    className={`movie-detail-rating-item${!ratingLogosReady.imdb ? ' movie-detail-rating-item--loading' : ''}`}
+                    aria-busy={!ratingLogosReady.imdb || undefined}
+                  >
+                    {!ratingLogosReady.imdb && (
+                      <SkeletonLoader
+                        variant="movie-detail-rating"
+                        className="movie-detail-rating-item-skeleton"
+                      />
+                    )}
+                    <img
+                      src="/img/imdb.jpg"
+                      alt="IMDb"
+                      className={`movie-detail-rating-logo${!ratingLogosReady.imdb ? ' movie-detail-rating-logo--loading' : ''}`}
+                      onLoad={() =>
+                        setRatingLogosReady((p) => (p.imdb ? p : { ...p, imdb: true }))
+                      }
+                      onError={() =>
+                        setRatingLogosReady((p) => (p.imdb ? p : { ...p, imdb: true }))
+                      }
+                    />
+                    {ratingLogosReady.imdb && (
+                      <span className="movie-detail-rating-value">{movie.ratingImdb}</span>
+                    )}
                   </div>
                 )}
                 {movie.ratingKinopoisk != null && movie.ratingKinopoisk !== '' && movie.ratingKinopoisk !== 'none' && (
-                  <div className="movie-detail-rating-item">
-                    <img src="/img/kinopoisk.jpg" alt="Kinopoisk" className="movie-detail-rating-logo" />
-                    <span className="movie-detail-rating-value">{movie.ratingKinopoisk}</span>
+                  <div
+                    className={`movie-detail-rating-item${!ratingLogosReady.kp ? ' movie-detail-rating-item--loading' : ''}`}
+                    aria-busy={!ratingLogosReady.kp || undefined}
+                  >
+                    {!ratingLogosReady.kp && (
+                      <SkeletonLoader
+                        variant="movie-detail-rating"
+                        className="movie-detail-rating-item-skeleton"
+                      />
+                    )}
+                    <img
+                      src="/img/kinopoisk.jpg"
+                      alt="Kinopoisk"
+                      className={`movie-detail-rating-logo${!ratingLogosReady.kp ? ' movie-detail-rating-logo--loading' : ''}`}
+                      onLoad={() =>
+                        setRatingLogosReady((p) => (p.kp ? p : { ...p, kp: true }))
+                      }
+                      onError={() =>
+                        setRatingLogosReady((p) => (p.kp ? p : { ...p, kp: true }))
+                      }
+                    />
+                    {ratingLogosReady.kp && (
+                      <span className="movie-detail-rating-value">{movie.ratingKinopoisk}</span>
+                    )}
                   </div>
                 )}
                 {movie.ratingNetflix != null && movie.ratingNetflix !== '' && movie.ratingNetflix !== 'none' && (
-                  <div className="movie-detail-rating-item">
-                    <img src="/img/netflix.jpg" alt="Netflix" className="movie-detail-rating-logo" />
-                    <span className="movie-detail-rating-value">{movie.ratingNetflix}</span>
+                  <div
+                    className={`movie-detail-rating-item${!ratingLogosReady.netflix ? ' movie-detail-rating-item--loading' : ''}`}
+                    aria-busy={!ratingLogosReady.netflix || undefined}
+                  >
+                    {!ratingLogosReady.netflix && (
+                      <SkeletonLoader
+                        variant="movie-detail-rating"
+                        className="movie-detail-rating-item-skeleton"
+                      />
+                    )}
+                    <img
+                      src="/img/netflix.jpg"
+                      alt="Netflix"
+                      className={`movie-detail-rating-logo${!ratingLogosReady.netflix ? ' movie-detail-rating-logo--loading' : ''}`}
+                      onLoad={() =>
+                        setRatingLogosReady((p) =>
+                          p.netflix ? p : { ...p, netflix: true }
+                        )
+                      }
+                      onError={() =>
+                        setRatingLogosReady((p) =>
+                          p.netflix ? p : { ...p, netflix: true }
+                        )
+                      }
+                    />
+                    {ratingLogosReady.netflix && (
+                      <span className="movie-detail-rating-value">{movie.ratingNetflix}</span>
+                    )}
                   </div>
                 )}
               </div>
