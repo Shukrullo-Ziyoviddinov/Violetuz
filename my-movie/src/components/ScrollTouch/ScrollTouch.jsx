@@ -73,7 +73,6 @@ const ScrollTouch = ({ children, className = '', ...props }) => {
       lastMoveTime = performance.now();
       lastClientX.current = e.clientX;
       element.style.cursor = 'grabbing';
-      element.setPointerCapture?.(e.pointerId);
     };
 
     const handleMouseLeave = () => {
@@ -83,11 +82,10 @@ const ScrollTouch = ({ children, className = '', ...props }) => {
       applyMomentum(velocityX * 16);
     };
 
-    const handleMouseUp = (e) => {
+    const handleMouseUp = () => {
       if (!isDown.current) return;
       isDown.current = false;
       element.style.cursor = 'grab';
-      element.releasePointerCapture?.(e.pointerId);
       applyMomentum(velocityX * 16);
     };
 
