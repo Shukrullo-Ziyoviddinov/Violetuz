@@ -488,6 +488,38 @@ const MovieDetail = () => {
                         </div>
                       ))}
                     </div>
+                    <div className="movie-detail-buttons movie-detail-buttons--skeleton" aria-hidden="true">
+                      <SkeletonLoader
+                        variant="movie-detail-btn"
+                        className="movie-detail-btn movie-detail-btn-primary movie-detail-btn-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-btn"
+                        className="movie-detail-btn movie-detail-btn-secondary movie-detail-btn-skeleton"
+                      />
+                    </div>
+                    <div className="movie-detail-description movie-detail-description--skeleton" aria-hidden="true">
+                      <div className="movie-detail-description-header">
+                        <SkeletonLoader
+                          variant="movie-detail-desc-title"
+                          className="movie-detail-description-header-skeleton"
+                        />
+                      </div>
+                      <div className="movie-detail-description-text">
+                        <SkeletonLoader
+                          variant="movie-detail-desc-preview"
+                          className="movie-detail-description-preview-skeleton"
+                        />
+                        <SkeletonLoader
+                          variant="movie-detail-desc-preview"
+                          className="movie-detail-description-preview-skeleton movie-detail-description-preview-skeleton--short"
+                        />
+                        <SkeletonLoader
+                          variant="movie-detail-desc-more"
+                          className="movie-detail-description-more-btn-skeleton"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -949,17 +981,38 @@ const MovieDetail = () => {
                     {i18n.language === 'uz' ? 'Film haqida qisqacha' : 'Кратко о фильме'}
                   </h3>
                 </div>
-                
+
                 <div className="movie-detail-description-text">
-                  <p className="movie-detail-description-preview">
-                    {descriptionText.length > 150 ? `${descriptionText.substring(0, 150)}...` : descriptionText}
-                  </p>
-                  <button 
-                    className="movie-detail-description-more-btn"
-                    onClick={() => setShowDescriptionModal(true)}
-                  >
-                    {i18n.language === 'uz' ? 'Batafsil' : 'Подробнее'}
-                  </button>
+                  {descriptionText ? (
+                    <>
+                      <p className="movie-detail-description-preview">
+                        {descriptionText.length > 150
+                          ? `${descriptionText.substring(0, 150)}...`
+                          : descriptionText}
+                      </p>
+                      <button
+                        className="movie-detail-description-more-btn"
+                        onClick={() => setShowDescriptionModal(true)}
+                      >
+                        {i18n.language === 'uz' ? 'Batafsil' : 'Подробнее'}
+                      </button>
+                    </>
+                  ) : (
+                    <div className="movie-detail-description-text--skeleton" aria-busy="true">
+                      <SkeletonLoader
+                        variant="movie-detail-desc-preview"
+                        className="movie-detail-description-preview-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-desc-preview"
+                        className="movie-detail-description-preview-skeleton movie-detail-description-preview-skeleton--short"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-desc-more"
+                        className="movie-detail-description-more-btn-skeleton"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1263,9 +1316,16 @@ const MovieDetail = () => {
               onTouchStart={handleModalHeaderTouchStart}
               onTouchEnd={handleModalTouchEnd}
             >
-              <h3>
-                {i18n.language === 'uz' ? 'Film haqida qisqacha' : 'Кратко о фильме'}
-              </h3>
+              {!descriptionText && !descriptionData ? (
+                <SkeletonLoader
+                  variant="movie-detail-desc-modal-title"
+                  className="movie-detail-description-modal-header-skeleton"
+                />
+              ) : (
+                <h3>
+                  {i18n.language === 'uz' ? 'Film haqida qisqacha' : 'Кратко о фильме'}
+                </h3>
+              )}
               <button
                 className="movie-detail-description-modal-close"
                 onClick={() => setShowDescriptionModal(false)}
@@ -1277,53 +1337,129 @@ const MovieDetail = () => {
               </button>
             </div>
             <div className="movie-detail-description-modal-body">
-              {isNewFormat ? (
+              {!descriptionText && !descriptionData ? (
+                <div className="movie-detail-description-modal-body--skeleton" aria-busy="true">
+                  <div className="movie-detail-description-modal-text">
+                    <SkeletonLoader
+                      variant="movie-detail-desc-preview"
+                      className="movie-detail-description-modal-text-skeleton"
+                    />
+                    <SkeletonLoader
+                      variant="movie-detail-desc-preview"
+                      className="movie-detail-description-modal-text-skeleton"
+                    />
+                    <SkeletonLoader
+                      variant="movie-detail-desc-preview"
+                      className="movie-detail-description-modal-text-skeleton movie-detail-description-preview-skeleton--short"
+                    />
+                  </div>
+                  <div className="movie-detail-description-modal-info movie-detail-description-modal-info--skeleton">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <div
+                        key={`desc-info-sk-${i}`}
+                        className="movie-detail-description-info-item movie-detail-description-info-item--skeleton"
+                      >
+                        <SkeletonLoader
+                          variant="movie-detail-desc-info"
+                          className="movie-detail-description-info-item-skeleton"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : isNewFormat ? (
                 <>
                   <div className="movie-detail-description-modal-text">
-                    <p>{descriptionText}</p>
+                    {descriptionText ? (
+                      <p>{descriptionText}</p>
+                    ) : (
+                      <>
+                        <SkeletonLoader
+                          variant="movie-detail-desc-preview"
+                          className="movie-detail-description-modal-text-skeleton"
+                        />
+                        <SkeletonLoader
+                          variant="movie-detail-desc-preview"
+                          className="movie-detail-description-modal-text-skeleton movie-detail-description-preview-skeleton--short"
+                        />
+                      </>
+                    )}
                   </div>
                   <div className="movie-detail-description-modal-info">
-                    <div className="movie-detail-description-info-item">
-                      <span className="movie-detail-description-label">
-                        {i18n.language === 'uz' ? 'Yil' : 'Год'}
-                      </span>
-                      <span className="movie-detail-description-value">{descriptionData.year || '-'}</span>
-                    </div>
-                    <div className="movie-detail-description-info-item">
-                      <span className="movie-detail-description-label">
-                        {i18n.language === 'uz' ? 'Davlat' : 'Страна'}
-                      </span>
-                      <span className="movie-detail-description-value">{descriptionData.country || '-'}</span>
-                    </div>
-                    <div className="movie-detail-description-info-item">
-                      <span className="movie-detail-description-label">
-                        {t('detail.duration')}
-                      </span>
-                      <span className="movie-detail-description-value">
-                        {descriptionData.duration ? `${descriptionData.duration} min` : '-'}
-                      </span>
-                    </div>
-                    <div className="movie-detail-description-info-item">
-                      <span className="movie-detail-description-label">
-                        {i18n.language === 'uz' ? 'Janr' : 'Жанр'}
-                      </span>
-                      <span className="movie-detail-description-value">
-                        {descriptionData.genre && Array.isArray(descriptionData.genre) 
-                          ? descriptionData.genre.join(', ') 
-                          : descriptionData.genre || '-'}
-                      </span>
-                    </div>
-                    <div className="movie-detail-description-info-item">
-                      <span className="movie-detail-description-label">
-                        {i18n.language === 'uz' ? 'Rejissor' : 'Режиссер'}
-                      </span>
-                      <span className="movie-detail-description-value">{descriptionData.director || '-'}</span>
-                    </div>
+                    {descriptionData ? (
+                      <>
+                        <div className="movie-detail-description-info-item">
+                          <span className="movie-detail-description-label">
+                            {i18n.language === 'uz' ? 'Yil' : 'Год'}
+                          </span>
+                          <span className="movie-detail-description-value">{descriptionData.year || '-'}</span>
+                        </div>
+                        <div className="movie-detail-description-info-item">
+                          <span className="movie-detail-description-label">
+                            {i18n.language === 'uz' ? 'Davlat' : 'Страна'}
+                          </span>
+                          <span className="movie-detail-description-value">{descriptionData.country || '-'}</span>
+                        </div>
+                        <div className="movie-detail-description-info-item">
+                          <span className="movie-detail-description-label">
+                            {t('detail.duration')}
+                          </span>
+                          <span className="movie-detail-description-value">
+                            {descriptionData.duration ? `${descriptionData.duration} min` : '-'}
+                          </span>
+                        </div>
+                        <div className="movie-detail-description-info-item">
+                          <span className="movie-detail-description-label">
+                            {i18n.language === 'uz' ? 'Janr' : 'Жанр'}
+                          </span>
+                          <span className="movie-detail-description-value">
+                            {descriptionData.genre && Array.isArray(descriptionData.genre)
+                              ? descriptionData.genre.join(', ')
+                              : descriptionData.genre || '-'}
+                          </span>
+                        </div>
+                        <div className="movie-detail-description-info-item">
+                          <span className="movie-detail-description-label">
+                            {i18n.language === 'uz' ? 'Rejissor' : 'Режиссер'}
+                          </span>
+                          <span className="movie-detail-description-value">{descriptionData.director || '-'}</span>
+                        </div>
+                      </>
+                    ) : (
+                      Array.from({ length: 5 }, (_, i) => (
+                        <div
+                          key={`desc-info-sk-modal-${i}`}
+                          className="movie-detail-description-info-item movie-detail-description-info-item--skeleton"
+                        >
+                          <SkeletonLoader
+                            variant="movie-detail-desc-info"
+                            className="movie-detail-description-info-item-skeleton"
+                          />
+                        </div>
+                      ))
+                    )}
                   </div>
                 </>
               ) : (
                 <div className="movie-detail-description-modal-text">
-                  <p>{descriptionText}</p>
+                  {descriptionText ? (
+                    <p>{descriptionText}</p>
+                  ) : (
+                    <>
+                      <SkeletonLoader
+                        variant="movie-detail-desc-preview"
+                        className="movie-detail-description-modal-text-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-desc-preview"
+                        className="movie-detail-description-modal-text-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-desc-preview"
+                        className="movie-detail-description-modal-text-skeleton movie-detail-description-preview-skeleton--short"
+                      />
+                    </>
+                  )}
                 </div>
               )}
             </div>

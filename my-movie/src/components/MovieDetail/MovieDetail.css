@@ -535,11 +535,16 @@
   flex-wrap: wrap;
 }
 
+.movie-detail-buttons--skeleton {
+  pointer-events: none;
+}
+
 .movie-detail-btn {
   padding: 1rem 1rem;
   width: 40%;
   min-width: 120px;
   font-size: 1.125rem;
+  line-height: 1.2;
   font-weight: bold;
   border: none;
   border-radius: 20px;
@@ -547,6 +552,34 @@
   transition: all 0.3s;
   box-sizing: border-box;
   flex: 1 1 auto;
+  min-height: calc(1rem * 2 + 1.125rem * 1.2);
+}
+
+/* Skeleton matches .movie-detail-btn layout (40% / flex / radius / height) */
+.movie-detail-btn-skeleton,
+.skeleton-loader.movie-detail-btn,
+.skeleton-loader--movie-detail-btn {
+  display: block;
+  width: 40%;
+  min-width: 120px;
+  flex: 1 1 auto;
+  height: calc(1rem * 2 + 1.125rem * 1.2) !important;
+  min-height: calc(1rem * 2 + 1.125rem * 1.2) !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 20px !important;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.08) 90%
+  ) !important;
+  background-size: 200% 100% !important;
+  background-color: transparent !important;
+  color: transparent !important;
+  cursor: default;
+  pointer-events: none;
+  transform: none !important;
 }
 
 .movie-detail-btn-primary {
@@ -578,21 +611,34 @@
   border: 1px solid rgba(70, 65, 80, 0.4);
 }
 
+.movie-detail-description--skeleton {
+  pointer-events: none;
+}
+
 .movie-detail-description-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
   gap: 1rem;
+  min-height: 1.5rem;
 }
 
 .movie-detail-description-header h3 {
   font-size: 1.5rem;
+  line-height: 1.2;
   margin: 0;
   color: #ffffff;
   flex: 1;
 }
 
+.movie-detail-description-header-skeleton,
+.skeleton-loader--movie-detail-desc-title {
+  width: min(16rem, 100%);
+  height: 1.5rem;
+  border-radius: 8px;
+  flex: 0 1 auto;
+}
 
 /* .movie-detail-description-text {
   margin-bottom: 1.5rem;
@@ -609,6 +655,22 @@
   margin: 0 0 1rem 0;
 }
 
+.movie-detail-description-preview-skeleton,
+.skeleton-loader--movie-detail-desc-preview {
+  display: block;
+  width: 100%;
+  height: calc(1.125rem * 1.8 * 2);
+  border-radius: 8px;
+  margin: 0 0 0.75rem 0;
+}
+
+.movie-detail-description-preview-skeleton--short,
+.skeleton-loader--movie-detail-desc-preview.movie-detail-description-preview-skeleton--short {
+  width: 72%;
+  height: calc(1.125rem * 1.8);
+  margin-bottom: 1rem;
+}
+
 .movie-detail-description-more-btn {
   background-color: #0313ea;
   color: #ffffff;
@@ -616,9 +678,20 @@
   padding: 0.25rem 1rem;
   border-radius: 25px;
   font-size: 0.6rem;
+  line-height: 1.2;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box;
+  min-height: calc(0.25rem * 2 + 0.6rem * 1.2);
+}
+
+.movie-detail-description-more-btn-skeleton,
+.skeleton-loader--movie-detail-desc-more {
+  display: block;
+  width: 4.5rem;
+  height: calc(0.25rem * 2 + 0.6rem * 1.2);
+  border-radius: 25px !important;
 }
 
 .movie-detail-seasons {
@@ -991,16 +1064,40 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.movie-detail-description-modal-info--skeleton {
+  pointer-events: none;
+}
+
 .movie-detail-description-info-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: calc(0.75rem * 2 + 1rem);
+  box-sizing: border-box;
+}
+
+.movie-detail-description-info-item--skeleton {
+  border-bottom: none;
+  padding: 0.35rem 0;
+}
+
+.movie-detail-description-info-item-skeleton,
+.skeleton-loader--movie-detail-desc-info {
+  width: 100% !important;
+  height: calc(0.75rem * 2 + 1rem) !important;
+  border-radius: 8px !important;
 }
 
 .movie-detail-description-info-item:last-child {
   border-bottom: none;
+}
+
+.movie-detail-description-modal-text-skeleton {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.75rem;
 }
 
 .movie-detail-description-label {
@@ -1106,10 +1203,18 @@
 
 .movie-detail-description-modal-header h3 {
   font-size: 1.5rem;
+  line-height: 1.2;
   margin: 0;
   color: #ffffff;
   text-align: center;
   flex: 1;
+}
+
+.movie-detail-description-modal-header-skeleton,
+.skeleton-loader--movie-detail-desc-modal-title {
+  width: min(16rem, 70%);
+  height: 1.5rem;
+  border-radius: 8px;
 }
 
 .movie-detail-description-modal-close {
@@ -1312,6 +1417,13 @@
     width: 50%;
     min-width: 0;
     flex: 1 1 auto;
+  }
+
+  .movie-detail-btn-skeleton,
+  .skeleton-loader.movie-detail-btn,
+  .skeleton-loader--movie-detail-btn {
+    width: 50%;
+    min-width: 0;
   }
 
   .movie-detail-description-header h3 {
@@ -1539,13 +1651,35 @@
     font-size: 1.125rem;
   }
 
+  .movie-detail-description-header-skeleton,
+  .skeleton-loader--movie-detail-desc-title {
+    height: 1.125rem;
+    width: min(12rem, 100%);
+  }
+
   .movie-detail-description-preview {
     font-size: 0.9rem;
+  }
+
+  .movie-detail-description-preview-skeleton,
+  .skeleton-loader--movie-detail-desc-preview {
+    height: calc(0.9rem * 1.8 * 2);
+  }
+
+  .movie-detail-description-preview-skeleton--short {
+    height: calc(0.9rem * 1.8);
   }
 
   .movie-detail-description-more-btn {
     padding: 0.625rem 1.25rem;
     font-size: 0.9rem;
+    min-height: calc(0.625rem * 2 + 0.9rem * 1.2);
+  }
+
+  .movie-detail-description-more-btn-skeleton,
+  .skeleton-loader--movie-detail-desc-more {
+    width: 5.5rem;
+    height: calc(0.625rem * 2 + 0.9rem * 1.2);
   }
 
   .movie-detail-description-info {
@@ -1557,12 +1691,22 @@
     font-size: 0.85rem;
   }
 
+  .movie-detail-description-info-item-skeleton,
+  .skeleton-loader--movie-detail-desc-info {
+    height: calc(0.75rem * 2 + 0.85rem) !important;
+  }
+
   .movie-detail-description-modal-header {
     padding: 1rem 1.25rem;
   }
 
   .movie-detail-description-modal-header h3 {
     font-size: 1.125rem;
+  }
+
+  .movie-detail-description-modal-header-skeleton,
+  .skeleton-loader--movie-detail-desc-modal-title {
+    height: 1.125rem;
   }
 
   .movie-detail-description-modal-body {

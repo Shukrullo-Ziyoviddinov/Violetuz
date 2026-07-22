@@ -202,6 +202,44 @@
   border-radius: 8px;
 }
 
+.skeleton-loader--movie-detail-btn {
+  width: 40%;
+  min-width: 120px;
+  height: calc(1rem * 2 + 1.125rem * 1.2);
+  border-radius: 20px;
+  flex: 1 1 auto;
+}
+
+.skeleton-loader--movie-detail-desc-title {
+  width: min(16rem, 100%);
+  height: 1.5rem;
+  border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-desc-preview {
+  width: 100%;
+  height: calc(1.125rem * 1.8 * 2);
+  border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-desc-more {
+  width: 4.5rem;
+  height: calc(0.25rem * 2 + 0.6rem * 1.2);
+  border-radius: 25px;
+}
+
+.skeleton-loader--movie-detail-desc-info {
+  width: 100%;
+  height: calc(0.75rem * 2 + 1rem);
+  border-radius: 8px;
+}
+
+.skeleton-loader--movie-detail-desc-modal-title {
+  width: min(16rem, 70%);
+  height: 1.5rem;
+  border-radius: 8px;
+}
+
 @media (max-width: 500px) {
   .skeleton-loader--home-shorts-title {
     width: 110px;
