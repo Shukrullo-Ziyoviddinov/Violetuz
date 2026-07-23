@@ -1537,13 +1537,42 @@ const MovieDetail = () => {
                     setShowWatchModal(true);
                   }}
                 >
-                  {t('detail.watch')}
+                  <svg
+                    className="movie-detail-btn-icon"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 5.5v13l11-6.5L8 5.5z" />
+                  </svg>
+                  <span>{t('detail.watch')}</span>
                 </button>
                 <button
                   className="movie-detail-btn movie-detail-btn-secondary"
                   onClick={() => navigate(`/movie/${movie.id}/trailer`)}
                 >
-                  {t('detail.trailer')}
+                  <svg
+                    className="movie-detail-btn-icon"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect x="3.5" y="10" width="17" height="10" rx="1.6" />
+                    <path d="M3.5 10 6 4.2h2.2L6.3 10" />
+                    <path d="M8.2 4.2h2.2l1.2 5.8" />
+                    <path d="M12.2 4.2h2.2l1.5 5.8" />
+                    <path d="M16.2 4.2H18.5L20.5 10" />
+                    <path d="M10.2 13.2v5.2l4.5-2.6-4.5-2.6z" fill="currentColor" stroke="none" />
+                  </svg>
+                  <span>{t('detail.trailer')}</span>
                 </button>
               </div>
 
