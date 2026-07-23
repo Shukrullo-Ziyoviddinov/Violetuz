@@ -119,11 +119,12 @@
   color: #fff;
 }
 
-/* Badge loaders — real o‘lcham, qorong‘i chip (age qizil emas) */
+/* Badge loaders — real badge matn/padding o‘lchami (matn transparent) */
 .search-modal-tavsiya-badge--skeleton {
   z-index: 3;
   pointer-events: none;
   color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
   border: none;
   overflow: hidden;
   background: linear-gradient(
@@ -134,27 +135,13 @@
   ) !important;
   background-size: 200% 100% !important;
   animation: search-modal-tavsiya-badge-shimmer 1.25s ease-in-out infinite;
-}
-
-.search-modal-tavsiya-badge--skeleton.search-modal-tavsiya-badge-fhd {
-  width: calc(0.65rem * 3 + 0.45rem * 2);
-  height: calc(0.65rem * 1.2 + 0.2rem * 2);
-  padding: 0;
+  width: auto;
+  height: auto;
   min-width: 0;
-}
-
-.search-modal-tavsiya-badge--skeleton.search-modal-tavsiya-badge-soon {
-  width: calc(0.65rem * 8.5 + 0.45rem * 2);
-  height: calc(0.65rem * 1.2 + 0.2rem * 2);
-  padding: 0;
-  min-width: 0;
+  padding: 0.2rem 0.45rem;
 }
 
 .search-modal-tavsiya-badge--skeleton.search-modal-tavsiya-badge-age {
-  width: calc(0.65rem * 2.5 + 0.45rem * 2);
-  height: calc(0.65rem * 1.2 + 0.2rem * 2);
-  padding: 0;
-  min-width: 0;
   background-color: transparent !important;
   background-image: linear-gradient(
     90deg,

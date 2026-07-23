@@ -51,19 +51,28 @@ const SearchModalTavsiyaItem = ({ movie, title, imgSrc, onOpen, t }) => {
 
         {showSkeleton ? (
           <>
-            <span
-              className={`search-modal-tavsiya-badge search-modal-tavsiya-badge--skeleton ${
-                isSoon
-                  ? 'search-modal-tavsiya-badge-soon'
-                  : 'search-modal-tavsiya-badge-fhd'
-              }`}
-              aria-hidden="true"
-            />
+            {isSoon ? (
+              <span
+                className="search-modal-tavsiya-badge search-modal-tavsiya-badge-soon search-modal-tavsiya-badge--skeleton"
+                aria-hidden="true"
+              >
+                {t('searchModal.tezOrada', 'Tez orada')}
+              </span>
+            ) : (
+              <span
+                className="search-modal-tavsiya-badge search-modal-tavsiya-badge-fhd search-modal-tavsiya-badge--skeleton"
+                aria-hidden="true"
+              >
+                FHD
+              </span>
+            )}
             {showAge && (
               <span
                 className="search-modal-tavsiya-badge search-modal-tavsiya-badge-age search-modal-tavsiya-badge--skeleton"
                 aria-hidden="true"
-              />
+              >
+                {movie.ageRestriction}+
+              </span>
             )}
           </>
         ) : (

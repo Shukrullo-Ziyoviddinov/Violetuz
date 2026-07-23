@@ -122,14 +122,14 @@
 }
 
 /*
-  Badge loaders — real badge o‘lchami, qorong‘i chip (age qizil emas).
-  soon: ~0.65rem * ~9 chars + padding
-  age: ~0.65rem * ~2.5 chars + padding
+  Badge loaders — real badge bilan bir xil padding/matn o‘lchami
+  (matn transparent, fon shimmer).
 */
 .search-modal-anons-badge--skeleton {
   z-index: 3;
   pointer-events: none;
   color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
   border: none;
   overflow: hidden;
   background: linear-gradient(
@@ -140,20 +140,20 @@
   ) !important;
   background-size: 200% 100% !important;
   animation: search-modal-anons-badge-shimmer 1.25s ease-in-out infinite;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 0.2rem 0.45rem;
 }
 
 .search-modal-anons-badge--skeleton.search-modal-anons-badge-soon {
-  width: calc(0.65rem * 8.5 + 0.45rem * 2);
-  height: calc(0.65rem * 1.2 + 0.2rem * 2);
-  padding: 0;
-  min-width: 0;
+  top: 0.4rem;
+  left: 0.4rem;
 }
 
 .search-modal-anons-badge--skeleton.search-modal-anons-badge-age {
-  width: calc(0.65rem * 2.5 + 0.45rem * 2);
-  height: calc(0.65rem * 1.2 + 0.2rem * 2);
-  padding: 0;
-  min-width: 0;
+  bottom: 0.4rem;
+  left: 0.4rem;
   background-color: transparent !important;
   background-image: linear-gradient(
     90deg,

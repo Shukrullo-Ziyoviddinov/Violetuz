@@ -53,12 +53,16 @@ const SearchModalAnonsItem = ({ item, title, imgSrc, onOpen, t }) => {
             <span
               className="search-modal-anons-badge search-modal-anons-badge-soon search-modal-anons-badge--skeleton"
               aria-hidden="true"
-            />
+            >
+              {t('searchModal.tezOrada', 'Tez orada')}
+            </span>
             {showAge && (
               <span
                 className="search-modal-anons-badge search-modal-anons-badge-age search-modal-anons-badge--skeleton"
                 aria-hidden="true"
-              />
+              >
+                {item.ageRestriction}+
+              </span>
             )}
           </>
         ) : (
