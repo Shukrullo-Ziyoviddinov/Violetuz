@@ -153,6 +153,26 @@
   border-radius: 24px;
 }
 
+.skeleton-loader--movie-detail-actor-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+}
+
+.skeleton-loader--movie-detail-actor-name {
+  width: 72%;
+  max-width: 7.5rem;
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--movie-detail-actor-movies {
+  width: 48%;
+  max-width: 5rem;
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+}
+
 /* MovieDetail hero video — fills .movie-detail-video-wrapper / .movie-detail-image */
 .skeleton-loader--movie-detail-video {
   width: 100%;
@@ -342,6 +362,21 @@
   .skeleton-loader--recommended-actors-title {
     width: 14rem;
     height: 1.2rem;
+  }
+
+  .skeleton-loader--movie-detail-actor-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .skeleton-loader--movie-detail-actor-name {
+    height: calc(0.8rem * 1.2);
+    max-width: 6.5rem;
+  }
+
+  .skeleton-loader--movie-detail-actor-movies {
+    height: calc(0.8rem * 1.2);
+    max-width: 4.5rem;
   }
 }
 

@@ -1202,6 +1202,7 @@
   border-radius: 50%;
   overflow: hidden;
   background: #1a1a1a;
+  position: relative;
 }
 
 .movie-detail-actor-image img {
@@ -1209,6 +1210,29 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+.movie-detail-actor-image-skeleton,
+.skeleton-loader--movie-detail-actor-img {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  z-index: 1;
+}
+
+.movie-detail-actor-img--loading {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.movie-detail-actor-item--loading,
+.movie-detail-actor-item--skeleton {
+  pointer-events: none;
+  cursor: default;
 }
 
 .movie-detail-actor-info {
@@ -1235,6 +1259,22 @@
   min-width: 0;
 }
 
+.movie-detail-actor-name--skeleton {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* name text line: 0.9rem * 1.2 */
+.movie-detail-actor-name-skeleton,
+.skeleton-loader--movie-detail-actor-name {
+  display: block !important;
+  width: 72% !important;
+  max-width: 7.5rem;
+  height: calc(0.9rem * 1.2) !important;
+  border-radius: 4px !important;
+}
+
 .movie-detail-actor-name-verified {
   flex-shrink: 0;
   width: 1rem;
@@ -1246,6 +1286,31 @@
   color: rgba(255, 255, 255, 0.85);
   display: block;
   margin-top: 0.15rem;
+  line-height: 1.2;
+}
+
+.movie-detail-actor-item .actors-page-movies-title--skeleton {
+  display: block;
+  margin-top: 0.15rem;
+  width: 100%;
+}
+
+/* "N ta video" line: 0.9rem * 1.2 */
+.movie-detail-actor-movies-title-skeleton,
+.skeleton-loader--movie-detail-actor-movies {
+  display: block !important;
+  width: 48% !important;
+  max-width: 5rem;
+  height: calc(0.9rem * 1.2) !important;
+  border-radius: 4px !important;
+}
+
+.movie-detail-actors--skeleton {
+  width: 100%;
+}
+
+.movie-detail-actors-title-skeleton {
+  margin-bottom: 1rem;
 }
 
 .movie-detail-actor-desc {
@@ -1728,6 +1793,22 @@
 
   .movie-detail-actor-name {
     font-size: 0.8rem;
+  }
+
+  .movie-detail-actor-item .actors-page-movies-title {
+    font-size: 0.8rem;
+  }
+
+  .movie-detail-actor-name-skeleton,
+  .skeleton-loader--movie-detail-actor-name {
+    height: calc(0.8rem * 1.2) !important;
+    max-width: 6.5rem;
+  }
+
+  .movie-detail-actor-movies-title-skeleton,
+  .skeleton-loader--movie-detail-actor-movies {
+    height: calc(0.8rem * 1.2) !important;
+    max-width: 4.5rem;
   }
 
 

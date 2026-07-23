@@ -369,24 +369,28 @@
 
   .video-banner-title-img-wrap,
   .video-banner-title-img-wrap--loading {
+    width: 160px;
     min-width: 160px;
     min-height: 28px;
   }
 
   .video-banner-name-img-wrap,
   .video-banner-name-img-wrap--loading {
+    width: 120px;
     min-width: 120px;
     min-height: 24px;
   }
 
   .skeleton-loader--video-banner-title,
-  .video-banner-title-img-skeleton {
+  .video-banner-title-img-skeleton,
+  .video-banner-content .skeleton-loader--video-banner-title {
     width: 160px !important;
     height: 28px !important;
   }
 
   .skeleton-loader--video-banner-name,
-  .video-banner-name-img-skeleton {
+  .video-banner-name-img-skeleton,
+  .video-banner-content .skeleton-loader--video-banner-name {
     width: 120px !important;
     height: 24px !important;
   }
@@ -424,5 +428,42 @@
 
   .video-banner-counter {
     font-size: 0.65rem;
+  }
 }
+
+/* Mobil: title/name loader ekran/blokga mos — katta fixed px emas */
+@media (max-width: 500px) {
+  .video-banner-title-img-wrap,
+  .video-banner-title-img-wrap--loading {
+    width: 42%;
+    max-width: 42%;
+    min-width: 0;
+    min-height: clamp(18px, 5.5cqw, 26px);
+  }
+
+  .video-banner-name-img-wrap,
+  .video-banner-name-img-wrap--loading {
+    width: 30%;
+    max-width: 30%;
+    min-width: 0;
+    min-height: clamp(14px, 4cqw, 20px);
+  }
+
+  .video-banner-title-img-wrap--loading .video-banner-title-img-skeleton,
+  .video-banner-title-img-skeleton,
+  .video-banner-content .skeleton-loader--video-banner-title,
+  .skeleton-loader--video-banner-title {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: clamp(18px, 5.5cqw, 26px) !important;
+  }
+
+  .video-banner-name-img-wrap--loading .video-banner-name-img-skeleton,
+  .video-banner-name-img-skeleton,
+  .video-banner-content .skeleton-loader--video-banner-name,
+  .skeleton-loader--video-banner-name {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: clamp(14px, 4cqw, 20px) !important;
+  }
 }

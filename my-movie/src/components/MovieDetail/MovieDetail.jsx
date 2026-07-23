@@ -21,7 +21,121 @@ import RatingModal from '../Rating/RatingModal';
 import { calculateMovieRating, formatMovieRating, getMovieLastVote, submitMovieRating } from '../Rating/CalculateRating';
 import '../Rating/CalculateRating.css';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
+import { normalizeImagePath } from '../../utils/utils';
 import './MovieDetail.css';
+
+const MOVIE_DETAIL_ACTOR_SKELETON_COUNT = 6;
+
+/** Actor card skeleton — o‘lchamlari .movie-detail-actor-* bilan bir xil */
+const MovieDetailActorItemSkeleton = () => (
+  <div className="movie-detail-actor-item movie-detail-actor-item--skeleton" aria-hidden="true">
+    <div className="movie-detail-actor-image movie-detail-actor-image--loading">
+      <SkeletonLoader
+        variant="movie-detail-actor-img"
+        className="movie-detail-actor-image-skeleton"
+      />
+    </div>
+    <div className="movie-detail-actor-info">
+      <span className="movie-detail-actor-name movie-detail-actor-name--skeleton">
+        <SkeletonLoader
+          variant="movie-detail-actor-name"
+          className="movie-detail-actor-name-skeleton"
+        />
+      </span>
+      <span className="actors-page-movies-title actors-page-movies-title--skeleton">
+        <SkeletonLoader
+          variant="movie-detail-actor-movies"
+          className="movie-detail-actor-movies-title-skeleton"
+        />
+      </span>
+    </div>
+  </div>
+);
+
+/** Avatar + ism + video count — rasm tayyor bo‘lguncha skeleton */
+const MovieDetailActorItem = ({
+  actor,
+  contentLang,
+  videoCountLabel,
+  onOpen,
+}) => {
+  const name =
+    actor.name?.[contentLang] || actor.name?.uz || actor.name?.ru || '';
+  const imgSrc = normalizeImagePath(actor.image || '/img/movie1.jpg');
+  const { showSkeleton, imgRef, onLoad, onError } = useImageReady(imgSrc);
+
+  return (
+    <div
+      className={`movie-detail-actor-item${showSkeleton ? ' movie-detail-actor-item--loading' : ''}`}
+      onClick={() => !showSkeleton && onOpen?.(actor.route)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (showSkeleton) return;
+        if (e.key === 'Enter') onOpen?.(actor.route);
+      }}
+      aria-busy={showSkeleton || undefined}
+    >
+      <div
+        className={`movie-detail-actor-image${
+          showSkeleton ? ' movie-detail-actor-image--loading' : ''
+        }`}
+      >
+        {showSkeleton && (
+          <SkeletonLoader
+            variant="movie-detail-actor-img"
+            className="movie-detail-actor-image-skeleton"
+          />
+        )}
+        <img
+          ref={imgRef}
+          src={imgSrc}
+          alt={name}
+          className={showSkeleton ? 'movie-detail-actor-img--loading' : undefined}
+          onLoad={onLoad}
+          onError={onError}
+        />
+      </div>
+      <div className="movie-detail-actor-info">
+        {showSkeleton ? (
+          <>
+            <span className="movie-detail-actor-name movie-detail-actor-name--skeleton">
+              <SkeletonLoader
+                variant="movie-detail-actor-name"
+                className="movie-detail-actor-name-skeleton"
+              />
+            </span>
+            <span className="actors-page-movies-title actors-page-movies-title--skeleton">
+              <SkeletonLoader
+                variant="movie-detail-actor-movies"
+                className="movie-detail-actor-movies-title-skeleton"
+              />
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="movie-detail-actor-name">
+              {name}
+              <img
+                src="/img/galichka2.png"
+                alt=""
+                className="movie-detail-actor-name-verified"
+              />
+            </span>
+            <span className="actors-page-movies-title">{videoCountLabel}</span>
+            <p className="movie-detail-actor-desc">
+              {actor.info?.[contentLang] ||
+                actor.info?.uz ||
+                actor.info?.ru ||
+                ''}
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const resolveMovieVideoSrc = (movie, lang) => {
   if (!movie?.movieMedia || typeof movie.movieMedia !== 'object') return null;
@@ -333,7 +447,7 @@ const MovieDetail = () => {
   const [titleImgFailed, setTitleImgFailed] = useState(false);
   const [ratingLogosReady, setRatingLogosReady] = useState({});
   const { allMovies, moviesLoading } = useMoviesApi();
-  const { allActors } = useActorsApi();
+  const { allActors, actorsLoading } = useActorsApi();
   const { getArtistById } = useMusicApi();
   const modalHeaderRef = React.useRef(null);
   const isDraggingRef = React.useRef(false);
@@ -866,6 +980,19 @@ const MovieDetail = () => {
                                 className="movie-detail-episode-number-skeleton"
                               />
                             </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="movie-detail-actors movie-detail-actors--skeleton" aria-hidden="true">
+                      <SkeletonLoader
+                        variant="movie-detail-section-title"
+                        className="movie-detail-section-title-skeleton movie-detail-actors-title-skeleton"
+                      />
+                      <div className="movie-detail-actors-scroll">
+                        <div className="movie-detail-actors-grid">
+                          {Array.from({ length: MOVIE_DETAIL_ACTOR_SKELETON_COUNT }, (_, i) => (
+                            <MovieDetailActorItemSkeleton key={`actor-page-sk-${i}`} />
                           ))}
                         </div>
                       </div>
@@ -1536,42 +1663,57 @@ const MovieDetail = () => {
                 );
               })()}
 
-              {movieCast.length > 0 && (() => {
+              {(() => {
+                const hasActorIds =
+                  Array.isArray(movie?.actors) && movie.actors.length > 0;
+                const showActorsListSkeleton =
+                  hasActorIds && actorsLoading && movieCast.length === 0;
+                if (!movieCast.length && !showActorsListSkeleton) return null;
+
                 return (
-                  <div className="movie-detail-actors">
+                  <div
+                    className="movie-detail-actors"
+                    aria-busy={showActorsListSkeleton || undefined}
+                  >
                     <h3 className="movie-detail-actors-title">
                       {i18n.language === 'uz' ? 'Aktyorlar' : 'Актеры'}
                     </h3>
                     <div className="movie-detail-actors-scroll">
                       <ScrollTouch className="movie-detail-actors-scroll-inner">
-                      <div className="movie-detail-actors-grid">
-                      {movieCast.map((actor) => (
-                        <div
-                          key={actor.key}
-                          className="movie-detail-actor-item"
-                          onClick={() => navigate(actor.route)}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => e.key === 'Enter' && navigate(actor.route)}
-                        >
-                          <div className="movie-detail-actor-image">
-                            <img src={actor.image} alt={actor.name[contentLang] || actor.name.uz} />
-                          </div>
-                          <div className="movie-detail-actor-info">
-                            <span className="movie-detail-actor-name">
-                              {actor.name[contentLang] || actor.name.uz || actor.name.ru}
-                              <img src="/img/galichka2.png" alt="" className="movie-detail-actor-name-verified" />
-                            </span>
-                            <span className="actors-page-movies-title">
-                              {allMovies.filter((m) => Array.isArray(m.actors) && m.actors.some((castId) => String(castId) === String(actor.rawId))).length} {i18n.language === 'uz' ? 'ta video' : 'видео'}
-                            </span>
-                            <p className="movie-detail-actor-desc">
-                              {actor.info?.[contentLang] || actor.info?.uz || actor.info?.ru || ''}
-                            </p>
-                          </div>
+                        <div className="movie-detail-actors-grid">
+                          {showActorsListSkeleton
+                            ? Array.from(
+                                { length: MOVIE_DETAIL_ACTOR_SKELETON_COUNT },
+                                (_, i) => (
+                                  <MovieDetailActorItemSkeleton
+                                    key={`actor-list-sk-${i}`}
+                                  />
+                                )
+                              )
+                            : movieCast.map((actor) => {
+                                const videoCount = allMovies.filter(
+                                  (m) =>
+                                    Array.isArray(m.actors) &&
+                                    m.actors.some(
+                                      (castId) =>
+                                        String(castId) === String(actor.rawId)
+                                    )
+                                ).length;
+                                const videoCountLabel = `${videoCount} ${
+                                  i18n.language === 'uz' ? 'ta video' : 'видео'
+                                }`;
+
+                                return (
+                                  <MovieDetailActorItem
+                                    key={actor.key}
+                                    actor={actor}
+                                    contentLang={contentLang}
+                                    videoCountLabel={videoCountLabel}
+                                    onOpen={(route) => navigate(route)}
+                                  />
+                                );
+                              })}
                         </div>
-                      ))}
-                      </div>
                       </ScrollTouch>
                     </div>
                   </div>
