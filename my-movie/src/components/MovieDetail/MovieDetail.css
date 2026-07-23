@@ -2019,59 +2019,59 @@
 /* Action tugmalar + specs — 450px dan kichik (480px dan keyin, ustun keladi) */
 @media (max-width: 450px) {
   .movie-detail-action-btn {
-    padding: 0.05rem 0.4rem;
-    font-size: 0.85rem;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.9rem;
     min-height: 0;
-    line-height: 1.15;
-    gap: 0.25rem;
+    line-height: 1.2;
+    gap: 0.3rem;
   }
 
   .movie-detail-actions .movie-detail-action-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
   }
 
   .movie-detail-rate-icon {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   .movie-detail-action-count {
-    min-width: 1.1rem;
-    font-size: 0.85rem;
+    min-width: 1.2rem;
+    font-size: 0.9rem;
   }
 
   .movie-detail-actions .repost-btn.movie-detail-action-btn {
-    padding: 0.05rem 0.4rem;
-    font-size: 0.85rem;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.9rem;
     min-height: 0;
-    line-height: 1.15;
+    line-height: 1.2;
   }
 
   .movie-detail-actions .repost-btn.movie-detail-action-btn i {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .movie-detail-actions .repost-btn.movie-detail-action-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
 
   .movie-detail-action-btn-skeleton,
   .skeleton-loader--movie-detail-action {
-    width: calc(16px + 0.4rem * 2) !important;
-    height: calc(0.05rem * 2 + 0.85rem * 1.15) !important;
+    width: calc(18px + 0.45rem * 2) !important;
+    height: calc(0.15rem * 2 + 0.9rem * 1.2) !important;
   }
 
   .movie-detail-action-btn-skeleton--wide,
   .skeleton-loader--movie-detail-action-wide {
-    width: 72px !important;
-    min-width: 72px !important;
-    height: calc(0.05rem * 2 + 0.85rem * 1.15) !important;
+    width: 76px !important;
+    min-width: 76px !important;
+    height: calc(0.15rem * 2 + 0.9rem * 1.2) !important;
   }
 
   .movie-detail-action-btn-rate {
-    min-width: 72px;
+    min-width: 76px;
   }
 
   .movie-detail-spec-item {

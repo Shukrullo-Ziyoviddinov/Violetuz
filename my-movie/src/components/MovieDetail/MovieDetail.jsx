@@ -849,6 +849,19 @@ const MovieDetail = () => {
                         className="movie-detail-title-img-skeleton"
                       />
                     </div>
+                    <div className="movie-detail-rating movie-detail-rating--skeleton" aria-hidden="true">
+                      {Array.from({ length: 4 }, (_, i) => (
+                        <div
+                          key={`rating-sk-${i}`}
+                          className="movie-detail-rating-item movie-detail-rating-item--skeleton"
+                        >
+                          <SkeletonLoader
+                            variant="movie-detail-rating"
+                            className="movie-detail-rating-item-skeleton"
+                          />
+                        </div>
+                      ))}
+                    </div>
                     <div className="movie-detail-specs">
                       <div className="movie-detail-specs-container">
                         {Array.from({ length: 4 }, (_, i) => (
@@ -905,19 +918,6 @@ const MovieDetail = () => {
                         variant="movie-detail-action"
                         className="movie-detail-action-btn-skeleton"
                       />
-                    </div>
-                    <div className="movie-detail-rating movie-detail-rating--skeleton" aria-hidden="true">
-                      {Array.from({ length: 4 }, (_, i) => (
-                        <div
-                          key={`rating-sk-${i}`}
-                          className="movie-detail-rating-item movie-detail-rating-item--skeleton"
-                        >
-                          <SkeletonLoader
-                            variant="movie-detail-rating"
-                            className="movie-detail-rating-item-skeleton"
-                          />
-                        </div>
-                      ))}
                     </div>
                     <div className="movie-detail-buttons movie-detail-buttons--skeleton" aria-hidden="true">
                       <SkeletonLoader
@@ -1266,106 +1266,6 @@ const MovieDetail = () => {
                 <h1 className="movie-detail-title">{getMovieTitle()}</h1>
               )}
 
-              <div className="movie-detail-specs">
-                {movie.specs && (
-                  <ScrollTouch className="movie-detail-specs-container">
-                    <div className="movie-detail-spec-item">
-                      <span className="movie-detail-spec-label">{t('detail.duration')}</span>
-                      <span className="movie-detail-spec-value">{movie.specs.duration} min</span>
-                    </div>
-                    <div className="movie-detail-spec-item">
-                      <span className="movie-detail-spec-label">{t('detail.ageRating')}</span>
-                      <span className="movie-detail-spec-value">{movie.specs.ageRating}</span>
-                    </div>
-                    <div className="movie-detail-spec-item">
-                      <span className="movie-detail-spec-label">{t('detail.year')}</span>
-                      <span className="movie-detail-spec-value">{movie.specs.year}</span>
-                    </div>
-                    {movie.specs.countries && movie.specs.countries.length > 0 && (
-                      <div className="movie-detail-spec-item">
-                        <span className="movie-detail-spec-label">{t('detail.countries')}</span>
-                        <span className="movie-detail-spec-value">{movie.specs.countries.join(', ')}</span>
-                      </div>
-                    )}
-                    {movie.specs.languages && movie.specs.languages.length > 0 && (
-                      <div className="movie-detail-spec-item">
-                        <span className="movie-detail-spec-label">{t('detail.languages')}</span>
-                        <span className="movie-detail-spec-value">{movie.specs.languages.join(', ')}</span>
-                      </div>
-                    )}
-                  </ScrollTouch>
-                )}
-              </div>
-
-              <div className="movie-detail-genre">
-                <span className="movie-detail-genre-label">{t('detail.genre')}:</span>
-                <div className="movie-detail-genres">
-                  {getMovieGenres().map((genre, index) => (
-                    <span key={index} className="movie-detail-genre-badge">
-                      {genre}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <ScrollTouch className="movie-detail-actions">
-                <LikeButton
-                  key={movie.id}
-                  variant="movieDetail"
-                  contentId={String(movie.id)}
-                  persistKey={`movie_${movie.id}`}
-                  likeMeta={{
-                    category: movie.type || 'movie',
-                    title: getMovieTitle(),
-                    image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '',
-                    route: `/movie/${movie.id}`,
-                  }}
-                  initialLikeCount={movie.like}
-                  initialDislikeCount={movie.dislike}
-                  countFormatter={formatActionCount}
-                />
-
-                <button
-                  className="movie-detail-action-btn movie-detail-action-btn-comment"
-                  onClick={() => commentsModalRef.current?.openModal()}
-                  aria-label={i18n.language === 'uz' ? 'Izohlar' : 'Комментарии'}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                  <span className="movie-detail-action-count">{formatActionCount(commentsCount)}</span>
-                </button>
-
-                <button
-                  className="movie-detail-action-btn movie-detail-action-btn-rate"
-                  onClick={() => setShowRatingModal(true)}
-                  aria-label={i18n.language === 'uz' ? 'Baholash' : 'Оценить'}
-                >
-                  <span className="movie-detail-rate-icon">★</span>
-                  <span className="movie-detail-rate-label">{rateLabel}</span>
-                </button>
-
-                <button
-                  className={`movie-detail-action-btn movie-detail-action-btn-wishlist ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
-                  onClick={() => toggleWishlist(movie.id, 'movie')}
-                  aria-label="Sevimlilarga qo'shish"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill={isInWishlist(movie.id, 'movie') ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                </button>
-                <Repost
-                  className="movie-detail-action-btn"
-                  item={{
-                    id: movie.id,
-                    type: 'movie',
-                    title: getMovieTitle(),
-                    image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '/img/movie1.jpg',
-                    route: `/movie/${movie.id}`,
-                  }}
-                />
-              </ScrollTouch>
-
               <div className="movie-detail-rating">
                 {movie.category !== 'anonslar' && movie.rating != null && movie.rating !== '' && movie.rating !== 'none' && (
                   <div
@@ -1482,6 +1382,106 @@ const MovieDetail = () => {
                   </div>
                 )}
               </div>
+
+              <div className="movie-detail-specs">
+                {movie.specs && (
+                  <ScrollTouch className="movie-detail-specs-container">
+                    <div className="movie-detail-spec-item">
+                      <span className="movie-detail-spec-label">{t('detail.duration')}</span>
+                      <span className="movie-detail-spec-value">{movie.specs.duration} min</span>
+                    </div>
+                    <div className="movie-detail-spec-item">
+                      <span className="movie-detail-spec-label">{t('detail.ageRating')}</span>
+                      <span className="movie-detail-spec-value">{movie.specs.ageRating}</span>
+                    </div>
+                    <div className="movie-detail-spec-item">
+                      <span className="movie-detail-spec-label">{t('detail.year')}</span>
+                      <span className="movie-detail-spec-value">{movie.specs.year}</span>
+                    </div>
+                    {movie.specs.countries && movie.specs.countries.length > 0 && (
+                      <div className="movie-detail-spec-item">
+                        <span className="movie-detail-spec-label">{t('detail.countries')}</span>
+                        <span className="movie-detail-spec-value">{movie.specs.countries.join(', ')}</span>
+                      </div>
+                    )}
+                    {movie.specs.languages && movie.specs.languages.length > 0 && (
+                      <div className="movie-detail-spec-item">
+                        <span className="movie-detail-spec-label">{t('detail.languages')}</span>
+                        <span className="movie-detail-spec-value">{movie.specs.languages.join(', ')}</span>
+                      </div>
+                    )}
+                  </ScrollTouch>
+                )}
+              </div>
+
+              <div className="movie-detail-genre">
+                <span className="movie-detail-genre-label">{t('detail.genre')}:</span>
+                <div className="movie-detail-genres">
+                  {getMovieGenres().map((genre, index) => (
+                    <span key={index} className="movie-detail-genre-badge">
+                      {genre}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <ScrollTouch className="movie-detail-actions">
+                <LikeButton
+                  key={movie.id}
+                  variant="movieDetail"
+                  contentId={String(movie.id)}
+                  persistKey={`movie_${movie.id}`}
+                  likeMeta={{
+                    category: movie.type || 'movie',
+                    title: getMovieTitle(),
+                    image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '',
+                    route: `/movie/${movie.id}`,
+                  }}
+                  initialLikeCount={movie.like}
+                  initialDislikeCount={movie.dislike}
+                  countFormatter={formatActionCount}
+                />
+
+                <button
+                  className="movie-detail-action-btn movie-detail-action-btn-comment"
+                  onClick={() => commentsModalRef.current?.openModal()}
+                  aria-label={i18n.language === 'uz' ? 'Izohlar' : 'Комментарии'}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <span className="movie-detail-action-count">{formatActionCount(commentsCount)}</span>
+                </button>
+
+                <button
+                  className="movie-detail-action-btn movie-detail-action-btn-rate"
+                  onClick={() => setShowRatingModal(true)}
+                  aria-label={i18n.language === 'uz' ? 'Baholash' : 'Оценить'}
+                >
+                  <span className="movie-detail-rate-icon">★</span>
+                  <span className="movie-detail-rate-label">{rateLabel}</span>
+                </button>
+
+                <button
+                  className={`movie-detail-action-btn movie-detail-action-btn-wishlist ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
+                  onClick={() => toggleWishlist(movie.id, 'movie')}
+                  aria-label="Sevimlilarga qo'shish"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill={isInWishlist(movie.id, 'movie') ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </button>
+                <Repost
+                  className="movie-detail-action-btn"
+                  item={{
+                    id: movie.id,
+                    type: 'movie',
+                    title: getMovieTitle(),
+                    image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '/img/movie1.jpg',
+                    route: `/movie/${movie.id}`,
+                  }}
+                />
+              </ScrollTouch>
 
               <div className="movie-detail-buttons">
                 <button
