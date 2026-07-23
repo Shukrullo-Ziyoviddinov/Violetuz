@@ -1229,8 +1229,7 @@
   pointer-events: none;
 }
 
-.movie-detail-actor-item--loading,
-.movie-detail-actor-item--skeleton {
+.movie-detail-actor-item--loading {
   pointer-events: none;
   cursor: default;
 }
@@ -1259,7 +1258,7 @@
   min-width: 0;
 }
 
-.movie-detail-actor-name--skeleton {
+.movie-detail-actor-name--loading {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -1289,7 +1288,7 @@
   line-height: 1.2;
 }
 
-.movie-detail-actor-item .actors-page-movies-title--skeleton {
+.movie-detail-actor-item .actors-page-movies-title--loading {
   display: block;
   margin-top: 0.15rem;
   width: 100%;
@@ -1303,14 +1302,6 @@
   max-width: 5rem;
   height: calc(0.9rem * 1.2) !important;
   border-radius: 4px !important;
-}
-
-.movie-detail-actors--skeleton {
-  width: 100%;
-}
-
-.movie-detail-actors-title-skeleton {
-  margin-bottom: 1rem;
 }
 
 .movie-detail-actor-desc {
