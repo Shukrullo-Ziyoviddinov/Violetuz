@@ -103,6 +103,7 @@
   height: 100%;
   min-height: 0;
   border-radius: inherit;
+  z-index: 1;
 }
 
 .movies-item-image {
@@ -111,7 +112,22 @@
   left: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   transition: transform 0.3s;
+}
+
+.movies-item-image--loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.movies-item--skeleton,
+.movies-item--loading {
+  cursor: default;
+}
+
+.movies-item--skeleton {
+  pointer-events: none;
 }
 
 .movies-item:hover .movies-item-image {

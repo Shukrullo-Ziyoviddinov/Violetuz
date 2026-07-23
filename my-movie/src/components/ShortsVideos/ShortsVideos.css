@@ -65,7 +65,12 @@
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  z-index: 1;
+  /* shield (z-index: 2) ustida — loader erta yashirilmasin */
+  z-index: 3;
+}
+
+.shorts-video-thumb--loading {
+  pointer-events: auto;
 }
 
 .shorts-video-preview-placeholder {
@@ -83,6 +88,7 @@
   opacity: 0;
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 /* Modal */

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
@@ -8,6 +8,118 @@ import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton, { getDisplayItems, shouldShowMore, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './Movies.css';
+
+/** Poster — skeleton until image fully loads (not just API JSON) */
+const MoviePosterItem = ({
+  movie,
+  isHorizontal,
+  isWideLayout,
+  contentLang,
+  getMovieTitle,
+  onOpen,
+  isInWishlist,
+  toggleWishlist,
+  t,
+  blockClick,
+}) => {
+  const [imgReady, setImgReady] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const imgSrc = movie.homeImg
+    ? movie.homeImg[contentLang] || movie.homeImg.uz || movie.homeImg.ru || ''
+    : '';
+
+  useEffect(() => {
+    setImgReady(false);
+    setImgFailed(false);
+    if (!imgSrc) {
+      setImgFailed(true);
+      setImgReady(true);
+    }
+  }, [imgSrc, movie.id]);
+
+  const showImgSkeleton = Boolean(imgSrc) && !imgReady && !imgFailed;
+
+  return (
+    <div
+      className={`movies-item ${isHorizontal ? 'movies-item-horizontal' : ''} ${isWideLayout ? 'movies-item-wide' : ''}${
+        showImgSkeleton ? ' movies-item--loading' : ''
+      }`}
+      onClick={() => !blockClick && !showImgSkeleton && onOpen?.(movie.id)}
+      aria-busy={showImgSkeleton || undefined}
+    >
+      <div className="movies-item-image-wrapper">
+        {showImgSkeleton && (
+          <SkeletonLoader
+            variant="movie-image"
+            className="movies-item-image-skeleton loader-skeleton"
+          />
+        )}
+        {!imgFailed && imgSrc && (
+          <img
+            src={imgSrc}
+            alt={getMovieTitle(movie)}
+            className={`movies-item-image${showImgSkeleton ? ' movies-item-image--loading' : ''}`}
+            onLoad={() => {
+              setImgReady(true);
+              setImgFailed(false);
+            }}
+            onError={() => {
+              setImgFailed(true);
+              setImgReady(true);
+            }}
+          />
+        )}
+        {!showImgSkeleton && (
+          <>
+            <button
+              className={`movies-item-wishlist-btn ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleWishlist(movie.id, 'movie');
+              }}
+              aria-label="Sevimlilarga qo'shish"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill={isInWishlist(movie.id, 'movie') ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+            {movie.category === 'anonslar' ? (
+              <div className="movies-item-badge movies-item-badge-soon">
+                {t('searchModal.tezOrada', 'Tez orada')}
+              </div>
+            ) : (
+              <div className="movies-item-badge movies-item-badge-fhd">FHD</div>
+            )}
+            {movie.ageRestriction != null && (
+              <div className="movies-item-badge movies-item-badge-age">{movie.ageRestriction}+</div>
+            )}
+            {movie.category !== 'anonslar' &&
+              movie.rating != null &&
+              movie.rating !== '' &&
+              movie.rating !== 'none' && (
+                <div className="movies-item-rating">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffd700" stroke="none">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span>{movie.rating}</span>
+                </div>
+              )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Movies = ({
   sectionType = 'recommended',
@@ -35,12 +147,12 @@ const Movies = ({
 
   const skeletonItems = useMemo(() => {
     const count = shouldShowLimit && Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT;
-    return Array.from({ length: count }, (_, index) => ({ id: `movie-skeleton-${index}` }));
+    return Array.from({ length: count }, (_, index) => ({ id: `movie-skeleton-${index}`, _skeleton: true }));
   }, [shouldShowLimit, limit]);
 
-  const itemsToRender = isLoading && displayMovies.length === 0 ? skeletonItems : displayMovies;
-  const showPosterSkeletons = isLoading && displayMovies.length === 0;
-  const showTitleSkeleton = isLoading && displayMovies.length === 0;
+  const showSectionSkeleton = isLoading && displayMovies.length === 0;
+  const itemsToRender = showSectionSkeleton ? skeletonItems : displayMovies;
+  const showTitleSkeleton = showSectionSkeleton;
 
   const getMovieTitle = (movie) => {
     if (movie.title && typeof movie.title === 'object') {
@@ -76,62 +188,42 @@ const Movies = ({
   const isWideLayout = false;
 
   const renderMovieItem = (movie) => {
-    return (
-      <div
-        key={movie.id}
-        className={`movies-item ${isHorizontal ? 'movies-item-horizontal' : ''} ${isWideLayout ? 'movies-item-wide' : ''}`}
-        onClick={() => !isLoading && handleMovieClick(movie.id)}
-      >
-        <div className="movies-item-image-wrapper">
-          {showPosterSkeletons ? (
+    if (movie._skeleton) {
+      return (
+        <div
+          key={movie.id}
+          className={`movies-item movies-item--skeleton ${isHorizontal ? 'movies-item-horizontal' : ''} ${isWideLayout ? 'movies-item-wide' : ''}`}
+          aria-hidden="true"
+        >
+          <div className="movies-item-image-wrapper">
             <SkeletonLoader
               variant="movie-image"
               className="movies-item-image-skeleton loader-skeleton"
             />
-          ) : (
-            <>
-              <img
-                src={movie.homeImg ? (movie.homeImg[contentLang] || movie.homeImg.uz || movie.homeImg.ru) : ''}
-                alt={getMovieTitle(movie)}
-                className="movies-item-image"
-              />
-              <button
-                className={`movies-item-wishlist-btn ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleWishlist(movie.id, 'movie');
-                }}
-                aria-label="Sevimlilarga qo'shish"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(movie.id, 'movie') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-              </button>
-              {movie.category === 'anonslar' ? (
-                <div className="movies-item-badge movies-item-badge-soon">{t('searchModal.tezOrada', 'Tez orada')}</div>
-              ) : (
-                <div className="movies-item-badge movies-item-badge-fhd">FHD</div>
-              )}
-              {movie.ageRestriction != null && (
-                <div className="movies-item-badge movies-item-badge-age">{movie.ageRestriction}+</div>
-              )}
-              {movie.category !== 'anonslar' && movie.rating != null && movie.rating !== '' && movie.rating !== 'none' && (
-                <div className="movies-item-rating">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffd700" stroke="none">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                  <span>{movie.rating}</span>
-                </div>
-              )}
-            </>
-          )}
+          </div>
         </div>
-      </div>
+      );
+    }
+
+    return (
+      <MoviePosterItem
+        key={movie.id}
+        movie={movie}
+        isHorizontal={isHorizontal}
+        isWideLayout={isWideLayout}
+        contentLang={contentLang}
+        getMovieTitle={getMovieTitle}
+        onOpen={handleMovieClick}
+        isInWishlist={isInWishlist}
+        toggleWishlist={toggleWishlist}
+        t={t}
+        blockClick={isLoading}
+      />
     );
   };
 
   return (
-    <div className="movies" aria-busy={isLoading || undefined}>
+    <div className="movies" aria-busy={isLoading || showSectionSkeleton || undefined}>
       <div className="movies-container">
         {!hideHeader && (
           <div className={`movies-header ${headerCount !== null ? 'movies-header--centered' : ''}`}>

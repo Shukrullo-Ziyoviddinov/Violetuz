@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -9,6 +9,7 @@ import { getWatchHistory } from '../../api/shortsWatchHistory';
 import { getShortsForHomeBlock } from '../../algo/shortsRecommendationAlgo';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import ShortsVideoThumb from '../ShortsVideos/ShortsVideoThumb';
 import '../ShortsVideos/ShortsVideos.css';
 import './HomeShorts.css';
 
@@ -21,7 +22,7 @@ const shouldAutoPlay = (index) => (index + 1) % 2 === 0;
 const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { allShortsVideos, allMovies, shortsLoading } = useMoviesApi();
+  const { allShortsVideos, allMovies, shortsLoading, moviesLoading } = useMoviesApi();
   const {
     allMusic,
     allClips,
@@ -29,7 +30,6 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
     musicShortsCatalog,
     musicShortsLoading,
   } = useMusicApi();
-  const [loadedPreviews, setLoadedPreviews] = useState({});
   const containerRef = useRef(null);
 
   const isMusic = source === 'music';
@@ -40,7 +40,10 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
   );
   const allShorts = isMusic ? musicShortsCatalog : movieShortsCatalog;
   const moreTo = isMusic ? '/music/shorts' : '/shorts';
-  const isDataLoading = isMusic ? musicShortsLoading : shortsLoading;
+  /* API + bog‘liq kataloglar tugaguncha skeleton */
+  const isDataLoading = isMusic
+    ? musicShortsLoading
+    : shortsLoading || moviesLoading;
 
   const homeShorts = useMemo(() => {
     const history = getWatchHistory();
@@ -142,8 +145,8 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
                     className="shorts-video-card home-shorts-card"
                     data-index={index}
                   >
-                    <div
-                      className="shorts-video-thumb"
+                    <ShortsVideoThumb
+                      videoSrc={getVideo(item)}
                       onMouseEnter={
                         !isAutoPlay
                           ? (e) => {
@@ -163,30 +166,7 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
                             }
                           : undefined
                       }
-                    >
-                      {!loadedPreviews[item.id] && (
-                        <SkeletonLoader
-                          variant="shorts-thumb"
-                          className="shorts-video-thumb-skeleton"
-                        />
-                      )}
-                      <video
-                        src={getVideo(item)}
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        className={`shorts-video-preview ${!loadedPreviews[item.id] ? 'shorts-video-loading' : ''}`}
-                        onLoadedData={() =>
-                          setLoadedPreviews((p) => ({ ...p, [item.id]: true }))
-                        }
-                        onCanPlay={() =>
-                          setLoadedPreviews((p) =>
-                            p[item.id] ? p : { ...p, [item.id]: true }
-                          )
-                        }
-                      />
-                    </div>
+                    />
                   </Link>
                 );
               })}

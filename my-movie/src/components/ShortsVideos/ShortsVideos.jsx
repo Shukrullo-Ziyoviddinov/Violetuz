@@ -18,6 +18,7 @@ import ShortsMovieHead from './ShortsMovieHead';
 import ShortsMusicHead from './ShortsMusicHead';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import ShortsVideoThumb from './ShortsVideoThumb';
 import './ShortsVideos.css';
 
 const MOBILE_BREAKPOINT = 768;
@@ -147,7 +148,7 @@ const ShortsVideos = ({
 }) => {
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allShortsVideos, allMovies, shortsLoading } = useMoviesApi();
+  const { allShortsVideos, allMovies, shortsLoading, moviesLoading } = useMoviesApi();
   const {
     allMusic,
     allClips,
@@ -162,7 +163,9 @@ const ShortsVideos = ({
   );
   const baseList = initialShorts || movieShortsCatalog;
   const isMusicShorts = variant === 'music';
-  const isDataLoading = isMusicShorts ? musicShortsLoading : shortsLoading;
+  const isDataLoading = isMusicShorts
+    ? musicShortsLoading
+    : shortsLoading || moviesLoading;
   const showGridSkeleton = !initialShorts && isDataLoading;
   const [shortsList, setShortsList] = useState(() => {
     if (repostShortsEntries?.length) {
@@ -222,7 +225,6 @@ const ShortsVideos = ({
   const [modalVideoMuted, setModalVideoMuted] = useState(false);
   const [desktopHover, setDesktopHover] = useState(false);
   const [shortsCommentCount, setShortsCommentCount] = useState(0);
-  const [loadedPreviews, setLoadedPreviews] = useState({});
   const [musicModalOpen, setMusicModalOpen] = useState(false);
   const musicAudioRef = useRef(null);
   const musicClipVideoRef = useRef(null);
@@ -1310,27 +1312,10 @@ const ShortsVideos = ({
               ))
             : shortsList.map((item, index) => (
             <div key={item.id} className="shorts-video-card">
-              <div
-                className="shorts-video-thumb"
+              <ShortsVideoThumb
+                videoSrc={getVideo(item)}
                 onClick={() => openModal(index)}
-              >
-                {!loadedPreviews[item.id] && (
-                  <SkeletonLoader
-                    variant="shorts-thumb"
-                    className="shorts-video-thumb-skeleton"
-                  />
-                )}
-                <video
-                  src={getVideo(item)}
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                  className={`shorts-video-preview ${!loadedPreviews[item.id] ? 'shorts-video-loading' : ''}`}
-                  onLoadedData={() => setLoadedPreviews((p) => ({ ...p, [item.id]: true }))}
-                  onCanPlay={() => setLoadedPreviews((p) => (p[item.id] ? p : { ...p, [item.id]: true }))}
-                />
-              </div>
+              />
             </div>
           ))}
         </div>

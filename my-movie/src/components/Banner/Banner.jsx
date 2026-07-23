@@ -7,6 +7,8 @@ import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './Banner.css';
 
 const BANNER_SKELETON_SLIDES = ['left', 'center', 'right'];
+/** Broken/slow CDN — skeleton ushlab qolmasin */
+const BANNER_IMAGE_READY_TIMEOUT_MS = 20000;
 
 const Banner = () => {
     const navigate = useNavigate();
@@ -34,6 +36,12 @@ const Banner = () => {
         }).filter((img) => img.src);
     }, [currentBanners, contentLang, allMovies]);
 
+    const imageSrcKey = useMemo(
+        () => images.map((img) => normalizeImagePath(img.src)).join('|'),
+        [images]
+    );
+
+    const [loadedSrcs, setLoadedSrcs] = useState(() => new Set());
     const [currentIndex, setCurrentIndex] = useState(0);
     const [dragOffset, setDragOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -45,6 +53,65 @@ const Banner = () => {
     const autoPlayIntervalRef = useRef(null);
     const dragStartTimeRef = useRef(0);
     const wasDragRef = useRef(false);
+
+    const markSrcReady = useCallback((src) => {
+        if (!src) return;
+        setLoadedSrcs((prev) => {
+            if (prev.has(src)) return prev;
+            const next = new Set(prev);
+            next.add(src);
+            return next;
+        });
+    }, []);
+
+    /* API tugagach ham rasmlar to‘liq yuklanmaguncha skeleton qoladi */
+    useEffect(() => {
+        setLoadedSrcs(new Set());
+    }, [imageSrcKey]);
+
+    useEffect(() => {
+        if (bannersLoading || images.length === 0) return undefined;
+
+        const normalized = images.map((img) => normalizeImagePath(img.src)).filter(Boolean);
+        const uniqueSrcs = [...new Set(normalized)];
+        const preloaders = [];
+
+        uniqueSrcs.forEach((src) => {
+            const existing = typeof document !== 'undefined'
+                ? Array.from(document.images || []).find((el) => el.currentSrc === src || el.src === src)
+                : null;
+            if (existing && existing.complete && existing.naturalWidth > 0) {
+                markSrcReady(src);
+                return;
+            }
+
+            const img = new Image();
+            const onDone = () => markSrcReady(src);
+            img.onload = onDone;
+            img.onerror = onDone;
+            img.src = src;
+            preloaders.push(img);
+        });
+
+        const timeoutId = window.setTimeout(() => {
+            uniqueSrcs.forEach((src) => markSrcReady(src));
+        }, BANNER_IMAGE_READY_TIMEOUT_MS);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+            preloaders.forEach((img) => {
+                img.onload = null;
+                img.onerror = null;
+            });
+        };
+    }, [bannersLoading, images, imageSrcKey, markSrcReady]);
+
+    const allBannerImagesReady =
+        images.length > 0 &&
+        images.every((img) => loadedSrcs.has(normalizeImagePath(img.src)));
+
+    const showBannerSkeleton =
+        bannersLoading || (images.length > 0 && !allBannerImagesReady);
 
     const startAutoPlay = useCallback(() => {
         stopAutoPlay();
@@ -229,14 +296,18 @@ const Banner = () => {
     }, []);
 
     useEffect(() => {
-        if (images.length > 0) {
+        if (images.length > 0 && allBannerImagesReady) {
             startAutoPlay();
+        } else {
+            stopAutoPlay();
         }
         return () => stopAutoPlay();
-    }, [images.length, startAutoPlay, stopAutoPlay]);
+    }, [images.length, allBannerImagesReady, startAutoPlay, stopAutoPlay]);
 
     useEffect(() => {
-        if (!slidesRef.current || !carouselRef.current || images.length === 0) return;
+        if (!slidesRef.current || !carouselRef.current || images.length === 0 || !allBannerImagesReady) {
+            return;
+        }
 
         const slidesEl = slidesRef.current;
         const carouselEl = carouselRef.current;
@@ -279,7 +350,7 @@ const Banner = () => {
             cancelAnimationFrame(rafId);
             resizeObserver.disconnect();
         };
-    }, [currentIndex, dragOffset, isDragging, images.length]);
+    }, [currentIndex, dragOffset, isDragging, images.length, allBannerImagesReady]);
 
     const getSlideClass = (index) => {
         const total = images.length;
@@ -295,19 +366,22 @@ const Banner = () => {
     };
 
     const renderSlideContent = (image, index) => {
+        const src = normalizeImagePath(image.src);
         return (
             <img
-                src={normalizeImagePath(image.src)}
+                src={src}
                 alt={`Banner ${index + 1}`}
                 draggable={false}
+                onLoad={() => markSrcReady(src)}
                 onError={(e) => {
+                    markSrcReady(src);
                     e.target.src = normalizeImagePath('/img/no-image.png');
                 }}
             />
         );
     };
 
-    if (bannersLoading) {
+    if (showBannerSkeleton) {
         return (
             <div className="banner">
                 <div className="banner-container">
@@ -371,7 +445,7 @@ const Banner = () => {
                             key={`prev-${image.id || index}`}
                             className={`manga-image ${slideClass}`}
                             aria-hidden="true"
-                            onClick={() => !bannersLoading && handleSlideClick(image)}
+                            onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
                             {renderSlideContent(image, index)}
@@ -386,7 +460,7 @@ const Banner = () => {
                             key={image.id || index}
                             className={`manga-image ${slideClass}`}
                             aria-hidden={index !== currentIndex}
-                            onClick={() => !bannersLoading && handleSlideClick(image)}
+                            onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
                             {renderSlideContent(image, index)}
@@ -401,7 +475,7 @@ const Banner = () => {
                             key={`next-${image.id || index}`}
                             className={`manga-image ${slideClass}`}
                             aria-hidden="true"
-                            onClick={() => !bannersLoading && handleSlideClick(image)}
+                            onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
                             {renderSlideContent(image, index)}
