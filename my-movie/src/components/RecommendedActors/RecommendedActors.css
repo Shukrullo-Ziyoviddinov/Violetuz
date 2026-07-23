@@ -49,11 +49,16 @@
   cursor: default;
 }
 
+.recommended-actors-item--loading {
+  cursor: default;
+}
+
 .recommended-actors-item:hover {
   transform: scale(1.02);
 }
 
-.recommended-actors-item--skeleton:hover {
+.recommended-actors-item--skeleton:hover,
+.recommended-actors-item--loading:hover {
   transform: none;
 }
 
