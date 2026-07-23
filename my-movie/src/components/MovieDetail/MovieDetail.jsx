@@ -920,6 +920,16 @@ const MovieDetail = () => {
                         ))}
                       </div>
                     </div>
+                    <div className="movie-detail-buttons movie-detail-buttons--skeleton" aria-hidden="true">
+                      <SkeletonLoader
+                        variant="movie-detail-btn"
+                        className="movie-detail-btn movie-detail-btn-primary movie-detail-btn-skeleton"
+                      />
+                      <SkeletonLoader
+                        variant="movie-detail-btn"
+                        className="movie-detail-btn movie-detail-btn-secondary movie-detail-btn-skeleton"
+                      />
+                    </div>
                     <div className="movie-detail-actions movie-detail-actions--skeleton" aria-hidden="true">
                       <SkeletonLoader
                         variant="movie-detail-action"
@@ -944,16 +954,6 @@ const MovieDetail = () => {
                       <SkeletonLoader
                         variant="movie-detail-action"
                         className="movie-detail-action-btn-skeleton"
-                      />
-                    </div>
-                    <div className="movie-detail-buttons movie-detail-buttons--skeleton" aria-hidden="true">
-                      <SkeletonLoader
-                        variant="movie-detail-btn"
-                        className="movie-detail-btn movie-detail-btn-primary movie-detail-btn-skeleton"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-btn"
-                        className="movie-detail-btn movie-detail-btn-secondary movie-detail-btn-skeleton"
                       />
                     </div>
                     <div className="movie-detail-description movie-detail-description--skeleton movie-detail-description--has-img" aria-hidden="true">
@@ -1471,6 +1471,53 @@ const MovieDetail = () => {
                 </div>
               </div>
 
+              <div className="movie-detail-buttons">
+                <button
+                  className="movie-detail-btn movie-detail-btn-primary"
+                  onClick={() => {
+                    setSelectedVideoUrl(null);
+                    setShowWatchModal(true);
+                  }}
+                >
+                  <svg
+                    className="movie-detail-btn-icon"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 5.5v13l11-6.5L8 5.5z" />
+                  </svg>
+                  <span>{t('detail.watch')}</span>
+                </button>
+                <button
+                  className="movie-detail-btn movie-detail-btn-secondary"
+                  onClick={() => navigate(`/movie/${movie.id}/trailer`)}
+                >
+                  <svg
+                    className="movie-detail-btn-icon"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect x="3.5" y="10" width="17" height="10" rx="1.6" />
+                    <path d="M3.5 10 6 4.2h2.2L6.3 10" />
+                    <path d="M8.2 4.2h2.2l1.2 5.8" />
+                    <path d="M12.2 4.2h2.2l1.5 5.8" />
+                    <path d="M16.2 4.2H18.5L20.5 10" />
+                    <path d="M10.2 13.2v5.2l4.5-2.6-4.5-2.6z" fill="currentColor" stroke="none" />
+                  </svg>
+                  <span>{t('detail.trailer')}</span>
+                </button>
+              </div>
+
               <ScrollTouch className="movie-detail-actions">
                 <LikeButton
                   key={movie.id}
@@ -1528,53 +1575,6 @@ const MovieDetail = () => {
                   }}
                 />
               </ScrollTouch>
-
-              <div className="movie-detail-buttons">
-                <button
-                  className="movie-detail-btn movie-detail-btn-primary"
-                  onClick={() => {
-                    setSelectedVideoUrl(null);
-                    setShowWatchModal(true);
-                  }}
-                >
-                  <svg
-                    className="movie-detail-btn-icon"
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M8 5.5v13l11-6.5L8 5.5z" />
-                  </svg>
-                  <span>{t('detail.watch')}</span>
-                </button>
-                <button
-                  className="movie-detail-btn movie-detail-btn-secondary"
-                  onClick={() => navigate(`/movie/${movie.id}/trailer`)}
-                >
-                  <svg
-                    className="movie-detail-btn-icon"
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <rect x="3.5" y="10" width="17" height="10" rx="1.6" />
-                    <path d="M3.5 10 6 4.2h2.2L6.3 10" />
-                    <path d="M8.2 4.2h2.2l1.2 5.8" />
-                    <path d="M12.2 4.2h2.2l1.5 5.8" />
-                    <path d="M16.2 4.2H18.5L20.5 10" />
-                    <path d="M10.2 13.2v5.2l4.5-2.6-4.5-2.6z" fill="currentColor" stroke="none" />
-                  </svg>
-                  <span>{t('detail.trailer')}</span>
-                </button>
-              </div>
 
               <div
                 className={`movie-detail-description${
