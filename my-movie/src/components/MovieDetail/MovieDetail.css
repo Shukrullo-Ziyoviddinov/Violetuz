@@ -1707,7 +1707,7 @@
 
   .movie-detail-info {
     position: relative;
-    padding-top: 0.75rem; /* title absolute — info/rating joyi barqaror */
+    padding-top: 3.25rem; /* title pastroq — rating bilan ustma-ust bo‘lmasin */
   }
 
   .movie-detail-title-img-wrapper,
@@ -1718,7 +1718,7 @@
     z-index: 3;
     margin: 0;
     max-width: 100%;
-    transform: translateY(-100%);
+    transform: translateY(-42%);
     transform-origin: left bottom;
     align-self: flex-start;
     filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.75));
@@ -1808,13 +1808,13 @@
   }
 
   .movie-detail-info {
-    padding-top: 0.75rem;
+    padding-top: 3rem;
   }
 
   .movie-detail-title-img-wrapper,
   .movie-detail-info > .movie-detail-title {
     margin: 0;
-    transform: translateY(-100%);
+    transform: translateY(-42%);
     transform-origin: left bottom;
   }
 
@@ -2074,13 +2074,13 @@
   }
 
   .movie-detail-info {
-    padding-top: 0.5rem;
+    padding-top: 2.75rem;
   }
 
   .movie-detail-title-img-wrapper,
   .movie-detail-info > .movie-detail-title {
     margin: 0;
-    transform: translateY(-100%);
+    transform: translateY(-40%);
     transform-origin: left bottom;
   }
 
