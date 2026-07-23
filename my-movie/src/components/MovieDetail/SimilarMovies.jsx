@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -10,9 +10,7 @@ import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import './SimilarMovies.css';
 
-const SKELETON_COUNT = 6;
-
-/** Poster thumb — image + overlay skeletons until poster loads (cache-safe) */
+/** Poster thumb — faqat real item; rasm tayyor bo‘lguncha shu wrapper ichida loader */
 const SimilarMovieItem = ({ movie, contentLang, getMovieTitle, onOpen, isInWishlist, toggleWishlist, t }) => {
   const imgSrc = movie.homeImg
     ? movie.homeImg[contentLang] || movie.homeImg.uz || movie.homeImg.ru || ''
@@ -144,8 +142,6 @@ const SimilarMovies = ({ currentMovie }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { allMovies, moviesLoading } = useMoviesApi();
 
-  const showSectionSkeleton = Boolean(moviesLoading);
-
   const currentTypeCategory = currentMovie
     ? Array.isArray(currentMovie.typeCategory)
       ? currentMovie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
@@ -158,8 +154,9 @@ const SimilarMovies = ({ currentMovie }) => {
     ? String(currentMovie.filterCountry).toLowerCase().trim()
     : '';
 
+  /* Fake 6 ta skeleton yo‘q — faqat real o‘xshash filmlar */
   const similarMovies =
-    !currentMovie || showSectionSkeleton
+    !currentMovie || moviesLoading
       ? []
       : allMovies.filter((movie) => {
           if (movie.id === currentMovie.id) return false;
@@ -199,73 +196,34 @@ const SimilarMovies = ({ currentMovie }) => {
     navigate(`/movie/${movieId}`);
   };
 
-  if (!showSectionSkeleton && (!currentMovie || similarMovies.length === 0)) {
+  if (!currentMovie || moviesLoading || similarMovies.length === 0) {
     return null;
   }
 
-  const moreToPath = currentMovie ? `/similar-movies/${currentMovie.id}` : '#';
-  const displayMovies = showSectionSkeleton
-    ? []
-    : getDisplayItems(similarMovies, DEFAULT_LIMIT);
+  const moreToPath = `/similar-movies/${currentMovie.id}`;
+  const displayMovies = getDisplayItems(similarMovies, DEFAULT_LIMIT);
 
   return (
-    <div
-      className={`similar-movies${showSectionSkeleton ? ' similar-movies--skeleton' : ''}`}
-      aria-busy={showSectionSkeleton || undefined}
-    >
+    <div className="similar-movies">
       <div className="similar-movies-header">
-        {showSectionSkeleton ? (
-          <SkeletonLoader
-            variant="similar-movies-title"
-            className="similar-movies-title-skeleton"
-          />
-        ) : (
-          <h3 className="similar-movies-title">
-            {i18n.language === 'uz' ? "O'xshash filimlar" : 'Похожие фильмы'}
-          </h3>
-        )}
-        {!showSectionSkeleton && <ShowMoreButton to={moreToPath} />}
+        <h3 className="similar-movies-title">
+          {i18n.language === 'uz' ? "O'xshash filimlar" : 'Похожие фильмы'}
+        </h3>
+        <ShowMoreButton to={moreToPath} />
       </div>
       <HorizontalScroll scrollAmount={300}>
-        {showSectionSkeleton
-          ? Array.from({ length: SKELETON_COUNT }, (_, i) => (
-              <div
-                key={`similar-sk-${i}`}
-                className="similar-movies-item similar-movies-item--skeleton"
-                aria-hidden="true"
-              >
-                <div className="similar-movies-item-image-wrapper">
-                  <SkeletonLoader
-                    variant="similar-movies-image"
-                    className="similar-movies-item-image-skeleton"
-                  />
-                  <span
-                    className="similar-movies-item-wishlist-btn similar-movies-item-wishlist-btn--skeleton"
-                    aria-hidden="true"
-                  />
-                  <span
-                    className="similar-movies-item-badge similar-movies-item-badge-fhd similar-movies-item-badge--skeleton"
-                    aria-hidden="true"
-                  />
-                  <span
-                    className="similar-movies-item-rating similar-movies-item-rating--skeleton"
-                    aria-hidden="true"
-                  />
-                </div>
-              </div>
-            ))
-          : displayMovies.map((movie) => (
-              <SimilarMovieItem
-                key={movie.id}
-                movie={movie}
-                contentLang={contentLang}
-                getMovieTitle={getMovieTitle}
-                onOpen={handleMovieClick}
-                isInWishlist={isInWishlist}
-                toggleWishlist={toggleWishlist}
-                t={t}
-              />
-            ))}
+        {displayMovies.map((movie) => (
+          <SimilarMovieItem
+            key={movie.id}
+            movie={movie}
+            contentLang={contentLang}
+            getMovieTitle={getMovieTitle}
+            onOpen={handleMovieClick}
+            isInWishlist={isInWishlist}
+            toggleWishlist={toggleWishlist}
+            t={t}
+          />
+        ))}
       </HorizontalScroll>
     </div>
   );

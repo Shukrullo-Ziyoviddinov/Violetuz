@@ -25,26 +25,30 @@ import { useImageReady } from '../../utils/useImageReady';
 import { normalizeImagePath } from '../../utils/utils';
 import './MovieDetail.css';
 
-/** Faqat real actor item — rasm/ism/video-count tayyor bo‘lguncha o‘sha blok ichida loader */
+/** Faqat film actors[] dagi real item — data/rasm kelguncha shu blok ichida loader */
 const MovieDetailActorItem = ({
   actor,
   contentLang,
   videoCountLabel,
   onOpen,
 }) => {
+  const resolved = actor.resolved !== false;
   const name =
     actor.name?.[contentLang] || actor.name?.uz || actor.name?.ru || '';
-  const imgSrc = normalizeImagePath(actor.image || '/img/movie1.jpg');
-  const { showSkeleton, imgRef, onLoad, onError } = useImageReady(imgSrc);
+  const imgSrc = resolved
+    ? normalizeImagePath(actor.image || '/img/movie1.jpg')
+    : '';
+  const img = useImageReady(imgSrc);
+  const showSkeleton = !resolved || img.showSkeleton;
 
   return (
     <div
       className={`movie-detail-actor-item${showSkeleton ? ' movie-detail-actor-item--loading' : ''}`}
-      onClick={() => !showSkeleton && onOpen?.(actor.route)}
+      onClick={() => !showSkeleton && resolved && onOpen?.(actor.route)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (showSkeleton) return;
+        if (showSkeleton || !resolved) return;
         if (e.key === 'Enter') onOpen?.(actor.route);
       }}
       aria-busy={showSkeleton || undefined}
@@ -60,14 +64,16 @@ const MovieDetailActorItem = ({
             className="movie-detail-actor-image-skeleton"
           />
         )}
-        <img
-          ref={imgRef}
-          src={imgSrc}
-          alt={name}
-          className={showSkeleton ? 'movie-detail-actor-img--loading' : undefined}
-          onLoad={onLoad}
-          onError={onError}
-        />
+        {imgSrc ? (
+          <img
+            ref={img.imgRef}
+            src={imgSrc}
+            alt={name}
+            className={showSkeleton ? 'movie-detail-actor-img--loading' : undefined}
+            onLoad={img.onLoad}
+            onError={img.onError}
+          />
+        ) : null}
       </div>
       <div className="movie-detail-actor-info">
         <span
@@ -428,8 +434,8 @@ const MovieDetail = () => {
   const [titleImgFailed, setTitleImgFailed] = useState(false);
   const [ratingLogosReady, setRatingLogosReady] = useState({});
   const { allMovies, moviesLoading } = useMoviesApi();
-  const { allActors } = useActorsApi();
-  const { getArtistById } = useMusicApi();
+  const { allActors, actorsLoading } = useActorsApi();
+  const { getArtistById, loading: musicApiLoading } = useMusicApi();
   const modalHeaderRef = React.useRef(null);
   const isDraggingRef = React.useRef(false);
   const modalStartYRef = React.useRef(0);
@@ -617,40 +623,64 @@ const MovieDetail = () => {
   const movieCast = useMemo(() => {
     if (!Array.isArray(movie?.actors)) return [];
 
-    const castItems = movie.actors.map((castId) => {
-      const normalizedId = typeof castId === 'number' ? castId : parseInt(castId, 10);
-      const actor = Number.isNaN(normalizedId)
-        ? undefined
-        : allActors.find((item) => item.id === normalizedId);
+    const castPending = actorsLoading || musicApiLoading;
 
-      if (actor) {
-        return {
-          key: `actor-${actor.id}`,
-          id: actor.id,
-          image: actor.image,
-          name: actor.name || {},
-          info: actor.info || {},
-          route: `/actor/${actor.id}`,
-          rawId: castId,
-        };
-      }
+    return movie.actors
+      .map((castId, index) => {
+        const normalizedId =
+          typeof castId === 'number' ? castId : parseInt(castId, 10);
+        const actor = Number.isNaN(normalizedId)
+          ? undefined
+          : allActors.find((item) => item.id === normalizedId);
 
-      const artist = getArtistById(castId);
-      if (!artist) return null;
+        if (actor) {
+          return {
+            key: `actor-${actor.id}`,
+            id: actor.id,
+            image: actor.image,
+            name: actor.name || {},
+            info: actor.info || {},
+            route: `/actor/${actor.id}`,
+            rawId: castId,
+            resolved: true,
+          };
+        }
 
-      return {
-        key: `artist-${artist.id}`,
-        id: artist.id,
-        image: artist.img || artist.imgArtist || '/img/movie1.jpg',
-        name: { uz: artist.name, ru: artist.name },
-        info: { uz: artist.description || '', ru: artist.description || '' },
-        route: `/music/artist/${artist.id}`,
-        rawId: castId,
-      };
-    }).filter(Boolean);
+        const artist = getArtistById(castId);
+        if (artist) {
+          return {
+            key: `artist-${artist.id}`,
+            id: artist.id,
+            image: artist.img || artist.imgArtist || '/img/movie1.jpg',
+            name: { uz: artist.name, ru: artist.name },
+            info: {
+              uz: artist.description || '',
+              ru: artist.description || '',
+            },
+            route: `/music/artist/${artist.id}`,
+            rawId: castId,
+            resolved: true,
+          };
+        }
 
-    return castItems;
-  }, [movie?.actors, allActors, getArtistById]);
+        /* Film actors[] da ID bor — API hali kelmagan: real slot + loader */
+        if (castPending) {
+          return {
+            key: `pending-${String(castId)}-${index}`,
+            id: castId,
+            image: '',
+            name: {},
+            info: {},
+            route: '#',
+            rawId: castId,
+            resolved: false,
+          };
+        }
+
+        return null;
+      })
+      .filter(Boolean);
+  }, [movie?.actors, allActors, getArtistById, actorsLoading, musicApiLoading]);
 
   useEffect(() => {
     if (!movie?.seasons?.length) {
@@ -1020,9 +1050,6 @@ const MovieDetail = () => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="movie-detail-container movie-detail-similar-wrapper">
-          <SimilarMovies currentMovie={null} />
         </div>
       </>
       );
