@@ -562,7 +562,7 @@
 .movie-detail-btn-primary {
   flex: 1.7 1 0;
   width: auto;
-  background: linear-gradient(145deg, #7a4ef0 0%, #6e40e5 55%, #6436d8 100%);
+  background: linear-gradient(135deg, #b87ff7, #9b4fe7);
   border-color: transparent;
   color: #ffffff;
 }
@@ -572,7 +572,7 @@
   width: auto;
   max-width: 38%;
   background: transparent;
-  border-color: #6e40e5;
+  border-color: #9b4fe7;
   color: #ffffff;
 }
 
@@ -622,13 +622,13 @@
 
 .movie-detail-btn-primary:hover {
   transform: translateY(-1px);
-  background: linear-gradient(145deg, #855af5 0%, #7548ea 55%, #6b3de0 100%);
+  background: linear-gradient(135deg, #c18ff9, #a55ff0);
 }
 
 .movie-detail-btn-secondary:hover {
   transform: translateY(-1px);
-  background: rgba(110, 64, 229, 0.12);
-  border-color: #7a4ef0;
+  background: rgba(155, 79, 231, 0.12);
+  border-color: #9b4fe7;
 }
 
 .movie-detail-description {
@@ -1695,8 +1695,23 @@
 @media (max-width: 968px) {
   .movie-detail-content {
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.25rem;
     padding: 1.5rem 2rem 2.5rem 2rem;
+  }
+
+  /* Stack: title-img image-block ustiga (overlay), tepaga emas */
+  .movie-detail-info-block,
+  .movie-detail-info {
+    overflow: visible;
+  }
+
+  .movie-detail-title-img-wrapper,
+  .movie-detail-info > .movie-detail-title {
+    position: relative;
+    z-index: 3;
+    margin-top: calc(-1.25rem - 3.5rem);
+    align-self: flex-start;
+    filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.75));
   }
   
 
@@ -1760,6 +1775,12 @@
   .movie-detail-content {
     padding: 0 0 2rem 0;
     background: transparent;
+    gap: 0.75rem;
+  }
+
+  .movie-detail-title-img-wrapper,
+  .movie-detail-info > .movie-detail-title {
+    margin-top: calc(-0.75rem - 4rem);
   }
 
   .movie-detail-image-block {
@@ -2010,6 +2031,12 @@
 
   .movie-detail-content {
     padding: 0.4rem 0 0.7rem 0;
+    gap: 0.5rem;
+  }
+
+  .movie-detail-title-img-wrapper,
+  .movie-detail-info > .movie-detail-title {
+    margin-top: calc(-0.5rem - 3.25rem);
   }
 
   .movie-detail-rating {
