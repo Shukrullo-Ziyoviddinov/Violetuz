@@ -50,11 +50,21 @@
 
 .video-banner-video--loading {
   opacity: 0;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.video-banner-card--skeleton {
+.video-banner-card--skeleton,
+.video-banner-card--loading {
   pointer-events: none;
   cursor: default;
+}
+
+.video-banner-card--loading {
+  pointer-events: auto;
 }
 
 .video-banner-title-img-wrap,
@@ -71,12 +81,23 @@
 
 .video-banner-img--loading {
   position: absolute;
+  inset: 0;
   opacity: 0;
   pointer-events: none;
 }
 
 .video-banner-rating-item-skeleton {
   flex-shrink: 0;
+}
+
+/* Rating logolarini skeleton paytida yuklash (ko‘rinmas) */
+.video-banner-ratings-preload {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .video-banner-counter--skeleton {

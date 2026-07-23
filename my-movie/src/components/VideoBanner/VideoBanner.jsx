@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
@@ -16,6 +16,337 @@ const RATING_IMGS = {
 };
 
 const RATING_SKELETON_COUNT = 4;
+const VIDEO_READY_TIMEOUT_MS = 20000;
+
+const markReadyMap = (setter, id) => {
+  setter((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+};
+
+/** Bitta banner kartochkasi — video + title/name/rating to‘liq tayyor bo‘lguncha skeleton */
+const VideoBannerCard = ({
+  banner,
+  movie,
+  contentLang,
+  moviesLoading,
+  unmuted,
+  onToggleMute,
+  onEnded,
+  onOpen,
+  cardRef,
+  videoRef,
+}) => {
+  const videoElRef = useRef(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [titleReady, setTitleReady] = useState(false);
+  const [nameReady, setNameReady] = useState(false);
+  const [ratingLogosReady, setRatingLogosReady] = useState({});
+
+  const isMovie = banner.type === 'movie';
+  const videoSrc = normalizeImagePath(banner.video || '');
+
+  const titleImgSrc = isMovie
+    ? movie?.titleImg?.[contentLang] ||
+      movie?.titleImg?.uz ||
+      movie?.titleImg?.ru ||
+      ''
+    : typeof banner.titleImage === 'string'
+      ? banner.titleImage
+      : banner.titleImage?.[contentLang] ||
+        banner.titleImage?.uz ||
+        banner.titleImage?.ru ||
+        '';
+
+  const nameImgSrc = !isMovie && banner.nameImg ? banner.nameImg : '';
+
+  const ratings =
+    isMovie && movie
+      ? {
+          rating: movie.rating,
+          ratingImdb: movie.ratingImdb,
+          ratingKinopoisk: movie.ratingKinopoisk,
+          ratingNetflix: movie.ratingNetflix,
+        }
+      : null;
+
+  const ratingEntries = useMemo(() => {
+    if (!ratings) return [];
+    const list = [];
+    if (ratings.ratingNetflix != null) {
+      list.push({ key: 'netflix', src: RATING_IMGS.netflix, value: ratings.ratingNetflix, alt: 'Netflix' });
+    }
+    if (ratings.ratingImdb != null) {
+      list.push({ key: 'imdb', src: RATING_IMGS.imdb, value: ratings.ratingImdb, alt: 'IMDb' });
+    }
+    if (ratings.ratingKinopoisk != null) {
+      list.push({ key: 'kinopoisk', src: RATING_IMGS.kinopoisk, value: ratings.ratingKinopoisk, alt: 'Kinopoisk' });
+    }
+    if (ratings.rating != null) {
+      list.push({ key: 'vl', src: RATING_IMGS.vl, value: ratings.rating, alt: 'Vl', vl: true });
+    }
+    return list;
+  }, [ratings]);
+
+  useEffect(() => {
+    setVideoReady(false);
+    setVideoFailed(false);
+  }, [videoSrc, banner.id]);
+
+  useEffect(() => {
+    setTitleReady(false);
+  }, [titleImgSrc, banner.id]);
+
+  useEffect(() => {
+    setNameReady(false);
+  }, [nameImgSrc, banner.id]);
+
+  useEffect(() => {
+    setRatingLogosReady({});
+  }, [banner.id, movie?.id]);
+
+  useEffect(() => {
+    if (!videoSrc || videoReady || videoFailed) return undefined;
+
+    const check = () => {
+      const el = videoElRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        setVideoReady(true);
+        setVideoFailed(false);
+      }
+    };
+
+    check();
+    const intervalId = window.setInterval(check, 200);
+    const timeoutId = window.setTimeout(() => {
+      const el = videoElRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        setVideoReady(true);
+      } else {
+        setVideoFailed(true);
+      }
+    }, VIDEO_READY_TIMEOUT_MS);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [videoSrc, videoReady, videoFailed]);
+
+  const markVideoReady = (e) => {
+    const el = e?.currentTarget || videoElRef.current;
+    if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setVideoReady(true);
+      setVideoFailed(false);
+    }
+  };
+
+  const waitingMovieMeta = isMovie && moviesLoading && !movie;
+  const titlePending = Boolean(titleImgSrc) && !titleReady;
+  const namePending = Boolean(nameImgSrc) && !nameReady;
+  const ratingsPending =
+    waitingMovieMeta ||
+    (ratingEntries.length > 0 &&
+      ratingEntries.some((r) => !ratingLogosReady[r.key]));
+
+  const showVideoSkeleton = Boolean(videoSrc) && !videoReady && !videoFailed;
+
+  /* Content (title / name / ratings) — video tayyor bo‘lguncha ham skeleton */
+  const showContentSkeleton =
+    showVideoSkeleton ||
+    waitingMovieMeta ||
+    titlePending ||
+    namePending ||
+    (isMovie && ratingsPending && (ratingEntries.length > 0 || waitingMovieMeta));
+
+  const setVideoNode = useCallback(
+    (el) => {
+      videoElRef.current = el;
+      if (typeof videoRef === 'function') videoRef(el);
+      else if (videoRef) videoRef.current = el;
+    },
+    [videoRef]
+  );
+
+  return (
+    <div
+      ref={cardRef}
+      data-banner-id={banner.id}
+      className={`video-banner-card${showContentSkeleton || showVideoSkeleton ? ' video-banner-card--loading' : ''}`}
+      onClick={() => !showVideoSkeleton && onOpen?.(banner)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (showVideoSkeleton) return;
+        if (e.key === 'Enter') onOpen?.(banner);
+      }}
+      aria-busy={showVideoSkeleton || showContentSkeleton || undefined}
+    >
+      <div className="video-banner-video-wrap">
+        {showVideoSkeleton && (
+          <SkeletonLoader
+            variant="video-banner-video"
+            className="video-banner-video-skeleton"
+          />
+        )}
+        {!videoFailed && videoSrc && (
+          <video
+            ref={setVideoNode}
+            key={videoSrc}
+            className={`video-banner-video${showVideoSkeleton ? ' video-banner-video--loading' : ''}`}
+            src={videoSrc}
+            muted={!unmuted}
+            playsInline
+            preload="auto"
+            autoPlay={false}
+            onLoadedData={markVideoReady}
+            onLoadedMetadata={markVideoReady}
+            onCanPlay={markVideoReady}
+            onError={() => {
+              setVideoFailed(true);
+              setVideoReady(false);
+            }}
+            onEnded={() => onEnded?.(banner.id)}
+          />
+        )}
+        <div className="video-banner-overlay" />
+        {!showVideoSkeleton && (
+          <button
+            type="button"
+            className="video-banner-sound-btn"
+            onClick={(e) => onToggleMute?.(e, banner.id)}
+            aria-label={unmuted ? "Ovozni o'chirish" : 'Ovozni yoqish'}
+          >
+            {unmuted ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <line x1="16" y1="9" x2="22" y2="15" />
+                <line x1="22" y1="9" x2="16" y2="15" />
+              </svg>
+            )}
+          </button>
+        )}
+      </div>
+
+      <div className="video-banner-content">
+        {isMovie ? (
+          <>
+            {(titleImgSrc || waitingMovieMeta || showVideoSkeleton) && (
+              <div className="video-banner-title-img-wrap">
+                {showContentSkeleton || titlePending || !titleImgSrc ? (
+                  <SkeletonLoader
+                    variant="video-banner-title"
+                    className="video-banner-title-img-skeleton"
+                  />
+                ) : null}
+                {titleImgSrc && (
+                  <img
+                    src={normalizeImagePath(titleImgSrc)}
+                    alt=""
+                    className={`video-banner-title-img${
+                      showContentSkeleton || titlePending ? ' video-banner-img--loading' : ''
+                    }`}
+                    onLoad={() => setTitleReady(true)}
+                    onError={() => setTitleReady(true)}
+                  />
+                )}
+              </div>
+            )}
+            {(ratingEntries.length > 0 || waitingMovieMeta || showVideoSkeleton) && (
+              <div className="video-banner-ratings">
+                {showContentSkeleton || ratingsPending
+                  ? Array.from({ length: RATING_SKELETON_COUNT }, (_, i) => (
+                      <SkeletonLoader
+                        key={`vb-rating-${banner.id}-${i}`}
+                        variant="video-banner-rating"
+                        className="video-banner-rating-item-skeleton"
+                      />
+                    ))
+                  : ratingEntries.map((r) => (
+                      <span
+                        key={r.key}
+                        className={`video-banner-rating-item${r.vl ? ' video-banner-rating-vl' : ''}`}
+                      >
+                        <img
+                          src={normalizeImagePath(r.src)}
+                          alt={r.alt}
+                          onLoad={() => markReadyMap(setRatingLogosReady, r.key)}
+                          onError={() => markReadyMap(setRatingLogosReady, r.key)}
+                        />
+                        <span>{r.value}</span>
+                      </span>
+                    ))}
+              </div>
+            )}
+            {/* Rating logolarini oldindan yuklash — skeleton paytida ham */}
+            {ratingEntries.length > 0 && (showContentSkeleton || ratingsPending) && (
+              <div className="video-banner-ratings-preload" aria-hidden="true">
+                {ratingEntries.map((r) => (
+                  <img
+                    key={`preload-${r.key}`}
+                    src={normalizeImagePath(r.src)}
+                    alt=""
+                    onLoad={() => markReadyMap(setRatingLogosReady, r.key)}
+                    onError={() => markReadyMap(setRatingLogosReady, r.key)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {(titleImgSrc || showVideoSkeleton) && (
+              <div className="video-banner-title-img-wrap">
+                {(showContentSkeleton || titlePending || !titleImgSrc) && (
+                  <SkeletonLoader
+                    variant="video-banner-title"
+                    className="video-banner-title-img-skeleton"
+                  />
+                )}
+                {titleImgSrc && (
+                  <img
+                    src={normalizeImagePath(titleImgSrc)}
+                    alt=""
+                    className={`video-banner-title-img${
+                      showContentSkeleton || titlePending ? ' video-banner-img--loading' : ''
+                    }`}
+                    onLoad={() => setTitleReady(true)}
+                    onError={() => setTitleReady(true)}
+                  />
+                )}
+              </div>
+            )}
+            {(nameImgSrc || showVideoSkeleton) && (
+              <div className="video-banner-name-img-wrap">
+                {(showContentSkeleton || namePending || !nameImgSrc) && (
+                  <SkeletonLoader
+                    variant="video-banner-name"
+                    className="video-banner-name-img-skeleton"
+                  />
+                )}
+                {nameImgSrc && (
+                  <img
+                    src={normalizeImagePath(nameImgSrc)}
+                    alt=""
+                    className={`video-banner-name-img${
+                      showContentSkeleton || namePending ? ' video-banner-img--loading' : ''
+                    }`}
+                    onLoad={() => setNameReady(true)}
+                    onError={() => setNameReady(true)}
+                  />
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const VideoBanner = ({ typeFilter }) => {
   const navigate = useNavigate();
@@ -31,9 +362,6 @@ const VideoBanner = ({ typeFilter }) => {
   const scrollToIndexRef = useRef(null);
   const [unmutedIds, setUnmutedIds] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadedVideos, setLoadedVideos] = useState({});
-  const [loadedTitleImgs, setLoadedTitleImgs] = useState({});
-  const [loadedNameImgs, setLoadedNameImgs] = useState({});
 
   const filteredBanners = useMemo(
     () => getVideoBannersByType(typeFilter),
@@ -41,15 +369,11 @@ const VideoBanner = ({ typeFilter }) => {
   );
 
   const showSectionSkeleton =
-    videoBannersLoading && filteredBanners.length === 0;
+    (videoBannersLoading || moviesLoading) && filteredBanners.length === 0;
 
   const getNavigatePath = (banner) => {
-    if (banner.type === 'movie') {
-      return `/movie/${banner.refId}`;
-    }
-    if (banner.type === 'music') {
-      return `/music/video/${banner.refId}`;
-    }
+    if (banner.type === 'movie') return `/movie/${banner.refId}`;
+    if (banner.type === 'music') return `/music/video/${banner.refId}`;
     return null;
   };
 
@@ -102,10 +426,6 @@ const VideoBanner = ({ typeFilter }) => {
     }
   };
 
-  const markVideoLoaded = (bannerId) => {
-    setLoadedVideos((prev) => (prev[bannerId] ? prev : { ...prev, [bannerId]: true }));
-  };
-
   const renderSkeletonCard = (key) => (
     <div key={key} className="video-banner-card video-banner-card--skeleton" aria-hidden="true">
       <div className="video-banner-video-wrap">
@@ -155,230 +475,24 @@ const VideoBanner = ({ typeFilter }) => {
                     )
                   : null;
 
-                const titleImgSrc = isMovie
-                  ? movie?.titleImg?.[contentLang] ||
-                    movie?.titleImg?.uz ||
-                    movie?.titleImg?.ru
-                  : typeof banner.titleImage === 'string'
-                    ? banner.titleImage
-                    : banner.titleImage?.[contentLang] ||
-                      banner.titleImage?.uz ||
-                      banner.titleImage?.ru;
-
-                const ratings =
-                  isMovie && movie
-                    ? {
-                        rating: movie.rating,
-                        ratingImdb: movie.ratingImdb,
-                        ratingKinopoisk: movie.ratingKinopoisk,
-                        ratingNetflix: movie.ratingNetflix,
-                      }
-                    : null;
-
-                const showVideoSkeleton = !loadedVideos[banner.id];
-                const showTitleSkeleton = Boolean(titleImgSrc) && !loadedTitleImgs[banner.id];
-                const showNameSkeleton =
-                  !isMovie && Boolean(banner.nameImg) && !loadedNameImgs[banner.id];
-                const showRatingsSkeleton = isMovie && moviesLoading && !movie;
-
                 return (
-                  <div
+                  <VideoBannerCard
                     key={banner.id}
-                    ref={(el) => {
+                    banner={banner}
+                    movie={movie}
+                    contentLang={contentLang}
+                    moviesLoading={moviesLoading}
+                    unmuted={Boolean(unmutedIds[banner.id])}
+                    onToggleMute={toggleMute}
+                    onEnded={handleVideoEnded}
+                    onOpen={handleBannerClick}
+                    cardRef={(el) => {
                       cardRefs.current[banner.id] = el;
                     }}
-                    data-banner-id={banner.id}
-                    className="video-banner-card"
-                    onClick={() => handleBannerClick(banner)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleBannerClick(banner)}
-                  >
-                    <div className="video-banner-video-wrap">
-                      {showVideoSkeleton && (
-                        <SkeletonLoader
-                          variant="video-banner-video"
-                          className="video-banner-video-skeleton"
-                        />
-                      )}
-                      <video
-                        ref={(el) => {
-                          videoRefs.current[banner.id] = el;
-                        }}
-                        className={`video-banner-video${showVideoSkeleton ? ' video-banner-video--loading' : ''}`}
-                        src={normalizeImagePath(banner.video)}
-                        muted={!unmutedIds[banner.id]}
-                        playsInline
-                        autoPlay={false}
-                        onLoadedData={() => markVideoLoaded(banner.id)}
-                        onCanPlay={() => markVideoLoaded(banner.id)}
-                        onEnded={() => handleVideoEnded(banner.id)}
-                      />
-                      <div className="video-banner-overlay" />
-                      <button
-                        type="button"
-                        className="video-banner-sound-btn"
-                        onClick={(e) => toggleMute(e, banner.id)}
-                        aria-label={
-                          unmutedIds[banner.id] ? "Ovozni o'chirish" : 'Ovozni yoqish'
-                        }
-                      >
-                        {unmutedIds[banner.id] ? (
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-                          </svg>
-                        ) : (
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                            <line x1="16" y1="9" x2="22" y2="15" />
-                            <line x1="22" y1="9" x2="16" y2="15" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-
-                    <div className="video-banner-content">
-                      {isMovie ? (
-                        <>
-                          {(titleImgSrc || moviesLoading) && (
-                            <div className="video-banner-title-img-wrap">
-                              {showTitleSkeleton || (!titleImgSrc && moviesLoading) ? (
-                                <SkeletonLoader
-                                  variant="video-banner-title"
-                                  className="video-banner-title-img-skeleton"
-                                />
-                              ) : null}
-                              {titleImgSrc ? (
-                                <img
-                                  src={normalizeImagePath(titleImgSrc)}
-                                  alt=""
-                                  className={`video-banner-title-img${showTitleSkeleton ? ' video-banner-img--loading' : ''}`}
-                                  onLoad={() =>
-                                    setLoadedTitleImgs((p) => ({
-                                      ...p,
-                                      [banner.id]: true,
-                                    }))
-                                  }
-                                />
-                              ) : null}
-                            </div>
-                          )}
-                          {(ratings || showRatingsSkeleton) && (
-                            <div className="video-banner-ratings">
-                              {showRatingsSkeleton
-                                ? Array.from({ length: RATING_SKELETON_COUNT }, (_, i) => (
-                                    <SkeletonLoader
-                                      key={`vb-rating-${banner.id}-${i}`}
-                                      variant="video-banner-rating"
-                                      className="video-banner-rating-item-skeleton"
-                                    />
-                                  ))
-                                : (
-                                  <>
-                                    {ratings.ratingNetflix != null && (
-                                      <span className="video-banner-rating-item">
-                                        <img
-                                          src={normalizeImagePath(RATING_IMGS.netflix)}
-                                          alt="Netflix"
-                                        />
-                                        <span>{ratings.ratingNetflix}</span>
-                                      </span>
-                                    )}
-                                    {ratings.ratingImdb != null && (
-                                      <span className="video-banner-rating-item">
-                                        <img
-                                          src={normalizeImagePath(RATING_IMGS.imdb)}
-                                          alt="IMDb"
-                                        />
-                                        <span>{ratings.ratingImdb}</span>
-                                      </span>
-                                    )}
-                                    {ratings.ratingKinopoisk != null && (
-                                      <span className="video-banner-rating-item">
-                                        <img
-                                          src={normalizeImagePath(RATING_IMGS.kinopoisk)}
-                                          alt="Kinopoisk"
-                                        />
-                                        <span>{ratings.ratingKinopoisk}</span>
-                                      </span>
-                                    )}
-                                    {ratings.rating != null && (
-                                      <span className="video-banner-rating-item video-banner-rating-vl">
-                                        <img
-                                          src={normalizeImagePath(RATING_IMGS.vl)}
-                                          alt="Vl"
-                                        />
-                                        <span>{ratings.rating}</span>
-                                      </span>
-                                    )}
-                                  </>
-                                )}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          {titleImgSrc && (
-                            <div className="video-banner-title-img-wrap">
-                              {showTitleSkeleton && (
-                                <SkeletonLoader
-                                  variant="video-banner-title"
-                                  className="video-banner-title-img-skeleton"
-                                />
-                              )}
-                              <img
-                                src={normalizeImagePath(titleImgSrc)}
-                                alt=""
-                                className={`video-banner-title-img${showTitleSkeleton ? ' video-banner-img--loading' : ''}`}
-                                onLoad={() =>
-                                  setLoadedTitleImgs((p) => ({
-                                    ...p,
-                                    [banner.id]: true,
-                                  }))
-                                }
-                              />
-                            </div>
-                          )}
-                          {banner.nameImg && (
-                            <div className="video-banner-name-img-wrap">
-                              {showNameSkeleton && (
-                                <SkeletonLoader
-                                  variant="video-banner-name"
-                                  className="video-banner-name-img-skeleton"
-                                />
-                              )}
-                              <img
-                                src={normalizeImagePath(banner.nameImg)}
-                                alt=""
-                                className={`video-banner-name-img${showNameSkeleton ? ' video-banner-img--loading' : ''}`}
-                                onLoad={() =>
-                                  setLoadedNameImgs((p) => ({
-                                    ...p,
-                                    [banner.id]: true,
-                                  }))
-                                }
-                              />
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
+                    videoRef={(el) => {
+                      videoRefs.current[banner.id] = el;
+                    }}
+                  />
                 );
               })}
         </HorizontalScroll>

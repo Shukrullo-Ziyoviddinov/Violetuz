@@ -141,8 +141,10 @@
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: bold;
+  line-height: 1.2;
   border-radius: 4px;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .movies-item-wishlist-btn {
@@ -161,6 +163,7 @@
   cursor: pointer;
   z-index: 2;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .movies-item-wishlist-btn:hover {
@@ -216,12 +219,92 @@
   color: #ffffff;
   font-size: 0.875rem;
   font-weight: bold;
+  line-height: 1.2;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .movies-item-rating svg {
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
+}
+
+/*
+  Overlay skeletonlar — poster shimmerdan farq qiladi (qorong‘i chip),
+  lekin real .movies-item-badge / wishlist / rating o‘lchami bilan bir xil.
+*/
+.movies-item-wishlist-btn--skeleton,
+.movies-item-badge--skeleton,
+.movies-item-rating--skeleton {
+  z-index: 3;
+  pointer-events: none;
+  color: transparent !important;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100%;
+  animation: movies-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes movies-overlay-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.movies-item-wishlist-btn--skeleton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+/* FHD: 0.75rem * ~3 chars + padding */
+.movies-item-badge--skeleton.movies-item-badge-fhd {
+  width: calc(0.75rem * 3 + 0.5rem * 2);
+  height: calc(0.75rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  min-width: 0;
+}
+
+/* Tez orada — biroz kengroq */
+.movies-item-badge--skeleton.movies-item-badge-soon {
+  width: calc(0.75rem * 8.5 + 0.5rem * 2);
+  height: calc(0.75rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  min-width: 0;
+}
+
+.movies-item-badge--skeleton.movies-item-badge-age {
+  width: calc(0.75rem * 2.5 + 0.5rem * 2);
+  height: calc(0.75rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  min-width: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(120, 0, 0, 0.75) 0%,
+    rgba(180, 40, 40, 0.85) 45%,
+    rgba(120, 0, 0, 0.75) 90%
+  ) !important;
+  background-size: 200% 100%;
+}
+
+/* rating: 16px icon + gap + ~2.5ch + padding */
+.movies-item-rating--skeleton {
+  width: calc(16px + 0.25rem + 0.875rem * 2.5 + 0.5rem * 2);
+  height: calc(0.875rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  gap: 0;
 }
 
 .movies-content-wrapper {

@@ -9,7 +9,7 @@ import ShowMoreButton, { getDisplayItems, shouldShowMore, DEFAULT_LIMIT } from '
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './Movies.css';
 
-/** Poster — skeleton until image fully loads (not just API JSON) */
+/** Poster — image + overlay (badge / wishlist / rating) skeletons until poster loads */
 const MoviePosterItem = ({
   movie,
   isHorizontal,
@@ -39,6 +39,10 @@ const MoviePosterItem = ({
   }, [imgSrc, movie.id]);
 
   const showImgSkeleton = Boolean(imgSrc) && !imgReady && !imgFailed;
+  const isSoon = movie.category === 'anonslar';
+  const showRating =
+    !isSoon && movie.rating != null && movie.rating !== '' && movie.rating !== 'none';
+  const showAge = movie.ageRestriction != null;
 
   return (
     <div
@@ -70,7 +74,33 @@ const MoviePosterItem = ({
             }}
           />
         )}
-        {!showImgSkeleton && (
+
+        {showImgSkeleton ? (
+          <>
+            <span
+              className="movies-item-wishlist-btn movies-item-wishlist-btn--skeleton"
+              aria-hidden="true"
+            />
+            <span
+              className={`movies-item-badge movies-item-badge--skeleton ${
+                isSoon ? 'movies-item-badge-soon' : 'movies-item-badge-fhd'
+              }`}
+              aria-hidden="true"
+            />
+            {showAge && (
+              <span
+                className="movies-item-badge movies-item-badge-age movies-item-badge--skeleton"
+                aria-hidden="true"
+              />
+            )}
+            {showRating && (
+              <span
+                className="movies-item-rating movies-item-rating--skeleton"
+                aria-hidden="true"
+              />
+            )}
+          </>
+        ) : (
           <>
             <button
               className={`movies-item-wishlist-btn ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
@@ -93,27 +123,24 @@ const MoviePosterItem = ({
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
               </svg>
             </button>
-            {movie.category === 'anonslar' ? (
+            {isSoon ? (
               <div className="movies-item-badge movies-item-badge-soon">
                 {t('searchModal.tezOrada', 'Tez orada')}
               </div>
             ) : (
               <div className="movies-item-badge movies-item-badge-fhd">FHD</div>
             )}
-            {movie.ageRestriction != null && (
+            {showAge && (
               <div className="movies-item-badge movies-item-badge-age">{movie.ageRestriction}+</div>
             )}
-            {movie.category !== 'anonslar' &&
-              movie.rating != null &&
-              movie.rating !== '' &&
-              movie.rating !== 'none' && (
-                <div className="movies-item-rating">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffd700" stroke="none">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                  <span>{movie.rating}</span>
-                </div>
-              )}
+            {showRating && (
+              <div className="movies-item-rating">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffd700" stroke="none">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span>{movie.rating}</span>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -199,6 +226,18 @@ const Movies = ({
             <SkeletonLoader
               variant="movie-image"
               className="movies-item-image-skeleton loader-skeleton"
+            />
+            <span
+              className="movies-item-wishlist-btn movies-item-wishlist-btn--skeleton"
+              aria-hidden="true"
+            />
+            <span
+              className="movies-item-badge movies-item-badge-fhd movies-item-badge--skeleton"
+              aria-hidden="true"
+            />
+            <span
+              className="movies-item-rating movies-item-rating--skeleton"
+              aria-hidden="true"
             />
           </div>
         </div>
