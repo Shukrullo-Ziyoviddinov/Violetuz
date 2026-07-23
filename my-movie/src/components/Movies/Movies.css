@@ -232,7 +232,8 @@
 
 /*
   Overlay skeletonlar — poster shimmerdan farq qiladi (qorong‘i chip),
-  lekin real .movies-item-badge / wishlist / rating o‘lchami bilan bir xil.
+  lekin real badge / wishlist / rating o‘lchami bilan bir xil.
+  Barcha overlaylar bir xil fon (age ham qizil emas).
 */
 .movies-item-wishlist-btn--skeleton,
 .movies-item-badge--skeleton,
@@ -290,13 +291,15 @@
   height: calc(0.75rem * 1.2 + 0.25rem * 2);
   padding: 0;
   min-width: 0;
-  background: linear-gradient(
+  /* Real age badge qizil — loaderda emas, boshqa overlaylar bilan bir xil fon */
+  background-color: transparent !important;
+  background-image: linear-gradient(
     90deg,
-    rgba(120, 0, 0, 0.75) 0%,
-    rgba(180, 40, 40, 0.85) 45%,
-    rgba(120, 0, 0, 0.75) 90%
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
   ) !important;
-  background-size: 200% 100%;
+  background-size: 200% 100% !important;
 }
 
 /* rating: 16px icon + gap + ~2.5ch + padding */
