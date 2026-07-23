@@ -402,7 +402,7 @@
   border: 1px solid rgba(70, 65, 80, 0.238);
   /* border: none; */
   color: #ffffff;
-  padding: 0.1rem 0.5rem;
+  padding: 0.75rem 1rem;
   border-radius: 20px;
   cursor: pointer;
   display: inline-flex;
@@ -411,16 +411,10 @@
   justify-content: flex-start;
   gap: 0.35rem;
   transition: all 0.3s;
-  font-size: 0.9rem;
+  font-size: 1.125rem;
   font-weight: 500;
   box-sizing: border-box;
-  min-height: 0;
-}
-
-.movie-detail-actions .movie-detail-action-btn svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
+  min-height: calc(0.75rem * 2 + 1.125rem * 1.2);
 }
 
 .movie-detail-actions--skeleton {
@@ -433,17 +427,17 @@
 
 .movie-detail-action-btn-skeleton,
 .skeleton-loader--movie-detail-action {
-  width: calc(18px + 0.5rem * 2) !important;
-  height: calc(0.1rem * 2 + 0.9rem * 1.2) !important;
+  width: calc(1.5rem + 2rem) !important; /* 24px icon + horizontal padding */
+  height: calc(0.75rem * 2 + 1.125rem * 1.2) !important;
   border-radius: 20px !important;
   flex-shrink: 0;
 }
 
 .movie-detail-action-btn-skeleton--wide,
 .skeleton-loader--movie-detail-action-wide {
-  width: 80px !important;
-  min-width: 80px !important;
-  height: calc(0.1rem * 2 + 0.9rem * 1.2) !important;
+  width: 90px !important;
+  min-width: 90px !important;
+  height: calc(0.75rem * 2 + 1.125rem * 1.2) !important;
   border-radius: 20px !important;
   flex-shrink: 0;
 }
@@ -464,7 +458,7 @@
 
 .movie-detail-rate-icon {
   color: #ffd447;
-  font-size: 1.25rem;
+  font-size: 1.85rem;
   line-height: 1;
 }
 
@@ -2020,4 +2014,92 @@
   .movie-detail-content {
     gap: 0.7rem;
 }
+}
+
+/* Action tugmalar + specs — 450px dan kichik (480px dan keyin, ustun keladi) */
+@media (max-width: 450px) {
+  .movie-detail-action-btn {
+    padding: 0.05rem 0.4rem;
+    font-size: 0.85rem;
+    min-height: 0;
+    line-height: 1.15;
+    gap: 0.25rem;
+  }
+
+  .movie-detail-actions .movie-detail-action-btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .movie-detail-rate-icon {
+    font-size: 1.1rem;
+  }
+
+  .movie-detail-action-count {
+    min-width: 1.1rem;
+    font-size: 0.85rem;
+  }
+
+  .movie-detail-actions .repost-btn.movie-detail-action-btn {
+    padding: 0.05rem 0.4rem;
+    font-size: 0.85rem;
+    min-height: 0;
+    line-height: 1.15;
+  }
+
+  .movie-detail-actions .repost-btn.movie-detail-action-btn i {
+    font-size: 16px;
+  }
+
+  .movie-detail-actions .repost-btn.movie-detail-action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .movie-detail-action-btn-skeleton,
+  .skeleton-loader--movie-detail-action {
+    width: calc(16px + 0.4rem * 2) !important;
+    height: calc(0.05rem * 2 + 0.85rem * 1.15) !important;
+  }
+
+  .movie-detail-action-btn-skeleton--wide,
+  .skeleton-loader--movie-detail-action-wide {
+    width: 72px !important;
+    min-width: 72px !important;
+    height: calc(0.05rem * 2 + 0.85rem * 1.15) !important;
+  }
+
+  .movie-detail-action-btn-rate {
+    min-width: 72px;
+  }
+
+  .movie-detail-spec-item {
+    min-width: 72px;
+    padding: 0.25rem 0.45rem;
+    gap: 0.1rem;
+    border-radius: 14px;
+  }
+
+  .movie-detail-spec-item--skeleton {
+    min-width: 72px;
+    height: calc(0.25rem * 2 + 0.55rem * 1.2 + 0.1rem + 0.7rem * 1.2);
+  }
+
+  .movie-detail-spec-item-skeleton,
+  .skeleton-loader--movie-detail-spec {
+    min-width: 72px;
+    border-radius: 14px !important;
+  }
+
+  .movie-detail-spec-label {
+    font-size: 0.52rem;
+    letter-spacing: 0.3px;
+    line-height: 1.15;
+  }
+
+  .movie-detail-spec-value {
+    font-size: 0.7rem;
+    line-height: 1.15;
+  }
 }
