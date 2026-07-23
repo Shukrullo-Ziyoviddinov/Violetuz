@@ -402,7 +402,7 @@
   border: 1px solid rgba(70, 65, 80, 0.238);
   /* border: none; */
   color: #ffffff;
-  padding: 0.75rem 1rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 20px;
   cursor: pointer;
   display: inline-flex;
@@ -411,10 +411,16 @@
   justify-content: flex-start;
   gap: 0.35rem;
   transition: all 0.3s;
-  font-size: 1.125rem;
+  font-size: 0.9rem;
   font-weight: 500;
   box-sizing: border-box;
-  min-height: calc(0.75rem * 2 + 1.125rem * 1.2);
+  min-height: 0;
+}
+
+.movie-detail-actions .movie-detail-action-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .movie-detail-actions--skeleton {
@@ -427,17 +433,17 @@
 
 .movie-detail-action-btn-skeleton,
 .skeleton-loader--movie-detail-action {
-  width: calc(1.5rem + 2rem) !important; /* 24px icon + horizontal padding */
-  height: calc(0.75rem * 2 + 1.125rem * 1.2) !important;
+  width: calc(18px + 0.5rem * 2) !important;
+  height: calc(0.1rem * 2 + 0.9rem * 1.2) !important;
   border-radius: 20px !important;
   flex-shrink: 0;
 }
 
 .movie-detail-action-btn-skeleton--wide,
 .skeleton-loader--movie-detail-action-wide {
-  width: 90px !important;
-  min-width: 90px !important;
-  height: calc(0.75rem * 2 + 1.125rem * 1.2) !important;
+  width: 80px !important;
+  min-width: 80px !important;
+  height: calc(0.1rem * 2 + 0.9rem * 1.2) !important;
   border-radius: 20px !important;
   flex-shrink: 0;
 }
@@ -458,7 +464,7 @@
 
 .movie-detail-rate-icon {
   color: #ffd447;
-  font-size: 1.85rem;
+  font-size: 1.25rem;
   line-height: 1;
 }
 
@@ -552,7 +558,7 @@
   transition: all 0.3s;
   box-sizing: border-box;
   flex: 1 1 auto;
-  min-height: calc(1rem * 2 + 1.125rem * 1.2);
+  min-height: 0;
 }
 
 /* Skeleton matches .movie-detail-btn layout (40% / flex / radius / height) */

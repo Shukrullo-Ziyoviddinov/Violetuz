@@ -249,15 +249,15 @@
 }
 
 .skeleton-loader--movie-detail-action {
-  width: calc(1.5rem + 2rem);
-  height: calc(0.75rem * 2 + 1.125rem * 1.2);
+  width: calc(18px + 0.5rem * 2);
+  height: calc(0.1rem * 2 + 0.9rem * 1.2);
   border-radius: 20px;
 }
 
 .skeleton-loader--movie-detail-action-wide {
-  width: 90px;
-  min-width: 90px;
-  height: calc(0.75rem * 2 + 1.125rem * 1.2);
+  width: 80px;
+  min-width: 80px;
+  height: calc(0.1rem * 2 + 0.9rem * 1.2);
   border-radius: 20px;
 }
 
