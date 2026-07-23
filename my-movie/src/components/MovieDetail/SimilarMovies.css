@@ -302,3 +302,12 @@
     padding-top: 135%;
   }
 }
+
+@media (max-width: 450px) {
+  .similar-movies-item-image-wrapper .similar-movies-item-wishlist-btn,
+  .similar-movies-item-image-wrapper .similar-movies-item-wishlist-btn.active,
+  .similar-movies-item-image-wrapper .similar-movies-item-wishlist-btn--skeleton {
+    width: 28px;
+    height: 28px;
+  }
+}
