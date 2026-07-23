@@ -8,13 +8,24 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.75rem;
+  min-height: calc(1rem * 1.2);
 }
 
 .search-modal-anons-title {
   font-size: 1rem;
   font-weight: 600;
+  line-height: 1.2;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
+  min-height: calc(1rem * 1.2);
+}
+
+/* Title skeleton — .search-modal-anons-title bilan mos */
+.search-modal-anons-title-skeleton,
+.skeleton-loader--search-modal-anons-title {
+  width: 5.5rem;
+  height: calc(1rem * 1.2);
+  border-radius: 6px;
 }
 
 .search-modal-anons .search-modal-anons-more-btn {
@@ -31,6 +42,15 @@
 
 .search-modal-anons-item:hover {
   transform: scale(1.02);
+}
+
+.search-modal-anons-item--loading {
+  pointer-events: none;
+  cursor: default;
+}
+
+.search-modal-anons-item--loading:hover {
+  transform: none;
 }
 
 .search-modal-anons-item-image-wrapper {
@@ -52,8 +72,28 @@
   transition: transform 0.3s ease;
 }
 
+.search-modal-anons-item-image--loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .search-modal-anons-item:hover .search-modal-anons-item-image {
   transform: scale(1.05);
+}
+
+.search-modal-anons-item--loading:hover .search-modal-anons-item-image {
+  transform: none;
+}
+
+/* Image skeleton fills wrapper */
+.search-modal-anons-item-image-skeleton,
+.skeleton-loader--search-modal-anons-image {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  z-index: 1;
 }
 
 .search-modal-anons-badge {
@@ -61,8 +101,10 @@
   padding: 0.2rem 0.45rem;
   font-size: 0.65rem;
   font-weight: 600;
+  line-height: 1.2;
   border-radius: 4px;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .search-modal-anons-badge-soon {
@@ -77,6 +119,58 @@
   left: 0.4rem;
   background: rgba(255, 0, 0, 0.85);
   color: #fff;
+}
+
+/*
+  Badge loaders — real badge o‘lchami, qorong‘i chip (age qizil emas).
+  soon: ~0.65rem * ~9 chars + padding
+  age: ~0.65rem * ~2.5 chars + padding
+*/
+.search-modal-anons-badge--skeleton {
+  z-index: 3;
+  pointer-events: none;
+  color: transparent !important;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: search-modal-anons-badge-shimmer 1.25s ease-in-out infinite;
+}
+
+.search-modal-anons-badge--skeleton.search-modal-anons-badge-soon {
+  width: calc(0.65rem * 8.5 + 0.45rem * 2);
+  height: calc(0.65rem * 1.2 + 0.2rem * 2);
+  padding: 0;
+  min-width: 0;
+}
+
+.search-modal-anons-badge--skeleton.search-modal-anons-badge-age {
+  width: calc(0.65rem * 2.5 + 0.45rem * 2);
+  height: calc(0.65rem * 1.2 + 0.2rem * 2);
+  padding: 0;
+  min-width: 0;
+  background-color: transparent !important;
+  background-image: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100% !important;
+}
+
+@keyframes search-modal-anons-badge-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 @media (max-width: 768px) {

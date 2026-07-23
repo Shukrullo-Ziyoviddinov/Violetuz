@@ -205,6 +205,49 @@
   border-radius: 20px;
 }
 
+.skeleton-loader--search-modal-genre-title {
+  width: 4.5rem;
+  height: calc(1rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--search-modal-genre-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
+.skeleton-loader--search-modal-genre-item-title {
+  width: 65%;
+  max-width: 7rem;
+  height: calc(0.8rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--search-modal-anons-title {
+  width: 5.5rem;
+  height: calc(1rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--search-modal-anons-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.skeleton-loader--search-modal-tavsiya-title {
+  width: 8rem;
+  height: calc(1rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--search-modal-tavsiya-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
 .skeleton-loader--movie-detail-action {
   width: calc(1.5rem + 2rem);
   height: calc(0.75rem * 2 + 1.125rem * 1.2);

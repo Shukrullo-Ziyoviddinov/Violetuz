@@ -5,7 +5,89 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { fetchRecommendations } from '../../api/recommendationsApi';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
+import { normalizeImagePath } from '../../utils/utils';
 import './SearchModalTavsiya.css';
+
+/** Faqat real tavsiya item — rasm/badge tayyor bo‘lguncha shu blok ichida loader */
+const SearchModalTavsiyaItem = ({ movie, title, imgSrc, onOpen, t }) => {
+  const src = normalizeImagePath(imgSrc || '');
+  const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(src);
+  const isSoon = movie.category === 'anonslar';
+  const showAge = movie.ageRestriction != null;
+
+  return (
+    <div
+      className={`search-modal-tavsiya-item${showSkeleton ? ' search-modal-tavsiya-item--loading' : ''}`}
+      onClick={() => !showSkeleton && onOpen?.(movie)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (showSkeleton) return;
+        if (e.key === 'Enter') onOpen?.(movie);
+      }}
+      aria-busy={showSkeleton || undefined}
+    >
+      <div className="search-modal-tavsiya-item-image-wrapper">
+        {showSkeleton && (
+          <SkeletonLoader
+            variant="search-modal-tavsiya-image"
+            className="search-modal-tavsiya-item-image-skeleton"
+          />
+        )}
+        {!failed && src && (
+          <img
+            ref={imgRef}
+            src={src}
+            alt={title}
+            className={`search-modal-tavsiya-item-image${
+              showSkeleton ? ' search-modal-tavsiya-item-image--loading' : ''
+            }`}
+            onLoad={onLoad}
+            onError={onError}
+          />
+        )}
+
+        {showSkeleton ? (
+          <>
+            <span
+              className={`search-modal-tavsiya-badge search-modal-tavsiya-badge--skeleton ${
+                isSoon
+                  ? 'search-modal-tavsiya-badge-soon'
+                  : 'search-modal-tavsiya-badge-fhd'
+              }`}
+              aria-hidden="true"
+            />
+            {showAge && (
+              <span
+                className="search-modal-tavsiya-badge search-modal-tavsiya-badge-age search-modal-tavsiya-badge--skeleton"
+                aria-hidden="true"
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {isSoon ? (
+              <span className="search-modal-tavsiya-badge search-modal-tavsiya-badge-soon">
+                {t('searchModal.tezOrada', 'Tez orada')}
+              </span>
+            ) : (
+              <span className="search-modal-tavsiya-badge search-modal-tavsiya-badge-fhd">
+                FHD
+              </span>
+            )}
+            {showAge && (
+              <span className="search-modal-tavsiya-badge search-modal-tavsiya-badge-age">
+                {movie.ageRestriction}+
+              </span>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const SearchModalTavsiya = ({ onMovieClick }) => {
   const { t } = useTranslation();
@@ -14,10 +96,20 @@ const SearchModalTavsiya = ({ onMovieClick }) => {
   const { getViewedItems } = useViewedMovies();
   const { allMovies } = useMoviesApi();
   const [recommendations, setRecommendations] = useState([]);
+  const [tavsiyaLoading, setTavsiyaLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    setTavsiyaLoading(true);
     const viewedItems = getViewedItems();
-    fetchRecommendations(viewedItems, 12, allMovies).then(setRecommendations);
+    fetchRecommendations(viewedItems, 12, allMovies).then((list) => {
+      if (cancelled) return;
+      setRecommendations(Array.isArray(list) ? list : []);
+      setTavsiyaLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [getViewedItems, allMovies]);
 
   const getTitle = (m) => {
@@ -39,40 +131,42 @@ const SearchModalTavsiya = ({ onMovieClick }) => {
     navigate(`/movie/${movie.id}`);
   };
 
-  if (recommendations.length === 0) return null;
+  /* Fake kartalar yo‘q — faqat real tavsiyalar */
+  if (!tavsiyaLoading && recommendations.length === 0) {
+    return null;
+  }
+
+  const waitingForList = tavsiyaLoading && recommendations.length === 0;
 
   return (
-    <div className="search-modal-tavsiya">
-      <h3 className="search-modal-tavsiya-title">{t('searchModal.tavsiyaEtamiz', 'Tavsiya etamiz')}</h3>
-      <div className="search-modal-tavsiya-list">
-        {recommendations.map((movie) => (
-          <div
-            key={movie.id}
-            className="search-modal-tavsiya-item"
-            onClick={() => handleClick(movie)}
-          >
-            <div className="search-modal-tavsiya-item-image-wrapper">
-              <img
-                src={getImg(movie)}
-                alt={getTitle(movie)}
-                className="search-modal-tavsiya-item-image"
-              />
-              {movie.category === 'anonslar' ? (
-                <span className="search-modal-tavsiya-badge search-modal-tavsiya-badge-soon">
-                  {t('searchModal.tezOrada', 'Tez orada')}
-                </span>
-              ) : (
-                <span className="search-modal-tavsiya-badge search-modal-tavsiya-badge-fhd">FHD</span>
-              )}
-              {movie.ageRestriction != null && (
-                <span className="search-modal-tavsiya-badge search-modal-tavsiya-badge-age">
-                  {movie.ageRestriction}+
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+    <div
+      className="search-modal-tavsiya"
+      aria-busy={waitingForList || undefined}
+    >
+      {waitingForList ? (
+        <SkeletonLoader
+          variant="search-modal-tavsiya-title"
+          className="search-modal-tavsiya-title-skeleton"
+        />
+      ) : (
+        <h3 className="search-modal-tavsiya-title">
+          {t('searchModal.tavsiyaEtamiz', 'Tavsiya etamiz')}
+        </h3>
+      )}
+      {recommendations.length > 0 && (
+        <div className="search-modal-tavsiya-list">
+          {recommendations.map((movie) => (
+            <SearchModalTavsiyaItem
+              key={movie.id}
+              movie={movie}
+              title={getTitle(movie)}
+              imgSrc={getImg(movie)}
+              onOpen={handleClick}
+              t={t}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
