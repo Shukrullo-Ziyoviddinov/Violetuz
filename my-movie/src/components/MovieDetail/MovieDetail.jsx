@@ -910,10 +910,6 @@ const MovieDetail = () => {
                       </div>
                     </div>
                     <div className="movie-detail-genre">
-                      <SkeletonLoader
-                        variant="movie-detail-genre-label"
-                        className="movie-detail-genre-label-skeleton"
-                      />
                       <div className="movie-detail-genres">
                         {Array.from({ length: 3 }, (_, i) => (
                           <SkeletonLoader
@@ -1466,7 +1462,6 @@ const MovieDetail = () => {
               </div>
 
               <div className="movie-detail-genre">
-                <span className="movie-detail-genre-label">{t('detail.genre')}:</span>
                 <div className="movie-detail-genres">
                   {getMovieGenres().map((genre, index) => (
                     <span key={index} className="movie-detail-genre-badge">
