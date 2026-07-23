@@ -374,11 +374,50 @@ const MovieDetail = () => {
     if (img.complete && img.naturalWidth > 0) {
       setTitleImgReady(true);
     }
+    const soft = window.setTimeout(() => setTitleImgReady(true), 12000);
     return () => {
       img.onload = null;
       img.onerror = null;
+      window.clearTimeout(soft);
     };
   }, [titleImgSrc, titleImgReady, titleImgFailed]);
+
+  // Rating logolari — keshda onLoad kelmasa ham
+  useEffect(() => {
+    if (!movie) return undefined;
+    const logos = [
+      movie.category !== 'anonslar' && movie.rating != null && movie.rating !== '' && movie.rating !== 'none'
+        ? { key: 'vl', src: '/img/photo_2026-02-16_20-30-31_preview_rev_1.png' }
+        : null,
+      movie.ratingImdb != null && movie.ratingImdb !== '' && movie.ratingImdb !== 'none'
+        ? { key: 'imdb', src: '/img/imdb.jpg' }
+        : null,
+      movie.ratingKinopoisk != null && movie.ratingKinopoisk !== '' && movie.ratingKinopoisk !== 'none'
+        ? { key: 'kp', src: '/img/kinopoisk.jpg' }
+        : null,
+      movie.ratingNetflix != null && movie.ratingNetflix !== '' && movie.ratingNetflix !== 'none'
+        ? { key: 'netflix', src: '/img/netflix.jpg' }
+        : null,
+    ].filter(Boolean);
+
+    const cleanups = logos.map(({ key, src }) => {
+      const img = new Image();
+      const done = () =>
+        setRatingLogosReady((p) => (p[key] ? p : { ...p, [key]: true }));
+      img.onload = done;
+      img.onerror = done;
+      img.src = src;
+      if (img.complete) done();
+      const soft = window.setTimeout(done, 12000);
+      return () => {
+        img.onload = null;
+        img.onerror = null;
+        window.clearTimeout(soft);
+      };
+    });
+
+    return () => cleanups.forEach((fn) => fn());
+  }, [movie?.id, movie?.rating, movie?.ratingImdb, movie?.ratingKinopoisk, movie?.ratingNetflix, movie?.category]);
 
   // Safety: if browser never fires canplay, do not leave skeleton forever after hard failure window
   useEffect(() => {

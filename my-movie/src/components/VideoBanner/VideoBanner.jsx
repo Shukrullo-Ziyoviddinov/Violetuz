@@ -6,6 +6,7 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { normalizeImagePath } from '../../utils/utils';
 import { matchId } from '../../utils/musicDataUtils';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady, useImagesReadyMap } from '../../utils/useImageReady';
 import './VideoBanner.css';
 
 const RATING_IMGS = {
@@ -17,10 +18,6 @@ const RATING_IMGS = {
 
 const RATING_SKELETON_COUNT = 4;
 const VIDEO_READY_TIMEOUT_MS = 20000;
-
-const markReadyMap = (setter, id) => {
-  setter((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
-};
 
 /** Bitta banner kartochkasi — video + title/name/rating to‘liq tayyor bo‘lguncha skeleton */
 const VideoBannerCard = ({
@@ -38,14 +35,11 @@ const VideoBannerCard = ({
   const videoElRef = useRef(null);
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [titleReady, setTitleReady] = useState(false);
-  const [nameReady, setNameReady] = useState(false);
-  const [ratingLogosReady, setRatingLogosReady] = useState({});
 
   const isMovie = banner.type === 'movie';
   const videoSrc = normalizeImagePath(banner.video || '');
 
-  const titleImgSrc = isMovie
+  const titleImgSrcRaw = isMovie
     ? movie?.titleImg?.[contentLang] ||
       movie?.titleImg?.uz ||
       movie?.titleImg?.ru ||
@@ -57,7 +51,12 @@ const VideoBannerCard = ({
         banner.titleImage?.ru ||
         '';
 
-  const nameImgSrc = !isMovie && banner.nameImg ? banner.nameImg : '';
+  const nameImgSrcRaw = !isMovie && banner.nameImg ? banner.nameImg : '';
+  const titleImgSrc = titleImgSrcRaw ? normalizeImagePath(titleImgSrcRaw) : '';
+  const nameImgSrc = nameImgSrcRaw ? normalizeImagePath(nameImgSrcRaw) : '';
+
+  const titleImg = useImageReady(titleImgSrc);
+  const nameImg = useImageReady(nameImgSrc);
 
   const ratings =
     isMovie && movie
@@ -73,36 +72,27 @@ const VideoBannerCard = ({
     if (!ratings) return [];
     const list = [];
     if (ratings.ratingNetflix != null) {
-      list.push({ key: 'netflix', src: RATING_IMGS.netflix, value: ratings.ratingNetflix, alt: 'Netflix' });
+      list.push({ key: 'netflix', src: normalizeImagePath(RATING_IMGS.netflix), value: ratings.ratingNetflix, alt: 'Netflix' });
     }
     if (ratings.ratingImdb != null) {
-      list.push({ key: 'imdb', src: RATING_IMGS.imdb, value: ratings.ratingImdb, alt: 'IMDb' });
+      list.push({ key: 'imdb', src: normalizeImagePath(RATING_IMGS.imdb), value: ratings.ratingImdb, alt: 'IMDb' });
     }
     if (ratings.ratingKinopoisk != null) {
-      list.push({ key: 'kinopoisk', src: RATING_IMGS.kinopoisk, value: ratings.ratingKinopoisk, alt: 'Kinopoisk' });
+      list.push({ key: 'kinopoisk', src: normalizeImagePath(RATING_IMGS.kinopoisk), value: ratings.ratingKinopoisk, alt: 'Kinopoisk' });
     }
     if (ratings.rating != null) {
-      list.push({ key: 'vl', src: RATING_IMGS.vl, value: ratings.rating, alt: 'Vl', vl: true });
+      list.push({ key: 'vl', src: normalizeImagePath(RATING_IMGS.vl), value: ratings.rating, alt: 'Vl', vl: true });
     }
     return list;
   }, [ratings]);
+
+  const { readyMap: ratingLogosReady, markReady: markRatingReady } =
+    useImagesReadyMap(ratingEntries);
 
   useEffect(() => {
     setVideoReady(false);
     setVideoFailed(false);
   }, [videoSrc, banner.id]);
-
-  useEffect(() => {
-    setTitleReady(false);
-  }, [titleImgSrc, banner.id]);
-
-  useEffect(() => {
-    setNameReady(false);
-  }, [nameImgSrc, banner.id]);
-
-  useEffect(() => {
-    setRatingLogosReady({});
-  }, [banner.id, movie?.id]);
 
   useEffect(() => {
     if (!videoSrc || videoReady || videoFailed) return undefined;
@@ -141,8 +131,8 @@ const VideoBannerCard = ({
   };
 
   const waitingMovieMeta = isMovie && moviesLoading && !movie;
-  const titlePending = Boolean(titleImgSrc) && !titleReady;
-  const namePending = Boolean(nameImgSrc) && !nameReady;
+  const titlePending = Boolean(titleImgSrc) && titleImg.showSkeleton;
+  const namePending = Boolean(nameImgSrc) && nameImg.showSkeleton;
   const ratingsPending =
     waitingMovieMeta ||
     (ratingEntries.length > 0 &&
@@ -150,13 +140,17 @@ const VideoBannerCard = ({
 
   const showVideoSkeleton = Boolean(videoSrc) && !videoReady && !videoFailed;
 
-  /* Content (title / name / ratings) — video tayyor bo‘lguncha ham skeleton */
+  /* Content — video yoki title/name/rating hali tayyor emas */
   const showContentSkeleton =
     showVideoSkeleton ||
     waitingMovieMeta ||
     titlePending ||
     namePending ||
     (isMovie && ratingsPending && (ratingEntries.length > 0 || waitingMovieMeta));
+
+  /* Title/name wrap har doim ko‘rinsin (loader yoki rasm) */
+  const showTitleWrap = Boolean(titleImgSrc) || waitingMovieMeta || showVideoSkeleton;
+  const showNameWrap = Boolean(nameImgSrc) || (!isMovie && showVideoSkeleton);
 
   const setVideoNode = useCallback(
     (el) => {
@@ -235,23 +229,24 @@ const VideoBannerCard = ({
       <div className="video-banner-content">
         {isMovie ? (
           <>
-            {(titleImgSrc || waitingMovieMeta || showVideoSkeleton) && (
+            {showTitleWrap && (
               <div className="video-banner-title-img-wrap">
-                {showContentSkeleton || titlePending || !titleImgSrc ? (
+                {(titlePending || !titleImgSrc || showVideoSkeleton || waitingMovieMeta) && (
                   <SkeletonLoader
                     variant="video-banner-title"
                     className="video-banner-title-img-skeleton"
                   />
-                ) : null}
+                )}
                 {titleImgSrc && (
                   <img
-                    src={normalizeImagePath(titleImgSrc)}
+                    ref={titleImg.imgRef}
+                    src={titleImgSrc}
                     alt=""
                     className={`video-banner-title-img${
-                      showContentSkeleton || titlePending ? ' video-banner-img--loading' : ''
+                      titlePending || showVideoSkeleton ? ' video-banner-img--loading' : ''
                     }`}
-                    onLoad={() => setTitleReady(true)}
-                    onError={() => setTitleReady(true)}
+                    onLoad={titleImg.onLoad}
+                    onError={titleImg.onError}
                   />
                 )}
               </div>
@@ -272,36 +267,22 @@ const VideoBannerCard = ({
                         className={`video-banner-rating-item${r.vl ? ' video-banner-rating-vl' : ''}`}
                       >
                         <img
-                          src={normalizeImagePath(r.src)}
+                          src={r.src}
                           alt={r.alt}
-                          onLoad={() => markReadyMap(setRatingLogosReady, r.key)}
-                          onError={() => markReadyMap(setRatingLogosReady, r.key)}
+                          onLoad={() => markRatingReady(r.key)}
+                          onError={() => markRatingReady(r.key)}
                         />
                         <span>{r.value}</span>
                       </span>
                     ))}
               </div>
             )}
-            {/* Rating logolarini oldindan yuklash — skeleton paytida ham */}
-            {ratingEntries.length > 0 && (showContentSkeleton || ratingsPending) && (
-              <div className="video-banner-ratings-preload" aria-hidden="true">
-                {ratingEntries.map((r) => (
-                  <img
-                    key={`preload-${r.key}`}
-                    src={normalizeImagePath(r.src)}
-                    alt=""
-                    onLoad={() => markReadyMap(setRatingLogosReady, r.key)}
-                    onError={() => markReadyMap(setRatingLogosReady, r.key)}
-                  />
-                ))}
-              </div>
-            )}
           </>
         ) : (
           <>
-            {(titleImgSrc || showVideoSkeleton) && (
+            {showTitleWrap && (
               <div className="video-banner-title-img-wrap">
-                {(showContentSkeleton || titlePending || !titleImgSrc) && (
+                {(titlePending || !titleImgSrc || showVideoSkeleton) && (
                   <SkeletonLoader
                     variant="video-banner-title"
                     className="video-banner-title-img-skeleton"
@@ -309,20 +290,21 @@ const VideoBannerCard = ({
                 )}
                 {titleImgSrc && (
                   <img
-                    src={normalizeImagePath(titleImgSrc)}
+                    ref={titleImg.imgRef}
+                    src={titleImgSrc}
                     alt=""
                     className={`video-banner-title-img${
-                      showContentSkeleton || titlePending ? ' video-banner-img--loading' : ''
+                      titlePending || showVideoSkeleton ? ' video-banner-img--loading' : ''
                     }`}
-                    onLoad={() => setTitleReady(true)}
-                    onError={() => setTitleReady(true)}
+                    onLoad={titleImg.onLoad}
+                    onError={titleImg.onError}
                   />
                 )}
               </div>
             )}
-            {(nameImgSrc || showVideoSkeleton) && (
+            {showNameWrap && (
               <div className="video-banner-name-img-wrap">
-                {(showContentSkeleton || namePending || !nameImgSrc) && (
+                {(namePending || !nameImgSrc || showVideoSkeleton) && (
                   <SkeletonLoader
                     variant="video-banner-name"
                     className="video-banner-name-img-skeleton"
@@ -330,13 +312,14 @@ const VideoBannerCard = ({
                 )}
                 {nameImgSrc && (
                   <img
-                    src={normalizeImagePath(nameImgSrc)}
+                    ref={nameImg.imgRef}
+                    src={nameImgSrc}
                     alt=""
                     className={`video-banner-name-img${
-                      showContentSkeleton || namePending ? ' video-banner-img--loading' : ''
+                      namePending || showVideoSkeleton ? ' video-banner-img--loading' : ''
                     }`}
-                    onLoad={() => setNameReady(true)}
-                    onError={() => setNameReady(true)}
+                    onLoad={nameImg.onLoad}
+                    onError={nameImg.onError}
                   />
                 )}
               </div>

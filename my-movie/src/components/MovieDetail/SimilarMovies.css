@@ -100,6 +100,10 @@
   pointer-events: none;
 }
 
+.similar-movies-item--loading {
+  cursor: default;
+}
+
 .similar-movies-item-wishlist-btn {
   position: absolute;
   top: 0.5rem;
@@ -116,6 +120,7 @@
   cursor: pointer;
   z-index: 2;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .similar-movies-item-wishlist-btn:hover {
@@ -133,8 +138,10 @@
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: bold;
+  line-height: 1.2;
   border-radius: 4px;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .similar-movies-item-badge-fhd {
@@ -167,12 +174,90 @@
   color: #ffffff;
   font-size: 0.875rem;
   font-weight: bold;
+  line-height: 1.2;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .similar-movies-item-rating svg {
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
+}
+
+/*
+  Overlay skeletonlar — poster shimmerdan farq qiladi (qorong‘i chip),
+  real o‘lchamda; barcha overlaylar bir xil fon (age ham qizil emas).
+*/
+.similar-movies-item-wishlist-btn--skeleton,
+.similar-movies-item-badge--skeleton,
+.similar-movies-item-rating--skeleton {
+  z-index: 3;
+  pointer-events: none;
+  color: transparent !important;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100%;
+  animation: similar-movies-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes similar-movies-overlay-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.similar-movies-item-wishlist-btn--skeleton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.similar-movies-item-badge--skeleton.similar-movies-item-badge-fhd {
+  width: calc(0.75rem * 3 + 0.5rem * 2);
+  height: calc(0.75rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  min-width: 0;
+}
+
+.similar-movies-item-badge--skeleton.similar-movies-item-badge-soon {
+  width: calc(0.75rem * 8.5 + 0.5rem * 2);
+  height: calc(0.75rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  min-width: 0;
+}
+
+.similar-movies-item-badge--skeleton.similar-movies-item-badge-age {
+  width: calc(0.75rem * 2.5 + 0.5rem * 2);
+  height: calc(0.75rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  min-width: 0;
+  background-color: transparent !important;
+  background-image: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100% !important;
+}
+
+.similar-movies-item-rating--skeleton {
+  width: calc(16px + 0.25rem + 0.875rem * 2.5 + 0.5rem * 2);
+  height: calc(0.875rem * 1.2 + 0.25rem * 2);
+  padding: 0;
+  gap: 0;
 }
 
 @media (max-width: 768px) {

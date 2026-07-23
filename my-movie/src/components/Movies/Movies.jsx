@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
@@ -7,9 +7,10 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton, { getDisplayItems, shouldShowMore, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
 import './Movies.css';
 
-/** Poster — image + overlay (badge / wishlist / rating) skeletons until poster loads */
+/** Poster — image + overlay skeletons until poster loads (cache-safe) */
 const MoviePosterItem = ({
   movie,
   isHorizontal,
@@ -22,23 +23,13 @@ const MoviePosterItem = ({
   t,
   blockClick,
 }) => {
-  const [imgReady, setImgReady] = useState(false);
-  const [imgFailed, setImgFailed] = useState(false);
-
   const imgSrc = movie.homeImg
     ? movie.homeImg[contentLang] || movie.homeImg.uz || movie.homeImg.ru || ''
     : '';
 
-  useEffect(() => {
-    setImgReady(false);
-    setImgFailed(false);
-    if (!imgSrc) {
-      setImgFailed(true);
-      setImgReady(true);
-    }
-  }, [imgSrc, movie.id]);
+  const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError, failed: imgFailed } =
+    useImageReady(imgSrc);
 
-  const showImgSkeleton = Boolean(imgSrc) && !imgReady && !imgFailed;
   const isSoon = movie.category === 'anonslar';
   const showRating =
     !isSoon && movie.rating != null && movie.rating !== '' && movie.rating !== 'none';
@@ -61,17 +52,12 @@ const MoviePosterItem = ({
         )}
         {!imgFailed && imgSrc && (
           <img
+            ref={imgRef}
             src={imgSrc}
             alt={getMovieTitle(movie)}
             className={`movies-item-image${showImgSkeleton ? ' movies-item-image--loading' : ''}`}
-            onLoad={() => {
-              setImgReady(true);
-              setImgFailed(false);
-            }}
-            onError={() => {
-              setImgFailed(true);
-              setImgReady(true);
-            }}
+            onLoad={onLoad}
+            onError={onError}
           />
         )}
 

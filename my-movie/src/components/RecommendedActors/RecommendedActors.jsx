@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import { useActorsApi } from '../../context/ActorsApiContext';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
 import './RecommendedActors.css';
 
 const RECOMMENDED_ACTORS_SKELETON_COUNT = 8;
@@ -18,24 +19,15 @@ const uniqueActorsById = (list) => {
   });
 };
 
-/** Rasm, ism va follow — rasm onLoad bo‘lguncha birga skeleton */
+/** Rasm, ism va follow — rasm tayyor bo‘lguncha birga skeleton (cache-safe) */
 const RecommendedActorCard = ({ actor, lang, onOpen, t }) => {
-  const [imgReady, setImgReady] = useState(false);
-  const [imgFailed, setImgFailed] = useState(false);
-
   const name = (() => {
     const n = actor?.name?.[lang] ?? actor?.name?.uz ?? actor?.name?.ru ?? '';
     return String(n).trim() || actor?.name?.uz || actor?.name?.ru || '';
   })();
 
   const imgSrc = actor.image || '/img/movie1.jpg';
-
-  useEffect(() => {
-    setImgReady(false);
-    setImgFailed(false);
-  }, [imgSrc, actor.id]);
-
-  const showSkeleton = !imgReady && !imgFailed;
+  const { showSkeleton, imgRef, onLoad, onError } = useImageReady(imgSrc);
 
   return (
     <div
@@ -61,17 +53,12 @@ const RecommendedActorCard = ({ actor, lang, onOpen, t }) => {
           />
         )}
         <img
+          ref={imgRef}
           src={imgSrc}
           alt={name}
           className={`recommended-actors-img${showSkeleton ? ' recommended-actors-img--loading' : ''}`}
-          onLoad={() => {
-            setImgReady(true);
-            setImgFailed(false);
-          }}
-          onError={() => {
-            setImgFailed(true);
-            setImgReady(true);
-          }}
+          onLoad={onLoad}
+          onError={onError}
         />
       </div>
 
