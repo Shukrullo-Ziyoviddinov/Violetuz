@@ -224,13 +224,19 @@ const VideoModal = ({
       setIsExiting(false);
       return;
     }
+    /* Ikki rAF: avval translateY(100%) chiziladi, keyin pastdan yuqoriga ochiladi */
     setSheetEntered(false);
     setIsExiting(false);
-    /* Bitta rAF: boshlang‘ich transform chiziladi, keyingi freymda surilish boshlanadi (ikki rAF “qotib” turadi) */
-    const id = requestAnimationFrame(() => {
-      setSheetEntered(true);
+    let id2 = 0;
+    const id1 = requestAnimationFrame(() => {
+      id2 = requestAnimationFrame(() => {
+        setSheetEntered(true);
+      });
     });
-    return () => cancelAnimationFrame(id);
+    return () => {
+      cancelAnimationFrame(id1);
+      cancelAnimationFrame(id2);
+    };
   }, [isOpen, src, isMobile]);
 
   useEffect(() => () => {
