@@ -401,6 +401,37 @@ const MovieDetailSceneThumb = ({ src, index, onOpen }) => {
   );
 };
 
+/** Film haqida preview — descriptionImg faqat shu blokda (modalda yo‘q) */
+const MovieDetailDescriptionImg = ({ src }) => {
+  const imgSrc = normalizeImagePath(src);
+  const img = useImageReady(imgSrc);
+  const showSkeleton = img.showSkeleton;
+
+  return (
+    <div
+      className={`movie-detail-description-img-wrap${
+        showSkeleton ? ' movie-detail-description-img-wrap--loading' : ''
+      }`}
+      aria-busy={showSkeleton || undefined}
+    >
+      {showSkeleton && (
+        <SkeletonLoader
+          variant="movie-detail-desc-img"
+          className="movie-detail-description-img-skeleton"
+        />
+      )}
+      <img
+        ref={img.imgRef}
+        src={imgSrc}
+        alt=""
+        className="movie-detail-description-img"
+        onLoad={img.onLoad}
+        onError={img.onError}
+      />
+    </div>
+  );
+};
+
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -930,25 +961,35 @@ const MovieDetail = () => {
                       />
                     </div>
                     <div className="movie-detail-description movie-detail-description--skeleton" aria-hidden="true">
-                      <div className="movie-detail-description-header">
-                        <SkeletonLoader
-                          variant="movie-detail-desc-title"
-                          className="movie-detail-description-header-skeleton"
-                        />
-                      </div>
-                      <div className="movie-detail-description-text">
-                        <SkeletonLoader
-                          variant="movie-detail-desc-preview"
-                          className="movie-detail-description-preview-skeleton"
-                        />
-                        <SkeletonLoader
-                          variant="movie-detail-desc-preview"
-                          className="movie-detail-description-preview-skeleton movie-detail-description-preview-skeleton--short"
-                        />
-                        <SkeletonLoader
-                          variant="movie-detail-desc-more"
-                          className="movie-detail-description-more-btn-skeleton"
-                        />
+                      <div className="movie-detail-description-inner">
+                        <div className="movie-detail-description-content">
+                          <div className="movie-detail-description-header">
+                            <SkeletonLoader
+                              variant="movie-detail-desc-title"
+                              className="movie-detail-description-header-skeleton"
+                            />
+                          </div>
+                          <div className="movie-detail-description-text">
+                            <SkeletonLoader
+                              variant="movie-detail-desc-preview"
+                              className="movie-detail-description-preview-skeleton"
+                            />
+                            <SkeletonLoader
+                              variant="movie-detail-desc-preview"
+                              className="movie-detail-description-preview-skeleton movie-detail-description-preview-skeleton--short"
+                            />
+                            <SkeletonLoader
+                              variant="movie-detail-desc-more"
+                              className="movie-detail-description-more-btn-skeleton"
+                            />
+                          </div>
+                        </div>
+                        <div className="movie-detail-description-img-wrap">
+                          <SkeletonLoader
+                            variant="movie-detail-desc-img"
+                            className="movie-detail-description-img-skeleton"
+                          />
+                        </div>
                       </div>
                     </div>
                     <div className="movie-detail-seasons movie-detail-seasons--skeleton" aria-hidden="true">
@@ -1113,6 +1154,15 @@ const MovieDetail = () => {
     return null;
   };
 
+  const getDescriptionImg = () => {
+    const desc = getMovieDescription();
+    if (typeof desc === 'object' && desc.descriptionImg) {
+      const src = String(desc.descriptionImg).trim();
+      return src && src !== 'none' ? src : '';
+    }
+    return '';
+  };
+
   const getMovieVideo = () => movieVideoSrc;
 
   const toggleMute = () => {
@@ -1157,6 +1207,7 @@ const MovieDetail = () => {
   const showVideoSkeleton = Boolean(movieVideo) && !videoReady && !videoFailed;
   const descriptionText = getDescriptionText();
   const descriptionData = getDescriptionData();
+  const descriptionImg = getDescriptionImg();
   const isNewFormat = descriptionData !== null;
   const ratingDisplayValue = formatMovieRating(movieRatingValue ?? movie?.rating);
   const rateLabel = userLastVote
@@ -1502,43 +1553,50 @@ const MovieDetail = () => {
               </div>
 
               <div className="movie-detail-description">
-                <div className="movie-detail-description-header">
-                  <h3>
-                    {i18n.language === 'uz' ? 'Film haqida qisqacha' : 'Кратко о фильме'}
-                  </h3>
-                </div>
-
-                <div className="movie-detail-description-text">
-                  {descriptionText ? (
-                    <>
-                      <p className="movie-detail-description-preview">
-                        {descriptionText.length > 150
-                          ? `${descriptionText.substring(0, 150)}...`
-                          : descriptionText}
-                      </p>
-                      <button
-                        className="movie-detail-description-more-btn"
-                        onClick={() => setShowDescriptionModal(true)}
-                      >
-                        {i18n.language === 'uz' ? 'Batafsil' : 'Подробнее'}
-                      </button>
-                    </>
-                  ) : (
-                    <div className="movie-detail-description-text--skeleton" aria-busy="true">
-                      <SkeletonLoader
-                        variant="movie-detail-desc-preview"
-                        className="movie-detail-description-preview-skeleton"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-desc-preview"
-                        className="movie-detail-description-preview-skeleton movie-detail-description-preview-skeleton--short"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-desc-more"
-                        className="movie-detail-description-more-btn-skeleton"
-                      />
+                <div className="movie-detail-description-inner">
+                  <div className="movie-detail-description-content">
+                    <div className="movie-detail-description-header">
+                      <h3>
+                        {i18n.language === 'uz' ? 'Film haqida qisqacha' : 'Кратко о фильме'}
+                      </h3>
                     </div>
-                  )}
+
+                    <div className="movie-detail-description-text">
+                      {descriptionText ? (
+                        <>
+                          <p className="movie-detail-description-preview">
+                            {descriptionText.length > 150
+                              ? `${descriptionText.substring(0, 150)}...`
+                              : descriptionText}
+                          </p>
+                          <button
+                            className="movie-detail-description-more-btn"
+                            onClick={() => setShowDescriptionModal(true)}
+                          >
+                            {i18n.language === 'uz' ? 'Batafsil' : 'Подробнее'}
+                          </button>
+                        </>
+                      ) : (
+                        <div className="movie-detail-description-text--skeleton" aria-busy="true">
+                          <SkeletonLoader
+                            variant="movie-detail-desc-preview"
+                            className="movie-detail-description-preview-skeleton"
+                          />
+                          <SkeletonLoader
+                            variant="movie-detail-desc-preview"
+                            className="movie-detail-description-preview-skeleton movie-detail-description-preview-skeleton--short"
+                          />
+                          <SkeletonLoader
+                            variant="movie-detail-desc-more"
+                            className="movie-detail-description-more-btn-skeleton"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {descriptionImg ? (
+                    <MovieDetailDescriptionImg src={descriptionImg} />
+                  ) : null}
                 </div>
               </div>
 

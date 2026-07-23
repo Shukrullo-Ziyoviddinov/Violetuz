@@ -1,5 +1,3 @@
-
-
 [
   {
     "id": 8001,
@@ -45,6 +43,7 @@
     "description": {
       "uz": {
         "text": "John Wick High Tablega qarshi yakuniy jangda — Parij va Berlinda qon to'kish.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2023,
         "country": "AQSh",
         "duration": 169,
@@ -57,6 +56,7 @@
       },
       "ru": {
         "text": "Джон Уик в финальной битве против Высшего стола — кровь в Париже и Берлине.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2023,
         "country": "США",
         "duration": 169,
@@ -167,6 +167,7 @@
     "description": {
       "uz": {
         "text": "Ethan Hunt va IMF jamoasi sun'iy intellektdan kelib chiqqan xavfga qarshi kurashadi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2023,
         "country": "AQSh",
         "duration": 163,
@@ -179,6 +180,7 @@
       },
       "ru": {
         "text": "Итан Хант и команда МВФ борются с угрозой искусственного интеллекта.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2023,
         "country": "США",
         "duration": 163,
@@ -289,6 +291,7 @@
     "description": {
       "uz": {
         "text": "Dominic Toretto va oilasi Dante — intiqom oluvchi dushmanga qarshi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2023,
         "country": "AQSh",
         "duration": 142,
@@ -301,6 +304,7 @@
       },
       "ru": {
         "text": "Доминик Торетто и семья против мстительного врага — Данте.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2023,
         "country": "США",
         "duration": 142,
@@ -410,6 +414,7 @@
     "description": {
       "uz": {
         "text": "Robert McCall Italiyada tinch hayot kechirayotganda mafiyaga qarshi chiqadi.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2023,
         "country": "AQSh",
         "duration": 109,
@@ -422,6 +427,7 @@
       },
       "ru": {
         "text": "Роберт МакКолл в Италии вступает в противостояние с мафией.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2023,
         "country": "США",
         "duration": 109,
@@ -530,6 +536,7 @@
     "description": {
       "uz": {
         "text": "Tyler Rake yana bir xavfli qutqarish missiyasida — qamoqxonadan qochish.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2023,
         "country": "AQSh",
         "duration": 122,
@@ -541,6 +548,7 @@
       },
       "ru": {
         "text": "Тайлер Рейк в новой опасной миссии спасения — побег из тюрьмы.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2023,
         "country": "США",
         "duration": 122,
@@ -650,6 +658,7 @@
     "description": {
       "uz": {
         "text": "FBI agenti Meksika va AQSh chegarasida narkotik kartellarga qarshi maxsus operatsiyada.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2015,
         "country": "AQSh",
         "duration": 121,
@@ -662,6 +671,7 @@
       },
       "ru": {
         "text": "Агент ФБР в спецоперации против наркокартелей на границе Мексики и США.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2015,
         "country": "США",
         "duration": 121,
@@ -773,6 +783,7 @@
     "description": {
       "uz": {
         "text": "FBI agenti Meksika va AQSh chegarasida narkotik kartellarga qarshi maxsus operatsiyada.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2015,
         "country": "AQSh",
         "duration": 121,
@@ -785,6 +796,7 @@
       },
       "ru": {
         "text": "Агент ФБР в спецоперации против наркокартелей на границе Мексики и США.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2015,
         "country": "США",
         "duration": 121,
@@ -896,6 +908,7 @@
     "description": {
       "uz": {
         "text": "Indiana Jones so'nggi sarguzashtida — vaqtni orqaga qaytarish qudratiga ega bo'lgan artefaktni qidirmoqda.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2023,
         "country": "AQSh",
         "duration": 154,
@@ -908,6 +921,7 @@
       },
       "ru": {
         "text": "Индиана Джонс в последнем приключении — ищет артефакт, способный повернуть время вспять.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2023,
         "country": "США",
         "duration": 154,
@@ -1016,6 +1030,7 @@
     "description": {
       "uz": {
         "text": "Nathan Drake va Victor Sullivan Magellanning yo'qolgan oltinini qidirishda — xavfli sarguzasht.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2022,
         "country": "AQSh",
         "duration": 116,
@@ -1027,6 +1042,7 @@
       },
       "ru": {
         "text": "Нейтан Дрейк и Виктор Салливан в поисках потерянного золота Магеллана — опасное приключение.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2022,
         "country": "США",
         "duration": 116,
@@ -1136,6 +1152,7 @@
     "description": {
       "uz": {
         "text": "Doktor Lily Houghton va Frank Amazon daryosida sehrli daraxtni qidirishda.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2021,
         "country": "AQSh",
         "duration": 127,
@@ -1148,6 +1165,7 @@
       },
       "ru": {
         "text": "Доктор Лилли Хоутон и Фрэнк в поисках волшебного дерева на реке Амазонка.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2021,
         "country": "США",
         "duration": 127,
@@ -1258,6 +1276,7 @@
     "description": {
       "uz": {
         "text": "To'rt do'st yana Jumanji o'yiniga kirib ketadi — lekin bu safar qoidalar o'zgargan.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2019,
         "country": "AQSh",
         "duration": 123,
@@ -1270,6 +1289,7 @@
       },
       "ru": {
         "text": "Четверо друзей снова попадают в игру Джуманджи — но на этот раз правила изменились.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2019,
         "country": "США",
         "duration": 123,
@@ -1378,6 +1398,7 @@
     "description": {
       "uz": {
         "text": "Lara Croft otasining yo'qolganini topish uchun xavfli orolga yo'l oladi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "AQSh",
         "duration": 118,
@@ -1390,6 +1411,7 @@
       },
       "ru": {
         "text": "Лара Крофт отправляется на опасный остров в поисках пропавшего отца.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "США",
         "duration": 118,
@@ -1500,6 +1522,7 @@
     "description": {
       "uz": {
         "text": "Yozuvchi Loretta Sage o'g'irlanadi — model Alan qutqarish uchun yo'l oladi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2022,
         "country": "AQSh",
         "duration": 112,
@@ -1512,6 +1535,7 @@
       },
       "ru": {
         "text": "Писательницу Лоретту Сейдж похищают — модель Алан отправляется на спасение.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2022,
         "country": "США",
         "duration": 112,
@@ -1621,6 +1645,7 @@
     "description": {
       "uz": {
         "text": "Nathan Drake va Victor Sullivan Magellanning yo'qolgan oltinini qidirishda — xavfli sarguzasht.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2022,
         "country": "AQSh",
         "duration": 116,
@@ -1632,6 +1657,7 @@
       },
       "ru": {
         "text": "Нейтан Дрейк и Виктор Салливан в поисках потерянного золота Магеллана — опасное приключение.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2022,
         "country": "США",
         "duration": 116,
@@ -1741,6 +1767,7 @@
     "description": {
       "uz": {
         "text": "Elsa va Anna yangi sirlarni kashf etadi — Elsa ovozni eshitadi va uni izlashga ketadi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2019,
         "country": "AQSh",
         "duration": 103,
@@ -1753,6 +1780,7 @@
       },
       "ru": {
         "text": "Эльза и Анна открывают новые тайны — Эльза слышит голос и отправляется на его поиски.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2019,
         "country": "США",
         "duration": 103,
@@ -1864,6 +1892,7 @@
     "description": {
       "uz": {
         "text": "Woody va do'stlari Forky bilan yangi sarguzashtga chiqadi — oila va do'stlik haqida.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2019,
         "country": "AQSh",
         "duration": 100,
@@ -1876,6 +1905,7 @@
       },
       "ru": {
         "text": "Вуди и друзья отправляются в новое приключение с Вилкой — о семье и дружбе.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2019,
         "country": "США",
         "duration": 100,
@@ -1987,6 +2017,7 @@
     "description": {
       "uz": {
         "text": "Shrek va Fiona qisqa ta'tildan keyin qaytadi — qirol va qirolicha bilan uchrashuv.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2004,
         "country": "AQSh",
         "duration": 93,
@@ -1999,6 +2030,7 @@
       },
       "ru": {
         "text": "Шрек и Фиона возвращаются после медового месяца — встреча с королём и королевой.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2004,
         "country": "США",
         "duration": 93,
@@ -2109,6 +2141,7 @@
     "description": {
       "uz": {
         "text": "Nyu-York hayvonot bog'idagi hayvonlar Madagaskar oroliga tushib qoladi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2005,
         "country": "AQSh",
         "duration": 86,
@@ -2121,6 +2154,7 @@
       },
       "ru": {
         "text": "Животные из нью-йоркского зоопарка оказываются на острове Мадагаскар.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2005,
         "country": "США",
         "duration": 86,
@@ -2231,6 +2265,7 @@
     "description": {
       "uz": {
         "text": "Po yangi dushman bilan kurashadi va Dragon Warrior sifatida yangi vazifani bajaradi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2024,
         "country": "AQSh",
         "duration": 94,
@@ -2243,6 +2278,7 @@
       },
       "ru": {
         "text": "По сражается с новым врагом и выполняет новую миссию как Воин Дракона.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2024,
         "country": "США",
         "duration": 94,
@@ -2353,6 +2389,7 @@
     "description": {
       "uz": {
         "text": "Miguel o'limdan keyingi dunyoga sayohat qiladi va oila sirlarini kashf etadi.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2017,
         "country": "AQSh",
         "duration": 105,
@@ -2365,6 +2402,7 @@
       },
       "ru": {
         "text": "Мигель путешествует в мир мёртвых и открывает семейные тайны.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2017,
         "country": "США",
         "duration": 105,
@@ -2477,6 +2515,7 @@
     "description": {
       "uz": {
         "text": "Miguel o'limdan keyingi dunyoga sayohat qiladi va oila sirlarini kashf etadi.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2017,
         "country": "AQSh",
         "duration": 105,
@@ -2489,6 +2528,7 @@
       },
       "ru": {
         "text": "Мигель путешествует в мир мёртвых и открывает семейные тайны.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2017,
         "country": "США",
         "duration": 105,
@@ -2601,6 +2641,7 @@
     "description": {
       "uz": {
         "text": "Miguel o'limdan keyingi dunyoga sayohat qiladi va oila sirlarini kashf etadi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2017,
         "country": "AQSh",
         "duration": 105,
@@ -2613,6 +2654,7 @@
       },
       "ru": {
         "text": "Мигель путешествует в мир мёртвых и открывает семейные тайны.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2017,
         "country": "США",
         "duration": 105,
@@ -2725,6 +2767,7 @@
     "description": {
       "uz": {
         "text": "Chihiro maxsus hamomda ishlashga majbur bo'ladi — sehrli dunyoda ota-onasini qutqarish uchun.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2001,
         "country": "Yaponiya",
         "duration": 125,
@@ -2737,6 +2780,7 @@
       },
       "ru": {
         "text": "Тихиро вынуждена работать в особенной бане — чтобы спасти родителей в волшебном мире.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2001,
         "country": "Япония",
         "duration": 125,
@@ -2847,6 +2891,7 @@
     "description": {
       "uz": {
         "text": "Mitsuha va Taki tanishing — ular tanani almashtirishda. Vaqt va masofa ularni ajratadi.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2016,
         "country": "Yaponiya",
         "duration": 106,
@@ -2859,6 +2904,7 @@
       },
       "ru": {
         "text": "Мицуха и Таки обмениваются телами. Время и расстояние разделяют их.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2016,
         "country": "Япония",
         "duration": 106,
@@ -2969,6 +3015,7 @@
     "description": {
       "uz": {
         "text": "Tanjiro va do'stlari Mugen poyezdda Yuqori Demon bilan jang qiladi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2020,
         "country": "Yaponiya",
         "duration": 117,
@@ -2981,6 +3028,7 @@
       },
       "ru": {
         "text": "Тандзиро и друзья сражаются с Верхним Демоном в поезде Муген.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2020,
         "country": "Япония",
         "duration": 117,
@@ -3091,6 +3139,7 @@
     "description": {
       "uz": {
         "text": "Sophie sehrgar tomonidan keksa ayolga aylantiriladi — Howl bilan uchrashadi va sehrli qal'ada yashaydi.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2004,
         "country": "Yaponiya",
         "duration": 119,
@@ -3103,6 +3152,7 @@
       },
       "ru": {
         "text": "Софи колдуньей превращена в старуху — встречает Хаула и живёт в волшебном замке.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2004,
         "country": "Япония",
         "duration": 119,
@@ -3213,6 +3263,7 @@
     "description": {
       "uz": {
         "text": "Forger oilasi dam olish uchun sayohatga chiqadi — lekin maxfiy vazifa ularni kutadi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2023,
         "country": "Yaponiya",
         "duration": 110,
@@ -3225,6 +3276,7 @@
       },
       "ru": {
         "text": "Семья Форджер отправляется в отпуск — но секретная миссия ждёт их.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2023,
         "country": "Япония",
         "duration": 110,
@@ -3335,6 +3387,7 @@
     "description": {
       "uz": {
         "text": "Kiki — 13 yoshli jodugar qiz. U supurgi bilan uchib, yangi shaharda yetakchilik qilishni o'rganadi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 1989,
         "country": "Yaponiya",
         "duration": 103,
@@ -3347,6 +3400,7 @@
       },
       "ru": {
         "text": "Кики — 13-летняя ведьма. Она летает на метле и учится самостоятельности в новом городе.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 1989,
         "country": "Япония",
         "duration": 103,
@@ -3458,6 +3512,7 @@
     "description": {
       "uz": {
         "text": "Forger oilasi dam olish uchun sayohatga chiqadi — lekin maxfiy vazifa ularni kutadi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2023,
         "country": "Yaponiya",
         "duration": 110,
@@ -3470,6 +3525,7 @@
       },
       "ru": {
         "text": "Семья Форджер отправляется в отпуск — но секретная миссия ждёт их.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2023,
         "country": "Япония",
         "duration": 110,
@@ -3585,6 +3641,7 @@
     "description": {
       "uz": {
         "text": "Ruh 2 - yangi qism. Jazz musiqachisining davom etayotgan sarguzashtlari.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2025,
         "country": "AQSh",
         "duration": 100,
@@ -3596,6 +3653,7 @@
       },
       "ru": {
         "text": "Душа 2 - новый сиквел. Продолжение приключений джазового музыканта.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2025,
         "country": "США",
         "duration": 100,
@@ -3709,6 +3767,7 @@
     "description": {
       "uz": {
         "text": "Oppenheimer davomi - yangi teaser.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2025,
         "country": "AQSh",
         "duration": 180,
@@ -3720,6 +3779,7 @@
       },
       "ru": {
         "text": "Продолжение Оппенгеймера - новый тизер.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2025,
         "country": "США",
         "duration": 180,
@@ -3831,6 +3891,7 @@
     "description": {
       "uz": {
         "text": "Romantika serialining yangi mavsumi - tez kunda.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2025,
         "country": "Korea",
         "duration": 60,
@@ -3842,6 +3903,7 @@
       },
       "ru": {
         "text": "Новый сезон сериала Романтика - скоро.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2025,
         "country": "Корея",
         "duration": 60,
@@ -3953,6 +4015,7 @@
     "description": {
       "uz": {
         "text": "2025 yilning eng kutilayotgan multfilmi - tez kunda.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2025,
         "country": "AQSh",
         "duration": 95,
@@ -3964,6 +4027,7 @@
       },
       "ru": {
         "text": "Самый ожидаемый мультфильм 2025 года - скоро.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2025,
         "country": "США",
         "duration": 95,
@@ -4075,6 +4139,7 @@
     "description": {
       "uz": {
         "text": "Yangi boevik film - teaser.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2025,
         "country": "AQSh",
         "duration": 120,
@@ -4086,6 +4151,7 @@
       },
       "ru": {
         "text": "Новый боевик - тизер.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2025,
         "country": "США",
         "duration": 120,
@@ -4197,6 +4263,7 @@
     "description": {
       "uz": {
         "text": "Anime yangi seriyasi - tez kunda.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2025,
         "country": "Yaponiya",
         "duration": 24,
@@ -4208,6 +4275,7 @@
       },
       "ru": {
         "text": "Новая серия аниме - скоро.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2025,
         "country": "Япония",
         "duration": 24,
@@ -4319,6 +4387,7 @@
     "description": {
       "uz": {
         "text": "Sarguzasht filmi - teaser.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2025,
         "country": "AQSh",
         "duration": 130,
@@ -4330,6 +4399,7 @@
       },
       "ru": {
         "text": "Приключенческий фильм - тизер.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2025,
         "country": "США",
         "duration": 130,
@@ -4436,6 +4506,7 @@
     "description": {
       "uz": {
         "text": "Ghostface qotil Nyu-Yorkda yangi qurbonlarni ta'qib qiladi — Woodsboro qotilliklari davom etadi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2023,
         "country": "AQSh",
         "duration": 122,
@@ -4447,6 +4518,7 @@
       },
       "ru": {
         "text": "Убийца Ghostface преследует новых жертв в Нью-Йорке — продолжение убийств в Вудсборо.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2023,
         "country": "США",
         "duration": 122,
@@ -4554,6 +4626,7 @@
     "description": {
       "uz": {
         "text": "Ikkita opa-singil va ularning bolalari qadimiy jinlar tomonidan hujumga uchraydi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2023,
         "country": "AQSh",
         "duration": 96,
@@ -4565,6 +4638,7 @@
       },
       "ru": {
         "text": "Две сестры и их дети подвергаются атаке древних демонов.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2023,
         "country": "США",
         "duration": 96,
@@ -4674,6 +4748,7 @@
     "description": {
       "uz": {
         "text": "Psixiatr bemor ko'rdi — qurbon o'z joniga qasd qiladi. Endi u ham xuddi shunday ko'rinishni ko'radi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2022,
         "country": "AQSh",
         "duration": 115,
@@ -4686,6 +4761,7 @@
       },
       "ru": {
         "text": "Психиатр видит, как пациент совершает самоубийство. Теперь она видит то же самое.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2022,
         "country": "США",
         "duration": 115,
@@ -4795,6 +4871,7 @@
     "description": {
       "uz": {
         "text": "Qo'g'irchoq Annabelning kelib chiqishi — qanday qilib jin qo'g'irchoqqa kirib ketgani.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2014,
         "country": "AQSh",
         "duration": 99,
@@ -4806,6 +4883,7 @@
       },
       "ru": {
         "text": "Происхождение куклы Аннабель — как демон вселился в куклу.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2014,
         "country": "США",
         "duration": 99,
@@ -4915,6 +4993,7 @@
     "description": {
       "uz": {
         "text": "Chris qiz do'stining oilasiga tashrif buyuradi — u yerda dahshatli sir yashiringan.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2017,
         "country": "AQSh",
         "duration": 104,
@@ -4927,6 +5006,7 @@
       },
       "ru": {
         "text": "Крис навещает семью подруги — там скрыта ужасная тайна.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2017,
         "country": "США",
         "duration": 104,
@@ -5038,6 +5118,7 @@
     "description": {
       "uz": {
         "text": "Ovoz eshitadigan yirtqichlar Yerda — oila jim turish orqali omon qolishga harakat qiladi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "AQSh",
         "duration": 90,
@@ -5050,6 +5131,7 @@
       },
       "ru": {
         "text": "Хищники, слышащие звук, на Земле — семья пытается выжить молчанием.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "США",
         "duration": 90,
@@ -5161,6 +5243,7 @@
     "description": {
       "uz": {
         "text": "Ovoz eshitadigan yirtqichlar Yerda — oila jim turish orqali omon qolishga harakat qiladi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2018,
         "country": "AQSh",
         "duration": 90,
@@ -5173,6 +5256,7 @@
       },
       "ru": {
         "text": "Хищники, слышащие звук, на Земле — семья пытается выжить молчанием.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2018,
         "country": "США",
         "duration": 90,
@@ -5289,6 +5373,7 @@
     "description": {
       "uz": {
         "text": "Jazz musiqachisining ruhi tanasidan ajralib ketadi va kech bo'lishidan oldin qaytish yo'lini topishi kerak.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2020,
         "country": "AQSh",
         "duration": 100,
@@ -5301,6 +5386,7 @@
       },
       "ru": {
         "text": "Душа джазового музыканта отделяется от тела, и он должен найти путь обратно, пока не поздно.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2020,
         "country": "США",
         "duration": 100,
@@ -5412,6 +5498,7 @@
     "description": {
       "uz": {
         "text": "J. Robert Oppenheimer hayoti va atom bombasini yaratishdagi rolining hikoyasi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2023,
         "country": "AQSh",
         "duration": 180,
@@ -5424,6 +5511,7 @@
       },
       "ru": {
         "text": "История Дж. Роберта Оппенгеймера и его роли в создании атомной бомбы.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2023,
         "country": "США",
         "duration": 180,
@@ -5535,6 +5623,7 @@
     "description": {
       "uz": {
         "text": "Jinoiy dunyoda qasos va adolat haqida qorong'u triller.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2024,
         "country": "Xitoy",
         "duration": 120,
@@ -5547,6 +5636,7 @@
       },
       "ru": {
         "text": "Тёмный триллер о мести и справедливости в преступном мире.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2024,
         "country": "Китай",
         "duration": 120,
@@ -5658,6 +5748,7 @@
     "description": {
       "uz": {
         "text": "Superqahramonlar oilasi nafaqadan chiqib dunyoni qutqarish uchun harakat qiladi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2004,
         "country": "AQSh",
         "duration": 115,
@@ -5670,6 +5761,7 @@
       },
       "ru": {
         "text": "Семья супергероев выходит из отставки, чтобы спасти мир.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2004,
         "country": "США",
         "duration": 115,
@@ -5781,6 +5873,7 @@
     "description": {
       "uz": {
         "text": "Odam o'z uy-joyini shafqatsiz bosqinchilardan himoya qilish haqida dramatik vestern.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2023,
         "country": "AQSh",
         "duration": 105,
@@ -5793,6 +5886,7 @@
       },
       "ru": {
         "text": "Драматический вестерн о человеке, защищающем свой дом от безжалостных захватчиков.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2023,
         "country": "США",
         "duration": 105,
@@ -5904,6 +5998,7 @@
     "description": {
       "uz": {
         "text": "Piter Parkerning maxfiy shaxsi butun dunyoga oshkor bo'ladi va u Doktor Strange yordamini so'raydi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2021,
         "country": "AQSh",
         "duration": 148,
@@ -5916,6 +6011,7 @@
       },
       "ru": {
         "text": "Тайная личность Питера Паркера раскрывается миру, и он обращается за помощью к Доктору Стрэнджу.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2021,
         "country": "США",
         "duration": 148,
@@ -6027,6 +6123,7 @@
     "description": {
       "uz": {
         "text": "Yosh ayol qasrda maxluq tomonidan asirga olinadi va uning tashqi ko'rinishidan tashqariga qarashni o'rganadi.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2017,
         "country": "AQSh",
         "duration": 129,
@@ -6039,6 +6136,7 @@
       },
       "ru": {
         "text": "Молодая женщина оказывается в плену у Чудовища в его замке и учится видеть в нём человека.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2017,
         "country": "США",
         "duration": 129,
@@ -6150,6 +6248,7 @@
     "description": {
       "uz": {
         "text": "Oliyjanob oila koinotning eng qimmatbaho resursi uchun urushga aralashadi.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2021,
         "country": "AQSh",
         "duration": 155,
@@ -6162,6 +6261,7 @@
       },
       "ru": {
         "text": "Знатная семья оказывается втянутой в войну за контроль над самым ценным ресурсом вселенной.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2021,
         "country": "США",
         "duration": 155,
@@ -6273,6 +6373,7 @@
     "description": {
       "uz": {
         "text": "Betmen Gotem shahridagi korruptsiyani ochadi va seriyali qotil Riddlerni ta'qib qiladi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2022,
         "country": "AQSh",
         "duration": 176,
@@ -6285,6 +6386,7 @@
       },
       "ru": {
         "text": "Бэтмен раскрывает коррупцию в Готэм-сити, преследуя серийного убийцу Загадочника.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2022,
         "country": "США",
         "duration": 176,
@@ -6396,6 +6498,7 @@
     "description": {
       "uz": {
         "text": "O'ttiz yil o'tgach, Maverick hali ham dengiz aviatori sifatida chegaralarni surib chiqmoqda.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2022,
         "country": "AQSh",
         "duration": 130,
@@ -6408,6 +6511,7 @@
       },
       "ru": {
         "text": "Спустя тридцать лет Мэверик по-прежнему расширяет границы как лучший военно-морской лётчик.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2022,
         "country": "США",
         "duration": 130,
@@ -6523,6 +6627,7 @@
     "description": {
       "uz": {
         "text": "Janubiy Koreya biznesmeni Shimoliy Koreyada parashyut bilan qulab tushadi va harbiy ofitser bilan romantik uchrashuvga duch keladi.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2019,
         "country": "Janubiy Koreya",
         "duration": 1140,
@@ -6535,6 +6640,7 @@
       },
       "ru": {
         "text": "Южнокорейская бизнесвумен приземляется с парашютом в Северной Корее и встречает военного офицера.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2019,
         "country": "Южная Корея",
         "duration": 1140,
@@ -6676,6 +6782,7 @@
     "description": {
       "uz": {
         "text": "Maxsus kuchlar ofitseri va jarroh shifokor urush zonasida sevgi topadi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2016,
         "country": "Janubiy Koreya",
         "duration": 960,
@@ -6688,6 +6795,7 @@
       },
       "ru": {
         "text": "Офицер спецназа и хирург находят любовь в зоне военных действий.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2016,
         "country": "Южная Корея",
         "duration": 960,
@@ -6822,6 +6930,7 @@
     "description": {
       "uz": {
         "text": "939 yoshli goblin va uning kelini — abadiy hayotdan ozod bo'lish uchun kurashadi.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2016,
         "country": "Janubiy Koreya",
         "duration": 900,
@@ -6834,6 +6943,7 @@
       },
       "ru": {
         "text": "939-летний демон и его невеста борются за освобождение от вечной жизни.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2016,
         "country": "Южная Корея",
         "duration": 900,
@@ -6967,6 +7077,7 @@
     "description": {
       "uz": {
         "text": "Zo'ravonlikdan jabr ko'rgan yosh o'g'il restoran ochish orqali adolat va muvaffaqiyatga erishishga harakat qiladi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2020,
         "country": "Janubiy Koreya",
         "duration": 960,
@@ -6979,6 +7090,7 @@
       },
       "ru": {
         "text": "Молодой человек, пострадавший от насилия, пытается добиться справедливости и успеха, открыв ресторан.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2020,
         "country": "Южная Корея",
         "duration": 960,
@@ -7111,6 +7223,7 @@
     "description": {
       "uz": {
         "text": "Yosh tadbirkorlar Seulda o'z startuplarini qurish uchun kurashadi va sevgi topadi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2020,
         "country": "Janubiy Koreya",
         "duration": 960,
@@ -7123,6 +7236,7 @@
       },
       "ru": {
         "text": "Молодые предприниматели борются за создание своих стартапов в Сеуле и находят любовь.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2020,
         "country": "Южная Корея",
         "duration": 960,
@@ -7255,6 +7369,7 @@
     "description": {
       "uz": {
         "text": "Maktabda zo'ravonlikdan jabr ko'rgan ayol yillar o'tgach, o'zini zo'rlaganlardan qasos olish rejasini boshlaydi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2022,
         "country": "Janubiy Koreya",
         "duration": 900,
@@ -7267,6 +7382,7 @@
       },
       "ru": {
         "text": "Женщина, пострадавшая от школьного насилия, годы спустя начинает план мести своим обидчикам.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2022,
         "country": "Южная Корея",
         "duration": 900,
@@ -7399,6 +7515,7 @@
     "description": {
       "uz": {
         "text": "Narsisistik bosh direktor va uning sadoqatli sekretari o'rtasida romantik komediya.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2018,
         "country": "Janubiy Koreya",
         "duration": 720,
@@ -7411,6 +7528,7 @@
       },
       "ru": {
         "text": "Романтическая комедия между нарциссическим CEO и его преданным секретарём.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2018,
         "country": "Южная Корея",
         "duration": 720,
@@ -7545,6 +7663,7 @@
     "description": {
       "uz": {
         "text": "Qarzga botgan yosh ayol va umidsiz o'rta yoshli erkak o'rtasida chuqur insoniy aloqa va qo'llab-quvvatlash.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2018,
         "country": "Janubiy Koreya",
         "duration": 900,
@@ -7557,6 +7676,7 @@
       },
       "ru": {
         "text": "Глубокая человеческая связь и поддержка между молодой женщиной в долгах и безнадёжным мужчиной средних лет.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2018,
         "country": "Южная Корея",
         "duration": 900,
@@ -7691,6 +7811,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -7703,6 +7824,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -7988,6 +8110,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi. Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi. Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi. Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi. Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -8000,6 +8123,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции. Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции. Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции. Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -8269,6 +8393,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -8281,6 +8406,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -8549,6 +8675,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -8561,6 +8688,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -8671,6 +8799,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -8683,6 +8812,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -8793,6 +8923,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -8805,6 +8936,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -8914,6 +9046,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -8926,6 +9059,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9034,6 +9168,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9046,6 +9181,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9154,6 +9290,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9166,6 +9303,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9274,6 +9412,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9286,6 +9425,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9394,6 +9534,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9406,6 +9547,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9515,6 +9657,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9527,6 +9670,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9636,6 +9780,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9648,6 +9793,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9755,8 +9901,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-5.jpg"
+      }
     },
     "trailersVideo": [
       {
@@ -9851,6 +10003,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9863,6 +10016,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -9972,6 +10126,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -9984,6 +10139,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -10088,6 +10244,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -10100,6 +10257,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -10207,8 +10365,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-9.jpg"
+      }
     },
     "trailersVideo": [
       {
@@ -10308,6 +10472,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -10320,6 +10485,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -10429,6 +10595,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -10441,6 +10608,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -10548,8 +10716,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg"
+      }
     },
     "trailersVideo": [
       {
@@ -10649,6 +10823,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -10661,6 +10836,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -10768,8 +10944,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-4.webp"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-4.webp"
+      }
     },
     "trailersVideo": [
       {
@@ -10869,6 +11051,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -10881,6 +11064,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -10988,8 +11172,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-6.avif"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-6.avif"
+      }
     },
     "trailersVideo": [
       {
@@ -11087,8 +11277,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-7.jpg"
+      }
     },
     "trailersVideo": [
       {
@@ -11188,6 +11384,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -11200,6 +11397,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -11307,8 +11505,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-9.jpg"
+      }
     },
     "trailersVideo": [
       {
@@ -11408,6 +11612,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -11420,6 +11625,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -11527,8 +11733,14 @@
       ]
     },
     "description": {
-      "uz": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
-      "ru": "Два заключенных сближаются в течение ряда лет."
+      "uz": {
+        "text": "Ikki qamalgan odam bir necha yil davomida bog'lanishadi.",
+        "descriptionImg": "/img/movie-4.5-1.avif"
+      },
+      "ru": {
+        "text": "Два заключенных сближаются в течение ряда лет.",
+        "descriptionImg": "/img/movie-4.5-1.avif"
+      }
     },
     "trailersVideo": [
       {
@@ -11628,6 +11840,7 @@
     "description": {
       "uz": {
         "text": "Malakali o'g'ri, agar u inceptionning mumkin bo'lmagan vazifasini bajarishga qodir bo'lsa, qutqarish imkoniyatiga ega bo'ladi.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2010,
         "country": "AQSh",
         "duration": 148,
@@ -11640,6 +11853,7 @@
       },
       "ru": {
         "text": "Опытный вор получает шанс на искупление, если сможет выполнить невозможную задачу инцепции.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2010,
         "country": "США",
         "duration": 148,
@@ -11748,6 +11962,7 @@
     "description": {
       "uz": {
         "text": "Don Vito Corleone va uning oilasi — mafiya dunyosi va hokimiyat. Kino tarixidagi eng buyuk film.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 1972,
         "country": "AQSh",
         "duration": 175,
@@ -11759,6 +11974,7 @@
       },
       "ru": {
         "text": "Дон Вито Корлеоне и его семья — мир мафии и власти. Один из величайших фильмов в истории кино.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 1972,
         "country": "США",
         "duration": 175,
@@ -11868,6 +12084,7 @@
     "description": {
       "uz": {
         "text": "Marty McFly va Doc Brown vaqt mashinasida — 1985 dan 1955 ga sayohat.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 1985,
         "country": "AQSh",
         "duration": 116,
@@ -11880,6 +12097,7 @@
       },
       "ru": {
         "text": "Марти МакФлай и Док Браун на машине времени — путешествие из 1985 в 1955.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 1985,
         "country": "США",
         "duration": 116,
@@ -11990,6 +12208,7 @@
     "description": {
       "uz": {
         "text": "Elliott va E.T. — bolalar va sayyoralik o'rtasidagi do'stlik. Steven Spielberg klassikasi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 1982,
         "country": "AQSh",
         "duration": 115,
@@ -12002,6 +12221,7 @@
       },
       "ru": {
         "text": "Эллиотт и Э.Т. — дружба между ребёнком и инопланетянином. Классика Стивена Спилберга.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 1982,
         "country": "США",
         "duration": 115,
@@ -12112,6 +12332,7 @@
     "description": {
       "uz": {
         "text": "Kelajakdan robot qotil — Sarah Connorni o'ldirish uchun yuborilgan. Arnold Schwarzenegger.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 1984,
         "country": "AQSh",
         "duration": 107,
@@ -12124,6 +12345,7 @@
       },
       "ru": {
         "text": "Робот-убийца из будущего — послан убить Сару Коннор. Арнольд Шварценеггер.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 1984,
         "country": "США",
         "duration": 107,
@@ -12234,6 +12456,7 @@
     "description": {
       "uz": {
         "text": "Baby va Johnny — kurortda raqs va sevgi. 1980-yillarning ikonik romantik filmi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 1987,
         "country": "AQSh",
         "duration": 100,
@@ -12246,6 +12469,7 @@
       },
       "ru": {
         "text": "Бэби и Джонни — танец и любовь на курорте. Иконический романтический фильм 80-х.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 1987,
         "country": "США",
         "duration": 100,
@@ -12352,6 +12576,7 @@
     "description": {
       "uz": {
         "text": "Andy Dufresne noto'g'ri qamoqqa tushadi — umid va ozodlik haqida. Eng yuqori reytingli film.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 1994,
         "country": "AQSh",
         "duration": 142,
@@ -12362,6 +12587,7 @@
       },
       "ru": {
         "text": "Энди Дюфрейн несправедливо попадает в тюрьму — о надежде и свободе. Фильм с высшим рейтингом.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 1994,
         "country": "США",
         "duration": 142,
@@ -12466,6 +12692,7 @@
     "description": {
       "uz": {
         "text": "Don Vito Corleone va uning oilasi — mafiya dunyosi va hokimiyat. Kino tarixidagi eng buyuk film.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 1972,
         "country": "AQSh",
         "duration": 175,
@@ -12477,6 +12704,7 @@
       },
       "ru": {
         "text": "Дон Вито Корлеоне и его семья — мир мафии и власти. Один из величайших фильмов в истории кино.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 1972,
         "country": "США",
         "duration": 175,
@@ -12586,6 +12814,7 @@
     "description": {
       "uz": {
         "text": "Jack va Rose Titanikda uchrashadi — sevgi va falokat. Tarixdagi eng mashhur romantik film.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 1997,
         "country": "AQSh",
         "duration": 194,
@@ -12598,6 +12827,7 @@
       },
       "ru": {
         "text": "Джек и Роуз встречаются на Титанике — любовь и катастрофа. Самый известный романтический фильм.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 1997,
         "country": "США",
         "duration": 194,
@@ -12706,6 +12936,7 @@
     "description": {
       "uz": {
         "text": "Noah va Allie — ijtimoiy farq ularni ajratadi, lekin sevgi umr bo'yi davom etadi.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2004,
         "country": "AQSh",
         "duration": 123,
@@ -12717,6 +12948,7 @@
       },
       "ru": {
         "text": "Ноа и Элли — социальная разница разделяет их, но любовь длится всю жизнь.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2004,
         "country": "США",
         "duration": 123,
@@ -12826,6 +13058,7 @@
     "description": {
       "uz": {
         "text": "Mia va Sebastian Los-Anjelesda — orzular va sevgi. Musiqiy romantik film.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2016,
         "country": "AQSh",
         "duration": 128,
@@ -12838,6 +13071,7 @@
       },
       "ru": {
         "text": "Миа и Себастьян в Лос-Анджелесе — мечты и любовь. Музыкальный романтический фильм.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2016,
         "country": "США",
         "duration": 128,
@@ -12946,6 +13180,7 @@
     "description": {
       "uz": {
         "text": "Hazel va Gus — ikkalasi ham kasallik bilan kurashadi. Sevgi va hayot haqida.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2014,
         "country": "AQSh",
         "duration": 126,
@@ -12957,6 +13192,7 @@
       },
       "ru": {
         "text": "Хейзел и Гас — оба борются с болезнью. О любви и жизни.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2014,
         "country": "США",
         "duration": 126,
@@ -13066,6 +13302,7 @@
     "description": {
       "uz": {
         "text": "Rachel Singapurga sevgilisi bilan boradi — u juda boy oiladan ekanini bilib qoladi.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2018,
         "country": "AQSh",
         "duration": 120,
@@ -13078,6 +13315,7 @@
       },
       "ru": {
         "text": "Рэйчел едет в Сингапур с возлюбленным — узнаёт, что он из очень богатой семьи.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2018,
         "country": "США",
         "duration": 120,
@@ -13188,6 +13426,7 @@
     "description": {
       "uz": {
         "text": "Elizabeth Bennet va Mr. Darcy — g'urur va noto'g'ri tushunchalar orasidagi sevgi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2005,
         "country": "Buyuk Britaniya",
         "duration": 129,
@@ -13200,6 +13439,7 @@
       },
       "ru": {
         "text": "Элизабет Беннет и мистер Дарси — любовь между гордостью и предубеждениями.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2005,
         "country": "Великобритания",
         "duration": 129,
@@ -13310,6 +13550,7 @@
     "description": {
       "uz": {
         "text": "Jack va Rose Titanikda uchrashadi — sevgi va falokat. Tarixdagi eng mashhur romantik film.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 1997,
         "country": "AQSh",
         "duration": 194,
@@ -13322,6 +13563,7 @@
       },
       "ru": {
         "text": "Джек и Роуз встречаются на Титанике — любовь и катастрофа. Самый известный романтический фильм.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 1997,
         "country": "США",
         "duration": 194,
@@ -13432,6 +13674,7 @@
     "description": {
       "uz": {
         "text": "Demobilizatsiya qilingan Danila Sankt-Peterburgda akasi bilan uchrashadi va jinoyat dunyosiga kirib ketadi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 1997,
         "country": "Rossiya",
         "duration": 100,
@@ -13444,6 +13687,7 @@
       },
       "ru": {
         "text": "Демобилизованный Данила приезжает к брату в Санкт-Петербург и попадает в криминальный мир.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 1997,
         "country": "Россия",
         "duration": 100,
@@ -13551,6 +13795,7 @@
     "description": {
       "uz": {
         "text": "Shimoliy Rossiyada baliqchi Nikolay uyini yo'qotish xavfi ostida — korruptsiya va hokimiyat haqida.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2014,
         "country": "Rossiya",
         "duration": 141,
@@ -13561,6 +13806,7 @@
       },
       "ru": {
         "text": "Рыбак Николай на севере России рискует потерять дом — о коррупции и власти.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2014,
         "country": "Россия",
         "duration": 141,
@@ -13667,6 +13913,7 @@
     "description": {
       "uz": {
         "text": "1972-yilgi Olimpiada — SSSR basketbol jamoasi AQShni mag'lub etadi. Sport tarixidagi epik voqea.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2017,
         "country": "Rossiya",
         "duration": 133,
@@ -13679,6 +13926,7 @@
       },
       "ru": {
         "text": "Олимпиада 1972 — сборная СССР по баскетболу побеждает США. Эпическое событие в истории спорта.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2017,
         "country": "Россия",
         "duration": 133,
@@ -13791,6 +14039,7 @@
     "description": {
       "uz": {
         "text": "1950-yillarda Moskvaga kelgan uch qizning hayoti va sevgisi haqida klassik sovet filmi.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 1979,
         "country": "SSSR",
         "duration": 150,
@@ -13803,6 +14052,7 @@
       },
       "ru": {
         "text": "Классическая советская картина о жизни и любви трёх девушек, приехавших в Москву в 1950-х.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 1979,
         "country": "СССР",
         "duration": 150,
@@ -13914,6 +14164,7 @@
     "description": {
       "uz": {
         "text": "Yangiy yil oldi sog'inganda do'stlar bilan hammomda bo'lgan Zhenya noto'g'ri uyga oqib ketadi.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 1975,
         "country": "SSSR",
         "duration": 184,
@@ -13926,6 +14177,7 @@
       },
       "ru": {
         "text": "В канун Нового года Женя по ошибке попадает в чужую квартиру после бани с друзьями.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 1975,
         "country": "СССР",
         "duration": 184,
@@ -14037,6 +14289,7 @@
     "description": {
       "uz": {
         "text": "1941-yil — yosh tankchi Nikolay qo'lga olinadi, lekin qochish rejasini tuzadi: T-34 tankida.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "Rossiya",
         "duration": 139,
@@ -14049,6 +14302,7 @@
       },
       "ru": {
         "text": "1941 год — молодой танкист Николай попадает в плен, но строит план побега на танке Т-34.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "Россия",
         "duration": 139,
@@ -14160,6 +14414,7 @@
     "description": {
       "uz": {
         "text": "Demobilizatsiya qilingan Danila Sankt-Peterburgda akasi bilan uchrashadi va jinoyat dunyosiga kirib ketadi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 1997,
         "country": "Rossiya",
         "duration": 100,
@@ -14172,6 +14427,7 @@
       },
       "ru": {
         "text": "Демобилизованный Данила приезжает к брату в Санкт-Петербург и попадает в криминальный мир.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 1997,
         "country": "Россия",
         "duration": 100,
@@ -14283,6 +14539,7 @@
     "description": {
       "uz": {
         "text": "Sulton Sulaymon va Hurram Sultonning sevgi va hokimiyat hikoyasi — Usmonli imperiyasi davri.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2011,
         "country": "Turkiya",
         "duration": 4320,
@@ -14295,6 +14552,7 @@
       },
       "ru": {
         "text": "История любви и власти Султана Сулеймана и Хюррем — эпоха Османской империи.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2011,
         "country": "Турция",
         "duration": 4320,
@@ -14492,6 +14750,7 @@
     "description": {
       "uz": {
         "text": "Usmonli davlati asoschisi Usmon otasining hayoti — Ertug'rul beg va qayilar qabilasi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2014,
         "country": "Turkiya",
         "duration": 4500,
@@ -14504,6 +14763,7 @@
       },
       "ru": {
         "text": "Жизнь отца основателя Османской империи — Эртугрул бей и племя кайи.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2014,
         "country": "Турция",
         "duration": 4500,
@@ -14681,6 +14941,7 @@
     "description": {
       "uz": {
         "text": "Edanur va Serkan — qarshilik va sevgi orasidagi munosabat. Romantik komediya.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2020,
         "country": "Turkiya",
         "duration": 1800,
@@ -14693,6 +14954,7 @@
       },
       "ru": {
         "text": "Эданур и Серкан — отношения между противостоянием и любовью. Романтическая комедия.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2020,
         "country": "Турция",
         "duration": 1800,
@@ -14817,6 +15079,7 @@
     "description": {
       "uz": {
         "text": "Nihan va Kemal — ijtimoiy farq va oilaviy dushmanlik orasidagi sevgi hikoyasi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2015,
         "country": "Turkiya",
         "duration": 2700,
@@ -14829,6 +15092,7 @@
       },
       "ru": {
         "text": "Нихан и Кемаль — история любви между социальной разницей и семейной враждой.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2015,
         "country": "Турция",
         "duration": 2700,
@@ -14967,6 +15231,7 @@
     "description": {
       "uz": {
         "text": "Bahor va Firat — intiqom va sevgi orasidagi murakkab munosabatlar.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2015,
         "country": "Turkiya",
         "duration": 2400,
@@ -14979,6 +15244,7 @@
       },
       "ru": {
         "text": "Бахар и Фират — сложные отношения между местью и любовью.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2015,
         "country": "Турция",
         "duration": 2400,
@@ -15117,6 +15383,7 @@
     "description": {
       "uz": {
         "text": "Sunay va Kerem — turli ijtimoiy qatlamlardan bo'lgan yoshlar orasidagi sevgi.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2017,
         "country": "Turkiya",
         "duration": 2100,
@@ -15129,6 +15396,7 @@
       },
       "ru": {
         "text": "Сunay и Керем — любовь между молодыми людьми из разных социальных слоёв.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2017,
         "country": "Турция",
         "duration": 2100,
@@ -15267,6 +15535,7 @@
     "description": {
       "uz": {
         "text": "Sunay va Kerem — turli ijtimoiy qatlamlardan bo'lgan yoshlar orasidagi sevgi.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2017,
         "country": "Turkiya",
         "duration": 2100,
@@ -15279,6 +15548,7 @@
       },
       "ru": {
         "text": "Сunay и Керем — любовь между молодыми людьми из разных социальных слоёв.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2017,
         "country": "Турция",
         "duration": 2100,
@@ -15417,6 +15687,7 @@
     "description": {
       "uz": {
         "text": "Kimyo o'qituvchisi Walter White metamfetamin ishlab chiqarishga kirishadi — kriminal dunyoga sayohat.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2008,
         "country": "AQSh",
         "duration": 3720,
@@ -15429,6 +15700,7 @@
       },
       "ru": {
         "text": "Учитель химии Уолтер Уайт начинает производить метамфетамин — путешествие в криминальный мир.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2008,
         "country": "США",
         "duration": 3720,
@@ -15606,6 +15878,7 @@
     "description": {
       "uz": {
         "text": "Vesteros yetti qirolligida taxt uchun kurash — ajdodlar, ajdarlar va qorong'u kuchlar.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2011,
         "country": "AQSh",
         "duration": 4200,
@@ -15618,6 +15891,7 @@
       },
       "ru": {
         "text": "Борьба за железный трон семи королевств Вестероса — драконы и тёмные силы.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2011,
         "country": "США",
         "duration": 4200,
@@ -15834,6 +16108,7 @@
     "description": {
       "uz": {
         "text": "Geralt — mutatsiya qilingan jodugar, canavarlar va odamlar o'rtasida yashaydi.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2019,
         "country": "AQSh",
         "duration": 2400,
@@ -15846,6 +16121,7 @@
       },
       "ru": {
         "text": "Геральт — мутировавший ведьмак, живущий между монстрами и людьми.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2019,
         "country": "США",
         "duration": 2400,
@@ -15997,6 +16273,7 @@
     "description": {
       "uz": {
         "text": "Har bir qismda texnologiya va jamiyatning qorong'u tomonlari ko'rsatiladi.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2011,
         "country": "Buyuk Britaniya",
         "duration": 1800,
@@ -16009,6 +16286,7 @@
       },
       "ru": {
         "text": "Каждый эпизод показывает тёмные стороны технологий и общества.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2011,
         "country": "Великобритания",
         "duration": 1800,
@@ -16186,6 +16464,7 @@
     "description": {
       "uz": {
         "text": "Zamonaviy London — Sherlock Holmes va doktor Watson jinoyatlarni hal qiladi.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2010,
         "country": "Buyuk Britaniya",
         "duration": 900,
@@ -16198,6 +16477,7 @@
       },
       "ru": {
         "text": "Современный Лондон — Шерлок Холмс и доктор Ватсон раскрывают преступления.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2010,
         "country": "Великобритания",
         "duration": 900,
@@ -16362,6 +16642,7 @@
     "description": {
       "uz": {
         "text": "1980-yillarda bolalar yo'qolgan do'stini qidirishda — «Upside Down» olamiga kirib ketadi.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2016,
         "country": "AQSh",
         "duration": 2400,
@@ -16374,6 +16655,7 @@
       },
       "ru": {
         "text": "В 1980-х дети ищут пропавшего друга — попадают в мир «Перевёрнутого».",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2016,
         "country": "США",
         "duration": 2400,
@@ -16551,6 +16833,7 @@
     "description": {
       "uz": {
         "text": "1980-yillarda bolalar yo'qolgan do'stini qidirishda — «Upside Down» olamiga kirib ketadi.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2016,
         "country": "AQSh",
         "duration": 2400,
@@ -16563,6 +16846,7 @@
       },
       "ru": {
         "text": "В 1980-х дети ищут пропавшего друга — попадают в мир «Перевёрнутого».",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2016,
         "country": "США",
         "duration": 2400,
@@ -16738,6 +17022,7 @@
     "description": {
       "uz": {
         "text": "Mahalla hayoti, qo'shnilar va kulguli voqealar. O'zbek kinosining mashhur komediyasi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "O'zbekiston",
         "duration": 95,
@@ -16749,6 +17034,7 @@
       },
       "ru": {
         "text": "Жизнь махалли, соседи и забавные происшествия. Популярная комедия узбекского кино.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2010,
         "country": "Узбекистан",
         "duration": 95,
@@ -16856,6 +17142,7 @@
     "description": {
       "uz": {
         "text": "Shahardan qishloqqa kelgan qiz va uning yangi hayotdagi sarguzashtlari.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2012,
         "country": "O'zbekiston",
         "duration": 102,
@@ -16867,6 +17154,7 @@
       },
       "ru": {
         "text": "Девушка, приехавшая из города в деревню, и её приключения в новой жизни.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2012,
         "country": "Узбекистан",
         "duration": 102,
@@ -16974,6 +17262,7 @@
     "description": {
       "uz": {
         "text": "O'zbekiston mustaqilligi va milliy qadriyatlar haqida. Tarixiy drama.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2008,
         "country": "O'zbekiston",
         "duration": 118,
@@ -16985,6 +17274,7 @@
       },
       "ru": {
         "text": "Об независимости Узбекистана и национальных ценностях. Историческая драма.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2008,
         "country": "Узбекистан",
         "duration": 118,
@@ -17091,6 +17381,7 @@
     "description": {
       "uz": {
         "text": "Sevgi, sadoqat va hayotiy qiyinchiliklar haqida hikoya.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2015,
         "country": "O'zbekiston",
         "duration": 88,
@@ -17102,6 +17393,7 @@
       },
       "ru": {
         "text": "История о любви, верности и жизненных трудностях.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2015,
         "country": "Узбекистан",
         "duration": 88,
@@ -17209,6 +17501,7 @@
     "description": {
       "uz": {
         "text": "Bolalik sarguzashtlari va do'stlik haqida oilaviy komediya.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "O'zbekiston",
         "duration": 92,
@@ -17220,6 +17513,7 @@
       },
       "ru": {
         "text": "Семейная комедия о детских приключениях и дружбе.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2018,
         "country": "Узбекистан",
         "duration": 92,
@@ -17326,6 +17620,7 @@
     "description": {
       "uz": {
         "text": "Yosh sportchi va uning muvaffaqiyatga yo'lida qiyinchiliklar.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2019,
         "country": "O'zbekiston",
         "duration": 105,
@@ -17337,6 +17632,7 @@
       },
       "ru": {
         "text": "Молодой спортсмен и трудности на пути к успеху.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2019,
         "country": "Узбекистан",
         "duration": 105,
@@ -17443,6 +17739,7 @@
     "description": {
       "uz": {
         "text": "Sevgi, sadoqat va hayotiy qiyinchiliklar haqida hikoya.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2015,
         "country": "O'zbekiston",
         "duration": 88,
@@ -17454,6 +17751,7 @@
       },
       "ru": {
         "text": "История о любви, верности и жизненных трудностях.",
+        "descriptionImg": "/img/movie-4.5-4.webp",
         "year": 2015,
         "country": "Узбекистан",
         "duration": 88,
@@ -17563,6 +17861,7 @@
     "description": {
       "uz": {
         "text": "Sun'iy intellekt hakamiga o'z begunohligingizni isbotlashingiz yoki qatl etilishingiz kerak.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2025,
         "country": "AQSh",
         "duration": 115,
@@ -17575,6 +17874,7 @@
       },
       "ru": {
         "text": "Докажите свою невиновность ИИ-судье или столкнётесь с казнью.",
+        "descriptionImg": "/img/movie-4.5-5.jpg",
         "year": 2025,
         "country": "США",
         "duration": 115,
@@ -17685,6 +17985,7 @@
     "description": {
       "uz": {
         "text": "Hindistonning afsonaviy aktyori Rajinikanth bosh rollarda — oila va sadoqat haqida epik hikoya.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2021,
         "country": "Hindiston",
         "duration": 178,
@@ -17697,6 +17998,7 @@
       },
       "ru": {
         "text": "Легендарный индийский актёр Раджиникант в эпической истории о семье и преданности.",
+        "descriptionImg": "/img/movie-4.5-6.avif",
         "year": 2021,
         "country": "Индия",
         "duration": 178,
@@ -17806,6 +18108,7 @@
     "description": {
       "uz": {
         "text": "Yoshlar shaharda orzu va qiyinchiliklar orasida o'sishlari haqida hikoya.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2024,
         "country": "AQSh",
         "duration": 95,
@@ -17817,6 +18120,7 @@
       },
       "ru": {
         "text": "История о взрослении молодёжи в городе — мечты и трудности.",
+        "descriptionImg": "/img/movie-4.5-7.jpg",
         "year": 2024,
         "country": "США",
         "duration": 95,
@@ -17922,6 +18226,7 @@
     "description": {
       "uz": {
         "text": "Qo'rquv uyga qaytadi — Ghostface qotil yana qurbonlarni ta'qib qiladi.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2026,
         "country": "AQSh",
         "duration": 120,
@@ -17933,6 +18238,7 @@
       },
       "ru": {
         "text": "Страх возвращается домой — убийца Ghostface снова преследует жертв.",
+        "descriptionImg": "/img/movie-4.5-8.jpg",
         "year": 2026,
         "country": "США",
         "duration": 120,
@@ -18042,6 +18348,7 @@
     "description": {
       "uz": {
         "text": "Hech qachon kichik orzularingiz uchun juda kichik emassiz — hayvonlar basketbol jamoasida.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2025,
         "country": "AQSh",
         "duration": 88,
@@ -18054,6 +18361,7 @@
       },
       "ru": {
         "text": "Вы никогда не слишком малы для больших мечтаний — животные в баскетбольной команде.",
+        "descriptionImg": "/img/movie-4.5-9.jpg",
         "year": 2025,
         "country": "США",
         "duration": 88,
@@ -18164,6 +18472,7 @@
     "description": {
       "uz": {
         "text": "Politsiya iti bilan birga shahardagi jinoyatlarga qarshi kurash.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2024,
         "country": "AQSh",
         "duration": 105,
@@ -18176,6 +18485,7 @@
       },
       "ru": {
         "text": "Борьба с преступностью в городе вместе с полицейской собакой.",
+        "descriptionImg": "/img/movie-4.5-10.jpg",
         "year": 2024,
         "country": "США",
         "duration": 105,
@@ -18284,6 +18594,7 @@
     "description": {
       "uz": {
         "text": "Strategiya va rejalashtirish bo'limidan Linda Liddle — endi u boshliq. Sam Raimi rejissorligi.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2025,
         "country": "AQSh",
         "duration": 98,
@@ -18295,6 +18606,7 @@
       },
       "ru": {
         "text": "Линда Лиддл из отдела стратегии и планирования — теперь она босс. Режиссёр Сэм Рэйми.",
+        "descriptionImg": "/img/movie-4.5-1.avif",
         "year": 2025,
         "country": "США",
         "duration": 98,
@@ -18404,6 +18716,7 @@
     "description": {
       "uz": {
         "text": "Yurakni ochiq tuting. Chloé Zhao rejissorligi — Maggie O'Farrell bestselleri asosida.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2025,
         "country": "AQSh",
         "duration": 112,
@@ -18416,6 +18729,7 @@
       },
       "ru": {
         "text": "Держите сердце открытым. Режиссёр Клоэ Чжао — по бестселлеру Мэгги О'Фаррелл.",
+        "descriptionImg": "/img/movie-4.5-2.jpeg",
         "year": 2025,
         "country": "США",
         "duration": 112,
@@ -18526,6 +18840,7 @@
     "description": {
       "uz": {
         "text": "Ishlar jingalak bo'lishi mumkin! Maxfiy agentlar — itlar va mushuklar urushida.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2025,
         "country": "AQSh",
         "duration": 90,
@@ -18538,6 +18853,7 @@
       },
       "ru": {
         "text": "Дела могут стать hairy! Секретные агенты — война собак и кошек.",
+        "descriptionImg": "/img/movie-4.5-3.jpg",
         "year": 2025,
         "country": "США",
         "duration": 90,
