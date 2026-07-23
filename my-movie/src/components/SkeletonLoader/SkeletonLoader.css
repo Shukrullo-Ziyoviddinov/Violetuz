@@ -88,14 +88,16 @@
 }
 
 .skeleton-loader--video-banner-title {
-  width: min(280px, 55%);
+  width: 280px;
+  max-width: 100%;
   height: 56px;
   max-height: 100px;
   border-radius: 8px;
 }
 
 .skeleton-loader--video-banner-name {
-  width: min(200px, 40%);
+  width: 200px;
+  max-width: 100%;
   height: 40px;
   max-height: 120px;
   border-radius: 8px;
