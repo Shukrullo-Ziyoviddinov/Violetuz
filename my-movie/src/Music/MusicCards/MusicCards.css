@@ -186,3 +186,11 @@
     width: 135px;
   }
 }
+
+@media (max-width: 450px) {
+  .music-cards-item-image-wrapper .music-cards-item-wishlist-btn,
+  .music-cards-item-image-wrapper .music-cards-item-wishlist-btn.active {
+    width: 28px;
+    height: 28px;
+  }
+}

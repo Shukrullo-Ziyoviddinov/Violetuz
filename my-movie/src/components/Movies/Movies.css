@@ -377,3 +377,12 @@
 }
 
 }
+
+@media (max-width: 450px) {
+  .movies-item-image-wrapper .movies-item-wishlist-btn,
+  .movies-item-image-wrapper .movies-item-wishlist-btn.active,
+  .movies-item-image-wrapper .movies-item-wishlist-btn--skeleton {
+    width: 28px;
+    height: 28px;
+  }
+}

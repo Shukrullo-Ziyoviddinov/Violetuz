@@ -142,3 +142,11 @@
     width: 135px;
   }
 }
+
+@media (max-width: 450px) {
+  .albums-for-you-item-image-wrapper .albums-for-you-item-wishlist-btn,
+  .albums-for-you-item-image-wrapper .albums-for-you-item-wishlist-btn.active {
+    width: 28px;
+    height: 28px;
+  }
+}

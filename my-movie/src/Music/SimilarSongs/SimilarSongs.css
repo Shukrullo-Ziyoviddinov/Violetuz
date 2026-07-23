@@ -142,3 +142,11 @@
     width: 135px;
   }
 }
+
+@media (max-width: 450px) {
+  .similar-songs-item-image-wrapper .similar-songs-item-wishlist-btn,
+  .similar-songs-item-image-wrapper .similar-songs-item-wishlist-btn.active {
+    width: 28px;
+    height: 28px;
+  }
+}

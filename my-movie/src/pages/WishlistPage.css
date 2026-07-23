@@ -146,22 +146,29 @@
     right: 0.3rem;
     width: 30px;
     height: 30px;
-;
     color: #9b4fe7;
     cursor: pointer;
     z-index: 2;
     transition: all 0.3s ease;
+  }
+
+  .wishlist-tab {
+    padding: 0.5rem 1rem;
+  }
+
+  .wishlist-tabs,
+  .wishlist-music {
+    margin-bottom: 1rem;
+    padding: 0 0.7rem;
+  }
 }
 
-.wishlist-tab {
-  padding: 0.5rem 1rem;
-}
-
-.wishlist-tabs, .wishlist-music{
-  margin-bottom: 1rem;
-  padding: 0 0.7rem;
-}
-
+@media (max-width: 450px) {
+  .wishlist-music-item-image-wrapper .wishlist-music-item-wishlist-btn,
+  .wishlist-music-item--klip .wishlist-music-item-image-wrapper .wishlist-music-item-wishlist-btn {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 @media (max-width: 400px) {

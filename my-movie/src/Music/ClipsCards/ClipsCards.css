@@ -36,3 +36,11 @@
     width: 200px;
   }
 }
+
+@media (max-width: 450px) {
+  .clips-cards .clips-image-wrapper .music-cards-item-wishlist-btn,
+  .clips-cards .clips-image-wrapper .music-cards-item-wishlist-btn.active {
+    width: 28px;
+    height: 28px;
+  }
+}

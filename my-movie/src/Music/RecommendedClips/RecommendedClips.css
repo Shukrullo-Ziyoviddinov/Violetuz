@@ -141,3 +141,11 @@
     width: 175px;
   }
 }
+
+@media (max-width: 450px) {
+  .recommended-clips-item-image-wrapper .recommended-clips-item-wishlist-btn,
+  .recommended-clips-item-image-wrapper .recommended-clips-item-wishlist-btn.active {
+    width: 28px;
+    height: 28px;
+  }
+}
