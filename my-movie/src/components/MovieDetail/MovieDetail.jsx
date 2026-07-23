@@ -960,7 +960,13 @@ const MovieDetail = () => {
                         className="movie-detail-btn movie-detail-btn-secondary movie-detail-btn-skeleton"
                       />
                     </div>
-                    <div className="movie-detail-description movie-detail-description--skeleton" aria-hidden="true">
+                    <div className="movie-detail-description movie-detail-description--skeleton movie-detail-description--has-img" aria-hidden="true">
+                      <div className="movie-detail-description-img-wrap">
+                        <SkeletonLoader
+                          variant="movie-detail-desc-img"
+                          className="movie-detail-description-img-skeleton"
+                        />
+                      </div>
                       <div className="movie-detail-description-inner">
                         <div className="movie-detail-description-content">
                           <div className="movie-detail-description-header">
@@ -983,12 +989,6 @@ const MovieDetail = () => {
                               className="movie-detail-description-more-btn-skeleton"
                             />
                           </div>
-                        </div>
-                        <div className="movie-detail-description-img-wrap">
-                          <SkeletonLoader
-                            variant="movie-detail-desc-img"
-                            className="movie-detail-description-img-skeleton"
-                          />
                         </div>
                       </div>
                     </div>
@@ -1552,7 +1552,14 @@ const MovieDetail = () => {
                 </button>
               </div>
 
-              <div className="movie-detail-description">
+              <div
+                className={`movie-detail-description${
+                  descriptionImg ? ' movie-detail-description--has-img' : ''
+                }`}
+              >
+                {descriptionImg ? (
+                  <MovieDetailDescriptionImg src={descriptionImg} />
+                ) : null}
                 <div className="movie-detail-description-inner">
                   <div className="movie-detail-description-content">
                     <div className="movie-detail-description-header">
@@ -1594,9 +1601,6 @@ const MovieDetail = () => {
                       )}
                     </div>
                   </div>
-                  {descriptionImg ? (
-                    <MovieDetailDescriptionImg src={descriptionImg} />
-                  ) : null}
                 </div>
               </div>
 

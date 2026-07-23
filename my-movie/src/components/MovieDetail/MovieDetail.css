@@ -602,14 +602,21 @@
 
 .movie-detail-description {
   /* margin-top: 2rem; */
+  position: relative;
   width: 100%;
   max-width: 100%;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
   box-sizing: border-box;
-  background: rgba(45, 45, 50, 0.3);
-  border: 1px solid rgba(70, 65, 80, 0.4);
+  background: #000000;
+  border: 1px solid rgba(70, 65, 80, 0.35);
   overflow: hidden;
+}
+
+.movie-detail-description--has-img {
+  /* padding faqat matnda — rasm yuqori/past/o‘ngga to‘liq yopishadi */
+  padding: 0;
+  min-height: 7.5rem;
 }
 
 .movie-detail-description--skeleton {
@@ -617,28 +624,70 @@
 }
 
 .movie-detail-description-inner {
-  display: flex;
-  align-items: stretch;
-  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
   width: 100%;
 }
 
+.movie-detail-description--has-img .movie-detail-description-inner {
+  max-width: 54%;
+  padding: 0.75rem 0.85rem 0.75rem 1rem;
+  box-sizing: border-box;
+}
+
 .movie-detail-description-content {
-  flex: 1 1 auto;
-  min-width: 0;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .movie-detail-description-img-wrap {
-  position: relative;
-  flex: 0 0 38%;
-  max-width: 11.5rem;
-  min-height: 6.5rem;
-  align-self: stretch;
-  border-radius: 8px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  width: 55%;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
-  background: rgba(30, 30, 35, 0.6);
+  pointer-events: none;
+  background: transparent;
+  /* faqat chapdan yumshoq xiralashish — yuqori/past/o‘ngda qora bo‘shliq yo‘q */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 12%,
+    rgba(0, 0, 0, 0.7) 32%,
+    #000 52%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 12%,
+    rgba(0, 0, 0, 0.7) 32%,
+    #000 52%,
+    #000 100%
+  );
+}
+
+.movie-detail-description-img-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 55%;
+  background: linear-gradient(
+    to right,
+    #000 0%,
+    rgba(0, 0, 0, 0.55) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
 .movie-detail-description-img-wrap--loading .movie-detail-description-img {
@@ -650,7 +699,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center right;
 }
 
 .movie-detail-description-img-skeleton,
@@ -659,7 +708,8 @@
   inset: 0;
   width: 100% !important;
   height: 100% !important;
-  border-radius: 8px !important;
+  border-radius: 0 !important;
+  z-index: 0;
 }
 
 .movie-detail-description-header {
@@ -1740,10 +1790,17 @@
     line-height: 1.6;
   }
 
+  .movie-detail-description--has-img {
+    min-height: 7rem;
+  }
+
+  .movie-detail-description--has-img .movie-detail-description-inner {
+    max-width: 52%;
+    padding: 0.7rem 0.75rem 0.7rem 0.9rem;
+  }
+
   .movie-detail-description-img-wrap {
-    flex-basis: 36%;
-    max-width: 9.5rem;
-    min-height: 5.5rem;
+    width: 56%;
   }
 
   .movie-detail-description-modal {
@@ -1977,6 +2034,16 @@
     padding: 0.5rem 0.5rem;
   }
 
+  .movie-detail-description--has-img {
+    padding: 0;
+    min-height: 6.25rem;
+  }
+
+  .movie-detail-description--has-img .movie-detail-description-inner {
+    max-width: 52%;
+    padding: 0.5rem 0.6rem 0.5rem 0.5rem;
+  }
+
   .movie-detail-description-header h3 {
     font-size: 1rem;
   }
@@ -2013,14 +2080,7 @@
   }
 
   .movie-detail-description-img-wrap {
-    flex-basis: 34%;
-    max-width: 7.5rem;
-    min-height: 5rem;
-    border-radius: 6px;
-  }
-
-  .movie-detail-description-inner {
-    gap: 0.5rem;
+    width: 58%;
   }
 
   .movie-detail-description-info {
