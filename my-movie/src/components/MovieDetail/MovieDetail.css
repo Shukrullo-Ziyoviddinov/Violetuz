@@ -2135,12 +2135,13 @@
     width: 100%;
     flex-wrap: nowrap;
     gap: 0.5rem;
+    justify-content: flex-start;
   }
 
   .movie-detail-rating-item {
     flex: 1 1 0;
     min-width: 0;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .movie-detail-rating-item--skeleton,
