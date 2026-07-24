@@ -249,7 +249,7 @@
 .movie-detail-specs-container {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.75rem;
+  gap: 0.5rem;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -391,7 +391,7 @@
 
 .movie-detail-actions {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.5rem;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -430,7 +430,7 @@
 
 .movie-detail-actions--skeleton {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.5rem;
   flex-wrap: nowrap;
   overflow: hidden;
   pointer-events: none;
@@ -2350,7 +2350,7 @@
   }
 
   .movie-detail-genre-badge {
-    padding: 0.3rem 1rem;
+    padding: 0.3rem 0.5rem;
   }
 
   .movie-detail-spec-item {
