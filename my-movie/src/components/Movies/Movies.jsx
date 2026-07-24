@@ -222,6 +222,10 @@ const Movies = ({
               aria-hidden="true"
             />
             <span
+              className="movies-item-badge movies-item-badge-age movies-item-badge--skeleton"
+              aria-hidden="true"
+            />
+            <span
               className="movies-item-rating movies-item-rating--skeleton"
               aria-hidden="true"
             />

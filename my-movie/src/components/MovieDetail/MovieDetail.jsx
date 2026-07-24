@@ -1088,6 +1088,9 @@ const MovieDetail = () => {
             </div>
           </div>
         </div>
+        <div className="movie-detail-container movie-detail-similar-wrapper">
+          <SimilarMovies currentMovie={null} />
+        </div>
       </>
       );
     }

@@ -302,10 +302,14 @@
   background-size: 200% 100% !important;
 }
 
-/* rating: 16px icon + gap + ~2.5ch + padding */
+/*
+  rating skeleton = real .movies-item-rating:
+  16px svg + 0.25rem gap + ~2.5ch raqam (0.875rem bold) + 0.5rem*2 padding
+  (0.875rem * 2.5 emas — har belgi 1em emas, shuning uchun loader kengroq chiqardi)
+*/
 .movies-item-rating--skeleton {
-  width: calc(16px + 0.25rem + 0.875rem * 2.5 + 0.5rem * 2);
-  height: calc(0.875rem * 1.2 + 0.25rem * 2);
+  width: calc(16px + 0.25rem + 2.5ch + 0.5rem * 2);
+  height: calc(max(16px, 0.875rem * 1.2) + 0.25rem * 2);
   padding: 0;
   gap: 0;
 }

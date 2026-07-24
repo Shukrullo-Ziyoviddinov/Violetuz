@@ -253,9 +253,10 @@
   background-size: 200% 100% !important;
 }
 
+/* rating skeleton = real .similar-movies-item-rating o‘lchami */
 .similar-movies-item-rating--skeleton {
-  width: calc(16px + 0.25rem + 0.875rem * 2.5 + 0.5rem * 2);
-  height: calc(0.875rem * 1.2 + 0.25rem * 2);
+  width: calc(16px + 0.25rem + 2.5ch + 0.5rem * 2);
+  height: calc(max(16px, 0.875rem * 1.2) + 0.25rem * 2);
   padding: 0;
   gap: 0;
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -135,6 +135,33 @@ const SimilarMovieItem = ({ movie, contentLang, getMovieTitle, onOpen, isInWishl
   );
 };
 
+const SimilarMovieSkeletonItem = () => (
+  <div className="similar-movies-item similar-movies-item--skeleton" aria-hidden="true">
+    <div className="similar-movies-item-image-wrapper">
+      <SkeletonLoader
+        variant="similar-movies-image"
+        className="similar-movies-item-image-skeleton"
+      />
+      <span
+        className="similar-movies-item-wishlist-btn similar-movies-item-wishlist-btn--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="similar-movies-item-badge similar-movies-item-badge-fhd similar-movies-item-badge--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="similar-movies-item-badge similar-movies-item-badge-age similar-movies-item-badge--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="similar-movies-item-rating similar-movies-item-rating--skeleton"
+        aria-hidden="true"
+      />
+    </div>
+  </div>
+);
+
 const SimilarMovies = ({ currentMovie }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -154,7 +181,6 @@ const SimilarMovies = ({ currentMovie }) => {
     ? String(currentMovie.filterCountry).toLowerCase().trim()
     : '';
 
-  /* Fake 6 ta skeleton yo‘q — faqat real o‘xshash filmlar */
   const similarMovies =
     !currentMovie || moviesLoading
       ? []
@@ -185,6 +211,20 @@ const SimilarMovies = ({ currentMovie }) => {
           return hasMatchingTypeCategory || hasMatchingFilterCountry;
         });
 
+  const skeletonItems = useMemo(
+    () =>
+      Array.from({ length: DEFAULT_LIMIT }, (_, index) => ({
+        id: `similar-movie-skeleton-${index}`,
+        _skeleton: true,
+      })),
+    []
+  );
+
+  const showSectionSkeleton = moviesLoading || !currentMovie;
+  const displayMovies = showSectionSkeleton
+    ? skeletonItems
+    : getDisplayItems(similarMovies, DEFAULT_LIMIT);
+
   const getMovieTitle = (movie) => {
     if (movie.title && typeof movie.title === 'object') {
       return movie.title[contentLang] || movie.title.uz || movie.title.ru;
@@ -196,34 +236,48 @@ const SimilarMovies = ({ currentMovie }) => {
     navigate(`/movie/${movieId}`);
   };
 
-  if (!currentMovie || moviesLoading || similarMovies.length === 0) {
+  /* Yuklanish tugagach o‘xshash yo‘q — yashirish; loader paytida null emas */
+  if (!showSectionSkeleton && similarMovies.length === 0) {
     return null;
   }
 
-  const moreToPath = `/similar-movies/${currentMovie.id}`;
-  const displayMovies = getDisplayItems(similarMovies, DEFAULT_LIMIT);
+  const moreToPath = currentMovie ? `/similar-movies/${currentMovie.id}` : '#';
 
   return (
-    <div className="similar-movies">
+    <div
+      className={`similar-movies${showSectionSkeleton ? ' similar-movies--skeleton' : ''}`}
+      aria-busy={showSectionSkeleton || undefined}
+    >
       <div className="similar-movies-header">
-        <h3 className="similar-movies-title">
-          {i18n.language === 'uz' ? "O'xshash filimlar" : 'Похожие фильмы'}
-        </h3>
-        <ShowMoreButton to={moreToPath} />
+        {showSectionSkeleton ? (
+          <SkeletonLoader
+            variant="similar-movies-title"
+            className="similar-movies-title-skeleton"
+          />
+        ) : (
+          <h3 className="similar-movies-title">
+            {i18n.language === 'uz' ? "O'xshash filimlar" : 'Похожие фильмы'}
+          </h3>
+        )}
+        {!showSectionSkeleton && <ShowMoreButton to={moreToPath} />}
       </div>
       <HorizontalScroll scrollAmount={300}>
-        {displayMovies.map((movie) => (
-          <SimilarMovieItem
-            key={movie.id}
-            movie={movie}
-            contentLang={contentLang}
-            getMovieTitle={getMovieTitle}
-            onOpen={handleMovieClick}
-            isInWishlist={isInWishlist}
-            toggleWishlist={toggleWishlist}
-            t={t}
-          />
-        ))}
+        {displayMovies.map((movie) =>
+          movie._skeleton ? (
+            <SimilarMovieSkeletonItem key={movie.id} />
+          ) : (
+            <SimilarMovieItem
+              key={movie.id}
+              movie={movie}
+              contentLang={contentLang}
+              getMovieTitle={getMovieTitle}
+              onOpen={handleMovieClick}
+              isInWishlist={isInWishlist}
+              toggleWishlist={toggleWishlist}
+              t={t}
+            />
+          )
+        )}
       </HorizontalScroll>
     </div>
   );
