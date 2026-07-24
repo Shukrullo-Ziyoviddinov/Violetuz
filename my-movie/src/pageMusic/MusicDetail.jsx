@@ -17,19 +17,20 @@ import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
+import visualizerStyles from '../Music/Visual/AudioVisualizerCanvas.module.css';
 import './MusicDetail.css';
 
 const MusicDetailPlayerSkeleton = () => (
   <div className="music-detail-audio-player music-detail-audio-player--skeleton" aria-hidden="true">
-    <SkeletonLoader variant="music-detail-play-btn" />
-    <SkeletonLoader variant="music-detail-action-btn" />
-    <SkeletonLoader variant="music-detail-action-btn" />
+    <span className="music-detail-play-btn music-detail-play-btn--skeleton" />
+    <span className="music-detail-action-btn music-detail-action-btn--skeleton" />
+    <span className="music-detail-action-btn music-detail-action-btn--skeleton" />
     <div className="music-detail-share-wrap">
-      <SkeletonLoader variant="music-detail-share-btn" />
+      <span className="share-button music-detail-share-btn--skeleton" />
     </div>
-    <SkeletonLoader variant="music-detail-action-btn" />
-    <div className="music-detail-visualizer-skeleton-wrap">
-      <SkeletonLoader variant="music-detail-visualizer" />
+    <span className="music-detail-action-btn music-detail-action-btn--skeleton" />
+    <div className={visualizerStyles.visualizer}>
+      <span className={`${visualizerStyles.canvas} music-detail-visualizer-canvas--skeleton`} />
     </div>
   </div>
 );
@@ -250,10 +251,12 @@ const MusicDetail = () => {
                       />
                     </div>
                     <div className="music-detail-right">
-                      <SkeletonLoader
-                        variant="music-detail-title"
-                        className="music-detail-title-skeleton"
-                      />
+                      <div
+                        className="music-detail-title music-detail-title--skeleton"
+                        aria-hidden="true"
+                      >
+                        <SkeletonLoader variant="music-detail-title" />
+                      </div>
                       <div
                         className="music-detail-artist-block music-detail-artist-block--skeleton"
                         aria-hidden="true"
@@ -454,8 +457,10 @@ const MusicDetail = () => {
                     }}
                   />
                   {showVisualizerSkeleton ? (
-                    <div className="music-detail-visualizer-skeleton-wrap" aria-hidden="true">
-                      <SkeletonLoader variant="music-detail-visualizer" />
+                    <div className={visualizerStyles.visualizer} aria-hidden="true">
+                      <span
+                        className={`${visualizerStyles.canvas} music-detail-visualizer-canvas--skeleton`}
+                      />
                     </div>
                   ) : (
                     <AudioVisualizerCanvas
