@@ -279,20 +279,51 @@
   line-height: 1.3;
 }
 
-/* Title skeleton — real .music-detail-title joyi va shrift o‘lchami */
+/* Title skeleton — em emas (4.45rem shriftda 11em top ni buzardi); real satr balandligi */
 .music-detail-title--skeleton {
   display: block;
-  width: 11em;
+  width: min(70%, 22rem);
   max-width: 100%;
-  min-height: 1.3em;
+  height: calc(4.45rem * 1.3);
+  min-height: 0;
+  font-size: 0; /* ichki em hisobini o‘chiradi */
+  line-height: 0;
   color: transparent;
+  margin: 0;
 }
 
 .music-detail-title--skeleton .skeleton-loader--music-detail-title {
   display: block;
   width: 100%;
-  height: 1.3em;
+  height: 100%;
   border-radius: 10px;
+}
+
+@media (max-width: 1193px) {
+  .music-detail-title--skeleton {
+    height: calc(4rem * 1.3);
+  }
+}
+
+@media (max-width: 1109px) and (min-width: 900px) {
+  .music-detail-title--skeleton {
+    width: min(70%, 16rem);
+    height: calc(2.5rem * 1.3);
+  }
+}
+
+@media (max-width: 769px) {
+  .music-detail-title--skeleton {
+    width: min(80%, 14rem);
+    height: calc(2.5rem * 1.3);
+  }
+}
+
+@media (max-width: 500px) {
+  .music-detail-title--skeleton {
+    width: min(85%, 12rem);
+    height: calc(2rem * 1.3);
+  }
 }
 
 .music-detail-artist-block {
@@ -318,9 +349,22 @@
   width: 48px;
   height: 48px;
   flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.music-detail-artist-img-wrap .music-detail-artist-img--skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .music-detail-artist-img--loading {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   opacity: 0;
   pointer-events: none;
 }
@@ -331,6 +375,7 @@
   height: 48px;
   border-radius: 50%;
   border: none;
+  flex-shrink: 0;
   pointer-events: none;
   background: linear-gradient(
     90deg,
@@ -528,6 +573,29 @@
   margin-bottom: 1rem;
 }
 
+/* Loading top — real colored top bilan bir xil padding (inline 1rem) */
+.music-detail--loading .music-detail-top {
+  padding: 1rem;
+  border-radius: 16px;
+}
+
+.music-detail-audio-player--skeleton {
+  pointer-events: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.music-detail-audio-player--skeleton .music-detail-share-wrap {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.music-detail-audio-player--skeleton .music-detail-visualizer-canvas--skeleton {
+  width: 200px;
+  height: 44px;
+}
+
 /*
   Player overlay skeletons — real play / action / share o‘lchami va flex joyi.
 */
@@ -610,10 +678,18 @@
     width: 100px;
     height: 44px;
   }
+
+  .music-detail-audio-player--skeleton .music-detail-visualizer-canvas--skeleton {
+    width: 100px;
+  }
 }
 
 @media (max-width: 400px) {
   .music-detail-visualizer-canvas--skeleton {
+    width: 70px;
+  }
+
+  .music-detail-audio-player--skeleton .music-detail-visualizer-canvas--skeleton {
     width: 70px;
   }
 }

@@ -20,7 +20,7 @@ import './MusicDetail.css';
 import './MusicAlbumDetail.css';
 
 const MusicDetailPlayerSkeleton = ({ hideDownload = false }) => (
-  <div className="music-detail-audio-player" aria-hidden="true">
+  <div className="music-detail-audio-player music-detail-audio-player--skeleton" aria-hidden="true">
     <span className="music-detail-play-btn music-detail-play-btn--skeleton" />
     <span className="music-detail-action-btn music-detail-action-btn--skeleton" />
     {!hideDownload && (
@@ -205,9 +205,7 @@ const MusicAlbumDetail = () => {
                         className="music-detail-artist-block music-detail-artist-block--skeleton"
                         aria-hidden="true"
                       >
-                        <div className="music-detail-artist-img-wrap">
-                          <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
-                        </div>
+                        <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
                         <div className="music-detail-artist-info">
                           <SkeletonLoader variant="music-detail-artist-name" />
                           <SkeletonLoader variant="music-detail-artist-meta" />
