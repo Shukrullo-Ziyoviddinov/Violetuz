@@ -314,16 +314,20 @@ const MusicDetail = () => {
   const showCoverSkeleton = !coverSrc || coverImg.showSkeleton;
   const showArtistSkeleton = artistsLoading || !pageArtist;
   const showArtistImgSkeleton =
-    showArtistSkeleton || (Boolean(artistImgSrc) && artistImg.showSkeleton) || !artistImgSrc;
+    showArtistSkeleton ||
+    (Boolean(artistImgSrc) && artistImg.showSkeleton) ||
+    (!!pageArtist && !artistImgSrc);
   const showTitleSkeleton = !getTitle(music);
-  /* Visualizer: trek/audio graph tayyor bo‘lmaguncha — tugmalar doim real joyda */
-  const showVisualizerSkeleton = !isCurrentTrack || !audioGraphReady;
+  /* Player faqat current track da (asl UI); visualizer audio tayyor bo‘lguncha skeleton */
+  const showVisualizerSkeleton = isCurrentTrack && !audioGraphReady;
 
   const topColor = isCurrentTrack ? (pageDominantColor || dominantColor) : null;
   const topStyle =
     topColor && typeof topColor.r === 'number'
       ? {
           background: `linear-gradient(180deg, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.65) 0%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.45) 40%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.28) 70%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.12) 100%)`,
+          borderRadius: '16px',
+          padding: '1rem',
           border: `1px solid rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.55)`,
         }
       : undefined;
@@ -331,7 +335,7 @@ const MusicDetail = () => {
   return (
     <div
       className="music-detail"
-      aria-busy={showCoverSkeleton || showArtistSkeleton || showVisualizerSkeleton || undefined}
+      aria-busy={showCoverSkeleton || showArtistSkeleton || undefined}
     >
       <div className="music-detail-container">
         <div className="music-detail-layout">
@@ -372,60 +376,58 @@ const MusicDetail = () => {
                   ) : (
                     <h1 className="music-detail-title">{getTitle(music)}</h1>
                   )}
-                  <div
-                    className={`music-detail-artist-block${
-                      showArtistSkeleton ? ' music-detail-artist-block--skeleton' : ''
-                    }`}
-                    onClick={() =>
-                      !showArtistSkeleton &&
-                      pageArtist?.id &&
-                      navigate(`/music/artist/${pageArtist.id}`)
-                    }
-                    style={
-                      showArtistSkeleton || !pageArtist?.id ? { cursor: 'default' } : undefined
-                    }
-                    aria-busy={showArtistSkeleton || showArtistImgSkeleton || undefined}
-                  >
-                    <div className="music-detail-artist-img-wrap">
-                      {showArtistImgSkeleton && (
-                        <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
-                      )}
-                      {artistImgSrc && !artistImg.failed && (
-                        <img
-                          ref={artistImg.imgRef}
-                          src={artistImgSrc}
-                          alt={pageArtist?.name || ''}
-                          className={`music-detail-artist-img${
-                            showArtistImgSkeleton ? ' music-detail-artist-img--loading' : ''
-                          }`}
-                          onLoad={artistImg.onLoad}
-                          onError={artistImg.onError}
-                        />
-                      )}
+                  {showArtistSkeleton ? (
+                    <div
+                      className="music-detail-artist-block music-detail-artist-block--skeleton"
+                      aria-hidden="true"
+                    >
+                      <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
+                      <div className="music-detail-artist-info">
+                        <SkeletonLoader variant="music-detail-artist-name" />
+                        <SkeletonLoader variant="music-detail-artist-meta" />
+                      </div>
                     </div>
-                    <div className="music-detail-artist-info">
-                      {showArtistSkeleton ? (
-                        <>
-                          <SkeletonLoader variant="music-detail-artist-name" />
-                          <SkeletonLoader variant="music-detail-artist-meta" />
-                        </>
-                      ) : (
-                        <>
-                          <span className="music-detail-artist-name">{pageArtist.name}</span>
-                          {music.year && (
-                            <span className="music-detail-artist-year">{music.year}</span>
-                          )}
-                          {isCurrentTrack && duration > 0 && (
-                            <span className="music-detail-artist-duration">
-                              {formatTime(duration)}
-                            </span>
-                          )}
-                        </>
-                      )}
+                  ) : (
+                    <div
+                      className="music-detail-artist-block"
+                      onClick={() =>
+                        pageArtist?.id && navigate(`/music/artist/${pageArtist.id}`)
+                      }
+                      style={pageArtist?.id ? undefined : { cursor: 'default' }}
+                    >
+                      <div className="music-detail-artist-img-wrap">
+                        {showArtistImgSkeleton && (
+                          <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
+                        )}
+                        {artistImgSrc && !artistImg.failed && (
+                          <img
+                            ref={artistImg.imgRef}
+                            src={artistImgSrc}
+                            alt={pageArtist.name}
+                            className={`music-detail-artist-img${
+                              showArtistImgSkeleton ? ' music-detail-artist-img--loading' : ''
+                            }`}
+                            onLoad={artistImg.onLoad}
+                            onError={artistImg.onError}
+                          />
+                        )}
+                      </div>
+                      <div className="music-detail-artist-info">
+                        <span className="music-detail-artist-name">{pageArtist.name}</span>
+                        {music.year && (
+                          <span className="music-detail-artist-year">{music.year}</span>
+                        )}
+                        {isCurrentTrack && duration > 0 && (
+                          <span className="music-detail-artist-duration">
+                            {formatTime(duration)}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
+              {isCurrentTrack ? (
               <div className="music-detail-audio-player">
                 <button
                   className="music-detail-play-btn"
@@ -490,6 +492,7 @@ const MusicDetail = () => {
                   />
                 )}
               </div>
+              ) : null}
             </div>
             {music?.lyricsText && getLyricsText(music.lyricsText)?.trim() && (
               <button

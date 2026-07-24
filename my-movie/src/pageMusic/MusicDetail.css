@@ -449,8 +449,6 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .music-detail-play-btn {
@@ -505,19 +503,10 @@
 .music-detail-share-wrap {
   position: relative;
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .music-detail-share-wrap .share-button-wrapper {
-  position: static !important;
-  top: auto !important;
-  right: auto !important;
-  width: 44px;
-  height: 44px;
+  position: static;
 }
 
 .music-detail-share-wrap .share-button {
@@ -533,10 +522,6 @@
   color: #fff;
   border: none;
   transform: scale(1.05);
-}
-
-.music-detail-audio-player--skeleton {
-  pointer-events: none;
 }
 
 .music-detail-trend-title-skeleton {
