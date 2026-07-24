@@ -183,6 +183,7 @@ export const MusicApiProvider = ({ children }) => {
   const albumsLoading = albumsQuery.isPending;
   const clipsLoading = clipsQuery.isPending;
   const concertsLoading = concertsQuery.isPending;
+  const artistsLoading = artistsQuery.isPending;
   const sectionsLoading = sectionsQuery.isPending;
   const clipSectionsLoading = clipSectionsQuery.isPending;
   const concertSectionsLoading = concertSectionsQuery.isPending;
@@ -223,6 +224,7 @@ export const MusicApiProvider = ({ children }) => {
     albumsLoading,
     clipsLoading,
     concertsLoading,
+    artistsLoading,
     sectionsLoading,
     clipSectionsLoading,
     concertSectionsLoading,
@@ -357,6 +359,7 @@ export const MusicApiProvider = ({ children }) => {
     albumsLoading,
     clipsLoading,
     concertsLoading,
+    artistsLoading,
     sectionsLoading,
     clipSectionsLoading,
     concertSectionsLoading,

@@ -15,7 +15,24 @@ import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
 import { AudioVisualizerCanvas, CardVisual } from '../Music/Visual';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
+import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../utils/useImageReady';
 import './MusicDetail.css';
+
+const MusicDetailPlayerSkeleton = () => (
+  <div className="music-detail-audio-player music-detail-audio-player--skeleton" aria-hidden="true">
+    <SkeletonLoader variant="music-detail-play-btn" />
+    <SkeletonLoader variant="music-detail-action-btn" />
+    <SkeletonLoader variant="music-detail-action-btn" />
+    <div className="music-detail-share-wrap">
+      <SkeletonLoader variant="music-detail-share-btn" />
+    </div>
+    <SkeletonLoader variant="music-detail-action-btn" />
+    <div className="music-detail-visualizer-skeleton-wrap">
+      <SkeletonLoader variant="music-detail-visualizer" />
+    </div>
+  </div>
+);
 
 const MusicDetail = () => {
   const { t } = useTranslation();
@@ -23,7 +40,8 @@ const MusicDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allMusic, getMusicByCategory, sections, getArtistById } = useMusicApi();
+  const { allMusic, getMusicByCategory, sections, getArtistById, musicLoading, artistsLoading } =
+    useMusicApi();
 
   const musicTrackSections = useMemo(
     () => (sections || []).filter((s) => s.wishlistType === 'music'),
@@ -37,6 +55,18 @@ const MusicDetail = () => {
   const [searchParams] = useSearchParams();
   const fromSection = searchParams.get('section') || location.state?.fromSection;
   const music = ensureArray(allMusic).find((m) => matchId(m.id, id));
+
+  const pageArtist = useMemo(() => {
+    if (!music) return null;
+    if (music.artistId) return getArtistById(music.artistId) || null;
+    if (music.artist) return { name: music.artist, img: music.img };
+    return null;
+  }, [music, getArtistById]);
+
+  const coverSrc = music?.img || '';
+  const coverImg = useImageReady(coverSrc);
+  const artistImgSrc = pageArtist?.imgArtist || pageArtist?.img || '';
+  const artistImg = useImageReady(artistImgSrc);
 
   const findSectionForMusicId = (musicId) => {
     if (musicId == null) return null;
@@ -205,6 +235,46 @@ const MusicDetail = () => {
   };
 
   if (!music) {
+    if (musicLoading) {
+      return (
+        <div className="music-detail music-detail--loading" aria-busy="true">
+          <div className="music-detail-container">
+            <div className="music-detail-layout">
+              <div className="music-detail-left-scroll">
+                <div className="music-detail-top">
+                  <div className="music-detail-top-row">
+                    <div className="music-detail-left">
+                      <SkeletonLoader
+                        variant="music-detail-cover"
+                        className="music-detail-cover-skeleton"
+                      />
+                    </div>
+                    <div className="music-detail-right">
+                      <SkeletonLoader
+                        variant="music-detail-title"
+                        className="music-detail-title-skeleton"
+                      />
+                      <div
+                        className="music-detail-artist-block music-detail-artist-block--skeleton"
+                        aria-hidden="true"
+                      >
+                        <SkeletonLoader variant="music-detail-artist-img" />
+                        <div className="music-detail-artist-info">
+                          <SkeletonLoader variant="music-detail-artist-name" />
+                          <SkeletonLoader variant="music-detail-artist-meta" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <MusicDetailPlayerSkeleton />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="music-detail">
         <div className="music-detail-error">Musiqa topilmadi</div>
@@ -226,8 +296,14 @@ const MusicDetail = () => {
         : ensureArray(allMusic);
   const sectionTitle = sectionConfig ? t(sectionConfig.titleKey, sectionConfig.titleDefault) : t('music.trendMusic', 'Trend Musiqa');
 
+  const showCoverSkeleton = !coverSrc || coverImg.showSkeleton;
+  const showArtistSkeleton = artistsLoading || !pageArtist;
+  const showArtistImgSkeleton = Boolean(artistImgSrc) && artistImg.showSkeleton;
+  const showPlayerSkeleton = !isCurrentTrack;
+  const showVisualizerSkeleton = isCurrentTrack && !audioGraphReady;
+
   return (
-    <div className="music-detail">
+    <div className="music-detail" aria-busy={showCoverSkeleton || showPlayerSkeleton || undefined}>
       <div className="music-detail-container">
         <div className="music-detail-layout">
           <div className="music-detail-left-scroll">
@@ -249,39 +325,84 @@ const MusicDetail = () => {
             >
               <div className="music-detail-top-row">
                 <div className="music-detail-left">
-                  <img
-                    ref={imgRef}
-                    src={music.img || '/img/movie1.jpg'}
-                    alt={getTitle(music)}
-                    className="music-detail-image"
-                  />
+                  {showCoverSkeleton && (
+                    <SkeletonLoader
+                      variant="music-detail-cover"
+                      className="music-detail-cover-skeleton"
+                    />
+                  )}
+                  {coverSrc && !coverImg.failed && (
+                    <img
+                      ref={(el) => {
+                        imgRef.current = el;
+                        coverImg.imgRef(el);
+                      }}
+                      src={coverSrc}
+                      alt={getTitle(music)}
+                      className={`music-detail-image${
+                        showCoverSkeleton ? ' music-detail-image--loading' : ''
+                      }`}
+                      onLoad={coverImg.onLoad}
+                      onError={coverImg.onError}
+                    />
+                  )}
                 </div>
                 <div className="music-detail-right">
                   <h1 className="music-detail-title">{getTitle(music)}</h1>
-                  {artist && (
+                  {showArtistSkeleton ? (
+                    <div
+                      className="music-detail-artist-block music-detail-artist-block--skeleton"
+                      aria-hidden="true"
+                    >
+                      <SkeletonLoader variant="music-detail-artist-img" />
+                      <div className="music-detail-artist-info">
+                        <SkeletonLoader variant="music-detail-artist-name" />
+                        <SkeletonLoader variant="music-detail-artist-meta" />
+                      </div>
+                    </div>
+                  ) : (
                     <div
                       className="music-detail-artist-block"
-                      onClick={() => navigate(`/music/artist/${artist.id}`)}
+                      onClick={() =>
+                        pageArtist?.id && navigate(`/music/artist/${pageArtist.id}`)
+                      }
+                      style={pageArtist?.id ? undefined : { cursor: 'default' }}
                     >
-                      <img
-                        src={artist.imgArtist || artist.img || '/img/movie1.jpg'}
-                        alt={artist.name}
-                        className="music-detail-artist-img"
-                      />
+                      <div className="music-detail-artist-img-wrap">
+                        {showArtistImgSkeleton && (
+                          <SkeletonLoader variant="music-detail-artist-img" />
+                        )}
+                        {artistImgSrc && !artistImg.failed && (
+                          <img
+                            ref={artistImg.imgRef}
+                            src={artistImgSrc}
+                            alt={pageArtist.name}
+                            className={`music-detail-artist-img${
+                              showArtistImgSkeleton ? ' music-detail-artist-img--loading' : ''
+                            }`}
+                            onLoad={artistImg.onLoad}
+                            onError={artistImg.onError}
+                          />
+                        )}
+                      </div>
                       <div className="music-detail-artist-info">
-                        <span className="music-detail-artist-name">{artist.name}</span>
+                        <span className="music-detail-artist-name">{pageArtist.name}</span>
                         {music.year && (
                           <span className="music-detail-artist-year">{music.year}</span>
                         )}
                         {isCurrentTrack && duration > 0 && (
-                          <span className="music-detail-artist-duration">{formatTime(duration)}</span>
+                          <span className="music-detail-artist-duration">
+                            {formatTime(duration)}
+                          </span>
                         )}
                       </div>
                     </div>
                   )}
                 </div>
               </div>
-              {isCurrentTrack && (
+              {showPlayerSkeleton ? (
+                <MusicDetailPlayerSkeleton />
+              ) : (
                 <div className="music-detail-audio-player">
                   <button
                     className="music-detail-play-btn"
@@ -332,7 +453,17 @@ const MusicDetail = () => {
                       route: `/music/${music.id}${resolvedSection ? `?section=${encodeURIComponent(resolvedSection)}` : ''}`,
                     }}
                   />
-                  <AudioVisualizerCanvas analyserRef={analyserRef} isPlaying={isPlaying} audioGraphReady={audioGraphReady} />
+                  {showVisualizerSkeleton ? (
+                    <div className="music-detail-visualizer-skeleton-wrap" aria-hidden="true">
+                      <SkeletonLoader variant="music-detail-visualizer" />
+                    </div>
+                  ) : (
+                    <AudioVisualizerCanvas
+                      analyserRef={analyserRef}
+                      isPlaying={isPlaying}
+                      audioGraphReady={audioGraphReady}
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -355,28 +486,28 @@ const MusicDetail = () => {
                 </span>
               </button>
             )}
-            {artist && (
+            {pageArtist?.id && (
               <div
                 className="music-detail-artist-card"
-                onClick={() => navigate(`/music/artist/${artist.id}`)}
+                onClick={() => navigate(`/music/artist/${pageArtist.id}`)}
               >
                 <img
-                  src={artist.imgArtist || artist.img || '/img/movie1.jpg'}
-                  alt={artist.name}
+                  src={pageArtist.imgArtist || pageArtist.img || '/img/movie1.jpg'}
+                  alt={pageArtist.name}
                   className="music-detail-artist-card-img"
                 />
                 <div className="music-detail-artist-card-info">
                   <span className="music-detail-artist-card-name">
-                    {artist.name}
+                    {pageArtist.name}
                     <img src="/img/galichka.png" alt="" className="music-detail-artist-card-verified" aria-hidden />
                   </span>
                   <div className="artist-detail-stat-item music-detail-artist-stat">
-                    <span className="artist-detail-track-num">{formatCount(artist.subscribers ?? 0)}</span>
+                    <span className="artist-detail-track-num">{formatCount(pageArtist.subscribers ?? 0)}</span>
                     <span className="artist-detail-track-label">Obunachi</span>
                   </div>
                 </div>
                 <FollowingButton
-                  artistId={artist.id}
+                  artistId={pageArtist.id}
                   wrapperClassName="music-detail-artist-card-btn"
                   stopPropagation
                 />
