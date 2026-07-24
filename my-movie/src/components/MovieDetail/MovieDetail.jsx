@@ -184,19 +184,32 @@ const resolveMovieVideoSrc = (movie, lang) => {
   return null;
 };
 
-/** Mavsumlar bo‘ylab global qisim: 1..N (faqat mavjud video URL lar) */
+/** Epizodda shu til videosi bormi */
+const episodeHasLang = (ep, lang) => {
+  const src = ep?.[lang];
+  return typeof src === 'string' && src.trim() !== '' && src !== 'none';
+};
+
+/** Mavsumda shu til videolari bormi */
+const seasonHasLang = (season, lang) =>
+  (season?.episodes || []).some((ep) => episodeHasLang(ep, lang));
+
+/**
+ * Qisim raqami FAQAT tanlangan til bo‘yicha 1..N.
+ * UZ va RU alohida ketma-ketlik — bir-biriga qo‘shilmaydi.
+ */
 const buildGlobalEpisodeNumbers = (seasons, lang) => {
   const map = new Map();
   let n = 0;
-  const sorted = [...(seasons || [])].sort(
-    (a, b) => (a.seasonNumber ?? 0) - (b.seasonNumber ?? 0)
-  );
+  const sorted = [...(seasons || [])]
+    .filter((season) => seasonHasLang(season, lang))
+    .sort((a, b) => (a.seasonNumber ?? 0) - (b.seasonNumber ?? 0));
+
   sorted.forEach((season) => {
     (season.episodes || []).forEach((ep, epIndex) => {
-      const src = ep?.[lang];
-      if (!src || src === 'none') return;
+      if (!episodeHasLang(ep, lang)) return;
       n += 1;
-      map.set(`${season.seasonNumber}-${epIndex}`, n);
+      map.set(`${lang}:${season.seasonNumber}:${epIndex}`, n);
     });
   });
   return map;
@@ -822,22 +835,25 @@ const MovieDetail = () => {
       setSelectedSeason(null);
       return;
     }
+    const seasonsForLang = movie.seasons.filter((s) => seasonHasLang(s, seasonsLang));
+    const pool = seasonsForLang.length ? seasonsForLang : movie.seasons;
     if (selectedSeason === null) {
-      setSelectedSeason(movie?.seasons?.[0]?.seasonNumber);
-    } else {
-      const exists = movie?.seasons?.some((s) => s.seasonNumber === selectedSeason);
-      if (!exists) setSelectedSeason(movie?.seasons?.[0]?.seasonNumber);
+      setSelectedSeason(pool[0]?.seasonNumber ?? null);
+      return;
     }
-  }, [movie, selectedSeason]);
+    const existsForLang = seasonsForLang.some((s) => s.seasonNumber === selectedSeason);
+    if (!existsForLang) {
+      setSelectedSeason(pool[0]?.seasonNumber ?? null);
+    }
+  }, [movie, selectedSeason, seasonsLang]);
 
   useEffect(() => {
-    if (!movie?.seasons?.length || selectedSeason == null) return;
-    const currentSeason = movie?.seasons?.find((s) => s.seasonNumber === selectedSeason);
-    const hasUz = currentSeason?.episodes?.some((ep) => ep.uz && ep.uz !== 'none');
-    const hasRu = currentSeason?.episodes?.some((ep) => ep.ru && ep.ru !== 'none');
-    if (seasonsLang === 'ru' && !hasRu) setSeasonsLang('uz');
+    if (!movie?.seasons?.length) return;
+    const hasUz = movie.seasons.some((s) => seasonHasLang(s, 'uz'));
+    const hasRu = movie.seasons.some((s) => seasonHasLang(s, 'ru'));
+    if (seasonsLang === 'ru' && !hasRu && hasUz) setSeasonsLang('uz');
     else if (seasonsLang === 'uz' && !hasUz && hasRu) setSeasonsLang('ru');
-  }, [movie, selectedSeason, seasonsLang]);
+  }, [movie, seasonsLang]);
 
   useEffect(() => {
     if (showDescriptionModal) {
@@ -1792,12 +1808,13 @@ const MovieDetail = () => {
               </div>
 
               {movie?.seasons?.length > 0 && (() => {
-                const currentSeason = selectedSeason != null
-                  ? movie.seasons?.find((s) => s.seasonNumber === selectedSeason)
-                  : movie.seasons?.[0];
-                const hasUzEpisodes = currentSeason?.episodes?.some((ep) => ep.uz && ep.uz !== 'none');
-                const hasRuEpisodes = currentSeason?.episodes?.some((ep) => ep.ru && ep.ru !== 'none');
+                const hasUzEpisodes = movie.seasons.some((s) => seasonHasLang(s, 'uz'));
+                const hasRuEpisodes = movie.seasons.some((s) => seasonHasLang(s, 'ru'));
+                const seasonsForLang = movie.seasons.filter((s) =>
+                  seasonHasLang(s, seasonsLang)
+                );
                 const showSeasonsChromeSkeleton = selectedSeason == null;
+                const episodeNumbers = buildGlobalEpisodeNumbers(movie.seasons, seasonsLang);
                 return (
                 <div className="movie-detail-seasons">
                   <div className="movie-detail-seasons-header">
@@ -1835,18 +1852,18 @@ const MovieDetail = () => {
                       )}
                     </div>
                     <div className="movie-detail-season-buttons">
-                      <ScrollTouch key={i18n.language} className="movie-detail-season-buttons-scroll">
+                      <ScrollTouch key={`${seasonsLang}-${i18n.language}`} className="movie-detail-season-buttons-scroll">
                         {showSeasonsChromeSkeleton
-                          ? Array.from({ length: Math.max(movie.seasons.length, 2) }, (_, i) => (
+                          ? Array.from({ length: Math.max(seasonsForLang.length || movie.seasons.length, 2) }, (_, i) => (
                               <SkeletonLoader
                                 key={`season-btn-live-sk-${i}`}
                                 variant="movie-detail-season-btn"
                                 className={`movie-detail-season-btn-skeleton${i === 0 ? ' movie-detail-season-btn-skeleton--active' : ''}`}
                               />
                             ))
-                          : movie.seasons?.map((season) => (
+                          : seasonsForLang.map((season) => (
                               <button
-                                key={`${season.seasonNumber}-${i18n.language}`}
+                                key={`${seasonsLang}-${season.seasonNumber}-${i18n.language}`}
                                 className={`movie-detail-season-btn ${selectedSeason === season.seasonNumber ? 'active' : ''}`}
                                 onClick={() => setSelectedSeason(season.seasonNumber)}
                               >
@@ -1884,37 +1901,35 @@ const MovieDetail = () => {
                         ))}
                       </div>
                     ) : (
-                      (() => {
-                        const episodeNumbers = buildGlobalEpisodeNumbers(
-                          movie.seasons,
-                          seasonsLang
-                        );
-                        return movie.seasons
-                          ?.filter((s) => s.seasonNumber === selectedSeason)
-                          ?.map((season) => (
-                            <ScrollTouch key={season.seasonNumber} className="movie-detail-episodes-scroll">
-                              {(season.episodes || []).map((ep, epIndex) => {
-                                const videoSrc = ep[seasonsLang];
-                                if (!videoSrc || videoSrc === 'none') return null;
-                                const episodeNumber =
-                                  episodeNumbers.get(`${season.seasonNumber}-${epIndex}`) ??
-                                  epIndex + 1;
-                                return (
-                                  <SeasonEpisodeThumb
-                                    key={`${season.seasonNumber}-${epIndex}-${seasonsLang}-${videoSrc}`}
-                                    videoSrc={videoSrc}
-                                    episodeNumber={episodeNumber}
-                                    lang={i18n.language === 'ru' ? 'ru' : 'uz'}
-                                    onOpen={(src) => {
-                                      setSelectedVideoUrl(src);
-                                      setShowWatchModal(true);
-                                    }}
-                                  />
-                                );
-                              })}
-                            </ScrollTouch>
-                          ));
-                      })()
+                      seasonsForLang
+                        .filter((s) => s.seasonNumber === selectedSeason)
+                        .map((season) => (
+                          <ScrollTouch
+                            key={`${seasonsLang}-${season.seasonNumber}`}
+                            className="movie-detail-episodes-scroll"
+                          >
+                            {(season.episodes || []).map((ep, epIndex) => {
+                              if (!episodeHasLang(ep, seasonsLang)) return null;
+                              const videoSrc = ep[seasonsLang];
+                              const episodeNumber =
+                                episodeNumbers.get(
+                                  `${seasonsLang}:${season.seasonNumber}:${epIndex}`
+                                ) ?? epIndex + 1;
+                              return (
+                                <SeasonEpisodeThumb
+                                  key={`${seasonsLang}-${season.seasonNumber}-${epIndex}-${videoSrc}`}
+                                  videoSrc={videoSrc}
+                                  episodeNumber={episodeNumber}
+                                  lang={i18n.language === 'ru' ? 'ru' : 'uz'}
+                                  onOpen={(src) => {
+                                    setSelectedVideoUrl(src);
+                                    setShowWatchModal(true);
+                                  }}
+                                />
+                              );
+                            })}
+                          </ScrollTouch>
+                        ))
                     )}
                   </div>
                 </div>
