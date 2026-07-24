@@ -275,7 +275,8 @@ const MusicDetail = () => {
     topColor && typeof topColor.r === 'number'
       ? {
           background: `linear-gradient(180deg, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.65) 0%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.45) 40%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.28) 70%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.12) 100%)`,
-          borderColor: `rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.55)`,
+          /* border o‘rniga inset shadow — padding/joy o‘zgarmaydi */
+          boxShadow: `inset 0 0 0 1px rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.55)`,
         }
       : undefined;
 
