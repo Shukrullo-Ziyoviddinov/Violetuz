@@ -352,3 +352,13 @@
     max-height: 50vh;
   }
 }
+
+@media (max-width: 450px) {
+  .filters {
+    margin-bottom: 0.1rem;
+  }
+
+  .filters-row {
+    margin-top: 10px;
+  }
+}

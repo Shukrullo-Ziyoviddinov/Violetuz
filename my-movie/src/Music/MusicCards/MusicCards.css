@@ -65,6 +65,17 @@
   border: 1px solid #9b4fe78f;
 }
 
+.music-cards-item-image-wrapper .music-cards-item-image-skeleton,
+.music-cards-item-image-wrapper .skeleton-loader--music-cards-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: inherit;
+  z-index: 1;
+}
+
 .music-cards-item-wishlist-btn {
   position: absolute;
   top: 0.5rem;
@@ -98,6 +109,25 @@
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.music-cards-item-image--loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.music-cards-item--skeleton,
+.music-cards-item--loading {
+  cursor: default;
+}
+
+.music-cards-item--skeleton {
+  pointer-events: none;
+}
+
+.music-cards-item--skeleton:hover,
+.music-cards-item--loading:hover {
+  transform: none;
 }
 
 .music-cards-item-play {
@@ -151,6 +181,59 @@
   text-overflow: ellipsis;
 }
 
+.music-cards-item-info .skeleton-loader--music-cards-item-title,
+.music-cards-item-info .skeleton-loader--music-cards-item-artist {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+  Overlay skeletonlar — real wishlist / play o‘lchami bilan bir xil.
+*/
+.music-cards-item-wishlist-btn--skeleton,
+.music-cards-item-play--skeleton {
+  z-index: 3;
+  pointer-events: none;
+  color: transparent !important;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100%;
+  animation: music-cards-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes music-cards-overlay-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Real: 36×36, top/right 0.5rem */
+.music-cards-item-wishlist-btn--skeleton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+/* Real: 32×32, bottom/right 0.5rem */
+.music-cards-item-play--skeleton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  bottom: 0.5rem;
+  right: 0.5rem;
+}
+
 @media (min-width: 768px) {
   .music-cards-item {
     width: 160px;
@@ -189,7 +272,8 @@
 
 @media (max-width: 450px) {
   .music-cards-item-image-wrapper .music-cards-item-wishlist-btn,
-  .music-cards-item-image-wrapper .music-cards-item-wishlist-btn.active {
+  .music-cards-item-image-wrapper .music-cards-item-wishlist-btn.active,
+  .music-cards-item-image-wrapper .music-cards-item-wishlist-btn--skeleton {
     width: 28px;
     height: 28px;
   }

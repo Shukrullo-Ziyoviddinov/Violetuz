@@ -178,6 +178,15 @@ export const MusicApiProvider = ({ children }) => {
     concertSectionsQuery.isPending ||
     pageContentQuery.isPending;
   const musicShortsLoading = musicShortsQuery.isPending;
+  const musicBannersLoading = musicBannersQuery.isPending;
+  const musicLoading = musicQuery.isPending;
+  const albumsLoading = albumsQuery.isPending;
+  const clipsLoading = clipsQuery.isPending;
+  const concertsLoading = concertsQuery.isPending;
+  const sectionsLoading = sectionsQuery.isPending;
+  const clipSectionsLoading = clipSectionsQuery.isPending;
+  const concertSectionsLoading = concertSectionsQuery.isPending;
+  const pageContentLoading = pageContentQuery.isPending;
   const error =
     musicQuery.error?.message ||
     albumsQuery.error?.message ||
@@ -209,6 +218,15 @@ export const MusicApiProvider = ({ children }) => {
     pageContent,
     loading,
     musicShortsLoading,
+    musicBannersLoading,
+    musicLoading,
+    albumsLoading,
+    clipsLoading,
+    concertsLoading,
+    sectionsLoading,
+    clipSectionsLoading,
+    concertSectionsLoading,
+    pageContentLoading,
     error,
     getMusicByCategory: (categoryNameMusic) =>
       allMusic.filter((item) => item.categoryNameMusic === categoryNameMusic),
@@ -334,6 +352,15 @@ export const MusicApiProvider = ({ children }) => {
     pageContent,
     loading,
     musicShortsLoading,
+    musicBannersLoading,
+    musicLoading,
+    albumsLoading,
+    clipsLoading,
+    concertsLoading,
+    sectionsLoading,
+    clipSectionsLoading,
+    concertSectionsLoading,
+    pageContentLoading,
     error,
     queryClient,
   ]);

@@ -4,12 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { normalizeImagePath } from '../../utils/utils';
 import { getLocalizedText } from '../../utils/utils';
 import { useMusicApi } from '../../context/MusicApiContext';
+import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import './MusicBanner.css';
+
+const MUSIC_BANNER_SKELETON_SLIDES = ['left', 'center', 'right'];
+/** Broken/slow CDN — skeleton ushlab qolmasin */
+const MUSIC_BANNER_IMAGE_READY_TIMEOUT_MS = 20000;
 
 const MusicBanner = () => {
     const navigate = useNavigate();
     const { i18n } = useTranslation();
-    const { allMusicBanners } = useMusicApi();
+    const { allMusicBanners, musicBannersLoading } = useMusicApi();
     const lang = i18n.language || 'uz';
     const images = useMemo(() => {
         const banners = Array.isArray(allMusicBanners) ? allMusicBanners : [];
@@ -20,6 +25,12 @@ const MusicBanner = () => {
         })).filter((img) => img.src);
     }, [lang, allMusicBanners]);
 
+    const imageSrcKey = useMemo(
+        () => images.map((img) => normalizeImagePath(img.src)).join('|'),
+        [images]
+    );
+
+    const [loadedSrcs, setLoadedSrcs] = useState(() => new Set());
     const [currentIndex, setCurrentIndex] = useState(0);
     const [dragOffset, setDragOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -31,6 +42,57 @@ const MusicBanner = () => {
     const autoPlayIntervalRef = useRef(null);
     const dragStartTimeRef = useRef(0);
     const wasDragRef = useRef(false);
+
+    const markSrcReady = useCallback((src) => {
+        if (!src) return;
+        setLoadedSrcs((prev) => {
+            if (prev.has(src)) return prev;
+            const next = new Set(prev);
+            next.add(src);
+            return next;
+        });
+    }, []);
+
+    useEffect(() => {
+        setLoadedSrcs(new Set());
+    }, [imageSrcKey]);
+
+    useEffect(() => {
+        if (musicBannersLoading || images.length === 0) return undefined;
+
+        const normalized = images.map((img) => normalizeImagePath(img.src)).filter(Boolean);
+        const uniqueSrcs = [...new Set(normalized)];
+        const preloaders = [];
+
+        uniqueSrcs.forEach((src) => {
+            const existing = typeof document !== 'undefined'
+                ? Array.from(document.images || []).find((el) => el.currentSrc === src || el.src === src)
+                : null;
+            if (existing && existing.complete && existing.naturalWidth > 0) {
+                markSrcReady(src);
+                return;
+            }
+
+            const img = new Image();
+            const onDone = () => markSrcReady(src);
+            img.onload = onDone;
+            img.onerror = onDone;
+            img.src = src;
+            preloaders.push(img);
+        });
+
+        const timeoutId = window.setTimeout(() => {
+            uniqueSrcs.forEach((src) => markSrcReady(src));
+        }, MUSIC_BANNER_IMAGE_READY_TIMEOUT_MS);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+            preloaders.forEach((img) => {
+                img.onload = null;
+                img.onerror = null;
+            });
+        };
+    }, [musicBannersLoading, images, imageSrcKey, markSrcReady]);
 
     // Auto-play funksiyalari
     const startAutoPlay = useCallback(() => {
@@ -279,6 +341,56 @@ const MusicBanner = () => {
         return 'hidden';
     };
 
+    const renderSlideContent = (image, index) => {
+        const src = normalizeImagePath(image.src);
+        const ready = loadedSrcs.has(src);
+        return (
+            <>
+                {!ready && (
+                    <SkeletonLoader
+                        variant="banner-image"
+                        className="music-image-skeleton"
+                    />
+                )}
+                <img
+                    src={src}
+                    alt={`Banner ${index + 1}`}
+                    draggable={false}
+                    className={ready ? undefined : 'music-image-img--loading'}
+                    onLoad={() => markSrcReady(src)}
+                    onError={(e) => {
+                        markSrcReady(src);
+                        e.target.src = normalizeImagePath('/img/no-image.png');
+                    }}
+                />
+            </>
+        );
+    };
+
+    /* API hali kelmagan — left / center / right skeleton */
+    if (musicBannersLoading && images.length === 0) {
+        return (
+            <div className="music-banner-container">
+                <div
+                    className="music-carousel music-carousel--skeleton"
+                    aria-busy="true"
+                    aria-label="Banner yuklanmoqda"
+                >
+                    <ul className="music-slides music-slides--skeleton">
+                        {MUSIC_BANNER_SKELETON_SLIDES.map((slideClass) => (
+                            <li key={slideClass} className={`music-image ${slideClass}`}>
+                                <SkeletonLoader
+                                    variant="banner-image"
+                                    className="music-image-skeleton"
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        );
+    }
+
     if (images.length === 0) return null;
 
     return (
@@ -319,14 +431,7 @@ const MusicBanner = () => {
                             onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            <img
-                                src={normalizeImagePath(image.src)}
-                                alt={`Banner ${index + 1}`}
-                                draggable={false}
-                                onError={(e) => {
-                                    e.target.src = normalizeImagePath('/img/no-image.png');
-                                }}
-                            />
+                            {renderSlideContent(image, index)}
                         </li>
                     ))}
 
@@ -339,14 +444,7 @@ const MusicBanner = () => {
                             onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            <img
-                                src={normalizeImagePath(image.src)}
-                                alt={`Banner ${index + 1}`}
-                                draggable={false}
-                                onError={(e) => {
-                                    e.target.src = normalizeImagePath('/img/no-image.png');
-                                }}
-                            />
+                            {renderSlideContent(image, index)}
                         </li>
                     ))}
 
@@ -359,14 +457,7 @@ const MusicBanner = () => {
                             onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            <img
-                                src={normalizeImagePath(image.src)}
-                                alt={`Banner ${index + 1}`}
-                                draggable={false}
-                                onError={(e) => {
-                                    e.target.src = normalizeImagePath('/img/no-image.png');
-                                }}
-                            />
+                            {renderSlideContent(image, index)}
                         </li>
                     ))}
                 </ul>
