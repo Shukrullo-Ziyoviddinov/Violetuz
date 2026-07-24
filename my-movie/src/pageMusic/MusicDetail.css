@@ -320,14 +320,26 @@
   flex-shrink: 0;
 }
 
-.music-detail-artist-img-wrap .skeleton-loader--music-detail-artist-img {
-  position: absolute;
-  inset: 0;
-}
-
 .music-detail-artist-img--loading {
   opacity: 0;
   pointer-events: none;
+}
+
+.music-detail-artist-img--skeleton {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  );
+  background-size: 200% 100%;
+  animation: music-detail-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
 }
 
 .music-detail-artist-block:hover {
@@ -438,6 +450,7 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .music-detail-play-btn {
@@ -494,10 +507,17 @@
   flex-shrink: 0;
   width: 44px;
   height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .music-detail-share-wrap .share-button-wrapper {
-  position: static;
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  width: 44px;
+  height: 44px;
 }
 
 .music-detail-share-wrap .share-button {
@@ -517,6 +537,10 @@
 
 .music-detail-audio-player--skeleton {
   pointer-events: none;
+}
+
+.music-detail-trend-title-skeleton {
+  margin-bottom: 1rem;
 }
 
 /*

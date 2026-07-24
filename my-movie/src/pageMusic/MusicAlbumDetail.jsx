@@ -20,7 +20,7 @@ import './MusicDetail.css';
 import './MusicAlbumDetail.css';
 
 const MusicDetailPlayerSkeleton = ({ hideDownload = false }) => (
-  <div className="music-detail-audio-player music-detail-audio-player--skeleton" aria-hidden="true">
+  <div className="music-detail-audio-player" aria-hidden="true">
     <span className="music-detail-play-btn music-detail-play-btn--skeleton" />
     <span className="music-detail-action-btn music-detail-action-btn--skeleton" />
     {!hideDownload && (
@@ -205,7 +205,9 @@ const MusicAlbumDetail = () => {
                         className="music-detail-artist-block music-detail-artist-block--skeleton"
                         aria-hidden="true"
                       >
-                        <SkeletonLoader variant="music-detail-artist-img" />
+                        <div className="music-detail-artist-img-wrap">
+                          <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
+                        </div>
                         <div className="music-detail-artist-info">
                           <SkeletonLoader variant="music-detail-artist-name" />
                           <SkeletonLoader variant="music-detail-artist-meta" />
@@ -215,6 +217,14 @@ const MusicAlbumDetail = () => {
                   </div>
                   <MusicDetailPlayerSkeleton />
                 </div>
+              </div>
+              <div className="music-detail-right-scroll" aria-hidden="true">
+                <SkeletonLoader
+                  variant="music-detail-artist-name"
+                  className="music-detail-trend-title-skeleton"
+                  width={140}
+                  height={20}
+                />
               </div>
             </div>
           </div>
@@ -236,8 +246,17 @@ const MusicAlbumDetail = () => {
 
   const showCoverSkeleton = !coverSrc || coverImg.showSkeleton;
   const showArtistSkeleton = artistsLoading && !album.artist && !pageArtist;
-  const showArtistImgSkeleton = Boolean(artistImgSrc) && artistImg.showSkeleton;
+  const showArtistImgSkeleton =
+    showArtistSkeleton || (Boolean(artistImgSrc) && artistImg.showSkeleton);
   const showVisualizerSkeleton = !audioGraphReady;
+
+  const topStyle =
+    displayColor && typeof displayColor.r === 'number'
+      ? {
+          background: `linear-gradient(180deg, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.65) 0%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.45) 40%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.28) 70%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.12) 100%)`,
+          border: `1px solid rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.55)`,
+        }
+      : undefined;
 
   const activeSong = currentTrack
     ? album.songs.find((song) => {
@@ -264,19 +283,7 @@ const MusicAlbumDetail = () => {
       <div className="music-detail-container">
         <div className="music-detail-layout">
           <div className="music-detail-left-scroll">
-            <div
-              className="music-detail-top"
-              style={
-                displayColor && typeof displayColor.r === 'number'
-                  ? {
-                      background: `linear-gradient(180deg, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.65) 0%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.45) 40%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.28) 70%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.12) 100%)`,
-                      borderRadius: '16px',
-                      padding: '1rem',
-                      border: `1px solid rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.55)`,
-                    }
-                  : undefined
-              }
-            >
+            <div className="music-detail-top" style={topStyle}>
               <div className="music-detail-top-row">
                 <div className="music-detail-left">
                   {showCoverSkeleton && (
@@ -300,70 +307,73 @@ const MusicAlbumDetail = () => {
                 </div>
                 <div className="music-detail-right">
                   <h1 className="music-detail-title">{album.title}</h1>
-                  {showArtistSkeleton ? (
-                    <div
-                      className="music-detail-artist-block music-detail-artist-block--skeleton"
-                      aria-hidden="true"
-                    >
-                      <SkeletonLoader variant="music-detail-artist-img" />
-                      <div className="music-detail-artist-info">
-                        <SkeletonLoader variant="music-detail-artist-name" />
-                        <SkeletonLoader variant="music-detail-artist-meta" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className="music-detail-artist-block music-album-artist-block"
-                      role={album.artistId ? 'button' : undefined}
-                      tabIndex={album.artistId ? 0 : undefined}
-                      onClick={album.artistId ? handleArtistClick : undefined}
-                      onKeyDown={
-                        album.artistId
-                          ? (e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                handleArtistClick();
-                              }
+                  <div
+                    className={`music-detail-artist-block music-album-artist-block${
+                      showArtistSkeleton ? ' music-detail-artist-block--skeleton' : ''
+                    }`}
+                    role={!showArtistSkeleton && album.artistId ? 'button' : undefined}
+                    tabIndex={!showArtistSkeleton && album.artistId ? 0 : undefined}
+                    onClick={!showArtistSkeleton && album.artistId ? handleArtistClick : undefined}
+                    onKeyDown={
+                      !showArtistSkeleton && album.artistId
+                        ? (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleArtistClick();
                             }
-                          : undefined
-                      }
-                      style={album.artistId ? { cursor: 'pointer' } : undefined}
-                    >
-                      <div className="music-detail-artist-img-wrap">
-                        {showArtistImgSkeleton && (
-                          <SkeletonLoader variant="music-detail-artist-img" />
-                        )}
-                        {artistImgSrc && !artistImg.failed && (
-                          <img
-                            ref={artistImg.imgRef}
-                            src={artistImgSrc}
-                            alt={album.artist}
-                            className={`music-detail-artist-img${
-                              showArtistImgSkeleton ? ' music-detail-artist-img--loading' : ''
-                            }`}
-                            onLoad={artistImg.onLoad}
-                            onError={artistImg.onError}
-                          />
-                        )}
-                      </div>
-                      <div className="music-detail-artist-info">
-                        <span className="music-detail-artist-name">{album.artist}</span>
-                        {album.year && (
-                          <span className="music-detail-artist-year">{album.year}</span>
-                        )}
-                        {album.songs?.length > 0 && (
-                          <span className="music-detail-artist-year">
-                            {t('music.albumSongsCount', { count: album.songs.length })}
-                          </span>
-                        )}
-                        {albumTotalDuration != null && albumTotalDuration > 0 && (
-                          <span className="music-detail-artist-duration">
-                            {t('music.albumTotal')} {formatTime(albumTotalDuration)}
-                          </span>
-                        )}
-                      </div>
+                          }
+                        : undefined
+                    }
+                    style={
+                      showArtistSkeleton || !album.artistId
+                        ? { cursor: 'default' }
+                        : { cursor: 'pointer' }
+                    }
+                    aria-busy={showArtistSkeleton || showArtistImgSkeleton || undefined}
+                  >
+                    <div className="music-detail-artist-img-wrap">
+                      {showArtistImgSkeleton && (
+                        <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
+                      )}
+                      {artistImgSrc && !artistImg.failed && (
+                        <img
+                          ref={artistImg.imgRef}
+                          src={artistImgSrc}
+                          alt={album.artist}
+                          className={`music-detail-artist-img${
+                            showArtistImgSkeleton ? ' music-detail-artist-img--loading' : ''
+                          }`}
+                          onLoad={artistImg.onLoad}
+                          onError={artistImg.onError}
+                        />
+                      )}
                     </div>
-                  )}
+                    <div className="music-detail-artist-info">
+                      {showArtistSkeleton ? (
+                        <>
+                          <SkeletonLoader variant="music-detail-artist-name" />
+                          <SkeletonLoader variant="music-detail-artist-meta" />
+                        </>
+                      ) : (
+                        <>
+                          <span className="music-detail-artist-name">{album.artist}</span>
+                          {album.year && (
+                            <span className="music-detail-artist-year">{album.year}</span>
+                          )}
+                          {album.songs?.length > 0 && (
+                            <span className="music-detail-artist-year">
+                              {t('music.albumSongsCount', { count: album.songs.length })}
+                            </span>
+                          )}
+                          {albumTotalDuration != null && albumTotalDuration > 0 && (
+                            <span className="music-detail-artist-duration">
+                              {t('music.albumTotal')} {formatTime(albumTotalDuration)}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="music-detail-audio-player">
