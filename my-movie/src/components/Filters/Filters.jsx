@@ -15,6 +15,13 @@ const getRatingFilter = (movie, selectedRatingType, selectedRating) => {
   return val != null && val !== '' && val !== 'none' && (val == selectedRating || Number(val) === Number(selectedRating));
 };
 
+const FILTER_BTN_SKELETONS = [
+  'filters-btn--skeleton-rating',
+  'filters-btn--skeleton-country',
+  'filters-btn--skeleton-genre',
+  'filters-btn--skeleton-age',
+];
+
 const Filters = ({
   movies = [],
   selectedRatingType = 'rating',
@@ -27,8 +34,29 @@ const Filters = ({
   onGenreSelect,
   selectedAge = null,
   onAgeSelect,
-  hideVlFilter = false
+  hideVlFilter = false,
+  isLoading = false,
 }) => {
+  if (isLoading) {
+    return (
+      <div className="filters filters--skeleton" aria-busy="true">
+        <div className="filters-container">
+          <ScrollTouch className="filters-scroll">
+            <div className="filters-row">
+              {FILTER_BTN_SKELETONS.map((mod) => (
+                <span
+                  key={mod}
+                  className={`filters-btn filters-btn--skeleton ${mod}`}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+          </ScrollTouch>
+        </div>
+      </div>
+    );
+  }
+
   const moviesForRating = selectedCountry
     ? movies.filter(m => m.filterCountry === selectedCountry)
     : movies;

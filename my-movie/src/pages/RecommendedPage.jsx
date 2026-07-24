@@ -162,6 +162,7 @@ const RecommendedPage = () => {
         onGenreSelect={setSelectedGenres}
         selectedAge={selectedAge}
         onAgeSelect={setSelectedAge}
+        isLoading={moviesLoading}
       />
       <Movies
         sectionType="all"

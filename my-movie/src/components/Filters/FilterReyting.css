@@ -57,6 +57,60 @@
   border-color: rgb(3, 19, 234);
 }
 
+/*
+  Idle .filters-btn: padding 0.75rem 1.25rem + icon 1.125rem + gap 0.5rem + label (1rem).
+  Height = padding*2 + max(icon, line-height). Width per label ch.
+*/
+.filters-btn--skeleton {
+  pointer-events: none;
+  cursor: default;
+  transform: none !important;
+  padding: 0;
+  gap: 0;
+  border: none;
+  color: transparent;
+  overflow: hidden;
+  box-sizing: border-box;
+  height: calc(0.75rem * 2 + max(1.125rem, 1rem * 1.2));
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.08) 90%
+  );
+  background-size: 200% 100%;
+  animation: filters-btn-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes filters-btn-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.filters-btn--skeleton-rating {
+  width: calc(1.25rem * 2 + 1.125rem + 0.5rem + 7ch);
+}
+
+.filters-btn--skeleton-country {
+  width: calc(1.25rem * 2 + 1.125rem + 0.5rem + 8ch);
+}
+
+.filters-btn--skeleton-genre {
+  width: calc(1.25rem * 2 + 1.125rem + 0.5rem + 4ch);
+}
+
+.filters-btn--skeleton-age {
+  width: calc(1.25rem * 2 + 1.125rem + 0.5rem + 4ch);
+}
+
+.filters--skeleton {
+  pointer-events: none;
+}
+
 .filters-btn-badge {
   background-color: rgba(3, 19, 234, 0.8);
   padding: 0.15rem 0.5rem;
@@ -216,6 +270,26 @@
   .filters-btn {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
+  }
+
+  .filters-btn--skeleton {
+    height: calc(0.5rem * 2 + max(1.125rem, 0.9rem * 1.2));
+  }
+
+  .filters-btn--skeleton-rating {
+    width: calc(1rem * 2 + 1.125rem + 0.5rem + 7ch);
+  }
+
+  .filters-btn--skeleton-country {
+    width: calc(1rem * 2 + 1.125rem + 0.5rem + 8ch);
+  }
+
+  .filters-btn--skeleton-genre {
+    width: calc(1rem * 2 + 1.125rem + 0.5rem + 4ch);
+  }
+
+  .filters-btn--skeleton-age {
+    width: calc(1rem * 2 + 1.125rem + 0.5rem + 4ch);
   }
 
   .filters-modal-overlay {

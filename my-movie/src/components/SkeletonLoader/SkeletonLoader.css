@@ -179,6 +179,54 @@
   border-radius: 6px;
 }
 
+.skeleton-loader--actors-page-image {
+  width: 210px;
+  height: 210px;
+  border-radius: 12px;
+}
+
+.skeleton-loader--actors-page-name {
+  width: min(14rem, 72%);
+  height: calc(2rem * 1.2);
+  border-radius: 8px;
+}
+
+.skeleton-loader--actors-page-meta-item {
+  width: calc(16px + 0.4rem + 0.9rem * 7);
+  height: calc(max(16px, 0.9rem * 1.2));
+  border-radius: 4px;
+}
+
+.skeleton-loader--actors-page-meta-genres-label {
+  width: calc(0.9rem * 5.5);
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actors-page-meta-genre-pill {
+  width: calc(0.6rem * 2 + 0.7rem * 4.5);
+  height: calc(0.3rem * 2 + 0.7rem * 1.2);
+  border-radius: 15px;
+}
+
+.skeleton-loader--actors-page-subscribers-count {
+  width: calc(0.9rem * 8);
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actors-page-movies-title {
+  width: calc(0.9rem * 6);
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actors-page-following-btn {
+  width: calc(1rem * 2 + 0.875rem * 7);
+  height: calc(0.5rem * 2 + 0.875rem * 1.2);
+  border-radius: 24px;
+}
+
 /* MovieDetail hero video — fills .movie-detail-video-wrapper / .movie-detail-image */
 .skeleton-loader--movie-detail-video {
   width: 100%;

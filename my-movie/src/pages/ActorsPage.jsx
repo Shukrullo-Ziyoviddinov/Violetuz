@@ -16,6 +16,8 @@ import ActorAwardsSection from '../components/ActorAwardsSection/ActorAwardsSect
 import SimilarActors from '../components/SimilarActors/SimilarActors';
 import ActorTopRatedKinolar from '../components/ActorTopRatedKinolar/ActorTopRatedKinolar';
 import Filters from '../components/Filters';
+import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../utils/useImageReady';
 import { formatCount } from '../utils/utils';
 import { primeVideoDraphyThumb } from '../utils/primeVideoDraphyThumb';
 import './ActorsPage.css';
@@ -64,6 +66,107 @@ const MetaIcon = ({ type }) => {
   }
   return null;
 };
+
+/** Refresh / birinchi yuklash — profile bloklari yo‘qolmasin, px real bilan bir xil */
+const ActorsPageProfileSkeleton = () => (
+  <div className="actors-page actors-page--skeleton" aria-busy="true">
+    <div className="actors-page-header">
+      <div className="actors-page-profile actors-page-profile--has-bg actors-page-profile--skeleton">
+        <div className="actors-page-image actors-page-image--skeleton">
+          <SkeletonLoader
+            variant="actors-page-image"
+            className="actors-page-image-skeleton"
+          />
+        </div>
+        <div className="actors-page-info">
+          <div className="actors-page-name actors-page-name--skeleton">
+            <SkeletonLoader
+              variant="actors-page-name"
+              className="actors-page-name-skeleton"
+            />
+          </div>
+          <div className="actors-page-meta">
+            <div className="actors-page-meta-row">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={`meta-sk-${i}`}
+                  className="actors-page-meta-item actors-page-meta-item--skeleton"
+                  aria-hidden="true"
+                >
+                  <SkeletonLoader
+                    variant="actors-page-meta-item"
+                    className="actors-page-meta-item-skeleton"
+                  />
+                </span>
+              ))}
+            </div>
+            <div className="actors-page-meta-genres">
+              <span
+                className="actors-page-meta-genres-label actors-page-meta-genres-label--skeleton"
+                aria-hidden="true"
+              >
+                <SkeletonLoader
+                  variant="actors-page-meta-genres-label"
+                  className="actors-page-meta-genres-label-skeleton"
+                />
+              </span>
+              <div className="actors-page-meta-genres-list">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={`genre-sk-${i}`}
+                    className="actors-page-meta-genre-pill actors-page-meta-genre-pill--skeleton"
+                    aria-hidden="true"
+                  >
+                    <SkeletonLoader
+                      variant="actors-page-meta-genre-pill"
+                      className="actors-page-meta-genre-pill-skeleton"
+                    />
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="actors-page-subscribe">
+            <span
+              className="actors-page-subscribers-count actors-page-subscribers-count--skeleton"
+              aria-hidden="true"
+            >
+              <SkeletonLoader
+                variant="actors-page-subscribers-count"
+                className="actors-page-subscribers-count-skeleton"
+              />
+            </span>
+            <span
+              className="actors-page-movies-title actors-page-movies-title--skeleton"
+              aria-hidden="true"
+            >
+              <SkeletonLoader
+                variant="actors-page-movies-title"
+                className="actors-page-movies-title-skeleton"
+              />
+            </span>
+            <div className="actors-page-follow-btn--desktop">
+              <span className="following-btn following-btn--skeleton" aria-hidden="true">
+                <SkeletonLoader
+                  variant="actors-page-following-btn"
+                  className="actors-page-following-btn-skeleton"
+                />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="actors-page-follow-btn--mobile">
+        <span className="following-btn following-btn--skeleton" aria-hidden="true">
+          <SkeletonLoader
+            variant="actors-page-following-btn"
+            className="actors-page-following-btn-skeleton"
+          />
+        </span>
+      </div>
+    </div>
+  </div>
+);
 
 const SectionIconBio = () => (
   <svg
@@ -214,8 +317,8 @@ const ActorsPage = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { getActorById, actorPageSectionLabels } = useActorsApi();
-  const { allMovies } = useMoviesApi();
+  const { getActorById, actorPageSectionLabels, actorsLoading } = useActorsApi();
+  const { allMovies, moviesLoading } = useMoviesApi();
   const bioSectionRef = useRef(null);
   const [bioLineClamp, setBioLineClamp] = useState(5);
   const [bioImgModalOpen, setBioImgModalOpen] = useState(false);
@@ -232,6 +335,9 @@ const ActorsPage = () => {
   const [displaySubscribers, setDisplaySubscribers] = useState(0);
 
   const actor = getActorById(id);
+  const profileImgSrc = actor?.image || '';
+  const profileImg = useImageReady(profileImgSrc);
+  const showProfileImgSkeleton = Boolean(actor) && profileImg.showSkeleton;
 
   useEffect(() => {
     setDisplaySubscribers(actor?.subscribers ?? 0);
@@ -344,6 +450,9 @@ const ActorsPage = () => {
   const videoDraphyOpenInModal = mediaRowSplit || videoDraphyTruncated;
 
   if (!actor) {
+    if (actorsLoading) {
+      return <ActorsPageProfileSkeleton />;
+    }
     return (
       <div className="actors-page actors-page-error">
         <h2>{i18n.language === 'uz' ? 'Aktyor topilmadi' : 'Актер не найден'}</h2>
@@ -368,8 +477,29 @@ const ActorsPage = () => {
           style={actor.backgroundImg ? { backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${actor.backgroundImg})` } : undefined}
         >
             <>
-              <div className="actors-page-image">
-                <img src={actor.image} alt={actorName} />
+              <div
+                className={`actors-page-image${
+                  showProfileImgSkeleton ? ' actors-page-image--loading' : ''
+                }`}
+              >
+                {showProfileImgSkeleton && (
+                  <SkeletonLoader
+                    variant="actors-page-image"
+                    className="actors-page-image-skeleton"
+                  />
+                )}
+                {profileImgSrc ? (
+                  <img
+                    ref={profileImg.imgRef}
+                    src={profileImgSrc}
+                    alt={actorName}
+                    className={
+                      showProfileImgSkeleton ? 'actors-page-image-img--loading' : undefined
+                    }
+                    onLoad={profileImg.onLoad}
+                    onError={profileImg.onError}
+                  />
+                ) : null}
               </div>
               <div className="actors-page-info">
                 <h1 className="actors-page-name">
@@ -692,13 +822,14 @@ const ActorsPage = () => {
           onGenreSelect={setSelectedGenres}
           selectedAge={selectedAge}
           onAgeSelect={setSelectedAge}
+          isLoading={moviesLoading}
         />
         <Movies
           sectionType="all"
           limit={null}
           filteredMovies={filteredActorMovies}
           hideHeader
-          isLoading={false}
+          isLoading={moviesLoading}
           showHorizontalScroll
         />
       </div>
