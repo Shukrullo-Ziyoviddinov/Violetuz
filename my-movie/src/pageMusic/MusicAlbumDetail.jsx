@@ -252,7 +252,6 @@ const MusicAlbumDetail = () => {
     displayColor && typeof displayColor.r === 'number'
       ? {
           background: `linear-gradient(180deg, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.65) 0%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.45) 40%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.28) 70%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.12) 100%)`,
-          boxShadow: `inset 0 0 0 1px rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.55)`,
         }
       : undefined;
 
