@@ -184,22 +184,46 @@ const resolveMovieVideoSrc = (movie, lang) => {
   return null;
 };
 
-/** Season episode thumb — skeleton until preview video is actually ready from server */
-const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
+/** Mavsumlar bo‘ylab global qisim: 1..N (faqat mavjud video URL lar) */
+const buildGlobalEpisodeNumbers = (seasons, lang) => {
+  const map = new Map();
+  let n = 0;
+  const sorted = [...(seasons || [])].sort(
+    (a, b) => (a.seasonNumber ?? 0) - (b.seasonNumber ?? 0)
+  );
+  sorted.forEach((season) => {
+    (season.episodes || []).forEach((ep, epIndex) => {
+      const src = ep?.[lang];
+      if (!src || src === 'none') return;
+      n += 1;
+      map.set(`${season.seasonNumber}-${epIndex}`, n);
+    });
+  });
+  return map;
+};
+
+/** Season episode thumb — global qisim + video daqiqasi (metadata) */
+const SeasonEpisodeThumb = ({ videoSrc, episodeNumber, lang = 'uz', onOpen }) => {
   const videoRef = useRef(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [durationMin, setDurationMin] = useState(null);
 
   useEffect(() => {
     setReady(false);
     setFailed(false);
+    setDurationMin(null);
   }, [videoSrc]);
 
   useEffect(() => {
     if (!videoSrc || ready || failed) return undefined;
     const check = () => {
       const el = videoRef.current;
-      if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      if (!el) return;
+      if (Number.isFinite(el.duration) && el.duration > 0) {
+        setDurationMin(Math.max(1, Math.round(el.duration / 60)));
+      }
+      if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
         setReady(true);
       }
     };
@@ -208,6 +232,9 @@ const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
     const timeoutId = window.setTimeout(() => {
       const el = videoRef.current;
       if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        if (Number.isFinite(el.duration) && el.duration > 0) {
+          setDurationMin(Math.max(1, Math.round(el.duration / 60)));
+        }
         setReady(true);
       }
     }, 20000);
@@ -217,8 +244,15 @@ const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
     };
   }, [videoSrc, ready, failed]);
 
+  const syncDuration = (el) => {
+    if (el && Number.isFinite(el.duration) && el.duration > 0) {
+      setDurationMin(Math.max(1, Math.round(el.duration / 60)));
+    }
+  };
+
   const markReady = (e) => {
     const el = e?.currentTarget || videoRef.current;
+    syncDuration(el);
     if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       setReady(true);
       setFailed(false);
@@ -231,6 +265,15 @@ const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
   };
 
   const showSkeleton = Boolean(videoSrc) && !ready && !failed;
+  const showDurationSkeleton = Boolean(videoSrc) && !failed && durationMin == null;
+  const partLabel =
+    lang === 'ru' ? `${episodeNumber} серия` : `${episodeNumber} qisim`;
+  const durationLabel =
+    durationMin != null
+      ? lang === 'ru'
+        ? `${durationMin} мин`
+        : `${durationMin} daqiqa`
+      : '';
 
   return (
     <div
@@ -251,16 +294,10 @@ const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
       aria-busy={showSkeleton || undefined}
     >
       {showSkeleton && (
-        <>
-          <SkeletonLoader
-            variant="movie-detail-episode"
-            className="movie-detail-episode-skeleton"
-          />
-          <SkeletonLoader
-            variant="movie-detail-episode-number"
-            className="movie-detail-episode-number-skeleton"
-          />
-        </>
+        <SkeletonLoader
+          variant="movie-detail-episode"
+          className="movie-detail-episode-skeleton"
+        />
       )}
       {!failed && (
         <video
@@ -273,14 +310,30 @@ const SeasonEpisodeThumb = ({ videoSrc, epIndex, onOpen }) => {
           playsInline
           className={`movie-detail-episode-video${showSkeleton ? ' movie-detail-episode-video--loading' : ''}`}
           onLoadedData={markReady}
-          onLoadedMetadata={markReady}
+          onLoadedMetadata={(e) => {
+            syncDuration(e.currentTarget);
+            markReady(e);
+          }}
           onCanPlay={markReady}
           onError={markFailed}
         />
       )}
-      {ready && (
-        <span className="movie-detail-episode-number">{epIndex + 1}</span>
+      {showSkeleton ? (
+        <SkeletonLoader
+          variant="movie-detail-episode-part"
+          className="movie-detail-episode-part-skeleton"
+        />
+      ) : (
+        <span className="movie-detail-episode-part">{partLabel}</span>
       )}
+      {showDurationSkeleton ? (
+        <SkeletonLoader
+          variant="movie-detail-episode-duration"
+          className="movie-detail-episode-duration-skeleton"
+        />
+      ) : durationMin != null ? (
+        <span className="movie-detail-episode-duration">{durationLabel}</span>
+      ) : null}
     </div>
   );
 };
@@ -1075,8 +1128,12 @@ const MovieDetail = () => {
                                 className="movie-detail-episode-skeleton"
                               />
                               <SkeletonLoader
-                                variant="movie-detail-episode-number"
-                                className="movie-detail-episode-number-skeleton"
+                                variant="movie-detail-episode-part"
+                                className="movie-detail-episode-part-skeleton"
+                              />
+                              <SkeletonLoader
+                                variant="movie-detail-episode-duration"
+                                className="movie-detail-episode-duration-skeleton"
                               />
                             </div>
                           ))}
@@ -1816,34 +1873,48 @@ const MovieDetail = () => {
                               className="movie-detail-episode-skeleton"
                             />
                             <SkeletonLoader
-                              variant="movie-detail-episode-number"
-                              className="movie-detail-episode-number-skeleton"
+                              variant="movie-detail-episode-part"
+                              className="movie-detail-episode-part-skeleton"
+                            />
+                            <SkeletonLoader
+                              variant="movie-detail-episode-duration"
+                              className="movie-detail-episode-duration-skeleton"
                             />
                           </div>
                         ))}
                       </div>
                     ) : (
-                      movie.seasons
-                        ?.filter((s) => s.seasonNumber === selectedSeason)
-                        ?.map((season) => (
-                          <ScrollTouch key={season.seasonNumber} className="movie-detail-episodes-scroll">
-                            {(season.episodes || []).map((ep, epIndex) => {
-                              const videoSrc = ep[seasonsLang];
-                              if (!videoSrc || videoSrc === 'none') return null;
-                              return (
-                                <SeasonEpisodeThumb
-                                  key={`${season.seasonNumber}-${epIndex}-${seasonsLang}-${videoSrc}`}
-                                  videoSrc={videoSrc}
-                                  epIndex={epIndex}
-                                  onOpen={(src) => {
-                                    setSelectedVideoUrl(src);
-                                    setShowWatchModal(true);
-                                  }}
-                                />
-                              );
-                            })}
-                          </ScrollTouch>
-                        ))
+                      (() => {
+                        const episodeNumbers = buildGlobalEpisodeNumbers(
+                          movie.seasons,
+                          seasonsLang
+                        );
+                        return movie.seasons
+                          ?.filter((s) => s.seasonNumber === selectedSeason)
+                          ?.map((season) => (
+                            <ScrollTouch key={season.seasonNumber} className="movie-detail-episodes-scroll">
+                              {(season.episodes || []).map((ep, epIndex) => {
+                                const videoSrc = ep[seasonsLang];
+                                if (!videoSrc || videoSrc === 'none') return null;
+                                const episodeNumber =
+                                  episodeNumbers.get(`${season.seasonNumber}-${epIndex}`) ??
+                                  epIndex + 1;
+                                return (
+                                  <SeasonEpisodeThumb
+                                    key={`${season.seasonNumber}-${epIndex}-${seasonsLang}-${videoSrc}`}
+                                    videoSrc={videoSrc}
+                                    episodeNumber={episodeNumber}
+                                    lang={i18n.language === 'ru' ? 'ru' : 'uz'}
+                                    onOpen={(src) => {
+                                      setSelectedVideoUrl(src);
+                                      setShowWatchModal(true);
+                                    }}
+                                  />
+                                );
+                              })}
+                            </ScrollTouch>
+                          ));
+                      })()
                     )}
                   </div>
                 </div>

@@ -335,9 +335,15 @@
   border-radius: 8px;
 }
 
-.skeleton-loader--movie-detail-episode-number {
-  width: 1.75rem;
-  height: calc(0.875rem * 1.2 + 4px);
+.skeleton-loader--movie-detail-episode-part {
+  width: 3.75rem;
+  height: calc(0.7rem * 1.2 + 4px);
+  border-radius: 4px;
+}
+
+.skeleton-loader--movie-detail-episode-duration {
+  width: 4.75rem;
+  height: calc(0.7rem * 1.2 + 4px);
   border-radius: 4px;
 }
 

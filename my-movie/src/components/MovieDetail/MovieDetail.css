@@ -1014,31 +1014,52 @@
   pointer-events: none;
 }
 
-.movie-detail-episode-number {
+.movie-detail-episode-part,
+.movie-detail-episode-duration {
   position: absolute;
-  bottom: 4px;
-  left: 8px;
-  font-size: 0.875rem;
+  left: 6px;
+  font-size: 0.7rem;
   line-height: 1.2;
-  font-weight: bold;
+  font-weight: 600;
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.55);
   padding: 2px 6px;
   border-radius: 4px;
   z-index: 2;
   box-sizing: border-box;
-  min-width: 1.5rem;
-  text-align: center;
+  max-width: calc(100% - 12px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.movie-detail-episode-number-skeleton,
-.skeleton-loader--movie-detail-episode-number {
+.movie-detail-episode-part {
+  top: 4px;
+}
+
+.movie-detail-episode-duration {
+  bottom: 4px;
+}
+
+.movie-detail-episode-part-skeleton,
+.skeleton-loader--movie-detail-episode-part {
+  position: absolute !important;
+  top: 4px !important;
+  left: 6px !important;
+  width: 3.75rem !important;
+  height: calc(0.7rem * 1.2 + 4px) !important;
+  border-radius: 4px !important;
+  z-index: 2;
+}
+
+.movie-detail-episode-duration-skeleton,
+.skeleton-loader--movie-detail-episode-duration {
   position: absolute !important;
   bottom: 4px !important;
-  left: 8px !important;
-  width: 1.75rem !important;
-  height: calc(0.875rem * 1.2 + 4px) !important;
+  left: 6px !important;
+  width: 4.75rem !important;
+  height: calc(0.7rem * 1.2 + 4px) !important;
   border-radius: 4px !important;
   z-index: 2;
 }
