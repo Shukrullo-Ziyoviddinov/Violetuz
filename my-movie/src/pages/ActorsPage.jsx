@@ -164,9 +164,195 @@ const ActorsPageProfileSkeleton = () => (
           />
         </span>
       </div>
+
+      <div className="actors-page-bio actors-page-bio--skeleton" aria-hidden="true">
+        <div className="actors-page-bio-inner">
+          <div className="actors-page-bio-text">
+            <div
+              className="actors-page-section-heading actors-page-bio-text-title actors-page-bio-text-title--skeleton"
+            >
+              <SkeletonLoader
+                variant="actors-page-bio-title"
+                className="actors-page-bio-text-title-skeleton"
+              />
+            </div>
+            <div className="actors-page-bio-text-body--skeleton">
+              <SkeletonLoader
+                variant="actors-page-bio-line"
+                className="actors-page-bio-line-skeleton"
+              />
+              <SkeletonLoader
+                variant="actors-page-bio-line"
+                className="actors-page-bio-line-skeleton actors-page-bio-line-skeleton--short"
+              />
+              <SkeletonLoader
+                variant="actors-page-bio-line"
+                className="actors-page-bio-line-skeleton"
+              />
+            </div>
+          </div>
+          <div className="actors-page-bio-images">
+            <div className="actors-page-bio-grid">
+              {Array.from({ length: 6 }, (_, i) => (
+                <div
+                  key={`bio-grid-sk-${i}`}
+                  className="actors-page-bio-grid-item actors-page-bio-grid-item--skeleton"
+                >
+                  <SkeletonLoader
+                    variant="actors-page-bio-grid-item"
+                    className="actors-page-bio-grid-item-skeleton"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+      <div className="actors-page-media-wrap actors-page-media-wrap--skeleton" aria-hidden="true">
+        <div className="actors-page-media-row">
+          <div className="actors-page-photo-gallery-block actors-page-photo-gallery-block--skeleton">
+            <div className="actors-page-photo-gallery-head">
+              <div className="actors-page-media-heading actors-page-section-heading actors-page-media-heading--skeleton">
+                <SkeletonLoader
+                  variant="actors-page-media-heading"
+                  className="actors-page-media-heading-skeleton"
+                />
+              </div>
+            </div>
+            <div className="actors-page-photo-gallery-grid">
+              <div className="actors-page-pg-cell actors-page-pg-cell--hero actors-page-pg-cell--skeleton">
+                <SkeletonLoader
+                  variant="actors-page-pg-cell"
+                  className="actors-page-pg-cell-skeleton"
+                />
+              </div>
+              <div className="actors-page-pg-cell actors-page-pg-cell--mid-top actors-page-pg-cell--skeleton">
+                <SkeletonLoader
+                  variant="actors-page-pg-cell"
+                  className="actors-page-pg-cell-skeleton"
+                />
+              </div>
+              <div className="actors-page-pg-cell actors-page-pg-cell--mid-bottom actors-page-pg-cell--skeleton">
+                <SkeletonLoader
+                  variant="actors-page-pg-cell"
+                  className="actors-page-pg-cell-skeleton"
+                />
+              </div>
+              <div className="actors-page-pg-cell actors-page-pg-cell--right actors-page-pg-cell--skeleton-wrap">
+                <div className="actors-page-pg-right-top">
+                  <div className="actors-page-pg-cell actors-page-pg-cell--small actors-page-pg-cell--skeleton">
+                    <SkeletonLoader
+                      variant="actors-page-pg-cell"
+                      className="actors-page-pg-cell-skeleton"
+                    />
+                  </div>
+                  <div className="actors-page-pg-cell actors-page-pg-cell--small actors-page-pg-cell--skeleton">
+                    <SkeletonLoader
+                      variant="actors-page-pg-cell"
+                      className="actors-page-pg-cell-skeleton"
+                    />
+                  </div>
+                </div>
+                <div className="actors-page-pg-cell actors-page-pg-cell--wide actors-page-pg-cell--skeleton">
+                  <SkeletonLoader
+                    variant="actors-page-pg-cell"
+                    className="actors-page-pg-cell-skeleton"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 );
+
+const ActorsPagePgCell = ({
+  src,
+  index,
+  className = '',
+  onOpen,
+}) => {
+  const { showSkeleton, imgRef, onLoad, onError } = useImageReady(src || '');
+
+  return (
+    <div
+      className={`actors-page-pg-cell ${className}${
+        showSkeleton ? ' actors-page-pg-cell--loading' : ''
+      }`.trim()}
+      role="button"
+      tabIndex={0}
+      aria-busy={showSkeleton || undefined}
+      onClick={() => !showSkeleton && onOpen?.(index)}
+      onKeyDown={(e) => {
+        if (showSkeleton) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpen?.(index);
+        }
+      }}
+    >
+      {showSkeleton && (
+        <SkeletonLoader
+          variant="actors-page-pg-cell"
+          className="actors-page-pg-cell-skeleton"
+        />
+      )}
+      {src ? (
+        <img
+          ref={imgRef}
+          src={src}
+          alt=""
+          className={showSkeleton ? 'actors-page-pg-cell-img--loading' : undefined}
+          onLoad={onLoad}
+          onError={onError}
+        />
+      ) : null}
+    </div>
+  );
+};
+
+const ActorsPageBioGridItem = ({ src, alt, index, onOpen }) => {
+  const { showSkeleton, imgRef, onLoad, onError } = useImageReady(src || '');
+
+  return (
+    <div
+      className={`actors-page-bio-grid-item${
+        showSkeleton ? ' actors-page-bio-grid-item--loading' : ''
+      }`}
+      role="button"
+      tabIndex={0}
+      aria-busy={showSkeleton || undefined}
+      onClick={() => !showSkeleton && onOpen?.(index)}
+      onKeyDown={(e) => {
+        if (showSkeleton) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpen?.(index);
+        }
+      }}
+    >
+      {showSkeleton && (
+        <SkeletonLoader
+          variant="actors-page-bio-grid-item"
+          className="actors-page-bio-grid-item-skeleton"
+        />
+      )}
+      {src ? (
+        <img
+          ref={imgRef}
+          src={src}
+          alt={alt}
+          className={showSkeleton ? 'actors-page-bio-grid-img--loading' : undefined}
+          onLoad={onLoad}
+          onError={onError}
+        />
+      ) : null}
+    </div>
+  );
+};
 
 const SectionIconBio = () => (
   <svg
@@ -589,25 +775,16 @@ const ActorsPage = () => {
                 <div className="actors-page-bio-images">
                   <div className="actors-page-bio-grid">
                     {bioImg.slice(0, 6).map((src, idx) => (
-                      <div
-                        key={idx}
-                        className="actors-page-bio-grid-item"
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => {
-                          setBioImgModalIndex(idx);
+                      <ActorsPageBioGridItem
+                        key={`${src}-${idx}`}
+                        src={src}
+                        alt={`${actorName} ${idx + 1}`}
+                        index={idx}
+                        onOpen={(i) => {
+                          setBioImgModalIndex(i);
                           setBioImgModalOpen(true);
                         }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            setBioImgModalIndex(idx);
-                            setBioImgModalOpen(true);
-                          }
-                        }}
-                      >
-                        <img src={src} alt={`${actorName} ${idx + 1}`} />
-                      </div>
+                      />
                     ))}
                   </div>
                 </div>
@@ -641,117 +818,63 @@ const ActorsPage = () => {
                   )}
                 </div>
                 <div className="actors-page-photo-gallery-grid">
-                <div
-                  className="actors-page-pg-cell actors-page-pg-cell--hero"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    setGalleryModalIndex(0);
+                <ActorsPagePgCell
+                  className="actors-page-pg-cell--hero"
+                  src={galleryCells[0]}
+                  index={0}
+                  onOpen={(i) => {
+                    setGalleryModalIndex(i);
                     setGalleryModalOpen(true);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setGalleryModalIndex(0);
-                      setGalleryModalOpen(true);
-                    }
-                  }}
-                >
-                  <img src={galleryCells[0]} alt="" />
-                </div>
-                <div
-                  className="actors-page-pg-cell actors-page-pg-cell--mid-top"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    setGalleryModalIndex(1);
+                />
+                <ActorsPagePgCell
+                  className="actors-page-pg-cell--mid-top"
+                  src={galleryCells[1]}
+                  index={1}
+                  onOpen={(i) => {
+                    setGalleryModalIndex(i);
                     setGalleryModalOpen(true);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setGalleryModalIndex(1);
-                      setGalleryModalOpen(true);
-                    }
-                  }}
-                >
-                  <img src={galleryCells[1]} alt="" />
-                </div>
-                <div
-                  className="actors-page-pg-cell actors-page-pg-cell--mid-bottom"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    setGalleryModalIndex(2);
+                />
+                <ActorsPagePgCell
+                  className="actors-page-pg-cell--mid-bottom"
+                  src={galleryCells[2]}
+                  index={2}
+                  onOpen={(i) => {
+                    setGalleryModalIndex(i);
                     setGalleryModalOpen(true);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setGalleryModalIndex(2);
-                      setGalleryModalOpen(true);
-                    }
-                  }}
-                >
-                  <img src={galleryCells[2]} alt="" />
-                </div>
+                />
                 <div className="actors-page-pg-cell actors-page-pg-cell--right">
                   <div className="actors-page-pg-right-top">
-                    <div
-                      className="actors-page-pg-cell actors-page-pg-cell--small"
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
-                        setGalleryModalIndex(3);
+                    <ActorsPagePgCell
+                      className="actors-page-pg-cell--small"
+                      src={galleryCells[3]}
+                      index={3}
+                      onOpen={(i) => {
+                        setGalleryModalIndex(i);
                         setGalleryModalOpen(true);
                       }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          setGalleryModalIndex(3);
-                          setGalleryModalOpen(true);
-                        }
-                      }}
-                    >
-                      <img src={galleryCells[3]} alt="" />
-                    </div>
-                    <div
-                      className="actors-page-pg-cell actors-page-pg-cell--small"
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
-                        setGalleryModalIndex(4);
+                    />
+                    <ActorsPagePgCell
+                      className="actors-page-pg-cell--small"
+                      src={galleryCells[4]}
+                      index={4}
+                      onOpen={(i) => {
+                        setGalleryModalIndex(i);
                         setGalleryModalOpen(true);
                       }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          setGalleryModalIndex(4);
-                          setGalleryModalOpen(true);
-                        }
-                      }}
-                    >
-                      <img src={galleryCells[4]} alt="" />
-                    </div>
+                    />
                   </div>
-                  <div
-                    className="actors-page-pg-cell actors-page-pg-cell--wide"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {
-                      setGalleryModalIndex(5);
+                  <ActorsPagePgCell
+                    className="actors-page-pg-cell--wide"
+                    src={galleryCells[5]}
+                    index={5}
+                    onOpen={(i) => {
+                      setGalleryModalIndex(i);
                       setGalleryModalOpen(true);
                     }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setGalleryModalIndex(5);
-                        setGalleryModalOpen(true);
-                      }
-                    }}
-                  >
-                    <img src={galleryCells[5]} alt="" />
-                  </div>
+                  />
                 </div>
               </div>
             </div>

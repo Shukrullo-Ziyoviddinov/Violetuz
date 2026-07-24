@@ -312,6 +312,8 @@
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   cursor: pointer;
+  position: relative;
+  background: #1a1a1a;
 }
 
 .actors-page-bio-grid-item:focus-visible {
@@ -323,6 +325,76 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.actors-page-bio-grid-item--skeleton,
+.actors-page-bio-grid-item--loading {
+  pointer-events: none;
+  cursor: default;
+}
+
+.actors-page-bio-grid-item-skeleton,
+.skeleton-loader--actors-page-bio-grid-item {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit !important;
+  z-index: 1;
+}
+
+.actors-page-bio-grid-img--loading {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Bio title: icon 20px + gap 0.45rem + "Biografiya" (~9ch), font 1.25rem, margin 0 0 1rem */
+.actors-page-bio-text-title--skeleton {
+  display: block;
+  width: calc(20px + 0.45rem + 1.25rem * 8);
+  max-width: 100%;
+  height: calc(max(20px, 1.25rem * 1.2));
+  margin: 0 0 1rem;
+  overflow: hidden;
+}
+
+.actors-page-bio-text-title-skeleton,
+.skeleton-loader--actors-page-bio-title {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 6px !important;
+}
+
+.actors-page-bio-text-body--skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.actors-page-bio-line-skeleton,
+.skeleton-loader--actors-page-bio-line {
+  display: block !important;
+  width: 100% !important;
+  height: calc(0.95rem * 1.7) !important;
+  border-radius: 4px !important;
+}
+
+.actors-page-bio-line-skeleton--short,
+.skeleton-loader--actors-page-bio-line.actors-page-bio-line-skeleton--short {
+  width: 72% !important;
+}
+
+.actors-page-bio--skeleton {
+  pointer-events: none;
 }
 
 /* Actors page skeleton — real blok px lari bilan bir xil */
@@ -910,6 +982,71 @@
 .actors-page-pg-cell--wide {
   flex: 1 1 0;
   min-height: 0;
+}
+
+.actors-page-pg-cell--skeleton,
+.actors-page-pg-cell--loading {
+  pointer-events: none;
+  cursor: default;
+}
+
+.actors-page-pg-cell--skeleton-wrap {
+  pointer-events: none;
+  cursor: default;
+}
+
+.actors-page-pg-cell-skeleton,
+.skeleton-loader--actors-page-pg-cell {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit !important;
+  z-index: 1;
+}
+
+.actors-page-pg-cell-img--loading {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Foto galereya sarlavha: icon 20px + gap 0.45rem + "Foto galereya" (~12ch), 1.1rem */
+.actors-page-media-heading--skeleton {
+  display: block;
+  flex: 0 1 auto;
+  width: calc(20px + 0.45rem + 1.1rem * 10);
+  max-width: 100%;
+  height: calc(max(20px, 1.1rem * 1.2));
+  margin: 0;
+  overflow: hidden;
+}
+
+.actors-page-media-heading-skeleton,
+.skeleton-loader--actors-page-media-heading {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 6px !important;
+}
+
+.actors-page-media-wrap--skeleton,
+.actors-page-photo-gallery-block--skeleton {
+  pointer-events: none;
+}
+
+.actors-page-photo-gallery-block--skeleton {
+  background: rgba(45, 45, 50, 0.3);
+  border: 1px solid rgba(70, 65, 80, 0.4);
+  padding: 1.5rem 1.1rem;
+  border-radius: 20px;
+  box-sizing: border-box;
 }
 
 .actors-page-video-draphy-block {
