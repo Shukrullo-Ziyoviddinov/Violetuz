@@ -257,6 +257,84 @@
   border-radius: 8px;
 }
 
+.skeleton-loader--actors-page-video-draphy-heading {
+  width: calc(20px + 0.45rem + 1.1rem * 9);
+  height: calc(max(20px, 1.1rem * 1.2));
+  border-radius: 6px;
+}
+
+.skeleton-loader--actors-page-video-draphy-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.skeleton-loader--actors-page-video-draphy-title {
+  width: min(100%, 9.5rem);
+  height: calc(0.95rem * 1.35);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actors-page-video-draphy-duration {
+  width: calc(0.8rem * 4.5);
+  height: calc(0.8rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actor-extra-block-title {
+  width: calc(1.05rem * 8);
+  height: calc(1.05rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--actor-award-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+.skeleton-loader--actor-award-title {
+  width: calc(0.88rem * 7);
+  height: calc(0.88rem * 1.35);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actor-award-category {
+  width: calc(0.88rem * 5.5);
+  height: calc(0.88rem * 1.35);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actor-award-work {
+  width: min(100%, 12rem);
+  height: calc(0.82rem * 1.4);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actor-similar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.skeleton-loader--actor-similar-name {
+  width: min(100%, 8.5rem);
+  height: calc(0.8rem * 1.3);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actor-similar-movies-title {
+  width: calc(0.9rem * 6);
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--actor-similar-follow {
+  width: calc(0.65rem * 2 + 0.72rem * 6);
+  height: calc(0.35rem * 2 + 0.72rem * 1.2);
+  border-radius: 18px;
+}
+
 /* MovieDetail hero video — fills .movie-detail-video-wrapper / .movie-detail-image */
 .skeleton-loader--movie-detail-video {
   width: 100%;

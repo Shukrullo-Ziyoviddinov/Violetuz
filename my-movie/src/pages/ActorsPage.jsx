@@ -12,8 +12,10 @@ import ImgModal from '../components/ImgModal/ImgModal';
 import GlobalModal from '../components/GlobalModal/GlobalModal';
 import VideoModal from '../components/VideoModal/VideoModal';
 import ShowMoreButton, { getDisplayItems } from '../components/ShowMoreButton/ShowMoreButton';
-import ActorAwardsSection from '../components/ActorAwardsSection/ActorAwardsSection';
-import SimilarActors from '../components/SimilarActors/SimilarActors';
+import ActorAwardsSection, {
+  ActorAwardsSectionSkeleton,
+} from '../components/ActorAwardsSection/ActorAwardsSection';
+import SimilarActors, { SimilarActorsSkeleton } from '../components/SimilarActors/SimilarActors';
 import ActorTopRatedKinolar from '../components/ActorTopRatedKinolar/ActorTopRatedKinolar';
 import Filters from '../components/Filters';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
@@ -211,7 +213,7 @@ const ActorsPageProfileSkeleton = () => (
     </div>
 
       <div className="actors-page-media-wrap actors-page-media-wrap--skeleton" aria-hidden="true">
-        <div className="actors-page-media-row">
+        <div className="actors-page-media-row actors-page-media-row--split">
           <div className="actors-page-photo-gallery-block actors-page-photo-gallery-block--skeleton">
             <div className="actors-page-photo-gallery-head">
               <div className="actors-page-media-heading actors-page-section-heading actors-page-media-heading--skeleton">
@@ -264,7 +266,52 @@ const ActorsPageProfileSkeleton = () => (
               </div>
             </div>
           </div>
+
+          <div className="actors-page-video-draphy-block actors-page-video-draphy-block--skeleton">
+            <div className="actors-page-video-draphy-head">
+              <div className="actors-page-media-heading actors-page-section-heading actors-page-media-heading--skeleton actors-page-video-draphy-heading--skeleton">
+                <SkeletonLoader
+                  variant="actors-page-video-draphy-heading"
+                  className="actors-page-video-draphy-heading-skeleton"
+                />
+              </div>
+            </div>
+            <div className="actors-page-video-draphy-list">
+              {Array.from({ length: 3 }, (_, i) => (
+                <div
+                  key={`vd-sk-${i}`}
+                  className="actors-page-video-draphy-item actors-page-video-draphy-item--modal-trigger actors-page-video-draphy-item--skeleton"
+                >
+                  <div className="actors-page-video-draphy-video-wrap actors-page-video-draphy-video-wrap--skeleton">
+                    <SkeletonLoader
+                      variant="actors-page-video-draphy-thumb"
+                      className="actors-page-video-draphy-thumb-skeleton"
+                    />
+                  </div>
+                  <div className="actors-page-video-draphy-info">
+                    <div className="actors-page-video-draphy-title actors-page-video-draphy-title--skeleton">
+                      <SkeletonLoader
+                        variant="actors-page-video-draphy-title"
+                        className="actors-page-video-draphy-title-skeleton"
+                      />
+                    </div>
+                    <div className="actors-page-video-draphy-duration actors-page-video-draphy-duration--skeleton">
+                      <SkeletonLoader
+                        variant="actors-page-video-draphy-duration"
+                        className="actors-page-video-draphy-duration-skeleton"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div className="actors-page-extras-wrap actors-page-extras-wrap--skeleton" aria-hidden="true">
+        <ActorAwardsSectionSkeleton />
+        <SimilarActorsSkeleton />
       </div>
   </div>
 );
@@ -424,10 +471,31 @@ const markDraphyThumbError = () => {
 
 const ActorVideoDraphyItem = ({ item, openInModal, onOpenVideo }) => {
   const [durationSec, setDurationSec] = useState(null);
+  const [mediaReady, setMediaReady] = useState(false);
   const { contentLang } = useContentLanguage();
   const title = item.title?.[contentLang] || item.title?.uz || item.title?.ru || '';
+  const showSkeleton = Boolean(item.src) && !mediaReady;
+
+  useEffect(() => {
+    setMediaReady(false);
+    setDurationSec(null);
+  }, [item.src]);
+
+  useEffect(() => {
+    if (!item.src || mediaReady) return undefined;
+    const soft = window.setTimeout(() => setMediaReady(true), 12000);
+    return () => window.clearTimeout(soft);
+  }, [item.src, mediaReady]);
+
+  const handleLoadedMetadata = (e) => {
+    const el = e.target;
+    setDurationSec(el.duration);
+    if (openInModal) primeVideoDraphyThumb(el);
+    setMediaReady(true);
+  };
 
   const openModal = () => {
+    if (showSkeleton) return;
     onOpenVideo?.({
       src: item.src,
       title,
@@ -437,63 +505,101 @@ const ActorVideoDraphyItem = ({ item, openInModal, onOpenVideo }) => {
     });
   };
 
+  const videoWrap = (
+    <div
+      className={`actors-page-video-draphy-video-wrap${
+        showSkeleton ? ' actors-page-video-draphy-video-wrap--loading' : ''
+      }`}
+    >
+      {showSkeleton && (
+        <SkeletonLoader
+          variant="actors-page-video-draphy-thumb"
+          className="actors-page-video-draphy-thumb-skeleton"
+        />
+      )}
+      {item.src ? (
+        <video
+          className={`actors-page-video-draphy-video${
+            showSkeleton ? ' actors-page-video-draphy-video--loading' : ''
+          }`}
+          src={item.src}
+          muted={openInModal || undefined}
+          controls={!openInModal || undefined}
+          playsInline
+          preload={openInModal ? 'auto' : 'metadata'}
+          onLoadedMetadata={handleLoadedMetadata}
+          onError={() => {
+            markDraphyThumbError();
+            setMediaReady(true);
+          }}
+        />
+      ) : null}
+    </div>
+  );
+
+  const infoBlock = (
+    <div className="actors-page-video-draphy-info">
+      {showSkeleton ? (
+        <>
+          <div className="actors-page-video-draphy-title actors-page-video-draphy-title--skeleton">
+            <SkeletonLoader
+              variant="actors-page-video-draphy-title"
+              className="actors-page-video-draphy-title-skeleton"
+            />
+          </div>
+          <div className="actors-page-video-draphy-duration actors-page-video-draphy-duration--skeleton">
+            <SkeletonLoader
+              variant="actors-page-video-draphy-duration"
+              className="actors-page-video-draphy-duration-skeleton"
+            />
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="actors-page-video-draphy-title">{title}</div>
+          {Number.isFinite(durationSec) && (
+            <div className="actors-page-video-draphy-duration">
+              {formatVideoDuration(durationSec)}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+
   if (openInModal) {
     return (
       <div
-        className="actors-page-video-draphy-item actors-page-video-draphy-item--modal-trigger"
+        className={`actors-page-video-draphy-item actors-page-video-draphy-item--modal-trigger${
+          showSkeleton ? ' actors-page-video-draphy-item--loading' : ''
+        }`}
         role="button"
         tabIndex={0}
+        aria-busy={showSkeleton || undefined}
         onClick={openModal}
         onKeyDown={(e) => {
+          if (showSkeleton) return;
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             openModal();
           }
         }}
       >
-        <div className="actors-page-video-draphy-video-wrap">
-          <video
-            className="actors-page-video-draphy-video"
-            src={item.src}
-            muted
-            playsInline
-            preload="auto"
-            onLoadedMetadata={(e) => {
-              setDurationSec(e.target.duration);
-              primeVideoDraphyThumb(e.target);
-            }}
-            onError={markDraphyThumbError}
-          />
-        </div>
-        <div className="actors-page-video-draphy-info">
-          <div className="actors-page-video-draphy-title">{title}</div>
-          {Number.isFinite(durationSec) && (
-            <div className="actors-page-video-draphy-duration">{formatVideoDuration(durationSec)}</div>
-          )}
-        </div>
+        {videoWrap}
+        {infoBlock}
       </div>
     );
   }
 
   return (
-    <div className="actors-page-video-draphy-item">
-      <div className="actors-page-video-draphy-video-wrap">
-        <video
-          className="actors-page-video-draphy-video"
-          src={item.src}
-          controls
-          playsInline
-          preload="metadata"
-          onLoadedMetadata={(e) => setDurationSec(e.target.duration)}
-          onError={markDraphyThumbError}
-        />
-      </div>
-      <div className="actors-page-video-draphy-info">
-        <div className="actors-page-video-draphy-title">{title}</div>
-        {Number.isFinite(durationSec) && (
-          <div className="actors-page-video-draphy-duration">{formatVideoDuration(durationSec)}</div>
-        )}
-      </div>
+    <div
+      className={`actors-page-video-draphy-item${
+        showSkeleton ? ' actors-page-video-draphy-item--loading' : ''
+      }`}
+      aria-busy={showSkeleton || undefined}
+    >
+      {videoWrap}
+      {infoBlock}
     </div>
   );
 };

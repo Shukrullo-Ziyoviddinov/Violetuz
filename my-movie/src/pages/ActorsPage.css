@@ -1017,15 +1017,19 @@
   pointer-events: none;
 }
 
-/* Foto galereya sarlavha: icon 20px + gap 0.45rem + "Foto galereya" (~12ch), 1.1rem */
-.actors-page-media-heading--skeleton {
+/* Foto galereya sarlavha: icon 20px + gap 0.45rem + "Foto galereya" (~10ch), 1.1rem
+   .photo-gallery-head ichida real heading flex:1 — skeleton uchun bekor */
+.actors-page-media-heading--skeleton,
+.actors-page-photo-gallery-head .actors-page-media-heading.actors-page-section-heading.actors-page-media-heading--skeleton {
   display: block;
-  flex: 0 1 auto;
-  width: calc(20px + 0.45rem + 1.1rem * 10);
-  max-width: 100%;
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  width: calc(20px + 0.45rem + 1.1rem * 10) !important;
+  max-width: min(calc(20px + 0.45rem + 1.1rem * 10), 70%) !important;
   height: calc(max(20px, 1.1rem * 1.2));
   margin: 0;
   overflow: hidden;
+  min-width: 0;
 }
 
 .actors-page-media-heading-skeleton,
@@ -1178,6 +1182,90 @@
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.55);
   font-variant-numeric: tabular-nums;
+}
+
+.actors-page-video-draphy-block--skeleton {
+  pointer-events: none;
+}
+
+.actors-page-video-draphy-item--skeleton,
+.actors-page-video-draphy-item--loading {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* Videografiya title: "Videografiya" ~11ch — flex:1 otaga cho‘zilmasin */
+.actors-page-video-draphy-head .actors-page-media-heading.actors-page-section-heading.actors-page-video-draphy-heading--skeleton,
+.actors-page-video-draphy-heading--skeleton {
+  display: block;
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  width: calc(20px + 0.45rem + 1.1rem * 9) !important;
+  max-width: min(calc(20px + 0.45rem + 1.1rem * 9), 70%) !important;
+  height: calc(max(20px, 1.1rem * 1.2));
+  margin: 0;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.actors-page-video-draphy-heading-skeleton,
+.skeleton-loader--actors-page-video-draphy-heading {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 6px !important;
+}
+
+.actors-page-video-draphy-video-wrap--skeleton,
+.actors-page-video-draphy-video-wrap--loading {
+  position: relative;
+}
+
+.actors-page-video-draphy-thumb-skeleton,
+.skeleton-loader--actors-page-video-draphy-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit !important;
+  z-index: 2;
+}
+
+.actors-page-video-draphy-video--loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.actors-page-video-draphy-title--skeleton {
+  display: block;
+  width: min(100%, 9.5rem);
+  height: calc(0.95rem * 1.35);
+  overflow: hidden;
+}
+
+.actors-page-video-draphy-title-skeleton,
+.skeleton-loader--actors-page-video-draphy-title {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px !important;
+}
+
+.actors-page-video-draphy-duration--skeleton {
+  display: block;
+  width: calc(0.8rem * 4.5);
+  height: calc(0.8rem * 1.2);
+  overflow: hidden;
+}
+
+.actors-page-video-draphy-duration-skeleton,
+.skeleton-loader--actors-page-video-draphy-duration {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px !important;
 }
 
 @media (max-width: 900px) {
@@ -1348,6 +1436,113 @@
   font-size: 0.82rem;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.62);
+}
+
+.actor-extra-block--skeleton {
+  pointer-events: none;
+}
+
+.actor-extra-block__title--skeleton {
+  display: block;
+  width: calc(1.05rem * 8);
+  max-width: 60%;
+  height: calc(1.05rem * 1.2);
+  margin: 0 0 14px;
+  overflow: hidden;
+}
+
+.actor-extra-block__title-skeleton,
+.skeleton-loader--actor-extra-block-title {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 6px !important;
+}
+
+.actor-award-row--skeleton,
+.actor-award-row--loading {
+  pointer-events: none;
+}
+
+.actor-award-row__thumb {
+  position: relative;
+}
+
+.actor-award-row__thumb--skeleton,
+.actor-award-row__thumb--loading {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.actor-award-row__thumb-skeleton,
+.skeleton-loader--actor-award-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  z-index: 1;
+}
+
+.actor-award-row__thumb-img--loading {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.actor-award-row__title--skeleton {
+  display: inline-block;
+  width: calc(0.88rem * 7);
+  height: calc(0.88rem * 1.35);
+  overflow: hidden;
+  vertical-align: baseline;
+}
+
+.actor-award-row__title-skeleton,
+.skeleton-loader--actor-award-title {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px !important;
+}
+
+.actor-award-row__category--skeleton {
+  display: inline-block;
+  width: calc(0.88rem * 5.5);
+  height: calc(0.88rem * 1.35);
+  overflow: hidden;
+  vertical-align: baseline;
+}
+
+.actor-award-row__category-skeleton,
+.skeleton-loader--actor-award-category {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px !important;
+}
+
+.actor-award-row__work--skeleton {
+  display: block;
+  width: min(100%, 12rem);
+  height: calc(0.82rem * 1.4);
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.actor-award-row__work-skeleton,
+.skeleton-loader--actor-award-work {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px !important;
+}
+
+.actors-page-extras-wrap--skeleton {
+  pointer-events: none;
 }
 
 .actor-similar-scroll {
