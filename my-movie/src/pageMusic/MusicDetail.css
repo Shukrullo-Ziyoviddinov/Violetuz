@@ -999,30 +999,51 @@
     border: none;
   }
 
+  /*
+    Mobil: ustma-ust layout. Inline topStyle (padding:1rem + border)
+    chap–o‘ng surmasin — desktop stiliga tegilmaydi.
+  */
   .music-detail-top {
-    margin: 0;
-    padding: 1rem 0 0;
-    border-radius: 0; 
+    margin: 0 !important;
+    padding: 1rem 0 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-sizing: border-box;
   }
 
   .music-detail-top-row {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: stretch;
+    text-align: left;
+    gap: 1rem;
+    width: 100%;
   }
 
   .music-detail-right {
-    align-self: flex-start;
+    align-self: stretch;
+    width: 100%;
     text-align: left;
+    min-width: 0;
   }
 
   .music-detail-left {
     flex-shrink: 0;
     width: 160px;
+    align-self: flex-start;
   }
 
   .music-detail-title {
     font-size: 1.4rem;
+  }
+
+  .music-detail-title--skeleton {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .music-detail-audio-player {
+    width: 100%;
+    box-sizing: border-box;
   }
 
 }
@@ -1063,7 +1084,12 @@
   .music-detail-top {
     width: 100vw;
     max-width: 100vw;
-    margin-left: calc(50% - 50vw);
+    margin-left: calc(50% - 50vw) !important;
+    /* full-bleed fon, kontent chetiga yopishmasin */
+    padding-left: 0.7rem !important;
+    padding-right: 0.7rem !important;
+    padding-top: 1rem !important;
+    padding-bottom: 0 !important;
   }
 
   .music-detail-title {
@@ -1072,5 +1098,6 @@
   .music-detail-left {
     flex-shrink: 0;
     width: 300px;
+    max-width: 100%;
   }
 }

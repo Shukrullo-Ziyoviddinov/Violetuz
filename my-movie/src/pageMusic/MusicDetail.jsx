@@ -270,11 +270,13 @@ const MusicDetail = () => {
   const showVisualizerSkeleton = !audioGraphReady;
 
   const topColor = isCurrentTrack ? (pageDominantColor || dominantColor) : null;
-  /* Faqat gradient — padding/border/radius ga tegilmaydi (joy surilmasin) */
   const topStyle =
     topColor && typeof topColor.r === 'number'
       ? {
           background: `linear-gradient(180deg, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.65) 0%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.45) 40%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.28) 70%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.12) 100%)`,
+          borderRadius: '16px',
+          padding: '1rem',
+          border: `1px solid rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.55)`,
         }
       : undefined;
 
