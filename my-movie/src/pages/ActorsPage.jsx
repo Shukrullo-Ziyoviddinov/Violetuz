@@ -695,10 +695,15 @@ const ActorsPage = () => {
     setSelectedAge(null);
   }, [id]);
 
-  const actorMovies = useMemo(
-    () => (actor ? allMovies.filter((movie) => movie.actors?.includes(actor.id)) : []),
-    [actor?.id]
-  );
+  const actorMovies = useMemo(() => {
+    if (!actor) return [];
+    const actorId = String(actor.id);
+    return allMovies.filter(
+      (movie) =>
+        Array.isArray(movie.actors) &&
+        movie.actors.some((castId) => String(castId) === actorId)
+    );
+  }, [actor, allMovies]);
 
   const filteredActorMovies = useMemo(() => {
     let list = actorMovies;
