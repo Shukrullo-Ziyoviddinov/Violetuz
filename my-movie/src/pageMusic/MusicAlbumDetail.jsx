@@ -179,60 +179,60 @@ const MusicAlbumDetail = () => {
     document.body.removeChild(link);
   };
 
-  if (!album) {
-    if (albumsLoading) {
-      return (
-        <div className="music-detail music-detail--loading" aria-busy="true">
-          <div className="music-detail-container">
-            <div className="music-detail-layout">
-              <div className="music-detail-left-scroll">
-                <div className="music-detail-top">
-                  <div className="music-detail-top-row">
-                    <div className="music-detail-left">
-                      <SkeletonLoader
-                        variant="music-detail-cover"
-                        className="music-detail-cover-skeleton"
-                      />
-                    </div>
-                    <div className="music-detail-right">
-                      <div
-                        className="music-detail-title music-detail-title--skeleton"
-                        aria-hidden="true"
-                      >
-                        <SkeletonLoader variant="music-detail-title" />
-                      </div>
-                      <div
-                        className="music-detail-artist-block music-detail-artist-block--skeleton"
-                        aria-hidden="true"
-                      >
-                        <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
-                        <div className="music-detail-artist-info">
-                          <SkeletonLoader variant="music-detail-artist-name" />
-                          <SkeletonLoader variant="music-detail-artist-meta" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <MusicDetailPlayerSkeleton />
-                </div>
-              </div>
-              <div className="music-detail-right-scroll" aria-hidden="true">
-                <SkeletonLoader
-                  variant="music-detail-artist-name"
-                  className="music-detail-trend-title-skeleton"
-                  width={140}
-                  height={20}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
+  if (!album && !albumsLoading) {
     return (
       <div className="music-detail">
         <div className="music-detail-error">Albom topilmadi</div>
+      </div>
+    );
+  }
+
+  if (!album) {
+    return (
+      <div className="music-detail music-detail--loading" aria-busy="true">
+        <div className="music-detail-container">
+          <div className="music-detail-layout">
+            <div className="music-detail-left-scroll">
+              <div className="music-detail-top">
+                <div className="music-detail-top-row">
+                  <div className="music-detail-left">
+                    <SkeletonLoader
+                      variant="music-detail-cover"
+                      className="music-detail-cover-skeleton"
+                    />
+                  </div>
+                  <div className="music-detail-right">
+                    <div
+                      className="music-detail-title music-detail-title--skeleton"
+                      aria-hidden="true"
+                    >
+                      <SkeletonLoader variant="music-detail-title" />
+                    </div>
+                    <div
+                      className="music-detail-artist-block music-detail-artist-block--skeleton"
+                      aria-hidden="true"
+                    >
+                      <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
+                      <div className="music-detail-artist-info">
+                        <SkeletonLoader variant="music-detail-artist-name" />
+                        <SkeletonLoader variant="music-detail-artist-meta" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <MusicDetailPlayerSkeleton hideDownload />
+              </div>
+            </div>
+            <div className="music-detail-right-scroll" aria-hidden="true">
+              <SkeletonLoader
+                variant="music-detail-artist-name"
+                className="music-detail-trend-title-skeleton"
+                width={140}
+                height={20}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -252,9 +252,7 @@ const MusicAlbumDetail = () => {
     displayColor && typeof displayColor.r === 'number'
       ? {
           background: `linear-gradient(180deg, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.65) 0%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.45) 40%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.28) 70%, rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.12) 100%)`,
-          borderRadius: '16px',
-          padding: '1rem',
-          border: `1px solid rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.55)`,
+          borderColor: `rgba(${displayColor.r}, ${displayColor.g}, ${displayColor.b}, 0.55)`,
         }
       : undefined;
 

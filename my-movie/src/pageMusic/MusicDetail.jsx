@@ -236,58 +236,8 @@ const MusicDetail = () => {
     document.body.removeChild(link);
   };
 
-  if (!music) {
-    if (musicLoading) {
-      return (
-        <div className="music-detail music-detail--loading" aria-busy="true">
-          <div className="music-detail-container">
-            <div className="music-detail-layout">
-              <div className="music-detail-left-scroll">
-                <div className="music-detail-top">
-                  <div className="music-detail-top-row">
-                    <div className="music-detail-left">
-                      <SkeletonLoader
-                        variant="music-detail-cover"
-                        className="music-detail-cover-skeleton"
-                      />
-                    </div>
-                    <div className="music-detail-right">
-                      <div
-                        className="music-detail-title music-detail-title--skeleton"
-                        aria-hidden="true"
-                      >
-                        <SkeletonLoader variant="music-detail-title" />
-                      </div>
-                      <div
-                        className="music-detail-artist-block music-detail-artist-block--skeleton"
-                        aria-hidden="true"
-                      >
-                        <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
-                        <div className="music-detail-artist-info">
-                          <SkeletonLoader variant="music-detail-artist-name" />
-                          <SkeletonLoader variant="music-detail-artist-meta" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <MusicDetailPlayerSkeleton />
-                </div>
-              </div>
-              {/* Real layout kengligini saqlash — o‘ng ustun bo‘lmasa player cho‘ziladi */}
-              <div className="music-detail-right-scroll" aria-hidden="true">
-                <SkeletonLoader
-                  variant="music-detail-artist-name"
-                  className="music-detail-trend-title-skeleton"
-                  width={140}
-                  height={20}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
+  /* Faqat yuklash tugab trek yo‘q — xato. Loadingda ham shu layout (remount = qimirlash). */
+  if (!music && !musicLoading) {
     return (
       <div className="music-detail">
         <div className="music-detail-error">Musiqa topilmadi</div>
@@ -297,8 +247,9 @@ const MusicDetail = () => {
 
   /* Player UI: sahifadagi trek = context dagi trek. syncFromPlayer = prev/next orqali keldik, timing uchun fallback */
   const isCurrentTrack =
-    matchId(currentMusic?.id, music?.id) ||
-    (!!location.state?.syncFromPlayer && music?.id != null);
+    !!music &&
+    (matchId(currentMusic?.id, music.id) ||
+      (!!location.state?.syncFromPlayer && music.id != null));
 
   // Bo'lim bo'yicha ro'yxat va title (Trend, Musiqani kashf eting, va hokazo)
   const trendList =
@@ -309,31 +260,31 @@ const MusicDetail = () => {
         : ensureArray(allMusic);
   const sectionTitle = sectionConfig ? t(sectionConfig.titleKey, sectionConfig.titleDefault) : t('music.trendMusic', 'Trend Musiqa');
 
-  const showCoverSkeleton = !coverSrc || coverImg.showSkeleton;
-  const showArtistSkeleton = artistsLoading || !pageArtist;
+  const showCoverSkeleton = !music || !coverSrc || coverImg.showSkeleton;
+  const showArtistSkeleton = !music || artistsLoading || !pageArtist;
   const showArtistImgSkeleton =
     showArtistSkeleton ||
     (Boolean(artistImgSrc) && artistImg.showSkeleton) ||
     (!!pageArtist && !artistImgSrc);
-  const showTitleSkeleton = !getTitle(music);
-  /* Player faqat current track da (asl UI); visualizer audio tayyor bo‘lguncha skeleton */
-  const showVisualizerSkeleton = isCurrentTrack && !audioGraphReady;
+  const showTitleSkeleton = !music || !getTitle(music);
+  const showVisualizerSkeleton = !audioGraphReady;
 
   const topColor = isCurrentTrack ? (pageDominantColor || dominantColor) : null;
+  /* Faqat fon/border-color — padding/radius CSS da, o‘zgarmaydi */
   const topStyle =
     topColor && typeof topColor.r === 'number'
       ? {
           background: `linear-gradient(180deg, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.65) 0%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.45) 40%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.28) 70%, rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.12) 100%)`,
-          borderRadius: '16px',
-          padding: '1rem',
-          border: `1px solid rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.55)`,
+          borderColor: `rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.55)`,
         }
       : undefined;
 
   return (
     <div
-      className="music-detail"
-      aria-busy={showCoverSkeleton || showArtistSkeleton || undefined}
+      className={`music-detail${musicLoading && !music ? ' music-detail--loading' : ''}`}
+      aria-busy={
+        musicLoading || showCoverSkeleton || showArtistSkeleton || undefined
+      }
     >
       <div className="music-detail-container">
         <div className="music-detail-layout">
@@ -354,7 +305,7 @@ const MusicDetail = () => {
                         coverImg.imgRef(el);
                       }}
                       src={coverSrc}
-                      alt={getTitle(music)}
+                      alt={music ? getTitle(music) : ''}
                       className={`music-detail-image${
                         showCoverSkeleton ? ' music-detail-image--loading' : ''
                       }`}
@@ -425,58 +376,90 @@ const MusicDetail = () => {
                   )}
                 </div>
               </div>
-              {isCurrentTrack ? (
-              <div className="music-detail-audio-player">
+              {!music ? (
+                <MusicDetailPlayerSkeleton />
+              ) : (
+              <div
+                className={`music-detail-audio-player${
+                  !isCurrentTrack ? ' music-detail-audio-player--skeleton' : ''
+                }`}
+              >
                 <button
-                  className="music-detail-play-btn"
+                  className={`music-detail-play-btn${
+                    !isCurrentTrack ? ' music-detail-play-btn--skeleton' : ''
+                  }`}
                   onClick={togglePlay}
+                  disabled={!isCurrentTrack}
                   aria-label={isPlaying ? 'Pauza' : 'Ijro etish'}
+                  aria-hidden={!isCurrentTrack}
                 >
-                  {isPlaying ? (
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="6" y="4" width="4" height="16" />
-                      <rect x="14" y="4" width="4" height="16" />
-                    </svg>
-                  ) : (
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5 3 19 12 5 21" />
-                    </svg>
-                  )}
+                  {isCurrentTrack ? (
+                    isPlaying ? (
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16" />
+                        <rect x="14" y="4" width="4" height="16" />
+                      </svg>
+                    ) : (
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21" />
+                      </svg>
+                    )
+                  ) : null}
                 </button>
                 <button
-                  className="music-detail-action-btn music-detail-download-btn"
+                  className={`music-detail-action-btn music-detail-download-btn${
+                    !isCurrentTrack ? ' music-detail-action-btn--skeleton' : ''
+                  }`}
                   onClick={handleDownload}
+                  disabled={!isCurrentTrack}
                   aria-label="Yuklab olish"
+                  aria-hidden={!isCurrentTrack}
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
+                  {isCurrentTrack ? (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  ) : null}
                 </button>
                 <button
-                  className={`music-detail-action-btn music-detail-save-btn ${isInWishlist(music.id, 'music') ? 'active' : ''}`}
+                  className={`music-detail-action-btn music-detail-save-btn${
+                    !isCurrentTrack ? ' music-detail-action-btn--skeleton' : ''
+                  }${isInWishlist(music.id, 'music') ? ' active' : ''}`}
                   onClick={() => toggleWishlist(music.id, 'music')}
+                  disabled={!isCurrentTrack}
                   aria-label="Sevimlilarga saqlash"
+                  aria-hidden={!isCurrentTrack}
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill={isInWishlist(music.id, 'music') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
+                  {isCurrentTrack ? (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill={isInWishlist(music.id, 'music') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  ) : null}
                 </button>
                 <div className="music-detail-share-wrap">
-                  <ShareButton movie={music} dropdownInPortal />
+                  {isCurrentTrack ? (
+                    <ShareButton movie={music} dropdownInPortal />
+                  ) : (
+                    <span className="share-button music-detail-share-btn--skeleton" />
+                  )}
                 </div>
-                <Repost
-                  className="music-detail-action-btn"
-                  item={{
-                    id: music.id,
-                    type: 'music',
-                    title: getTitle(music),
-                    image: music.img || '/img/movie1.jpg',
-                    route: `/music/${music.id}${resolvedSection ? `?section=${encodeURIComponent(resolvedSection)}` : ''}`,
-                  }}
-                />
-                {showVisualizerSkeleton ? (
+                {isCurrentTrack ? (
+                  <Repost
+                    className="music-detail-action-btn"
+                    item={{
+                      id: music.id,
+                      type: 'music',
+                      title: getTitle(music),
+                      image: music.img || '/img/movie1.jpg',
+                      route: `/music/${music.id}${resolvedSection ? `?section=${encodeURIComponent(resolvedSection)}` : ''}`,
+                    }}
+                  />
+                ) : (
+                  <span className="music-detail-action-btn music-detail-action-btn--skeleton repost-btn" />
+                )}
+                {showVisualizerSkeleton || !isCurrentTrack ? (
                   <div className={visualizerStyles.visualizer} aria-hidden="true">
                     <span
                       className={`${visualizerStyles.canvas} music-detail-visualizer-canvas--skeleton`}
@@ -490,7 +473,7 @@ const MusicDetail = () => {
                   />
                 )}
               </div>
-              ) : null}
+              )}
             </div>
             {music?.lyricsText && getLyricsText(music.lyricsText)?.trim() && (
               <button
@@ -538,77 +521,92 @@ const MusicDetail = () => {
                 />
               </div>
             )}
-            <SimilarSongs music={music} />
-            <AlbumsForYou music={music} />
-            <RecommendedClips music={music} />
+            {music && (
+              <>
+                <SimilarSongs music={music} />
+                <AlbumsForYou music={music} />
+                <RecommendedClips music={music} />
+              </>
+            )}
           </div>
           <div className="music-detail-right-scroll">
-            <h3 className="music-detail-trend-title">{sectionTitle}</h3>
-            <div className="music-detail-trend-grid">
-              {trendList.map((item) => {
-                const itemArtist = getArtistById(item.artistId);
-                const isPlayingTrack = item.id === currentMusic?.id;
-                const cardDominantColor = isPlayingTrack ? (pageDominantColor || dominantColor) : null;
-                return (
-                  <div
-                    key={item.id}
-                    className={`music-detail-trend-card ${isPlayingTrack ? 'music-detail-trend-card-active' : ''}`}
-                    style={
-                      isPlayingTrack &&
-                      cardDominantColor &&
-                      typeof cardDominantColor.r === 'number'
-                        ? {
-                            '--card-dominant-r': cardDominantColor.r,
-                            '--card-dominant-g': cardDominantColor.g,
-                            '--card-dominant-b': cardDominantColor.b,
-                          }
-                        : undefined
-                    }
-                    onClick={() => navigate(`/music/${item.id}${resolvedSection ? `?section=${encodeURIComponent(resolvedSection)}` : ''}`)}
-                  >
-                    <div className="music-detail-trend-card-img-wrap">
-                      <img
-                        src={item.img || '/img/movie1.jpg'}
-                        alt={getTitle(item)}
-                        className="music-detail-trend-card-img"
-                      />
-                      <button
-                        className={`music-detail-trend-card-wishlist ${isInWishlist(item.id, 'music') ? 'active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleWishlist(item.id, 'music');
-                        }}
-                        aria-label="Sevimlilarga qo'shish"
+            {music ? (
+              <>
+                <h3 className="music-detail-trend-title">{sectionTitle}</h3>
+                <div className="music-detail-trend-grid">
+                  {trendList.map((item) => {
+                    const itemArtist = getArtistById(item.artistId);
+                    const isPlayingTrack = item.id === currentMusic?.id;
+                    const cardDominantColor = isPlayingTrack ? (pageDominantColor || dominantColor) : null;
+                    return (
+                      <div
+                        key={item.id}
+                        className={`music-detail-trend-card ${isPlayingTrack ? 'music-detail-trend-card-active' : ''}`}
+                        style={
+                          isPlayingTrack &&
+                          cardDominantColor &&
+                          typeof cardDominantColor.r === 'number'
+                            ? {
+                                '--card-dominant-r': cardDominantColor.r,
+                                '--card-dominant-g': cardDominantColor.g,
+                                '--card-dominant-b': cardDominantColor.b,
+                              }
+                            : undefined
+                        }
+                        onClick={() => navigate(`/music/${item.id}${resolvedSection ? `?section=${encodeURIComponent(resolvedSection)}` : ''}`)}
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill={isInWishlist(item.id, 'music') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                        </svg>
-                      </button>
-                      <div className="music-detail-trend-card-play">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                          <polygon points="5 3 19 12 5 21" />
-                        </svg>
+                        <div className="music-detail-trend-card-img-wrap">
+                          <img
+                            src={item.img || '/img/movie1.jpg'}
+                            alt={getTitle(item)}
+                            className="music-detail-trend-card-img"
+                          />
+                          <button
+                            className={`music-detail-trend-card-wishlist ${isInWishlist(item.id, 'music') ? 'active' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleWishlist(item.id, 'music');
+                            }}
+                            aria-label="Sevimlilarga qo'shish"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill={isInWishlist(item.id, 'music') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                            </svg>
+                          </button>
+                          <div className="music-detail-trend-card-play">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <polygon points="5 3 19 12 5 21" />
+                            </svg>
+                          </div>
+                        </div>
+                        {isPlayingTrack && (
+                          <CardVisual
+                            analyserRef={analyserRef}
+                            isPlaying={isPlaying}
+                            audioGraphReady={audioGraphReady}
+                          />
+                        )}
+                        <div className="music-detail-trend-card-info">
+                          <span className="music-detail-trend-card-title">{getTitle(item)}</span>
+                          <span className="music-detail-trend-card-artist">{itemArtist?.name || ''}</span>
+                          <span className="music-detail-trend-card-meta">
+                            {item.year && <span className="music-detail-trend-card-year">{item.year}</span>}
+                            <AudioDuration audioUrl={item.audio} prefix={item.year ? ' • ' : ''} />
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    {isPlayingTrack && (
-                      <CardVisual
-                        analyserRef={analyserRef}
-                        isPlaying={isPlaying}
-                        audioGraphReady={audioGraphReady}
-                      />
-                    )}
-                    <div className="music-detail-trend-card-info">
-                      <span className="music-detail-trend-card-title">{getTitle(item)}</span>
-                      <span className="music-detail-trend-card-artist">{itemArtist?.name || ''}</span>
-                      <span className="music-detail-trend-card-meta">
-                        {item.year && <span className="music-detail-trend-card-year">{item.year}</span>}
-                        <AudioDuration audioUrl={item.audio} prefix={item.year ? ' • ' : ''} />
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <SkeletonLoader
+                variant="music-detail-artist-name"
+                className="music-detail-trend-title-skeleton"
+                width={140}
+                height={20}
+              />
+            )}
           </div>
         </div>
       </div>
