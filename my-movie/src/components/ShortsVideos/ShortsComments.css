@@ -132,10 +132,10 @@
 }
 
 .shorts-comment-like-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
+  width: 25px;
+  height: 25px;
+  min-width: 25px;
+  min-height: 25px;
   border: none;
   background: rgba(255, 255, 255, 0.197);
   border-radius: 50%;
