@@ -604,6 +604,10 @@
   box-sizing: border-box;
 }
 
+.actors-page-movies--skeleton {
+  pointer-events: none;
+}
+
 .actors-page-error {
   display: flex;
   flex-direction: column;

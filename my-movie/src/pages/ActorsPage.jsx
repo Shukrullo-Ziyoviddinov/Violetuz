@@ -16,7 +16,9 @@ import ActorAwardsSection, {
   ActorAwardsSectionSkeleton,
 } from '../components/ActorAwardsSection/ActorAwardsSection';
 import SimilarActors, { SimilarActorsSkeleton } from '../components/SimilarActors/SimilarActors';
-import ActorTopRatedKinolar from '../components/ActorTopRatedKinolar/ActorTopRatedKinolar';
+import ActorTopRatedKinolar, {
+  ActorTopRatedKinolarSkeleton,
+} from '../components/ActorTopRatedKinolar/ActorTopRatedKinolar';
 import Filters from '../components/Filters';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
@@ -312,6 +314,19 @@ const ActorsPageProfileSkeleton = () => (
       <div className="actors-page-extras-wrap actors-page-extras-wrap--skeleton" aria-hidden="true">
         <ActorAwardsSectionSkeleton />
         <SimilarActorsSkeleton />
+        <ActorTopRatedKinolarSkeleton />
+      </div>
+
+      <div className="actors-page-movies actors-page-movies--skeleton" aria-hidden="true">
+        <Filters isLoading />
+        <Movies
+          sectionType="all"
+          limit={null}
+          filteredMovies={[]}
+          hideHeader
+          isLoading
+          showHorizontalScroll
+        />
       </div>
   </div>
 );

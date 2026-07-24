@@ -4,6 +4,8 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useActorsApi } from '../../context/ActorsApiContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import ShowMoreButton from '../ShowMoreButton/ShowMoreButton';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
 import './ActorTopRatedKinolar.css';
 
 const getMovieTitle = (m, lang) => {
@@ -23,10 +25,109 @@ const getPoster = (m) => {
 /** Sahifada 3×2 = 6 ta kartochka; ortiqchalari "Ko'proq" orqali /recommended */
 const TOP_RATED_VISIBLE_COUNT = 6;
 
+const ActorTopRatedCardSkeleton = () => (
+  <li className="actor-toprated-card actor-toprated-card--skeleton" aria-hidden="true">
+    <div className="actor-toprated-card__btn actor-toprated-card__btn--skeleton">
+      <div className="actor-toprated-card__img-wrap actor-toprated-card__img-wrap--skeleton">
+        <SkeletonLoader
+          variant="actor-toprated-img"
+          className="actor-toprated-card__img-skeleton"
+        />
+        <span className="actor-toprated-card__imdb actor-toprated-card__imdb--skeleton">
+          <SkeletonLoader
+            variant="actor-toprated-imdb"
+            className="actor-toprated-card__imdb-skeleton"
+          />
+        </span>
+      </div>
+    </div>
+  </li>
+);
+
+export const ActorTopRatedKinolarSkeleton = ({ count = TOP_RATED_VISIBLE_COUNT }) => (
+  <section
+    className="actor-toprated actor-extra-block actor-extra-block--top-rated actor-extra-block--skeleton"
+    aria-busy="true"
+  >
+    <div className="actor-toprated-head">
+      <div className="actor-extra-block__title actor-extra-block__title--skeleton actor-toprated-head__title--skeleton">
+        <SkeletonLoader
+          variant="actor-extra-block-title"
+          className="actor-extra-block__title-skeleton"
+        />
+      </div>
+    </div>
+    <div className="actor-toprated-scroll">
+      <ul className="actor-toprated-list">
+        {Array.from({ length: count }, (_, i) => (
+          <ActorTopRatedCardSkeleton key={`toprated-sk-${i}`} />
+        ))}
+      </ul>
+    </div>
+  </section>
+);
+
+const ActorTopRatedCard = ({ movie, name, poster, ratingImdb, onOpen }) => {
+  const { showSkeleton, imgRef, onLoad, onError } = useImageReady(poster || '');
+
+  return (
+    <li
+      className={`actor-toprated-card${showSkeleton ? ' actor-toprated-card--loading' : ''}`}
+      aria-busy={showSkeleton || undefined}
+    >
+      <button
+        type="button"
+        className="actor-toprated-card__btn"
+        disabled={showSkeleton}
+        onClick={() => !showSkeleton && onOpen?.(movie.id)}
+        aria-label={name || undefined}
+      >
+        <div
+          className={`actor-toprated-card__img-wrap${
+            showSkeleton ? ' actor-toprated-card__img-wrap--loading' : ''
+          }`}
+        >
+          {showSkeleton && (
+            <SkeletonLoader
+              variant="actor-toprated-img"
+              className="actor-toprated-card__img-skeleton"
+            />
+          )}
+          {poster ? (
+            <img
+              ref={imgRef}
+              src={poster}
+              alt=""
+              className={`actor-toprated-card__img${
+                showSkeleton ? ' actor-toprated-card__img--loading' : ''
+              }`}
+              loading="lazy"
+              onLoad={onLoad}
+              onError={onError}
+            />
+          ) : null}
+          {showSkeleton ? (
+            <span className="actor-toprated-card__imdb actor-toprated-card__imdb--skeleton">
+              <SkeletonLoader
+                variant="actor-toprated-imdb"
+                className="actor-toprated-card__imdb-skeleton"
+              />
+            </span>
+          ) : (
+            <span className="actor-toprated-card__imdb">
+              IMDb {Number(ratingImdb).toFixed(1)}
+            </span>
+          )}
+        </div>
+      </button>
+    </li>
+  );
+};
+
 const ActorTopRatedKinolar = ({ actorId }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
-  const { allMovies } = useMoviesApi();
+  const { allMovies, moviesLoading } = useMoviesApi();
   const { actorPageSectionLabels } = useActorsApi();
 
   const list = useMemo(() => {
@@ -40,6 +141,10 @@ const ActorTopRatedKinolar = ({ actorId }) => {
 
   const visible = useMemo(() => list.slice(0, TOP_RATED_VISIBLE_COUNT), [list]);
   const hasMore = list.length > TOP_RATED_VISIBLE_COUNT;
+
+  if (moviesLoading) {
+    return <ActorTopRatedKinolarSkeleton />;
+  }
 
   if (!list.length) return null;
 
@@ -61,19 +166,14 @@ const ActorTopRatedKinolar = ({ actorId }) => {
             const poster = getPoster(m);
             const name = getMovieTitle(m, contentLang);
             return (
-              <li key={m.id} className="actor-toprated-card">
-                <button
-                  type="button"
-                  className="actor-toprated-card__btn"
-                  onClick={() => navigate(`/movie/${m.id}`)}
-                  aria-label={name || undefined}
-                >
-                  <div className="actor-toprated-card__img-wrap">
-                    <img src={poster} alt="" className="actor-toprated-card__img" loading="lazy" />
-                    <span className="actor-toprated-card__imdb">IMDb {Number(m.ratingImdb).toFixed(1)}</span>
-                  </div>
-                </button>
-              </li>
+              <ActorTopRatedCard
+                key={m.id}
+                movie={m}
+                name={name}
+                poster={poster}
+                ratingImdb={m.ratingImdb}
+                onOpen={(id) => navigate(`/movie/${id}`)}
+              />
             );
           })}
         </ul>

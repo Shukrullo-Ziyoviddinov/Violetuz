@@ -14,6 +14,71 @@
   min-width: 0;
 }
 
+/* Title skeleton — flex:1 bilan cho‘zilmasin */
+.actor-toprated-head .actor-extra-block__title.actor-toprated-head__title--skeleton,
+.actor-toprated-head__title--skeleton {
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  width: calc(1.05rem * 12) !important;
+  max-width: min(calc(1.05rem * 12), 75%) !important;
+  height: calc(1.05rem * 1.2);
+  overflow: hidden;
+}
+
+.actor-toprated-card--skeleton,
+.actor-toprated-card--loading {
+  pointer-events: none;
+}
+
+.actor-toprated-card__btn--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
+.actor-toprated .actor-toprated-card__img-wrap--skeleton,
+.actor-toprated .actor-toprated-card__img-wrap--loading {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.actor-toprated-card__img-skeleton,
+.skeleton-loader--actor-toprated-img {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  z-index: 1;
+}
+
+.actor-toprated-card__img--loading {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* IMDb badge: padding 2px 4px + font clamp ~0.65rem, bottom/left/right 4px */
+.actor-toprated .actor-toprated-card__imdb--skeleton {
+  display: block;
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  overflow: hidden;
+  height: calc(0.65rem * 1.2 + 2px * 2);
+  line-height: 0;
+}
+
+.actor-toprated-card__imdb-skeleton,
+.skeleton-loader--actor-toprated-imdb {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 3px !important;
+}
+
 .actor-toprated-head .show-more-btn {
   flex-shrink: 0;
 }
@@ -119,5 +184,9 @@
     bottom: 2px;
     left: 2px;
     right: 2px;
+  }
+
+  .actor-toprated .actor-toprated-card__imdb--skeleton {
+    height: calc(0.5rem * 1.2 + 1px * 2);
   }
 }
