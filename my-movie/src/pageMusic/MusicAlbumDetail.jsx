@@ -13,27 +13,8 @@ import AlbumsForYou from '../Music/AlbumsForYou/AlbumsForYou';
 import SimilarSongs from '../Music/SimilarSongs/SimilarSongs';
 import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
 import { AudioVisualizerCanvas, CardVisual } from '../Music/Visual';
-import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
-import { useImageReady } from '../utils/useImageReady';
-import visualizerStyles from '../Music/Visual/AudioVisualizerCanvas.module.css';
 import './MusicDetail.css';
 import './MusicAlbumDetail.css';
-
-const MusicDetailPlayerSkeleton = ({ hideDownload = false }) => (
-  <div className="music-detail-audio-player music-detail-audio-player--skeleton" aria-hidden="true">
-    <span className="music-detail-play-btn music-detail-play-btn--skeleton" />
-    <span className="music-detail-action-btn music-detail-action-btn--skeleton" />
-    {!hideDownload && (
-      <span className="music-detail-action-btn music-detail-action-btn--skeleton" />
-    )}
-    <div className="music-detail-share-wrap">
-      <span className="share-button music-detail-share-btn--skeleton" />
-    </div>
-    <div className={visualizerStyles.visualizer}>
-      <span className={`${visualizerStyles.canvas} music-detail-visualizer-canvas--skeleton`} />
-    </div>
-  </div>
-);
 
 const ALBUM_TRACK_ID_OFFSET = 50000;
 
@@ -50,7 +31,7 @@ const albumSongToTrack = (album, song) => ({
 
 const MusicAlbumDetail = () => {
   const { id } = useParams();
-  const { sections, allAlbums, getAlbumsByCategory, albumsLoading, getArtistById, artistsLoading } =
+  const { sections, allAlbums, getAlbumsByCategory } =
     useMusicApi();
   const albumSections = (sections || []).filter((s) => s.wishlistType === 'album');
   const topAlbums = getAlbumsByCategory('TopAlbums');
@@ -128,12 +109,6 @@ const MusicAlbumDetail = () => {
 
   const album = allAlbums.find((a) => matchId(a.id, id));
 
-  const coverSrc = album?.img || '';
-  const coverImg = useImageReady(coverSrc);
-  const artistImgSrc = album?.img || '';
-  const artistImg = useImageReady(artistImgSrc);
-  const pageArtist = album?.artistId ? getArtistById(album.artistId) : null;
-
   /* Bo'lim bo'yicha ro'yxat va sarlavha – Music Drops, Top Albomlar va hokazo */
   const albumList = sectionConfig?.categoryNameMusic
     ? getAlbumsByCategory(sectionConfig.categoryNameMusic)
@@ -179,60 +154,10 @@ const MusicAlbumDetail = () => {
     document.body.removeChild(link);
   };
 
-  if (!album && !albumsLoading) {
+  if (!album) {
     return (
       <div className="music-detail">
         <div className="music-detail-error">Albom topilmadi</div>
-      </div>
-    );
-  }
-
-  if (!album) {
-    return (
-      <div className="music-detail music-detail--loading" aria-busy="true">
-        <div className="music-detail-container">
-          <div className="music-detail-layout">
-            <div className="music-detail-left-scroll">
-              <div className="music-detail-top">
-                <div className="music-detail-top-row">
-                  <div className="music-detail-left">
-                    <SkeletonLoader
-                      variant="music-detail-cover"
-                      className="music-detail-cover-skeleton"
-                    />
-                  </div>
-                  <div className="music-detail-right">
-                    <div
-                      className="music-detail-title music-detail-title--skeleton"
-                      aria-hidden="true"
-                    >
-                      <SkeletonLoader variant="music-detail-title" />
-                    </div>
-                    <div
-                      className="music-detail-artist-block music-detail-artist-block--skeleton"
-                      aria-hidden="true"
-                    >
-                      <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
-                      <div className="music-detail-artist-info">
-                        <SkeletonLoader variant="music-detail-artist-name" />
-                        <SkeletonLoader variant="music-detail-artist-meta" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <MusicDetailPlayerSkeleton hideDownload />
-              </div>
-            </div>
-            <div className="music-detail-right-scroll" aria-hidden="true">
-              <SkeletonLoader
-                variant="music-detail-artist-name"
-                className="music-detail-trend-title-skeleton"
-                width={140}
-                height={20}
-              />
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
@@ -241,12 +166,6 @@ const MusicAlbumDetail = () => {
   const isCurrentTrack = currentTrack && currentMusic?.id === currentTrack?.id;
   const isAlbumPlaying = !!currentTrack;
   const displayColor = (isAlbumPlaying && dominantColor) ? dominantColor : albumDominantColor;
-
-  const showCoverSkeleton = !coverSrc || coverImg.showSkeleton;
-  const showArtistSkeleton = artistsLoading && !album.artist && !pageArtist;
-  const showArtistImgSkeleton =
-    showArtistSkeleton || (Boolean(artistImgSrc) && artistImg.showSkeleton);
-  const showVisualizerSkeleton = !audioGraphReady;
 
   const topStyle =
     displayColor && typeof displayColor.r === 'number'
@@ -286,36 +205,21 @@ const MusicAlbumDetail = () => {
             <div className="music-detail-top" style={topStyle}>
               <div className="music-detail-top-row">
                 <div className="music-detail-left">
-                  {showCoverSkeleton && (
-                    <SkeletonLoader
-                      variant="music-detail-cover"
-                      className="music-detail-cover-skeleton"
-                    />
-                  )}
-                  {coverSrc && !coverImg.failed && (
-                    <img
-                      ref={coverImg.imgRef}
-                      src={coverSrc}
-                      alt={album.title}
-                      className={`music-detail-image${
-                        showCoverSkeleton ? ' music-detail-image--loading' : ''
-                      }`}
-                      onLoad={coverImg.onLoad}
-                      onError={coverImg.onError}
-                    />
-                  )}
+                  <img
+                    src={album.img || '/img/movie1.jpg'}
+                    alt={album.title}
+                    className="music-detail-image"
+                  />
                 </div>
                 <div className="music-detail-right">
                   <h1 className="music-detail-title">{album.title}</h1>
                   <div
-                    className={`music-detail-artist-block music-album-artist-block${
-                      showArtistSkeleton ? ' music-detail-artist-block--skeleton' : ''
-                    }`}
-                    role={!showArtistSkeleton && album.artistId ? 'button' : undefined}
-                    tabIndex={!showArtistSkeleton && album.artistId ? 0 : undefined}
-                    onClick={!showArtistSkeleton && album.artistId ? handleArtistClick : undefined}
+                    className="music-detail-artist-block music-album-artist-block"
+                    role={album.artistId ? 'button' : undefined}
+                    tabIndex={album.artistId ? 0 : undefined}
+                    onClick={album.artistId ? handleArtistClick : undefined}
                     onKeyDown={
-                      !showArtistSkeleton && album.artistId
+                      album.artistId
                         ? (e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                               e.preventDefault();
@@ -324,53 +228,27 @@ const MusicAlbumDetail = () => {
                           }
                         : undefined
                     }
-                    style={
-                      showArtistSkeleton || !album.artistId
-                        ? { cursor: 'default' }
-                        : { cursor: 'pointer' }
-                    }
-                    aria-busy={showArtistSkeleton || showArtistImgSkeleton || undefined}
+                    style={album.artistId ? { cursor: 'pointer' } : undefined}
                   >
-                    <div className="music-detail-artist-img-wrap">
-                      {showArtistImgSkeleton && (
-                        <span className="music-detail-artist-img music-detail-artist-img--skeleton" />
-                      )}
-                      {artistImgSrc && !artistImg.failed && (
-                        <img
-                          ref={artistImg.imgRef}
-                          src={artistImgSrc}
-                          alt={album.artist}
-                          className={`music-detail-artist-img${
-                            showArtistImgSkeleton ? ' music-detail-artist-img--loading' : ''
-                          }`}
-                          onLoad={artistImg.onLoad}
-                          onError={artistImg.onError}
-                        />
-                      )}
-                    </div>
+                    <img
+                      src={album.img || '/img/movie1.jpg'}
+                      alt={album.artist}
+                      className="music-detail-artist-img"
+                    />
                     <div className="music-detail-artist-info">
-                      {showArtistSkeleton ? (
-                        <>
-                          <SkeletonLoader variant="music-detail-artist-name" />
-                          <SkeletonLoader variant="music-detail-artist-meta" />
-                        </>
-                      ) : (
-                        <>
-                          <span className="music-detail-artist-name">{album.artist}</span>
-                          {album.year && (
-                            <span className="music-detail-artist-year">{album.year}</span>
-                          )}
-                          {album.songs?.length > 0 && (
-                            <span className="music-detail-artist-year">
-                              {t('music.albumSongsCount', { count: album.songs.length })}
-                            </span>
-                          )}
-                          {albumTotalDuration != null && albumTotalDuration > 0 && (
-                            <span className="music-detail-artist-duration">
-                              {t('music.albumTotal')} {formatTime(albumTotalDuration)}
-                            </span>
-                          )}
-                        </>
+                      <span className="music-detail-artist-name">{album.artist}</span>
+                      {album.year && (
+                        <span className="music-detail-artist-year">{album.year}</span>
+                      )}
+                      {album.songs?.length > 0 && (
+                        <span className="music-detail-artist-year">
+                          {t('music.albumSongsCount', { count: album.songs.length })}
+                        </span>
+                      )}
+                      {albumTotalDuration != null && albumTotalDuration > 0 && (
+                        <span className="music-detail-artist-duration">
+                          {t('music.albumTotal')} {formatTime(albumTotalDuration)}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -419,19 +297,11 @@ const MusicAlbumDetail = () => {
                     <ShareButton movie={album} dropdownInPortal />
                   </div>
                 {isAlbumPlaying && (
-                  showVisualizerSkeleton ? (
-                    <div className={visualizerStyles.visualizer} aria-hidden="true">
-                      <span
-                        className={`${visualizerStyles.canvas} music-detail-visualizer-canvas--skeleton`}
-                      />
-                    </div>
-                  ) : (
-                    <AudioVisualizerCanvas
-                      analyserRef={analyserRef}
-                      isPlaying={isPlaying}
-                      audioGraphReady={audioGraphReady}
-                    />
-                  )
+                  <AudioVisualizerCanvas
+                    analyserRef={analyserRef}
+                    isPlaying={isPlaying}
+                    audioGraphReady={audioGraphReady}
+                  />
                 )}
               </div>
             </div>
