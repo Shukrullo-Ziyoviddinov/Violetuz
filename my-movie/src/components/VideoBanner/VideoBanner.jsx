@@ -132,20 +132,22 @@ const VideoBannerCard = ({
     }
   };
 
-  const showVideoSkeleton = Boolean(videoSrc) && !videoReady && !videoFailed;
+  /* Video yo‘q yoki hali tayyor emas — wrap ichida loader */
+  const showVideoSkeleton = !videoFailed && (!videoSrc || !videoReady);
 
   /* Film banner: titleImg movie DB dan (refId) — film/rasm tayyor bo‘lguncha skeleton */
   const awaitingMovieFromDb = isMovie && moviesLoading;
-  const titleImageLoading = Boolean(titleImgSrc) && !titleImg.ready;
-  const nameImageLoading = Boolean(nameImgSrc) && !nameImg.ready;
 
-  const showTitleSkeleton = awaitingMovieFromDb || titleImageLoading;
-  const showNameSkeleton = nameImageLoading;
+  /* Music: title/name src yo‘q bo‘lsa ham loader qoladi; movie: DB/rasm kutadi */
+  const showTitleSkeleton = isMovie
+    ? awaitingMovieFromDb || titleImg.showSkeleton
+    : !titleImgSrc || titleImg.showSkeleton;
+  const showNameSkeleton = !isMovie && (!nameImgSrc || nameImg.showSkeleton);
 
   const showTitleWrap = isMovie
-    ? awaitingMovieFromDb || Boolean(titleImgSrc)
-    : Boolean(titleImgSrc) || showTitleSkeleton;
-  const showNameWrap = !isMovie && (Boolean(nameImgSrc) || showNameSkeleton);
+    ? awaitingMovieFromDb || Boolean(titleImgSrc) || showTitleSkeleton
+    : true;
+  const showNameWrap = !isMovie;
 
   const ratingsPending =
     awaitingMovieFromDb ||
@@ -368,7 +370,10 @@ const VideoBanner = ({ typeFilter }) => {
   );
 
   const showSectionSkeleton =
-    (videoBannersLoading || moviesLoading) && filteredBanners.length === 0;
+    filteredBanners.length === 0 &&
+    (typeFilter === 'music'
+      ? videoBannersLoading
+      : videoBannersLoading || moviesLoading);
 
   const getNavigatePath = (banner) => {
     if (banner.type === 'movie') return `/movie/${banner.refId}`;
@@ -425,6 +430,8 @@ const VideoBanner = ({ typeFilter }) => {
     }
   };
 
+  const isMusicFilter = typeFilter === 'music';
+
   const renderSkeletonCard = (key) => (
     <div key={key} className="video-banner-card video-banner-card--skeleton" aria-hidden="true">
       <div className="video-banner-video-wrap">
@@ -434,23 +441,36 @@ const VideoBanner = ({ typeFilter }) => {
         />
       </div>
       <div className="video-banner-content">
-        <SkeletonLoader
-          variant="video-banner-title"
-          className="video-banner-title-img-skeleton"
-        />
-        <div className="video-banner-ratings">
-          {Array.from({ length: RATING_SKELETON_COUNT }, (_, i) => (
-            <SkeletonLoader
-              key={`vb-rating-sk-${i}`}
-              variant="video-banner-rating"
-              className="video-banner-rating-item-skeleton"
-            />
-          ))}
+        <div
+          className="video-banner-title-img-wrap video-banner-title-img-wrap--loading"
+          aria-busy="true"
+        >
+          <SkeletonLoader
+            variant="video-banner-title"
+            className="video-banner-title-img-skeleton"
+          />
         </div>
-        <SkeletonLoader
-          variant="video-banner-name"
-          className="video-banner-name-img-skeleton"
-        />
+        {isMusicFilter ? (
+          <div
+            className="video-banner-name-img-wrap video-banner-name-img-wrap--loading"
+            aria-busy="true"
+          >
+            <SkeletonLoader
+              variant="video-banner-name"
+              className="video-banner-name-img-skeleton"
+            />
+          </div>
+        ) : (
+          <div className="video-banner-ratings">
+            {Array.from({ length: RATING_SKELETON_COUNT }, (_, i) => (
+              <SkeletonLoader
+                key={`vb-rating-sk-${i}`}
+                variant="video-banner-rating"
+                className="video-banner-rating-item-skeleton"
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
