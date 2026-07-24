@@ -173,6 +173,12 @@
   border-radius: 4px;
 }
 
+.skeleton-loader--movie-detail-actors-title {
+  width: min(8.5rem, 40%);
+  height: calc(1.25rem * 1.2);
+  border-radius: 6px;
+}
+
 /* MovieDetail hero video — fills .movie-detail-video-wrapper / .movie-detail-image */
 .skeleton-loader--movie-detail-video {
   width: 100%;

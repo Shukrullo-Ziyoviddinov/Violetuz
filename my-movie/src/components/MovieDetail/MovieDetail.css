@@ -1298,6 +1298,26 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: #ffffff;
+  line-height: 1.2;
+  min-height: calc(1.25rem * 1.2);
+}
+
+.movie-detail-actors-title-skeleton,
+.skeleton-loader--movie-detail-actors-title {
+  display: block !important;
+  width: min(8.5rem, 40%) !important;
+  height: calc(1.25rem * 1.2) !important;
+  border-radius: 6px !important;
+  margin: 0 0 1rem 0 !important;
+}
+
+.movie-detail-actors--skeleton,
+.movie-detail-actors--loading {
+  pointer-events: none;
+}
+
+.movie-detail-actor-item--skeleton {
+  cursor: default;
 }
 
 .movie-detail-actors-scroll {
@@ -2025,12 +2045,6 @@
     height: calc(0.8rem * 1.2) !important;
     max-width: 4.5rem;
   }
-
-
-
-
-
-
 }
 
 /* Video to‘liq kenglik — faqat 450px dan kichik ekranlar */
@@ -2173,15 +2187,16 @@
     gap: 0.35rem;
   }
 
+  /* Real: padding + max(14px icon, 0.8rem*1.2 text) + gap + ~3.2em value */
   .movie-detail-spec-item--skeleton {
-    min-width: 4.75rem;
-    height: calc(0.35rem * 2 + 0.85rem);
+    min-width: calc(0.55rem * 2 + 14px + 0.35rem + 0.8rem * 3.2);
+    height: calc(0.35rem * 2 + max(14px, 0.8rem * 1.2));
   }
 
   .movie-detail-spec-item-skeleton,
   .skeleton-loader--movie-detail-spec {
-    min-width: 4.75rem;
-    width: 4.75rem !important;
+    min-width: calc(0.55rem * 2 + 14px + 0.35rem + 0.8rem * 3.2);
+    width: calc(0.55rem * 2 + 14px + 0.35rem + 0.8rem * 3.2) !important;
   }
 
   .movie-detail-spec-icon svg {
@@ -2394,15 +2409,16 @@
     border-radius: 10px;
   }
 
+  /* Real: padding + max(13px icon, 0.7rem*1.15 text) + gap + ~3.2em value */
   .movie-detail-spec-item--skeleton {
-    min-width: 4.25rem;
-    height: calc(0.3rem * 2 + 0.75rem);
+    min-width: calc(0.5rem * 2 + 13px + 0.3rem + 0.7rem * 3.2);
+    height: calc(0.3rem * 2 + max(13px, 0.7rem * 1.15));
   }
 
   .movie-detail-spec-item-skeleton,
   .skeleton-loader--movie-detail-spec {
-    min-width: 4.25rem;
-    width: 4.25rem !important;
+    min-width: calc(0.5rem * 2 + 13px + 0.3rem + 0.7rem * 3.2);
+    width: calc(0.5rem * 2 + 13px + 0.3rem + 0.7rem * 3.2) !important;
     border-radius: 10px !important;
   }
 

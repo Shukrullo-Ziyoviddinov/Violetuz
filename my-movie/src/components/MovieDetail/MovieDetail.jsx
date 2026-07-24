@@ -124,6 +124,55 @@ const MovieDetailActorItem = ({
   );
 };
 
+const ACTORS_SECTION_SKELETON_COUNT = 6;
+
+const MovieDetailActorSkeletonItem = () => (
+  <div
+    className="movie-detail-actor-item movie-detail-actor-item--loading movie-detail-actor-item--skeleton"
+    aria-hidden="true"
+  >
+    <div className="movie-detail-actor-image movie-detail-actor-image--loading">
+      <SkeletonLoader
+        variant="movie-detail-actor-img"
+        className="movie-detail-actor-image-skeleton"
+      />
+    </div>
+    <div className="movie-detail-actor-info">
+      <span className="movie-detail-actor-name movie-detail-actor-name--loading">
+        <SkeletonLoader
+          variant="movie-detail-actor-name"
+          className="movie-detail-actor-name-skeleton"
+        />
+      </span>
+      <span className="actors-page-movies-title actors-page-movies-title--loading">
+        <SkeletonLoader
+          variant="movie-detail-actor-movies"
+          className="movie-detail-actor-movies-title-skeleton"
+        />
+      </span>
+    </div>
+  </div>
+);
+
+/** Refresh / birinchi yuklash — title + actor itemlar yo‘qolmasin */
+const MovieDetailActorsSkeleton = ({ count = ACTORS_SECTION_SKELETON_COUNT }) => (
+  <div className="movie-detail-actors movie-detail-actors--skeleton" aria-busy="true">
+    <SkeletonLoader
+      variant="movie-detail-actors-title"
+      className="movie-detail-actors-title-skeleton"
+    />
+    <div className="movie-detail-actors-scroll">
+      <div className="movie-detail-actors-scroll-inner">
+        <div className="movie-detail-actors-grid">
+          {Array.from({ length: count }, (_, i) => (
+            <MovieDetailActorSkeletonItem key={`actor-section-sk-${i}`} />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const resolveMovieVideoSrc = (movie, lang) => {
   if (!movie?.movieMedia || typeof movie.movieMedia !== 'object') return null;
   const langData = movie.movieMedia[lang] || movie.movieMedia.uz || movie.movieMedia.ru;
@@ -713,6 +762,8 @@ const MovieDetail = () => {
       .filter(Boolean);
   }, [movie?.actors, allActors, getArtistById, actorsLoading, musicApiLoading]);
 
+  const actorsSectionPending = movieCast.some((a) => a.resolved === false);
+
   useEffect(() => {
     if (!movie?.seasons?.length) {
       setSelectedSeason(null);
@@ -1032,6 +1083,7 @@ const MovieDetail = () => {
                         </div>
                       </div>
                     </div>
+                    <MovieDetailActorsSkeleton />
                     <div className="movie-detail-scenes movie-detail-scenes--skeleton" aria-hidden="true">
                       <SkeletonLoader
                         variant="movie-detail-section-title"
@@ -1799,10 +1851,22 @@ const MovieDetail = () => {
               })()}
 
               {movieCast.length > 0 && (
-                  <div className="movie-detail-actors">
-                    <h3 className="movie-detail-actors-title">
-                      {i18n.language === 'uz' ? 'Aktyorlar' : 'Актеры'}
-                    </h3>
+                  <div
+                    className={`movie-detail-actors${
+                      actorsSectionPending ? ' movie-detail-actors--loading' : ''
+                    }`}
+                    aria-busy={actorsSectionPending || undefined}
+                  >
+                    {actorsSectionPending ? (
+                      <SkeletonLoader
+                        variant="movie-detail-actors-title"
+                        className="movie-detail-actors-title-skeleton"
+                      />
+                    ) : (
+                      <h3 className="movie-detail-actors-title">
+                        {i18n.language === 'uz' ? 'Aktyorlar' : 'Актеры'}
+                      </h3>
+                    )}
                     <div className="movie-detail-actors-scroll">
                       <ScrollTouch className="movie-detail-actors-scroll-inner">
                         <div className="movie-detail-actors-grid">

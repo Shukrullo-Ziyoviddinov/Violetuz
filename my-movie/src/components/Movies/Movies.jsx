@@ -159,11 +159,21 @@ const Movies = ({
   const hasMoreMovies = shouldShowMore(allMoviesData, limit, moreTo);
 
   const skeletonItems = useMemo(() => {
-    const count = shouldShowLimit && Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT;
-    return Array.from({ length: count }, (_, index) => ({ id: `movie-skeleton-${index}`, _skeleton: true }));
+    /* limit=null (recommended grid) — DEFAULT_LIMIT o‘rniga to‘liqroq grid */
+    const count =
+      shouldShowLimit && Number(limit) > 0
+        ? Number(limit)
+        : limit == null
+          ? 12
+          : DEFAULT_LIMIT;
+    return Array.from({ length: count }, (_, index) => ({
+      id: `movie-skeleton-${index}`,
+      _skeleton: true,
+    }));
   }, [shouldShowLimit, limit]);
 
-  const showSectionSkeleton = isLoading && displayMovies.length === 0;
+  /* API tugaguncha skeleton; timer bilan erta o‘chirmaslik — bo‘sh (null) flash bo‘lmasin */
+  const showSectionSkeleton = Boolean(isLoading) && displayMovies.length === 0;
   const itemsToRender = showSectionSkeleton ? skeletonItems : displayMovies;
   const showTitleSkeleton = showSectionSkeleton;
 

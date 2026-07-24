@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { getTopRatedMovies } from '../components/TopRatedContent/TopRatedContent';
-import { useLoading } from '../context/LoadingContext';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
@@ -64,8 +63,7 @@ const RecommendedPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const genreFromUrl = searchParams.get('genre');
-  const { recommendedLoading, setLoading } = useLoading();
-  const { allMovies, allGenres, getCategoryById } = useMoviesApi();
+  const { allMovies, allGenres, getCategoryById, moviesLoading } = useMoviesApi();
 
   const getGenresFromUrl = useCallback((g) => {
     if (!g) return [];
@@ -149,12 +147,6 @@ const RecommendedPage = () => {
     filteredMovies = filteredMovies.filter(movie => movie.ageRestriction === selectedAge);
   }
 
-  useEffect(() => {
-    setLoading('recommended', true);
-    const timer = setTimeout(() => setLoading('recommended', false), 500);
-    return () => clearTimeout(timer);
-  }, [categoryId, movieId, location.pathname, setLoading]);
-
   return (
     <div className="recommended-page">
       <Filters
@@ -176,7 +168,7 @@ const RecommendedPage = () => {
         limit={null}
         filteredMovies={filteredMovies}
         hideHeader
-        isLoading={recommendedLoading}
+        isLoading={moviesLoading}
       />
     </div>
   );
