@@ -4,7 +4,7 @@
  * Backend: GET /api/albums orqali API/DB dan keladi.
  */
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useMusicApi } from '../context/MusicApiContext';
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
@@ -44,29 +44,21 @@ const getRecommendedAlbumsFromList = (item, allAlbums, options = {}) => {
 export const fetchRecommendedAlbums = async (item, options = {}, allAlbums = []) =>
   Promise.resolve(getRecommendedAlbumsFromList(item, allAlbums, options));
 
+/**
+ * @returns {{ items: Array, isLoading: boolean }}
+ */
 export const useRecommendedAlbums = (item, options = {}) => {
-  const { allAlbums } = useMusicApi();
-  const [items, setItems] = useState([]);
-
+  const { allAlbums, albumsLoading } = useMusicApi();
   const itemId = item?.id;
   const limit = options?.limit;
   const excludeId = options?.excludeId;
 
-  useEffect(() => {
-    if (!itemId) {
-      setItems([]);
-      return;
-    }
-    let cancelled = false;
-    fetchRecommendedAlbums(item, { limit, excludeId }, allAlbums).then((data) => {
-      if (!cancelled && Array.isArray(data)) {
-        setItems(data);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [itemId, limit, excludeId, item, allAlbums]);
+  const isLoading = Boolean(itemId) && Boolean(albumsLoading);
 
-  return items;
+  const items = useMemo(() => {
+    if (!itemId || albumsLoading) return [];
+    return getRecommendedAlbumsFromList(item, allAlbums, { limit, excludeId });
+  }, [itemId, item, allAlbums, albumsLoading, limit, excludeId]);
+
+  return { items, isLoading };
 };

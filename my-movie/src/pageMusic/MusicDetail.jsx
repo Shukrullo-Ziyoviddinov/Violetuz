@@ -576,12 +576,8 @@ const MusicDetail = () => {
             )}
             {/* forceSkeleton: refreshda music kelguncha image-wrapper skeletonlar turadi, bo‘lim yo‘qolmaydi */}
             <SimilarSongs music={music} forceSkeleton={showHeroDataSkeleton} />
-            {music && (
-              <>
-                <AlbumsForYou music={music} />
-                <RecommendedClips music={music} />
-              </>
-            )}
+            <AlbumsForYou music={music} forceSkeleton={showHeroDataSkeleton} />
+            {music && <RecommendedClips music={music} />}
           </div>
           <div className="music-detail-right-scroll">
             {showHeroDataSkeleton ? (
