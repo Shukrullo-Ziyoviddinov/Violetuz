@@ -15,6 +15,8 @@ import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
 import { AudioVisualizerCanvas, CardVisual } from '../Music/Visual';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
+import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../utils/useImageReady';
 import './MusicDetail.css';
 
 const MusicDetail = () => {
@@ -23,7 +25,14 @@ const MusicDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allMusic, getMusicByCategory, sections, getArtistById } = useMusicApi();
+  const {
+    allMusic,
+    getMusicByCategory,
+    sections,
+    getArtistById,
+    musicLoading,
+    artistsLoading,
+  } = useMusicApi();
 
   const musicTrackSections = useMemo(
     () => (sections || []).filter((s) => s.wishlistType === 'music'),
@@ -89,6 +98,26 @@ const MusicDetail = () => {
   } = useMusicPlayer();
 
   const imgRef = useRef(null);
+  const coverSrc = music?.img || (music ? '/img/movie1.jpg' : '');
+  const coverImg = useImageReady(coverSrc);
+  const artistImgSrc = pageArtist
+    ? pageArtist.imgArtist || pageArtist.img || '/img/movie1.jpg'
+    : '';
+  const artistImg = useImageReady(artistImgSrc);
+
+  const showHeroDataSkeleton = Boolean(musicLoading) && !music;
+  const showCoverSkeleton = showHeroDataSkeleton || coverImg.showSkeleton;
+  const showTitleSkeleton = showHeroDataSkeleton;
+  const showArtistDataSkeleton =
+    showHeroDataSkeleton ||
+    (Boolean(music?.artistId) && Boolean(artistsLoading) && !pageArtist);
+  const showArtistImgSkeleton = Boolean(pageArtist) && artistImg.showSkeleton;
+
+  const setCoverImgRef = (el) => {
+    imgRef.current = el;
+    coverImg.imgRef(el);
+  };
+
   const [lyricsModalOpen, setLyricsModalOpen] = useState(() => location.state?.openLyrics ?? false);
   const [lyricsDragOffset, setLyricsDragOffset] = useState(0);
   const [lyricsDragging, setLyricsDragging] = useState(false);
@@ -211,8 +240,50 @@ const MusicDetail = () => {
     document.body.removeChild(link);
   };
 
-  /* Faqat yuklash tugab trek yoâ€˜q â€” xato */
+  /* API hali kelmagan — hero skeleton (left / title / artist) */
   if (!music) {
+    if (musicLoading || showHeroDataSkeleton) {
+      return (
+        <div className="music-detail" aria-busy="true">
+          <div className="music-detail-container">
+            <div className="music-detail-layout">
+              <div className="music-detail-left-scroll">
+                <div className="music-detail-top">
+                  <div className="music-detail-top-row">
+                    <div className="music-detail-left">
+                      <SkeletonLoader
+                        variant="music-detail-cover"
+                        className="music-detail-cover-skeleton"
+                      />
+                    </div>
+                    <div className="music-detail-right">
+                      <h1
+                        className="music-detail-title music-detail-title--skeleton"
+                        aria-hidden="true"
+                      >
+                        <SkeletonLoader variant="music-detail-title" />
+                      </h1>
+                      <div
+                        className="music-detail-artist-block music-detail-artist-block--skeleton"
+                        aria-hidden="true"
+                      >
+                        <SkeletonLoader variant="music-detail-artist-img" />
+                        <div className="music-detail-artist-info">
+                          <SkeletonLoader variant="music-detail-artist-name" />
+                          <SkeletonLoader variant="music-detail-artist-meta" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="music-detail-right-scroll" aria-hidden="true" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="music-detail">
         <div className="music-detail-error">Musiqa topilmadi</div>
@@ -252,40 +323,106 @@ const MusicDetail = () => {
           <div className="music-detail-left-scroll">
             <div className="music-detail-top" style={topStyle}>
               <div className="music-detail-top-row">
-                <div className="music-detail-left">
-                  <img
-                    ref={imgRef}
-                    src={music.img || '/img/movie1.jpg'}
-                    alt={getTitle(music)}
-                    className="music-detail-image"
-                  />
+                <div className="music-detail-left" aria-busy={showCoverSkeleton || undefined}>
+                  {showCoverSkeleton && (
+                    <SkeletonLoader
+                      variant="music-detail-cover"
+                      className="music-detail-cover-skeleton"
+                    />
+                  )}
+                  {coverSrc && (
+                    <img
+                      ref={setCoverImgRef}
+                      src={coverSrc}
+                      alt={getTitle(music)}
+                      className={`music-detail-image${
+                        showCoverSkeleton ? ' music-detail-image--loading' : ''
+                      }`}
+                      onLoad={coverImg.onLoad}
+                      onError={coverImg.onError}
+                    />
+                  )}
                 </div>
                 <div className="music-detail-right">
-                  <h1 className="music-detail-title">{getTitle(music)}</h1>
-                  {pageArtist && (
-                    <div
-                      className="music-detail-artist-block"
-                      onClick={() =>
-                        pageArtist?.id && navigate(`/music/artist/${pageArtist.id}`)
-                      }
-                      style={pageArtist?.id ? undefined : { cursor: 'default' }}
+                  {showTitleSkeleton ? (
+                    <h1
+                      className="music-detail-title music-detail-title--skeleton"
+                      aria-hidden="true"
                     >
-                      <img
-                        src={pageArtist.imgArtist || pageArtist.img || '/img/movie1.jpg'}
-                        alt={pageArtist.name}
-                        className="music-detail-artist-img"
-                      />
-                      <div className="music-detail-artist-info">
-                        <span className="music-detail-artist-name">{pageArtist.name}</span>
-                        {music.year && (
-                          <span className="music-detail-artist-year">{music.year}</span>
-                        )}
-                        {isCurrentTrack && duration > 0 && (
-                          <span className="music-detail-artist-duration">
-                            {formatTime(duration)}
-                          </span>
-                        )}
-                      </div>
+                      <SkeletonLoader variant="music-detail-title" />
+                    </h1>
+                  ) : (
+                    <h1 className="music-detail-title">{getTitle(music)}</h1>
+                  )}
+                  {(showArtistDataSkeleton || pageArtist) && (
+                    <div
+                      className={`music-detail-artist-block${
+                        showArtistDataSkeleton
+                          ? ' music-detail-artist-block--skeleton'
+                          : ''
+                      }`}
+                      onClick={() => {
+                        if (showArtistDataSkeleton) return;
+                        if (pageArtist?.id) navigate(`/music/artist/${pageArtist.id}`);
+                      }}
+                      style={
+                        showArtistDataSkeleton || !pageArtist?.id
+                          ? { cursor: 'default' }
+                          : undefined
+                      }
+                      aria-busy={
+                        showArtistDataSkeleton || showArtistImgSkeleton || undefined
+                      }
+                    >
+                      {showArtistDataSkeleton ? (
+                        <>
+                          <SkeletonLoader variant="music-detail-artist-img" />
+                          <div className="music-detail-artist-info">
+                            <SkeletonLoader variant="music-detail-artist-name" />
+                            <SkeletonLoader variant="music-detail-artist-meta" />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="music-detail-artist-img-wrap">
+                            {showArtistImgSkeleton && (
+                              <SkeletonLoader
+                                variant="music-detail-artist-img"
+                                className="music-detail-artist-img--skeleton"
+                              />
+                            )}
+                            {artistImgSrc && (
+                              <img
+                                ref={artistImg.imgRef}
+                                src={artistImgSrc}
+                                alt={pageArtist.name}
+                                className={`music-detail-artist-img${
+                                  showArtistImgSkeleton
+                                    ? ' music-detail-artist-img--loading'
+                                    : ''
+                                }`}
+                                onLoad={artistImg.onLoad}
+                                onError={artistImg.onError}
+                              />
+                            )}
+                          </div>
+                          <div className="music-detail-artist-info">
+                            <span className="music-detail-artist-name">
+                              {pageArtist.name}
+                            </span>
+                            {music.year && (
+                              <span className="music-detail-artist-year">
+                                {music.year}
+                              </span>
+                            )}
+                            {isCurrentTrack && duration > 0 && (
+                              <span className="music-detail-artist-duration">
+                                {formatTime(duration)}
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
