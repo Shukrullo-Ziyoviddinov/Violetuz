@@ -76,6 +76,11 @@
   margin: 0 0 1rem 0;
 }
 
+.music-detail-trend-title-skeleton {
+  display: block;
+  margin: 0 0 1rem 0;
+}
+
 .music-detail-trend-grid {
   display: flex;
   flex-direction: column;
@@ -101,6 +106,17 @@
   transform: translateX(4px);
 }
 
+.music-detail-trend-card--skeleton,
+.music-detail-trend-card--loading {
+  cursor: default;
+  pointer-events: none;
+}
+
+.music-detail-trend-card--skeleton:hover,
+.music-detail-trend-card--loading:hover {
+  transform: none;
+}
+
 .music-detail-trend-card-info {
   flex: 1;
   min-width: 0;
@@ -109,7 +125,6 @@
   justify-content: space-between;
   gap: 0.2rem;
 }
-
 
 .music-detail-trend-card-img-wrap {
   position: relative;
@@ -121,10 +136,25 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.music-detail-trend-card-img-wrap .skeleton-loader--music-detail-trend-img,
+.music-detail-trend-card-img-wrap .music-detail-trend-card-img-skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  z-index: 0;
+}
+
 .music-detail-trend-card-img {
   width: 100%;
   height: 100%;
   /* object-fit: cover; */
+}
+
+.music-detail-trend-card-img--loading {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .music-detail-trend-card-wishlist {
@@ -169,6 +199,48 @@
   z-index: 2;
 }
 
+.music-detail-trend-card-wishlist--skeleton,
+.music-detail-trend-card-play--skeleton {
+  z-index: 3;
+  pointer-events: none;
+  color: transparent !important;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100%;
+  animation: music-detail-trend-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes music-detail-trend-overlay-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.music-detail-trend-card-wishlist--skeleton {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  top: 4px;
+  right: 4px;
+}
+
+.music-detail-trend-card-play--skeleton {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  bottom: 4px;
+  right: 4px;
+}
+
 .music-detail-trend-card-active {
   background: rgba(
     var(--card-dominant-r, 192),
@@ -189,6 +261,10 @@
   align-items: center;
   gap: 0.5rem;
   margin-top: auto;
+}
+
+.music-detail-trend-card-meta--skeleton {
+  min-height: calc(0.78rem * 1.2);
 }
 
 .music-detail-trend-card-year,
@@ -632,10 +708,6 @@
   color: #fff;
   border: none;
   transform: scale(1.05);
-}
-
-.music-detail-trend-title-skeleton {
-  margin-bottom: 1rem;
 }
 
 .music-detail-audio-player--skeleton {

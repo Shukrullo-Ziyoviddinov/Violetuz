@@ -854,6 +854,42 @@
   }
 }
 
+/* Music detail trend sidebar */
+.skeleton-loader--music-detail-trend-title {
+  width: 10rem;
+  height: calc(1.25rem * 1.2);
+  border-radius: 6px;
+  margin: 0 0 1rem 0;
+}
+
+.skeleton-loader--music-detail-trend-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.skeleton-loader--music-detail-trend-card-title {
+  width: 70%;
+  max-width: 100%;
+  height: calc(0.95rem * 1.3);
+  border-radius: 4px;
+}
+
+.skeleton-loader--music-detail-trend-card-artist {
+  width: 50%;
+  max-width: 100%;
+  height: calc(0.8rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--music-detail-trend-card-meta {
+  width: 4rem;
+  height: calc(0.78rem * 1.2);
+  border-radius: 4px;
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,
