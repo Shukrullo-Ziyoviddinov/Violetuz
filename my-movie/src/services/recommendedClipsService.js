@@ -4,7 +4,7 @@
  * Backend: GET /api/clips orqali API/DB dan keladi.
  */
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useMusicApi } from '../context/MusicApiContext';
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
@@ -59,28 +59,21 @@ const getRecommendedClipsFromList = (item, allClips, options = {}) => {
 export const fetchRecommendedClips = async (item, options = {}, allClips = []) =>
   Promise.resolve(getRecommendedClipsFromList(item, allClips, options));
 
+/**
+ * @returns {{ items: Array, isLoading: boolean }}
+ */
 export const useRecommendedClips = (item, options = {}) => {
-  const { allClips } = useMusicApi();
-  const [items, setItems] = useState([]);
+  const { allClips, clipsLoading } = useMusicApi();
   const itemId = item?.id;
   const excludeId = options?.excludeId;
   const limit = options?.limit;
 
-  useEffect(() => {
-    if (!itemId) {
-      setItems([]);
-      return;
-    }
-    let cancelled = false;
-    fetchRecommendedClips(item, { limit, excludeId }, allClips).then((data) => {
-      if (!cancelled && Array.isArray(data)) {
-        setItems(data);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [itemId, excludeId, limit, item, allClips]);
+  const isLoading = Boolean(itemId) && Boolean(clipsLoading);
 
-  return items;
+  const items = useMemo(() => {
+    if (!itemId || clipsLoading) return [];
+    return getRecommendedClipsFromList(item, allClips, { limit, excludeId });
+  }, [itemId, item, allClips, clipsLoading, limit, excludeId]);
+
+  return { items, isLoading };
 };
