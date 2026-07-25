@@ -429,6 +429,15 @@
   transition: opacity 0.2s;
 }
 
+.music-detail-artist-card--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.music-detail-artist-card--skeleton:hover {
+  opacity: 1;
+}
+
 .music-detail-artist-card:hover {
   opacity: 0.9;
 }
@@ -436,6 +445,23 @@
 .music-detail-artist-card-btn {
   flex-shrink: 0;
   margin-left: auto;
+}
+
+.music-detail-artist-card-img-wrap {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.music-detail-artist-card-img-wrap .skeleton-loader--music-detail-artist-card-img,
+.music-detail-artist-card-img-wrap .music-detail-artist-card-img--skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .music-detail-artist-card-img {
@@ -446,6 +472,15 @@
   border: 2px solid #ccc;
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.08);
+}
+
+.music-detail-artist-card-img--loading {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .music-detail-artist-card-info {
@@ -464,6 +499,21 @@
   color: #fff;
 }
 
+.music-detail-artist-card-name--skeleton {
+  display: block;
+  width: 8rem;
+  max-width: 100%;
+  height: calc(1rem * 1.2);
+  font-size: 0;
+  line-height: 0;
+}
+
+.music-detail-artist-card-name--skeleton .skeleton-loader--music-detail-artist-card-name {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .music-detail-artist-card-verified {
   width: 1rem;
   height: 1rem;
@@ -478,6 +528,11 @@
   gap: 0.35rem;
 }
 
+.music-detail-artist-card .music-detail-artist-stat--skeleton {
+  align-items: center;
+  min-height: calc(0.9rem * 1.2);
+}
+
 .music-detail-artist-card .music-detail-artist-stat .artist-detail-track-num {
   font-size: 0.9rem;
   font-weight: 600;
@@ -488,6 +543,16 @@
   font-size: 0.85rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.6);
+}
+
+.music-detail-artist-card-btn .following-btn--skeleton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  pointer-events: none;
 }
 
 .music-detail-audio-player {
@@ -720,6 +785,15 @@
   transition: opacity 0.2s;
 }
 
+.load-more-lyrics--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.load-more-lyrics--skeleton:hover {
+  opacity: 1;
+}
+
 .load-more-lyrics:hover {
   opacity: 0.9;
 }
@@ -728,6 +802,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.load-more-lyrics-inner--skeleton {
+  min-height: calc(1.7rem * 1.2);
 }
 
 .load-more-lyrics-title {

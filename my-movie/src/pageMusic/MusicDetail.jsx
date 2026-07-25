@@ -112,6 +112,10 @@ const MusicDetail = () => {
     showHeroDataSkeleton ||
     (Boolean(music?.artistId) && Boolean(artistsLoading) && !pageArtist);
   const showArtistImgSkeleton = Boolean(pageArtist) && artistImg.showSkeleton;
+  const showLyricsSkeleton = showHeroDataSkeleton;
+  const showArtistCardSkeleton =
+    showArtistDataSkeleton || (Boolean(pageArtist?.id) && showArtistImgSkeleton);
+  const showArtistCard = showArtistCardSkeleton || Boolean(pageArtist?.id);
 
   const setCoverImgRef = (el) => {
     imgRef.current = el;
@@ -274,6 +278,35 @@ const MusicDetail = () => {
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+                <div
+                  className="load-more-lyrics load-more-lyrics--skeleton"
+                  aria-hidden="true"
+                >
+                  <span className="load-more-lyrics-inner load-more-lyrics-inner--skeleton">
+                    <SkeletonLoader variant="music-detail-lyrics-title" />
+                    <SkeletonLoader variant="music-detail-lyrics-icon" />
+                  </span>
+                </div>
+                <div
+                  className="music-detail-artist-card music-detail-artist-card--skeleton"
+                  aria-hidden="true"
+                >
+                  <SkeletonLoader variant="music-detail-artist-card-img" />
+                  <div className="music-detail-artist-card-info">
+                    <span className="music-detail-artist-card-name music-detail-artist-card-name--skeleton">
+                      <SkeletonLoader variant="music-detail-artist-card-name" />
+                    </span>
+                    <div className="artist-detail-stat-item music-detail-artist-stat music-detail-artist-stat--skeleton">
+                      <SkeletonLoader variant="music-detail-artist-stat-num" />
+                      <SkeletonLoader variant="music-detail-artist-stat-label" />
+                    </div>
+                  </div>
+                  <div className="music-detail-artist-card-btn">
+                    <span className="following-btn following-btn--skeleton" aria-hidden="true">
+                      <SkeletonLoader variant="music-detail-following-btn" />
+                    </span>
                   </div>
                 </div>
               </div>
@@ -486,50 +519,115 @@ const MusicDetail = () => {
                 </div>
               )}
             </div>
-            {music?.lyricsText && getLyricsText(music.lyricsText)?.trim() && (
-              <button
-                type="button"
-                className="load-more-lyrics"
-                onClick={() => setLyricsModalOpen(true)}
-                aria-label="Lyrics"
-              >
-                <span className="load-more-lyrics-inner">
-                  <h3 className="load-more-lyrics-title">Lyrics</h3>
-                  <span className="load-more-lyrics-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" />
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2h2v2a5 5 0 0 0 10 0v-2h2z" />
-                      <path d="M5 16v2h14v-2H5z" />
-                    </svg>
-                  </span>
-                </span>
-              </button>
-            )}
-            {pageArtist?.id && (
+            {showLyricsSkeleton ? (
               <div
-                className="music-detail-artist-card"
-                onClick={() => navigate(`/music/artist/${pageArtist.id}`)}
+                className="load-more-lyrics load-more-lyrics--skeleton"
+                aria-hidden="true"
               >
-                <img
-                  src={pageArtist.imgArtist || pageArtist.img || '/img/movie1.jpg'}
-                  alt={pageArtist.name}
-                  className="music-detail-artist-card-img"
-                />
-                <div className="music-detail-artist-card-info">
-                  <span className="music-detail-artist-card-name">
-                    {pageArtist.name}
-                    <img src="/img/galichka.png" alt="" className="music-detail-artist-card-verified" aria-hidden />
+                <span className="load-more-lyrics-inner load-more-lyrics-inner--skeleton">
+                  <SkeletonLoader variant="music-detail-lyrics-title" />
+                  <SkeletonLoader variant="music-detail-lyrics-icon" />
+                </span>
+              </div>
+            ) : (
+              music?.lyricsText &&
+              getLyricsText(music.lyricsText)?.trim() && (
+                <button
+                  type="button"
+                  className="load-more-lyrics"
+                  onClick={() => setLyricsModalOpen(true)}
+                  aria-label="Lyrics"
+                >
+                  <span className="load-more-lyrics-inner">
+                    <h3 className="load-more-lyrics-title">Lyrics</h3>
+                    <span className="load-more-lyrics-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" />
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2h2v2a5 5 0 0 0 10 0v-2h2z" />
+                        <path d="M5 16v2h14v-2H5z" />
+                      </svg>
+                    </span>
                   </span>
-                  <div className="artist-detail-stat-item music-detail-artist-stat">
-                    <span className="artist-detail-track-num">{formatCount(pageArtist.subscribers ?? 0)}</span>
-                    <span className="artist-detail-track-label">Obunachi</span>
-                  </div>
-                </div>
-                <FollowingButton
-                  artistId={pageArtist.id}
-                  wrapperClassName="music-detail-artist-card-btn"
-                  stopPropagation
-                />
+                </button>
+              )
+            )}
+            {showArtistCard && (
+              <div
+                className={`music-detail-artist-card${
+                  showArtistCardSkeleton ? ' music-detail-artist-card--skeleton' : ''
+                }`}
+                onClick={() => {
+                  if (showArtistCardSkeleton) return;
+                  if (pageArtist?.id) navigate(`/music/artist/${pageArtist.id}`);
+                }}
+                aria-busy={showArtistCardSkeleton || undefined}
+              >
+                {showArtistCardSkeleton ? (
+                  <>
+                    <SkeletonLoader variant="music-detail-artist-card-img" />
+                    <div className="music-detail-artist-card-info">
+                      <span className="music-detail-artist-card-name music-detail-artist-card-name--skeleton">
+                        <SkeletonLoader variant="music-detail-artist-card-name" />
+                      </span>
+                      <div className="artist-detail-stat-item music-detail-artist-stat music-detail-artist-stat--skeleton">
+                        <SkeletonLoader variant="music-detail-artist-stat-num" />
+                        <SkeletonLoader variant="music-detail-artist-stat-label" />
+                      </div>
+                    </div>
+                    <div className="music-detail-artist-card-btn">
+                      <span className="following-btn following-btn--skeleton" aria-hidden="true">
+                        <SkeletonLoader variant="music-detail-following-btn" />
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="music-detail-artist-card-img-wrap">
+                      {showArtistImgSkeleton && (
+                        <SkeletonLoader
+                          variant="music-detail-artist-card-img"
+                          className="music-detail-artist-card-img--skeleton"
+                        />
+                      )}
+                      {artistImgSrc && (
+                        <img
+                          ref={artistImg.imgRef}
+                          src={artistImgSrc}
+                          alt={pageArtist.name}
+                          className={`music-detail-artist-card-img${
+                            showArtistImgSkeleton
+                              ? ' music-detail-artist-card-img--loading'
+                              : ''
+                          }`}
+                          onLoad={artistImg.onLoad}
+                          onError={artistImg.onError}
+                        />
+                      )}
+                    </div>
+                    <div className="music-detail-artist-card-info">
+                      <span className="music-detail-artist-card-name">
+                        {pageArtist.name}
+                        <img
+                          src="/img/galichka.png"
+                          alt=""
+                          className="music-detail-artist-card-verified"
+                          aria-hidden
+                        />
+                      </span>
+                      <div className="artist-detail-stat-item music-detail-artist-stat">
+                        <span className="artist-detail-track-num">
+                          {formatCount(pageArtist.subscribers ?? 0)}
+                        </span>
+                        <span className="artist-detail-track-label">Obunachi</span>
+                      </div>
+                    </div>
+                    <FollowingButton
+                      artistId={pageArtist.id}
+                      wrapperClassName="music-detail-artist-card-btn"
+                      stopPropagation
+                    />
+                  </>
+                )}
               </div>
             )}
             <SimilarSongs music={music} />
