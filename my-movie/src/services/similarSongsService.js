@@ -4,7 +4,7 @@
  * Backend music collection orqali API/DB dan kelgan ma'lumot ishlatiladi.
  */
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useMusicApi } from '../context/MusicApiContext';
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
@@ -49,38 +49,15 @@ export const fetchSimilarSongs = async (music, options = {}, allMusic = []) =>
  */
 export const useSimilarSongs = (music, options = {}) => {
   const { allMusic, musicLoading } = useMusicApi();
-  const [items, setItems] = useState([]);
-  const [resolved, setResolved] = useState(false);
-
   const musicId = music?.id;
   const limit = options?.limit;
 
-  useEffect(() => {
-    if (!musicId) {
-      setItems([]);
-      setResolved(true);
-      return undefined;
-    }
+  const isLoading = Boolean(musicId) && Boolean(musicLoading);
 
-    if (musicLoading) {
-      setResolved(false);
-      return undefined;
-    }
-
-    let cancelled = false;
-    setResolved(false);
-    fetchSimilarSongs(music, { limit }, allMusic).then((data) => {
-      if (!cancelled && Array.isArray(data)) {
-        setItems(data);
-        setResolved(true);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [musicId, limit, music, allMusic, musicLoading]);
-
-  const isLoading = Boolean(musicId) && (Boolean(musicLoading) || !resolved);
+  const items = useMemo(() => {
+    if (!musicId || musicLoading) return [];
+    return getSimilarSongsFromList(music, allMusic, { limit });
+  }, [musicId, music, allMusic, musicLoading, limit]);
 
   return { items, isLoading };
 };

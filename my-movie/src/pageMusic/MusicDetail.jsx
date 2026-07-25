@@ -106,15 +106,21 @@ const MusicDetail = () => {
   const artistImg = useImageReady(artistImgSrc);
 
   const showHeroDataSkeleton = Boolean(musicLoading) && !music;
+  const heroAwaitingCover = Boolean(music) && coverImg.showSkeleton;
   const showCoverSkeleton = showHeroDataSkeleton || coverImg.showSkeleton;
-  const showTitleSkeleton = showHeroDataSkeleton;
+  /* API yoki cover — title/lyrics refreshda miltillamasin */
+  const showTitleSkeleton = showHeroDataSkeleton || heroAwaitingCover;
   const showArtistDataSkeleton =
     showHeroDataSkeleton ||
+    heroAwaitingCover ||
     (Boolean(music?.artistId) && Boolean(artistsLoading) && !pageArtist);
   const showArtistImgSkeleton = Boolean(pageArtist) && artistImg.showSkeleton;
-  const showLyricsSkeleton = showHeroDataSkeleton;
+  const showLyricsSkeleton =
+    showHeroDataSkeleton ||
+    (heroAwaitingCover && Boolean(music?.lyricsText));
   const showArtistCardSkeleton =
-    showArtistDataSkeleton || (Boolean(pageArtist?.id) && showArtistImgSkeleton);
+    showArtistDataSkeleton ||
+    (Boolean(pageArtist?.id) && (showArtistImgSkeleton || heroAwaitingCover));
   const showArtistCard = showArtistCardSkeleton || Boolean(pageArtist?.id);
 
   const setCoverImgRef = (el) => {
@@ -246,7 +252,7 @@ const MusicDetail = () => {
 
   /* API hali kelmagan — hero skeleton (left / title / artist) */
   if (!music) {
-    if (musicLoading || showHeroDataSkeleton) {
+    if (musicLoading) {
       return (
         <div className="music-detail" aria-busy="true">
           <div className="music-detail-container">

@@ -164,30 +164,33 @@ export const MusicApiProvider = ({ children }) => {
     [pageContentQuery.data]
   );
 
+  /** Birinchi muvaffaqiyatli/error javobgacha — refreshda skeleton ushlab turadi */
+  const isAwaiting = (q) => !q.isSuccess && !q.isError;
+
   const loading =
-    musicQuery.isPending ||
-    albumsQuery.isPending ||
-    clipsQuery.isPending ||
-    concertsQuery.isPending ||
-    artistMusicStoriesQuery.isPending ||
-    artistsQuery.isPending ||
-    musicShortsQuery.isPending ||
-    musicBannersQuery.isPending ||
-    sectionsQuery.isPending ||
-    clipSectionsQuery.isPending ||
-    concertSectionsQuery.isPending ||
-    pageContentQuery.isPending;
-  const musicShortsLoading = musicShortsQuery.isPending;
-  const musicBannersLoading = musicBannersQuery.isPending;
-  const musicLoading = musicQuery.isPending;
-  const albumsLoading = albumsQuery.isPending;
-  const clipsLoading = clipsQuery.isPending;
-  const concertsLoading = concertsQuery.isPending;
-  const artistsLoading = artistsQuery.isPending;
-  const sectionsLoading = sectionsQuery.isPending;
-  const clipSectionsLoading = clipSectionsQuery.isPending;
-  const concertSectionsLoading = concertSectionsQuery.isPending;
-  const pageContentLoading = pageContentQuery.isPending;
+    isAwaiting(musicQuery) ||
+    isAwaiting(albumsQuery) ||
+    isAwaiting(clipsQuery) ||
+    isAwaiting(concertsQuery) ||
+    isAwaiting(artistMusicStoriesQuery) ||
+    isAwaiting(artistsQuery) ||
+    isAwaiting(musicShortsQuery) ||
+    isAwaiting(musicBannersQuery) ||
+    isAwaiting(sectionsQuery) ||
+    isAwaiting(clipSectionsQuery) ||
+    isAwaiting(concertSectionsQuery) ||
+    isAwaiting(pageContentQuery);
+  const musicShortsLoading = isAwaiting(musicShortsQuery);
+  const musicBannersLoading = isAwaiting(musicBannersQuery);
+  const musicLoading = isAwaiting(musicQuery);
+  const albumsLoading = isAwaiting(albumsQuery);
+  const clipsLoading = isAwaiting(clipsQuery);
+  const concertsLoading = isAwaiting(concertsQuery);
+  const artistsLoading = isAwaiting(artistsQuery);
+  const sectionsLoading = isAwaiting(sectionsQuery);
+  const clipSectionsLoading = isAwaiting(clipSectionsQuery);
+  const concertSectionsLoading = isAwaiting(concertSectionsQuery);
+  const pageContentLoading = isAwaiting(pageContentQuery);
   const error =
     musicQuery.error?.message ||
     albumsQuery.error?.message ||

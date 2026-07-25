@@ -2,6 +2,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 const SOFT_TIMEOUT_MS = 12000;
 
+/** Kesh hit bo‘lsa ham skeleton kamida 1–2 frame ko‘rinsin (refresh miltillashini oldini oladi) */
+function afterPaint(cb) {
+  let innerId = 0;
+  const outerId = window.requestAnimationFrame(() => {
+    innerId = window.requestAnimationFrame(cb);
+  });
+  return () => {
+    window.cancelAnimationFrame(outerId);
+    window.cancelAnimationFrame(innerId);
+  };
+}
+
 /**
  * <img> load holati — brauzer keshida onLoad kelmasa ham complete tekshiradi.
  * @param {string} src
@@ -12,6 +24,7 @@ export function useImageReady(src) {
   const [failed, setFailed] = useState(false);
   const imgRef = useRef(null);
   const srcRef = useRef(src);
+  const genRef = useRef(0);
   srcRef.current = src;
 
   const markReady = useCallback(() => {
@@ -25,6 +38,7 @@ export function useImageReady(src) {
   }, []);
 
   useEffect(() => {
+    genRef.current += 1;
     setReady(false);
     setFailed(false);
     if (!src) {
@@ -33,57 +47,82 @@ export function useImageReady(src) {
     }
   }, [src]);
 
-  const syncFromElement = useCallback(
-    (el) => {
-      if (!el || !srcRef.current) return false;
-      if (!el.complete) return false;
-      if (el.naturalWidth > 0) {
-        markReady();
-        return true;
-      }
-      markFailed();
-      return true;
-    },
-    [markReady, markFailed]
-  );
+  const readElementState = useCallback((el) => {
+    if (!el || !srcRef.current) return null;
+    if (!el.complete) return null;
+    return el.naturalWidth > 0 ? 'ok' : 'fail';
+  }, []);
 
-  const setImgRef = useCallback(
-    (el) => {
-      imgRef.current = el;
-      syncFromElement(el);
-    },
-    [syncFromElement]
-  );
+  const setImgRef = useCallback((el) => {
+    imgRef.current = el;
+  }, []);
+
+  const reveal = useCallback((ok, gen) => {
+    return afterPaint(() => {
+      if (genRef.current !== gen) return;
+      if (ok) markReady();
+      else markFailed();
+    });
+  }, [markReady, markFailed]);
 
   useEffect(() => {
     if (!src || ready || failed) return undefined;
 
-    // DOM img (agar ref allaqachon o‘rnatilgan bo‘lsa)
-    if (syncFromElement(imgRef.current)) return undefined;
+    const gen = genRef.current;
+    let cancelled = false;
+    let cancelPaint = null;
 
-    // Preload — kesh / erta load
-    const pre = new Image();
-    const onDone = () => {
-      if (pre.naturalWidth > 0) markReady();
-      else markFailed();
+    const finish = (ok) => {
+      if (cancelled || genRef.current !== gen) return;
+      cancelPaint?.();
+      cancelPaint = reveal(ok, gen);
     };
-    pre.onload = onDone;
-    pre.onerror = () => markFailed();
+
+    const fromEl = readElementState(imgRef.current);
+    if (fromEl) {
+      finish(fromEl === 'ok');
+      return () => {
+        cancelled = true;
+        cancelPaint?.();
+      };
+    }
+
+    const pre = new Image();
+    pre.onload = () => finish(true);
+    pre.onerror = () => finish(false);
     pre.src = src;
-    if (pre.complete) onDone();
+    if (pre.complete) {
+      finish(pre.naturalWidth > 0);
+    }
 
     const timeoutId = window.setTimeout(() => {
-      if (syncFromElement(imgRef.current)) return;
-      // Soft unblock — abadiy skeleton bo‘lmasin
-      markReady();
+      if (cancelled || genRef.current !== gen) return;
+      const state = readElementState(imgRef.current);
+      if (state) {
+        finish(state === 'ok');
+        return;
+      }
+      finish(true);
     }, SOFT_TIMEOUT_MS);
 
     return () => {
+      cancelled = true;
+      cancelPaint?.();
       pre.onload = null;
       pre.onerror = null;
       window.clearTimeout(timeoutId);
     };
-  }, [src, ready, failed, markReady, markFailed, syncFromElement]);
+  }, [src, ready, failed, readElementState, reveal]);
+
+  const onLoad = useCallback(() => {
+    const gen = genRef.current;
+    reveal(true, gen);
+  }, [reveal]);
+
+  const onError = useCallback(() => {
+    const gen = genRef.current;
+    reveal(false, gen);
+  }, [reveal]);
 
   const showSkeleton = Boolean(src) && !ready && !failed;
 
@@ -92,8 +131,8 @@ export function useImageReady(src) {
     failed,
     showSkeleton,
     imgRef: setImgRef,
-    onLoad: markReady,
-    onError: markFailed,
+    onLoad,
+    onError,
   };
 }
 
@@ -118,7 +157,9 @@ export function useImagesReadyMap(entries) {
       pre.onload = done;
       pre.onerror = done;
       pre.src = src;
-      if (pre.complete) done();
+      if (pre.complete) {
+        return afterPaint(done);
+      }
       const t = window.setTimeout(done, SOFT_TIMEOUT_MS);
       return () => {
         pre.onload = null;
