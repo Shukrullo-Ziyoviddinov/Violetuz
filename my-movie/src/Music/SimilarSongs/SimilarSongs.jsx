@@ -12,6 +12,33 @@ import './SimilarSongs.css';
 
 const DEFAULT_SKELETON_COUNT = 8;
 
+const SimilarSongSkeletonCard = ({ id }) => (
+  <div
+    key={id}
+    className="similar-songs-item similar-songs-item--skeleton"
+    aria-hidden="true"
+  >
+    <div className="similar-songs-item-image-wrapper">
+      <SkeletonLoader
+        variant="similar-songs-image"
+        className="similar-songs-item-image-skeleton"
+      />
+      <span
+        className="similar-songs-item-wishlist-btn similar-songs-item-wishlist-btn--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="similar-songs-item-play similar-songs-item-play--skeleton"
+        aria-hidden="true"
+      />
+      <div className="similar-songs-item-info">
+        <SkeletonLoader variant="similar-songs-item-title" />
+        <SkeletonLoader variant="similar-songs-item-artist" />
+      </div>
+    </div>
+  </div>
+);
+
 /** Cover + overlay skeletons until image is ready */
 const SimilarSongItem = ({
   item,
@@ -108,13 +135,21 @@ const SimilarSongItem = ({
  * O'xshash musiqalar / Tavsiya etilgan musiqalar bo'limi.
  * music: type 'music'. album: type 'musicAlbom'. klip: type 'klip' yoki 'konsert' (VideoPage).
  * titleKey: VideoPage da "music.recommendedMusic" (Tavsiya etilgan musiqalar).
+ *
+ * forceSkeleton — parent hali music topmagan (refresh); image-wrapper skeletonlar darhol turadi.
  */
-const SimilarSongs = ({ music, album, klip, titleKey = 'music.similarSongs' }) => {
+const SimilarSongs = ({
+  music,
+  album,
+  klip,
+  titleKey = 'music.similarSongs',
+  forceSkeleton = false,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getArtistById } = useMusicApi();
+  const { getArtistById, musicLoading } = useMusicApi();
 
   const item = music || album || klip;
   const { items: similarSongs, isLoading } = useSimilarSongs(item);
@@ -151,44 +186,22 @@ const SimilarSongs = ({ music, album, klip, titleKey = 'music.similarSongs' }) =
     []
   );
 
-  const showSectionSkeleton = Boolean(isLoading) && similarSongs.length === 0;
+  /* Catalog hali kelmagan yoki force — bo‘lim yo‘qolmasin, image-wrapper skeleton turadi */
+  const awaitingCatalog = Boolean(forceSkeleton) || (Boolean(musicLoading) && !item);
+  const showSectionSkeleton =
+    awaitingCatalog || (Boolean(isLoading) && similarSongs.length === 0);
   const itemsToRender = showSectionSkeleton ? skeletonItems : similarSongs;
   const showTitleSkeleton = showSectionSkeleton;
 
-  if (!item) return null;
   if (music && music.type !== 'music') return null;
   if (album && album.type !== 'musicAlbom') return null;
   if (klip && klip.type !== 'klip' && klip.type !== 'konsert') return null;
+  if (!item && !showSectionSkeleton) return null;
   if (!showSectionSkeleton && !similarSongs.length) return null;
 
   const renderCard = (song) => {
     if (song._skeleton) {
-      return (
-        <div
-          key={song.id}
-          className="similar-songs-item similar-songs-item--skeleton"
-          aria-hidden="true"
-        >
-          <div className="similar-songs-item-image-wrapper">
-            <SkeletonLoader
-              variant="similar-songs-image"
-              className="similar-songs-item-image-skeleton"
-            />
-            <span
-              className="similar-songs-item-wishlist-btn similar-songs-item-wishlist-btn--skeleton"
-              aria-hidden="true"
-            />
-            <span
-              className="similar-songs-item-play similar-songs-item-play--skeleton"
-              aria-hidden="true"
-            />
-            <div className="similar-songs-item-info">
-              <SkeletonLoader variant="similar-songs-item-title" />
-              <SkeletonLoader variant="similar-songs-item-artist" />
-            </div>
-          </div>
-        </div>
-      );
+      return <SimilarSongSkeletonCard key={song.id} id={song.id} />;
     }
 
     return (
@@ -200,7 +213,7 @@ const SimilarSongs = ({ music, album, klip, titleKey = 'music.similarSongs' }) =
         onOpen={handleCardClick}
         isInWishlist={isInWishlist}
         onWishlistClick={handleWishlistClick}
-        blockClick={Boolean(isLoading)}
+        blockClick={Boolean(isLoading) || showSectionSkeleton}
       />
     );
   };
@@ -208,7 +221,7 @@ const SimilarSongs = ({ music, album, klip, titleKey = 'music.similarSongs' }) =
   return (
     <div
       className="similar-songs"
-      aria-busy={isLoading || showSectionSkeleton || undefined}
+      aria-busy={showSectionSkeleton || isLoading || undefined}
     >
       <div className="similar-songs-container">
         {showTitleSkeleton ? (
