@@ -44,9 +44,13 @@ const getSimilarSongsFromList = (music, allMusic, options = {}) => {
 export const fetchSimilarSongs = async (music, options = {}, allMusic = []) =>
   Promise.resolve(getSimilarSongsFromList(music, allMusic, options));
 
+/**
+ * @returns {{ items: Array, isLoading: boolean }}
+ */
 export const useSimilarSongs = (music, options = {}) => {
-  const { allMusic } = useMusicApi();
+  const { allMusic, musicLoading } = useMusicApi();
   const [items, setItems] = useState([]);
+  const [resolved, setResolved] = useState(false);
 
   const musicId = music?.id;
   const limit = options?.limit;
@@ -54,18 +58,29 @@ export const useSimilarSongs = (music, options = {}) => {
   useEffect(() => {
     if (!musicId) {
       setItems([]);
-      return;
+      setResolved(true);
+      return undefined;
     }
+
+    if (musicLoading) {
+      setResolved(false);
+      return undefined;
+    }
+
     let cancelled = false;
+    setResolved(false);
     fetchSimilarSongs(music, { limit }, allMusic).then((data) => {
       if (!cancelled && Array.isArray(data)) {
         setItems(data);
+        setResolved(true);
       }
     });
     return () => {
       cancelled = true;
     };
-  }, [musicId, limit, music, allMusic]);
+  }, [musicId, limit, music, allMusic, musicLoading]);
 
-  return items;
+  const isLoading = Boolean(musicId) && (Boolean(musicLoading) || !resolved);
+
+  return { items, isLoading };
 };

@@ -18,6 +18,10 @@
   margin: 0 0 1rem 0;
 }
 
+.similar-songs-title-skeleton {
+  display: block;
+}
+
 .similar-songs-content {
   width: 100%;
 }
@@ -33,6 +37,20 @@
   transform: scale(1.02);
 }
 
+.similar-songs-item--skeleton,
+.similar-songs-item--loading {
+  cursor: default;
+}
+
+.similar-songs-item--skeleton {
+  pointer-events: none;
+}
+
+.similar-songs-item--skeleton:hover,
+.similar-songs-item--loading:hover {
+  transform: none;
+}
+
 .similar-songs-item-image-wrapper {
   position: relative;
   width: 100%;
@@ -41,6 +59,16 @@
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(215, 134, 228, 0.56);
+}
+
+.similar-songs-item-image-wrapper .similar-songs-item-image-skeleton,
+.similar-songs-item-image-wrapper .skeleton-loader--similar-songs-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  z-index: 0;
 }
 
 .similar-songs-item-wishlist-btn {
@@ -77,6 +105,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.similar-songs-item-image--loading {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .similar-songs-item-play {
@@ -130,6 +163,57 @@
   text-overflow: ellipsis;
 }
 
+.similar-songs-item-info .skeleton-loader--similar-songs-item-title,
+.similar-songs-item-info .skeleton-loader--similar-songs-item-artist {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+  Overlay skeletonlar — real wishlist / play o‘lchami bilan bir xil.
+*/
+.similar-songs-item-wishlist-btn--skeleton,
+.similar-songs-item-play--skeleton {
+  z-index: 3;
+  pointer-events: none;
+  color: transparent !important;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100%;
+  animation: similar-songs-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes similar-songs-overlay-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.similar-songs-item-wishlist-btn--skeleton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.similar-songs-item-play--skeleton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  bottom: 0.5rem;
+  right: 0.5rem;
+}
+
 @media (max-width: 500px) {
   .similar-songs-title {
     font-size: 1.2rem;
@@ -145,7 +229,8 @@
 
 @media (max-width: 450px) {
   .similar-songs-item-image-wrapper .similar-songs-item-wishlist-btn,
-  .similar-songs-item-image-wrapper .similar-songs-item-wishlist-btn.active {
+  .similar-songs-item-image-wrapper .similar-songs-item-wishlist-btn.active,
+  .similar-songs-item-image-wrapper .similar-songs-item-wishlist-btn--skeleton {
     width: 28px;
     height: 28px;
   }
