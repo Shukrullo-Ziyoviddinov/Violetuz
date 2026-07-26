@@ -6,6 +6,12 @@
   overflow: hidden;
 }
 
+@media (max-width: 650px) {
+  .video-detail {
+    background: #000;
+  }
+}
+
 .video-detail-container {
   max-width: 1400px;
   width: 100%;
