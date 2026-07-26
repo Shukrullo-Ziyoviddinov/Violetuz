@@ -60,7 +60,7 @@
 
 .similar-movies-item-title {
   margin: 0.55rem 0 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.3;
   color: #fff;
@@ -83,7 +83,7 @@
 .similar-movies-item-title--skeleton {
   display: block;
   width: 72%;
-  height: 16px;
+  height: 17px;
   margin-top: 0.55rem;
   border-radius: 4px;
   background: linear-gradient(
@@ -320,12 +320,6 @@
     width: 150px;
   }
 
-  .similar-movies-item-title {
-    font-size: 14px;
-    font-weight: 700;
-    margin-top: 0.45rem;
-  }
-
   .similar-movies-item-meta {
     font-size: 11px;
     font-weight: 600;
@@ -345,6 +339,17 @@
   .similar-movies-title-skeleton,
   .skeleton-loader--similar-movies-title {
     height: calc(1.5rem * 1.2) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .similar-movies-item-title {
+    font-size: 16px;
+    margin-top: 0.45rem;
+  }
+
+  .similar-movies-item-title--skeleton {
+    height: 16px;
   }
 }
 
