@@ -35,6 +35,45 @@
   height: 24px;
 }
 
+/* Labeled pill (video detail va boshqa joylar) — dumaloq emas, matn ichida */
+.share-button.share-button--labeled {
+  width: max-content;
+  min-width: max-content;
+  max-width: none;
+  height: auto;
+  min-height: 34px;
+  padding: 8px 14px;
+  gap: 6px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: none;
+  box-sizing: border-box;
+  white-space: nowrap;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.share-button.share-button--labeled:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  color: #fff;
+  transform: none;
+}
+
+.share-button.share-button--labeled svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.share-button.share-button--labeled .share-button-label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+}
+
 /* Desktop dropdown */
 .share-button-dropdown {
   position: absolute;

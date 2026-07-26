@@ -157,12 +157,12 @@
 .video-detail-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   width: 100%;
   min-width: 0;
 }
 
-.video-detail-actions .scroll-touch {
+.video-detail-actions .scroll-touch,
+.video-detail-actions-scroll {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -170,24 +170,30 @@
   min-width: 0;
 }
 
-/* Desktop: pill tugmalar — rasmga o‘xshash, px kattaroq */
 .video-detail-actions .like-button {
+  display: flex;
+  align-items: center;
   gap: 10px;
   flex-shrink: 0;
 }
 
+/* Barcha action pilllar — kontent ichida, dumaloq emas */
 .video-detail-actions .like-button-btn,
 .video-detail-actions .video-detail-action-btn,
-.video-detail-actions .share-button.share-button--labeled {
+.video-detail-actions .video-detail-share-wrap .share-button.share-button--labeled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 44px;
-  padding: 0 18px;
-  width: auto;
-  min-width: 0;
+  width: max-content;
+  min-width: max-content;
+  max-width: none;
+  height: auto;
+  min-height: 44px;
+  padding: 10px 18px;
   box-sizing: border-box;
+  flex-shrink: 0;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 999px;
@@ -197,16 +203,17 @@
   font-weight: 500;
   line-height: 1;
   white-space: nowrap;
-  transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  backdrop-filter: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
 .video-detail-actions .like-button-btn:hover,
 .video-detail-actions .video-detail-action-btn:hover,
-.video-detail-actions .share-button.share-button--labeled:hover {
+.video-detail-actions .video-detail-share-wrap .share-button.share-button--labeled:hover {
   background: rgba(255, 255, 255, 0.16);
   color: #fff;
-  transform: none;
   border: none;
+  transform: none;
 }
 
 .video-detail-actions .like-button-like.active {
@@ -222,45 +229,54 @@
   box-shadow: none;
 }
 
-.video-detail-actions .video-detail-save-btn.active,
-.video-detail-actions .video-detail-repost-btn.active {
+.video-detail-actions .video-detail-save-btn.active {
   color: #c084fc;
 }
 
-.video-detail-actions .like-button-icon-wrap,
-.video-detail-actions .video-detail-action-btn svg,
-.video-detail-actions .share-button.share-button--labeled svg {
+.video-detail-actions .like-button-icon-wrap {
   width: 22px;
   height: 22px;
   flex-shrink: 0;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.video-detail-actions .like-button-icon-wrap svg {
+.video-detail-actions .like-button-icon-wrap svg,
+.video-detail-actions .video-detail-action-btn svg,
+.video-detail-actions .video-detail-share-wrap .share-button.share-button--labeled svg {
   width: 22px;
   height: 22px;
+  flex-shrink: 0;
   display: block;
 }
 
 .video-detail-actions .like-button-count,
 .video-detail-actions .video-detail-action-btn span,
-.video-detail-actions .share-button-label {
+.video-detail-actions .video-detail-share-wrap .share-button-label {
+  display: inline-block;
   font-size: 15px;
   font-weight: 500;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .video-detail-actions .like-button-count.empty {
-  display: inline;
+  display: inline-block;
 }
 
 .video-detail-share-wrap {
   flex-shrink: 0;
   position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .video-detail-share-wrap .share-button-wrapper {
   position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
 }
 
 .video-detail-share-wrap .share-button-dropdown {
@@ -268,11 +284,6 @@
   right: 0;
   left: auto;
   margin-top: 8px;
-}
-
-.video-detail-actions .repost-btn.video-detail-repost-btn i {
-  font-size: 18px;
-  line-height: 1;
 }
 
 .video-detail .movie-detail-comments {
@@ -563,8 +574,9 @@
 }
 
 @media (max-width: 768px) {
-  /* Mobile: rasmda ko‘rsatilgan kompakt pill o‘lchamlar */
-  .video-detail-actions .scroll-touch {
+  /* Mobile: rasmdagi kompakt pill — matn/ikon blok ichida */
+  .video-detail-actions .scroll-touch,
+  .video-detail-actions-scroll {
     gap: 8px;
   }
 
@@ -574,34 +586,29 @@
 
   .video-detail-actions .like-button-btn,
   .video-detail-actions .video-detail-action-btn,
-  .video-detail-actions .share-button.share-button--labeled {
-    height: 34px;
-    padding: 0 12px;
+  .video-detail-actions .video-detail-share-wrap .share-button.share-button--labeled {
+    min-height: 34px;
+    padding: 8px 14px;
     gap: 6px;
     font-size: 13px;
-    background: rgba(255, 255, 255, 0.1);
   }
 
-  .video-detail-actions .like-button-icon-wrap,
-  .video-detail-actions .video-detail-action-btn svg,
-  .video-detail-actions .share-button.share-button--labeled svg {
+  .video-detail-actions .like-button-icon-wrap {
     width: 16px;
     height: 16px;
   }
 
-  .video-detail-actions .like-button-icon-wrap svg {
+  .video-detail-actions .like-button-icon-wrap svg,
+  .video-detail-actions .video-detail-action-btn svg,
+  .video-detail-actions .video-detail-share-wrap .share-button.share-button--labeled svg {
     width: 16px;
     height: 16px;
   }
 
   .video-detail-actions .like-button-count,
   .video-detail-actions .video-detail-action-btn span,
-  .video-detail-actions .share-button-label {
+  .video-detail-actions .video-detail-share-wrap .share-button-label {
     font-size: 13px;
-  }
-
-  .video-detail-actions .repost-btn.video-detail-repost-btn i {
-    font-size: 14px;
   }
 
   .video-detail-actions .like-button-like.active {

@@ -8,7 +8,6 @@ import ShareButton from '../components/ShareButton/ShareButton';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import LikeButton from '../Music/LikeButton/LikeButton';
-import Repost from '../components/Repost/Repost';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
 import MovieComments from '../components/MovieDetail/MovieComments';
@@ -178,28 +177,6 @@ const VideoPage = () => {
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                     </svg>
                     <span>Saqlash</span>
-                  </button>
-                  <Repost
-                    className="video-detail-action-btn video-detail-repost-btn"
-                    item={{
-                      id: video.id,
-                      type: video.type === 'konsert' ? 'konsert' : 'klip',
-                      title: video.title || '',
-                      artistName: artist?.name || '',
-                      image: video.img || '/img/movie1.jpg',
-                      route: `/music/video/${video.id}`,
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="video-detail-action-btn video-detail-comment-btn"
-                    onClick={() => commentsRef.current?.openModal()}
-                    aria-label="Izohlar"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                    <span>Izohlar</span>
                   </button>
                 </ScrollTouch>
               </div>
