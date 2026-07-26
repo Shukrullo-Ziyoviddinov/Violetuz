@@ -32,7 +32,9 @@ const RepostIconOutline = () => (
 const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Repost', label = null }) => {
   const { toggleRepost: dispatchToggle } = useReposts();
   const active = useIsReposted(item?.id, item?.type);
-  const useOutlineIcon = className.includes('shorts-modal-action-btn');
+  const useOutlineIcon =
+    className.includes('shorts-modal-action-btn') ||
+    className.includes('video-detail-repost-btn');
 
   const handleClick = useCallback(
     (e) => {

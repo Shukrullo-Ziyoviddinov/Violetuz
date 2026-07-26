@@ -51,10 +51,13 @@
   color: #9b4fe7;
 }
 
-/* Video detail action tugmalari bilan bir xil px */
-.video-detail-actions .repost-btn.video-detail-repost-btn i {
-  font-size: 18px;
-  line-height: 1;
+/* Video detail — qolgan action SVG ikonlar bilan bir xil stroke/px */
+.video-detail-actions .repost-btn.video-detail-repost-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: block;
+  stroke-width: 2;
 }
 
 .video-detail-actions .repost-btn.video-detail-repost-btn.active {
