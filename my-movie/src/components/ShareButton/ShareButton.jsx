@@ -9,7 +9,13 @@ import './ShareButton.css';
 const MOBILE_BREAKPOINT = 768;
 const DRAG_THRESHOLD = 8;
 
-const ShareButton = ({ movie, dropdownInPortal = false, portalTarget = null }) => {
+const ShareButton = ({
+  movie,
+  dropdownInPortal = false,
+  portalTarget = null,
+  label = null,
+  className = '',
+}) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const location = useLocation();
@@ -220,20 +226,30 @@ const ShareButton = ({ movie, dropdownInPortal = false, portalTarget = null }) =
     </>
   );
 
+  const shareLabel = label ?? t('share.share', 'Ulashish');
+
   return (
-    <div className="share-button-wrapper" ref={dropdownRef}>
+    <div className={`share-button-wrapper ${className}`.trim()} ref={dropdownRef}>
       <button
-        className="share-button"
+        className={`share-button ${label ? 'share-button--labeled' : ''}`.trim()}
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={t('share.share')}
+        aria-label={shareLabel}
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="18" cy="5" r="3" />
-          <circle cx="6" cy="12" r="3" />
-          <circle cx="18" cy="19" r="3" />
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-        </svg>
+        {label ? (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 14l5-5-5-5" />
+            <path d="M20 9H9a5 5 0 0 0 0 10h1" />
+          </svg>
+        ) : (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+        )}
+        {label ? <span className="share-button-label">{label}</span> : null}
       </button>
 
       {isOpen && (

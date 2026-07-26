@@ -52,13 +52,13 @@
 }
 
 /* Video detail action tugmalari bilan bir xil px */
-.video-detail-actions .repost-btn.video-detail-save-btn i {
-  font-size: 22px;
+.video-detail-actions .repost-btn.video-detail-repost-btn i {
+  font-size: 18px;
   line-height: 1;
 }
 
-.video-detail-actions .repost-btn.video-detail-save-btn.active {
-  color: rgba(155, 79, 231, 1);
+.video-detail-actions .repost-btn.video-detail-repost-btn.active {
+  color: #c084fc;
 }
 
 /* Music detail audio player: download / wishlist / share bilan bir xil — 44px tugma, 22px ikonka */
