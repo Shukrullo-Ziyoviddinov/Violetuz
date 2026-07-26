@@ -51,8 +51,11 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
 
   const applyTransform = (value) => {
     if (!trackRef.current) return;
-    translateX.current = value;
-    trackRef.current.style.transform = `translate3d(${value}px, 0, 0)`;
+    // Subpixel qaltirashni oldini olish (DPR bo‘yicha yaxlitlash)
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    const rounded = Math.round(value * dpr) / dpr;
+    translateX.current = rounded;
+    trackRef.current.style.transform = `translate3d(${rounded}px, 0, 0)`;
   };
 
   /** Drag: 1:1 kuzatish (kechikishsiz) + chegarada yumshoq qarshilik */
@@ -124,6 +127,10 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     setCanScrollRight(tx > -maxScroll + 1);
   };
 
+  const setMotionClass = (on) => {
+    wrapperRef.current?.classList.toggle('horizontal-scroll-motion', on);
+  };
+
   const cancelMotion = () => {
     if (animTimerRef.current) {
       clearTimeout(animTimerRef.current);
@@ -175,11 +182,13 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const distance = Math.abs(snapped - translateX.current);
     if (distance < 0.5) {
       updateTranslate(snapped);
+      setMotionClass(false);
       checkScrollability();
       notifyIndexChange();
       return;
     }
 
+    setMotionClass(true);
     // Sekin masofa — yumshoqroq ease; katta masofa — tezlikka mos
     const duration = preferredDuration ?? Math.min(520, Math.max(220, 180 + distance * 0.42));
     trackRef.current.style.transition = `transform ${duration}ms cubic-bezier(0.22, 0.82, 0.24, 1)`;
@@ -187,6 +196,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
 
     animTimerRef.current = setTimeout(() => {
       if (trackRef.current) trackRef.current.style.transition = '';
+      setMotionClass(false);
       checkScrollability();
       notifyIndexChange();
       animTimerRef.current = null;
@@ -197,6 +207,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
   const glideWithVelocity = (initialVelocity, finalTarget) => {
     cancelMotion();
     if (trackRef.current) trackRef.current.style.transition = 'none';
+    setMotionClass(true);
 
     let v = initialVelocity;
     let last = performance.now();
@@ -331,6 +342,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
   const beginDrag = (clientX, clientY) => {
     cancelMotion();
     syncTranslateFromDOM();
+    setMotionClass(true);
     isDraggingRef.current = true;
     dragStartX.current = clientX;
     dragStartY.current = clientY;
@@ -397,6 +409,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
       if (deltaY > deltaX) {
         isHorizontalDrag.current = false;
         isDraggingRef.current = false;
+        setMotionClass(false);
         setIsDragging(false);
         return;
       }
@@ -465,7 +478,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
       )}
 
       <div
-        className={`horizontal-scroll-viewport ${isDragging ? 'horizontal-scroll-dragging' : ''}`}
+        className={`horizontal-scroll-viewport${isDragging ? ' horizontal-scroll-dragging' : ''}`}
         ref={wrapperRef}
         onMouseDown={handleMouseDown}
         onClickCapture={handleContainerClick}

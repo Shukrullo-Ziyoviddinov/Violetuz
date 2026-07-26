@@ -24,6 +24,19 @@
   cursor: grabbing;
 }
 
+/*
+  Qaltirash sababi: drag/glide paytida kursor kartochkalar ustidan o‘tganda
+  hover scale/transition yonib-o‘chadi. Scroll mantiqiga tegmasdan muzlatamiz.
+*/
+.horizontal-scroll-viewport.horizontal-scroll-motion .horizontal-scroll-track > * {
+  pointer-events: none !important;
+}
+
+.horizontal-scroll-viewport.horizontal-scroll-motion .horizontal-scroll-track * {
+  transition: none !important;
+  animation: none !important;
+}
+
 /* Track - flex qator, transform bilan harakatlanadi */
 .horizontal-scroll-track {
   display: flex;
@@ -32,7 +45,9 @@
   width: max-content;
   will-change: transform;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   transform: translate3d(0, 0, 0);
+  transform-style: flat;
 }
 
 .horizontal-scroll-btn {
