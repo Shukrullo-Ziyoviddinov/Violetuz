@@ -337,3 +337,9 @@
 }
 
 }
+
+@media (max-width: 480px) {
+  .music-filter-modal-title {
+    font-size: 1rem;
+  }
+}
