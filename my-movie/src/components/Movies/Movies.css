@@ -99,7 +99,7 @@
 
 .movies-item-meta {
   margin: 0.2rem 0 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.3;
   color: rgba(255, 255, 255, 0.55);
@@ -127,7 +127,7 @@
 .movies-item-meta--skeleton {
   display: block;
   width: 48%;
-  height: 12px;
+  height: 14px;
   margin-top: 0.35rem;
   border-radius: 4px;
   background: linear-gradient(
@@ -410,11 +410,6 @@
     font-size: 1.5rem;
   }
 
-  .movies-item-meta {
-    font-size: 11px;
-    font-weight: 600;
-  }
-
   .movies-item-horizontal {
     width: 150px;
   }
@@ -432,6 +427,14 @@
 
   .movies-item-title--skeleton {
     height: 16px;
+  }
+
+  .movies-item-meta {
+    font-size: 13px;
+  }
+
+  .movies-item-meta--skeleton {
+    height: 13px;
   }
 }
 
