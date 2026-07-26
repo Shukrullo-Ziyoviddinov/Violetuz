@@ -6,6 +6,12 @@
   overflow: hidden;
 }
 
+@media (max-width: 650px) {
+  .music-detail {
+    background: #000;
+  }
+}
+
 .music-detail-container {
   max-width: 1400px;
   width: 100%;
