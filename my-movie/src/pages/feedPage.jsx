@@ -39,9 +39,33 @@ const FeedPage = () => {
   const followingIds = useFollowingIds();
   const feedProfileUser = useFeedProfile();
   const [messagesOpen, setMessagesOpen] = useState(false);
-  const { sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allArtists, getArtistById } = useMusicApi();
-  const { allActors } = useActorsApi();
-  const { allMovies } = useMoviesApi();
+  const {
+    sections,
+    getMusicByCategory,
+    getAlbumsByCategory,
+    allClips,
+    allConcerts,
+    allArtists,
+    getArtistById,
+    artistsLoading,
+    clipsLoading,
+    concertsLoading,
+    musicLoading,
+    albumsLoading,
+    sectionsLoading,
+  } = useMusicApi();
+  const { allActors, actorsLoading } = useActorsApi();
+  const { allMovies, moviesLoading } = useMoviesApi();
+
+  const feedLoading =
+    moviesLoading ||
+    actorsLoading ||
+    artistsLoading ||
+    clipsLoading ||
+    concertsLoading ||
+    musicLoading ||
+    albumsLoading ||
+    sectionsLoading;
 
   const openMessages = useCallback(() => setMessagesOpen(true), []);
 
@@ -174,7 +198,7 @@ const FeedPage = () => {
         onChangeCategory={setActiveCategory}
         onOpenMessages={openMessages}
       />
-      <FeedList items={filteredItems} />
+      <FeedList items={filteredItems} loading={feedLoading} />
       <MessageModal open={messagesOpen} onClose={() => setMessagesOpen(false)} />
     </div>
   );

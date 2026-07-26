@@ -1207,6 +1207,95 @@
   border-radius: 8px;
 }
 
+.skeleton-loader--feed-list-empty-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+.skeleton-loader--feed-list-empty-text {
+  width: min(16rem, 100%);
+  height: calc(0.95rem * 1.45 * 2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--feed-list-empty-btn {
+  width: 100%;
+  height: 100%;
+  min-height: 2.6rem;
+  border-radius: 10px;
+}
+
+.skeleton-loader--profile-page-repost-empty-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+.skeleton-loader--profile-page-repost-empty-text {
+  width: min(14rem, 100%);
+  height: calc(0.9rem * 1.4);
+  border-radius: 6px;
+}
+
+.skeleton-loader--profile-page-repost-empty-btn {
+  width: 100%;
+  height: 100%;
+  min-height: 2.5rem;
+  border-radius: 10px;
+}
+
+.skeleton-loader--like-history-empty-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+.skeleton-loader--like-history-empty-btn {
+  width: 100%;
+  height: 100%;
+  min-height: 2.6rem;
+  border-radius: 10px;
+}
+
+.skeleton-loader--rating-page-empty-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+.skeleton-loader--rating-page-empty-text {
+  width: min(16rem, 100%);
+  height: calc(0.95rem * 1.45 * 2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--rating-page-empty-btn {
+  width: 100%;
+  height: 100%;
+  min-height: 2.6rem;
+  border-radius: 50px;
+}
+
+.skeleton-loader--wishlist-empty-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+.skeleton-loader--wishlist-empty-text {
+  width: min(16rem, 100%);
+  height: calc(1.125rem * 1.5 * 2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--wishlist-empty-btn {
+  width: 100%;
+  height: 100%;
+  min-height: 2.7rem;
+  border-radius: 50px;
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,

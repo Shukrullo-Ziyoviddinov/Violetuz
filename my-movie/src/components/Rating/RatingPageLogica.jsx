@@ -4,8 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { calculateMovieRating, formatMovieRating, getMovieLastVote } from './CalculateRating';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
 import '../Movies/Movies.css';
 import './RatingPageLogica.css';
+
+const EMPTY_IMG_SRC = '/img/ReytingImg_preview_rev_1.png';
 
 const normalizeType = (typeValue) => {
   const raw = String(typeValue || '')
@@ -15,11 +19,61 @@ const normalizeType = (typeValue) => {
   return raw;
 };
 
+const RatingPageEmptySkeleton = () => (
+  <div className="rating-page-empty" aria-busy="true">
+    <div className="rating-page-empty-img rating-page-empty-img--skeleton" aria-hidden="true">
+      <SkeletonLoader variant="rating-page-empty-img" />
+    </div>
+    <div className="rating-page-empty-text rating-page-empty-text--skeleton" aria-hidden="true">
+      <SkeletonLoader variant="rating-page-empty-text" />
+    </div>
+    <div className="rating-page-empty-actions" aria-hidden="true">
+      <div className="rating-page-empty-btn rating-page-empty-btn--skeleton">
+        <SkeletonLoader variant="rating-page-empty-btn" />
+      </div>
+    </div>
+  </div>
+);
+
+const RatingPageEmpty = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError } = useImageReady(EMPTY_IMG_SRC);
+
+  if (showImgSkeleton) {
+    return <RatingPageEmptySkeleton />;
+  }
+
+  return (
+    <div className="rating-page-empty">
+      <img
+        ref={imgRef}
+        className="rating-page-empty-img"
+        src={EMPTY_IMG_SRC}
+        alt=""
+        decoding="async"
+        onLoad={onLoad}
+        onError={onError}
+      />
+      <p className="rating-page-empty-text">{t('ratingPage.emptyDescription')}</p>
+      <div className="rating-page-empty-actions">
+        <button
+          type="button"
+          className="rating-page-empty-btn"
+          onClick={() => navigate('/')}
+        >
+          {t('ratingPage.emptyCta')}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const RatingPageLogica = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { allMovies } = useMoviesApi();
+  const { allMovies, moviesLoading } = useMoviesApi();
 
   const ratedMovies = useMemo(() => {
     return allMovies
@@ -37,27 +91,12 @@ const RatingPageLogica = () => {
       .filter(Boolean);
   }, [allMovies]);
 
+  if (moviesLoading && !ratedMovies.length) {
+    return <RatingPageEmptySkeleton />;
+  }
+
   if (!ratedMovies.length) {
-    return (
-      <div className="rating-page-empty">
-        <img
-          className="rating-page-empty-img"
-          src="/img/ReytingImg_preview_rev_1.png"
-          alt=""
-          decoding="async"
-        />
-        <p className="rating-page-empty-text">{t('ratingPage.emptyDescription')}</p>
-        <div className="rating-page-empty-actions">
-          <button
-            type="button"
-            className="rating-page-empty-btn"
-            onClick={() => navigate('/')}
-          >
-            {t('ratingPage.emptyCta')}
-          </button>
-        </div>
-      </div>
-    );
+    return <RatingPageEmpty />;
   }
 
   return (

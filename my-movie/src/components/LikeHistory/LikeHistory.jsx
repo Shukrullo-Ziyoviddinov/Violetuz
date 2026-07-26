@@ -5,9 +5,13 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
 import '../Movies/Movies.css';
 import '../../pageMusic/MusicMorePage.css';
 import './LikeHistory.css';
+
+const EMPTY_IMG_SRC = '/img/LikeHistoryImg_preview_rev_1.png';
 
 const categoryLabel = {
   movie: 'Kino',
@@ -24,41 +28,71 @@ const formatDate = (value) => {
   }
 };
 
-const LikeHistory = ({ items = [], activeCategory = '' }) => {
+const LikeHistoryEmptySkeleton = () => (
+  <div className="like-history-empty" aria-busy="true">
+    <div className="like-history-empty-img like-history-empty-img--skeleton" aria-hidden="true">
+      <SkeletonLoader variant="like-history-empty-img" />
+    </div>
+    <div className="like-history-empty-actions" aria-hidden="true">
+      <div className="like-history-empty-btn like-history-empty-btn--skeleton">
+        <SkeletonLoader variant="like-history-empty-btn" />
+      </div>
+      <div className="like-history-empty-btn like-history-empty-btn--music like-history-empty-btn--skeleton">
+        <SkeletonLoader variant="like-history-empty-btn" />
+      </div>
+    </div>
+  </div>
+);
+
+const LikeHistoryEmpty = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError } = useImageReady(EMPTY_IMG_SRC);
+
+  if (showImgSkeleton) {
+    return <LikeHistoryEmptySkeleton />;
+  }
+
+  return (
+    <div className="like-history-empty">
+      <img
+        ref={imgRef}
+        className="like-history-empty-img"
+        src={EMPTY_IMG_SRC}
+        alt=""
+        decoding="async"
+        onLoad={onLoad}
+        onError={onError}
+      />
+      <div className="like-history-empty-actions">
+        <button
+          type="button"
+          className="like-history-empty-btn"
+          onClick={() => navigate('/')}
+        >
+          {t('wishlist.tabMovies')}
+        </button>
+        <button
+          type="button"
+          className="like-history-empty-btn like-history-empty-btn--music"
+          onClick={() => navigate('/music')}
+        >
+          {t('navbar.music')}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const LikeHistory = ({ items = [], activeCategory = '' }) => {
+  const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { allClips, allConcerts, getArtistById } = useMusicApi();
   const { allMovies } = useMoviesApi();
 
   if (!items.length) {
-    return (
-      <div className="like-history-empty">
-        <img
-          className="like-history-empty-img"
-          src="/img/LikeHistoryImg_preview_rev_1.png"
-          alt=""
-          decoding="async"
-        />
-        <div className="like-history-empty-actions">
-          <button
-            type="button"
-            className="like-history-empty-btn"
-            onClick={() => navigate('/')}
-          >
-            {t('wishlist.tabMovies')}
-          </button>
-          <button
-            type="button"
-            className="like-history-empty-btn like-history-empty-btn--music"
-            onClick={() => navigate('/music')}
-          >
-            {t('navbar.music')}
-          </button>
-        </div>
-      </div>
-    );
+    return <LikeHistoryEmpty />;
   }
 
   return (

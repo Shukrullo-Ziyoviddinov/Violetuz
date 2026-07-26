@@ -7,7 +7,63 @@ import { useMoviesApi } from '../context/MoviesApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import Movies from '../components/Movies/Movies';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
+import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../utils/useImageReady';
 import './WishlistPage.css';
+
+const EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
+
+const WishlistEmptySkeleton = () => (
+  <div className="wishlist-page wishlist-page--empty">
+    <div className="wishlist-empty" aria-busy="true">
+      <div className="wishlist-empty-img wishlist-empty-img--skeleton" aria-hidden="true">
+        <SkeletonLoader variant="wishlist-empty-img" />
+      </div>
+      <div className="wishlist-empty-text wishlist-empty-text--skeleton" aria-hidden="true">
+        <SkeletonLoader variant="wishlist-empty-text" />
+      </div>
+      <div className="wishlist-empty-btn wishlist-empty-btn--skeleton" aria-hidden="true">
+        <SkeletonLoader variant="wishlist-empty-btn" />
+      </div>
+    </div>
+  </div>
+);
+
+const WishlistEmpty = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError } = useImageReady(EMPTY_IMG_SRC);
+
+  if (showImgSkeleton) {
+    return <WishlistEmptySkeleton />;
+  }
+
+  return (
+    <div className="wishlist-page wishlist-page--empty">
+      <div className="wishlist-empty">
+        <img
+          ref={imgRef}
+          src={EMPTY_IMG_SRC}
+          alt={t('wishlist.emptyText')}
+          className="wishlist-empty-img"
+          decoding="async"
+          onLoad={onLoad}
+          onError={onError}
+        />
+        <p className="wishlist-empty-text">
+          {t('wishlist.emptyText')}
+        </p>
+        <button
+          type="button"
+          className="wishlist-empty-btn"
+          onClick={() => navigate('/')}
+        >
+          {t('wishlist.goToHome')}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const iconSize = 18;
 const WishlistTabIcons = {
@@ -57,9 +113,22 @@ const WishlistPage = () => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { wishlistItems, toggleWishlist } = useWishlist();
-  const { allMovies: apiMovies } = useMoviesApi();
-  const { allMusic, allAlbums, allClips, allConcerts, getArtistById } = useMusicApi();
+  const { allMovies: apiMovies, moviesLoading } = useMoviesApi();
+  const {
+    allMusic,
+    allAlbums,
+    allClips,
+    allConcerts,
+    getArtistById,
+    musicLoading,
+    albumsLoading,
+    clipsLoading,
+    concertsLoading,
+  } = useMusicApi();
   const [activeTab, setActiveTab] = useState('movie');
+
+  const wishlistCatalogLoading =
+    moviesLoading || musicLoading || albumsLoading || clipsLoading || concertsLoading;
 
   const normalizeType = (raw) => {
     const v = String(raw || '').toLowerCase();
@@ -127,26 +196,10 @@ const WishlistPage = () => {
   };
 
   if (isEmpty) {
-    return (
-      <div className="wishlist-page wishlist-page--empty">
-        <div className="wishlist-empty">
-          <img
-            src="/img/wishlist_preview_rev_1.png"
-            alt={t('wishlist.emptyText')}
-            className="wishlist-empty-img"
-          />
-          <p className="wishlist-empty-text">
-            {t('wishlist.emptyText')}
-          </p>
-          <button
-            className="wishlist-empty-btn"
-            onClick={() => navigate('/')}
-          >
-            {t('wishlist.goToHome')}
-          </button>
-        </div>
-      </div>
-    );
+    if (wishlistCatalogLoading) {
+      return <WishlistEmptySkeleton />;
+    }
+    return <WishlistEmpty />;
   }
 
   const effectiveTab = showTabs

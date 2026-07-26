@@ -21,9 +21,78 @@ import RepostMusicCard from '../components/Repost/RepostMusicCard';
 import RepostVideoCard from '../components/Repost/RepostVideoCard';
 import RepostShortsCard from '../components/Repost/RepostShortsCard';
 import ComentariaHistory from '../components/ComentariaHistory/ComentariaHistory';
+import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { setProfileInfoMenuHandler, clearProfileInfoMenuHandler } from '../profileInfoMenuBridge';
 import { normalizeUsername } from '../store/slices/userUtils';
+import { useImageReady } from '../utils/useImageReady';
 import './ProfilePage.css';
+
+const REPOST_EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
+
+const ProfileRepostEmptySkeleton = () => (
+  <div className="profile-page-repost-empty" aria-busy="true">
+    <div
+      className="profile-page-repost-empty-img profile-page-repost-empty-img--skeleton"
+      aria-hidden="true"
+    >
+      <SkeletonLoader variant="profile-page-repost-empty-img" />
+    </div>
+    <div
+      className="profile-page-repost-empty-text profile-page-repost-empty-text--skeleton"
+      aria-hidden="true"
+    >
+      <SkeletonLoader variant="profile-page-repost-empty-text" />
+    </div>
+    <div className="profile-page-repost-empty-actions" aria-hidden="true">
+      <div className="profile-page-repost-empty-btn profile-page-repost-empty-btn--movie profile-page-repost-empty-btn--skeleton">
+        <SkeletonLoader variant="profile-page-repost-empty-btn" />
+      </div>
+      <div className="profile-page-repost-empty-btn profile-page-repost-empty-btn--music profile-page-repost-empty-btn--skeleton">
+        <SkeletonLoader variant="profile-page-repost-empty-btn" />
+      </div>
+    </div>
+  </div>
+);
+
+const ProfileRepostEmpty = ({ onNavigateMovie, onNavigateMusic }) => {
+  const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError } =
+    useImageReady(REPOST_EMPTY_IMG_SRC);
+
+  if (showImgSkeleton) {
+    return <ProfileRepostEmptySkeleton />;
+  }
+
+  return (
+    <div className="profile-page-repost-empty">
+      <img
+        ref={imgRef}
+        src={REPOST_EMPTY_IMG_SRC}
+        alt=""
+        className="profile-page-repost-empty-img"
+        decoding="async"
+        onLoad={onLoad}
+        onError={onError}
+      />
+      <p className="profile-page-repost-empty-text">Hozircha repostlar yo‘q</p>
+      <div className="profile-page-repost-empty-actions">
+        <button
+          type="button"
+          className="profile-page-repost-empty-btn profile-page-repost-empty-btn--movie"
+          onClick={onNavigateMovie}
+        >
+          Kino
+        </button>
+        <button
+          type="button"
+          className="profile-page-repost-empty-btn profile-page-repost-empty-btn--music"
+          onClick={onNavigateMusic}
+        >
+          Musiqa
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const formatUsernameDisplay = (raw) => {
   const u = normalizeUsername(raw);
@@ -305,31 +374,10 @@ const ProfilePage = () => {
                 </div>
                 <RepostFilter activeFilter={repostFilter} onChange={setRepostFilter} />
                 {filteredRepostItems.length === 0 ? (
-                  <div className="profile-page-repost-empty">
-                    <img
-                      src="/img/wishlist_preview_rev_1.png"
-                      alt=""
-                      className="profile-page-repost-empty-img"
-                      loading="lazy"
-                    />
-                    <p className="profile-page-repost-empty-text">Hozircha repostlar yo‘q</p>
-                    <div className="profile-page-repost-empty-actions">
-                      <button
-                        type="button"
-                        className="profile-page-repost-empty-btn profile-page-repost-empty-btn--movie"
-                        onClick={() => navigate('/')}
-                      >
-                        Kino
-                      </button>
-                      <button
-                        type="button"
-                        className="profile-page-repost-empty-btn profile-page-repost-empty-btn--music"
-                        onClick={() => navigate('/music')}
-                      >
-                        Musiqa
-                      </button>
-                    </div>
-                  </div>
+                  <ProfileRepostEmpty
+                    onNavigateMovie={() => navigate('/')}
+                    onNavigateMusic={() => navigate('/music')}
+                  />
                 ) : repostFilter === 'all' ? (
                   repostSectionsAll.length > 0 ? (
                     <div className="profile-page-repost-by-type">
