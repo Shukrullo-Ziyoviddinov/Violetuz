@@ -29,6 +29,27 @@ const ARTIST_INFO_SKELETON_COUNT = 4;
 const ARTIST_STAT_SKELETON_COUNT = 6;
 const ARTIST_BIO_LINE_SKELETON_COUNT = 5;
 const ARTIST_BIOIMG_SKELETON_COUNT = 3;
+const ARTIST_TRACK_SKELETON_COLUMNS = 3;
+const ARTIST_TRACKS_PER_COLUMN = 4;
+
+const ArtistDetailTrackSkeleton = () => (
+  <div className="artist-detail-track artist-detail-track--skeleton" aria-hidden="true">
+    <div className="artist-detail-track-img-wrap artist-detail-track-img-wrap--skeleton">
+      <SkeletonLoader variant="artist-detail-track-img" />
+    </div>
+    <div className="artist-detail-track-info">
+      <span className="artist-detail-track-name artist-detail-track-name--skeleton">
+        <SkeletonLoader variant="artist-detail-track-name" />
+      </span>
+      <span className="artist-detail-track-title artist-detail-track-title--skeleton">
+        <SkeletonLoader variant="artist-detail-track-title" />
+      </span>
+    </div>
+    <span className="artist-detail-play-btn artist-detail-play-btn--skeleton" aria-hidden="true">
+      <SkeletonLoader variant="artist-detail-play-btn" />
+    </span>
+  </div>
+);
 
 const ArtistDetail = () => {
   const { id } = useParams();
@@ -46,8 +67,13 @@ const ArtistDetail = () => {
     getArtistById,
     artistsLoading,
     artistMusicStoriesLoading,
+    musicLoading,
+    albumsLoading,
+    clipsLoading,
+    concertsLoading,
+    musicShortsLoading,
   } = useMusicApi();
-  const { allMovies } = useMoviesApi();
+  const { allMovies, moviesLoading } = useMoviesApi();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [playingTrackColor, setPlayingTrackColor] = useState(null);
   const [artistHeaderColor, setArtistHeaderColor] = useState(null);
@@ -114,6 +140,24 @@ const ArtistDetail = () => {
     ),
     [id, allMovies],
   );
+  const hasAnyCatalogContent =
+    artistTracks.length > 0 ||
+    artistAlbums.length > 0 ||
+    artistClips.length > 0 ||
+    artistShorts.length > 0 ||
+    artistConcerts.length > 0 ||
+    artistMovies.length > 0;
+  const catalogsLoading =
+    Boolean(musicLoading) ||
+    Boolean(albumsLoading) ||
+    Boolean(clipsLoading) ||
+    Boolean(concertsLoading) ||
+    Boolean(musicShortsLoading) ||
+    Boolean(moviesLoading);
+  const showFilterSkeleton =
+    showHeroDataSkeleton || (catalogsLoading && !hasAnyCatalogContent);
+  const showTracksSkeleton =
+    showHeroDataSkeleton || (Boolean(musicLoading) && artistTracks.length === 0);
 
   useEffect(() => {
     if (!artist?.img) {
@@ -442,9 +486,9 @@ const ArtistDetail = () => {
             </div>
           </div>
         )}
-        {artist && (
+        {(artist || showFilterSkeleton || showTracksSkeleton) && (
         <>
-        {(getBio(artist.bio).text || artist.photoGallery?.length > 0) && (
+        {artist && (getBio(artist.bio).text || artist.photoGallery?.length > 0) && (
           <div className={`artist-detail-bio-gallery${getBio(artist.bio).text && artist.photoGallery?.length ? '' : ' artist-detail-bio-gallery--single'}`}>
             {getBio(artist.bio).text && (
               <div ref={bioSectionRef} className="artist-detail-bio-section">
@@ -483,8 +527,9 @@ const ArtistDetail = () => {
             )}
           </div>
         )}
-        {(artistTracks.length > 0 || artistAlbums.length > 0 || artistClips.length > 0 || artistShorts.length > 0 || artistConcerts.length > 0 || artistMovies.length > 0) && (
+        {(showFilterSkeleton || hasAnyCatalogContent) && (
           <ArtistDetailElementFilter
+            forceSkeleton={showFilterSkeleton}
             hasMusic={artistTracks.length > 0}
             hasAlbums={artistAlbums.length > 0}
             hasClips={artistClips.length > 0}
@@ -495,10 +540,32 @@ const ArtistDetail = () => {
             onChange={setActiveFilter}
           />
         )}
-        {(activeFilter === FILTER_ALL || activeFilter === FILTER_MUSIC) && artistTracks.length > 0 && (
-        <div className={`artist-detail-tracks-wrap${activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''}`}>
-          <h3 className="artist-detail-tracks-title">{t('music.tracks', 'Musiqalar')}</h3>
-          {activeFilter === FILTER_ALL ? (
+        {(showTracksSkeleton ||
+          ((activeFilter === FILTER_ALL || activeFilter === FILTER_MUSIC) && artistTracks.length > 0)) && (
+        <div
+          className={`artist-detail-tracks-wrap${
+            !showTracksSkeleton && activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''
+          }`}
+          aria-busy={showTracksSkeleton || undefined}
+        >
+          {showTracksSkeleton ? (
+            <h3 className="artist-detail-tracks-title artist-detail-tracks-title--skeleton" aria-hidden="true">
+              <SkeletonLoader variant="artist-detail-tracks-title" />
+            </h3>
+          ) : (
+            <h3 className="artist-detail-tracks-title">{t('music.tracks', 'Musiqalar')}</h3>
+          )}
+          {showTracksSkeleton ? (
+          <HorizontalScroll scrollAmount={280}>
+            {Array.from({ length: ARTIST_TRACK_SKELETON_COLUMNS }, (_, colIndex) => (
+              <div key={`artist-track-col-skel-${colIndex}`} className="artist-detail-tracks-column">
+                {Array.from({ length: ARTIST_TRACKS_PER_COLUMN }, (_, rowIndex) => (
+                  <ArtistDetailTrackSkeleton key={`artist-track-skel-${colIndex}-${rowIndex}`} />
+                ))}
+              </div>
+            ))}
+          </HorizontalScroll>
+          ) : activeFilter === FILTER_ALL ? (
           <HorizontalScroll scrollAmount={280}>
             {chunkedTracks.map((column, colIndex) => {
               return (
@@ -601,6 +668,8 @@ const ArtistDetail = () => {
           )}
         </div>
         )}
+        {artist && (
+        <>
         {(activeFilter === FILTER_ALL || activeFilter === FILTER_ALBUM) && artistAlbums.length > 0 && (
           <div className={`artist-detail-albums-wrap${activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''}`}>
             <h3 className="artist-detail-albums-title">{t('music.albums', 'Albomlar')}</h3>
@@ -1038,6 +1107,8 @@ const ArtistDetail = () => {
               </div>
             )}
           </div>
+        )}
+        </>
         )}
         </>
         )}

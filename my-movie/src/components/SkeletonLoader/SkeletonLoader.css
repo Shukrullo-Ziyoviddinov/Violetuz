@@ -1151,6 +1151,44 @@
   border-radius: 8px;
 }
 
+.skeleton-loader--artist-detail-filter-btn {
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+}
+
+.skeleton-loader--artist-detail-tracks-title {
+  width: calc(1.2rem * 7);
+  height: calc(1.2rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--artist-detail-track-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-loader--artist-detail-track-name {
+  width: 100%;
+  height: calc(0.85rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--artist-detail-track-title {
+  width: 100%;
+  height: calc(1rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--artist-detail-play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,

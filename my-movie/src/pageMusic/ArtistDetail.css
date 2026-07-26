@@ -634,6 +634,25 @@
   margin: 0 0 1rem 0;
 }
 
+.artist-detail-tracks-title--skeleton {
+  display: block;
+  width: calc(1.2rem * 7);
+  max-width: 100%;
+  height: calc(1.2rem * 1.2);
+  margin: 0 0 1rem 0;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  overflow: hidden;
+}
+
+.artist-detail-tracks-title--skeleton .skeleton-loader--artist-detail-tracks-title {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
 /* Kliplar - konteyner ichida, sarlavha va kontent ko'rinadi */
 .artist-detail-clips-wrap {
   width: 100%;
@@ -782,6 +801,11 @@
   transition: background 0.4s ease, box-shadow 0.4s ease;
 }
 
+.artist-detail-track--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
 .artist-detail-track--playing {
   border-color: rgba(255, 255, 255, 0.15);
 }
@@ -799,6 +823,20 @@
   justify-content: center;
   border: 2px solid rgba(0, 0, 0, 0.6);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.artist-detail-track-img-wrap--skeleton {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  padding: 0;
+}
+
+.artist-detail-track-img-wrap--skeleton .skeleton-loader--artist-detail-track-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .artist-detail-track-img {
@@ -839,6 +877,23 @@
   white-space: nowrap;
 }
 
+.artist-detail-track-name--skeleton {
+  display: block;
+  width: 55%;
+  height: calc(0.85rem * 1.2);
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  overflow: hidden;
+}
+
+.artist-detail-track-name--skeleton .skeleton-loader--artist-detail-track-name {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
 .artist-detail-track-title {
   font-size: 1rem;
   font-weight: 600;
@@ -846,6 +901,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.artist-detail-track-title--skeleton {
+  display: block;
+  width: 75%;
+  height: calc(1rem * 1.2);
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  overflow: hidden;
+}
+
+.artist-detail-track-title--skeleton .skeleton-loader--artist-detail-track-title {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
 }
 
 .artist-detail-play-btn {
@@ -863,9 +935,30 @@
   transition: transform 0.2s, background 0.2s;
 }
 
+.artist-detail-play-btn--skeleton {
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  pointer-events: none;
+  cursor: default;
+  overflow: hidden;
+}
+
+.artist-detail-play-btn--skeleton .skeleton-loader--artist-detail-play-btn {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
 .artist-detail-play-btn:hover {
   background: rgba(155, 79, 231, 1);
   transform: scale(1.05);
+}
+
+.artist-detail-play-btn--skeleton:hover {
+  background: transparent;
+  transform: none;
 }
 
 .artist-detail-error {

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ScrollTouch from '../../components/ScrollTouch/ScrollTouch';
+import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import './ArtistDetailElementFilter.css';
 
 const FILTER_ALL = 'all';
@@ -10,6 +11,8 @@ const FILTER_KLIP = 'klip';
 const FILTER_SHORTS = 'shorts';
 const FILTER_KONSERT = 'konsert';
 const FILTER_MOVIES = 'movies';
+
+const FILTER_SKELETON_COUNT = 5;
 
 const iconSize = 18;
 
@@ -77,6 +80,7 @@ const ArtistDetailElementFilter = ({
   hasMovies = false,
   value,
   onChange,
+  forceSkeleton = false,
 }) => {
   const { t } = useTranslation();
   const [internalValue, setInternalValue] = useState(FILTER_ALL);
@@ -104,6 +108,27 @@ const ArtistDetailElementFilter = ({
       onChange?.(filterId);
     }
   };
+
+  if (forceSkeleton) {
+    return (
+      <div
+        className="artist-detail-element-filter artist-detail-element-filter--skeleton"
+        aria-busy="true"
+        aria-hidden="true"
+      >
+        {Array.from({ length: FILTER_SKELETON_COUNT }, (_, i) => (
+          <span
+            key={`artist-filter-skel-${i}`}
+            className={`artist-detail-element-filter-btn artist-detail-element-filter-btn--skeleton${
+              i === 0 ? ' active' : ''
+            }`}
+          >
+            <SkeletonLoader variant="artist-detail-filter-btn" />
+          </span>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <ScrollTouch className="artist-detail-element-filter">
