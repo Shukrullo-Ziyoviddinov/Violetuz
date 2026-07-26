@@ -19,3 +19,9 @@
   border-color: #9b4fe7;
   background: rgba(155, 79, 231, 0.22);
 }
+
+@media (max-width: 500px) {
+  .like-history-filter {
+    margin-bottom: 0.4rem;
+  }
+}
