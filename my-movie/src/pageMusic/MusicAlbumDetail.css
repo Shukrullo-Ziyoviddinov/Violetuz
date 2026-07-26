@@ -24,10 +24,16 @@
   margin: 0 0 0.75rem 0;
 }
 
+.music-album-songs-title-skeleton {
+  display: block;
+  margin: 0 0 0.75rem 0;
+}
+
 .music-album-songs-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .music-album-song-row {
@@ -41,6 +47,11 @@
   transition: background 0.2s;
 }
 
+.music-album-song-row--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
 .music-album-song-row:hover {
   background: rgba(255, 255, 255, 0.08);
 }
@@ -52,8 +63,8 @@
 
 .music-album-song-headphone-icon {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
