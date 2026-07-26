@@ -130,6 +130,7 @@ const MoviePosterItem = ({
           </>
         )}
       </div>
+      <h3 className="movies-item-title">{getMovieTitle(movie)}</h3>
     </div>
   );
 };
@@ -240,6 +241,7 @@ const Movies = ({
               aria-hidden="true"
             />
           </div>
+          <span className="movies-item-title movies-item-title--skeleton" aria-hidden="true" />
         </div>
       );
     }
