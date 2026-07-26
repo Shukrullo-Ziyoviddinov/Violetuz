@@ -35,6 +35,15 @@ const MoviePosterItem = ({
     !isSoon && movie.rating != null && movie.rating !== '' && movie.rating !== 'none';
   const showAge = movie.ageRestriction != null;
 
+  const year = movie.specs?.year;
+  const countries = Array.isArray(movie.specs?.countries)
+    ? movie.specs.countries.filter(Boolean).join(', ')
+    : '';
+  const metaParts = [];
+  if (year != null && year !== '') metaParts.push(`${year}-yil`);
+  if (countries) metaParts.push(countries);
+  const metaText = metaParts.join(' ');
+
   return (
     <div
       className={`movies-item ${isHorizontal ? 'movies-item-horizontal' : ''} ${isWideLayout ? 'movies-item-wide' : ''}${
@@ -131,6 +140,7 @@ const MoviePosterItem = ({
         )}
       </div>
       <h3 className="movies-item-title">{getMovieTitle(movie)}</h3>
+      {metaText ? <p className="movies-item-meta">{metaText}</p> : null}
     </div>
   );
 };
@@ -242,6 +252,7 @@ const Movies = ({
             />
           </div>
           <span className="movies-item-title movies-item-title--skeleton" aria-hidden="true" />
+          <span className="movies-item-meta movies-item-meta--skeleton" aria-hidden="true" />
         </div>
       );
     }
