@@ -2,11 +2,14 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ScrollTouch from '../../components/ScrollTouch/ScrollTouch';
 import MusicFilterModal from './MusicFilterModal';
+import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import './MusicFilter.css';
 
 const norm = (v) => (typeof v === 'string' ? v.toLowerCase().trim() : v);
 
-const MusicFilter = ({ data = [], onFilteredChange }) => {
+const FILTER_SKELETON_KEYS = ['year', 'genre', 'language', 'country'];
+
+const MusicFilter = ({ data = [], onFilteredChange, forceSkeleton = false }) => {
   const { t } = useTranslation();
 
   const LABELS = {
@@ -24,24 +27,32 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
   const [modalType, setModalType] = useState(null);
   const { year, genre, language, country } = filters;
 
-  const hasAnyFilter = year != null || (genre && genre !== 'all') || (language && language !== 'all') || (country && country !== 'all');
+  const hasAnyFilter =
+    year != null ||
+    (genre && genre !== 'all') ||
+    (language && language !== 'all') ||
+    (country && country !== 'all');
   const isBarchasiActive = !hasAnyFilter;
 
   const { filteredData, yearOpts, genreOpts, languageOpts, countryOpts } = useMemo(() => {
     const base = data;
 
-    const byYear = year != null && year !== '' && year !== 'all'
-      ? base.filter((item) => Number(item.year) === Number(year))
-      : base;
-    const byGenre = genre && genre !== 'all'
-      ? byYear.filter((item) => norm(item.genre) === norm(genre))
-      : byYear;
-    const byLang = language && language !== 'all'
-      ? byGenre.filter((item) => norm(item.language) === norm(language))
-      : byGenre;
-    const byCountry = country && country !== 'all'
-      ? byLang.filter((item) => norm(item.country) === norm(country))
-      : byLang;
+    const byYear =
+      year != null && year !== '' && year !== 'all'
+        ? base.filter((item) => Number(item.year) === Number(year))
+        : base;
+    const byGenre =
+      genre && genre !== 'all'
+        ? byYear.filter((item) => norm(item.genre) === norm(genre))
+        : byYear;
+    const byLang =
+      language && language !== 'all'
+        ? byGenre.filter((item) => norm(item.language) === norm(language))
+        : byGenre;
+    const byCountry =
+      country && country !== 'all'
+        ? byLang.filter((item) => norm(item.country) === norm(country))
+        : byLang;
 
     const finalFiltered = byCountry;
 
@@ -56,7 +67,8 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
       .filter((v) => !isNaN(v));
     const forGenreOpts = data
       .filter((item) => {
-        if (year != null && year !== '' && year !== 'all' && Number(item.year) !== Number(year)) return false;
+        if (year != null && year !== '' && year !== 'all' && Number(item.year) !== Number(year))
+          return false;
         if (language && language !== 'all' && norm(item.language) !== norm(language)) return false;
         if (country && country !== 'all' && norm(item.country) !== norm(country)) return false;
         return true;
@@ -65,7 +77,8 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
       .filter(Boolean);
     const forLangOpts = data
       .filter((item) => {
-        if (year != null && year !== '' && year !== 'all' && Number(item.year) !== Number(year)) return false;
+        if (year != null && year !== '' && year !== 'all' && Number(item.year) !== Number(year))
+          return false;
         if (genre && genre !== 'all' && norm(item.genre) !== norm(genre)) return false;
         if (country && country !== 'all' && norm(item.country) !== norm(country)) return false;
         return true;
@@ -74,7 +87,8 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
       .filter(Boolean);
     const forCountryOpts = data
       .filter((item) => {
-        if (year != null && year !== '' && year !== 'all' && Number(item.year) !== Number(year)) return false;
+        if (year != null && year !== '' && year !== 'all' && Number(item.year) !== Number(year))
+          return false;
         if (genre && genre !== 'all' && norm(item.genre) !== norm(genre)) return false;
         if (language && language !== 'all' && norm(item.language) !== norm(language)) return false;
         return true;
@@ -106,8 +120,9 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
   }, [data, year, genre, language, country]);
 
   useEffect(() => {
+    if (forceSkeleton) return;
     onFilteredChange?.(filteredData);
-  }, [filteredData, onFilteredChange]);
+  }, [filteredData, onFilteredChange, forceSkeleton]);
 
   const setFilter = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -161,6 +176,24 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
 
   const modalConfig = getModalConfig();
 
+  if (forceSkeleton) {
+    return (
+      <div className="music-filter music-filter--skeleton" aria-busy="true" aria-hidden="true">
+        <div className="music-filter-scroll">
+          <span className="music-filter-btn music-filter-btn-barchasi active music-filter-btn--skeleton">
+            <SkeletonLoader variant="music-filter-value" />
+          </span>
+          {FILTER_SKELETON_KEYS.map((key) => (
+            <span key={key} className="music-filter-btn music-filter-btn--skeleton">
+              <SkeletonLoader variant="music-filter-label" />
+              <SkeletonLoader variant="music-filter-value" />
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="music-filter">
       <ScrollTouch className="music-filter-scroll">
@@ -174,7 +207,7 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
         <button
           type="button"
           className={`music-filter-btn ${modalType === 'year' ? 'open' : ''} ${year ? 'has-value' : ''}`}
-          onClick={() => setModalType((t) => (t === 'year' ? null : 'year'))}
+          onClick={() => setModalType((prev) => (prev === 'year' ? null : 'year'))}
         >
           <span className="music-filter-label">{LABELS.year}:</span>
           <span className="music-filter-value">{getFilterDisplayValue('year')}</span>
@@ -185,7 +218,7 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
         <button
           type="button"
           className={`music-filter-btn ${modalType === 'genre' ? 'open' : ''} ${genre ? 'has-value' : ''}`}
-          onClick={() => setModalType((t) => (t === 'genre' ? null : 'genre'))}
+          onClick={() => setModalType((prev) => (prev === 'genre' ? null : 'genre'))}
         >
           <span className="music-filter-label">{LABELS.genre}:</span>
           <span className="music-filter-value">{getFilterDisplayValue('genre')}</span>
@@ -196,7 +229,7 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
         <button
           type="button"
           className={`music-filter-btn ${modalType === 'language' ? 'open' : ''} ${language ? 'has-value' : ''}`}
-          onClick={() => setModalType((t) => (t === 'language' ? null : 'language'))}
+          onClick={() => setModalType((prev) => (prev === 'language' ? null : 'language'))}
         >
           <span className="music-filter-label">{LABELS.language}:</span>
           <span className="music-filter-value">{getFilterDisplayValue('language')}</span>
@@ -207,7 +240,7 @@ const MusicFilter = ({ data = [], onFilteredChange }) => {
         <button
           type="button"
           className={`music-filter-btn ${modalType === 'country' ? 'open' : ''} ${country ? 'has-value' : ''}`}
-          onClick={() => setModalType((t) => (t === 'country' ? null : 'country'))}
+          onClick={() => setModalType((prev) => (prev === 'country' ? null : 'country'))}
         >
           <span className="music-filter-label">{LABELS.country}:</span>
           <span className="music-filter-value">{getFilterDisplayValue('country')}</span>

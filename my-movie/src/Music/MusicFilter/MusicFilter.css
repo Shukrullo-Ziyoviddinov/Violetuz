@@ -295,6 +295,30 @@
   color: #fff;
 }
 
+.music-filter--skeleton .music-filter-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.music-filter--skeleton .music-filter-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.music-filter-btn--skeleton {
+  pointer-events: none;
+  cursor: default;
+  gap: 0.4rem;
+}
+
+.music-filter-btn--skeleton .skeleton-loader--music-filter-label,
+.music-filter-btn--skeleton .skeleton-loader--music-filter-value {
+  display: block;
+}
+
 /* Desktop: modal o'rtada, yopish tugmasi ko'rinadi */
 @media (min-width: 768px) {
   .music-filter-modal-overlay {

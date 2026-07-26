@@ -126,6 +126,16 @@
   margin-bottom: 2rem;
 }
 
+.music-more-page-header--skeleton {
+  min-height: 44px;
+}
+
+.music-more-page-title-skeleton {
+  display: block;
+  flex: 1;
+  max-width: 16rem;
+}
+
 .music-more-page-back {
   width: 44px;
   height: 44px;
@@ -167,6 +177,17 @@
   transition: transform 0.25s ease;
 }
 
+.music-more-page-item--skeleton,
+.music-more-page-item--loading {
+  cursor: default;
+  pointer-events: none;
+}
+
+.music-more-page-item--skeleton:hover,
+.music-more-page-item--loading:hover {
+  transform: none;
+}
+
 .music-more-page-item:hover {
   transform: scale(1.02);
 }
@@ -179,6 +200,52 @@
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid #9b4fe78f;
+}
+
+.music-more-page-item-image-wrapper .music-more-page-item-image-skeleton,
+.music-more-page-item-image-wrapper .skeleton-loader--music-more-page-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.music-more-page-item-image--loading {
+  opacity: 0;
+}
+
+.music-more-page-item-wishlist-btn--skeleton,
+.music-more-page-item-play--skeleton {
+  border: none;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.12);
+  animation: music-more-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+@keyframes music-more-overlay-skeleton-shimmer {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.music-more-page-item-wishlist-btn--skeleton {
+  color: transparent;
+}
+
+.music-more-page-item-play--skeleton {
+  background: rgba(155, 79, 231, 0.35);
+  color: transparent;
+}
+
+.music-more-page-item-info .skeleton-loader--music-more-page-item-title,
+.music-more-page-item-info .skeleton-loader--music-more-page-item-artist {
+  display: block;
+  margin: 0 0 0.25rem 0;
 }
 
 .music-more-page-item-wishlist-btn {
