@@ -1189,6 +1189,24 @@
   flex-shrink: 0;
 }
 
+.skeleton-loader--artist-detail-albums-title {
+  width: calc(1.2rem * 6);
+  height: calc(1.2rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--artist-detail-clips-title {
+  width: calc(1.2rem * 5);
+  height: calc(1.2rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--artist-detail-shorts-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,

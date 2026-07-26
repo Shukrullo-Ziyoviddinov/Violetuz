@@ -624,6 +624,25 @@
   margin-top: 0.5rem;
 }
 
+.artist-detail-albums-title--skeleton {
+  display: block;
+  width: calc(1.2rem * 6);
+  max-width: 100%;
+  height: calc(1.2rem * 1.2);
+  margin: 0 0 1rem 0;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  overflow: hidden;
+}
+
+.artist-detail-albums-title--skeleton .skeleton-loader--artist-detail-albums-title {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
 /* Bo'lim sarlavhalari - Musiqalar, Albomlar, Kliplar (desktop va mobil bir xil) */
 .artist-detail-tracks-title,
 .artist-detail-albums-title,
@@ -659,6 +678,25 @@
   margin: 1rem 0 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.artist-detail-clips-title--skeleton {
+  display: block;
+  width: calc(1.2rem * 5);
+  max-width: 100%;
+  height: calc(1.2rem * 1.2);
+  margin: 0 0 1rem;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  overflow: hidden;
+}
+
+.artist-detail-clips-title--skeleton .skeleton-loader--artist-detail-clips-title {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
 }
 
 .artist-detail-clips-wrap .artist-detail-clips-title {
@@ -980,6 +1018,11 @@
   height: fit-content;
 }
 
+.artist-detail-shorts-wrap .artist-detail-shorts-card--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
 .artist-detail-shorts-wrap .music-cards-item-play {
   display: none;
 }
@@ -992,6 +1035,50 @@
   border-radius: 8px;
   overflow: hidden;
   position: relative;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-thumb--skeleton {
+  background: transparent;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-thumb-skeleton,
+.artist-detail-shorts-wrap .skeleton-loader--artist-detail-shorts-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-info--skeleton {
+  transform: translateY(0) !important;
+  pointer-events: none;
+}
+
+.artist-detail-shorts-wrap .artist-detail-shorts-info--skeleton .skeleton-loader--music-cards-item-title,
+.artist-detail-shorts-wrap .artist-detail-shorts-info--skeleton .skeleton-loader--music-cards-item-artist {
+  position: relative;
+  z-index: 1;
+}
+
+/* Movies section skeleton overlays */
+.artist-detail-movies-wrap .artist-detail-movie-image-wrapper {
+  position: relative;
+}
+
+.artist-detail-movies-wrap .artist-detail-movie-image-wrapper .music-cards-item-image-skeleton,
+.artist-detail-movies-wrap .artist-detail-movie-image-wrapper .skeleton-loader--music-cards-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.artist-detail-movies-wrap .artist-detail-movie-image-wrapper .movies-item-badge--skeleton,
+.artist-detail-movies-wrap .artist-detail-movie-image-wrapper .movies-item-rating--skeleton {
+  z-index: 3;
+  pointer-events: none;
 }
 
 /* Info thumb ichida, pastda overlay. Mobilda doim ko'rinadi, desktopda hover da */

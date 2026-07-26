@@ -31,6 +31,11 @@ const ARTIST_BIO_LINE_SKELETON_COUNT = 5;
 const ARTIST_BIOIMG_SKELETON_COUNT = 3;
 const ARTIST_TRACK_SKELETON_COLUMNS = 3;
 const ARTIST_TRACKS_PER_COLUMN = 4;
+const ARTIST_ALBUM_SKELETON_COUNT = 6;
+const ARTIST_CLIP_SKELETON_COUNT = 6;
+const ARTIST_SHORTS_SKELETON_COUNT = 6;
+const ARTIST_CONCERT_SKELETON_COUNT = 6;
+const ARTIST_MOVIE_SKELETON_COUNT = 6;
 
 const ArtistDetailTrackSkeleton = () => (
   <div className="artist-detail-track artist-detail-track--skeleton" aria-hidden="true">
@@ -48,6 +53,103 @@ const ArtistDetailTrackSkeleton = () => (
     <span className="artist-detail-play-btn artist-detail-play-btn--skeleton" aria-hidden="true">
       <SkeletonLoader variant="artist-detail-play-btn" />
     </span>
+  </div>
+);
+
+const ArtistDetailAlbumCardSkeleton = () => (
+  <div className="music-cards-item music-cards-item--skeleton" aria-hidden="true">
+    <div className="music-cards-item-image-wrapper">
+      <SkeletonLoader
+        variant="music-cards-image"
+        className="music-cards-item-image-skeleton"
+      />
+      <span
+        className="music-cards-item-wishlist-btn music-cards-item-wishlist-btn--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="music-cards-item-play music-cards-item-play--skeleton"
+        aria-hidden="true"
+      />
+      <div className="music-cards-item-info">
+        <SkeletonLoader variant="music-cards-item-title" />
+        <SkeletonLoader variant="music-cards-item-artist" />
+      </div>
+    </div>
+  </div>
+);
+
+const ArtistDetailClipCardSkeleton = () => (
+  <div
+    className="music-cards-item clips-item music-cards-item--skeleton"
+    aria-hidden="true"
+  >
+    <div className="music-cards-item-image-wrapper clips-image-wrapper">
+      <SkeletonLoader
+        variant="music-cards-image"
+        className="music-cards-item-image-skeleton"
+      />
+      <span
+        className="music-cards-item-wishlist-btn music-cards-item-wishlist-btn--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="music-cards-item-play music-cards-item-play--skeleton"
+        aria-hidden="true"
+      />
+      <div className="music-cards-item-info">
+        <SkeletonLoader variant="music-cards-item-title" />
+        <SkeletonLoader variant="music-cards-item-artist" />
+      </div>
+    </div>
+  </div>
+);
+
+const ArtistDetailShortsCardSkeleton = () => (
+  <div
+    className="artist-detail-shorts-card music-cards-item clips-item music-cards-item--skeleton artist-detail-shorts-card--skeleton"
+    aria-hidden="true"
+  >
+    <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb artist-detail-shorts-thumb--skeleton">
+      <SkeletonLoader
+        variant="artist-detail-shorts-thumb"
+        className="artist-detail-shorts-thumb-skeleton"
+      />
+      <div className="music-cards-item-info artist-detail-shorts-info artist-detail-shorts-info--skeleton">
+        <SkeletonLoader variant="music-cards-item-title" />
+        <SkeletonLoader variant="music-cards-item-artist" />
+      </div>
+    </div>
+  </div>
+);
+
+const ArtistDetailMovieCardSkeleton = () => (
+  <div
+    className="music-cards-item artist-detail-movie-item music-cards-item--skeleton"
+    aria-hidden="true"
+  >
+    <div className="music-cards-item-image-wrapper artist-detail-movie-image-wrapper">
+      <SkeletonLoader
+        variant="music-cards-image"
+        className="music-cards-item-image-skeleton"
+      />
+      <span
+        className="music-cards-item-wishlist-btn music-cards-item-wishlist-btn--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="movies-item-badge movies-item-badge-fhd movies-item-badge--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="movies-item-badge movies-item-badge-age movies-item-badge--skeleton"
+        aria-hidden="true"
+      />
+      <span
+        className="movies-item-rating movies-item-rating--skeleton"
+        aria-hidden="true"
+      />
+    </div>
   </div>
 );
 
@@ -158,6 +260,16 @@ const ArtistDetail = () => {
     showHeroDataSkeleton || (catalogsLoading && !hasAnyCatalogContent);
   const showTracksSkeleton =
     showHeroDataSkeleton || (Boolean(musicLoading) && artistTracks.length === 0);
+  const showAlbumsSkeleton =
+    showHeroDataSkeleton || (Boolean(albumsLoading) && artistAlbums.length === 0);
+  const showClipsSkeleton =
+    showHeroDataSkeleton || (Boolean(clipsLoading) && artistClips.length === 0);
+  const showShortsSkeleton =
+    showHeroDataSkeleton || (Boolean(musicShortsLoading) && artistShorts.length === 0);
+  const showConcertsSkeleton =
+    showHeroDataSkeleton || (Boolean(concertsLoading) && artistConcerts.length === 0);
+  const showMoviesSkeleton =
+    showHeroDataSkeleton || (Boolean(moviesLoading) && artistMovies.length === 0);
 
   useEffect(() => {
     if (!artist?.img) {
@@ -486,7 +598,7 @@ const ArtistDetail = () => {
             </div>
           </div>
         )}
-        {(artist || showFilterSkeleton || showTracksSkeleton) && (
+        {(artist || showFilterSkeleton || showTracksSkeleton || showAlbumsSkeleton || showClipsSkeleton || showShortsSkeleton || showConcertsSkeleton || showMoviesSkeleton) && (
         <>
         {artist && (getBio(artist.bio).text || artist.photoGallery?.length > 0) && (
           <div className={`artist-detail-bio-gallery${getBio(artist.bio).text && artist.photoGallery?.length ? '' : ' artist-detail-bio-gallery--single'}`}>
@@ -668,348 +780,466 @@ const ArtistDetail = () => {
           )}
         </div>
         )}
-        {artist && (
-        <>
-        {(activeFilter === FILTER_ALL || activeFilter === FILTER_ALBUM) && artistAlbums.length > 0 && (
-          <div className={`artist-detail-albums-wrap${activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''}`}>
-            <h3 className="artist-detail-albums-title">{t('music.albums', 'Albomlar')}</h3>
-            {activeFilter === FILTER_ALL ? (
-            <HorizontalScroll scrollAmount={220}>
-              {artistAlbums.map((album) => (
-                <div
-                  key={album.id}
-                  className="music-cards-item"
-                  onClick={() => navigate(`/music/album/${album.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/album/${album.id}`)}
-                  aria-label={`${album.title} - ${artist.name}`}
-                >
-                  <div className="music-cards-item-image-wrapper">
-                    <img
-                      src={album.img || '/img/movie1.jpg'}
-                      alt={album.title}
-                      className="music-cards-item-image"
-                    />
-                    <button
-                      type="button"
-                      className={`music-cards-item-wishlist-btn ${isInWishlist(album.id, 'album') ? 'active' : ''}`}
-                      onClick={(e) => { e.stopPropagation(); toggleWishlist(album.id, 'album'); }}
-                      aria-label={isInWishlist(album.id, 'album') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(album.id, 'album') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
-                    <div className="music-cards-item-play">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="5 3 19 12 5 21" />
-                      </svg>
-                    </div>
-                    <div className="music-cards-item-info">
-                      <h3 className="music-cards-item-title">{album.title}</h3>
-                      <p className="music-cards-item-artist">{album.artist}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </HorizontalScroll>
+        {(showAlbumsSkeleton ||
+          ((activeFilter === FILTER_ALL || activeFilter === FILTER_ALBUM) &&
+            artistAlbums.length > 0)) && (
+          <div
+            className={`artist-detail-albums-wrap${
+              !showAlbumsSkeleton && activeFilter !== FILTER_ALL
+                ? ' artist-detail-section--filtered'
+                : ''
+            }`}
+            aria-busy={showAlbumsSkeleton || undefined}
+          >
+            {showAlbumsSkeleton ? (
+              <h3
+                className="artist-detail-albums-title artist-detail-albums-title--skeleton"
+                aria-hidden="true"
+              >
+                <SkeletonLoader variant="artist-detail-albums-title" />
+              </h3>
             ) : (
-            <div className="artist-detail-albums-grid">
-              {artistAlbums.map((album) => (
-                <div
-                  key={album.id}
-                  className="music-cards-item"
-                  onClick={() => navigate(`/music/album/${album.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/album/${album.id}`)}
-                  aria-label={`${album.title} - ${artist.name}`}
-                >
-                  <div className="music-cards-item-image-wrapper">
-                    <img
-                      src={album.img || '/img/movie1.jpg'}
-                      alt={album.title}
-                      className="music-cards-item-image"
-                    />
-                    <button
-                      type="button"
-                      className={`music-cards-item-wishlist-btn ${isInWishlist(album.id, 'album') ? 'active' : ''}`}
-                      onClick={(e) => { e.stopPropagation(); toggleWishlist(album.id, 'album'); }}
-                      aria-label={isInWishlist(album.id, 'album') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(album.id, 'album') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
-                    <div className="music-cards-item-play">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="5 3 19 12 5 21" />
-                      </svg>
-                    </div>
-                    <div className="music-cards-item-info">
-                      <h3 className="music-cards-item-title">{album.title}</h3>
-                      <p className="music-cards-item-artist">{album.artist}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+              <h3 className="artist-detail-albums-title">{t('music.albums', 'Albomlar')}</h3>
             )}
-          </div>
-        )}
-        {(activeFilter === FILTER_ALL || activeFilter === FILTER_KLIP) && artistClips.length > 0 && (
-          <div className={`artist-detail-clips-wrap clips-cards${activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''}`}>
-            <h3 className="artist-detail-clips-title">{t('music.clips', 'Kliplar')}</h3>
-            {activeFilter === FILTER_ALL ? (
-            <HorizontalScroll scrollAmount={260}>
-              {artistClips.map((clip) => (
-                <div
-                  key={clip.id}
-                  className="music-cards-item clips-item"
-                  onClick={() => navigate(`/music/video/${clip.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${clip.id}`)}
-                  aria-label={`${clip.title} - ${artist.name}`}
-                >
-                  <div className="music-cards-item-image-wrapper clips-image-wrapper">
-                    <img
-                      src={clip.img || '/img/movie1.jpg'}
-                      alt={clip.title}
-                      className="music-cards-item-image"
-                    />
-                    <button
-                      type="button"
-                      className={`music-cards-item-wishlist-btn ${isInWishlist(clip.id, 'klip') ? 'active' : ''}`}
-                      onClick={(e) => { e.stopPropagation(); toggleWishlist(clip.id, 'klip'); }}
-                      aria-label={isInWishlist(clip.id, 'klip') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(clip.id, 'klip') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
-                    <div className="music-cards-item-play">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="5 3 19 12 5 21" />
-                      </svg>
-                    </div>
-                    <div className="music-cards-item-info">
-                      <h3 className="music-cards-item-title">{clip.title}</h3>
-                      <p className="music-cards-item-artist">{artist.name}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </HorizontalScroll>
-            ) : (
-            <div className="artist-detail-clips-grid">
-              {artistClips.map((clip) => (
-                <div
-                  key={clip.id}
-                  className="music-cards-item clips-item"
-                  onClick={() => navigate(`/music/video/${clip.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${clip.id}`)}
-                  aria-label={`${clip.title} - ${artist.name}`}
-                >
-                  <div className="music-cards-item-image-wrapper clips-image-wrapper">
-                    <img
-                      src={clip.img || '/img/movie1.jpg'}
-                      alt={clip.title}
-                      className="music-cards-item-image"
-                    />
-                    <button
-                      type="button"
-                      className={`music-cards-item-wishlist-btn ${isInWishlist(clip.id, 'klip') ? 'active' : ''}`}
-                      onClick={(e) => { e.stopPropagation(); toggleWishlist(clip.id, 'klip'); }}
-                      aria-label={isInWishlist(clip.id, 'klip') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(clip.id, 'klip') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
-                    <div className="music-cards-item-play">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="5 3 19 12 5 21" />
-                      </svg>
-                    </div>
-                    <div className="music-cards-item-info">
-                      <h3 className="music-cards-item-title">{clip.title}</h3>
-                      <p className="music-cards-item-artist">{artist.name}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            )}
-          </div>
-        )}
-        {(activeFilter === FILTER_ALL || activeFilter === FILTER_SHORTS) && artistShorts.length > 0 && (
-          <div className={`artist-detail-clips-wrap clips-cards artist-detail-shorts-wrap${activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''}`}>
-            <h3 className="artist-detail-clips-title">{t('music.shorts', 'Shorts')}</h3>
-            {activeFilter === FILTER_ALL ? (
-            <HorizontalScroll scrollAmount={220}>
-              {artistShorts.map((short) => {
-                const globalIndex = musicShorts.findIndex((s) => s.id === short.id);
-                const safeIndex = globalIndex >= 0 ? globalIndex : 0;
-                return (
+            {showAlbumsSkeleton ? (
+              <HorizontalScroll scrollAmount={220}>
+                {Array.from({ length: ARTIST_ALBUM_SKELETON_COUNT }, (_, i) => (
+                  <ArtistDetailAlbumCardSkeleton key={`artist-album-skel-${i}`} />
+                ))}
+              </HorizontalScroll>
+            ) : activeFilter === FILTER_ALL ? (
+              <HorizontalScroll scrollAmount={220}>
+                {artistAlbums.map((album) => (
                   <div
-                    key={short.id}
-                    className="artist-detail-shorts-card music-cards-item clips-item"
-                    onClick={() => navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                    key={album.id}
+                    className="music-cards-item"
+                    onClick={() => navigate(`/music/album/${album.id}`)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/shorts?startIndex=${safeIndex}`)}
-                    aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/album/${album.id}`)}
+                    aria-label={`${album.title} - ${artist.name}`}
                   >
-                    <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">
-                      <video
-                        src={getShortVideo(short, contentLang)}
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        className="artist-detail-shorts-preview"
+                    <div className="music-cards-item-image-wrapper">
+                      <img
+                        src={album.img || '/img/movie1.jpg'}
+                        alt={album.title}
+                        className="music-cards-item-image"
                       />
-                      <div className="music-cards-item-info artist-detail-shorts-info">
-                        <h3 className="music-cards-item-title">{getShortTitle(short, contentLang)}</h3>
+                      <button
+                        type="button"
+                        className={`music-cards-item-wishlist-btn ${isInWishlist(album.id, 'album') ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleWishlist(album.id, 'album'); }}
+                        aria-label={isInWishlist(album.id, 'album') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(album.id, 'album') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                      <div className="music-cards-item-play">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21" />
+                        </svg>
+                      </div>
+                      <div className="music-cards-item-info">
+                        <h3 className="music-cards-item-title">{album.title}</h3>
+                        <p className="music-cards-item-artist">{album.artist}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </HorizontalScroll>
+            ) : (
+              <div className="artist-detail-albums-grid">
+                {artistAlbums.map((album) => (
+                  <div
+                    key={album.id}
+                    className="music-cards-item"
+                    onClick={() => navigate(`/music/album/${album.id}`)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/album/${album.id}`)}
+                    aria-label={`${album.title} - ${artist.name}`}
+                  >
+                    <div className="music-cards-item-image-wrapper">
+                      <img
+                        src={album.img || '/img/movie1.jpg'}
+                        alt={album.title}
+                        className="music-cards-item-image"
+                      />
+                      <button
+                        type="button"
+                        className={`music-cards-item-wishlist-btn ${isInWishlist(album.id, 'album') ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleWishlist(album.id, 'album'); }}
+                        aria-label={isInWishlist(album.id, 'album') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(album.id, 'album') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                      <div className="music-cards-item-play">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21" />
+                        </svg>
+                      </div>
+                      <div className="music-cards-item-info">
+                        <h3 className="music-cards-item-title">{album.title}</h3>
+                        <p className="music-cards-item-artist">{album.artist}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {(showClipsSkeleton ||
+          ((activeFilter === FILTER_ALL || activeFilter === FILTER_KLIP) &&
+            artistClips.length > 0)) && (
+          <div
+            className={`artist-detail-clips-wrap clips-cards${
+              !showClipsSkeleton && activeFilter !== FILTER_ALL
+                ? ' artist-detail-section--filtered'
+                : ''
+            }`}
+            aria-busy={showClipsSkeleton || undefined}
+          >
+            {showClipsSkeleton ? (
+              <h3
+                className="artist-detail-clips-title artist-detail-clips-title--skeleton"
+                aria-hidden="true"
+              >
+                <SkeletonLoader variant="artist-detail-clips-title" />
+              </h3>
+            ) : (
+              <h3 className="artist-detail-clips-title">{t('music.clips', 'Kliplar')}</h3>
+            )}
+            {showClipsSkeleton ? (
+              <HorizontalScroll scrollAmount={260}>
+                {Array.from({ length: ARTIST_CLIP_SKELETON_COUNT }, (_, i) => (
+                  <ArtistDetailClipCardSkeleton key={`artist-clip-skel-${i}`} />
+                ))}
+              </HorizontalScroll>
+            ) : activeFilter === FILTER_ALL ? (
+              <HorizontalScroll scrollAmount={260}>
+                {artistClips.map((clip) => (
+                  <div
+                    key={clip.id}
+                    className="music-cards-item clips-item"
+                    onClick={() => navigate(`/music/video/${clip.id}`)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${clip.id}`)}
+                    aria-label={`${clip.title} - ${artist.name}`}
+                  >
+                    <div className="music-cards-item-image-wrapper clips-image-wrapper">
+                      <img
+                        src={clip.img || '/img/movie1.jpg'}
+                        alt={clip.title}
+                        className="music-cards-item-image"
+                      />
+                      <button
+                        type="button"
+                        className={`music-cards-item-wishlist-btn ${isInWishlist(clip.id, 'klip') ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleWishlist(clip.id, 'klip'); }}
+                        aria-label={isInWishlist(clip.id, 'klip') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(clip.id, 'klip') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                      <div className="music-cards-item-play">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21" />
+                        </svg>
+                      </div>
+                      <div className="music-cards-item-info">
+                        <h3 className="music-cards-item-title">{clip.title}</h3>
                         <p className="music-cards-item-artist">{artist.name}</p>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </HorizontalScroll>
+                ))}
+              </HorizontalScroll>
             ) : (
-            <div className="artist-detail-clips-grid artist-detail-shorts-grid">
-              {artistShorts.map((short) => {
-                const globalIndex = musicShorts.findIndex((s) => s.id === short.id);
-                const safeIndex = globalIndex >= 0 ? globalIndex : 0;
-                return (
+              <div className="artist-detail-clips-grid">
+                {artistClips.map((clip) => (
                   <div
-                    key={short.id}
-                    className="artist-detail-shorts-card music-cards-item clips-item"
-                    onClick={() => navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                    key={clip.id}
+                    className="music-cards-item clips-item"
+                    onClick={() => navigate(`/music/video/${clip.id}`)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/shorts?startIndex=${safeIndex}`)}
-                    aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${clip.id}`)}
+                    aria-label={`${clip.title} - ${artist.name}`}
                   >
-                    <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">
-                      <video
-                        src={getShortVideo(short, contentLang)}
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        className="artist-detail-shorts-preview"
+                    <div className="music-cards-item-image-wrapper clips-image-wrapper">
+                      <img
+                        src={clip.img || '/img/movie1.jpg'}
+                        alt={clip.title}
+                        className="music-cards-item-image"
                       />
-                      <div className="music-cards-item-info artist-detail-shorts-info">
-                        <h3 className="music-cards-item-title">{getShortTitle(short, contentLang)}</h3>
+                      <button
+                        type="button"
+                        className={`music-cards-item-wishlist-btn ${isInWishlist(clip.id, 'klip') ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleWishlist(clip.id, 'klip'); }}
+                        aria-label={isInWishlist(clip.id, 'klip') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(clip.id, 'klip') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                      <div className="music-cards-item-play">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21" />
+                        </svg>
+                      </div>
+                      <div className="music-cards-item-info">
+                        <h3 className="music-cards-item-title">{clip.title}</h3>
                         <p className="music-cards-item-artist">{artist.name}</p>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
             )}
           </div>
         )}
-        {(activeFilter === FILTER_ALL || activeFilter === FILTER_KONSERT) && artistConcerts.length > 0 && (
-          <div className={`artist-detail-clips-wrap clips-cards${activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''}`}>
-            <h3 className="artist-detail-clips-title">{t('music.concerts', 'Konsertlar')}</h3>
-            {activeFilter === FILTER_ALL ? (
-            <HorizontalScroll scrollAmount={260}>
-              {artistConcerts.map((concert) => (
-                <div
-                  key={concert.id}
-                  className="music-cards-item clips-item"
-                  onClick={() => navigate(`/music/video/${concert.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${concert.id}`)}
-                  aria-label={`${concert.title} - ${artist.name}`}
-                >
-                  <div className="music-cards-item-image-wrapper clips-image-wrapper">
-                    <img
-                      src={concert.img || '/img/movie1.jpg'}
-                      alt={concert.title}
-                      className="music-cards-item-image"
-                    />
-                    <button
-                      type="button"
-                      className={`music-cards-item-wishlist-btn ${isInWishlist(concert.id, 'konsert') ? 'active' : ''}`}
-                      onClick={(e) => { e.stopPropagation(); toggleWishlist(concert.id, 'konsert'); }}
-                      aria-label={isInWishlist(concert.id, 'konsert') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(concert.id, 'konsert') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
-                    <div className="music-cards-item-play">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="5 3 19 12 5 21" />
-                      </svg>
-                    </div>
-                    <div className="music-cards-item-info">
-                      <h3 className="music-cards-item-title">{concert.title}</h3>
-                      <p className="music-cards-item-artist">{artist.name}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </HorizontalScroll>
+        {(showShortsSkeleton ||
+          ((activeFilter === FILTER_ALL || activeFilter === FILTER_SHORTS) &&
+            artistShorts.length > 0)) && (
+          <div
+            className={`artist-detail-clips-wrap clips-cards artist-detail-shorts-wrap${
+              !showShortsSkeleton && activeFilter !== FILTER_ALL
+                ? ' artist-detail-section--filtered'
+                : ''
+            }`}
+            aria-busy={showShortsSkeleton || undefined}
+          >
+            {showShortsSkeleton ? (
+              <h3
+                className="artist-detail-clips-title artist-detail-clips-title--skeleton"
+                aria-hidden="true"
+              >
+                <SkeletonLoader variant="artist-detail-clips-title" />
+              </h3>
             ) : (
-            <div className="artist-detail-clips-grid">
-              {artistConcerts.map((concert) => (
-                <div
-                  key={concert.id}
-                  className="music-cards-item clips-item"
-                  onClick={() => navigate(`/music/video/${concert.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${concert.id}`)}
-                  aria-label={`${concert.title} - ${artist.name}`}
-                >
-                  <div className="music-cards-item-image-wrapper clips-image-wrapper">
-                    <img
-                      src={concert.img || '/img/movie1.jpg'}
-                      alt={concert.title}
-                      className="music-cards-item-image"
-                    />
-                    <button
-                      type="button"
-                      className={`music-cards-item-wishlist-btn ${isInWishlist(concert.id, 'konsert') ? 'active' : ''}`}
-                      onClick={(e) => { e.stopPropagation(); toggleWishlist(concert.id, 'konsert'); }}
-                      aria-label={isInWishlist(concert.id, 'konsert') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
+              <h3 className="artist-detail-clips-title">{t('music.shorts', 'Shorts')}</h3>
+            )}
+            {showShortsSkeleton ? (
+              <HorizontalScroll scrollAmount={220}>
+                {Array.from({ length: ARTIST_SHORTS_SKELETON_COUNT }, (_, i) => (
+                  <ArtistDetailShortsCardSkeleton key={`artist-shorts-skel-${i}`} />
+                ))}
+              </HorizontalScroll>
+            ) : activeFilter === FILTER_ALL ? (
+              <HorizontalScroll scrollAmount={220}>
+                {artistShorts.map((short) => {
+                  const globalIndex = musicShorts.findIndex((s) => s.id === short.id);
+                  const safeIndex = globalIndex >= 0 ? globalIndex : 0;
+                  return (
+                    <div
+                      key={short.id}
+                      className="artist-detail-shorts-card music-cards-item clips-item"
+                      onClick={() => navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(concert.id, 'konsert') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
-                    <div className="music-cards-item-play">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="5 3 19 12 5 21" />
-                      </svg>
+                      <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">
+                        <video
+                          src={getShortVideo(short, contentLang)}
+                          muted
+                          loop
+                          playsInline
+                          preload="metadata"
+                          className="artist-detail-shorts-preview"
+                        />
+                        <div className="music-cards-item-info artist-detail-shorts-info">
+                          <h3 className="music-cards-item-title">{getShortTitle(short, contentLang)}</h3>
+                          <p className="music-cards-item-artist">{artist.name}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="music-cards-item-info">
-                      <h3 className="music-cards-item-title">{concert.title}</h3>
-                      <p className="music-cards-item-artist">{artist.name}</p>
+                  );
+                })}
+              </HorizontalScroll>
+            ) : (
+              <div className="artist-detail-clips-grid artist-detail-shorts-grid">
+                {artistShorts.map((short) => {
+                  const globalIndex = musicShorts.findIndex((s) => s.id === short.id);
+                  const safeIndex = globalIndex >= 0 ? globalIndex : 0;
+                  return (
+                    <div
+                      key={short.id}
+                      className="artist-detail-shorts-card music-cards-item clips-item"
+                      onClick={() => navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
+                    >
+                      <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">
+                        <video
+                          src={getShortVideo(short, contentLang)}
+                          muted
+                          loop
+                          playsInline
+                          preload="metadata"
+                          className="artist-detail-shorts-preview"
+                        />
+                        <div className="music-cards-item-info artist-detail-shorts-info">
+                          <h3 className="music-cards-item-title">{getShortTitle(short, contentLang)}</h3>
+                          <p className="music-cards-item-artist">{artist.name}</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}
-        {(activeFilter === FILTER_ALL || activeFilter === FILTER_MOVIES) && artistMovies.length > 0 && (
-          <div className={`artist-detail-clips-wrap artist-detail-movies-wrap${activeFilter !== FILTER_ALL ? ' artist-detail-section--filtered' : ''}`}>
-            <h3 className="artist-detail-clips-title">{t('movies.movies', 'Kinolar')}</h3>
-            {activeFilter === FILTER_ALL ? (
+        {(showConcertsSkeleton ||
+          ((activeFilter === FILTER_ALL || activeFilter === FILTER_KONSERT) &&
+            artistConcerts.length > 0)) && (
+          <div
+            className={`artist-detail-clips-wrap clips-cards${
+              !showConcertsSkeleton && activeFilter !== FILTER_ALL
+                ? ' artist-detail-section--filtered'
+                : ''
+            }`}
+            aria-busy={showConcertsSkeleton || undefined}
+          >
+            {showConcertsSkeleton ? (
+              <h3
+                className="artist-detail-clips-title artist-detail-clips-title--skeleton"
+                aria-hidden="true"
+              >
+                <SkeletonLoader variant="artist-detail-clips-title" />
+              </h3>
+            ) : (
+              <h3 className="artist-detail-clips-title">{t('music.concerts', 'Konsertlar')}</h3>
+            )}
+            {showConcertsSkeleton ? (
+              <HorizontalScroll scrollAmount={260}>
+                {Array.from({ length: ARTIST_CONCERT_SKELETON_COUNT }, (_, i) => (
+                  <ArtistDetailClipCardSkeleton key={`artist-concert-skel-${i}`} />
+                ))}
+              </HorizontalScroll>
+            ) : activeFilter === FILTER_ALL ? (
+              <HorizontalScroll scrollAmount={260}>
+                {artistConcerts.map((concert) => (
+                  <div
+                    key={concert.id}
+                    className="music-cards-item clips-item"
+                    onClick={() => navigate(`/music/video/${concert.id}`)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${concert.id}`)}
+                    aria-label={`${concert.title} - ${artist.name}`}
+                  >
+                    <div className="music-cards-item-image-wrapper clips-image-wrapper">
+                      <img
+                        src={concert.img || '/img/movie1.jpg'}
+                        alt={concert.title}
+                        className="music-cards-item-image"
+                      />
+                      <button
+                        type="button"
+                        className={`music-cards-item-wishlist-btn ${isInWishlist(concert.id, 'konsert') ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleWishlist(concert.id, 'konsert'); }}
+                        aria-label={isInWishlist(concert.id, 'konsert') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(concert.id, 'konsert') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                      <div className="music-cards-item-play">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21" />
+                        </svg>
+                      </div>
+                      <div className="music-cards-item-info">
+                        <h3 className="music-cards-item-title">{concert.title}</h3>
+                        <p className="music-cards-item-artist">{artist.name}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </HorizontalScroll>
+            ) : (
+              <div className="artist-detail-clips-grid">
+                {artistConcerts.map((concert) => (
+                  <div
+                    key={concert.id}
+                    className="music-cards-item clips-item"
+                    onClick={() => navigate(`/music/video/${concert.id}`)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/video/${concert.id}`)}
+                    aria-label={`${concert.title} - ${artist.name}`}
+                  >
+                    <div className="music-cards-item-image-wrapper clips-image-wrapper">
+                      <img
+                        src={concert.img || '/img/movie1.jpg'}
+                        alt={concert.title}
+                        className="music-cards-item-image"
+                      />
+                      <button
+                        type="button"
+                        className={`music-cards-item-wishlist-btn ${isInWishlist(concert.id, 'konsert') ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleWishlist(concert.id, 'konsert'); }}
+                        aria-label={isInWishlist(concert.id, 'konsert') ? 'Sevimlilardan olib tashlash' : 'Sevimlilarga qo\'shish'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={isInWishlist(concert.id, 'konsert') ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                      <div className="music-cards-item-play">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21" />
+                        </svg>
+                      </div>
+                      <div className="music-cards-item-info">
+                        <h3 className="music-cards-item-title">{concert.title}</h3>
+                        <p className="music-cards-item-artist">{artist.name}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {(showMoviesSkeleton ||
+          ((activeFilter === FILTER_ALL || activeFilter === FILTER_MOVIES) &&
+            artistMovies.length > 0)) && (
+          <div
+            className={`artist-detail-clips-wrap artist-detail-movies-wrap${
+              !showMoviesSkeleton && activeFilter !== FILTER_ALL
+                ? ' artist-detail-section--filtered'
+                : ''
+            }`}
+            aria-busy={showMoviesSkeleton || undefined}
+          >
+            {showMoviesSkeleton ? (
+              <h3
+                className="artist-detail-clips-title artist-detail-clips-title--skeleton"
+                aria-hidden="true"
+              >
+                <SkeletonLoader variant="artist-detail-clips-title" />
+              </h3>
+            ) : (
+              <h3 className="artist-detail-clips-title">{t('movies.movies', 'Kinolar')}</h3>
+            )}
+            {showMoviesSkeleton ? (
+              <HorizontalScroll scrollAmount={220}>
+                {Array.from({ length: ARTIST_MOVIE_SKELETON_COUNT }, (_, i) => (
+                  <ArtistDetailMovieCardSkeleton key={`artist-movie-skel-${i}`} />
+                ))}
+              </HorizontalScroll>
+            ) : activeFilter === FILTER_ALL ? (
               <HorizontalScroll scrollAmount={220}>
                 {artistMovies.map((movie) => (
                   <div
@@ -1108,8 +1338,7 @@ const ArtistDetail = () => {
             )}
           </div>
         )}
-        </>
-        )}
+
         </>
         )}
       </div>
