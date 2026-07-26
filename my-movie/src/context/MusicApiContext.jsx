@@ -187,6 +187,7 @@ export const MusicApiProvider = ({ children }) => {
   const clipsLoading = isAwaiting(clipsQuery);
   const concertsLoading = isAwaiting(concertsQuery);
   const artistsLoading = isAwaiting(artistsQuery);
+  const artistMusicStoriesLoading = isAwaiting(artistMusicStoriesQuery);
   const sectionsLoading = isAwaiting(sectionsQuery);
   const clipSectionsLoading = isAwaiting(clipSectionsQuery);
   const concertSectionsLoading = isAwaiting(concertSectionsQuery);
@@ -228,6 +229,7 @@ export const MusicApiProvider = ({ children }) => {
     clipsLoading,
     concertsLoading,
     artistsLoading,
+    artistMusicStoriesLoading,
     sectionsLoading,
     clipSectionsLoading,
     concertSectionsLoading,
@@ -363,6 +365,7 @@ export const MusicApiProvider = ({ children }) => {
     clipsLoading,
     concertsLoading,
     artistsLoading,
+    artistMusicStoriesLoading,
     sectionsLoading,
     clipSectionsLoading,
     concertSectionsLoading,

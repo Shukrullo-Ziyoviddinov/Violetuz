@@ -26,6 +26,9 @@ const getShortTitle = (item, lang) => item?.title?.[lang] || item?.title?.uz || 
 const getShortVideo = (item, lang) => item?.video?.[lang] || item?.video?.uz || '';
 
 const ARTIST_INFO_SKELETON_COUNT = 4;
+const ARTIST_STAT_SKELETON_COUNT = 6;
+const ARTIST_BIO_LINE_SKELETON_COUNT = 5;
+const ARTIST_BIOIMG_SKELETON_COUNT = 3;
 
 const ArtistDetail = () => {
   const { id } = useParams();
@@ -42,6 +45,7 @@ const ArtistDetail = () => {
     musicShortsCatalog,
     getArtistById,
     artistsLoading,
+    artistMusicStoriesLoading,
   } = useMusicApi();
   const { allMovies } = useMoviesApi();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -59,6 +63,7 @@ const ArtistDetail = () => {
   const showHeroDataSkeleton = Boolean(artistsLoading) && !artist;
   const showImgSkeleton = showHeroDataSkeleton || (Boolean(artist) && artistImg.showSkeleton);
   const showCaptionSkeleton = showHeroDataSkeleton;
+  const showStatsSkeleton = showHeroDataSkeleton;
 
   const musicShorts = musicShortsCatalog;
 
@@ -96,6 +101,9 @@ const ArtistDetail = () => {
 
   const artistTracks = allMusic.filter((tr) => tr.artistId === id);
   const artistStories = getArtistMusicStoriesByArtist(id);
+  const showStoriesSkeleton =
+    showHeroDataSkeleton ||
+    (Boolean(artistMusicStoriesLoading) && artistStories.length === 0);
   const artistAlbums = getAlbumsByArtist(id);
   const artistClips = getClipsByArtist(id);
   const artistShorts = musicShorts.filter((s) => s.artistId === id);
@@ -298,54 +306,142 @@ const ArtistDetail = () => {
               )}
             </div>
           </div>
-          {artist && (
+          {(showStatsSkeleton || artist) && (
           <>
-          <div className="artist-detail-stats">
-            <ScrollTouch className="artist-detail-stats-items">
-              <div className="artist-detail-stat-item">
-                <span className="artist-detail-track-num">{artistTracks.length}</span>
-                <span className="artist-detail-track-label">{t('music.tracks', 'Musiqa')}</span>
-              </div>
-              <div className="artist-detail-stat-item">
-                <span className="artist-detail-track-num">{artistAlbums.length}</span>
-                <span className="artist-detail-track-label">{t('music.albums', 'Albomlar')}</span>
-              </div>
-              <div className="artist-detail-stat-item">
-                <span className="artist-detail-track-num">{artistClips.length}</span>
-                <span className="artist-detail-track-label">{t('music.clips', 'Kliplar')}</span>
-              </div>
-              <div className="artist-detail-stat-item">
-                <span className="artist-detail-track-num">{artistShorts.length}</span>
-                <span className="artist-detail-track-label">{t('music.shorts', 'Shorts')}</span>
-              </div>
-              <div className="artist-detail-stat-item">
-                <span className="artist-detail-track-num">{artistConcerts.length}</span>
-                <span className="artist-detail-track-label">{t('music.concerts', 'Konsertlar')}</span>
-              </div>
-              <div className="artist-detail-stat-item">
-                <span className="artist-detail-track-num" data-subscriber-count>
-                  {formatCount(artist.subscribers ?? 0)}
-                </span>
-                <span className="artist-detail-track-label">Obuna</span>
-              </div>
-            </ScrollTouch>
-            <div className="artist-detail-stats-follow">
-              <FollowingButton
-                artistId={artist.id}
-                onSubscribeChange={(isSubscribed) => {
-                  const el = document.querySelector('[data-subscriber-count]');
-                  if (el) {
-                    const base = (artist.subscribers ?? 0) + (isSubscribed ? 1 : 0);
-                    el.textContent = formatCount(base);
-                  }
-                }}
-              />
-            </div>
+          <div
+            className={`artist-detail-stats${showStatsSkeleton ? ' artist-detail-stats--skeleton' : ''}`}
+            aria-busy={showStatsSkeleton || undefined}
+          >
+            {showStatsSkeleton ? (
+              <>
+                <ScrollTouch className="artist-detail-stats-items">
+                  {Array.from({ length: ARTIST_STAT_SKELETON_COUNT }, (_, i) => (
+                    <div
+                      key={`artist-stat-skel-${i}`}
+                      className="artist-detail-stat-item artist-detail-stat-item--skeleton"
+                      aria-hidden="true"
+                    >
+                      <SkeletonLoader variant="artist-detail-stat-num" />
+                      <SkeletonLoader variant="artist-detail-stat-label" />
+                    </div>
+                  ))}
+                </ScrollTouch>
+                <div className="artist-detail-stats-follow">
+                  <span className="following-btn following-btn--skeleton" aria-hidden="true">
+                    <SkeletonLoader variant="artist-detail-following-btn" />
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <ScrollTouch className="artist-detail-stats-items">
+                  <div className="artist-detail-stat-item">
+                    <span className="artist-detail-track-num">{artistTracks.length}</span>
+                    <span className="artist-detail-track-label">{t('music.tracks', 'Musiqa')}</span>
+                  </div>
+                  <div className="artist-detail-stat-item">
+                    <span className="artist-detail-track-num">{artistAlbums.length}</span>
+                    <span className="artist-detail-track-label">{t('music.albums', 'Albomlar')}</span>
+                  </div>
+                  <div className="artist-detail-stat-item">
+                    <span className="artist-detail-track-num">{artistClips.length}</span>
+                    <span className="artist-detail-track-label">{t('music.clips', 'Kliplar')}</span>
+                  </div>
+                  <div className="artist-detail-stat-item">
+                    <span className="artist-detail-track-num">{artistShorts.length}</span>
+                    <span className="artist-detail-track-label">{t('music.shorts', 'Shorts')}</span>
+                  </div>
+                  <div className="artist-detail-stat-item">
+                    <span className="artist-detail-track-num">{artistConcerts.length}</span>
+                    <span className="artist-detail-track-label">{t('music.concerts', 'Konsertlar')}</span>
+                  </div>
+                  <div className="artist-detail-stat-item">
+                    <span className="artist-detail-track-num" data-subscriber-count>
+                      {formatCount(artist.subscribers ?? 0)}
+                    </span>
+                    <span className="artist-detail-track-label">Obuna</span>
+                  </div>
+                </ScrollTouch>
+                <div className="artist-detail-stats-follow">
+                  <FollowingButton
+                    artistId={artist.id}
+                    onSubscribeChange={(isSubscribed) => {
+                      const el = document.querySelector('[data-subscriber-count]');
+                      if (el) {
+                        const base = (artist.subscribers ?? 0) + (isSubscribed ? 1 : 0);
+                        el.textContent = formatCount(base);
+                      }
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </div>
-          <ArtistMusicStory stories={artistStories} />
+          {(showStoriesSkeleton || artistStories.length > 0) && (
+            <ArtistMusicStory
+              stories={artistStories}
+              forceSkeleton={showStoriesSkeleton}
+            />
+          )}
           </>
           )}
         </div>
+        {showHeroDataSkeleton && (
+          <div
+            className="artist-detail-bio-gallery"
+            aria-busy="true"
+            aria-hidden="true"
+          >
+            <div className="artist-detail-bio-section artist-detail-bio-section--skeleton">
+              <h3 className="artist-detail-bio-title artist-detail-bio-title--skeleton">
+                <SkeletonLoader variant="artist-detail-bio-title" />
+              </h3>
+              <div className="more-text artist-detail-bio-text artist-detail-bio-text--skeleton">
+                <div className="more-text-content more-text-content--skeleton">
+                  {Array.from({ length: ARTIST_BIO_LINE_SKELETON_COUNT }, (_, i) => (
+                    <SkeletonLoader
+                      key={`artist-bio-line-skel-${i}`}
+                      variant="artist-detail-bio-line"
+                      className={
+                        i === ARTIST_BIO_LINE_SKELETON_COUNT - 1
+                          ? 'artist-detail-bio-line-skeleton--short'
+                          : undefined
+                      }
+                    />
+                  ))}
+                </div>
+                <div className="more-text-bioimg-row more-text-bioimg-row--skeleton">
+                  {Array.from({ length: ARTIST_BIOIMG_SKELETON_COUNT }, (_, i) => (
+                    <span
+                      key={`artist-bioimg-skel-${i}`}
+                      className="more-text-bioimg more-text-bioimg--skeleton"
+                    >
+                      <SkeletonLoader variant="artist-detail-bioimg" />
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="artist-detail-gallery-section artist-detail-gallery-section--skeleton">
+              <h3 className="artist-detail-gallery-title artist-detail-gallery-title--skeleton">
+                <SkeletonLoader variant="artist-detail-gallery-title" />
+              </h3>
+              <div className="artist-detail-gallery-grid">
+                <div className="artist-detail-gallery-cell artist-detail-gallery-cell--tall artist-detail-gallery-cell--skeleton">
+                  <SkeletonLoader variant="artist-detail-gallery-cell" />
+                </div>
+                {Array.from({ length: 4 }, (_, i) => (
+                  <div
+                    key={`artist-gallery-cell-skel-${i}`}
+                    className="artist-detail-gallery-cell artist-detail-gallery-cell--skeleton"
+                  >
+                    <SkeletonLoader variant="artist-detail-gallery-cell" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         {artist && (
         <>
         {(getBio(artist.bio).text || artist.photoGallery?.length > 0) && (

@@ -25,9 +25,31 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.artist-music-story-item--skeleton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  pointer-events: none;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: transparent;
+}
+
+.artist-music-story-item--skeleton .skeleton-loader--artist-music-story-item {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
 .artist-music-story-item:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.artist-music-story-item--skeleton:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .artist-music-story-img {
