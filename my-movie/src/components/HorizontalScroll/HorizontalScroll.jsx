@@ -86,31 +86,46 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     return first.offsetWidth + gap;
   };
 
+  const getMaxIndex = () => {
+    const itemWidth = getItemWidth();
+    const maxScroll = getMaxScroll();
+    if (itemWidth <= 0 || maxScroll <= 0) return 0;
+    // Kam kartochkada floor(maxScroll/itemWidth)=0 bo‘lib, index 0 ham oxirga yopishib qolardi
+    return Math.max(1, Math.ceil(maxScroll / itemWidth));
+  };
+
   const snapToItemBoundary = (value) => {
     const itemWidth = getItemWidth();
-    if (itemWidth <= 0) return value;
+    if (itemWidth <= 0) return 0;
     const maxScroll = getMaxScroll();
-    const maxIndex = Math.floor(maxScroll / itemWidth);
-    const index = Math.round(-value / itemWidth);
-    const snapped = index >= maxIndex ? -maxScroll : -Math.min(index * itemWidth, maxScroll);
-    return Math.max(-maxScroll, Math.min(0, snapped));
+    if (maxScroll <= 0) return 0;
+    const maxIndex = getMaxIndex();
+    let index = Math.round(-value / itemWidth);
+    index = Math.max(0, Math.min(index, maxIndex));
+    if (index === 0) return 0;
+    if (index >= maxIndex) return -maxScroll;
+    return Math.max(-maxScroll, -index * itemWidth);
   };
 
   const indexFromTranslate = (value) => {
     const itemWidth = getItemWidth();
     if (itemWidth <= 0) return 0;
     const maxScroll = getMaxScroll();
-    const maxIndex = Math.floor(maxScroll / itemWidth);
-    const atEnd = -value >= maxScroll - 1;
-    return atEnd ? maxIndex : Math.round(-value / itemWidth);
+    if (maxScroll <= 0) return 0;
+    const maxIndex = getMaxIndex();
+    if (-value >= maxScroll - 1) return maxIndex;
+    return Math.max(0, Math.min(Math.round(-value / itemWidth), maxIndex));
   };
 
   const translateFromIndex = (index) => {
     const itemWidth = getItemWidth();
     const maxScroll = getMaxScroll();
-    const maxIndex = Math.floor(maxScroll / itemWidth);
+    if (maxScroll <= 0 || itemWidth <= 0) return 0;
+    const maxIndex = getMaxIndex();
     const clamped = Math.max(0, Math.min(index, maxIndex));
-    return clamped >= maxIndex ? -maxScroll : -clamped * itemWidth;
+    if (clamped === 0) return 0;
+    if (clamped >= maxIndex) return -maxScroll;
+    return Math.max(-maxScroll, -clamped * itemWidth);
   };
 
   const getCurrentIndex = () => indexFromTranslate(translateX.current);
@@ -271,8 +286,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
 
   const resolveTargetIndex = (velocity, delta) => {
     const itemWidth = getItemWidth();
-    const maxScroll = getMaxScroll();
-    const maxIndex = Math.floor(maxScroll / Math.max(itemWidth, 1));
+    const maxIndex = getMaxIndex();
     const startIndex = indexFromTranslate(dragStartTranslate.current);
 
     const flingPx = velocity * FLING_MS;
