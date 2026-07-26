@@ -5,6 +5,12 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 650px) {
+  .feed-page {
+    background: #000;
+  }
+}
+
 @media (min-width: 900px) {
   .feed-page {
     display: block;

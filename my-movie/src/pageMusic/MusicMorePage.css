@@ -1,7 +1,7 @@
 .music-more-page {
   min-height: 100vh;
   padding: 2rem 0;
-  background: linear-gradient(to bottom, rgba(10, 10, 10, 0.95), #0a0a0a);
+  background: #000;
 }
 
 .music-more-page-container {
