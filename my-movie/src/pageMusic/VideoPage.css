@@ -244,6 +244,15 @@
   color: #c084fc;
 }
 
+.video-detail-actions .video-detail-repost-btn.active {
+  color: #c084fc;
+}
+
+.video-detail-actions .video-detail-repost-btn i {
+  font-size: 18px;
+  line-height: 1;
+}
+
 .video-detail-actions .like-button-icon-wrap {
   width: 22px;
   height: 22px;

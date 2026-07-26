@@ -8,6 +8,7 @@ import ShareButton from '../components/ShareButton/ShareButton';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import LikeButton from '../Music/LikeButton/LikeButton';
+import Repost from '../components/Repost/Repost';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
 import MovieComments from '../components/MovieDetail/MovieComments';
@@ -178,6 +179,18 @@ const VideoPage = () => {
                     </svg>
                     <span>Saqlash</span>
                   </button>
+                  <Repost
+                    className="video-detail-action-btn video-detail-repost-btn"
+                    label="Repost"
+                    item={{
+                      id: video.id,
+                      type: video.type === 'konsert' ? 'konsert' : 'klip',
+                      title: video.title || '',
+                      artistName: artist?.name || '',
+                      image: video.img || '/img/movie1.jpg',
+                      route: `/music/video/${video.id}`,
+                    }}
+                  />
                 </ScrollTouch>
               </div>
             </div>

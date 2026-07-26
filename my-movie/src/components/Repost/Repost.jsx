@@ -29,7 +29,7 @@ const RepostIconOutline = () => (
   </svg>
 );
 
-const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Repost' }) => {
+const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Repost', label = null }) => {
   const { toggleRepost: dispatchToggle } = useReposts();
   const active = useIsReposted(item?.id, item?.type);
   const useOutlineIcon = className.includes('shorts-modal-action-btn');
@@ -51,6 +51,7 @@ const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Rep
       title="Repost"
     >
       {useOutlineIcon ? <RepostIconOutline /> : <i className="fa-solid fa-repeat" aria-hidden="true" />}
+      {label ? <span className="repost-btn-label">{label}</span> : null}
     </button>
   );
 };
