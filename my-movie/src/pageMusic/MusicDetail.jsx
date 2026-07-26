@@ -497,13 +497,7 @@ const MusicDetail = () => {
                     />
                   )}
                 </div>
-                <div
-                  className={`music-detail-right${
-                    showTitleSkeleton || showArtistDataSkeleton || !music
-                      ? ' music-detail-right--skeleton'
-                      : ''
-                  }`}
-                >
+                <div className="music-detail-right">
                   {showTitleSkeleton || !music ? (
                     <h1
                       className="music-detail-title music-detail-title--skeleton"
