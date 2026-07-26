@@ -319,6 +319,13 @@
 }
 }
 
+@media (max-width: 480px) {
+  .music-more-page-item-wishlist-btn {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 @media (max-width: 768px) {
     .music-more-page-container {
     padding: 0 0.7rem;
