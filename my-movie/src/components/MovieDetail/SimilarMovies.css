@@ -58,6 +58,60 @@
   transition: transform 0.3s ease;
 }
 
+.similar-movies-item-title {
+  margin: 0.55rem 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.similar-movies-item-meta {
+  margin: 0.2rem 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.similar-movies-item-title--skeleton {
+  display: block;
+  width: 72%;
+  height: 16px;
+  margin-top: 0.55rem;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  );
+  background-size: 200% 100%;
+  animation: similar-movies-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
+.similar-movies-item-meta--skeleton {
+  display: block;
+  width: 48%;
+  height: 12px;
+  margin-top: 0.35rem;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  );
+  background-size: 200% 100%;
+  animation: similar-movies-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
+}
+
 .similar-movies-item--skeleton {
   cursor: default;
   pointer-events: none;
@@ -264,6 +318,17 @@
 @media (max-width: 768px) {
   .similar-movies-item {
     width: 150px;
+  }
+
+  .similar-movies-item-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 0.45rem;
+  }
+
+  .similar-movies-item-meta {
+    font-size: 11px;
+    font-weight: 600;
   }
 
   .similar-movies-header {

@@ -24,6 +24,15 @@ const SimilarMovieItem = ({ movie, contentLang, getMovieTitle, onOpen, isInWishl
     !isSoon && movie.rating != null && movie.rating !== '' && movie.rating !== 'none';
   const showAge = movie.ageRestriction != null;
 
+  const year = movie.specs?.year;
+  const countries = Array.isArray(movie.specs?.countries)
+    ? movie.specs.countries.filter(Boolean).join(', ')
+    : '';
+  const metaParts = [];
+  if (year != null && year !== '') metaParts.push(`${year}-yil`);
+  if (countries) metaParts.push(countries);
+  const metaText = metaParts.join(' ');
+
   return (
     <div
       className={`similar-movies-item${showImgSkeleton ? ' similar-movies-item--loading' : ''}`}
@@ -131,6 +140,8 @@ const SimilarMovieItem = ({ movie, contentLang, getMovieTitle, onOpen, isInWishl
           </>
         )}
       </div>
+      <h3 className="similar-movies-item-title">{getMovieTitle(movie)}</h3>
+      {metaText ? <p className="similar-movies-item-meta">{metaText}</p> : null}
     </div>
   );
 };
@@ -159,6 +170,8 @@ const SimilarMovieSkeletonItem = () => (
         aria-hidden="true"
       />
     </div>
+    <span className="similar-movies-item-title similar-movies-item-title--skeleton" aria-hidden="true" />
+    <span className="similar-movies-item-meta similar-movies-item-meta--skeleton" aria-hidden="true" />
   </div>
 );
 
