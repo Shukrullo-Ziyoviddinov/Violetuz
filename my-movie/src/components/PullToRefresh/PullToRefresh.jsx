@@ -18,12 +18,16 @@ const MODAL_SELECTOR = [
   '.message-modal--open',
   '.message-search-modal--open',
   '.music-detail-lyrics-modal',
+  '.music-filter-modal-overlay',
+  '.music-filter-modal',
   '.video-modal--sheet',
   '.video-modal--desktop',
   '.share-modal-content',
   '.navbar-mobile-search-overlay',
   '.watch-modal-overlay',
   '.trailer-modal-overlay',
+  '.trailer-page-overlay',
+  '.trailer-modal-scroll-area',
   '.comentaria-history-modal',
 ].join(', ');
 
