@@ -1,13 +1,15 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import './HorizontalScroll.css';
 
-// Carousel drag: sekin + foizga yetmasa → joyiga qaytadi; yetganda yoki tezlikka qarab → silliq scroll
+// Carousel drag: foizga yetmasa → joyiga qaytadi; yetganda / tezlikka qarab → silliq scroll
 const DRAG_THRESHOLD_PERCENT = 0.4;
-const VELOCITY_THRESHOLD = 0.28; // px/ms
+const VELOCITY_THRESHOLD = 0.22; // px/ms — sekin swipe ham hisobga olinsin
 const CLICK_THRESHOLD = 8;
-const FLING_MS = 280;
-const VELOCITY_STALE_MS = 64;
-const EDGE_RESISTANCE = 0.35; // chegarada yumshoq qarshilik (native scroll kabi)
+const FLING_MS = 340;
+const VELOCITY_STALE_MS = 72;
+const EDGE_RESISTANCE = 0.35;
+const FRICTION = 0.0032; // inertia sekinlashishi (1/ms)
+const MIN_GLIDE_VELOCITY = 0.02; // px/ms
 
 const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = false, scrollToIndexRef, onScrollIndexChange }) => {
   const wrapperRef = useRef(null);
@@ -20,7 +22,6 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
   const justFinishedDrag = useRef(false);
   const animTimerRef = useRef(null);
   const rafRef = useRef(null);
-  const pendingTranslate = useRef(null);
 
   const translateX = useRef(0);
   const dragStartX = useRef(0);
@@ -54,7 +55,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     trackRef.current.style.transform = `translate3d(${value}px, 0, 0)`;
   };
 
-  /** Drag paytida: chegaradan tashqarida yumshoq qarshilik, clamp emas */
+  /** Drag: 1:1 kuzatish (kechikishsiz) + chegarada yumshoq qarshilik */
   const applyDragTranslate = (value) => {
     if (!trackRef.current || !wrapperRef.current) return;
     const maxScroll = getMaxScroll();
@@ -65,19 +66,9 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
       const overflow = next + maxScroll;
       next = -maxScroll + overflow * EDGE_RESISTANCE;
     }
-    pendingTranslate.current = next;
-    if (rafRef.current == null) {
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = null;
-        if (pendingTranslate.current != null) {
-          applyTransform(pendingTranslate.current);
-          pendingTranslate.current = null;
-        }
-      });
-    }
+    applyTransform(next);
   };
 
-  /** Animatsiya / tugatish: qattiq clamp */
   const updateTranslate = (value) => {
     if (!trackRef.current || !wrapperRef.current) return;
     const maxScroll = getMaxScroll();
@@ -133,7 +124,17 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     setCanScrollRight(tx > -maxScroll + 1);
   };
 
-  /** Animatsiya o‘rtasida bosilsa — joriy vizual joydan davom etish */
+  const cancelMotion = () => {
+    if (animTimerRef.current) {
+      clearTimeout(animTimerRef.current);
+      animTimerRef.current = null;
+    }
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  };
+
   const syncTranslateFromDOM = () => {
     if (!trackRef.current) return;
     const style = getComputedStyle(trackRef.current);
@@ -143,7 +144,6 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     }
     trackRef.current.style.transition = 'none';
     applyTransform(translateX.current);
-    // reflow — keyingi frameda transition yoqilmasin
     void trackRef.current.offsetHeight;
   };
 
@@ -169,11 +169,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
 
   const animateTo = useCallback((target, preferredDuration) => {
     if (!wrapperRef.current || !trackRef.current) return;
-    if (animTimerRef.current) clearTimeout(animTimerRef.current);
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
+    cancelMotion();
 
     const snapped = snapToItemBoundary(target);
     const distance = Math.abs(snapped - translateX.current);
@@ -184,8 +180,9 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
       return;
     }
 
-    const duration = preferredDuration ?? Math.min(480, Math.max(200, distance * 0.45));
-    trackRef.current.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
+    // Sekin masofa — yumshoqroq ease; katta masofa — tezlikka mos
+    const duration = preferredDuration ?? Math.min(520, Math.max(220, 180 + distance * 0.42));
+    trackRef.current.style.transition = `transform ${duration}ms cubic-bezier(0.22, 0.82, 0.24, 1)`;
     updateTranslate(snapped);
 
     animTimerRef.current = setTimeout(() => {
@@ -195,6 +192,51 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
       animTimerRef.current = null;
     }, duration);
   }, []);
+
+  /** Native scrolldek: tezlik bilan sirg‘anish, keyin snap */
+  const glideWithVelocity = (initialVelocity, finalTarget) => {
+    cancelMotion();
+    if (trackRef.current) trackRef.current.style.transition = 'none';
+
+    let v = initialVelocity;
+    let last = performance.now();
+    const maxScroll = getMaxScroll();
+
+    const settle = () => {
+      const distance = Math.abs(finalTarget - translateX.current);
+      // Tezlik qolgan bo‘lsa — biroz tezroq settle; sekin bo‘lsa — yumshoq
+      const boost = Math.min(120, Math.abs(v) * 180);
+      const duration = Math.min(480, Math.max(200, distance * 0.48 + 160 - boost));
+      animateTo(finalTarget, duration);
+    };
+
+    if (Math.abs(v) < MIN_GLIDE_VELOCITY) {
+      settle();
+      return;
+    }
+
+    const tick = (now) => {
+      const dt = Math.min(34, now - last);
+      last = now;
+
+      v *= Math.exp(-FRICTION * dt);
+      const next = translateX.current - v * dt;
+      const clamped = Math.max(-maxScroll, Math.min(0, next));
+      applyTransform(clamped);
+
+      // Chegaraga urilsa yoki tezlik o‘chsa → snap
+      const hitEdge = clamped !== next;
+      if (hitEdge || Math.abs(v) < MIN_GLIDE_VELOCITY) {
+        rafRef.current = null;
+        settle();
+        return;
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+  };
 
   const handleScroll = (direction, e) => {
     e.preventDefault();
@@ -207,17 +249,49 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
   const recordMoveVelocity = (clientX) => {
     const now = performance.now();
     const dt = now - lastMoveTime.current;
-    if (dt > 0 && dt < 100) {
+    if (dt > 0 && dt < 120) {
       const instant = (lastPointX.current - clientX) / dt;
-      // Silliqlashtirish — sekin surishda ham tezlik barqaror
-      velocityX.current = velocityX.current * 0.6 + instant * 0.4;
+      // Sekin harakatda ham tezlikni yo‘qotmaslik — biroz ko‘proq instant
+      velocityX.current = velocityX.current * 0.45 + instant * 0.55;
     }
     lastMoveTime.current = now;
     lastPointX.current = clientX;
   };
 
+  const resolveTargetIndex = (velocity, delta) => {
+    const itemWidth = getItemWidth();
+    const maxScroll = getMaxScroll();
+    const maxIndex = Math.floor(maxScroll / Math.max(itemWidth, 1));
+    const startIndex = indexFromTranslate(dragStartTranslate.current);
+
+    const flingPx = velocity * FLING_MS;
+    const projected = translateX.current - flingPx;
+    let targetIndex = indexFromTranslate(snapToItemBoundary(projected));
+
+    const direction =
+      Math.sign(delta) ||
+      Math.sign(velocity) ||
+      (projected < dragStartTranslate.current ? 1 : -1);
+
+    if (direction > 0 && targetIndex <= startIndex) {
+      targetIndex = startIndex + 1;
+    } else if (direction < 0 && targetIndex >= startIndex) {
+      targetIndex = startIndex - 1;
+    }
+
+    const dragItems = Math.abs(delta) / Math.max(itemWidth, 1);
+    const flingItems = Math.abs(flingPx) / Math.max(itemWidth, 1);
+    const maxSteps = Math.max(1, Math.min(maxIndex, Math.ceil(dragItems + flingItems)));
+    if (direction > 0) {
+      targetIndex = Math.min(targetIndex, startIndex + maxSteps, maxIndex);
+    } else {
+      targetIndex = Math.max(targetIndex, startIndex - maxSteps, 0);
+    }
+
+    return targetIndex;
+  };
+
   const finishDrag = () => {
-    // Chegaradan tashqarida bo‘lsa avval clamp
     const maxScroll = getMaxScroll();
     if (translateX.current > 0 || translateX.current < -maxScroll) {
       updateTranslate(translateX.current);
@@ -237,57 +311,25 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const absVelocity = Math.abs(velocity);
     const isFastDrag = absVelocity > VELOCITY_THRESHOLD;
     const passedThreshold = Math.abs(delta) > thresholdDistance;
-
     const startIndex = indexFromTranslate(dragStartTranslate.current);
-    const maxIndex = Math.floor(maxScroll / Math.max(itemWidth, 1));
 
-    let targetTranslate;
-
+    // Foizga yetmasa va sekin → silkinib joyiga qaytadi (saqlanadi)
     if (!passedThreshold && !isFastDrag) {
-      // Kerakli foizgacha surilmagan va sekin → joyiga qaytadi (hozergidek)
-      targetTranslate = translateFromIndex(startIndex);
-    } else {
-      const flingPx = velocity * FLING_MS;
-      const projected = translateX.current - flingPx;
-      let targetIndex = indexFromTranslate(snapToItemBoundary(projected));
-
-      const direction =
-        Math.sign(delta) ||
-        Math.sign(velocity) ||
-        (projected < dragStartTranslate.current ? 1 : -1);
-
-      if (direction > 0 && targetIndex <= startIndex) {
-        targetIndex = startIndex + 1;
-      } else if (direction < 0 && targetIndex >= startIndex) {
-        targetIndex = startIndex - 1;
-      }
-
-      const dragItems = Math.abs(delta) / Math.max(itemWidth, 1);
-      const flingItems = Math.abs(flingPx) / Math.max(itemWidth, 1);
-      const maxSteps = Math.max(1, Math.min(maxIndex, Math.ceil(dragItems + flingItems)));
-      if (direction > 0) {
-        targetIndex = Math.min(targetIndex, startIndex + maxSteps, maxIndex);
-      } else {
-        targetIndex = Math.max(targetIndex, startIndex - maxSteps, 0);
-      }
-
-      targetTranslate = translateFromIndex(targetIndex);
+      const distance = Math.abs(translateFromIndex(startIndex) - translateX.current);
+      animateTo(translateFromIndex(startIndex), Math.min(360, Math.max(200, 160 + distance * 0.55)));
+      setTimeout(() => { justFinishedDrag.current = false; }, 150);
+      return;
     }
 
-    const distance = Math.abs(targetTranslate - translateX.current);
-    // Sekin qo‘yib yuborsa — yumshoqroq; tez bo‘lsa — biroz tezroq animatsiya
-    const duration = isFastDrag
-      ? Math.min(420, Math.max(180, distance * 0.35))
-      : Math.min(480, Math.max(220, distance * 0.5));
-    animateTo(targetTranslate, duration);
+    const targetTranslate = translateFromIndex(resolveTargetIndex(velocity, delta));
+
+    // Sekin yoki tez — tezlikka qarab silliq glide, keyin snap
+    glideWithVelocity(velocity, targetTranslate);
     setTimeout(() => { justFinishedDrag.current = false; }, 150);
   };
 
   const beginDrag = (clientX, clientY) => {
-    if (animTimerRef.current) {
-      clearTimeout(animTimerRef.current);
-      animTimerRef.current = null;
-    }
+    cancelMotion();
     syncTranslateFromDOM();
     isDraggingRef.current = true;
     dragStartX.current = clientX;
@@ -303,11 +345,9 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     if (!isDraggingRef.current) return;
     recordMoveVelocity(clientX);
     const delta = dragStartX.current - clientX;
-    // 1:1 kuzatish — setState yo‘q, rAF orqali (sahifa scrollidek)
     applyDragTranslate(dragStartTranslate.current - delta);
   };
 
-  // ========== MOUSE ==========
   const handleMouseDown = (e) => {
     if (isMobile) return;
     if (e.button !== 0) return;
@@ -338,7 +378,6 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     };
   }, [isDragging, isMobile]);
 
-  // ========== TOUCH ==========
   const handleTouchStart = (e) => {
     if (!isMobile) return;
     isHorizontalDrag.current = null;
