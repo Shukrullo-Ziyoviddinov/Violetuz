@@ -366,10 +366,6 @@ const MusicMorePage = () => {
     allAlbums,
     allClips,
     allConcerts,
-    getMusicByCategory,
-    getAlbumsByCategory,
-    getClipsByCategory,
-    getConcertsByCategory,
     allArtists,
     getArtistById,
     musicLoading,
@@ -412,32 +408,46 @@ const MusicMorePage = () => {
     artistsLoading,
   ]);
 
-  const safeSectionData = config.isAllArtists
-    ? allArtists.map((a) => ({ ...a, title: a.name, artist: a.description }))
-    : categoryNameMusic === '__all__'
-      ? allMusic
-      : categoryNameMusic === '__all_albums__'
-        ? allAlbums
-        : categoryNameMusic === '__all_clips__'
-          ? allClips
-          : categoryNameMusic === '__all_concerts__'
-            ? allConcerts
-            : categoryNameMusic
-              ? wishlistType === 'album'
-                ? getAlbumsByCategory(categoryNameMusic)
-                : wishlistType === 'klip'
-                  ? getClipsByCategory(categoryNameMusic)
-                  : wishlistType === 'konsert'
-                    ? getConcertsByCategory(categoryNameMusic)
-                    : getMusicByCategory(categoryNameMusic)
-              : ensureArray(sectionData);
+  /* filter() har renderda yangi massiv — useMemo yo‘q bo‘lsa useEffect loop → navbar ishlamaydi */
+  const safeSectionData = useMemo(() => {
+    if (config.isAllArtists) {
+      return allArtists.map((a) => ({ ...a, title: a.name, artist: a.description }));
+    }
+    if (categoryNameMusic === '__all__') return allMusic;
+    if (categoryNameMusic === '__all_albums__') return allAlbums;
+    if (categoryNameMusic === '__all_clips__') return allClips;
+    if (categoryNameMusic === '__all_concerts__') return allConcerts;
+    if (categoryNameMusic) {
+      if (wishlistType === 'album') {
+        return allAlbums.filter((item) => item.categoryNameMusic === categoryNameMusic);
+      }
+      if (wishlistType === 'klip') {
+        return allClips.filter((item) => item.categoryNameMusic === categoryNameMusic);
+      }
+      if (wishlistType === 'konsert') {
+        return allConcerts.filter((item) => item.categoryNameMusic === categoryNameMusic);
+      }
+      return allMusic.filter((item) => item.categoryNameMusic === categoryNameMusic);
+    }
+    return ensureArray(sectionData);
+  }, [
+    config.isAllArtists,
+    categoryNameMusic,
+    wishlistType,
+    allMusic,
+    allAlbums,
+    allClips,
+    allConcerts,
+    allArtists,
+    sectionData,
+  ]);
 
   const [filteredItems, setFilteredItems] = useState(safeSectionData);
   const allItems = filteredItems;
 
   useEffect(() => {
     setFilteredItems(safeSectionData);
-  }, [section, safeSectionData]);
+  }, [safeSectionData]);
 
   const showPageSkeleton = Boolean(catalogLoading) && safeSectionData.length === 0;
   const skeletonItems = useMemo(
