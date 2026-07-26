@@ -40,6 +40,14 @@
   padding: 0;
 }
 
+.artist-detail-img-wrap .skeleton-loader--artist-detail-img,
+.artist-detail-img-wrap .artist-detail-img-skeleton {
+  display: block;
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+}
+
 .artist-detail-img {
   width: 100%;
   height: 250px;
@@ -50,6 +58,15 @@
   margin: 0;
   padding: 0;
   vertical-align: top;
+}
+
+.artist-detail-img--loading {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .artist-detail-caption {
@@ -63,6 +80,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  z-index: 1;
 }
 
 .artist-detail-name {
@@ -76,6 +94,24 @@
   padding: 0;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
   order: 1;
+}
+
+.artist-detail-name--skeleton {
+  display: block;
+  width: min(55%, 18rem);
+  max-width: 100%;
+  height: calc(4.45rem * 1.1);
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  text-shadow: none;
+}
+
+.artist-detail-name--skeleton .skeleton-loader--artist-detail-name {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
 }
 
 .artist-detail-name-verified {
@@ -95,11 +131,32 @@
   order: 2;
 }
 
+.artist-detail-description--skeleton {
+  display: block;
+  width: min(70%, 22rem);
+  max-width: 100%;
+  height: calc(1.2rem * 1.4);
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+}
+
+.artist-detail-description--skeleton .skeleton-loader--artist-detail-description {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
 @media (max-width: 700px) {
   .artist-detail-description {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .artist-detail-description--skeleton {
+    width: min(85%, 14rem);
   }
 
   .artist-detail-name-verified {
@@ -116,6 +173,10 @@
   order: 3;
 }
 
+.artist-detail-info--skeleton {
+  pointer-events: none;
+}
+
 .artist-detail-info-item {
   display: inline-flex;
   align-items: center;
@@ -123,6 +184,10 @@
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.9);
   flex-shrink: 0;
+}
+
+.artist-detail-info-item--skeleton {
+  min-height: calc(0.95rem * 1.3);
 }
 
 .artist-detail-info-icon {
@@ -794,12 +859,19 @@
     margin-right: 0;
   }
 
-  .artist-detail-img {
+  .artist-detail-img,
+  .artist-detail-img-wrap .skeleton-loader--artist-detail-img,
+  .artist-detail-img-wrap .artist-detail-img-skeleton {
     height: 170px;
   }
 
   .artist-detail-name {
     font-size: 2rem;
+  }
+
+  .artist-detail-name--skeleton {
+    width: min(70%, 12rem);
+    height: calc(2rem * 1.1);
   }
 }
 

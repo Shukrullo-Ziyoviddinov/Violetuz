@@ -1055,6 +1055,46 @@
   border-radius: 4px;
 }
 
+/* Artist detail hero */
+.skeleton-loader--artist-detail-img {
+  display: block;
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+}
+
+.skeleton-loader--artist-detail-name {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
+.skeleton-loader--artist-detail-description {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+.skeleton-loader--artist-detail-info-item {
+  display: block;
+  width: 7.5rem;
+  height: calc(0.95rem * 1.3);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .skeleton-loader--artist-detail-img {
+    height: 170px;
+  }
+
+  .skeleton-loader--artist-detail-info-item {
+    width: 6rem;
+  }
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,
