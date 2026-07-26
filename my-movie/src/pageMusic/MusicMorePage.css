@@ -217,29 +217,38 @@
 
 .music-more-page-item-wishlist-btn--skeleton,
 .music-more-page-item-play--skeleton {
-  border: none;
+  z-index: 3;
   pointer-events: none;
-  background: rgba(255, 255, 255, 0.12);
+  color: transparent !important;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 20, 24, 0.82) 0%,
+    rgba(55, 55, 62, 0.88) 45%,
+    rgba(20, 20, 24, 0.82) 90%
+  ) !important;
+  background-size: 200% 100%;
   animation: music-more-overlay-skeleton-shimmer 1.25s ease-in-out infinite;
 }
 
 @keyframes music-more-overlay-skeleton-shimmer {
-  0%,
-  100% {
-    opacity: 0.45;
+  0% {
+    background-position: 100% 0;
   }
-  50% {
-    opacity: 0.85;
+  100% {
+    background-position: -100% 0;
   }
 }
 
 .music-more-page-item-wishlist-btn--skeleton {
-  color: transparent;
+  width: 36px;
+  height: 36px;
 }
 
 .music-more-page-item-play--skeleton {
-  background: rgba(155, 79, 231, 0.35);
-  color: transparent;
+  width: 32px;
+  height: 32px;
 }
 
 .music-more-page-item-info .skeleton-loader--music-more-page-item-title,
@@ -364,6 +373,11 @@
 
 }
 
+.music-more-page-item-play.music-more-page-item-play--skeleton {
+  width: 28px;
+  height: 28px;
+}
+
 .music-more-page-item-title {
   font-size: 1rem;
 }
@@ -373,6 +387,11 @@
 }
 
 .music-more-page-item-wishlist-btn {
+  width: 30px;
+  height: 30px;
+}
+
+.music-more-page-item-wishlist-btn.music-more-page-item-wishlist-btn--skeleton {
   width: 30px;
   height: 30px;
 }
@@ -387,7 +406,14 @@
 }
 
 @media (max-width: 480px) {
-  .music-more-page-item-wishlist-btn {
+  .music-more-page-item-wishlist-btn,
+  .music-more-page-item-wishlist-btn.music-more-page-item-wishlist-btn--skeleton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .music-more-page-item-play,
+  .music-more-page-item-play.music-more-page-item-play--skeleton {
     width: 28px;
     height: 28px;
   }
