@@ -890,6 +890,84 @@
   border-radius: 4px;
 }
 
+/* Video detail */
+.skeleton-loader--video-detail-info-artist {
+  width: 7rem;
+  height: calc(18px * 1.3);
+  border-radius: 6px;
+}
+
+.skeleton-loader--video-detail-info-title {
+  width: 14rem;
+  max-width: 70%;
+  height: calc(18px * 1.3);
+  border-radius: 6px;
+}
+
+.skeleton-loader--video-detail-action {
+  width: 7.5rem;
+  height: 44px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.skeleton-loader--video-detail-action-sm {
+  width: 4.5rem;
+  height: 44px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.skeleton-loader--video-detail-trend-title {
+  width: 10rem;
+  height: calc(1.2rem * 1.2);
+  border-radius: 6px;
+  margin: 0 0 1rem 0;
+}
+
+.skeleton-loader--video-detail-trend-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.skeleton-loader--video-detail-trend-card-title {
+  width: 75%;
+  max-width: 100%;
+  height: calc(0.95rem * 1.3);
+  border-radius: 4px;
+}
+
+.skeleton-loader--video-detail-trend-card-artist {
+  width: 50%;
+  max-width: 100%;
+  height: calc(0.8rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--video-detail-trend-card-year {
+  width: 3rem;
+  height: calc(0.78rem * 1.2);
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .skeleton-loader--video-detail-action,
+  .skeleton-loader--video-detail-action-sm {
+    height: 34px;
+  }
+
+  .skeleton-loader--video-detail-action {
+    width: 6.5rem;
+  }
+
+  .skeleton-loader--video-detail-action-sm {
+    width: 3.75rem;
+  }
+}
+
 /* Album songs list */
 .skeleton-loader--music-album-songs-title {
   width: 7rem;

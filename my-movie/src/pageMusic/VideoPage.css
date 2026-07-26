@@ -109,6 +109,82 @@
   gap: 0.5rem 0.5rem;
 }
 
+.video-detail-info--skeleton {
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.video-detail-actions--skeleton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.video-detail-actions--skeleton::-webkit-scrollbar {
+  display: none;
+}
+
+.video-detail-artist-card--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.video-detail-artist-card-img-wrap {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.video-detail-artist-card-img-wrap .video-detail-artist-card-img--skeleton,
+.video-detail-artist-card-img-wrap .skeleton-loader--music-detail-artist-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.video-detail-artist-card-img--loading {
+  opacity: 0;
+}
+
+.video-detail-artist-stat--skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.video-detail-trend-title-skeleton {
+  display: block;
+  margin: 0 0 1rem 0;
+}
+
+.video-detail-trend-card--skeleton,
+.video-detail-trend-card--loading {
+  cursor: default;
+  pointer-events: none;
+}
+
+.video-detail-trend-card-img-wrap .video-detail-trend-card-img-skeleton,
+.video-detail-trend-card-img-wrap .skeleton-loader--video-detail-trend-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.video-detail-trend-card-img--loading {
+  opacity: 0;
+}
+
 .video-detail-info .video-detail-title,
 .video-detail-artist-name {
   font-size: 18px;
