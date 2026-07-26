@@ -99,12 +99,21 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     if (itemWidth <= 0) return 0;
     const maxScroll = getMaxScroll();
     if (maxScroll <= 0) return 0;
-    const maxIndex = getMaxIndex();
-    let index = Math.round(-value / itemWidth);
-    index = Math.max(0, Math.min(index, maxIndex));
+
+    // Oxirgi yarim kartochka ichida — to‘liq oxir (oxirgi element kesilmasin)
+    if (-value >= maxScroll - itemWidth * 0.5) {
+      return -maxScroll;
+    }
+
+    const index = Math.max(0, Math.round(-value / itemWidth));
     if (index === 0) return 0;
-    if (index >= maxIndex) return -maxScroll;
-    return Math.max(-maxScroll, -index * itemWidth);
+
+    const pos = -index * itemWidth;
+    // Qolgan masofa yarim itemdan kam bo‘lsa ham oxirga yopish
+    if (pos <= -maxScroll || maxScroll + pos < itemWidth * 0.5) {
+      return -maxScroll;
+    }
+    return pos;
   };
 
   const indexFromTranslate = (value) => {
@@ -113,7 +122,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const maxScroll = getMaxScroll();
     if (maxScroll <= 0) return 0;
     const maxIndex = getMaxIndex();
-    if (-value >= maxScroll - 1) return maxIndex;
+    if (-value >= maxScroll - itemWidth * 0.5) return maxIndex;
     return Math.max(0, Math.min(Math.round(-value / itemWidth), maxIndex));
   };
 
@@ -125,7 +134,10 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const clamped = Math.max(0, Math.min(index, maxIndex));
     if (clamped === 0) return 0;
     if (clamped >= maxIndex) return -maxScroll;
-    return Math.max(-maxScroll, -clamped * itemWidth);
+    const pos = -clamped * itemWidth;
+    // Oraliq index ham oxirga juda yaqin bo‘lsa — to‘liq oxir
+    if (maxScroll + pos < itemWidth * 0.5) return -maxScroll;
+    return pos;
   };
 
   const getCurrentIndex = () => indexFromTranslate(translateX.current);
