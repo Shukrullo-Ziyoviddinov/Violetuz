@@ -236,9 +236,8 @@ const ShareButton = ({
         aria-label={shareLabel}
       >
         {label ? (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M15 14l5-5-5-5" />
-            <path d="M20 9H9a5 5 0 0 0 0 10h1" />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1.5-4.5 4.5-8.5 11-9V9z" />
           </svg>
         ) : (
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
