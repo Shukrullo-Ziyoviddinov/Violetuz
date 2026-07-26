@@ -1293,6 +1293,10 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.shorts-music-modal .search-modal-tavsiya {
+  margin-top: 0;
+}
+
 
 /* Info blok kengayganda - faqat description scroll qiladi, progress bar joyida */
 .shorts-modal-info-expanded {
