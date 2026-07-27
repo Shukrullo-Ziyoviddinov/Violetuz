@@ -176,7 +176,17 @@ const Banner = () => {
     const handleToggleMute = useCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
-        setUnmuted((prev) => !prev);
+        const el = centerVideoRef.current;
+        setUnmuted((prev) => {
+            const nextUnmuted = !prev;
+            if (el) {
+                el.muted = !nextUnmuted;
+                if (nextUnmuted) {
+                    el.play().catch(() => {});
+                }
+            }
+            return nextUnmuted;
+        });
     }, []);
 
     const handleVideoEnded = useCallback(() => {
@@ -283,8 +293,10 @@ const Banner = () => {
 
     const handleMouseEnter = () => {
         setIsUserInteracting(true);
-        clearVideoTimers();
-        if (centerVideoRef.current) centerVideoRef.current.pause();
+        // Video allaqachon ijroda bo‘lsa pauza qilmaymiz (unmute icon uchun)
+        if (!showCenterVideo) {
+            clearVideoTimers();
+        }
     };
 
     const handleMouseLeave = () => {
@@ -349,16 +361,17 @@ const Banner = () => {
         nextSlide,
     ]);
 
-    /* Center video play/pause */
+    /* Center video play/pause — hover (isUserInteracting) video ni to‘xtatmaydi */
     useEffect(() => {
         const el = centerVideoRef.current;
         if (!el) return;
-        if (showCenterVideo && bannerInView && !isUserInteracting && !isDragging) {
+        if (showCenterVideo && bannerInView && !isDragging) {
+            el.muted = !unmuted;
             el.play().catch(() => {});
         } else {
             el.pause();
         }
-    }, [showCenterVideo, bannerInView, isUserInteracting, isDragging, currentIndex]);
+    }, [showCenterVideo, bannerInView, isDragging, currentIndex, unmuted]);
 
     useEffect(() => {
         let resizeTimer;
