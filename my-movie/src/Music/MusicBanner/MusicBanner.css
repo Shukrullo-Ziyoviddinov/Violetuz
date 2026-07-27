@@ -127,6 +127,43 @@
   }
 }
 
+.music-banner-sound-btn {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.65rem;
+  z-index: 12;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background 0.2s ease;
+}
+
+.music-banner-sound-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+@media (max-width: 768px) {
+  .music-banner-sound-btn {
+    width: 30px;
+    height: 30px;
+    right: 0.45rem;
+    bottom: 0.45rem;
+  }
+
+  .music-banner-sound-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
 /* Slayd Pozitsiyalari */
 .music-image.center {
   opacity: 1;

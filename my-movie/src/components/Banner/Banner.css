@@ -140,6 +140,43 @@
     }
 }
 
+.manga-banner-sound-btn {
+    position: absolute;
+    right: 0.65rem;
+    bottom: 0.65rem;
+    z-index: 12;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background 0.2s ease;
+}
+
+.manga-banner-sound-btn:hover {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+@media (max-width: 768px) {
+    .manga-banner-sound-btn {
+        width: 30px;
+        height: 30px;
+        right: 0.45rem;
+        bottom: 0.45rem;
+    }
+
+    .manga-banner-sound-btn svg {
+        width: 15px;
+        height: 15px;
+    }
+}
+
 /* Slayd Pozitsiyalari */
 .manga-image.center {
     opacity: 1;

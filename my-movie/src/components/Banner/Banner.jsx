@@ -51,6 +51,7 @@ const Banner = () => {
     const [isUserInteracting, setIsUserInteracting] = useState(false);
     const [showCenterVideo, setShowCenterVideo] = useState(false);
     const [bannerInView, setBannerInView] = useState(true);
+    const [unmuted, setUnmuted] = useState(false);
     const startXRef = useRef(0);
     const currentXRef = useRef(0);
     const carouselRef = useRef(null);
@@ -147,6 +148,7 @@ const Banner = () => {
         if (index >= 0 && index < images.length) {
             clearVideoTimers();
             setShowCenterVideo(false);
+            setUnmuted(false);
             pauseCenterVideo();
             setCurrentIndex(index);
             setDragOffset(0);
@@ -156,6 +158,7 @@ const Banner = () => {
     const nextSlide = useCallback(() => {
         clearVideoTimers();
         setShowCenterVideo(false);
+        setUnmuted(false);
         pauseCenterVideo();
         setCurrentIndex((prev) => (prev + 1) % images.length);
         setDragOffset(0);
@@ -164,10 +167,17 @@ const Banner = () => {
     const prevSlide = useCallback(() => {
         clearVideoTimers();
         setShowCenterVideo(false);
+        setUnmuted(false);
         pauseCenterVideo();
         setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
         setDragOffset(0);
     }, [images.length, clearVideoTimers, pauseCenterVideo]);
+
+    const handleToggleMute = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setUnmuted((prev) => !prev);
+    }, []);
 
     const handleVideoEnded = useCallback(() => {
         nextSlide();
@@ -451,12 +461,35 @@ const Banner = () => {
                         ref={centerVideoRef}
                         className={`manga-banner-video${videoVisible ? '' : ' manga-banner-media--hidden'}`}
                         src={videoSrc}
-                        muted
+                        muted={!unmuted}
                         playsInline
                         preload="auto"
                         draggable={false}
                         onEnded={handleVideoEnded}
                     />
+                ) : null}
+                {videoVisible ? (
+                    <button
+                        type="button"
+                        className="manga-banner-sound-btn"
+                        onClick={handleToggleMute}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        aria-label={unmuted ? "Ovozni o'chirish" : 'Ovozni yoqish'}
+                    >
+                        {unmuted ? (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                            </svg>
+                        ) : (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <line x1="16" y1="9" x2="22" y2="15" />
+                                <line x1="22" y1="9" x2="16" y2="15" />
+                            </svg>
+                        )}
+                    </button>
                 ) : null}
             </>
         );
