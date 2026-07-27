@@ -12,6 +12,11 @@ const musicBannerSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    video: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     buttonId: {
       type: Number,
       required: true,

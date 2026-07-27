@@ -2,16 +2,19 @@
   {
     "id": 1,
     "img": "/img/movie-4.5-2.jpeg",
+    "video": "/video/The Amateur _ Official Trailer.mp4",
     "buttonId": 101
   },
   {
     "id": 2,
     "img": "/img/movie-4.5-10.jpg",
+    "video": "/video/Zivert - Life   Премьера клипа.mp4",
     "buttonId": 102
   },
   {
     "id": 3,
     "img": "/img/movie-4.5-5.jpg",
+    "video": "/video/The Amateur _ Official Trailer.mp4",
     "buttonId": 103
   }
 ]

@@ -10,6 +10,8 @@ import './MusicBanner.css';
 const MUSIC_BANNER_SKELETON_SLIDES = ['left', 'center', 'right'];
 /** Broken/slow CDN — skeleton ushlab qolmasin */
 const MUSIC_BANNER_IMAGE_READY_TIMEOUT_MS = 20000;
+/** Rasm ko‘rinib turadi, keyin video */
+const MUSIC_BANNER_VIDEO_REVEAL_MS = 5000;
 
 const MusicBanner = () => {
     const navigate = useNavigate();
@@ -21,6 +23,7 @@ const MusicBanner = () => {
         return banners.map((item) => ({
             id: item.id,
             src: typeof item.img === 'object' ? getLocalizedText(item.img, lang) : item.img,
+            video: item.video || '',
             link: item.buttonId ? `/music/${item.buttonId}` : null
         })).filter((img) => img.src);
     }, [lang, allMusicBanners]);
@@ -35,11 +38,16 @@ const MusicBanner = () => {
     const [dragOffset, setDragOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isUserInteracting, setIsUserInteracting] = useState(false);
+    const [showCenterVideo, setShowCenterVideo] = useState(false);
+    const [bannerInView, setBannerInView] = useState(true);
     const startXRef = useRef(0);
     const currentXRef = useRef(0);
     const carouselRef = useRef(null);
     const slidesRef = useRef(null);
-    const autoPlayIntervalRef = useRef(null);
+    const bannerRootRef = useRef(null);
+    const centerVideoRef = useRef(null);
+    const videoRevealTimerRef = useRef(null);
+    const noVideoAdvanceTimerRef = useRef(null);
     const dragStartTimeRef = useRef(0);
     const wasDragRef = useRef(false);
 
@@ -51,6 +59,28 @@ const MusicBanner = () => {
             next.add(src);
             return next;
         });
+    }, []);
+
+    const clearVideoTimers = useCallback(() => {
+        if (videoRevealTimerRef.current) {
+            clearTimeout(videoRevealTimerRef.current);
+            videoRevealTimerRef.current = null;
+        }
+        if (noVideoAdvanceTimerRef.current) {
+            clearTimeout(noVideoAdvanceTimerRef.current);
+            noVideoAdvanceTimerRef.current = null;
+        }
+    }, []);
+
+    const pauseCenterVideo = useCallback(() => {
+        const el = centerVideoRef.current;
+        if (!el) return;
+        el.pause();
+        try {
+            el.currentTime = 0;
+        } catch {
+            /* ignore */
+        }
     }, []);
 
     useEffect(() => {
@@ -94,52 +124,36 @@ const MusicBanner = () => {
         };
     }, [musicBannersLoading, images, imageSrcKey, markSrcReady]);
 
-    // Auto-play funksiyalari
-    const startAutoPlay = useCallback(() => {
-        stopAutoPlay();
-        autoPlayIntervalRef.current = setInterval(() => {
-            if (!isUserInteracting) {
-                setCurrentIndex(prev => (prev + 1) % images.length);
-            }
-        }, 5000);
-    }, [images.length, isUserInteracting]);
-
-    const stopAutoPlay = useCallback(() => {
-        if (autoPlayIntervalRef.current) {
-            clearInterval(autoPlayIntervalRef.current);
-            autoPlayIntervalRef.current = null;
-        }
-    }, []);
-
-    const resetAutoPlay = useCallback(() => {
-        stopAutoPlay();
-        if (!isUserInteracting) {
-            startAutoPlay();
-        }
-    }, [isUserInteracting, startAutoPlay, stopAutoPlay]);
-
-    // Slayd o'tish funksiyalari
     const goToSlide = useCallback((index) => {
         if (index >= 0 && index < images.length) {
+            clearVideoTimers();
+            setShowCenterVideo(false);
+            pauseCenterVideo();
             setCurrentIndex(index);
             setDragOffset(0);
-            resetAutoPlay();
         }
-    }, [images.length, resetAutoPlay]);
+    }, [images.length, clearVideoTimers, pauseCenterVideo]);
 
     const nextSlide = useCallback(() => {
-        setCurrentIndex(prev => (prev + 1) % images.length);
+        clearVideoTimers();
+        setShowCenterVideo(false);
+        pauseCenterVideo();
+        setCurrentIndex((prev) => (prev + 1) % images.length);
         setDragOffset(0);
-        resetAutoPlay();
-    }, [images.length, resetAutoPlay]);
+    }, [images.length, clearVideoTimers, pauseCenterVideo]);
 
     const prevSlide = useCallback(() => {
-        setCurrentIndex(prev => (prev - 1 + images.length) % images.length);
+        clearVideoTimers();
+        setShowCenterVideo(false);
+        pauseCenterVideo();
+        setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
         setDragOffset(0);
-        resetAutoPlay();
-    }, [images.length, resetAutoPlay]);
+    }, [images.length, clearVideoTimers, pauseCenterVideo]);
 
-    // Drag boshlanishi
+    const handleVideoEnded = useCallback(() => {
+        nextSlide();
+    }, [nextSlide]);
+
     const handleDragStart = (clientX) => {
         wasDragRef.current = false;
         setIsDragging(true);
@@ -147,10 +161,10 @@ const MusicBanner = () => {
         startXRef.current = clientX;
         currentXRef.current = clientX;
         dragStartTimeRef.current = Date.now();
-        stopAutoPlay();
+        clearVideoTimers();
+        if (centerVideoRef.current) centerVideoRef.current.pause();
     };
 
-    // Drag harakati
     const handleDragMove = (clientX) => {
         if (!isDragging) return;
         currentXRef.current = clientX;
@@ -164,7 +178,6 @@ const MusicBanner = () => {
         navigate(image.link);
     };
 
-    // Drag tugashi
     const handleDragEnd = () => {
         if (!isDragging) return;
 
@@ -187,16 +200,13 @@ const MusicBanner = () => {
 
         setIsDragging(false);
         setIsUserInteracting(false);
-        resetAutoPlay();
     };
 
-    // Mouse drag
     const handleMouseDown = (e) => {
         e.preventDefault();
         handleDragStart(e.pageX);
     };
 
-    // Touch events
     const handleTouchStart = (e) => {
         handleDragStart(e.touches[0].clientX);
     };
@@ -209,7 +219,6 @@ const MusicBanner = () => {
         handleDragEnd();
     };
 
-    // Document event listeners for drag
     useEffect(() => {
         if (!isDragging) return;
 
@@ -230,7 +239,6 @@ const MusicBanner = () => {
         };
     }, [isDragging]);
 
-    // Keyboard navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'ArrowLeft') {
@@ -244,42 +252,87 @@ const MusicBanner = () => {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [prevSlide, nextSlide]);
 
-    // Mouse enter/leave
     const handleMouseEnter = () => {
         setIsUserInteracting(true);
-        stopAutoPlay();
+        clearVideoTimers();
+        if (centerVideoRef.current) centerVideoRef.current.pause();
     };
 
     const handleMouseLeave = () => {
         if (!isDragging) {
             setIsUserInteracting(false);
-            startAutoPlay();
         }
     };
 
-    // Visibility change
     useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                stopAutoPlay();
-            } else {
-                if (!isUserInteracting) {
-                    startAutoPlay();
+        const root = bannerRootRef.current;
+        if (!root) return undefined;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                const visible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
+                setBannerInView(visible);
+                if (!visible) {
+                    clearVideoTimers();
+                    setShowCenterVideo(false);
+                    pauseCenterVideo();
                 }
+            },
+            { threshold: [0, 0.35, 0.55, 0.75, 1] }
+        );
+        observer.observe(root);
+        return () => observer.disconnect();
+    }, [clearVideoTimers, pauseCenterVideo, musicBannersLoading, images.length]);
+
+    useEffect(() => {
+        if (images.length === 0) return undefined;
+        if (!bannerInView || isUserInteracting || isDragging) return undefined;
+
+        const current = images[currentIndex];
+        const hasVideo = Boolean(current?.video);
+
+        clearVideoTimers();
+        setShowCenterVideo(false);
+        pauseCenterVideo();
+
+        videoRevealTimerRef.current = setTimeout(() => {
+            if (hasVideo) {
+                setShowCenterVideo(true);
+            } else {
+                noVideoAdvanceTimerRef.current = setTimeout(() => {
+                    nextSlide();
+                }, MUSIC_BANNER_VIDEO_REVEAL_MS);
             }
-        };
+        }, MUSIC_BANNER_VIDEO_REVEAL_MS);
 
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [isUserInteracting, startAutoPlay, stopAutoPlay]);
+        return () => clearVideoTimers();
+    }, [
+        currentIndex,
+        bannerInView,
+        isUserInteracting,
+        isDragging,
+        images,
+        clearVideoTimers,
+        pauseCenterVideo,
+        nextSlide,
+    ]);
 
-    // Window resize
+    useEffect(() => {
+        const el = centerVideoRef.current;
+        if (!el) return;
+        if (showCenterVideo && bannerInView && !isUserInteracting && !isDragging) {
+            el.play().catch(() => {});
+        } else {
+            el.pause();
+        }
+    }, [showCenterVideo, bannerInView, isUserInteracting, isDragging, currentIndex]);
+
     useEffect(() => {
         let resizeTimer;
         const handleResize = () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                setCurrentIndex(prev => prev);
+                setCurrentIndex((prev) => prev);
             }, 250);
         };
 
@@ -290,25 +343,14 @@ const MusicBanner = () => {
         };
     }, []);
 
-    // Auto-play boshlash
-    useEffect(() => {
-        if (images.length > 0) {
-            startAutoPlay();
-        }
-        return () => stopAutoPlay();
-    }, [images.length, startAutoPlay, stopAutoPlay]);
-
-    // Rasmlarni markazlash uchun transform hisoblash
     useEffect(() => {
         if (!slidesRef.current || images.length === 0) return;
 
         const slideWidth = slidesRef.current.querySelector('.music-image')?.offsetWidth || 0;
         const containerWidth = carouselRef.current?.offsetWidth || 0;
 
-        // Gap foizda - CSS bilan bir xil (2% of container)
         const gap = containerWidth * 0.01;
 
-        // Clone rasmlar uchun offset (images.length rasmdan keyin boshlanadi)
         const actualIndex = currentIndex + images.length;
         const offset = (containerWidth / 2) - (slideWidth / 2) - (actualIndex * (slideWidth + gap));
 
@@ -321,16 +363,9 @@ const MusicBanner = () => {
         }
     }, [currentIndex, dragOffset, isDragging, images.length]);
 
-    // Slayd pozitsiyalarini hisoblash
     const getSlideClass = (index) => {
         const total = images.length;
         if (total === 0) return 'hidden';
-
-        const normalizedCurrent = currentIndex;
-        const normalizedIndex = ((index % total) + total) % total;
-
-        const prevIndex = (normalizedCurrent - 1 + total) % total;
-        const nextIndex = (normalizedCurrent + 1) % total;
 
         const diff = index - currentIndex;
 
@@ -341,9 +376,13 @@ const MusicBanner = () => {
         return 'hidden';
     };
 
-    const renderSlideContent = (image, index) => {
+    const renderSlideContent = (image, index, { isPrimaryCenter = false } = {}) => {
         const src = normalizeImagePath(image.src);
+        const videoSrc = normalizeImagePath(image.video);
         const ready = loadedSrcs.has(src);
+        const isActiveCenter = isPrimaryCenter && index === currentIndex;
+        const videoVisible = isActiveCenter && showCenterVideo && Boolean(videoSrc);
+
         return (
             <>
                 {!ready && (
@@ -356,21 +395,35 @@ const MusicBanner = () => {
                     src={src}
                     alt={`Banner ${index + 1}`}
                     draggable={false}
-                    className={ready ? undefined : 'music-image-img--loading'}
+                    className={[
+                        ready ? '' : 'music-image-img--loading',
+                        videoVisible ? 'music-banner-media--hidden' : '',
+                    ].filter(Boolean).join(' ') || undefined}
                     onLoad={() => markSrcReady(src)}
                     onError={(e) => {
                         markSrcReady(src);
                         e.target.src = normalizeImagePath('/img/no-image.png');
                     }}
                 />
+                {isActiveCenter && videoSrc ? (
+                    <video
+                        ref={centerVideoRef}
+                        className={`music-banner-video${videoVisible ? '' : ' music-banner-media--hidden'}`}
+                        src={videoSrc}
+                        muted
+                        playsInline
+                        preload="metadata"
+                        draggable={false}
+                        onEnded={handleVideoEnded}
+                    />
+                ) : null}
             </>
         );
     };
 
-    /* API hali kelmagan — left / center / right skeleton */
     if (musicBannersLoading && images.length === 0) {
         return (
-            <div className="music-banner-container">
+            <div className="music-banner-container" ref={bannerRootRef}>
                 <div
                     className="music-carousel music-carousel--skeleton"
                     aria-busy="true"
@@ -394,7 +447,7 @@ const MusicBanner = () => {
     if (images.length === 0) return null;
 
     return (
-        <div className="music-banner-container">
+        <div className="music-banner-container" ref={bannerRootRef}>
             <div
                 className={`music-carousel ${isDragging ? 'is-dragging' : ''}`}
                 ref={carouselRef}
@@ -422,7 +475,6 @@ const MusicBanner = () => {
                 </button>
 
                 <ul className="music-slides" ref={slidesRef}>
-                    {/* Oldingi rasmlar (clone) - infinite effect uchun */}
                     {images.map((image, index) => (
                         <li
                             key={`prev-${image.id || index}`}
@@ -435,7 +487,6 @@ const MusicBanner = () => {
                         </li>
                     ))}
 
-                    {/* Asosiy rasmlar */}
                     {images.map((image, index) => (
                         <li
                             key={image.id || index}
@@ -444,11 +495,10 @@ const MusicBanner = () => {
                             onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            {renderSlideContent(image, index)}
+                            {renderSlideContent(image, index, { isPrimaryCenter: true })}
                         </li>
                     ))}
 
-                    {/* Keyingi rasmlar (clone) - infinite effect uchun */}
                     {images.map((image, index) => (
                         <li
                             key={`next-${image.id || index}`}

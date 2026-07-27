@@ -73,6 +73,23 @@
   user-select: none;
 }
 
+.music-image video.music-banner-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.music-image img.music-banner-media--hidden,
+.music-image video.music-banner-media--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .music-image img.music-image-img--loading {
   opacity: 0;
 }
