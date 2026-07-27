@@ -412,7 +412,7 @@ const MusicBanner = () => {
                         src={videoSrc}
                         muted
                         playsInline
-                        preload="metadata"
+                        preload="auto"
                         draggable={false}
                         onEnded={handleVideoEnded}
                     />
