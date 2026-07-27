@@ -160,12 +160,12 @@
 .similar-trailer-dislike {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  font-size: 10px;
   transition: all 0.3s ease;
   cursor: pointer;
-  padding: 0.2rem 0.4rem;
+  padding: 0.15rem 0.3rem;
   border-radius: 4px;
 }
 
@@ -191,8 +191,9 @@
 
 .similar-trailer-like svg,
 .similar-trailer-dislike svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 button.similar-trailer-like,
@@ -280,13 +281,13 @@ button.similar-trailer-dislike {
 
   .similar-trailer-like,
   .similar-trailer-dislike {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .similar-trailer-like svg,
   .similar-trailer-dislike svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   .similar-trailer-play {
@@ -353,17 +354,6 @@ button.similar-trailer-dislike {
     gap: 0.6rem;
   }
 
-  .similar-trailer-like,
-  .similar-trailer-dislike {
-    font-size: 10px;
-  }
-
-  .similar-trailer-like svg,
-  .similar-trailer-dislike svg {
-    width: 14px;
-    height: 14px;
-  }
-
   .similar-trailer-play {
     width: 28px;
     height: 28px;
@@ -372,6 +362,14 @@ button.similar-trailer-dislike {
   .similar-trailer-play svg {
     width: 12px;
     height: 12px;
+  }
+}
+
+/* ≤500px: faqat like/dislike qiymat (son) px kamayadi */
+@media (max-width: 500px) {
+  .similar-trailer-like,
+  .similar-trailer-dislike {
+    font-size: 8px;
   }
 }
 
