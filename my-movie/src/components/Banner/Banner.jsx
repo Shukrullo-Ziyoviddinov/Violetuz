@@ -9,6 +9,8 @@ import './Banner.css';
 const BANNER_SKELETON_SLIDES = ['left', 'center', 'right'];
 /** Broken/slow CDN — skeleton ushlab qolmasin */
 const BANNER_IMAGE_READY_TIMEOUT_MS = 20000;
+/** Rasm ko‘rinib turadi, keyin video */
+const BANNER_VIDEO_REVEAL_MS = 5000;
 
 const Banner = () => {
     const navigate = useNavigate();
@@ -31,6 +33,7 @@ const Banner = () => {
             return {
                 id: banner.id,
                 src,
+                video: banner.video || '',
                 link: banner.movieId ? `/movie/${banner.movieId}` : null
             };
         }).filter((img) => img.src);
@@ -46,11 +49,16 @@ const Banner = () => {
     const [dragOffset, setDragOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isUserInteracting, setIsUserInteracting] = useState(false);
+    const [showCenterVideo, setShowCenterVideo] = useState(false);
+    const [bannerInView, setBannerInView] = useState(true);
     const startXRef = useRef(0);
     const currentXRef = useRef(0);
     const carouselRef = useRef(null);
     const slidesRef = useRef(null);
-    const autoPlayIntervalRef = useRef(null);
+    const bannerRootRef = useRef(null);
+    const centerVideoRef = useRef(null);
+    const videoRevealTimerRef = useRef(null);
+    const noVideoAdvanceTimerRef = useRef(null);
     const dragStartTimeRef = useRef(0);
     const wasDragRef = useRef(false);
 
@@ -62,6 +70,28 @@ const Banner = () => {
             next.add(src);
             return next;
         });
+    }, []);
+
+    const clearVideoTimers = useCallback(() => {
+        if (videoRevealTimerRef.current) {
+            clearTimeout(videoRevealTimerRef.current);
+            videoRevealTimerRef.current = null;
+        }
+        if (noVideoAdvanceTimerRef.current) {
+            clearTimeout(noVideoAdvanceTimerRef.current);
+            noVideoAdvanceTimerRef.current = null;
+        }
+    }, []);
+
+    const pauseCenterVideo = useCallback(() => {
+        const el = centerVideoRef.current;
+        if (!el) return;
+        el.pause();
+        try {
+            el.currentTime = 0;
+        } catch {
+            /* ignore */
+        }
     }, []);
 
     /* API tugagach ham rasmlar to‘liq yuklanmaguncha skeleton qoladi */
@@ -113,48 +143,35 @@ const Banner = () => {
     const showBannerSkeleton =
         bannersLoading || (images.length > 0 && !allBannerImagesReady);
 
-    const startAutoPlay = useCallback(() => {
-        stopAutoPlay();
-        autoPlayIntervalRef.current = setInterval(() => {
-            if (!isUserInteracting) {
-                setCurrentIndex(prev => (prev + 1) % images.length);
-            }
-        }, 5000);
-    }, [images.length, isUserInteracting]);
-
-    const stopAutoPlay = useCallback(() => {
-        if (autoPlayIntervalRef.current) {
-            clearInterval(autoPlayIntervalRef.current);
-            autoPlayIntervalRef.current = null;
-        }
-    }, []);
-
-    const resetAutoPlay = useCallback(() => {
-        stopAutoPlay();
-        if (!isUserInteracting) {
-            startAutoPlay();
-        }
-    }, [isUserInteracting, startAutoPlay, stopAutoPlay]);
-
     const goToSlide = useCallback((index) => {
         if (index >= 0 && index < images.length) {
+            clearVideoTimers();
+            setShowCenterVideo(false);
+            pauseCenterVideo();
             setCurrentIndex(index);
             setDragOffset(0);
-            resetAutoPlay();
         }
-    }, [images.length, resetAutoPlay]);
+    }, [images.length, clearVideoTimers, pauseCenterVideo]);
 
     const nextSlide = useCallback(() => {
-        setCurrentIndex(prev => (prev + 1) % images.length);
+        clearVideoTimers();
+        setShowCenterVideo(false);
+        pauseCenterVideo();
+        setCurrentIndex((prev) => (prev + 1) % images.length);
         setDragOffset(0);
-        resetAutoPlay();
-    }, [images.length, resetAutoPlay]);
+    }, [images.length, clearVideoTimers, pauseCenterVideo]);
 
     const prevSlide = useCallback(() => {
-        setCurrentIndex(prev => (prev - 1 + images.length) % images.length);
+        clearVideoTimers();
+        setShowCenterVideo(false);
+        pauseCenterVideo();
+        setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
         setDragOffset(0);
-        resetAutoPlay();
-    }, [images.length, resetAutoPlay]);
+    }, [images.length, clearVideoTimers, pauseCenterVideo]);
+
+    const handleVideoEnded = useCallback(() => {
+        nextSlide();
+    }, [nextSlide]);
 
     const handleDragStart = (clientX) => {
         wasDragRef.current = false;
@@ -163,7 +180,8 @@ const Banner = () => {
         startXRef.current = clientX;
         currentXRef.current = clientX;
         dragStartTimeRef.current = Date.now();
-        stopAutoPlay();
+        clearVideoTimers();
+        if (centerVideoRef.current) centerVideoRef.current.pause();
     };
 
     const handleDragMove = (clientX) => {
@@ -201,7 +219,6 @@ const Banner = () => {
 
         setIsDragging(false);
         setIsUserInteracting(false);
-        resetAutoPlay();
     };
 
     const handleMouseDown = (e) => {
@@ -256,35 +273,89 @@ const Banner = () => {
 
     const handleMouseEnter = () => {
         setIsUserInteracting(true);
-        stopAutoPlay();
+        clearVideoTimers();
+        if (centerVideoRef.current) centerVideoRef.current.pause();
     };
 
     const handleMouseLeave = () => {
         if (!isDragging) {
             setIsUserInteracting(false);
-            startAutoPlay();
         }
     };
 
+    /* Pastga scroll — banner ko‘rinishi pasayganda video o‘chadi, rasm qaytadi */
     useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                stopAutoPlay();
-            } else if (!isUserInteracting) {
-                startAutoPlay();
-            }
-        };
+        const root = bannerRootRef.current;
+        if (!root) return undefined;
 
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [isUserInteracting, startAutoPlay, stopAutoPlay]);
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                const visible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
+                setBannerInView(visible);
+                if (!visible) {
+                    clearVideoTimers();
+                    setShowCenterVideo(false);
+                    pauseCenterVideo();
+                }
+            },
+            { threshold: [0, 0.35, 0.55, 0.75, 1] }
+        );
+        observer.observe(root);
+        return () => observer.disconnect();
+    }, [clearVideoTimers, pauseCenterVideo, showBannerSkeleton, images.length]);
+
+    /* Rasm → 5s → video; video tugasa keyingi slayd */
+    useEffect(() => {
+        if (!allBannerImagesReady || images.length === 0) return undefined;
+        if (!bannerInView || isUserInteracting || isDragging) return undefined;
+
+        const current = images[currentIndex];
+        const hasVideo = Boolean(current?.video);
+
+        clearVideoTimers();
+        setShowCenterVideo(false);
+        pauseCenterVideo();
+
+        videoRevealTimerRef.current = setTimeout(() => {
+            if (hasVideo) {
+                setShowCenterVideo(true);
+            } else {
+                noVideoAdvanceTimerRef.current = setTimeout(() => {
+                    nextSlide();
+                }, BANNER_VIDEO_REVEAL_MS);
+            }
+        }, BANNER_VIDEO_REVEAL_MS);
+
+        return () => clearVideoTimers();
+    }, [
+        currentIndex,
+        bannerInView,
+        isUserInteracting,
+        isDragging,
+        allBannerImagesReady,
+        images,
+        clearVideoTimers,
+        pauseCenterVideo,
+        nextSlide,
+    ]);
+
+    /* Center video play/pause */
+    useEffect(() => {
+        const el = centerVideoRef.current;
+        if (!el) return;
+        if (showCenterVideo && bannerInView && !isUserInteracting && !isDragging) {
+            el.play().catch(() => {});
+        } else {
+            el.pause();
+        }
+    }, [showCenterVideo, bannerInView, isUserInteracting, isDragging, currentIndex]);
 
     useEffect(() => {
         let resizeTimer;
         const handleResize = () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                setCurrentIndex(prev => prev);
+                setCurrentIndex((prev) => prev);
             }, 250);
         };
 
@@ -294,15 +365,6 @@ const Banner = () => {
             clearTimeout(resizeTimer);
         };
     }, []);
-
-    useEffect(() => {
-        if (images.length > 0 && allBannerImagesReady) {
-            startAutoPlay();
-        } else {
-            stopAutoPlay();
-        }
-        return () => stopAutoPlay();
-    }, [images.length, allBannerImagesReady, startAutoPlay, stopAutoPlay]);
 
     useEffect(() => {
         if (!slidesRef.current || !carouselRef.current || images.length === 0 || !allBannerImagesReady) {
@@ -365,25 +427,44 @@ const Banner = () => {
         return 'hidden';
     };
 
-    const renderSlideContent = (image, index) => {
+    const renderSlideContent = (image, index, { isPrimaryCenter = false } = {}) => {
         const src = normalizeImagePath(image.src);
+        const videoSrc = normalizeImagePath(image.video);
+        const isActiveCenter = isPrimaryCenter && index === currentIndex;
+        const videoVisible = isActiveCenter && showCenterVideo && Boolean(videoSrc);
+
         return (
-            <img
-                src={src}
-                alt={`Banner ${index + 1}`}
-                draggable={false}
-                onLoad={() => markSrcReady(src)}
-                onError={(e) => {
-                    markSrcReady(src);
-                    e.target.src = normalizeImagePath('/img/no-image.png');
-                }}
-            />
+            <>
+                <img
+                    className={videoVisible ? 'manga-banner-media--hidden' : undefined}
+                    src={src}
+                    alt={`Banner ${index + 1}`}
+                    draggable={false}
+                    onLoad={() => markSrcReady(src)}
+                    onError={(e) => {
+                        markSrcReady(src);
+                        e.target.src = normalizeImagePath('/img/no-image.png');
+                    }}
+                />
+                {isActiveCenter && videoSrc ? (
+                    <video
+                        ref={centerVideoRef}
+                        className={`manga-banner-video${videoVisible ? '' : ' manga-banner-media--hidden'}`}
+                        src={videoSrc}
+                        muted
+                        playsInline
+                        preload="metadata"
+                        draggable={false}
+                        onEnded={handleVideoEnded}
+                    />
+                ) : null}
+            </>
         );
     };
 
     if (showBannerSkeleton) {
         return (
-            <div className="banner">
+            <div className="banner" ref={bannerRootRef}>
                 <div className="banner-container">
                     <div
                         className="manga-carousel manga-carousel--skeleton"
@@ -409,7 +490,7 @@ const Banner = () => {
     if (images.length === 0) return null;
 
     return (
-        <div className="banner">
+        <div className="banner" ref={bannerRootRef}>
             <div className="banner-container">
             <div
                 className={`manga-carousel ${isDragging ? 'is-dragging' : ''}`}
@@ -463,7 +544,7 @@ const Banner = () => {
                             onClick={() => handleSlideClick(image)}
                             role={image.link ? 'button' : undefined}
                         >
-                            {renderSlideContent(image, index)}
+                            {renderSlideContent(image, index, { isPrimaryCenter: true })}
                         </li>
                         );
                     })}

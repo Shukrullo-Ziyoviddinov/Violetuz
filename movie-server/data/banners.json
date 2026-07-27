@@ -1,10 +1,10 @@
 [
-  { "id": 1, "lang": "uz", "movieId": 6005, "image": "/img/movie3.jpg" },
-  { "id": 2, "lang": "uz", "movieId": 5004, "image": "/img/movie6.jpg" },
-  { "id": 3, "lang": "uz", "movieId": 4008, "image": "/img/movie12.jpg" },
-  { "id": 4, "lang": "uz", "movieId": 4007, "image": "/img/movie15.jpg" },
-  { "id": 5, "lang": "ru", "movieId": 6005, "image": "/img/movie3.jpg" },
-  { "id": 6, "lang": "ru", "movieId": 5004, "image": "/img/movie6.jpg" },
-  { "id": 7, "lang": "ru", "movieId": 5008, "image": "/img/movie12.jpg" },
-  { "id": 8, "lang": "ru", "movieId": 4007, "image": "/img/movie15.jpg" }
+  { "id": 1, "lang": "uz", "movieId": 6005, "image": "/img/movie3.jpg", "video": "/video/shorts2.mp4" },
+  { "id": 2, "lang": "uz", "movieId": 5004, "image": "/img/movie6.jpg", "video": "/video/shorts4.mp4" },
+  { "id": 3, "lang": "uz", "movieId": 4008, "image": "/img/movie12.jpg", "video": "/video/shorts10.mp4" },
+  { "id": 4, "lang": "uz", "movieId": 4007, "image": "/img/movie15.jpg", "video": "/video/shorts2.mp4" },
+  { "id": 5, "lang": "ru", "movieId": 6005, "image": "/img/movie3.jpg", "video": "/video/shorts4.mp4" },
+  { "id": 6, "lang": "ru", "movieId": 5004, "image": "/img/movie6.jpg", "video": "/video/shorts10.mp4" },
+  { "id": 7, "lang": "ru", "movieId": 5008, "image": "/img/movie12.jpg", "video": "/video/shorts2.mp4" },
+  { "id": 8, "lang": "ru", "movieId": 4007, "image": "/img/movie15.jpg", "video": "/video/shorts4.mp4" }
 ]

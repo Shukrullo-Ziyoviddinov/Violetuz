@@ -91,6 +91,23 @@
     user-select: none;
 }
 
+.manga-image video.manga-banner-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    pointer-events: none;
+    user-select: none;
+}
+
+.manga-image img.manga-banner-media--hidden,
+.manga-image video.manga-banner-media--hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
 /* Slayd Pozitsiyalari */
 .manga-image.center {
     opacity: 1;
