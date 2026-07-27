@@ -164,7 +164,7 @@ button.similar-trailer-dislike {
   align-items: center;
   gap: 0.25rem;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1;
   font-family: inherit;
@@ -205,13 +205,13 @@ button.similar-trailer-dislike.active {
 .similar-trailer-actions .similar-trailer-dislike svg,
 button.similar-trailer-like svg,
 button.similar-trailer-dislike svg {
-  width: 12px !important;
-  height: 12px !important;
+  width: 16px !important;
+  height: 16px !important;
   flex-shrink: 0;
 }
 
 .similar-trailer-actions .similar-trailer-action-count {
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1;
 }
 
@@ -290,25 +290,6 @@ button.similar-trailer-dislike svg {
     gap: 0.65rem;
   }
 
-  .similar-trailer-actions .similar-trailer-like,
-  .similar-trailer-actions .similar-trailer-dislike,
-  button.similar-trailer-like,
-  button.similar-trailer-dislike {
-    font-size: 9px;
-  }
-
-  .similar-trailer-actions .similar-trailer-like svg,
-  .similar-trailer-actions .similar-trailer-dislike svg,
-  button.similar-trailer-like svg,
-  button.similar-trailer-dislike svg {
-    width: 12px !important;
-    height: 12px !important;
-  }
-
-  .similar-trailer-actions .similar-trailer-action-count {
-    font-size: 9px;
-  }
-
   .similar-trailer-play {
     width: 36px;
     height: 36px;
@@ -339,6 +320,25 @@ button.similar-trailer-dislike svg {
 
   .similar-trailer-actions {
     gap: 0.75rem;
+  }
+
+  .similar-trailer-actions .similar-trailer-like,
+  .similar-trailer-actions .similar-trailer-dislike,
+  button.similar-trailer-like,
+  button.similar-trailer-dislike {
+    font-size: 11px;
+  }
+
+  .similar-trailer-actions .similar-trailer-action-count {
+    font-size: 11px;
+  }
+
+  .similar-trailer-actions .similar-trailer-like svg,
+  .similar-trailer-actions .similar-trailer-dislike svg,
+  button.similar-trailer-like svg,
+  button.similar-trailer-dislike svg {
+    width: 15px !important;
+    height: 15px !important;
   }
 
   .similar-trailer-play {
@@ -381,28 +381,6 @@ button.similar-trailer-dislike svg {
   .similar-trailer-play svg {
     width: 12px;
     height: 12px;
-  }
-}
-
-/* ≤500px: faqat like/dislike qiymat (son) px kamayadi, icon saqlanadi */
-@media (max-width: 500px) {
-  .similar-trailer-actions .similar-trailer-like,
-  .similar-trailer-actions .similar-trailer-dislike,
-  button.similar-trailer-like,
-  button.similar-trailer-dislike {
-    font-size: 7px;
-  }
-
-  .similar-trailer-actions .similar-trailer-action-count {
-    font-size: 7px;
-  }
-
-  .similar-trailer-actions .similar-trailer-like svg,
-  .similar-trailer-actions .similar-trailer-dislike svg,
-  button.similar-trailer-like svg,
-  button.similar-trailer-dislike svg {
-    width: 12px !important;
-    height: 12px !important;
   }
 }
 
