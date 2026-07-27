@@ -59,20 +59,16 @@
   border-radius: 12px;
   overflow: hidden;
   background: linear-gradient(135deg, #0F0F0F, #1C1C1C);
-  border: 2px solid rgba(155, 79, 231, 0.3);
+  border: none;
   display: flex;
   flex-direction: row;
   gap: 1rem;
   padding: 0.75rem;
-  transition: all 0.3s ease;
-}
-
-.similar-trailer-item:hover {
-  border-color: #bd02bd;
+  transition: background 0.3s ease;
 }
 
 .similar-trailer-item.active {
-  border-color: #bd02bd;
+  background: linear-gradient(135deg, rgba(189, 2, 189, 0.45) 0%, rgba(155, 79, 231, 0.55) 100%);
 }
 
 /* Video Section - Left Side */
@@ -97,11 +93,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.similar-trailer-item:hover .similar-trailer-video-element {
-  transform: scale(1.05);
 }
 
 .similar-trailer-play {
@@ -120,10 +111,6 @@
   justify-content: center;
   border: 2px solid rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-}
-
-.similar-trailer-item:hover .similar-trailer-play {
-  transform: translate(-50%, -50%) scale(1.15);
 }
 
 /* Info Section - Right Side */

@@ -31,14 +31,14 @@ const SimilarTrailers = ({
           movieTitle: movie.title,
         }))
       )
-      .filter((trailer) => {
-        if (trailer.typeTrailers !== currentTypeTrailers) return false;
-        if (trailer.movieId === currentMovie?.id && trailer.id === selectedTrailer?.id) {
-          return false;
-        }
-        return true;
-      });
-  }, [allMovies, currentMovie?.id, currentTypeTrailers, selectedTrailer?.id]);
+      .filter((trailer) => trailer.typeTrailers === currentTypeTrailers);
+  }, [allMovies, currentTypeTrailers]);
+
+  const selectedKey = selectedTrailer
+    ? (getTrailerKey
+        ? getTrailerKey(selectedTrailer)
+        : `${selectedTrailer.movieId ?? currentMovie?.id}-${selectedTrailer.id}`)
+    : null;
 
   const titleClassName = `similar-trailers-title${hideTitleOnMobile ? ' similar-trailers-title--desktop-only' : ''}`;
 
@@ -69,10 +69,11 @@ const SimilarTrailers = ({
         <div className="similar-trailers-list">
           {similarTrailers.map((trailer) => {
             const tKey = getTrailerKey ? getTrailerKey(trailer) : `${trailer.movieId}-${trailer.id}`;
+            const isActive = selectedKey != null && tKey === selectedKey;
             return (
               <div
                 key={`${trailer.movieId}-${trailer.id}`}
-                className="similar-trailer-item"
+                className={`similar-trailer-item${isActive ? ' active' : ''}`}
                 onClick={() => onTrailerSelect(trailer)}
               >
                 <div className="similar-trailer-video">
