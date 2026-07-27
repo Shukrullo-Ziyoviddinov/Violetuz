@@ -27,7 +27,7 @@ const FeedMovieCard = ({ item }) => {
         <div className="feed-movie-card-actions-like-group">
           <LikeButton
             key={item.movieId}
-            variant="movieDetail"
+            className="feed-movie-like-button"
             contentId={String(item.movieId)}
             persistKey={`movie_${item.movieId}`}
             likeMeta={{

@@ -79,8 +79,6 @@ const FeedMusicCard = ({ item }) => {
         </div>
       </div>
 
-      <FeedMusicDuration audioUrl={item.audio} />
-
       <div
         className="feed-music-card-track"
         role="button"
@@ -100,6 +98,7 @@ const FeedMusicCard = ({ item }) => {
         <div className="feed-music-card-track-info">
           <div className="feed-music-card-artist">{item.artistName}</div>
           <div className="feed-music-card-track-name">{item.trackTitle}</div>
+          <FeedMusicDuration audioUrl={item.audio} />
         </div>
         <div className="feed-music-card-play">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

@@ -84,39 +84,18 @@
   align-items: center;
 }
 
-/* Feed: ixcham tugma, icon chapda — yonida son */
-.feed-movie-card-actions .movie-detail-action-btn {
-  background: rgba(45, 45, 50, 0.3);
-  border: 1px solid rgba(70, 65, 80, 0.238);
-  color: #ffffff;
-  padding: 0.28rem 0.5rem;
-  border-radius: 999px;
-  cursor: pointer;
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.35rem;
-  transition: all 0.3s;
-  font-size: 0.78rem;
-  font-weight: 600;
+.feed-movie-like-button.like-button {
+  margin-right: auto;
 }
 
-.feed-movie-card-actions .movie-detail-action-btn svg {
+.feed-movie-like-button .like-button-btn {
+  padding: 0.28rem 0.52rem;
+  font-size: 0.78rem;
+}
+
+.feed-movie-like-button .like-button-icon-wrap svg {
   width: 16px;
   height: 16px;
-  flex-shrink: 0;
-}
-
-.feed-movie-card-actions .movie-detail-action-btn.active {
-  color: #9b4fe7;
-}
-
-.feed-movie-card-actions .movie-detail-action-count {
-  font-weight: 700;
-  min-width: 0;
-  text-align: left;
-  line-height: 1;
 }
 
 .feed-movie-card-fav {

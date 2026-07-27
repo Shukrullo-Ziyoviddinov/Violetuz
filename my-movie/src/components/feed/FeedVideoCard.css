@@ -61,6 +61,44 @@
   position: relative;
 }
 
+.feed-video-card-info.video-detail-info {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  gap: 0.12rem;
+  margin-top: 0.45rem;
+  min-width: 0;
+}
+
+.feed-video-card-info .video-detail-title,
+.feed-video-card-info .video-detail-artist-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  margin: 0;
+  max-width: 100%;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.feed-video-card-info .video-detail-artist-name {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.feed-video-card-info .video-detail-artist-name:hover {
+  color: rgba(155, 79, 231, 1);
+}
+
 .feed-video-card-cover {
   width: 100%;
   height: 155px;

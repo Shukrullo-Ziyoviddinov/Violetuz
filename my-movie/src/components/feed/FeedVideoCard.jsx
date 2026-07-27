@@ -26,6 +26,27 @@ const FeedVideoCard = ({ item }) => {
         <img src={item.cover} alt={item.title} className="feed-video-card-cover" />
         <div className="feed-video-card-badge">{item.videoKind}</div>
       </div>
+      <div className="feed-video-card-info video-detail-info">
+        <span className="video-detail-title">{item.title}</span>
+        <span
+          className="video-detail-artist-name"
+          role="link"
+          tabIndex={0}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (item.artistId) navigate(`/music/artist/${item.artistId}`);
+          }}
+          onKeyDown={(e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && item.artistId) {
+              e.preventDefault();
+              e.stopPropagation();
+              navigate(`/music/artist/${item.artistId}`);
+            }
+          }}
+        >
+          {item.artistName}
+        </span>
+      </div>
       <div className="feed-video-card-actions" onClick={(e) => e.stopPropagation()} role="presentation">
         <LikeButton
           contentId={String(item.videoId)}
