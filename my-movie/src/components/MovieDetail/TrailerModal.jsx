@@ -1,11 +1,9 @@
-
-
-
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { formatActionCount } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import LikeButton from '../../Music/LikeButton/LikeButton';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import SimilarTrailers from './SimilarTrailers';
 import './TrailerModal.css';
 
@@ -29,26 +27,25 @@ export const TrailerCloseButton = ({ onClick, label = 'Close' }) => (
   </button>
 );
 
-const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
+const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoading = false }) => {
   const isPage = variant === 'page';
   const overlayClass = isPage ? 'trailer-page-overlay' : 'trailer-modal-overlay';
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const getTrailers = () => {
+  const trailers = useMemo(() => {
+    if (!movie) return [];
     if (movie.trailersVideo && Array.isArray(movie.trailersVideo)) {
       return movie.trailersVideo;
     }
-    // Fallback for old structure
     if (movie.trailers && Array.isArray(movie.trailers)) {
-      return movie.trailers.map(t => ({
-        id: t.id,
-        trailers: { uz: t.url, ru: t.url },
-        title: { uz: t.title, ru: t.title }
+      return movie.trailers.map((tr) => ({
+        id: tr.id,
+        trailers: { uz: tr.url, ru: tr.url },
+        title: { uz: tr.title, ru: tr.title },
       }));
     }
     return [];
-  };
-  const trailers = getTrailers();
+  }, [movie]);
   const [selectedTrailer, setSelectedTrailer] = useState(trailers[0] || null);
 
   const getTrailerKey = (trailer) => {
@@ -70,10 +67,26 @@ const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
   const [isSheetDragging, setIsSheetDragging] = useState(false);
 
   useEffect(() => {
+    if (!movie) {
+      setSelectedTrailer(null);
+      return;
+    }
+    setSelectedTrailer(trailers[0] || null);
+    // faqat film almashganda birinchi trailerni tanlash
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [movie?.id]);
+
+  useEffect(() => {
+    if (externalLoading || !movie) {
+      setTrailerLoading(true);
+      return undefined;
+    }
     setTrailerLoading(true);
     const timer = setTimeout(() => setTrailerLoading(false), 120);
     return () => clearTimeout(timer);
-  }, []);
+  }, [externalLoading, movie?.id]);
+
+  const showLoading = externalLoading || trailerLoading;
 
   // useRef - stale closure muammosini hal qilish uchun
   const hideControlsTimeoutRef = useRef(null);
@@ -511,7 +524,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
     handlePlayPause();
   };
 
-  if (!trailers || trailers.length === 0) {
+  if (!showLoading && (!trailers || trailers.length === 0)) {
     return (
       <div className={overlayClass} onClick={isPage ? undefined : onClose}>
         <div className="trailer-modal" onClick={(e) => e.stopPropagation()}>
@@ -539,7 +552,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
         <TrailerCloseButton onClick={onClose} label={t('common.back', 'Back')} />
 
         <div className="trailer-modal-pin">
-            {(selectedTrailer || trailerLoading) && (
+            {(selectedTrailer || showLoading) && (
               <div 
                 className="trailer-modal-video-wrapper"
                 ref={videoWrapperRef}
@@ -548,7 +561,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
                 onTouchStart={handleVideoWrapperTouchStart}
                 onTouchEnd={handleVideoWrapperTouchEnd}
               >
-                {trailerLoading ? (
+                {showLoading ? (
                   <div className="trailer-modal-video-placeholder" aria-hidden="true" />
                 ) : (
                   <video
@@ -568,7 +581,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
                   />
                 )}
                 
-                {trailerLoading ? null : (
+                {showLoading ? null : (
                 <>
                 <div
                   className={`trailer-modal-controls-overlay ${showControls ? 'show' : ''}`}
@@ -717,9 +730,18 @@ const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
           onTouchEnd={handleSheetTouchEnd}
           onTouchCancel={handleSheetTouchEnd}
         >
-            {(selectedTrailer || trailerLoading) && (
+            {(selectedTrailer || showLoading) && (
               <div className="trailer-modal-controls-info">
-                {trailerLoading ? null : selectedTrailer ? (
+                {showLoading ? (
+                  <>
+                    <SkeletonLoader variant="trailer-modal-controls-title" />
+                    <SkeletonLoader variant="trailer-modal-controls-text" />
+                    <div className="trailer-modal-controls-actions">
+                      <SkeletonLoader variant="trailer-modal-controls-action" />
+                      <SkeletonLoader variant="trailer-modal-controls-action" />
+                    </div>
+                  </>
+                ) : selectedTrailer ? (
                   <>
                     <div className="trailer-modal-controls-title">
                       {selectedTrailer.title?.[contentLang] || selectedTrailer.title?.uz || selectedTrailer.title?.ru || ''}
@@ -743,15 +765,22 @@ const TrailerModal = ({ movie, onClose, variant = 'modal' }) => {
               </div>
             )}
 
-            {(selectedTrailer || trailerLoading) && (
-              <h4 className="similar-trailers-title trailer-modal-sticky-similar-title">
-                {t('detail.similarTrailers')}
-              </h4>
+            {(selectedTrailer || showLoading) && (
+              showLoading ? (
+                <SkeletonLoader
+                  variant="similar-trailers-title"
+                  className="trailer-modal-sticky-similar-title trailer-modal-sticky-similar-title--skeleton"
+                />
+              ) : (
+                <h4 className="similar-trailers-title trailer-modal-sticky-similar-title">
+                  {t('detail.similarTrailers')}
+                </h4>
+              )
             )}
 
             <div className="trailer-modal-sidebar">
               <SimilarTrailers
-                trailerLoading={trailerLoading}
+                trailerLoading={showLoading}
                 currentMovie={movie}
                 selectedTrailer={selectedTrailer}
                 onTrailerSelect={handleTrailerSelect}

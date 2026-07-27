@@ -4,6 +4,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { formatActionCount } from '../../utils/utils';
 import LikeButton from '../../Music/LikeButton/LikeButton';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import VerticalScroll from './VerticalScroll';
 import './SimilarTrailers.css';
 
@@ -25,6 +26,22 @@ const showTrailerPreviewFrame = (e) => {
   };
   if (video.readyState >= 1) seekToPreview();
 };
+
+const SimilarTrailerItemSkeleton = () => (
+  <div className="similar-trailer-item similar-trailer-item--skeleton" aria-hidden="true">
+    <div className="similar-trailer-video">
+      <SkeletonLoader variant="similar-trailer-video" />
+    </div>
+    <div className="similar-trailer-info">
+      <SkeletonLoader variant="similar-trailer-title" />
+      <SkeletonLoader variant="similar-trailer-text" />
+      <div className="similar-trailer-actions">
+        <SkeletonLoader variant="similar-trailer-action" />
+        <SkeletonLoader variant="similar-trailer-action" />
+      </div>
+    </div>
+  </div>
+);
 
 const SimilarTrailers = ({
   currentMovie,
@@ -64,8 +81,18 @@ const SimilarTrailers = ({
   if (trailerLoading) {
     return (
       <div className="similar-trailers-container similar-trailers-container--loading">
-        <h4 className={titleClassName}>{t('detail.similarTrailers')}</h4>
-        <div className="similar-trailers-loading-panel" aria-hidden="true" />
+        <SkeletonLoader
+          variant="similar-trailers-title"
+          className={`${titleClassName} similar-trailers-title--skeleton`}
+        />
+        <VerticalScroll className="similar-trailers-scroll-wrapper">
+          <div className="similar-trailers-list">
+            <SimilarTrailerItemSkeleton />
+            <SimilarTrailerItemSkeleton />
+            <SimilarTrailerItemSkeleton />
+            <SimilarTrailerItemSkeleton />
+          </div>
+        </VerticalScroll>
       </div>
     );
   }

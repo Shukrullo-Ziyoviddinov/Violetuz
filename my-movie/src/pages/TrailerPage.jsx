@@ -10,8 +10,9 @@ const TrailerPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { allMovies } = useMoviesApi();
-  const movie = allMovies.find((m) => m.id === parseInt(id, 10));
+  const { allMovies, moviesLoading } = useMoviesApi();
+  const movie = allMovies.find((m) => m.id === parseInt(id, 10)) || null;
+  const pageLoading = moviesLoading && !movie;
 
   const handleClose = () => navigate(-1);
 
@@ -30,7 +31,7 @@ const TrailerPage = () => {
     };
   }, []);
 
-  if (!movie) {
+  if (!moviesLoading && !movie) {
     return (
       <div className="trailer-page">
         <div className="trailer-page-overlay">
@@ -47,7 +48,12 @@ const TrailerPage = () => {
 
   return (
     <div className="trailer-page">
-      <TrailerModal movie={movie} onClose={handleClose} variant="page" />
+      <TrailerModal
+        movie={movie}
+        onClose={handleClose}
+        variant="page"
+        loading={pageLoading}
+      />
     </div>
   );
 };
