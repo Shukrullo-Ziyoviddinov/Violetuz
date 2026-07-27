@@ -7,6 +7,25 @@ import LikeButton from '../../Music/LikeButton/LikeButton';
 import VerticalScroll from './VerticalScroll';
 import './SimilarTrailers.css';
 
+/** Video ijro etilmasdan, metadata dan lavha (still frame) ko‘rsatadi */
+const showTrailerPreviewFrame = (e) => {
+  const video = e.currentTarget;
+  if (!video || video.dataset.previewReady === '1') return;
+  const seekToPreview = () => {
+    try {
+      const duration = Number(video.duration);
+      const t = Number.isFinite(duration) && duration > 0
+        ? Math.min(1, Math.max(0.1, duration * 0.08))
+        : 0.1;
+      video.currentTime = t;
+      video.dataset.previewReady = '1';
+    } catch {
+      /* ignore seek errors */
+    }
+  };
+  if (video.readyState >= 1) seekToPreview();
+};
+
 const SimilarTrailers = ({
   currentMovie,
   selectedTrailer,
@@ -81,8 +100,10 @@ const SimilarTrailers = ({
                     src={trailer.trailers?.[contentLang] || trailer.trailers?.uz || trailer.trailers?.ru || ''}
                     muted
                     playsInline
-                    preload="none"
+                    preload="metadata"
                     className="similar-trailer-video-element"
+                    onLoadedMetadata={showTrailerPreviewFrame}
+                    onLoadedData={showTrailerPreviewFrame}
                   />
                   <div className="similar-trailer-play">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
