@@ -1,8 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './FeedMusicCard.css';
 
 const activateKey = (e) => e.key === 'Enter' || e.key === ' ';
+
+const formatMusicDuration = (sec) => {
+  if (!sec || Number.isNaN(sec)) return '';
+  const total = Math.floor(sec);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${String(m).padStart(2, '0')} : ${String(s).padStart(2, '0')}`;
+};
+
+const FeedMusicDuration = ({ audioUrl }) => {
+  const [duration, setDuration] = useState(null);
+
+  useEffect(() => {
+    if (!audioUrl) {
+      setDuration(null);
+      return undefined;
+    }
+    const audio = new Audio(audioUrl);
+    const onMeta = () => setDuration(audio.duration);
+    audio.addEventListener('loadedmetadata', onMeta);
+    audio.load();
+    return () => {
+      audio.removeEventListener('loadedmetadata', onMeta);
+      audio.src = '';
+    };
+  }, [audioUrl]);
+
+  const label = formatMusicDuration(duration);
+  if (!label) return null;
+
+  return <div className="feed-music-card-duration">{label}</div>;
+};
 
 const FeedMusicCard = ({ item }) => {
   const navigate = useNavigate();
@@ -46,6 +78,8 @@ const FeedMusicCard = ({ item }) => {
           <div className="feed-music-card-type">Music artist</div>
         </div>
       </div>
+
+      <FeedMusicDuration audioUrl={item.audio} />
 
       <div
         className="feed-music-card-track"

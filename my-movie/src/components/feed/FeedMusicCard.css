@@ -29,7 +29,7 @@
 .feed-music-card-name {
   display: inline-flex;
   align-items: center;
-  gap: 0.28rem;
+  gap: 0rem;
   min-width: 0;
   max-width: 100%;
   color: #fff;
@@ -54,6 +54,15 @@
 .feed-music-card-type {
   color: rgba(255, 255, 255, 0.65);
   font-size: 0.72rem;
+}
+
+.feed-music-card-duration {
+  margin: 0 0 0.55rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
 .feed-music-card-track {
