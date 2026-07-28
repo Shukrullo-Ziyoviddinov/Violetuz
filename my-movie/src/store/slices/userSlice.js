@@ -3,13 +3,12 @@ import {
   DEFAULT_PROFILE,
   normalizeUsername,
   parseStoredProfile,
+  loadLegacyUserState,
+  writeProfileCache,
+  clearAuthStorage,
 } from './userUtils';
 
-const initialState = {
-  isLoggedIn: false,
-  token: null,
-  profile: { ...DEFAULT_PROFILE },
-};
+const initialState = loadLegacyUserState();
 
 const userSlice = createSlice({
   name: 'user',
@@ -18,13 +17,18 @@ const userSlice = createSlice({
     setLoggedIn: (state, action) => {
       state.isLoggedIn = !!action.payload;
       if (!action.payload) {
-        state.token = null;
+        clearAuthStorage();
       }
     },
+    setAuthReady: (state, action) => {
+      state.authReady = action.payload !== false;
+    },
     setAuthSession: (state, action) => {
-      const { token, user } = action.payload || {};
-      state.token = token || null;
-      state.isLoggedIn = Boolean(token && user);
+      const payload = action.payload || {};
+      const nested = payload.data && typeof payload.data === 'object' ? payload.data : null;
+      const user = payload.user || nested?.user || null;
+      state.isLoggedIn = Boolean(user);
+      state.authReady = true;
       if (user) {
         state.profile = parseStoredProfile({
           name: user.name,
@@ -33,16 +37,19 @@ const userSlice = createSlice({
           avatar: state.profile.avatar,
           email: user.email,
         });
+        writeProfileCache(state.profile);
       }
     },
     clearAuthSession: (state) => {
       state.isLoggedIn = false;
-      state.token = null;
+      state.authReady = true;
       state.profile = { ...DEFAULT_PROFILE };
+      clearAuthStorage();
     },
     setProfile: (state, action) => {
       state.profile = parseStoredProfile(action.payload);
       state.isLoggedIn = true;
+      writeProfileCache(state.profile);
     },
     updateProfile: (state, action) => {
       const data = action.payload || {};
@@ -56,12 +63,14 @@ const userSlice = createSlice({
         email: data.email !== undefined ? data.email : state.profile.email,
       };
       state.isLoggedIn = true;
+      writeProfileCache(state.profile);
     },
   },
 });
 
 export const {
   setLoggedIn,
+  setAuthReady,
   setAuthSession,
   clearAuthSession,
   setProfile,
@@ -69,7 +78,7 @@ export const {
 } = userSlice.actions;
 
 export const selectIsLoggedIn = (state) => state.user.isLoggedIn;
-export const selectAuthToken = (state) => state.user.token;
+export const selectAuthReady = (state) => state.user.authReady;
 export const selectProfile = (state) => state.user.profile;
 
 export const selectFeedProfileHeader = createSelector([selectProfile], (profile) => ({

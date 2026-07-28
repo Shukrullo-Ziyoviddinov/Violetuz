@@ -109,7 +109,7 @@ const getCurrentLanguage = () => {
 const ProfilePage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { profile, updateProfile, isLoggedIn } = useAuth();
+  const { profile, updateProfile, isLoggedIn, authReady } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
@@ -125,11 +125,12 @@ const ProfilePage = () => {
   const [repostFilter, setRepostFilter] = useState('all');
 
   useEffect(() => {
+    if (!authReady) return;
     if (!isLoggedIn) {
       navigate('/', { replace: true });
       requestOpenAuthModal('register');
     }
-  }, [isLoggedIn, navigate]);
+  }, [authReady, isLoggedIn, navigate]);
 
   useEffect(() => {
     setCurrentLanguage(getCurrentLanguage());
@@ -246,7 +247,7 @@ const ProfilePage = () => {
     setShowFollowingModal(false);
   };
 
-  if (!isLoggedIn) {
+  if (!authReady || !isLoggedIn) {
     return null;
   }
 

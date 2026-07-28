@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { logoutRequest } from '../api/authApi';
 import {
   setLoggedIn as setLoggedInAction,
   updateProfile as updateProfileAction,
@@ -7,8 +8,8 @@ import {
   setAuthSession as setAuthSessionAction,
   clearAuthSession as clearAuthSessionAction,
   selectIsLoggedIn,
+  selectAuthReady,
   selectProfile,
-  selectAuthToken,
   selectFeedProfileHeader,
 } from '../store/slices/userSlice';
 
@@ -18,8 +19,8 @@ export const AuthProvider = ({ children }) => children;
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const authReady = useAppSelector(selectAuthReady);
   const profile = useAppSelector(selectProfile);
-  const token = useAppSelector(selectAuthToken);
 
   const setLoggedIn = useCallback(
     (value) => dispatch(setLoggedInAction(!!value)),
@@ -41,13 +42,18 @@ export const useAuth = () => {
     [dispatch]
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await logoutRequest();
+    } catch {
+      /* cookie yo‘q bo‘lsa ham UI tozalanadi */
+    }
     dispatch(clearAuthSessionAction());
   }, [dispatch]);
 
   return {
     isLoggedIn,
-    token,
+    authReady,
     setLoggedIn,
     profile,
     updateProfile,

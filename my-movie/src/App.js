@@ -25,6 +25,7 @@ import TrailerPage from './pages/TrailerPage';
 import MovieDetail from './components/MovieDetail/MovieDetail';
 import PullToRefresh from './components/PullToRefresh/PullToRefresh';
 import AuthModalHost from './components/AuthModal/AuthModalHost';
+import AuthSessionBootstrap from './components/AuthSessionBootstrap';
 import { ViewedMoviesProvider } from './context/ViewedMoviesContext';
 import { ContentLanguageProvider } from './context/ContentLanguageContext';
 import { MusicPlayerProvider } from './context/MusicPlayerContext';
@@ -46,6 +47,7 @@ function App() {
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <PersistGate loading={null} persistor={persistor}>
+          <AuthSessionBootstrap />
           <ViewedMoviesProvider>
             <MoviesApiProvider>
               <ActorsApiProvider>

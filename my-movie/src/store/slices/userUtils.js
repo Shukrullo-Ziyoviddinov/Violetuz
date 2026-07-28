@@ -1,6 +1,4 @@
 export const PROFILE_STORAGE_KEY = 'violet_profile';
-export const AUTH_STORAGE_KEY = 'violet_user_authenticated';
-export const AUTH_TOKEN_KEY = 'violet_auth_token';
 
 export const DEFAULT_PROFILE = {
   name: '',
@@ -29,10 +27,9 @@ export const parseStoredProfile = (parsed) => {
   };
 };
 
+/** Faqat profil cache (auth cookie’da) */
 export const loadLegacyUserState = () => {
   let profile = { ...DEFAULT_PROFILE };
-  let isLoggedIn = false;
-  let token = null;
 
   try {
     const profileRaw = localStorage.getItem(PROFILE_STORAGE_KEY);
@@ -43,16 +40,37 @@ export const loadLegacyUserState = () => {
     /* ignore */
   }
 
+  // Eski localStorage tokenlarni tozalash
   try {
-    const authRaw = localStorage.getItem(AUTH_STORAGE_KEY);
-    const tokenRaw = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (authRaw === 'true' && tokenRaw) {
-      isLoggedIn = true;
-      token = tokenRaw;
-    }
+    localStorage.removeItem('violet_auth_token');
+    localStorage.removeItem('violet_user_authenticated');
   } catch {
     /* ignore */
   }
 
-  return { isLoggedIn, profile, token };
+  return {
+    isLoggedIn: false,
+    profile,
+    authReady: false,
+  };
+};
+
+export const writeProfileCache = (profile) => {
+  try {
+    if (profile) {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    }
+  } catch {
+    /* ignore */
+  }
+};
+
+export const clearAuthStorage = () => {
+  try {
+    localStorage.removeItem(PROFILE_STORAGE_KEY);
+    localStorage.removeItem('violet_auth_token');
+    localStorage.removeItem('violet_user_authenticated');
+  } catch {
+    /* ignore */
+  }
 };

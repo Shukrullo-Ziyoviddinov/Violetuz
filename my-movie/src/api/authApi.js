@@ -2,6 +2,16 @@ import { resolveApiBaseUrl } from './apiBase';
 
 const API_BASE_URL = resolveApiBaseUrl();
 
+const authFetch = (path, options = {}) =>
+  fetch(`${API_BASE_URL}${path}`, {
+    credentials: 'include',
+    ...options,
+    headers: {
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...options.headers,
+    },
+  });
+
 const parseJson = async (response) => {
   let body = null;
   try {
@@ -21,51 +31,57 @@ const parseJson = async (response) => {
 
 export const checkUsernameAvailable = async (username) => {
   const q = encodeURIComponent(String(username || '').trim());
-  const res = await fetch(`${API_BASE_URL}/auth/username-available?username=${q}`);
+  const res = await authFetch(`/auth/username-available?username=${q}`);
   return parseJson(res);
 };
 
 export const registerStart = async (payload) => {
-  const res = await fetch(`${API_BASE_URL}/auth/register/start`, {
+  const res = await authFetch('/auth/register/start', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
   return parseJson(res);
 };
 
 export const registerVerify = async (payload) => {
-  const res = await fetch(`${API_BASE_URL}/auth/register/verify`, {
+  const res = await authFetch('/auth/register/verify', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
   return parseJson(res);
 };
 
 export const loginStart = async (payload) => {
-  const res = await fetch(`${API_BASE_URL}/auth/login/start`, {
+  const res = await authFetch('/auth/login/start', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
   return parseJson(res);
 };
 
 export const loginVerify = async (payload) => {
-  const res = await fetch(`${API_BASE_URL}/auth/login/verify`, {
+  const res = await authFetch('/auth/login/verify', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
   return parseJson(res);
 };
 
 export const loginWithUsername = async (payload) => {
-  const res = await fetch(`${API_BASE_URL}/auth/login/username`, {
+  const res = await authFetch('/auth/login/username', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+  return parseJson(res);
+};
+
+/** Cookie sessiyasidan joriy userni olish */
+export const fetchMe = async () => {
+  const res = await authFetch('/auth/me');
+  return parseJson(res);
+};
+
+export const logoutRequest = async () => {
+  const res = await authFetch('/auth/logout', { method: 'POST' });
   return parseJson(res);
 };

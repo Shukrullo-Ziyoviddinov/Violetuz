@@ -173,10 +173,7 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
           username: username.trim(),
           password,
         });
-        setAuthSession({
-          token: data.token,
-          user: data.user,
-        });
+        setAuthSession({ user: data.user });
         onClose?.();
       }
     } catch (err) {
@@ -201,10 +198,7 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
           ? await registerVerify(payload)
           : await loginVerify(payload);
 
-      setAuthSession({
-        token: data.token,
-        user: data.user,
-      });
+      setAuthSession({ user: data.user });
       onClose?.();
     } catch (err) {
       setError(err.message || 'Kod noto‘g‘ri');
