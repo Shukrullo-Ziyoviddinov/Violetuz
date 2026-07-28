@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
@@ -8,43 +8,100 @@ import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import VerticalScroll from './VerticalScroll';
 import './SimilarTrailers.css';
 
-const VIDEO_READY_TIMEOUT_MS = 20000;
+const VIDEO_READY_TIMEOUT_MS = 25000;
 
-/** Preview kadrga seek — tayyor bo‘lganda onReady */
-const seekTrailerPreview = (video, onReady) => {
-  if (!video || video.dataset.previewReady === '1') {
-    onReady?.();
-    return;
+/** Haqiqiy video freym chizilguncha kutadi */
+const waitForPaintedFrame = (video, cb) => {
+  if (!video) {
+    cb();
+    return () => {};
   }
-  if (video.dataset.previewSeeking === '1') return;
+  if (typeof video.requestVideoFrameCallback === 'function') {
+    const id = video.requestVideoFrameCallback(() => cb());
+    return () => {
+      try {
+        video.cancelVideoFrameCallback?.(id);
+      } catch {
+        /* ignore */
+      }
+    };
+  }
+  let inner = 0;
+  const outer = window.requestAnimationFrame(() => {
+    inner = window.requestAnimationFrame(cb);
+  });
+  return () => {
+    window.cancelAnimationFrame(outer);
+    window.cancelAnimationFrame(inner);
+  };
+};
+
+/**
+ * Preview kadrga seek + freym paint bo‘lgach onReady.
+ * Metadata yetarli emas — partial/black kadr ko‘rinmasin.
+ */
+const primeSimilarTrailerThumb = (video, onReady) => {
+  if (!video || video.tagName !== 'VIDEO') return () => {};
+  if (video.dataset.previewReady === '1') {
+    onReady();
+    return () => {};
+  }
+  if (video.dataset.previewSeeking === '1') return () => {};
   video.dataset.previewSeeking = '1';
 
+  let cancelPaint = null;
+  let seekedHandler = null;
+  let fallbackTimer = null;
+
   const finish = () => {
+    if (video.dataset.previewReady === '1') return;
     video.dataset.previewReady = '1';
     video.dataset.previewSeeking = '0';
-    onReady?.();
+    cancelPaint?.();
+    cancelPaint = waitForPaintedFrame(video, () => {
+      if (video.videoWidth > 0 || video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        onReady();
+      } else {
+        onReady();
+      }
+    });
   };
 
   const doSeek = () => {
     try {
       const duration = Number(video.duration);
       const t = Number.isFinite(duration) && duration > 0
-        ? Math.min(1, Math.max(0.1, duration * 0.08))
-        : 0.1;
-      const onSeeked = () => {
-        video.removeEventListener('seeked', onSeeked);
+        ? Math.min(Math.max(duration * 0.08, 0.15), Math.max(duration - 0.05, 0.15))
+        : 0.15;
+
+      seekedHandler = () => {
+        video.removeEventListener('seeked', seekedHandler);
+        seekedHandler = null;
+        if (fallbackTimer) window.clearTimeout(fallbackTimer);
         finish();
       };
-      video.addEventListener('seeked', onSeeked);
+      video.addEventListener('seeked', seekedHandler);
+
+      if (Math.abs(video.currentTime - t) < 0.05 && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        video.removeEventListener('seeked', seekedHandler);
+        seekedHandler = null;
+        finish();
+        return;
+      }
+
       video.currentTime = t;
-      // Ba’zi brauzerlar seeked bermaydi (allaqachon shu vaqt)
-      window.setTimeout(() => {
+
+      // seeked kelmasa — loadeddata / soft wait
+      fallbackTimer = window.setTimeout(() => {
         if (video.dataset.previewReady === '1') return;
+        if (seekedHandler) {
+          video.removeEventListener('seeked', seekedHandler);
+          seekedHandler = null;
+        }
         if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-          video.removeEventListener('seeked', onSeeked);
           finish();
         }
-      }, 800);
+      }, 2500);
     } catch {
       finish();
     }
@@ -52,13 +109,31 @@ const seekTrailerPreview = (video, onReady) => {
 
   if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
     doSeek();
+  } else {
+    const onMeta = () => {
+      video.removeEventListener('loadedmetadata', onMeta);
+      doSeek();
+    };
+    video.addEventListener('loadedmetadata', onMeta);
+    return () => {
+      video.removeEventListener('loadedmetadata', onMeta);
+      if (seekedHandler) video.removeEventListener('seeked', seekedHandler);
+      if (fallbackTimer) window.clearTimeout(fallbackTimer);
+      cancelPaint?.();
+    };
   }
+
+  return () => {
+    if (seekedHandler) video.removeEventListener('seeked', seekedHandler);
+    if (fallbackTimer) window.clearTimeout(fallbackTimer);
+    cancelPaint?.();
+  };
 };
 
 const SimilarTrailerItemSkeleton = () => (
   <div className="similar-trailer-item similar-trailer-item--skeleton" aria-hidden="true">
     <div className="similar-trailer-video">
-      <SkeletonLoader variant="similar-trailer-video" />
+      <SkeletonLoader variant="similar-trailer-video" className="similar-trailer-video-skeleton" />
     </div>
     <div className="similar-trailer-info">
       <SkeletonLoader variant="similar-trailer-title" />
@@ -79,6 +154,7 @@ const SimilarTrailerItem = ({
   contentLang,
 }) => {
   const videoRef = useRef(null);
+  const primeCleanupRef = useRef(null);
   const videoSrc =
     trailer.trailers?.[contentLang] || trailer.trailers?.uz || trailer.trailers?.ru || '';
   const [ready, setReady] = useState(false);
@@ -87,27 +163,59 @@ const SimilarTrailerItem = ({
   useEffect(() => {
     setReady(false);
     setFailed(false);
+    primeCleanupRef.current?.();
+    primeCleanupRef.current = null;
   }, [videoSrc]);
+
+  const markReady = useCallback(() => {
+    setReady(true);
+    setFailed(false);
+  }, []);
+
+  const markFailed = useCallback(() => {
+    setFailed(true);
+    setReady(false);
+  }, []);
+
+  const tryPrime = useCallback(
+    (e) => {
+      const el = e?.currentTarget || videoRef.current;
+      if (!el || ready || failed) return;
+      // Allaqachon seek/prime ketayotgan bo‘lsa — cleanup qilmaslik (aks holda seek bekor bo‘ladi)
+      if (el.dataset.previewSeeking === '1' || el.dataset.previewReady === '1') {
+        if (el.dataset.previewReady === '1') markReady();
+        return;
+      }
+      primeCleanupRef.current?.();
+      primeCleanupRef.current = primeSimilarTrailerThumb(el, markReady);
+    },
+    [ready, failed, markReady]
+  );
 
   useEffect(() => {
     if (!videoSrc || ready || failed) return undefined;
 
     const check = () => {
       const el = videoRef.current;
-      if (el?.dataset.previewReady === '1' && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-        setReady(true);
-        setFailed(false);
+      if (
+        el?.dataset.previewReady === '1' &&
+        el.videoWidth > 0 &&
+        el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+      ) {
+        markReady();
       }
     };
 
     check();
-    const intervalId = window.setInterval(check, 200);
+    const intervalId = window.setInterval(check, 250);
     const timeoutId = window.setTimeout(() => {
       const el = videoRef.current;
-      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
-        setReady(true);
+      if (el && el.videoWidth > 0) {
+        markReady();
+      } else if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        markReady();
       } else {
-        setFailed(true);
+        markFailed();
       }
     }, VIDEO_READY_TIMEOUT_MS);
 
@@ -115,29 +223,14 @@ const SimilarTrailerItem = ({
       window.clearInterval(intervalId);
       window.clearTimeout(timeoutId);
     };
-  }, [videoSrc, ready, failed]);
+  }, [videoSrc, ready, failed, markReady, markFailed]);
 
-  const markPreviewReady = () => {
-    const el = videoRef.current;
-    if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-      setReady(true);
-      setFailed(false);
-    } else {
-      setReady(true);
-      setFailed(false);
-    }
-  };
-
-  const tryPrime = (e) => {
-    const el = e?.currentTarget || videoRef.current;
-    if (!el) return;
-    seekTrailerPreview(el, markPreviewReady);
-  };
-
-  const markFailed = () => {
-    setFailed(true);
-    setReady(false);
-  };
+  useEffect(
+    () => () => {
+      primeCleanupRef.current?.();
+    },
+    []
+  );
 
   const showSkeleton = Boolean(videoSrc) && !ready && !failed;
 
@@ -149,7 +242,11 @@ const SimilarTrailerItem = ({
       onClick={() => !showSkeleton && onSelect?.(trailer)}
       aria-busy={showSkeleton || undefined}
     >
-      <div className="similar-trailer-video">
+      <div
+        className={`similar-trailer-video${
+          showSkeleton ? ' similar-trailer-video--loading' : ''
+        }`}
+      >
         {showSkeleton && (
           <SkeletonLoader
             variant="similar-trailer-video"

@@ -12,7 +12,6 @@
   max-height: 100%;
   position: relative;
   z-index: 0;
-  contain: layout style;
 }
 
 .similar-trailers-loading-panel {
@@ -22,28 +21,38 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-.similar-trailer-item--skeleton {
-  cursor: default;
-  pointer-events: none;
-}
-
+.similar-trailer-item--skeleton,
 .similar-trailer-item--loading {
   cursor: default;
   pointer-events: none;
 }
 
-.similar-trailer-video-skeleton {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 3;
-  border-radius: inherit;
+.similar-trailer-video--loading {
+  background: #141414;
+}
+
+.similar-trailer-video-skeleton,
+.similar-trailer-video .skeleton-loader--similar-trailer-video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  z-index: 4 !important;
+  border-radius: inherit !important;
+  display: block !important;
 }
 
 .similar-trailer-video-element--loading {
-  opacity: 0;
-  visibility: hidden;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 1;
 }
 
 .similar-trailers-title--skeleton {
