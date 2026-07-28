@@ -86,26 +86,54 @@
 }
 
 .auth-modal-method-tabs {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  gap: 0;
   margin: 0.35rem 0 0.75rem;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.auth-modal-method-tabs-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  z-index: 0;
+  width: calc((100% - 6px) / 2);
+  height: calc(100% - 6px);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  transition: transform 0.28s ease;
+  pointer-events: none;
+}
+
+.auth-modal-method-tabs--username .auth-modal-method-tabs-slider {
+  transform: translateX(100%);
 }
 
 .auth-modal-method-tab {
+  position: relative;
+  z-index: 1;
   border: none;
-  border-radius: 10px;
-  padding: 0.7rem 0.75rem;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(0, 0, 0, 0.45);
+  border-radius: 8px;
+  padding: 0.42rem 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.55);
+  background: transparent;
   cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .auth-modal-method-tab--active {
   color: #fff;
-  background-color: #0313ea;
+  background: transparent;
 }
 
 .auth-modal-input-wrap {
@@ -295,5 +323,24 @@
   .auth-modal-close {
     top: 0.85rem;
     right: 0.85rem;
+  }
+
+  .auth-modal-method-tabs {
+    padding: 2px;
+    border-radius: 9px;
+  }
+
+  .auth-modal-method-tabs-slider {
+    top: 2px;
+    left: 2px;
+    width: calc((100% - 4px) / 2);
+    height: calc(100% - 4px);
+    border-radius: 7px;
+  }
+
+  .auth-modal-method-tab {
+    padding: 0.32rem 0.35rem;
+    font-size: 0.68rem;
+    border-radius: 7px;
   }
 }

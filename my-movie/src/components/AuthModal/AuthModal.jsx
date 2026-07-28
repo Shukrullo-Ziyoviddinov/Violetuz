@@ -357,7 +357,12 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
 
               {mode === 'login' && (
                 <>
-                  <div className="auth-modal-method-tabs" role="tablist" aria-label="Kirish usuli">
+                  <div
+                    className={`auth-modal-method-tabs auth-modal-method-tabs--${loginMethod}`}
+                    role="tablist"
+                    aria-label="Kirish usuli"
+                  >
+                    <span className="auth-modal-method-tabs-slider" aria-hidden="true" />
                     <button
                       type="button"
                       role="tab"
