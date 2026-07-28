@@ -1,8 +1,0 @@
-.vertikal-drag {
-  touch-action: none;
-  transition: transform 0.1s ease-out;
-}
-
-.vertikal-drag:active {
-  transition: none;
-}
