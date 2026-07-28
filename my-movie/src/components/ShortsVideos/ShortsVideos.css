@@ -396,19 +396,25 @@
 }
 
 .shorts-modal-desktop-inner {
+  --shorts-progress-area-h: 5.75rem;
   position: relative;
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   min-width: 0;
 }
 
 .shorts-modal-desktop-video .shorts-modal-desktop-video-el {
   width: 100%;
-  height: 100%;
+  height: calc(100% - var(--shorts-progress-area-h));
   object-fit: contain;
   background: #000;
+  flex-shrink: 0;
+}
+
+.shorts-modal-desktop-inner .shorts-modal-play-pause-center {
+  top: calc((100% - var(--shorts-progress-area-h)) / 2);
 }
 
 /* Play/Pause - video markazida, rang #9b4fe7 */
@@ -458,16 +464,17 @@
 /* Progress bar va comment input - pastda, 100% kenglik */
 .shorts-modal-progress-area {
   position: absolute;
-  bottom: 1rem;
+  bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
-  padding: 0 1.25rem;
+  padding: 0.65rem 1.25rem 0.85rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   z-index: 6;
+  background: #000;
 }
 
 .shorts-modal-progress-wrap {
