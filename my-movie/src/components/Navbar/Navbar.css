@@ -673,19 +673,19 @@
 
 @media (max-width: 500px) {
   .navbar.navbar--profile-page .navbar-profile-menu-btn {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     border-radius: 10px;
   }
 
   .navbar.navbar--profile-page .navbar-profile-menu-icon {
-    width: 16px;
+    width: 14px;
     gap: 3px;
   }
 
   .navbar.navbar--profile-page .navbar-profile-menu-icon span {
-    width: 14px;
-    height: 1.8px;
+    width: 12px;
+    height: 1.7px;
   }
 }
 

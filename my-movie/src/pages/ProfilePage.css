@@ -259,8 +259,8 @@
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
-  min-height: calc(100vh - 300px);
-  padding: 0 1rem;
+  min-height: 220px;
+  padding: 1.25rem 1rem 0.5rem;
   box-sizing: border-box;
 }
 
@@ -637,8 +637,7 @@
 .profile-name-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .profile-name {
@@ -684,7 +683,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 20%;
   border: none;
   background: #0312ea6f;
   color: white;
@@ -713,7 +712,6 @@
   .profile-page {
     min-height: auto;
     padding: 0 1rem;
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
   }
 
@@ -825,8 +823,8 @@
   }
 
   .profile-edit-btn {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 20px;
   }
 
   .profile-edit-btn-icon {
@@ -837,15 +835,9 @@
 
 @media (max-width: 576px) {
   .profile-page-repost-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    min-height: calc(100vh - 530px);
-    padding: 0 1rem;
-    box-sizing: border-box;
-}
+    min-height: 200px;
+    padding: 1rem 0.5rem 0.25rem;
+  }
 }
 
 @media (max-width: 370px) {
