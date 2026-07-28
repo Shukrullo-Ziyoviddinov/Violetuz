@@ -33,7 +33,7 @@ const userSlice = createSlice({
         state.profile = parseStoredProfile({
           name: user.name,
           username: user.username,
-          bio: state.profile.bio,
+          bio: user.bio !== undefined ? user.bio : state.profile.bio,
           avatar: state.profile.avatar,
           email: user.email,
         });

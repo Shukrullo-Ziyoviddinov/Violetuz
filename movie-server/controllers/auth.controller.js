@@ -9,8 +9,10 @@ const sendAuthSuccess = (res, payload, status = 200) => {
 };
 
 const checkUsername = asyncHandler(async (req, res) => {
+  const excludeUserId = req.authUser?._id || null;
   const result = await authService.checkUsernameAvailability(
-    req.query.username || req.params.username
+    req.query.username || req.params.username,
+    excludeUserId
   );
   return sendSuccess(res, { data: result });
 });
@@ -52,6 +54,11 @@ const logout = asyncHandler(async (_req, res) => {
   return sendSuccess(res, { data: { ok: true } }, 200);
 });
 
+const updateProfile = asyncHandler(async (req, res) => {
+  const user = await authService.updateProfile(req.authUser._id, req.body || {});
+  return sendSuccess(res, { data: { user } }, 200);
+});
+
 module.exports = {
   checkUsername,
   registerStart,
@@ -61,4 +68,5 @@ module.exports = {
   loginUsername,
   me,
   logout,
+  updateProfile,
 };

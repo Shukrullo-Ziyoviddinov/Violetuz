@@ -50,14 +50,14 @@ const isUsernameTaken = async (usernameNormalized, excludeUserId = null) => {
   return Boolean(existing);
 };
 
-const checkUsernameAvailability = async (rawUsername) => {
+const checkUsernameAvailability = async (rawUsername, excludeUserId = null) => {
   const username = normalizeUsername(rawUsername);
   if (!username) {
     throw badRequest('Username majburiy');
   }
   assertUsernameFormat(username);
   const usernameNormalized = username.toLowerCase();
-  const taken = await isUsernameTaken(usernameNormalized);
+  const taken = await isUsernameTaken(usernameNormalized, excludeUserId);
   return {
     username,
     available: !taken,
@@ -300,6 +300,42 @@ const verifyLogin = async ({ email, code }) => {
   return publicUserPayload(user, token);
 };
 
+const updateProfile = async (userId, { name, username, bio }) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw notFound('Foydalanuvchi topilmadi');
+  }
+
+  const trimmedName = String(name ?? user.name).trim();
+  if (!trimmedName || trimmedName.length < 2) {
+    throw badRequest('Name majburiy (kamida 2 belgi)');
+  }
+  if (trimmedName.length > 80) {
+    throw badRequest('Name juda uzun');
+  }
+
+  const cleanUsername = normalizeUsername(username ?? user.username);
+  assertUsernameFormat(cleanUsername);
+  const usernameNormalized = cleanUsername.toLowerCase();
+
+  if (await isUsernameTaken(usernameNormalized, user._id)) {
+    throw createHttpError(409, 'Bu username band', { field: 'username' });
+  }
+
+  let cleanBio = bio !== undefined ? String(bio ?? '').trim() : user.bio || '';
+  if (cleanBio.length > 500) {
+    throw badRequest('Bio maksimal 500 belgi');
+  }
+
+  user.name = trimmedName;
+  user.username = cleanUsername;
+  user.usernameNormalized = usernameNormalized;
+  user.bio = cleanBio;
+  await user.save();
+
+  return user.toPublicJSON();
+};
+
 module.exports = {
   checkUsernameAvailability,
   startRegister,
@@ -307,4 +343,5 @@ module.exports = {
   startLogin,
   verifyLogin,
   loginWithUsername,
+  updateProfile,
 };

@@ -215,6 +215,75 @@
   box-sizing: border-box;
 }
 
+.profile-edit-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.profile-edit-input--with-icon {
+  padding-right: 2.6rem;
+}
+
+.profile-edit-input--ok {
+  border-color: rgba(76, 175, 80, 0.65) !important;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.profile-edit-input-trailing {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.profile-edit-username-loader {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  animation: profile-edit-username-spin 0.7s linear infinite;
+}
+
+@keyframes profile-edit-username-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.profile-edit-username-ok {
+  color: #66bb6a;
+}
+
+.profile-edit-username-bad {
+  color: #ef5350;
+}
+
+.profile-edit-field-ok {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #81c784;
+}
+
+.profile-edit-field-error {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #ef9a9a;
+}
+
+.profile-edit-error {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(244, 67, 54, 0.15);
+  color: #ff8a80;
+  font-size: 0.85rem;
+}
+
 .profile-edit-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }

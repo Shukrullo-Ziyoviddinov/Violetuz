@@ -85,3 +85,11 @@ export const logoutRequest = async () => {
   const res = await authFetch('/auth/logout', { method: 'POST' });
   return parseJson(res);
 };
+
+export const updateProfileRequest = async (payload) => {
+  const res = await authFetch('/auth/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+  return parseJson(res);
+};

@@ -45,6 +45,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: '',
+    },
   },
   {
     timestamps: true,
@@ -58,6 +64,7 @@ userSchema.methods.toPublicJSON = function toPublicJSON() {
     name: this.name,
     username: this.username,
     email: this.email,
+    bio: this.bio || '',
     createdAt: this.createdAt,
   };
 };

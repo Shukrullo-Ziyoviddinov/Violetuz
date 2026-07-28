@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { checkUsernameAvailable, updateProfileRequest } from '../../api/authApi';
 import './ProfileEditModal.css';
 
 const normalizeUsername = (raw) => (raw ?? '').trim().replace(/^@+/, '').trim();
-
+const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
 const ProfileEditModal = ({ profile, onSave, onClose }) => {
@@ -13,17 +14,29 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const [bio, setBio] = useState(profile.bio || '');
   const [avatar, setAvatar] = useState(profile.avatar ?? null);
   const [dragY, setDragY] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  /** idle | same | checking | available | taken | invalid */
+  const [usernameStatus, setUsernameStatus] = useState('same');
+  const [usernameMessage, setUsernameMessage] = useState('');
   const startYRef = useRef(0);
   const avatarInputRef = useRef(null);
+  const usernameTimerRef = useRef(null);
+  const usernameReqIdRef = useRef(0);
+  const originalUsername = normalizeUsername(profile.username).toLowerCase();
 
-  const isNameInvalid = !name.trim();
-  const isFormValid = !isNameInvalid;
+  const isNameInvalid = !name.trim() || name.trim().length < 2;
+  const usernameOk = usernameStatus === 'same' || usernameStatus === 'available';
+  const isFormValid = !isNameInvalid && usernameOk && !busy;
 
   useEffect(() => {
     setName(profile.name || '');
     setUsername(normalizeUsername(profile.username));
     setBio(profile.bio || '');
     setAvatar(profile.avatar ?? null);
+    setUsernameStatus('same');
+    setUsernameMessage('');
+    setError('');
   }, [profile]);
 
   useEffect(() => {
@@ -34,6 +47,79 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
       document.body.style.overflow = '';
     };
   }, []);
+
+  const runUsernameCheck = useCallback(
+    async (value) => {
+      const clean = normalizeUsername(value);
+      if (!clean) {
+        setUsernameStatus('idle');
+        setUsernameMessage('');
+        return;
+      }
+      if (clean.toLowerCase() === originalUsername) {
+        setUsernameStatus('same');
+        setUsernameMessage('');
+        return;
+      }
+      if (clean.includes('-')) {
+        setUsernameStatus('invalid');
+        setUsernameMessage('- belgi mumkun emas');
+        return;
+      }
+      if (!USERNAME_RE.test(clean)) {
+        setUsernameStatus('invalid');
+        setUsernameMessage('3–30 belgi: harf, raqam, _ yoki .');
+        return;
+      }
+
+      const reqId = ++usernameReqIdRef.current;
+      setUsernameStatus('checking');
+      setUsernameMessage('');
+
+      try {
+        const data = await checkUsernameAvailable(clean);
+        if (reqId !== usernameReqIdRef.current) return;
+        if (data?.available) {
+          setUsernameStatus('available');
+          setUsernameMessage("Username bo'sh");
+        } else {
+          setUsernameStatus('taken');
+          setUsernameMessage('Bu username band.');
+        }
+      } catch (err) {
+        if (reqId !== usernameReqIdRef.current) return;
+        setUsernameStatus('invalid');
+        setUsernameMessage(err.message || 'Tekshirib bo‘lmadi');
+      }
+    },
+    [originalUsername]
+  );
+
+  useEffect(() => {
+    if (usernameTimerRef.current) window.clearTimeout(usernameTimerRef.current);
+
+    const clean = normalizeUsername(username);
+    if (!clean) {
+      setUsernameStatus('idle');
+      setUsernameMessage('');
+      return undefined;
+    }
+    if (clean.toLowerCase() === originalUsername) {
+      setUsernameStatus('same');
+      setUsernameMessage('');
+      return undefined;
+    }
+
+    setUsernameStatus('checking');
+    setUsernameMessage('');
+    usernameTimerRef.current = window.setTimeout(() => {
+      runUsernameCheck(username);
+    }, 350);
+
+    return () => {
+      if (usernameTimerRef.current) window.clearTimeout(usernameTimerRef.current);
+    };
+  }, [username, originalUsername, runUsernameCheck]);
 
   const handleTouchStart = (e) => {
     startYRef.current = e.touches[0].clientY;
@@ -67,16 +153,44 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid) return;
-    onSave({
-      name,
-      username: normalizeUsername(username),
-      bio,
-      avatar,
-    });
+    if (!isFormValid || busy) return;
+    setError('');
+    setBusy(true);
+    try {
+      const data = await updateProfileRequest({
+        name: name.trim(),
+        username: normalizeUsername(username),
+        bio: bio.trim(),
+      });
+      onSave({
+        name: data.user?.name ?? name.trim(),
+        username: data.user?.username ?? normalizeUsername(username),
+        bio: data.user?.bio ?? bio.trim(),
+        avatar,
+      });
+    } catch (err) {
+      setError(err.message || 'Saqlab bo‘lmadi');
+      if (err.field === 'username') {
+        setUsernameStatus('taken');
+        setUsernameMessage('Bu username band.');
+      }
+    } finally {
+      setBusy(false);
+    }
   };
+
+  const usernameInputClass = [
+    'profile-edit-input',
+    'profile-edit-input--with-icon',
+    usernameStatus === 'taken' || usernameStatus === 'invalid'
+      ? 'profile-edit-input-invalid'
+      : '',
+    usernameStatus === 'available' ? 'profile-edit-input--ok' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <>
@@ -183,15 +297,51 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
           </div>
           <div className="profile-edit-field">
             <label htmlFor="profile-username">{t('profile.username')}</label>
-            <input
-              id="profile-username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(normalizeUsername(e.target.value))}
-              placeholder={t('profile.usernamePlaceholder')}
-              className="profile-edit-input"
-              autoComplete="username"
-            />
+            <div className="profile-edit-input-wrap">
+              <input
+                id="profile-username"
+                type="text"
+                value={username}
+                onChange={(e) =>
+                  setUsername(e.target.value.replace(/^@+/, '').replace(/\s/g, ''))
+                }
+                placeholder={t('profile.usernamePlaceholder')}
+                className={usernameInputClass}
+                autoComplete="username"
+              />
+              <span className="profile-edit-input-trailing" aria-hidden="true">
+                {usernameStatus === 'checking' ? (
+                  <span className="profile-edit-username-loader" />
+                ) : null}
+                {usernameStatus === 'available' ? (
+                  <svg className="profile-edit-username-ok" viewBox="0 0 24 24" width="18" height="18">
+                    <path
+                      fill="currentColor"
+                      d="M9.55 18l-5.7-5.7 1.4-1.45 4.3 4.3L18.7 6.4l1.4 1.4z"
+                    />
+                  </svg>
+                ) : null}
+                {usernameStatus === 'taken' || usernameStatus === 'invalid' ? (
+                  <svg className="profile-edit-username-bad" viewBox="0 0 24 24" width="18" height="18">
+                    <path
+                      fill="currentColor"
+                      d="M18.3 5.71L12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.71 2.89 18.3 9.18 12 2.89 5.71 4.3 4.29l6.29 6.3 6.29-6.3z"
+                    />
+                  </svg>
+                ) : null}
+              </span>
+            </div>
+            {usernameMessage ? (
+              <p
+                className={
+                  usernameStatus === 'available'
+                    ? 'profile-edit-field-ok'
+                    : 'profile-edit-field-error'
+                }
+              >
+                {usernameMessage}
+              </p>
+            ) : null}
           </div>
           <div className="profile-edit-field">
             <label htmlFor="profile-bio">{t('profile.bio')}</label>
@@ -202,14 +352,16 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
               placeholder={t('profile.bioPlaceholder')}
               className="profile-edit-input profile-edit-textarea"
               rows={3}
+              maxLength={500}
             />
           </div>
+          {error ? <p className="profile-edit-error">{error}</p> : null}
           <button
             type="submit"
             className="profile-edit-save"
-            disabled={!isFormValid}
+            disabled={!isFormValid || busy}
           >
-            {t('profile.save')}
+            {busy ? '...' : t('profile.save')}
           </button>
         </form>
       </div>
