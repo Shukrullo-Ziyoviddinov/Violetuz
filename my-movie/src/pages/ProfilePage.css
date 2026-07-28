@@ -2,7 +2,7 @@
 .profile-page {
   min-height: calc(100vh - 80px);
   background: #0a0a0a;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 }
 
 .profile-page-header {
@@ -10,6 +10,7 @@
   height: 320px;
   flex-shrink: 0;
   z-index: 0;
+  overflow: hidden;
 }
 
 .profile-page-bg {
@@ -82,8 +83,8 @@
   z-index: 1;
   max-width: 600px;
   width: 100%;
-  margin: 0 auto;
-  padding: 2rem 1.25rem 1.5rem;
+  margin: -140px auto 0;
+  padding: 0 1.25rem 1.5rem;
   box-sizing: border-box;
 }
 
@@ -637,14 +638,17 @@
 .profile-name-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
 }
 
 .profile-name {
+  flex: 1;
+  min-width: 0;
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -730,11 +734,11 @@
   }
 
   .profile-page-content {
-    padding: 1.5rem 0 1rem;
+    margin-top: -120px;
+    padding: 0 0 1rem;
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
-    margin: 0 auto;
+    /* overflow-x: clip; */
   }
 
   .profile-page-top-card {

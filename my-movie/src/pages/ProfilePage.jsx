@@ -270,7 +270,9 @@ const ProfilePage = () => {
             <span />
           </span>
         </button>
-        <div className="profile-page-content">
+      </div>
+
+      <div className="profile-page-content">
           <div className="profile-page-top-card">
             <div className="profile-page-top">
               <>
@@ -423,7 +425,6 @@ const ProfilePage = () => {
                 )}
               </div>
           </div>
-        </div>
       </div>
 
       {showInfoModal && (
