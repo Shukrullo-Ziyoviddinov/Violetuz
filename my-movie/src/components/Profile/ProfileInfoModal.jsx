@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
-import GlobalModal from '../GlobalModal/GlobalModal';
+import MiniGlobalModal from '../MiniGlobalModal/MiniGlobalModal';
 import './ProfileInfoModal.css';
 
 const ProfileInfoModal = ({
@@ -199,7 +199,7 @@ const ProfileInfoModal = ({
         </div>
       </div>
 
-      <GlobalModal
+      <MiniGlobalModal
         isOpen={showLogoutConfirm}
         onClose={() => {
           if (!logoutBusy) setShowLogoutConfirm(false);
@@ -226,7 +226,7 @@ const ProfileInfoModal = ({
             </button>
           </div>
         </div>
-      </GlobalModal>
+      </MiniGlobalModal>
     </>
   );
 };

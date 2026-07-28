@@ -29,6 +29,8 @@ const MODAL_SELECTOR = [
   '.trailer-page-overlay',
   '.trailer-modal-scroll-area',
   '.comentaria-history-modal',
+  '.profile-edit-modal',
+  '.profile-edit-overlay',
 ].join(', ');
 
 const getMaxDrop = () =>
