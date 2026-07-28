@@ -4,6 +4,7 @@ import {
   checkUsernameAvailable,
   loginStart,
   loginVerify,
+  loginWithUsername,
   registerStart,
   registerVerify,
 } from '../../api/authApi';
@@ -16,6 +17,7 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
   const { setAuthSession } = useAuth();
   const [mode, setMode] = useState(initialMode === 'login' ? 'login' : 'register');
   const [step, setStep] = useState('form'); // form | verify
+  const [loginMethod, setLoginMethod] = useState('gmail'); // gmail | username
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -115,6 +117,7 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
     setCode('');
     setPassword('');
     setShowPassword(false);
+    setLoginMethod('gmail');
     setUsernameStatus('idle');
     setUsernameMessage('');
   };
@@ -153,20 +156,29 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
           email: email.trim(),
           password,
         });
-      } else {
+        setStep('verify');
+        setCode('');
+      } else if (loginMethod === 'gmail') {
         if (!EMAIL_RE.test(email.trim())) {
           throw new Error('Gmail manzil noto‘g‘ri');
         }
-        if (!password) {
-          throw new Error('Parol majburiy');
+        await loginStart({ email: email.trim() });
+        setStep('verify');
+        setCode('');
+      } else {
+        if (!username.trim() || !password) {
+          throw new Error('Parol yoki username xato');
         }
-        await loginStart({
-          email: email.trim(),
+        const data = await loginWithUsername({
+          username: username.trim(),
           password,
         });
+        setAuthSession({
+          token: data.token,
+          user: data.user,
+        });
+        onClose?.();
       }
-      setStep('verify');
-      setCode('');
     } catch (err) {
       setError(err.message || 'Xatolik yuz berdi');
       if (err.field === 'username') {
@@ -351,57 +363,112 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
 
               {mode === 'login' && (
                 <>
-                  <label className="auth-modal-label" htmlFor="auth-login-email">
-                    Gmail manzil
-                  </label>
-                  <input
-                    id="auth-login-email"
-                    className="auth-modal-input"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="example@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-
-                  <label className="auth-modal-label" htmlFor="auth-login-password">
-                    Parol
-                  </label>
-                  <div className="auth-modal-input-wrap">
-                    <input
-                      id="auth-login-password"
-                      className="auth-modal-input auth-modal-input--with-icon"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
+                  <div className="auth-modal-method-tabs" role="tablist" aria-label="Kirish usuli">
                     <button
                       type="button"
-                      className="auth-modal-password-toggle"
-                      onClick={() => setShowPassword((v) => !v)}
-                      aria-label={showPassword ? 'Parolni berkitish' : 'Parolni ko‘rish'}
+                      role="tab"
+                      aria-selected={loginMethod === 'gmail'}
+                      className={`auth-modal-method-tab${
+                        loginMethod === 'gmail' ? ' auth-modal-method-tab--active' : ''
+                      }`}
+                      onClick={() => {
+                        setLoginMethod('gmail');
+                        setError('');
+                        setPassword('');
+                      }}
                     >
-                      {showPassword ? (
-                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                          <path
-                            fill="currentColor"
-                            d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                          />
-                        </svg>
-                      ) : (
-                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                          <path
-                            fill="currentColor"
-                            d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                          />
-                        </svg>
-                      )}
+                      Gmail
+                    </button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={loginMethod === 'username'}
+                      className={`auth-modal-method-tab${
+                        loginMethod === 'username' ? ' auth-modal-method-tab--active' : ''
+                      }`}
+                      onClick={() => {
+                        setLoginMethod('username');
+                        setError('');
+                        setEmail('');
+                      }}
+                    >
+                      Username
                     </button>
                   </div>
+
+                  {loginMethod === 'gmail' ? (
+                    <>
+                      <label className="auth-modal-label" htmlFor="auth-login-email">
+                        Gmail manzil
+                      </label>
+                      <input
+                        id="auth-login-email"
+                        className="auth-modal-input"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        placeholder="example@gmail.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <label className="auth-modal-label" htmlFor="auth-login-username">
+                        Username
+                      </label>
+                      <input
+                        id="auth-login-username"
+                        className="auth-modal-input"
+                        name="username"
+                        type="text"
+                        autoComplete="username"
+                        placeholder="username_01"
+                        value={username}
+                        onChange={(e) =>
+                          setUsername(e.target.value.replace(/^@+/, '').replace(/\s/g, ''))
+                        }
+                      />
+
+                      <label className="auth-modal-label" htmlFor="auth-login-password">
+                        Parol
+                      </label>
+                      <div className="auth-modal-input-wrap">
+                        <input
+                          id="auth-login-password"
+                          className="auth-modal-input auth-modal-input--with-icon"
+                          name="password"
+                          type={showPassword ? 'text' : 'password'}
+                          autoComplete="current-password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className="auth-modal-password-toggle"
+                          onClick={() => setShowPassword((v) => !v)}
+                          aria-label={showPassword ? 'Parolni berkitish' : 'Parolni ko‘rish'}
+                        >
+                          {showPassword ? (
+                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                              <path
+                                fill="currentColor"
+                                d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
+                              />
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                              <path
+                                fill="currentColor"
+                                d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
 
@@ -430,7 +497,9 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
                   ? 'Kutilmoqda...'
                   : mode === 'register'
                     ? "Ro'yxatdan o'tish"
-                    : 'Davom etish'}
+                    : loginMethod === 'username'
+                      ? 'Hisobga kirish'
+                      : 'Davom etish'}
               </button>
             </form>
 

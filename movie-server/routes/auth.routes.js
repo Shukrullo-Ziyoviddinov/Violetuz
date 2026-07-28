@@ -12,5 +12,6 @@ router.post('/register/start', authController.registerStart);
 router.post('/register/verify', authController.registerVerify);
 router.post('/login/start', authController.loginStart);
 router.post('/login/verify', authController.loginVerify);
+router.post('/login/username', authController.loginUsername);
 
 module.exports = router;

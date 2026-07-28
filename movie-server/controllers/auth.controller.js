@@ -29,10 +29,16 @@ const loginVerify = asyncHandler(async (req, res) => {
   return sendSuccess(res, { data }, 200);
 });
 
+const loginUsername = asyncHandler(async (req, res) => {
+  const data = await authService.loginWithUsername(req.body || {});
+  return sendSuccess(res, { data }, 200);
+});
+
 module.exports = {
   checkUsername,
   registerStart,
   registerVerify,
   loginStart,
   loginVerify,
+  loginUsername,
 };

@@ -201,27 +201,16 @@ const verifyRegister = async ({ email, code }) => {
   return publicUserPayload(user, token);
 };
 
-const startLogin = async ({ email, password }) => {
+const startLogin = async ({ email }) => {
   const cleanEmail = normalizeEmail(email);
-  const cleanPassword = String(password || '');
 
   if (!EMAIL_RE.test(cleanEmail)) {
     throw badRequest('Gmail manzil noto\'g\'ri');
   }
-  if (!cleanPassword) {
-    throw badRequest('Parol majburiy');
-  }
 
-  const user = await User.findOne({ emailNormalized: cleanEmail }).select(
-    '+passwordHash'
-  );
+  const user = await User.findOne({ emailNormalized: cleanEmail });
   if (!user) {
-    throw createHttpError(401, 'Gmail yoki parol noto\'g\'ri');
-  }
-
-  const ok = await bcrypt.compare(cleanPassword, user.passwordHash);
-  if (!ok) {
-    throw createHttpError(401, 'Gmail yoki parol noto\'g\'ri');
+    throw createHttpError(401, 'Bu gmail bilan hisob topilmadi');
   }
 
   const code = generateOtpCode();
@@ -244,6 +233,31 @@ const startLogin = async ({ email, password }) => {
     purpose: 'login',
     message: 'Kirish kodi gmailga yuborildi',
   };
+};
+
+const loginWithUsername = async ({ username, password }) => {
+  const cleanUsername = normalizeUsername(username);
+  const cleanPassword = String(password || '');
+
+  if (!cleanUsername || !cleanPassword) {
+    throw createHttpError(401, 'Parol yoki username xato');
+  }
+
+  const user = await User.findOne({
+    usernameNormalized: cleanUsername.toLowerCase(),
+  }).select('+passwordHash');
+
+  if (!user) {
+    throw createHttpError(401, 'Parol yoki username xato');
+  }
+
+  const ok = await bcrypt.compare(cleanPassword, user.passwordHash);
+  if (!ok) {
+    throw createHttpError(401, 'Parol yoki username xato');
+  }
+
+  const token = signToken(user);
+  return publicUserPayload(user, token);
 };
 
 const verifyLogin = async ({ email, code }) => {
@@ -292,4 +306,5 @@ module.exports = {
   verifyRegister,
   startLogin,
   verifyLogin,
+  loginWithUsername,
 };
