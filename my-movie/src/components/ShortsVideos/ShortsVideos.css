@@ -189,22 +189,18 @@
 }
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-info-content {
-  /* progress area balandligi + yuqoridagi bo'shliq — elementlar ichiga kirmasin */
-  padding-bottom: calc(5.75rem + 1rem);
   flex: 0 1 auto;
+  padding-bottom: 6.1rem;
 }
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area {
   position: absolute;
-  bottom: 0;
+  bottom: 0.75rem;
   left: 0;
   right: 0;
-  height: auto;
-  min-height: 5.75rem;
-  padding: 1rem 1.25rem 1.1rem;
+  padding: 0 1.25rem;
   box-sizing: border-box;
   flex-shrink: 0;
-  background: #000;
 }
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-wrap {
@@ -399,36 +395,19 @@
 }
 
 .shorts-modal-desktop-inner {
-  --shorts-progress-area-h: 7rem;
   position: relative;
   flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
-  min-height: 0;
-  height: 100%;
-  box-sizing: border-box;
 }
 
-/* Video progress zonaning ustida — pastga kirmaydi */
 .shorts-modal-desktop-video .shorts-modal-desktop-video-el {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: var(--shorts-progress-area-h);
   width: 100%;
-  height: auto;
-  max-height: none;
+  height: 100%;
   object-fit: contain;
-  object-position: center center;
   background: #000;
-}
-
-.shorts-modal-desktop-inner .shorts-modal-play-pause-center {
-  top: calc((100% - var(--shorts-progress-area-h)) / 2);
 }
 
 /* Play/Pause - video markazida, rang #9b4fe7 */
@@ -467,47 +446,27 @@
   height: 36px;
 }
 
-/* Info pastda qoladi (top: 0 yo'q) — progress ustida */
 .shorts-modal-info-desktop {
-  top: auto;
-  bottom: 0;
-  padding: 1.25rem 1.25rem 0;
+  padding: 1.25rem 1.25rem;
   padding-right: calc(48px + 16px + 1.25rem); /* o'ng: actions-sidebar + margin + base padding */
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  box-sizing: border-box;
-}
-
-.shorts-modal-info-desktop .shorts-modal-info-content {
-  flex: 0 1 auto;
-  /* progress balandligi + buttonlar bilan orasidagi bo'shliq */
-  padding-bottom: calc(var(--shorts-progress-area-h) + 0.85rem);
 }
 
 /* Progress bar va comment input - pastda, 100% kenglik */
 .shorts-modal-progress-area {
   position: absolute;
-  bottom: 0;
+  bottom: 1rem;
   left: 0;
   right: 0;
   width: 100%;
-  padding: 0.9rem 1.25rem 1.15rem;
+  padding: 0 1.25rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 0.65rem;
+  gap: 0.5rem;
   z-index: 6;
-  background: #000;
-}
-
-.shorts-modal-info-desktop .shorts-modal-progress-area {
-  bottom: 0;
-  height: var(--shorts-progress-area-h);
-  min-height: var(--shorts-progress-area-h);
-  /* yuqori padding — bar/input tepasida bo'shliq, buttonlarni yopmasin */
-  padding: 1.15rem 1.25rem 1.15rem;
 }
 
 .shorts-modal-progress-wrap {
@@ -815,7 +774,7 @@
 .shorts-modal-caption-music-wrap {
   width: 100%;
   min-width: 0;
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .shorts-modal-description-row {
@@ -843,7 +802,7 @@
   height: 48px;
   padding: 0;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.35);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
@@ -867,7 +826,7 @@
 }
 
 .shorts-modal-music-corner-mobile {
-  right: 12px;
+  right: 11px;
   bottom: 6.75rem;
   width: 40px;
   height: 40px;
@@ -875,13 +834,17 @@
 
 .shorts-modal-music-corner-desktop {
   right: 16px;
-  bottom: 5.5rem;
+  bottom: 10rem;
 }
 
 @media (max-width: 500px) {
   .shorts-modal-music-corner-mobile {
+    bottom: 9.5rem;
     right: 18px;
-    bottom: 8.5rem;
+  }
+
+  .shorts-modal-actions-sidebar {
+    right: 4px;
   }
 }
 
@@ -1448,8 +1411,6 @@
   }
 
   .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area {
-    padding-left: 0.7rem;
-    padding-right: 0.7rem;
-    background: #000;
+    padding: 0 0.7rem;
   }
 }
