@@ -787,26 +787,6 @@ const ShortsVideos = ({
               )}
             </div>
           </div>
-          <div className="shorts-modal-progress-area">
-            <div className="shorts-modal-progress-wrap shorts-modal-progress-fixed">
-              <div className="shorts-modal-progress-bar" onClick={handleModalVideoProgress}>
-                <div
-                  className="shorts-modal-progress-fill"
-                  style={{ width: `${(modalVideoState.currentTime / (modalVideoState.duration || 1)) * 100}%` }}
-                />
-              </div>
-              <span className="shorts-modal-duration">
-                {formatTime(modalVideoState.currentTime)} / {formatTime(modalVideoState.duration)}
-              </span>
-            </div>
-            <input
-              type="text"
-              className="shorts-modal-comment-input"
-              placeholder={contentLang === 'ru' ? 'Написать комментарий...' : 'Izoh yozing...'}
-              readOnly
-              onClick={(e) => { e.stopPropagation(); handleShortsCommentClick(e); }}
-            />
-          </div>
         </div>
         <div className="shorts-modal-actions-sidebar shorts-modal-actions-mobile">
           <LikeButton
@@ -859,7 +839,6 @@ const ShortsVideos = ({
     descriptionExpanded,
     getVideo,
     handleMobileVideoTap,
-    handleModalVideoProgress,
     handleMusicBlockClick,
     handleShortsCommentClick,
     handleShortsSaveClick,
@@ -867,7 +846,6 @@ const ShortsVideos = ({
     isInWishlist,
     isItemMusicSlide,
     mobilePlayPauseVisible,
-    modalVideoState,
     renderMusicCornerButton,
     repostShareRoute,
     shortsCommentCount,
@@ -954,6 +932,32 @@ const ShortsVideos = ({
               onIndexChange={handleMobileIndexChange}
               renderItem={renderMobileShortSlide}
             />
+            {/* Progress drag bilan ketmasin — VertikalDrag tashqarisida */}
+            <div
+              className="shorts-modal-progress-area shorts-modal-progress-area-mobile-fixed"
+              onClick={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+            >
+              <div className="shorts-modal-progress-wrap shorts-modal-progress-fixed">
+                <div className="shorts-modal-progress-bar" onClick={handleModalVideoProgress}>
+                  <div
+                    className="shorts-modal-progress-fill"
+                    style={{ width: `${(modalVideoState.currentTime / (modalVideoState.duration || 1)) * 100}%` }}
+                  />
+                </div>
+                <span className="shorts-modal-duration">
+                  {formatTime(modalVideoState.currentTime)} / {formatTime(modalVideoState.duration)}
+                </span>
+              </div>
+              <input
+                type="text"
+                className="shorts-modal-comment-input"
+                placeholder={contentLang === 'ru' ? 'Написать комментарий...' : 'Izoh yozing...'}
+                readOnly
+                onClick={(e) => { e.stopPropagation(); handleShortsCommentClick(e); }}
+              />
+            </div>
           </div>
         ) : (
           // ============ DESKTOP ============

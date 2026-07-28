@@ -193,7 +193,8 @@
   padding-bottom: 5rem;
 }
 
-.shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area {
+.shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area,
+.shorts-modal-progress-area-mobile-fixed {
   position: absolute;
   bottom: 0.75rem;
   left: 0;
@@ -201,6 +202,12 @@
   padding: 0 1.25rem;
   box-sizing: border-box;
   flex-shrink: 0;
+}
+
+/* Drag paytida joyida qoladi — slide ichida emas */
+.shorts-modal-progress-area-mobile-fixed {
+  z-index: 20;
+  pointer-events: auto;
 }
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-wrap {
@@ -508,8 +515,8 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0.5rem 0.75rem;
-  background: rgba(45, 45, 50, 0.4);
-  border: 1px solid rgba(70, 65, 80, 0.5);
+  background: rgba(18, 18, 22, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 20px;
   color: #fff;
   font-size: 0.9rem;
@@ -518,23 +525,23 @@
   transition: border-color 0.2s, background 0.2s;
 }
 
-/* Qora progress fonidan ajralib turishi uchun */
+/* Progress area ichida ham to'qroq */
 .shorts-modal-progress-area .shorts-modal-comment-input {
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(18, 18, 22, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .shorts-modal-comment-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .shorts-modal-comment-input:hover {
   border-color: rgba(155, 79, 231, 0.5);
-  background: rgba(45, 45, 50, 0.6);
+  background: rgba(28, 28, 34, 0.96);
 }
 
 .shorts-modal-progress-area .shorts-modal-comment-input:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(28, 28, 34, 0.96);
   border-color: rgba(155, 79, 231, 0.55);
 }
 
@@ -1416,7 +1423,8 @@
     padding-right: 0.7rem;
   }
 
-  .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area {
+  .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area,
+  .shorts-modal-progress-area-mobile-fixed {
     padding: 0 0.7rem;
   }
 }
