@@ -189,8 +189,8 @@
 }
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-info-content {
-  /* progress bar + comment input uchun pastda joy */
-  padding-bottom: 5.25rem;
+  /* progress area balandligi + yuqoridagi bo'shliq — elementlar ichiga kirmasin */
+  padding-bottom: calc(5.75rem + 1rem);
   flex: 0 1 auto;
 }
 
@@ -200,8 +200,8 @@
   left: 0;
   right: 0;
   height: auto;
-  min-height: 5.5rem;
-  padding: 0.75rem 1.25rem 1rem;
+  min-height: 5.75rem;
+  padding: 1rem 1.25rem 1.1rem;
   box-sizing: border-box;
   flex-shrink: 0;
   background: #000;
@@ -590,7 +590,6 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-decoration: none;
-  margin-bottom: 1rem;
   width: fit-content;
   transition: all 0.2s ease;
 }
@@ -1449,6 +1448,8 @@
   }
 
   .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area {
-    padding: 0 0.7rem;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    background: #000;
   }
 }
