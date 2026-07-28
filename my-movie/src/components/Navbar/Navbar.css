@@ -655,18 +655,19 @@
 
 @media (max-width: 768px) {
   .navbar.navbar--profile-page .navbar-profile-menu-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 11px;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
   }
 
   .navbar.navbar--profile-page .navbar-profile-menu-icon {
-    width: 18px;
-    gap: 4px;
+    width: 14px;
+    gap: 3px;
   }
 
   .navbar.navbar--profile-page .navbar-profile-menu-icon span {
-    width: 16px;
+    width: 12px;
+    height: 1.7px;
   }
 }
 
