@@ -699,7 +699,7 @@
   }
 
   .profile-page {
-    min-height: calc(100vh - 150px);
+    min-height: calc(100vh - 80px);
     padding: 0 1rem;
     box-sizing: border-box;
   }
