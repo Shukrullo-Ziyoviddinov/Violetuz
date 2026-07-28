@@ -8,9 +8,9 @@ const CLIENT_URLS = String(process.env.CLIENT_URLS || '')
   .map((item) => item.trim())
   .filter(Boolean);
 const DATABASE_URL = process.env.DATABASE_URL || '';
-const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
-const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || '';
-const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'Violet';
+const BREVO_API_KEY = String(process.env.BREVO_API_KEY || '').trim();
+const BREVO_SENDER_EMAIL = String(process.env.BREVO_SENDER_EMAIL || '').trim();
+const BREVO_SENDER_NAME = String(process.env.BREVO_SENDER_NAME || 'VioletPlay').trim();
 const JWT_SECRET = process.env.JWT_SECRET || 'violet-dev-jwt-secret-change-me';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '30d';
 const ALLOWED_ORIGINS = Array.from(

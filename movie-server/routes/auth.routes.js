@@ -7,6 +7,7 @@ const authController = require('../controllers/auth.controller');
  */
 const router = Router();
 
+router.get('/status', authController.status);
 router.get('/username-available', authController.checkUsername);
 router.post('/register/start', authController.registerStart);
 router.post('/register/verify', authController.registerVerify);
