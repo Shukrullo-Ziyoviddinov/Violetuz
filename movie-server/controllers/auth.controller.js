@@ -1,17 +1,6 @@
 const asyncHandler = require('../middleware/asyncHandler');
 const { sendSuccess } = require('../utils/response');
 const authService = require('../services/auth.service');
-const { getBrevoConfigStatus } = require('../services/brevoEmail.service');
-
-const status = asyncHandler(async (_req, res) => {
-  const brevo = getBrevoConfigStatus();
-  return sendSuccess(res, {
-    data: {
-      ok: brevo.hasApiKey && brevo.hasSenderEmail,
-      brevo,
-    },
-  });
-});
 
 const checkUsername = asyncHandler(async (req, res) => {
   const result = await authService.checkUsernameAvailability(
@@ -41,7 +30,6 @@ const loginVerify = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  status,
   checkUsername,
   registerStart,
   registerVerify,

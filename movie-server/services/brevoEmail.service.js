@@ -83,10 +83,7 @@ const sendOtpEmail = async ({ toEmail, toName, code, purpose }) => {
     } catch {
       details = await response.text();
     }
-    const brevoMsg =
-      (details && (details.message || details.error || details.code)) ||
-      `Brevo HTTP ${response.status}`;
-    const err = new Error(`Failed to send verification email: ${brevoMsg}`);
+    const err = new Error('Failed to send verification email');
     err.status = 502;
     err.details = details;
     throw err;
@@ -95,16 +92,6 @@ const sendOtpEmail = async ({ toEmail, toName, code, purpose }) => {
   return true;
 };
 
-const getBrevoConfigStatus = () => ({
-  hasApiKey: Boolean(BREVO_API_KEY),
-  hasSenderEmail: Boolean(BREVO_SENDER_EMAIL),
-  senderEmailHint: BREVO_SENDER_EMAIL
-    ? `${BREVO_SENDER_EMAIL.slice(0, 2)}***@${BREVO_SENDER_EMAIL.split('@')[1] || '?'}`
-    : null,
-  senderName: BREVO_SENDER_NAME || 'VioletPlay',
-});
-
 module.exports = {
   sendOtpEmail,
-  getBrevoConfigStatus,
 };
