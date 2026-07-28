@@ -95,6 +95,58 @@
   margin-top: 1.25rem;
 }
 
+.profile-info-action--logout .profile-wishlist-left {
+  color: #ef5350;
+}
+
+.profile-info-action--logout .profile-wishlist-arrow {
+  color: rgba(239, 83, 80, 0.75);
+}
+
+.profile-logout-confirm {
+  padding: 0.25rem 0 0.5rem;
+}
+
+.profile-logout-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.profile-logout-confirm-btn {
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.profile-logout-confirm-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.profile-logout-confirm-btn--yes {
+  border: none;
+  background: #e53935;
+  color: #fff;
+}
+
+.profile-logout-confirm-btn--yes:hover:not(:disabled) {
+  background: #c62828;
+}
+
+.profile-logout-confirm-btn--no {
+  border: 1px solid #fff;
+  background: #000;
+  color: #fff;
+}
+
+.profile-logout-confirm-btn--no:hover:not(:disabled) {
+  background: #111;
+}
+
 @media (max-width: 768px) {
   .profile-info-overlay {
     background: #0a0a0a;
