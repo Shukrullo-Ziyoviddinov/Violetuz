@@ -135,10 +135,6 @@ const ProfilePage = () => {
     setCurrentLanguage(getCurrentLanguage());
   }, [i18n.language]);
 
-  if (!isLoggedIn) {
-    return null;
-  }
-
   useEffect(() => {
     const open = () => setShowInfoModal(true);
     setProfileInfoMenuHandler(open);
@@ -249,6 +245,10 @@ const ProfilePage = () => {
     }
     setShowFollowingModal(false);
   };
+
+  if (!isLoggedIn) {
+    return null;
+  }
 
   return (
     <div className="profile-page">

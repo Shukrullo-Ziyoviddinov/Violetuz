@@ -18,17 +18,42 @@ const sendOtpEmail = async ({ toEmail, toName, code, purpose }) => {
 
   const isLogin = purpose === 'login';
   const subject = isLogin
-    ? `Violet — kirish kodi: ${code}`
-    : `Violet — tasdiqlash kodi: ${code}`;
+    ? 'VioletPlay — kirish kodi'
+    : "VioletPlay — ro'yxatdan o'tish kodi";
+
+  const actionText = isLogin
+    ? "Assalomu alaykum! VioletPlay platformasida kirish uchun tasdiqlash kodingiz:"
+    : "Assalomu alaykum! VioletPlay platformasida ro'yxatdan o'tish uchun tasdiqlash kodingiz:";
+
+  const textContent = [
+    'VioletPlay',
+    '',
+    actionText,
+    '',
+    String(code),
+    '',
+    '⏱ Bu kod faqat 2 daqiqa davomida amal qiladi.',
+    "Agar siz bu amalni bajarmagan bo'lsangiz, bu xabarni e'tiborsiz qoldiring.",
+    '',
+    'Hurmat bilan,',
+    'VioletPlay jamoasi',
+  ].join('\n');
 
   const htmlContent = `
-    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:12px;">
-      <h2 style="margin:0 0 12px;color:#e0aaff;">Violet</h2>
-      <p style="margin:0 0 16px;color:#ccc;">
-        ${isLogin ? 'Hisobga kirish uchun kod:' : "Ro'yxatdan o'tishni tasdiqlash kodi:"}
+    <div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:12px;">
+      <h2 style="margin:0 0 16px;color:#e0aaff;">VioletPlay</h2>
+      <p style="margin:0 0 16px;color:#ccc;line-height:1.5;">${actionText}</p>
+      <p style="font-size:32px;letter-spacing:8px;font-weight:700;margin:0 0 20px;color:#fff;">${code}</p>
+      <p style="margin:0 0 8px;color:#bbb;font-size:14px;line-height:1.5;">
+        ⏱ Bu kod faqat <strong>2 daqiqa</strong> davomida amal qiladi.
       </p>
-      <p style="font-size:32px;letter-spacing:8px;font-weight:700;margin:0 0 16px;color:#fff;">${code}</p>
-      <p style="margin:0;color:#888;font-size:13px;">Kod 10 daqiqa amal qiladi. Agar bu siz bo'lmasangiz, xabarni e'tiborsiz qoldiring.</p>
+      <p style="margin:0 0 20px;color:#888;font-size:13px;line-height:1.5;">
+        Agar siz bu amalni bajarmagan bo'lsangiz, bu xabarni e'tiborsiz qoldiring.
+      </p>
+      <p style="margin:0;color:#9a9a9a;font-size:13px;line-height:1.5;">
+        Hurmat bilan,<br/>
+        <span style="color:#e0aaff;">VioletPlay jamoasi</span>
+      </p>
     </div>
   `;
 
@@ -41,11 +66,12 @@ const sendOtpEmail = async ({ toEmail, toName, code, purpose }) => {
     },
     body: JSON.stringify({
       sender: {
-        name: BREVO_SENDER_NAME || 'Violet',
+        name: BREVO_SENDER_NAME || 'VioletPlay',
         email: BREVO_SENDER_EMAIL,
       },
       to: [{ email: toEmail, name: toName || toEmail }],
       subject,
+      textContent,
       htmlContent,
     }),
   });
