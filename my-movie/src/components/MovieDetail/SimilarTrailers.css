@@ -46,7 +46,6 @@
 
 .similar-trailer-video-element--loading {
   opacity: 0 !important;
-  visibility: hidden !important;
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
