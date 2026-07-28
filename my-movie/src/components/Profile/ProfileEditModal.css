@@ -310,6 +310,18 @@
   line-height: 1.45;
 }
 
+.profile-edit-bio-counter {
+  margin: 0;
+  text-align: right;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: #66bb6a;
+}
+
+.profile-edit-bio-counter--limit {
+  color: #ef5350;
+}
+
 .profile-edit-save {
   margin-top: 0.5rem;
   padding: 0.85rem 1.5rem;

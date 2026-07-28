@@ -11,6 +11,7 @@ const OTP_TTL_MS = 2 * 60 * 1000;
 const OTP_MAX_ATTEMPTS = 5;
 const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BIO_MAX_CHARS = 65;
 
 const normalizeUsername = (raw) => String(raw || '').trim().replace(/^@+/, '');
 const normalizeEmail = (raw) => String(raw || '').trim().toLowerCase();
@@ -322,9 +323,9 @@ const updateProfile = async (userId, { name, username, bio }) => {
     throw createHttpError(409, 'Bu username band', { field: 'username' });
   }
 
-  let cleanBio = bio !== undefined ? String(bio ?? '').trim() : user.bio || '';
-  if (cleanBio.length > 500) {
-    throw badRequest('Bio maksimal 500 belgi');
+  let cleanBio = bio !== undefined ? String(bio ?? '') : user.bio || '';
+  if (cleanBio.length > BIO_MAX_CHARS) {
+    throw badRequest(`Bio maksimal ${BIO_MAX_CHARS} belgi`);
   }
 
   user.name = trimmedName;

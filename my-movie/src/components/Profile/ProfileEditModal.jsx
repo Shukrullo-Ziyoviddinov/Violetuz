@@ -6,6 +6,7 @@ import './ProfileEditModal.css';
 const normalizeUsername = (raw) => (raw ?? '').trim().replace(/^@+/, '').trim();
 const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const BIO_MAX_CHARS = 65;
 
 const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const isNameInvalid = !name.trim() || name.trim().length < 2;
   const usernameOk = usernameStatus === 'same' || usernameStatus === 'available';
   const isFormValid = !isNameInvalid && usernameOk && !busy;
+  const bioRemaining = BIO_MAX_CHARS - bio.length;
 
   useEffect(() => {
     setName(profile.name || '');
@@ -162,12 +164,12 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
       const data = await updateProfileRequest({
         name: name.trim(),
         username: normalizeUsername(username),
-        bio: bio.trim(),
+        bio,
       });
       onSave({
         name: data.user?.name ?? name.trim(),
         username: data.user?.username ?? normalizeUsername(username),
-        bio: data.user?.bio ?? bio.trim(),
+        bio: data.user?.bio ?? bio,
         avatar,
       });
     } catch (err) {
@@ -348,12 +350,19 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
             <textarea
               id="profile-bio"
               value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              onChange={(e) => setBio(e.target.value.slice(0, BIO_MAX_CHARS))}
               placeholder={t('profile.bioPlaceholder')}
               className="profile-edit-input profile-edit-textarea"
               rows={3}
-              maxLength={500}
+              maxLength={BIO_MAX_CHARS}
             />
+            <p
+              className={`profile-edit-bio-counter${
+                bioRemaining === 0 ? ' profile-edit-bio-counter--limit' : ''
+              }`}
+            >
+              {bioRemaining}
+            </p>
           </div>
           {error ? <p className="profile-edit-error">{error}</p> : null}
           <button
