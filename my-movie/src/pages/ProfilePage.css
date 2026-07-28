@@ -1,7 +1,6 @@
 
 .profile-page {
   min-height: calc(100vh - 80px);
-  background: #0a0a0a;
   /* overflow-x: hidden; */
 }
 
@@ -763,6 +762,26 @@
     margin-top: 0;
     border-radius: 0;
     width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .profile-page-top,
+  .profile-page-stats,
+  .profile-page-quick-links {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .profile-page-repost {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-sizing: border-box;
   }
 
   .profile-avatar-wrap {
