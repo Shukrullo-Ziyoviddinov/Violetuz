@@ -385,10 +385,6 @@ const ProfilePage = () => {
                 <ComentariaHistory />
               </div>
             <div className="profile-page-repost">
-                <div className="profile-page-repost-title-wrap">
-                  <i className="fa-solid fa-repeat" aria-hidden="true" />
-                  <span className="profile-page-repost-title">{t('profilePage.repostTitle')}</span>
-                </div>
                 <RepostFilter activeFilter={repostFilter} onChange={setRepostFilter} />
                 {filteredRepostItems.length === 0 ? (
                   <ProfileRepostEmpty
