@@ -9,7 +9,7 @@ const { badRequest, notFound, createHttpError } = require('../utils/errors');
 
 const OTP_TTL_MS = 2 * 60 * 1000;
 const OTP_MAX_ATTEMPTS = 5;
-const USERNAME_RE = /^[a-zA-Z0-9_]{3,30}$/;
+const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const normalizeUsername = (raw) => String(raw || '').trim().replace(/^@+/, '');
@@ -33,8 +33,11 @@ const publicUserPayload = (user, token) => ({
 });
 
 const assertUsernameFormat = (username) => {
+  if (username.includes('-')) {
+    throw badRequest('- belgi mumkun emas');
+  }
   if (!USERNAME_RE.test(username)) {
-    throw badRequest('Username 3–30 belgi: harf, raqam yoki _');
+    throw badRequest('Username 3–30 belgi: harf, raqam, _ yoki .');
   }
 };
 
