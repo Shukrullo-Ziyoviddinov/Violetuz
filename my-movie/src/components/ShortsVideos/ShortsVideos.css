@@ -190,7 +190,7 @@
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-info-content {
   flex: 0 1 auto;
-  padding-bottom: 6.1rem;
+  padding-bottom: 5rem;
 }
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-progress-area {
@@ -827,7 +827,7 @@
 
 .shorts-modal-music-corner-mobile {
   right: 11px;
-  bottom: 6.75rem;
+  bottom: 5rem;
   width: 40px;
   height: 40px;
 }
@@ -839,12 +839,14 @@
 
 @media (max-width: 500px) {
   .shorts-modal-music-corner-mobile {
-    bottom: 9.5rem;
-    right: 18px;
+    right: 11px;
+    bottom: 7.2rem;
+    width: 32px;
+    height: 32px;
   }
 
-  .shorts-modal-actions-sidebar {
-    right: 4px;
+  .shorts-modal-info-overlay.shorts-modal-info-mobile .shorts-modal-info-content {
+    padding-bottom: 4.5rem;
   }
 }
 
@@ -1337,6 +1339,10 @@
   align-items: center;
   gap: 10px;
   z-index: 10;
+}
+
+.shorts-modal-actions-sidebar.shorts-modal-actions-mobile {
+  right: 4px;
 }
 
 .shorts-modal-action-btn {
