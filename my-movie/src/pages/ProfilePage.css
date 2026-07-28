@@ -100,6 +100,8 @@
   border-radius: 12px;
   background-color: rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 1;
 }
 
 .profile-page-stats {
@@ -673,8 +675,8 @@
 
 .profile-edit-btn {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
   background: #0312ea6f;
@@ -724,13 +726,17 @@
     margin: 0 auto;
   }
 
+  .profile-page-top-card {
+    margin-top: 0.8rem;
+  }
+
   .profile-avatar-wrap {
     width: 70px;
     height: 70px;
   }
 
   .profile-name {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
   .profile-username {
@@ -803,6 +809,11 @@
     width: 24px;
     height: 24px;
     padding: 2px;
+  }
+
+  .profile-edit-btn {
+    width: 36px;
+    height: 36px;
   }
 }
 
