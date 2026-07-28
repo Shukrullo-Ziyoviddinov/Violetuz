@@ -9,12 +9,15 @@ import SearchMusicResults from '../../Music/SearchMusicResults/SearchMusicResult
 import SearchMusicIstoriy from '../../Music/SearchMusicResults/SearchMusicIstoriy';
 import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCategory';
 import ShortsPickerModal from './ShortsPickerModal';
+import { requestOpenAuthModal } from '../../authModalBridge';
+import { useAuth } from '../../context/AuthContext';
 import './NavbarMobile.css';
 
 const NavbarMobile = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isLoggedIn } = useAuth();
   const pathname = location.pathname;
   const [showSearch, setShowSearch] = useState(false);
   const [showShortsPicker, setShowShortsPicker] = useState(false);
@@ -84,7 +87,10 @@ const NavbarMobile = () => {
 
         <button
           className={`navbar-mobile-item ${isProfileActive ? 'navbar-mobile-item-active' : ''}`}
-          onClick={() => navigate('/profile')}
+          onClick={() => {
+            if (isLoggedIn) navigate('/profile');
+            else requestOpenAuthModal('register');
+          }}
           aria-label={t('navbar.mobileProfile')}
         >
           <i className="fa-solid fa-user" aria-hidden="true" />

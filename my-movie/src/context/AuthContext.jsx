@@ -4,8 +4,11 @@ import {
   setLoggedIn as setLoggedInAction,
   updateProfile as updateProfileAction,
   setProfile as setProfileAction,
+  setAuthSession as setAuthSessionAction,
+  clearAuthSession as clearAuthSessionAction,
   selectIsLoggedIn,
   selectProfile,
+  selectAuthToken,
   selectFeedProfileHeader,
 } from '../store/slices/userSlice';
 
@@ -16,6 +19,7 @@ export const useAuth = () => {
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const profile = useAppSelector(selectProfile);
+  const token = useAppSelector(selectAuthToken);
 
   const setLoggedIn = useCallback(
     (value) => dispatch(setLoggedInAction(!!value)),
@@ -32,12 +36,24 @@ export const useAuth = () => {
     [dispatch]
   );
 
+  const setAuthSession = useCallback(
+    (payload) => dispatch(setAuthSessionAction(payload)),
+    [dispatch]
+  );
+
+  const logout = useCallback(() => {
+    dispatch(clearAuthSessionAction());
+  }, [dispatch]);
+
   return {
     isLoggedIn,
+    token,
     setLoggedIn,
     profile,
     updateProfile,
     setProfile,
+    setAuthSession,
+    logout,
   };
 };
 

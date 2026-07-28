@@ -11,6 +11,8 @@ import SearchMusicIstoriy from '../../Music/SearchMusicResults/SearchMusicIstori
 import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCategory';
 import { requestOpenProfileInfoMenu } from '../../profileInfoMenuBridge';
 import { requestOpenMessagesModal } from '../../messagesModalBridge';
+import { requestOpenAuthModal } from '../../authModalBridge';
+import { useAuth } from '../../context/AuthContext';
 import ShortsPickerModal from './ShortsPickerModal';
 import './Navbar.css';
 
@@ -18,6 +20,7 @@ const Navbar = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isLoggedIn } = useAuth();
   const isMusicPage = location.pathname === '/music';
   const isMusicSection = location.pathname.startsWith('/music');
   const isFeedPage = location.pathname === '/feed';
@@ -214,7 +217,10 @@ const Navbar = () => {
 
           <button
             className="navbar-icon-btn navbar-desktop-only"
-            onClick={() => navigate('/profile')}
+            onClick={() => {
+              if (isLoggedIn) navigate('/profile');
+              else requestOpenAuthModal('register');
+            }}
             aria-label={t('navbar.profile')}
           >
             <i className="fa-solid fa-user" aria-hidden="true" />

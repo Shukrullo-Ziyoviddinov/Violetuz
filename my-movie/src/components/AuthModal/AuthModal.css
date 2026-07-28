@@ -1,0 +1,202 @@
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  box-sizing: border-box;
+}
+
+.auth-modal-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(0.95);
+}
+
+.auth-modal-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.55);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.auth-modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  max-height: min(92vh, 760px);
+  overflow: auto;
+  padding: 1.75rem 1.5rem 1.5rem;
+  border-radius: 22px;
+  background: rgba(28, 28, 32, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.auth-modal-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+}
+
+.auth-modal-subtitle {
+  margin: 0 0 1.35rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.62);
+  text-align: center;
+}
+
+.auth-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.auth-modal-label {
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.auth-modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(rgba(18, 18, 22, 0.92), rgba(18, 18, 22, 0.92)) padding-box,
+    linear-gradient(135deg, #bd02bd, #9b4fe7, #ff4d9a) border-box;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.auth-modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.auth-modal-input--invalid {
+  background:
+    linear-gradient(rgba(18, 18, 22, 0.92), rgba(18, 18, 22, 0.92)) padding-box,
+    linear-gradient(135deg, #ff4d4d, #f44336) border-box;
+}
+
+.auth-modal-input--code {
+  letter-spacing: 0.35em;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.auth-modal-field-error {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: #ff6b6b;
+}
+
+.auth-modal-error {
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(244, 67, 54, 0.15);
+  color: #ff8a80;
+  font-size: 0.85rem;
+}
+
+.auth-modal-submit {
+  margin-top: 1.15rem;
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(90deg, #7b1fa2 0%, #c2185b 100%);
+  box-shadow: 0 0 24px rgba(189, 2, 189, 0.35);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.auth-modal-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.auth-modal-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-modal-back {
+  margin-top: 0.65rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-modal-footer {
+  margin: 1.15rem 0 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.88rem;
+}
+
+.auth-modal-link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .auth-modal-overlay {
+    padding: 0;
+  }
+
+  .auth-modal-card {
+    width: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    padding: 4.5rem 1.25rem 2rem;
+  }
+
+  .auth-modal-close {
+    top: 0.85rem;
+    right: 0.85rem;
+  }
+}

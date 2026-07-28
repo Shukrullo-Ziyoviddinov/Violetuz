@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const healthRoutes = require('./health.routes');
+const authRoutes = require('./auth.routes');
 const movieRoutes = require('./movie.routes');
 const movieSectionRoutes = require('./movieSection.routes');
 const musicRoutes = require('./music.routes');
@@ -26,6 +27,7 @@ const musicBannerRoutes = require('./musicBanner.routes');
 const router = Router();
 
 router.use('/health', healthRoutes);
+router.use('/auth', authRoutes);
 router.use('/movies', movieRoutes);
 router.use('/actors', actorRoutes);
 router.use('/actor-page-labels', actorPageLabelRoutes);

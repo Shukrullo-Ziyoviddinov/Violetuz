@@ -23,6 +23,7 @@ import RepostShortsCard from '../components/Repost/RepostShortsCard';
 import ComentariaHistory from '../components/ComentariaHistory/ComentariaHistory';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { setProfileInfoMenuHandler, clearProfileInfoMenuHandler } from '../profileInfoMenuBridge';
+import { requestOpenAuthModal } from '../authModalBridge';
 import { normalizeUsername } from '../store/slices/userUtils';
 import { useImageReady } from '../utils/useImageReady';
 import './ProfilePage.css';
@@ -108,7 +109,7 @@ const getCurrentLanguage = () => {
 const ProfilePage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { profile, updateProfile } = useAuth();
+  const { profile, updateProfile, isLoggedIn } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
@@ -124,8 +125,19 @@ const ProfilePage = () => {
   const [repostFilter, setRepostFilter] = useState('all');
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/', { replace: true });
+      requestOpenAuthModal('register');
+    }
+  }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
     setCurrentLanguage(getCurrentLanguage());
   }, [i18n.language]);
+
+  if (!isLoggedIn) {
+    return null;
+  }
 
   useEffect(() => {
     const open = () => setShowInfoModal(true);

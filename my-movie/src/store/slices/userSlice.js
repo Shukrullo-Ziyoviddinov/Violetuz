@@ -7,6 +7,7 @@ import {
 
 const initialState = {
   isLoggedIn: false,
+  token: null,
   profile: { ...DEFAULT_PROFILE },
 };
 
@@ -16,6 +17,28 @@ const userSlice = createSlice({
   reducers: {
     setLoggedIn: (state, action) => {
       state.isLoggedIn = !!action.payload;
+      if (!action.payload) {
+        state.token = null;
+      }
+    },
+    setAuthSession: (state, action) => {
+      const { token, user } = action.payload || {};
+      state.token = token || null;
+      state.isLoggedIn = Boolean(token && user);
+      if (user) {
+        state.profile = parseStoredProfile({
+          name: user.name,
+          username: user.username,
+          bio: state.profile.bio,
+          avatar: state.profile.avatar,
+          email: user.email,
+        });
+      }
+    },
+    clearAuthSession: (state) => {
+      state.isLoggedIn = false;
+      state.token = null;
+      state.profile = { ...DEFAULT_PROFILE };
     },
     setProfile: (state, action) => {
       state.profile = parseStoredProfile(action.payload);
@@ -30,15 +53,23 @@ const userSlice = createSlice({
         ),
         bio: data.bio !== undefined ? String(data.bio).trim() : state.profile.bio,
         avatar: data.avatar !== undefined ? data.avatar : state.profile.avatar,
+        email: data.email !== undefined ? data.email : state.profile.email,
       };
       state.isLoggedIn = true;
     },
   },
 });
 
-export const { setLoggedIn, setProfile, updateProfile } = userSlice.actions;
+export const {
+  setLoggedIn,
+  setAuthSession,
+  clearAuthSession,
+  setProfile,
+  updateProfile,
+} = userSlice.actions;
 
 export const selectIsLoggedIn = (state) => state.user.isLoggedIn;
+export const selectAuthToken = (state) => state.user.token;
 export const selectProfile = (state) => state.user.profile;
 
 export const selectFeedProfileHeader = createSelector([selectProfile], (profile) => ({
