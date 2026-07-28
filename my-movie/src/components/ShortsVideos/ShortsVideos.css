@@ -412,12 +412,16 @@
   box-sizing: border-box;
 }
 
+/* Video progress zonaning ustida — pastga kirmaydi */
 .shorts-modal-desktop-video .shorts-modal-desktop-video-el {
-  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--shorts-progress-area-h);
   width: 100%;
-  flex: 0 0 auto;
-  height: calc(100% - var(--shorts-progress-area-h));
-  max-height: calc(100% - var(--shorts-progress-area-h));
+  height: auto;
+  max-height: none;
   object-fit: contain;
   object-position: center center;
   background: #000;
@@ -463,8 +467,9 @@
   height: 36px;
 }
 
+/* Info pastda qoladi (top: 0 yo'q) — progress ustida */
 .shorts-modal-info-desktop {
-  top: 0;
+  top: auto;
   bottom: 0;
   padding: 1.25rem 1.25rem 0;
   padding-right: calc(48px + 16px + 1.25rem); /* o'ng: actions-sidebar + margin + base padding */
@@ -475,7 +480,9 @@
 }
 
 .shorts-modal-info-desktop .shorts-modal-info-content {
-  padding-bottom: calc(var(--shorts-progress-area-h, 7rem) + 0.5rem);
+  flex: 0 1 auto;
+  /* progress balandligi + buttonlar bilan orasidagi bo'shliq */
+  padding-bottom: calc(var(--shorts-progress-area-h) + 0.85rem);
 }
 
 /* Progress bar va comment input - pastda, 100% kenglik */
@@ -496,11 +503,11 @@
 }
 
 .shorts-modal-info-desktop .shorts-modal-progress-area {
-  /* desktop-inner pastidagi reserved zonani to'liq yopadi */
   bottom: 0;
   height: var(--shorts-progress-area-h);
   min-height: var(--shorts-progress-area-h);
-  padding: 0.9rem 1.25rem 1.15rem;
+  /* yuqori padding — bar/input tepasida bo'shliq, buttonlarni yopmasin */
+  padding: 1.15rem 1.25rem 1.15rem;
 }
 
 .shorts-modal-progress-wrap {
@@ -552,6 +559,12 @@
   transition: border-color 0.2s, background 0.2s;
 }
 
+/* Qora progress fonidan ajralib turishi uchun */
+.shorts-modal-progress-area .shorts-modal-comment-input {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
 .shorts-modal-comment-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -559,6 +572,11 @@
 .shorts-modal-comment-input:hover {
   border-color: rgba(155, 79, 231, 0.5);
   background: rgba(45, 45, 50, 0.6);
+}
+
+.shorts-modal-progress-area .shorts-modal-comment-input:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(155, 79, 231, 0.55);
 }
 
 .shorts-modal-watch-btn {
