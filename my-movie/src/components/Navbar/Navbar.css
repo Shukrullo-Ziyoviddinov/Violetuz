@@ -518,8 +518,33 @@
     justify-content: flex-end;
   }
 
-  /* Profil sahifasi: mobil ≤768 navbar logosi yo‘q */
+  /* Profile sahifasi: navbar o'zi ko'rinmaydi, faqat menu tugmasi qoladi */
+  .navbar.navbar--profile-page {
+    height: 0;
+    min-height: 0;
+    max-height: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    backdrop-filter: none;
+    overflow: visible;
+  }
+
+  .navbar.navbar--profile-page .navbar-container {
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    max-width: none;
+    justify-content: flex-end;
+  }
+
+  /* Profil sahifasi: mobil ≤768 navbarning ichki qismlari yo'q */
   .navbar.navbar--profile-page .navbar-left {
+    display: none !important;
+  }
+
+  .navbar.navbar--profile-page .navbar-center,
+  .navbar.navbar--profile-page .navbar-right {
     display: none !important;
   }
 
@@ -527,6 +552,10 @@
     display: flex !important;
     align-items: center;
     flex-shrink: 0;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 1205;
   }
 
   .navbar.navbar--feed-page .navbar-container {
@@ -622,5 +651,40 @@
   height: 2px;
   border-radius: 1px;
   background: currentColor;
+}
+
+@media (max-width: 768px) {
+  .navbar.navbar--profile-page .navbar-profile-menu-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+
+  .navbar.navbar--profile-page .navbar-profile-menu-icon {
+    width: 18px;
+    gap: 4px;
+  }
+
+  .navbar.navbar--profile-page .navbar-profile-menu-icon span {
+    width: 16px;
+  }
+}
+
+@media (max-width: 500px) {
+  .navbar.navbar--profile-page .navbar-profile-menu-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .navbar.navbar--profile-page .navbar-profile-menu-icon {
+    width: 16px;
+    gap: 3px;
+  }
+
+  .navbar.navbar--profile-page .navbar-profile-menu-icon span {
+    width: 14px;
+    height: 1.8px;
+  }
 }
 
