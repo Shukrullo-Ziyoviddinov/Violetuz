@@ -733,15 +733,15 @@
 
   .profile-page {
     min-height: auto;
-    padding: 0 1rem;
+    padding: 0;
     box-sizing: border-box;
   }
 
   .profile-page-header {
     height: 280px;
-    margin-left: -1rem;
-    margin-right: -1rem;
-    width: calc(100% + 2rem);
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
   }
 
   .profile-page-bg {
@@ -752,8 +752,7 @@
   }
 
   .profile-page-content {
-    /* Header 280px; menu btn ~8+30px — card shu pastidan boshlansin */
-    margin-top: calc(-280px + 52px);
+    margin-top: -238px;
     padding: 0 0 1rem;
     width: 100%;
     max-width: 100%;
@@ -762,6 +761,8 @@
 
   .profile-page-top-card {
     margin-top: 0;
+    border-radius: 0;
+    width: 100%;
   }
 
   .profile-avatar-wrap {

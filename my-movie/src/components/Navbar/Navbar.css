@@ -554,7 +554,7 @@
     flex-shrink: 0;
     position: fixed;
     top: 8px;
-    right: 12px;
+    right: max(1rem, env(safe-area-inset-right, 0px));
     z-index: 1305;
   }
 
