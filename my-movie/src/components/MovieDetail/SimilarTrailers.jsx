@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
@@ -8,23 +8,51 @@ import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import VerticalScroll from './VerticalScroll';
 import './SimilarTrailers.css';
 
-/** Video ijro etilmasdan, metadata dan lavha (still frame) ko‘rsatadi */
-const showTrailerPreviewFrame = (e) => {
-  const video = e.currentTarget;
-  if (!video || video.dataset.previewReady === '1') return;
-  const seekToPreview = () => {
+const VIDEO_READY_TIMEOUT_MS = 20000;
+
+/** Preview kadrga seek — tayyor bo‘lganda onReady */
+const seekTrailerPreview = (video, onReady) => {
+  if (!video || video.dataset.previewReady === '1') {
+    onReady?.();
+    return;
+  }
+  if (video.dataset.previewSeeking === '1') return;
+  video.dataset.previewSeeking = '1';
+
+  const finish = () => {
+    video.dataset.previewReady = '1';
+    video.dataset.previewSeeking = '0';
+    onReady?.();
+  };
+
+  const doSeek = () => {
     try {
       const duration = Number(video.duration);
       const t = Number.isFinite(duration) && duration > 0
         ? Math.min(1, Math.max(0.1, duration * 0.08))
         : 0.1;
+      const onSeeked = () => {
+        video.removeEventListener('seeked', onSeeked);
+        finish();
+      };
+      video.addEventListener('seeked', onSeeked);
       video.currentTime = t;
-      video.dataset.previewReady = '1';
+      // Ba’zi brauzerlar seeked bermaydi (allaqachon shu vaqt)
+      window.setTimeout(() => {
+        if (video.dataset.previewReady === '1') return;
+        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          video.removeEventListener('seeked', onSeeked);
+          finish();
+        }
+      }, 800);
     } catch {
-      /* ignore seek errors */
+      finish();
     }
   };
-  if (video.readyState >= 1) seekToPreview();
+
+  if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+    doSeek();
+  }
 };
 
 const SimilarTrailerItemSkeleton = () => (
@@ -42,6 +70,153 @@ const SimilarTrailerItemSkeleton = () => (
     </div>
   </div>
 );
+
+const SimilarTrailerItem = ({
+  trailer,
+  isActive,
+  onSelect,
+  tKey,
+  contentLang,
+}) => {
+  const videoRef = useRef(null);
+  const videoSrc =
+    trailer.trailers?.[contentLang] || trailer.trailers?.uz || trailer.trailers?.ru || '';
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    setFailed(false);
+  }, [videoSrc]);
+
+  useEffect(() => {
+    if (!videoSrc || ready || failed) return undefined;
+
+    const check = () => {
+      const el = videoRef.current;
+      if (el?.dataset.previewReady === '1' && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        setReady(true);
+        setFailed(false);
+      }
+    };
+
+    check();
+    const intervalId = window.setInterval(check, 200);
+    const timeoutId = window.setTimeout(() => {
+      const el = videoRef.current;
+      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        setReady(true);
+      } else {
+        setFailed(true);
+      }
+    }, VIDEO_READY_TIMEOUT_MS);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [videoSrc, ready, failed]);
+
+  const markPreviewReady = () => {
+    const el = videoRef.current;
+    if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setReady(true);
+      setFailed(false);
+    } else {
+      setReady(true);
+      setFailed(false);
+    }
+  };
+
+  const tryPrime = (e) => {
+    const el = e?.currentTarget || videoRef.current;
+    if (!el) return;
+    seekTrailerPreview(el, markPreviewReady);
+  };
+
+  const markFailed = () => {
+    setFailed(true);
+    setReady(false);
+  };
+
+  const showSkeleton = Boolean(videoSrc) && !ready && !failed;
+
+  return (
+    <div
+      className={`similar-trailer-item${isActive ? ' active' : ''}${
+        showSkeleton ? ' similar-trailer-item--loading' : ''
+      }`}
+      onClick={() => !showSkeleton && onSelect?.(trailer)}
+      aria-busy={showSkeleton || undefined}
+    >
+      <div className="similar-trailer-video">
+        {showSkeleton && (
+          <SkeletonLoader
+            variant="similar-trailer-video"
+            className="similar-trailer-video-skeleton"
+          />
+        )}
+        {!failed && videoSrc && (
+          <video
+            ref={videoRef}
+            key={videoSrc}
+            src={videoSrc}
+            muted
+            playsInline
+            preload="auto"
+            className={`similar-trailer-video-element${
+              showSkeleton ? ' similar-trailer-video-element--loading' : ''
+            }`}
+            onLoadedMetadata={tryPrime}
+            onLoadedData={tryPrime}
+            onCanPlay={tryPrime}
+            onError={markFailed}
+          />
+        )}
+        {!showSkeleton && (
+          <div className="similar-trailer-play">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          </div>
+        )}
+      </div>
+      <div className="similar-trailer-info">
+        {showSkeleton ? (
+          <>
+            <SkeletonLoader variant="similar-trailer-title" />
+            <SkeletonLoader variant="similar-trailer-text" />
+            <div className="similar-trailer-actions">
+              <SkeletonLoader variant="similar-trailer-action" />
+              <SkeletonLoader variant="similar-trailer-action" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="similar-trailer-title">
+              {trailer.title?.[contentLang] || trailer.title?.uz || trailer.title?.ru || ''}
+            </div>
+            <div className="similar-trailer-text">
+              {trailer.text?.[contentLang] || trailer.text?.uz || trailer.text?.ru || ''}
+            </div>
+            <div className="similar-trailer-actions">
+              <LikeButton
+                key={tKey}
+                variant="trailerSimilar"
+                contentId={tKey}
+                persistTrailerKey={tKey}
+                initialLikeCount={trailer.like}
+                initialDislikeCount={trailer.dislike}
+                countFormatter={formatActionCount}
+                stopPropagation
+              />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const SimilarTrailers = ({
   currentMovie,
@@ -117,48 +292,14 @@ const SimilarTrailers = ({
             const tKey = getTrailerKey ? getTrailerKey(trailer) : `${trailer.movieId}-${trailer.id}`;
             const isActive = selectedKey != null && tKey === selectedKey;
             return (
-              <div
+              <SimilarTrailerItem
                 key={`${trailer.movieId}-${trailer.id}`}
-                className={`similar-trailer-item${isActive ? ' active' : ''}`}
-                onClick={() => onTrailerSelect(trailer)}
-              >
-                <div className="similar-trailer-video">
-                  <video
-                    src={trailer.trailers?.[contentLang] || trailer.trailers?.uz || trailer.trailers?.ru || ''}
-                    muted
-                    playsInline
-                    preload="metadata"
-                    className="similar-trailer-video-element"
-                    onLoadedMetadata={showTrailerPreviewFrame}
-                    onLoadedData={showTrailerPreviewFrame}
-                  />
-                  <div className="similar-trailer-play">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="similar-trailer-info">
-                  <div className="similar-trailer-title">
-                    {trailer.title?.[contentLang] || trailer.title?.uz || trailer.title?.ru || ''}
-                  </div>
-                  <div className="similar-trailer-text">
-                    {trailer.text?.[contentLang] || trailer.text?.uz || trailer.text?.ru || ''}
-                  </div>
-                  <div className="similar-trailer-actions">
-                    <LikeButton
-                      key={tKey}
-                      variant="trailerSimilar"
-                      contentId={tKey}
-                      persistTrailerKey={tKey}
-                      initialLikeCount={trailer.like}
-                      initialDislikeCount={trailer.dislike}
-                      countFormatter={formatActionCount}
-                      stopPropagation
-                    />
-                  </div>
-                </div>
-              </div>
+                trailer={trailer}
+                isActive={isActive}
+                onSelect={onTrailerSelect}
+                tKey={tKey}
+                contentLang={contentLang}
+              />
             );
           })}
         </div>
