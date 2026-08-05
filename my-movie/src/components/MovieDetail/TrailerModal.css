@@ -123,7 +123,7 @@
   align-items: center;
   justify-content: center;
   z-index: 2100;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
   line-height: 1;
 }
 
@@ -759,17 +759,21 @@ button.trailer-modal-controls-dislike {
   }
 
   .trailer-modal-close {
-    position: static;
-    align-self: flex-start;
-    top: auto;
+    /* Har doim bir xil joy — immersive/oddiy sakrash yo'q */
+    position: absolute;
+    top: max(0.5rem, env(safe-area-inset-top, 0px));
+    left: max(0.75rem, env(safe-area-inset-left, 0px));
     right: auto;
+    bottom: auto;
+    align-self: auto;
     width: 44px;
     height: 44px;
-    margin: max(0.5rem, env(safe-area-inset-top, 0px)) 0 0.35rem max(0.75rem, env(safe-area-inset-left, 0px));
+    margin: 0;
     font-size: 26px;
-    z-index: 20;
+    z-index: 40;
     flex-shrink: 0;
     pointer-events: auto;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
   }
 
   .trailer-modal-close-x {
@@ -807,29 +811,27 @@ button.trailer-modal-controls-dislike {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     touch-action: pan-y;
-    transform: translate3d(0, var(--trailer-sheet-drag-y, 0px), 0);
-    transition:
-      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Transform gap yaratmasin — video pastiga yopishgan qoladi */
+    transform: none;
+    opacity: calc(1 - var(--trailer-sheet-progress, 0) * 0.92);
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .trailer-modal-pin .trailer-modal-video-wrapper {
     transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Expand progress: drag va spring-back / settle paytida */
+  /* Expand: video o'sadi, scroll joyini egallaydi — controls scroll bilan yopishgan */
   .trailer-modal:not(.trailer-modal--immersive) .trailer-modal-pin .trailer-modal-video-wrapper {
     aspect-ratio: auto;
     height: calc(
-      56.25vw + (100dvh - 56.25vw - 4.5rem) * var(--trailer-sheet-progress, 0)
+      56.25vw + (100dvh - 56.25vw) * var(--trailer-sheet-progress, 0)
     );
-    max-height: calc(100dvh - 4.5rem);
+    max-height: 100dvh;
   }
 
   .trailer-modal--sheet-dragging .trailer-modal-scroll-area {
     transition: none;
-    will-change: transform;
     touch-action: none;
   }
 
@@ -837,9 +839,7 @@ button.trailer-modal-controls-dislike {
     transition: none;
   }
 
-  /* Commit expand: scroll pastga sirg'ilib kiradi, video to'liq balandlikka */
   .trailer-modal--expanding .trailer-modal-scroll-area {
-    opacity: calc(1 - var(--trailer-sheet-progress, 0));
     pointer-events: none;
     overflow: hidden;
   }
@@ -848,10 +848,11 @@ button.trailer-modal-controls-dislike {
     transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Mode switch snap — bitta frame transition yo'q = bounce yo'q */
   .trailer-modal--snap .trailer-modal-scroll-area,
   .trailer-modal--snap .trailer-modal-pin,
-  .trailer-modal--snap .trailer-modal-video-wrapper {
+  .trailer-modal--snap .trailer-modal-video-wrapper,
+  .trailer-modal--snap .trailer-modal-close,
+  .trailer-modal--snap .trailer-modal-bottom-controls {
     transition: none !important;
   }
 
@@ -865,7 +866,7 @@ button.trailer-modal-controls-dislike {
     top: max(0.5rem, env(safe-area-inset-top, 0px));
     left: max(0.75rem, env(safe-area-inset-left, 0px));
     margin: 0;
-    z-index: 30;
+    z-index: 40;
   }
 
   .trailer-modal--immersive .trailer-modal-pin {
@@ -886,11 +887,8 @@ button.trailer-modal-controls-dislike {
     opacity: 0;
     overflow: hidden;
     pointer-events: none;
-    transform: translate3d(0, 110%, 0) !important;
-    transition:
-      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: none !important;
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .trailer-modal--immersive .trailer-modal-video-wrapper {
@@ -905,17 +903,17 @@ button.trailer-modal-controls-dislike {
     touch-action: pan-y;
   }
 
-  /* Immersive → oddiy: yuqoriga drag — scroll-area pastdan silliq chiqadi */
+  /* Collapse: scroll videoning pastiga yopishgan (translate yo'q) */
   .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-scroll-area {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     width: 100%;
-    max-height: calc(var(--trailer-sheet-progress, 0) * 48dvh);
+    max-height: none;
     min-height: 0;
-    opacity: clamp(0, calc(var(--trailer-sheet-progress, 0) * 1.6), 1);
+    opacity: clamp(0.15, var(--trailer-sheet-progress, 0), 1);
     overflow: hidden;
     pointer-events: none;
-    transform: translate3d(0, calc((1 - var(--trailer-sheet-progress, 0)) * 110%), 0) !important;
-    will-change: transform, max-height, opacity;
+    transform: none !important;
+    will-change: opacity;
   }
 
   .trailer-modal--immersive.trailer-modal--collapsing.trailer-modal--sheet-dragging .trailer-modal-scroll-area {
@@ -923,22 +921,18 @@ button.trailer-modal-controls-dislike {
   }
 
   .trailer-modal--immersive.trailer-modal--collapsing:not(.trailer-modal--sheet-dragging) .trailer-modal-scroll-area {
-    transition:
-      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-pin {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
   }
 
   .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-video-wrapper {
     height: calc(
-      (100dvh - 4.5rem)
-      - ((100dvh - 4.5rem) - 56.25vw) * var(--trailer-sheet-progress, 0)
+      100dvh - (100dvh - 56.25vw) * var(--trailer-sheet-progress, 0)
     );
-    max-height: calc(100dvh - 4.5rem);
+    max-height: 100dvh;
     flex: 0 0 auto;
   }
 
@@ -948,6 +942,11 @@ button.trailer-modal-controls-dislike {
 
   .trailer-modal--immersive.trailer-modal--collapsing:not(.trailer-modal--sheet-dragging) .trailer-modal-video-wrapper {
     transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .trailer-modal--expanding .trailer-modal-bottom-controls,
+  .trailer-modal--collapsing .trailer-modal-bottom-controls {
+    transition: none;
   }
 
   .trailer-modal--immersive .trailer-modal-video {

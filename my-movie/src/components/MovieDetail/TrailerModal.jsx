@@ -186,7 +186,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     });
   };
 
-  // Commit: avval progress=1 gacha silliq, keyin mode switch (bounce yo'q)
+  // Commit: avval progress=1 gacha silliq (scroll+controls birga), keyin mode switch
   const animateCommitExpand = () => {
     if (sheetSettlingRef.current === 'expand') return;
     clearSettleTimer();
@@ -195,8 +195,8 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     setSheetSettling('expand');
     sheetSettlingRef.current = 'expand';
     requestAnimationFrame(() => {
-      const push = typeof window !== 'undefined' ? window.innerHeight * 0.55 : 440;
-      setSheetDragYSafe(push, 1);
+      // translate push yo'q — gap yaratmasin; faqat progress
+      setSheetDragYSafe(0, 1);
     });
     settleTimerRef.current = setTimeout(() => {
       sheetSettlingRef.current = null;
@@ -337,9 +337,9 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     updateSheetVelocity(touch.clientY);
     sheetDragRef.current.rawDy = rawDy;
     const threshold = getSheetThreshold();
-    const visual = resistSheetDrag(rawDy);
+    // Translate gap yaratadi (controls va scroll ajraladi) — faqat progress
     const progress = Math.min(rawDy / (threshold * 1.25), 1);
-    setSheetDragYSafe(visual, progress);
+    setSheetDragYSafe(0, progress);
   };
 
   const handleSheetTouchEnd = () => {
@@ -421,7 +421,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     sheetDragRef.current.rawDy = rawDy;
     const threshold = getSheetThreshold();
     const progress = Math.min(upDy / (threshold * 1.25), 1);
-    setSheetDragYSafe(resistSheetDrag(upDy), progress);
+    setSheetDragYSafe(0, progress);
   };
 
   const handleCollapseTouchEnd = () => {
