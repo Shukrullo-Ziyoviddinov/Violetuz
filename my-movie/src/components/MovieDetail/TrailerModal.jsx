@@ -57,13 +57,16 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const videoRef = useRef(null);
   const videoWrapperRef = useRef(null);
   const scrollAreaRef = useRef(null);
-  const sheetDragRef = useRef({ active: false, startY: 0, canDrag: false });
-  const immersivePullRef = useRef({ active: false, startY: 0 });
+  const sheetDragRef = useRef({ active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 });
+  const sheetDragYRef = useRef(0);
+  const immersivePullRef = useRef({ active: false, startY: 0, startX: 0, moved: false });
+  const isImmersiveVideoRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [trailerLoading, setTrailerLoading] = useState(true);
   const [isImmersiveVideo, setIsImmersiveVideo] = useState(false);
   const [sheetDragY, setSheetDragY] = useState(0);
+  const [sheetDragProgress, setSheetDragProgress] = useState(0);
   const [isSheetDragging, setIsSheetDragging] = useState(false);
 
   useEffect(() => {
@@ -106,13 +109,41 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const speedOptions = [1, 1.5, 2];
 
   const isMobileViewport = () => typeof window !== 'undefined' && window.innerWidth <= 969;
-  const getSheetExpandThreshold = () => (typeof window !== 'undefined' ? window.innerHeight : 800) * 0.32;
+  // Immersive'ga o'tish: ekranning ~35% i pastga — o'rtacha og'ir
+  const getSheetExpandThreshold = () => (typeof window !== 'undefined' ? window.innerHeight : 800) * 0.35;
+  const SHEET_ACTIVATE_PX = 14;
+  const IMMERSIVE_COLLAPSE_PX = 80;
+
+  // Pastga tortishda "rubber" — barmoq siljishidan vizual sekinroq
+  const resistSheetDrag = (rawDy) => {
+    const threshold = getSheetExpandThreshold();
+    const t = Math.max(rawDy, 0) / Math.max(threshold, 1);
+    // 0..1 oralig'ida og'irlashadi, ortiqcha tortishda yanada sekin
+    const eased = 1 - Math.exp(-t * 1.15);
+    return eased * threshold * 0.92;
+  };
+
+  const setSheetDragYSafe = (y, progress = 0) => {
+    sheetDragYRef.current = y;
+    setSheetDragY(y);
+    setSheetDragProgress(progress);
+  };
 
   const collapseImmersiveVideo = () => {
+    isImmersiveVideoRef.current = false;
     setIsImmersiveVideo(false);
-    setSheetDragY(0);
+    setSheetDragYSafe(0);
     setIsSheetDragging(false);
-    sheetDragRef.current = { active: false, startY: 0, canDrag: false };
+    sheetDragRef.current = { active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 };
+    immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: false };
+  };
+
+  const expandImmersiveVideo = () => {
+    isImmersiveVideoRef.current = true;
+    setIsImmersiveVideo(true);
+    setSheetDragYSafe(0);
+    setIsSheetDragging(false);
+    sheetDragRef.current = { active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 };
   };
 
   const handleTrailerSelect = (trailer) => {
@@ -130,72 +161,70 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   };
 
   const handleSheetTouchStart = (e) => {
-    if (!isMobileViewport() || isImmersiveVideo) return;
+    if (!isMobileViewport() || isImmersiveVideoRef.current) return;
     const scrollEl = scrollAreaRef.current;
     if (!scrollEl || scrollEl.scrollTop > 2) return;
     const touch = e.touches[0];
     if (!touch) return;
-    sheetDragRef.current = { active: true, startY: touch.clientY, canDrag: true };
+    sheetDragRef.current = {
+      active: true,
+      startY: touch.clientY,
+      canDrag: true,
+      locked: false,
+      rawDy: 0,
+    };
   };
 
   const handleSheetTouchMove = (e) => {
-    if (!sheetDragRef.current.active || !sheetDragRef.current.canDrag || isImmersiveVideo) return;
+    if (!sheetDragRef.current.active || !sheetDragRef.current.canDrag || isImmersiveVideoRef.current) return;
     const touch = e.touches[0];
     if (!touch) return;
-    const dy = touch.clientY - sheetDragRef.current.startY;
-    if (dy > 0) {
-      if (e.cancelable) e.preventDefault();
-      setIsSheetDragging(true);
-      setSheetDragY(dy);
-    } else if (dy < -8 && sheetDragY === 0) {
+    const rawDy = touch.clientY - sheetDragRef.current.startY;
+
+    if (rawDy < -SHEET_ACTIVATE_PX && !sheetDragRef.current.locked) {
       sheetDragRef.current.canDrag = false;
       setIsSheetDragging(false);
+      setSheetDragYSafe(0);
+      return;
     }
+
+    if (rawDy <= 0) return;
+
+    if (!sheetDragRef.current.locked) {
+      if (rawDy < SHEET_ACTIVATE_PX) return;
+      sheetDragRef.current.locked = true;
+    }
+
+    if (e.cancelable) e.preventDefault();
+    sheetDragRef.current.rawDy = rawDy;
+    const threshold = getSheetExpandThreshold();
+    setIsSheetDragging(true);
+    // Sheet rubber; video balandligi barmoq masofasiga (sekinroq grow)
+    setSheetDragYSafe(resistSheetDrag(rawDy), Math.min(rawDy / threshold, 1));
   };
 
   const handleSheetTouchEnd = () => {
     if (!sheetDragRef.current.active) return;
     const threshold = getSheetExpandThreshold();
-    const shouldExpand = sheetDragY >= threshold * 0.5;
-    sheetDragRef.current = { active: false, startY: 0, canDrag: false };
+    const rawDy = sheetDragRef.current.rawDy;
+    const wasLocked = sheetDragRef.current.locked;
+    sheetDragRef.current = { active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 };
     setIsSheetDragging(false);
-    if (shouldExpand) {
-      setSheetDragY(0);
-      setIsImmersiveVideo(true);
+
+    // Barmoq ~35% ekran pastga — vizual rubber alohida
+    if (wasLocked && rawDy >= threshold) {
+      setSheetDragYSafe(0, 0);
+      expandImmersiveVideo();
     } else {
-      setSheetDragY(0);
+      setSheetDragYSafe(0, 0);
     }
-  };
-
-  const handleImmersivePullStart = (e) => {
-    if (!isMobileViewport() || !isImmersiveVideo) return;
-    if (e.target.closest('.trailer-modal-bottom-controls') || e.target.closest('button') || e.target.closest('input')) return;
-    const touch = e.touches[0];
-    if (!touch) return;
-    immersivePullRef.current = { active: true, startY: touch.clientY };
-  };
-
-  const handleImmersivePullMove = (e) => {
-    if (!immersivePullRef.current.active || !isImmersiveVideo) return;
-    const touch = e.touches[0];
-    if (!touch) return;
-    const dy = touch.clientY - immersivePullRef.current.startY;
-    if (dy < -48) {
-      if (e.cancelable) e.preventDefault();
-      collapseImmersiveVideo();
-      immersivePullRef.current.active = false;
-    }
-  };
-
-  const handleImmersivePullEnd = () => {
-    immersivePullRef.current.active = false;
   };
 
   const handleExpandToggle = (e) => {
     e.stopPropagation();
     if (isMobileViewport()) {
-      if (isImmersiveVideo) collapseImmersiveVideo();
-      else setIsImmersiveVideo(true);
+      if (isImmersiveVideoRef.current || isImmersiveVideo) collapseImmersiveVideo();
+      else expandImmersiveVideo();
       showControlsWithDelay();
       return;
     }
@@ -203,7 +232,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   };
 
   const showExpandedIcon = isMobileViewport() ? isImmersiveVideo : isFullscreen;
-  const sheetDragProgress = Math.min(sheetDragY / getSheetExpandThreshold(), 1);
 
   const trailerModalClassName = [
     'trailer-modal',
@@ -254,6 +282,10 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   useEffect(() => {
     showControlsRef.current = showControls;
   }, [showControls]);
+
+  useEffect(() => {
+    isImmersiveVideoRef.current = isImmersiveVideo;
+  }, [isImmersiveVideo]);
 
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {
@@ -480,19 +512,71 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     };
   }, [selectedTrailer?.trailers?.[contentLang], playbackSpeed]);
 
-  // Mobil: video ustiga bosilganda controls toggle
+  // Mobil: video ustiga bosilganda controls toggle + immersive'dan yuqoriga swipe
   const videoTapRef = useRef({ x: 0, y: 0, time: 0 });
 
   const handleVideoWrapperTouchStart = (e) => {
     if (!('ontouchstart' in window)) return;
     if (e.target.closest('.trailer-modal-control-btn') || e.target.closest('.trailer-modal-bottom-controls') || e.target.closest('input')) return;
     const touch = e.touches[0];
+    if (!touch) return;
     videoTapRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+
+    if (isMobileViewport() && isImmersiveVideoRef.current) {
+      immersivePullRef.current = {
+        active: true,
+        startY: touch.clientY,
+        startX: touch.clientX,
+        moved: false,
+      };
+    }
+  };
+
+  const handleVideoWrapperTouchMove = (e) => {
+    if (!immersivePullRef.current.active || !isImmersiveVideoRef.current) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const dy = touch.clientY - immersivePullRef.current.startY;
+    const dx = Math.abs(touch.clientX - immersivePullRef.current.startX);
+
+    if (Math.abs(dy) > 10 || dx > 10) {
+      immersivePullRef.current.moved = true;
+    }
+
+    // Faqat aniq yuqoriga (pastdan tepaga) swipe
+    if (dy < -24 && Math.abs(dy) > dx * 1.2) {
+      if (e.cancelable) e.preventDefault();
+    }
+
+    if (dy <= -IMMERSIVE_COLLAPSE_PX && Math.abs(dy) > dx) {
+      if (e.cancelable) e.preventDefault();
+      collapseImmersiveVideo();
+      immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: true };
+    }
   };
 
   const handleVideoWrapperTouchEnd = (e) => {
     if (!('ontouchstart' in window)) return;
     if (e.target.closest('.trailer-modal-control-btn') || e.target.closest('.trailer-modal-bottom-controls') || e.target.closest('input')) return;
+
+    const pull = immersivePullRef.current;
+    if (pull.active && isImmersiveVideoRef.current) {
+      const touch = e.changedTouches?.[0];
+      if (touch) {
+        const dy = touch.clientY - pull.startY;
+        const dx = Math.abs(touch.clientX - pull.startX);
+        if (dy <= -IMMERSIVE_COLLAPSE_PX * 0.75 && Math.abs(dy) > dx) {
+          collapseImmersiveVideo();
+          immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: false };
+          return;
+        }
+      }
+    }
+    immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: false };
+
+    // Swipe bo'lsa controls toggle qilmasin
+    if (pull.moved) return;
+
     const touch = e.changedTouches?.[0];
     if (!touch) return;
     const { x, y, time } = videoTapRef.current;
@@ -501,14 +585,11 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     const dt = Date.now() - time;
     if (dx < 20 && dy < 20 && dt < 300) {
       e.preventDefault();
-      // showControlsRef.current — joriy qiymatni ref orqali o'qiymiz (stale closure yo'q)
       if (showControlsRef.current) {
-        // Yashir
         clearHideTimeout();
         setShowControls(false);
         showControlsRef.current = false;
       } else {
-        // Ko'rsat
         setShowControls(true);
         showControlsRef.current = true;
         if (isPlayingRef.current) {
@@ -559,7 +640,9 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                 onMouseMove={('ontouchstart' in window) ? undefined : throttledShowControls}
                 onMouseLeave={('ontouchstart' in window) ? undefined : () => isPlaying && setShowControls(false)}
                 onTouchStart={handleVideoWrapperTouchStart}
+                onTouchMove={handleVideoWrapperTouchMove}
                 onTouchEnd={handleVideoWrapperTouchEnd}
+                onTouchCancel={handleVideoWrapperTouchEnd}
               >
                 {showLoading ? (
                   <div className="trailer-modal-video-placeholder" aria-hidden="true" />
@@ -585,11 +668,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                 <>
                 <div
                   className={`trailer-modal-controls-overlay ${showControls ? 'show' : ''}`}
-                  onTouchStart={(e) => {
-                    handleImmersivePullStart(e);
-                  }}
-                  onTouchMove={handleImmersivePullMove}
-                  onTouchEnd={handleImmersivePullEnd}
                 >
                   <div className="trailer-modal-controls-center">
                     <button className="trailer-modal-control-btn" onClick={handleBack10} aria-label="Rewind 10 seconds">

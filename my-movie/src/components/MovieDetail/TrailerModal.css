@@ -852,6 +852,7 @@ button.trailer-modal-controls-dislike {
     transform: none !important;
     overflow: hidden;
     transition: flex 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    touch-action: pan-y;
   }
 
   .trailer-modal--immersive .trailer-modal-scroll-area {
@@ -875,6 +876,7 @@ button.trailer-modal-controls-dislike {
     border: none;
     box-shadow: none;
     transition: height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    touch-action: pan-y;
   }
 
   .trailer-modal--immersive .trailer-modal-video {
