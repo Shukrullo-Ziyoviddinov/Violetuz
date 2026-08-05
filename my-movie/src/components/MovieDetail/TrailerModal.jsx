@@ -57,9 +57,19 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const videoRef = useRef(null);
   const videoWrapperRef = useRef(null);
   const scrollAreaRef = useRef(null);
-  const sheetDragRef = useRef({ active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 });
+  const sheetDragRef = useRef({
+    active: false,
+    mode: null, // 'expand' | 'collapse'
+    startY: 0,
+    startX: 0,
+    canDrag: false,
+    locked: false,
+    rawDy: 0,
+    lastY: 0,
+    lastT: 0,
+    velocity: 0,
+  });
   const sheetDragYRef = useRef(0);
-  const immersivePullRef = useRef({ active: false, startY: 0, startX: 0, moved: false });
   const isImmersiveVideoRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -68,6 +78,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const [sheetDragY, setSheetDragY] = useState(0);
   const [sheetDragProgress, setSheetDragProgress] = useState(0);
   const [isSheetDragging, setIsSheetDragging] = useState(false);
+  const [sheetGesture, setSheetGesture] = useState(null); // 'expand' | 'collapse'
 
   useEffect(() => {
     if (!movie) {
@@ -109,18 +120,36 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const speedOptions = [1, 1.5, 2];
 
   const isMobileViewport = () => typeof window !== 'undefined' && window.innerWidth <= 969;
-  // Immersive'ga o'tish: ekranning ~35% i pastga — o'rtacha og'ir
-  const getSheetExpandThreshold = () => (typeof window !== 'undefined' ? window.innerHeight : 800) * 0.35;
-  const SHEET_ACTIVATE_PX = 14;
-  const IMMERSIVE_COLLAPSE_PX = 80;
+  const getSheetThreshold = () => (typeof window !== 'undefined' ? window.innerHeight : 800) * 0.35;
+  const SHEET_ACTIVATE_PX = 18;
+  const SHEET_FLING_VELOCITY = 0.72; // px/ms
+  const SHEET_FLING_MIN_RATIO = 0.18; // fling uchun minimal yo'l (~6% ekran)
 
-  // Pastga tortishda "rubber" — barmoq siljishidan vizual sekinroq
-  const resistSheetDrag = (rawDy) => {
-    const threshold = getSheetExpandThreshold();
-    const t = Math.max(rawDy, 0) / Math.max(threshold, 1);
-    // 0..1 oralig'ida og'irlashadi, ortiqcha tortishda yanada sekin
-    const eased = 1 - Math.exp(-t * 1.15);
-    return eased * threshold * 0.92;
+  const emptySheetDrag = () => ({
+    active: false,
+    mode: null,
+    startY: 0,
+    startX: 0,
+    canDrag: false,
+    locked: false,
+    rawDy: 0,
+    lastY: 0,
+    lastT: 0,
+    velocity: 0,
+  });
+
+  // Og'ir lekin silliq rubber: barmoqning ~42% i, chegaradan keyin yanada sekin
+  const resistSheetDrag = (rawAbs) => {
+    const threshold = getSheetThreshold();
+    const tracked = Math.max(rawAbs, 0) * 0.42;
+    if (tracked <= threshold) {
+      // engil ease-out — sekin start, silliq o'sish
+      const t = tracked / Math.max(threshold, 1);
+      const smoothed = t * t * (3 - 2 * t); // smoothstep
+      return smoothed * threshold * 0.88;
+    }
+    const over = tracked - threshold;
+    return threshold * 0.88 + over * 0.18;
   };
 
   const setSheetDragYSafe = (y, progress = 0) => {
@@ -129,21 +158,44 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     setSheetDragProgress(progress);
   };
 
+  const resetSheetVisual = () => {
+    setSheetDragYSafe(0, 0);
+    setIsSheetDragging(false);
+    setSheetGesture(null);
+    sheetDragRef.current = emptySheetDrag();
+  };
+
   const collapseImmersiveVideo = () => {
     isImmersiveVideoRef.current = false;
     setIsImmersiveVideo(false);
-    setSheetDragYSafe(0);
-    setIsSheetDragging(false);
-    sheetDragRef.current = { active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 };
-    immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: false };
+    resetSheetVisual();
   };
 
   const expandImmersiveVideo = () => {
     isImmersiveVideoRef.current = true;
     setIsImmersiveVideo(true);
-    setSheetDragYSafe(0);
-    setIsSheetDragging(false);
-    sheetDragRef.current = { active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 };
+    resetSheetVisual();
+  };
+
+  const updateSheetVelocity = (clientY) => {
+    const now = performance.now();
+    const prev = sheetDragRef.current;
+    const dt = Math.max(now - (prev.lastT || now), 1);
+    const vy = (clientY - (prev.lastY || clientY)) / dt;
+    sheetDragRef.current.lastY = clientY;
+    sheetDragRef.current.lastT = now;
+    // Smooth velocity (ema)
+    sheetDragRef.current.velocity = prev.velocity * 0.65 + vy * 0.35;
+  };
+
+  const shouldCommitSheet = (rawAbs, velocitySigned, direction) => {
+    const threshold = getSheetThreshold();
+    if (rawAbs >= threshold) return true;
+    const flingOk =
+      direction === 'expand'
+        ? velocitySigned >= SHEET_FLING_VELOCITY
+        : velocitySigned <= -SHEET_FLING_VELOCITY;
+    return flingOk && rawAbs >= threshold * SHEET_FLING_MIN_RATIO;
   };
 
   const handleTrailerSelect = (trailer) => {
@@ -160,63 +212,172 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     collapseImmersiveVideo();
   };
 
+  // —— Expand: scroll-area pastga ——
   const handleSheetTouchStart = (e) => {
     if (!isMobileViewport() || isImmersiveVideoRef.current) return;
     const scrollEl = scrollAreaRef.current;
     if (!scrollEl || scrollEl.scrollTop > 2) return;
     const touch = e.touches[0];
     if (!touch) return;
+    const now = performance.now();
     sheetDragRef.current = {
       active: true,
+      mode: 'expand',
       startY: touch.clientY,
+      startX: touch.clientX,
       canDrag: true,
       locked: false,
       rawDy: 0,
+      lastY: touch.clientY,
+      lastT: now,
+      velocity: 0,
     };
   };
 
   const handleSheetTouchMove = (e) => {
-    if (!sheetDragRef.current.active || !sheetDragRef.current.canDrag || isImmersiveVideoRef.current) return;
+    const drag = sheetDragRef.current;
+    if (!drag.active || drag.mode !== 'expand' || !drag.canDrag || isImmersiveVideoRef.current) return;
     const touch = e.touches[0];
     if (!touch) return;
-    const rawDy = touch.clientY - sheetDragRef.current.startY;
+    const rawDy = touch.clientY - drag.startY;
+    const dx = Math.abs(touch.clientX - drag.startX);
 
-    if (rawDy < -SHEET_ACTIVATE_PX && !sheetDragRef.current.locked) {
+    if (rawDy < -SHEET_ACTIVATE_PX && !drag.locked) {
       sheetDragRef.current.canDrag = false;
-      setIsSheetDragging(false);
-      setSheetDragYSafe(0);
+      resetSheetVisual();
       return;
     }
 
     if (rawDy <= 0) return;
 
-    if (!sheetDragRef.current.locked) {
-      if (rawDy < SHEET_ACTIVATE_PX) return;
+    if (!drag.locked) {
+      if (rawDy < SHEET_ACTIVATE_PX || rawDy < dx * 1.15) return;
       sheetDragRef.current.locked = true;
+      setSheetGesture('expand');
+      setIsSheetDragging(true);
     }
 
     if (e.cancelable) e.preventDefault();
+    updateSheetVelocity(touch.clientY);
     sheetDragRef.current.rawDy = rawDy;
-    const threshold = getSheetExpandThreshold();
-    setIsSheetDragging(true);
-    // Sheet rubber; video balandligi barmoq masofasiga (sekinroq grow)
-    setSheetDragYSafe(resistSheetDrag(rawDy), Math.min(rawDy / threshold, 1));
+    const threshold = getSheetThreshold();
+    const visual = resistSheetDrag(rawDy);
+    // Progress barmoq yo'lidan, lekin og'irroq (1.25x): silliq o'sadi, tez to'lmaydi
+    const progress = Math.min(rawDy / (threshold * 1.25), 1);
+    setSheetDragYSafe(visual, progress);
   };
 
   const handleSheetTouchEnd = () => {
-    if (!sheetDragRef.current.active) return;
-    const threshold = getSheetExpandThreshold();
-    const rawDy = sheetDragRef.current.rawDy;
-    const wasLocked = sheetDragRef.current.locked;
-    sheetDragRef.current = { active: false, startY: 0, canDrag: false, locked: false, rawDy: 0 };
+    const drag = sheetDragRef.current;
+    if (!drag.active || drag.mode !== 'expand') return;
+    const rawDy = drag.rawDy;
+    const velocity = drag.velocity;
+    const wasLocked = drag.locked;
+    sheetDragRef.current = emptySheetDrag();
     setIsSheetDragging(false);
+    setSheetGesture(null);
 
-    // Barmoq ~35% ekran pastga — vizual rubber alohida
-    if (wasLocked && rawDy >= threshold) {
+    if (wasLocked && shouldCommitSheet(rawDy, velocity, 'expand')) {
       setSheetDragYSafe(0, 0);
       expandImmersiveVideo();
     } else {
+      // yetmasa — transition bilan yuqoriga qaytish
+      requestAnimationFrame(() => setSheetDragYSafe(0, 0));
+    }
+  };
+
+  // —— Collapse: immersive ichida yuqoriga (teskari sheet) ——
+  const isCollapseIgnoreTarget = (target) => {
+    if (!(target instanceof Element)) return false;
+    return Boolean(
+      target.closest('.trailer-modal-control-btn')
+      || target.closest('.trailer-modal-progress-container')
+      || target.closest('.trailer-modal-icon-btn')
+      || target.closest('input')
+      || target.closest('.trailer-modal-speed-menu')
+    );
+  };
+
+  const handleCollapseTouchStart = (e) => {
+    if (!isMobileViewport() || !isImmersiveVideoRef.current) return;
+    if (isCollapseIgnoreTarget(e.target)) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const now = performance.now();
+    sheetDragRef.current = {
+      active: true,
+      mode: 'collapse',
+      startY: touch.clientY,
+      startX: touch.clientX,
+      canDrag: true,
+      locked: false,
+      rawDy: 0,
+      lastY: touch.clientY,
+      lastT: now,
+      velocity: 0,
+    };
+  };
+
+  const handleCollapseTouchMove = (e) => {
+    const drag = sheetDragRef.current;
+    if (!drag.active || drag.mode !== 'collapse' || !drag.canDrag || !isImmersiveVideoRef.current) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rawDy = touch.clientY - drag.startY; // yuqoriga = manfiy
+    const upDy = -rawDy;
+    const dx = Math.abs(touch.clientX - drag.startX);
+
+    if (rawDy > SHEET_ACTIVATE_PX && !drag.locked) {
+      sheetDragRef.current.canDrag = false;
+      resetSheetVisual();
+      return;
+    }
+
+    if (upDy <= 0) return;
+
+    if (!drag.locked) {
+      if (upDy < SHEET_ACTIVATE_PX || upDy < dx * 1.15) return;
+      sheetDragRef.current.locked = true;
+      setSheetGesture('collapse');
+      setIsSheetDragging(true);
+    }
+
+    if (e.cancelable) e.preventDefault();
+    updateSheetVelocity(touch.clientY);
+    sheetDragRef.current.rawDy = rawDy;
+    const threshold = getSheetThreshold();
+    const progress = Math.min(upDy / (threshold * 1.25), 1);
+    // Collapse'da scroll-area pastdan chiqadi — progress CSS orqali
+    setSheetDragYSafe(resistSheetDrag(upDy), progress);
+  };
+
+  const handleCollapseTouchEnd = () => {
+    const drag = sheetDragRef.current;
+    if (!drag.active || drag.mode !== 'collapse') return;
+    const upDy = Math.max(-drag.rawDy, 0);
+    const velocity = drag.velocity;
+    const wasLocked = drag.locked;
+    const threshold = getSheetThreshold();
+    const progressSnapshot = Math.min(upDy / (threshold * 1.25), 1);
+    sheetDragRef.current = emptySheetDrag();
+
+    if (wasLocked && shouldCommitSheet(upDy, velocity, 'collapse')) {
+      setIsSheetDragging(false);
+      setSheetGesture(null);
       setSheetDragYSafe(0, 0);
+      collapseImmersiveVideo();
+    } else {
+      // yetmasa — scroll-area yana pastga (silliq), video markazda qoladi
+      setIsSheetDragging(false);
+      if (wasLocked && progressSnapshot > 0.02) {
+        requestAnimationFrame(() => {
+          setSheetDragYSafe(0, 0);
+          requestAnimationFrame(() => setSheetGesture(null));
+        });
+      } else {
+        setSheetGesture(null);
+        setSheetDragYSafe(0, 0);
+      }
     }
   };
 
@@ -237,6 +398,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     'trailer-modal',
     isImmersiveVideo ? 'trailer-modal--immersive' : '',
     isSheetDragging ? 'trailer-modal--sheet-dragging' : '',
+    sheetGesture === 'collapse' ? 'trailer-modal--collapsing' : '',
   ].filter(Boolean).join(' ');
 
   const trailerModalStyle = isMobileViewport()
@@ -512,78 +674,49 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     };
   }, [selectedTrailer?.trailers?.[contentLang], playbackSpeed]);
 
-  // Mobil: video ustiga bosilganda controls toggle + immersive'dan yuqoriga swipe
+  // Mobil: video ustiga bosilganda controls toggle
   const videoTapRef = useRef({ x: 0, y: 0, time: 0 });
+  const collapseMovedRef = useRef(false);
 
-  const handleVideoWrapperTouchStart = (e) => {
-    if (!('ontouchstart' in window)) return;
-    if (e.target.closest('.trailer-modal-control-btn') || e.target.closest('.trailer-modal-bottom-controls') || e.target.closest('input')) return;
-    const touch = e.touches[0];
-    if (!touch) return;
-    videoTapRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+  const handlePinTouchStart = (e) => {
+    collapseMovedRef.current = false;
+    handleCollapseTouchStart(e);
+  };
 
-    if (isMobileViewport() && isImmersiveVideoRef.current) {
-      immersivePullRef.current = {
-        active: true,
-        startY: touch.clientY,
-        startX: touch.clientX,
-        moved: false,
-      };
+  const handlePinTouchMove = (e) => {
+    handleCollapseTouchMove(e);
+    if (sheetDragRef.current.mode === 'collapse' && sheetDragRef.current.locked) {
+      collapseMovedRef.current = true;
     }
   };
 
-  const handleVideoWrapperTouchMove = (e) => {
-    if (!immersivePullRef.current.active || !isImmersiveVideoRef.current) return;
+  const handlePinTouchEnd = () => {
+    handleCollapseTouchEnd();
+  };
+
+  const handleVideoWrapperTouchStart = (e) => {
+    if (!('ontouchstart' in window)) return;
+    if (isCollapseIgnoreTarget(e.target)) return;
     const touch = e.touches[0];
     if (!touch) return;
-    const dy = touch.clientY - immersivePullRef.current.startY;
-    const dx = Math.abs(touch.clientX - immersivePullRef.current.startX);
-
-    if (Math.abs(dy) > 10 || dx > 10) {
-      immersivePullRef.current.moved = true;
-    }
-
-    // Faqat aniq yuqoriga (pastdan tepaga) swipe
-    if (dy < -24 && Math.abs(dy) > dx * 1.2) {
-      if (e.cancelable) e.preventDefault();
-    }
-
-    if (dy <= -IMMERSIVE_COLLAPSE_PX && Math.abs(dy) > dx) {
-      if (e.cancelable) e.preventDefault();
-      collapseImmersiveVideo();
-      immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: true };
-    }
+    videoTapRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
   };
 
   const handleVideoWrapperTouchEnd = (e) => {
     if (!('ontouchstart' in window)) return;
-    if (e.target.closest('.trailer-modal-control-btn') || e.target.closest('.trailer-modal-bottom-controls') || e.target.closest('input')) return;
-
-    const pull = immersivePullRef.current;
-    if (pull.active && isImmersiveVideoRef.current) {
-      const touch = e.changedTouches?.[0];
-      if (touch) {
-        const dy = touch.clientY - pull.startY;
-        const dx = Math.abs(touch.clientX - pull.startX);
-        if (dy <= -IMMERSIVE_COLLAPSE_PX * 0.75 && Math.abs(dy) > dx) {
-          collapseImmersiveVideo();
-          immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: false };
-          return;
-        }
-      }
+    if (collapseMovedRef.current) {
+      collapseMovedRef.current = false;
+      return;
     }
-    immersivePullRef.current = { active: false, startY: 0, startX: 0, moved: false };
-
-    // Swipe bo'lsa controls toggle qilmasin
-    if (pull.moved) return;
+    if (isCollapseIgnoreTarget(e.target)) return;
 
     const touch = e.changedTouches?.[0];
     if (!touch) return;
     const { x, y, time } = videoTapRef.current;
     const dx = Math.abs(touch.clientX - x);
-    const dy = Math.abs(touch.clientY - y);
+    const dyAbs = Math.abs(touch.clientY - y);
     const dt = Date.now() - time;
-    if (dx < 20 && dy < 20 && dt < 300) {
+    if (dx < 20 && dyAbs < 20 && dt < 300) {
       e.preventDefault();
       if (showControlsRef.current) {
         clearHideTimeout();
@@ -632,7 +765,13 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
       >
         <TrailerCloseButton onClick={onClose} label={t('common.back', 'Back')} />
 
-        <div className="trailer-modal-pin">
+        <div
+          className="trailer-modal-pin"
+          onTouchStart={handlePinTouchStart}
+          onTouchMove={handlePinTouchMove}
+          onTouchEnd={handlePinTouchEnd}
+          onTouchCancel={handlePinTouchEnd}
+        >
             {(selectedTrailer || showLoading) && (
               <div 
                 className="trailer-modal-video-wrapper"
@@ -640,9 +779,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                 onMouseMove={('ontouchstart' in window) ? undefined : throttledShowControls}
                 onMouseLeave={('ontouchstart' in window) ? undefined : () => isPlaying && setShowControls(false)}
                 onTouchStart={handleVideoWrapperTouchStart}
-                onTouchMove={handleVideoWrapperTouchMove}
                 onTouchEnd={handleVideoWrapperTouchEnd}
-                onTouchCancel={handleVideoWrapperTouchEnd}
               >
                 {showLoading ? (
                   <div className="trailer-modal-video-placeholder" aria-hidden="true" />
@@ -697,7 +834,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
                   onMouseMove={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
                 >
                   <div 
                     className="trailer-modal-progress-container"
