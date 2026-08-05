@@ -71,6 +71,8 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   });
   const sheetDragYRef = useRef(0);
   const isImmersiveVideoRef = useRef(false);
+  const sheetSettlingRef = useRef(null);
+  const settleTimerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [trailerLoading, setTrailerLoading] = useState(true);
@@ -79,6 +81,8 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const [sheetDragProgress, setSheetDragProgress] = useState(0);
   const [isSheetDragging, setIsSheetDragging] = useState(false);
   const [sheetGesture, setSheetGesture] = useState(null); // 'expand' | 'collapse'
+  const [sheetSettling, setSheetSettling] = useState(null); // 'expand' | 'collapse'
+  const [sheetSnap, setSheetSnap] = useState(false); // transition o'chirish (bounce yo'q)
 
   useEffect(() => {
     if (!movie) {
@@ -124,6 +128,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const SHEET_ACTIVATE_PX = 18;
   const SHEET_FLING_VELOCITY = 0.72; // px/ms
   const SHEET_FLING_MIN_RATIO = 0.18; // fling uchun minimal yo'l (~6% ekran)
+  const SHEET_SETTLE_MS = 420;
 
   const emptySheetDrag = () => ({
     active: false,
@@ -143,7 +148,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     const threshold = getSheetThreshold();
     const tracked = Math.max(rawAbs, 0) * 0.42;
     if (tracked <= threshold) {
-      // engil ease-out — sekin start, silliq o'sish
       const t = tracked / Math.max(threshold, 1);
       const smoothed = t * t * (3 - 2 * t); // smoothstep
       return smoothed * threshold * 0.88;
@@ -158,20 +162,93 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     setSheetDragProgress(progress);
   };
 
+  const clearSettleTimer = () => {
+    if (settleTimerRef.current) {
+      clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = null;
+    }
+  };
+
   const resetSheetVisual = () => {
     setSheetDragYSafe(0, 0);
     setIsSheetDragging(false);
     setSheetGesture(null);
+    setSheetSettling(null);
+    sheetSettlingRef.current = null;
     sheetDragRef.current = emptySheetDrag();
   };
 
-  const collapseImmersiveVideo = () => {
+  const snapThenClearMotion = (apply) => {
+    setSheetSnap(true);
+    apply();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setSheetSnap(false));
+    });
+  };
+
+  // Commit: avval progress=1 gacha silliq, keyin mode switch (bounce yo'q)
+  const animateCommitExpand = () => {
+    if (sheetSettlingRef.current === 'expand') return;
+    clearSettleTimer();
+    setIsSheetDragging(false);
+    setSheetGesture('expand');
+    setSheetSettling('expand');
+    sheetSettlingRef.current = 'expand';
+    requestAnimationFrame(() => {
+      const push = typeof window !== 'undefined' ? window.innerHeight * 0.55 : 440;
+      setSheetDragYSafe(push, 1);
+    });
+    settleTimerRef.current = setTimeout(() => {
+      sheetSettlingRef.current = null;
+      snapThenClearMotion(() => {
+        isImmersiveVideoRef.current = true;
+        setIsImmersiveVideo(true);
+        setSheetSettling(null);
+        setSheetGesture(null);
+        setSheetDragYSafe(0, 0);
+      });
+    }, SHEET_SETTLE_MS);
+  };
+
+  const animateCommitCollapse = () => {
+    if (sheetSettlingRef.current === 'collapse') return;
+    clearSettleTimer();
+    setIsSheetDragging(false);
+    setSheetGesture('collapse');
+    setSheetSettling('collapse');
+    sheetSettlingRef.current = 'collapse';
+    requestAnimationFrame(() => {
+      setSheetDragYSafe(0, 1);
+    });
+    settleTimerRef.current = setTimeout(() => {
+      sheetSettlingRef.current = null;
+      snapThenClearMotion(() => {
+        isImmersiveVideoRef.current = false;
+        setIsImmersiveVideo(false);
+        setSheetSettling(null);
+        setSheetGesture(null);
+        setSheetDragYSafe(0, 0);
+      });
+    }, SHEET_SETTLE_MS);
+  };
+
+  const collapseImmersiveVideo = ({ instant = false } = {}) => {
+    if (!instant && isMobileViewport() && isImmersiveVideoRef.current && !sheetSettlingRef.current) {
+      animateCommitCollapse();
+      return;
+    }
+    clearSettleTimer();
     isImmersiveVideoRef.current = false;
     setIsImmersiveVideo(false);
     resetSheetVisual();
   };
 
-  const expandImmersiveVideo = () => {
+  const expandImmersiveVideo = ({ instant = false } = {}) => {
+    if (!instant && isMobileViewport() && !isImmersiveVideoRef.current && !sheetSettlingRef.current) {
+      animateCommitExpand();
+      return;
+    }
+    clearSettleTimer();
     isImmersiveVideoRef.current = true;
     setIsImmersiveVideo(true);
     resetSheetVisual();
@@ -184,7 +261,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     const vy = (clientY - (prev.lastY || clientY)) / dt;
     sheetDragRef.current.lastY = clientY;
     sheetDragRef.current.lastT = now;
-    // Smooth velocity (ema)
     sheetDragRef.current.velocity = prev.velocity * 0.65 + vy * 0.35;
   };
 
@@ -209,12 +285,12 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     setIsPlaying(false);
     setShowControls(true);
     showControlsRef.current = true;
-    collapseImmersiveVideo();
+    collapseImmersiveVideo({ instant: true });
   };
 
   // —— Expand: scroll-area pastga ——
   const handleSheetTouchStart = (e) => {
-    if (!isMobileViewport() || isImmersiveVideoRef.current) return;
+    if (!isMobileViewport() || isImmersiveVideoRef.current || sheetSettlingRef.current) return;
     const scrollEl = scrollAreaRef.current;
     if (!scrollEl || scrollEl.scrollTop > 2) return;
     const touch = e.touches[0];
@@ -236,7 +312,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
 
   const handleSheetTouchMove = (e) => {
     const drag = sheetDragRef.current;
-    if (!drag.active || drag.mode !== 'expand' || !drag.canDrag || isImmersiveVideoRef.current) return;
+    if (!drag.active || drag.mode !== 'expand' || !drag.canDrag || isImmersiveVideoRef.current || sheetSettlingRef.current) return;
     const touch = e.touches[0];
     if (!touch) return;
     const rawDy = touch.clientY - drag.startY;
@@ -262,7 +338,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     sheetDragRef.current.rawDy = rawDy;
     const threshold = getSheetThreshold();
     const visual = resistSheetDrag(rawDy);
-    // Progress barmoq yo'lidan, lekin og'irroq (1.25x): silliq o'sadi, tez to'lmaydi
     const progress = Math.min(rawDy / (threshold * 1.25), 1);
     setSheetDragYSafe(visual, progress);
   };
@@ -275,13 +350,12 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     const wasLocked = drag.locked;
     sheetDragRef.current = emptySheetDrag();
     setIsSheetDragging(false);
-    setSheetGesture(null);
 
     if (wasLocked && shouldCommitSheet(rawDy, velocity, 'expand')) {
-      setSheetDragYSafe(0, 0);
+      // progress=0 ga tashlamasdan — settle animatsiya
       expandImmersiveVideo();
     } else {
-      // yetmasa — transition bilan yuqoriga qaytish
+      setSheetGesture(null);
       requestAnimationFrame(() => setSheetDragYSafe(0, 0));
     }
   };
@@ -299,7 +373,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   };
 
   const handleCollapseTouchStart = (e) => {
-    if (!isMobileViewport() || !isImmersiveVideoRef.current) return;
+    if (!isMobileViewport() || !isImmersiveVideoRef.current || sheetSettlingRef.current) return;
     if (isCollapseIgnoreTarget(e.target)) return;
     const touch = e.touches[0];
     if (!touch) return;
@@ -320,7 +394,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
 
   const handleCollapseTouchMove = (e) => {
     const drag = sheetDragRef.current;
-    if (!drag.active || drag.mode !== 'collapse' || !drag.canDrag || !isImmersiveVideoRef.current) return;
+    if (!drag.active || drag.mode !== 'collapse' || !drag.canDrag || !isImmersiveVideoRef.current || sheetSettlingRef.current) return;
     const touch = e.touches[0];
     if (!touch) return;
     const rawDy = touch.clientY - drag.startY; // yuqoriga = manfiy
@@ -347,7 +421,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     sheetDragRef.current.rawDy = rawDy;
     const threshold = getSheetThreshold();
     const progress = Math.min(upDy / (threshold * 1.25), 1);
-    // Collapse'da scroll-area pastdan chiqadi — progress CSS orqali
     setSheetDragYSafe(resistSheetDrag(upDy), progress);
   };
 
@@ -360,24 +433,18 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     const threshold = getSheetThreshold();
     const progressSnapshot = Math.min(upDy / (threshold * 1.25), 1);
     sheetDragRef.current = emptySheetDrag();
+    setIsSheetDragging(false);
 
     if (wasLocked && shouldCommitSheet(upDy, velocity, 'collapse')) {
-      setIsSheetDragging(false);
+      collapseImmersiveVideo();
+    } else if (wasLocked && progressSnapshot > 0.02) {
+      requestAnimationFrame(() => {
+        setSheetDragYSafe(0, 0);
+        requestAnimationFrame(() => setSheetGesture(null));
+      });
+    } else {
       setSheetGesture(null);
       setSheetDragYSafe(0, 0);
-      collapseImmersiveVideo();
-    } else {
-      // yetmasa — scroll-area yana pastga (silliq), video markazda qoladi
-      setIsSheetDragging(false);
-      if (wasLocked && progressSnapshot > 0.02) {
-        requestAnimationFrame(() => {
-          setSheetDragYSafe(0, 0);
-          requestAnimationFrame(() => setSheetGesture(null));
-        });
-      } else {
-        setSheetGesture(null);
-        setSheetDragYSafe(0, 0);
-      }
     }
   };
 
@@ -398,7 +465,9 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     'trailer-modal',
     isImmersiveVideo ? 'trailer-modal--immersive' : '',
     isSheetDragging ? 'trailer-modal--sheet-dragging' : '',
-    sheetGesture === 'collapse' ? 'trailer-modal--collapsing' : '',
+    (sheetGesture === 'collapse' || sheetSettling === 'collapse') ? 'trailer-modal--collapsing' : '',
+    sheetSettling === 'expand' ? 'trailer-modal--expanding' : '',
+    sheetSnap ? 'trailer-modal--snap' : '',
   ].filter(Boolean).join(' ');
 
   const trailerModalStyle = isMobileViewport()
@@ -448,6 +517,10 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   useEffect(() => {
     isImmersiveVideoRef.current = isImmersiveVideo;
   }, [isImmersiveVideo]);
+
+  useEffect(() => () => {
+    if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
+  }, []);
 
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {

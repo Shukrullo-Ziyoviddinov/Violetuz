@@ -809,16 +809,16 @@ button.trailer-modal-controls-dislike {
     touch-action: pan-y;
     transform: translate3d(0, var(--trailer-sheet-drag-y, 0px), 0);
     transition:
-      transform 0.38s cubic-bezier(0.32, 0.72, 0, 1),
-      opacity 0.28s ease,
-      max-height 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .trailer-modal-pin .trailer-modal-video-wrapper {
-    transition: height 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Expand progress: drag va spring-back paytida */
+  /* Expand progress: drag va spring-back / settle paytida */
   .trailer-modal:not(.trailer-modal--immersive) .trailer-modal-pin .trailer-modal-video-wrapper {
     aspect-ratio: auto;
     height: calc(
@@ -835,6 +835,24 @@ button.trailer-modal-controls-dislike {
 
   .trailer-modal--sheet-dragging:not(.trailer-modal--immersive) .trailer-modal-video-wrapper {
     transition: none;
+  }
+
+  /* Commit expand: scroll pastga sirg'ilib kiradi, video to'liq balandlikka */
+  .trailer-modal--expanding .trailer-modal-scroll-area {
+    opacity: calc(1 - var(--trailer-sheet-progress, 0));
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .trailer-modal--expanding .trailer-modal-pin .trailer-modal-video-wrapper {
+    transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Mode switch snap — bitta frame transition yo'q = bounce yo'q */
+  .trailer-modal--snap .trailer-modal-scroll-area,
+  .trailer-modal--snap .trailer-modal-pin,
+  .trailer-modal--snap .trailer-modal-video-wrapper {
+    transition: none !important;
   }
 
   .trailer-modal--immersive {
@@ -854,11 +872,10 @@ button.trailer-modal-controls-dislike {
     flex: 1 1 auto;
     min-height: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: stretch;
     transform: none !important;
     overflow: hidden;
-    transition: flex 0.38s cubic-bezier(0.32, 0.72, 0, 1);
     touch-action: pan-y;
   }
 
@@ -871,9 +888,9 @@ button.trailer-modal-controls-dislike {
     pointer-events: none;
     transform: translate3d(0, 110%, 0) !important;
     transition:
-      transform 0.38s cubic-bezier(0.32, 0.72, 0, 1),
-      opacity 0.28s ease,
-      max-height 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .trailer-modal--immersive .trailer-modal-video-wrapper {
@@ -885,7 +902,6 @@ button.trailer-modal-controls-dislike {
     min-height: 0;
     border: none;
     box-shadow: none;
-    transition: height 0.38s cubic-bezier(0.32, 0.72, 0, 1);
     touch-action: pan-y;
   }
 
@@ -908,14 +924,13 @@ button.trailer-modal-controls-dislike {
 
   .trailer-modal--immersive.trailer-modal--collapsing:not(.trailer-modal--sheet-dragging) .trailer-modal-scroll-area {
     transition:
-      transform 0.38s cubic-bezier(0.32, 0.72, 0, 1),
-      opacity 0.28s ease,
-      max-height 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-pin {
     flex: 1 1 auto;
-    transition: none;
   }
 
   .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-video-wrapper {
@@ -932,7 +947,7 @@ button.trailer-modal-controls-dislike {
   }
 
   .trailer-modal--immersive.trailer-modal--collapsing:not(.trailer-modal--sheet-dragging) .trailer-modal-video-wrapper {
-    transition: height 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .trailer-modal--immersive .trailer-modal-video {
