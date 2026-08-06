@@ -174,7 +174,9 @@ const ShortsVideos = ({
     return orderShortsByRepostIds(baseList, repostIds);
   });
   const [isMobileView, setIsMobileView] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(
+    () => startIndex != null && startIndex >= 0
+  );
   const [activeIndex, setActiveIndex] = useState(startIndex ?? 0);
   const hasLoadedMore = useRef(false);
 
@@ -334,7 +336,9 @@ const ShortsVideos = ({
 
   const closeModal = useCallback(() => {
     if (onCloseFromHome) {
+      // Modalni yopmasa — ortqa navigatsiya tugaguncha shorts grid flash bo‘lmasin
       onCloseFromHome();
+      return;
     }
     setModalOpen(false);
     setSlideState(null);
@@ -1289,33 +1293,35 @@ const ShortsVideos = ({
 
   return (
     <div className="shorts-videos" aria-busy={showGridSkeleton || undefined}>
-      <div className="shorts-videos-container">
-        <div className="shorts-videos-grid" ref={gridRef}>
-          {showGridSkeleton
-            ? Array.from({ length: GRID_SKELETON_COUNT }, (_, index) => (
-                <div
-                  key={`shorts-grid-skeleton-${index}`}
-                  className="shorts-video-card shorts-video-card--skeleton"
-                  aria-hidden="true"
-                >
-                  <div className="shorts-video-thumb">
-                    <SkeletonLoader
-                      variant="shorts-thumb"
-                      className="shorts-video-thumb-skeleton"
-                    />
+      {!onCloseFromHome && (
+        <div className="shorts-videos-container">
+          <div className="shorts-videos-grid" ref={gridRef}>
+            {showGridSkeleton
+              ? Array.from({ length: GRID_SKELETON_COUNT }, (_, index) => (
+                  <div
+                    key={`shorts-grid-skeleton-${index}`}
+                    className="shorts-video-card shorts-video-card--skeleton"
+                    aria-hidden="true"
+                  >
+                    <div className="shorts-video-thumb">
+                      <SkeletonLoader
+                        variant="shorts-thumb"
+                        className="shorts-video-thumb-skeleton"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))
-            : shortsList.map((item, index) => (
-            <div key={item.id} className="shorts-video-card">
-              <ShortsVideoThumb
-                videoSrc={getVideo(item)}
-                onClick={() => openModal(index)}
-              />
-            </div>
-          ))}
+                ))
+              : shortsList.map((item, index) => (
+              <div key={item.id} className="shorts-video-card">
+                <ShortsVideoThumb
+                  videoSrc={getVideo(item)}
+                  onClick={() => openModal(index)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       {modalOpen && createPortal(modalContent, document.body)}
     </div>
   );

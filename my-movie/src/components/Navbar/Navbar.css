@@ -575,24 +575,24 @@
   }
 
   .navbar.navbar--feed-page .navbar-feed-messages-mobile {
+    -webkit-tap-highlight-color: transparent;
+    align-items: center;
+    background: #ffffff14;
+    border: none;
+    border-radius: 50%;
+    color: #fffffff2;
+    cursor: pointer;
     display: inline-flex !important;
+    height: 35px;
+    justify-content: center;
+    padding: 0;
     position: absolute;
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 2;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.95);
-    cursor: pointer;
-    padding: 0;
     transition: background 0.2s ease, color 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
+    width: 35px;
+    z-index: 2;
   }
 
   .navbar.navbar--feed-page .navbar-feed-messages-mobile:hover {
@@ -601,7 +601,7 @@
   }
 
   .navbar.navbar--feed-page .navbar-feed-messages-mobile i {
-    font-size: 21px;
+    font-size: 17px;
     line-height: 1;
   }
 }

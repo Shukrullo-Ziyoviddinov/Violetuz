@@ -142,6 +142,7 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
                   <Link
                     key={item.id}
                     to={`${moreTo}?startIndex=${safeIndex}`}
+                    state={{ shortsReturnTo: isMusic ? '/music' : '/' }}
                     className="shorts-video-card home-shorts-card"
                     data-index={index}
                   >

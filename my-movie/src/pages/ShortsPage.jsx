@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { parseRepostShortsParam } from '../components/Repost/repostTypes';
 import ShortsVideos from '../components/ShortsVideos/ShortsVideos';
 import './ShortsPage.css';
@@ -7,6 +7,7 @@ import './ShortsPage.css';
 const ShortsPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const startIndex = searchParams.get('startIndex');
   const startIndexNum = startIndex != null ? parseInt(startIndex, 10) : null;
   const repostIdsRaw = searchParams.get('repostIds');
@@ -24,7 +25,13 @@ const ShortsPage = () => {
     (repostShortsEntries != null && repostShortsEntries.length > 0);
 
   const handleCloseFromHome = () => {
-    if (fromHomeLink) navigate(-1);
+    if (!fromHomeLink) return;
+    const returnTo = location.state?.shortsReturnTo;
+    if (typeof returnTo === 'string' && returnTo) {
+      navigate(returnTo, { replace: true });
+      return;
+    }
+    navigate(-1);
   };
 
   return (
