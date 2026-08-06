@@ -224,6 +224,7 @@ const ShortsVideos = ({
   const shortsModalHistoryRef = useRef(false);
   const [modalVideoState, setModalVideoState] = useState({ isPlaying: true, currentTime: 0, duration: 0 });
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [mobilePlayOverlayVisible, setMobilePlayOverlayVisible] = useState(false);
   const [modalVideoMuted, setModalVideoMuted] = useState(false);
   const [desktopHover, setDesktopHover] = useState(false);
   const [shortsCommentCount, setShortsCommentCount] = useState(0);
@@ -276,6 +277,7 @@ const ShortsVideos = ({
       const safe = Math.min(startIndex, shortsList.length - 1);
       setActiveIndex(safe);
       setModalOpen(true);
+      setMobilePlayOverlayVisible(false);
       setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
     }
   }, [startIndex, shortsList.length]);
@@ -334,6 +336,7 @@ const ShortsVideos = ({
   const openModal = useCallback((index) => {
     setActiveIndex(index);
     setModalOpen(true);
+    setMobilePlayOverlayVisible(false);
     setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
     if (!onCloseFromHome && !shortsModalHistoryRef.current) {
       window.history.pushState({ shortsModal: true }, '');
@@ -447,6 +450,7 @@ const ShortsVideos = ({
     setMusicModalOpen(false);
     setClipControlsVisible(false);
     setClipVideoFullscreen(false);
+    setMobilePlayOverlayVisible(false);
 
     const v = modalVideoRef.current;
     if (!v) return;
@@ -731,9 +735,11 @@ const ShortsVideos = ({
     if (!v) return;
     collapseDescription();
     if (v.paused) {
+      setMobilePlayOverlayVisible(false);
       v.play().catch(() => {});
     } else {
       v.pause();
+      setMobilePlayOverlayVisible(true);
     }
   }, [collapseDescription]);
 
@@ -779,7 +785,7 @@ const ShortsVideos = ({
             handleMobileVideoTap();
           } : undefined}
         />
-        {isCenter && !modalVideoState.isPlaying && (
+        {isCenter && mobilePlayOverlayVisible && (
           <button
             type="button"
             className="shorts-modal-play-pause-center shorts-modal-play-pause-mobile"
@@ -895,7 +901,7 @@ const ShortsVideos = ({
     handleWatchClick,
     isInWishlist,
     isItemMusicSlide,
-    modalVideoState.isPlaying,
+    mobilePlayOverlayVisible,
     renderMusicCornerButton,
     repostShareRoute,
     shortsCommentCount,
