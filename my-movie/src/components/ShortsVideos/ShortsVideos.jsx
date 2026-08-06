@@ -221,7 +221,6 @@ const ShortsVideos = ({
   const shortsCommentsRef = useRef(null);
   const [modalVideoState, setModalVideoState] = useState({ isPlaying: true, currentTime: 0, duration: 0 });
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
-  const [mobilePlayPauseVisible, setMobilePlayPauseVisible] = useState(false);
   const [modalVideoMuted, setModalVideoMuted] = useState(false);
   const [desktopHover, setDesktopHover] = useState(false);
   const [shortsCommentCount, setShortsCommentCount] = useState(0);
@@ -396,7 +395,6 @@ const ShortsVideos = ({
 
   useEffect(() => {
     setDescriptionExpanded(false);
-    setMobilePlayPauseVisible(false);
     setDesktopHover(false);
     setMusicModalOpen(false);
     setClipControlsVisible(false);
@@ -680,14 +678,12 @@ const ShortsVideos = ({
     const v = modalVideoRef.current;
     if (!v) return;
     collapseDescription();
-    if (mobilePlayPauseVisible) {
-      setMobilePlayPauseVisible(false);
+    if (v.paused) {
       v.play().catch(() => {});
     } else {
-      setMobilePlayPauseVisible(true);
       v.pause();
     }
-  }, [mobilePlayPauseVisible, collapseDescription]);
+  }, [collapseDescription]);
 
   const getTitle = (item) => getLocalizedField(item?.title, contentLang);
   const getDescription = (item) => item.description?.[contentLang] || item.description?.uz || '';
@@ -728,17 +724,14 @@ const ShortsVideos = ({
             handleMobileVideoTap();
           } : undefined}
         />
-        {isCenter && mobilePlayPauseVisible && (
+        {isCenter && !modalVideoState.isPlaying && (
           <button
+            type="button"
             className="shorts-modal-play-pause-center shorts-modal-play-pause-mobile"
-            onClick={(e) => { e.stopPropagation(); toggleModalVideoPlay(); }}
-            aria-label={modalVideoState.isPlaying ? 'Pauza' : 'Ijro'}
+            onClick={(e) => { e.stopPropagation(); handleMobileVideoTap(); }}
+            aria-label="Ijro"
           >
-            {modalVideoState.isPlaying ? (
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
-            ) : (
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-            )}
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
           </button>
         )}
         {isCenter && (
@@ -845,12 +838,11 @@ const ShortsVideos = ({
     handleWatchClick,
     isInWishlist,
     isItemMusicSlide,
-    mobilePlayPauseVisible,
+    modalVideoState.isPlaying,
     renderMusicCornerButton,
     repostShareRoute,
     shortsCommentCount,
     toggleDescriptionExpanded,
-    toggleModalVideoPlay,
     modalVideoMuted,
   ]);
 
