@@ -221,6 +221,7 @@ const ShortsVideos = ({
   const modalVideoRef = useRef(null);
   const mobileVideoTapRef = useRef({ startY: 0, moved: false });
   const shortsCommentsRef = useRef(null);
+  const shortsModalHistoryRef = useRef(false);
   const [modalVideoState, setModalVideoState] = useState({ isPlaying: true, currentTime: 0, duration: 0 });
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [modalVideoMuted, setModalVideoMuted] = useState(false);
@@ -275,6 +276,7 @@ const ShortsVideos = ({
       const safe = Math.min(startIndex, shortsList.length - 1);
       setActiveIndex(safe);
       setModalOpen(true);
+      setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
     }
   }, [startIndex, shortsList.length]);
 
@@ -332,6 +334,18 @@ const ShortsVideos = ({
   const openModal = useCallback((index) => {
     setActiveIndex(index);
     setModalOpen(true);
+    setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
+    if (!onCloseFromHome && !shortsModalHistoryRef.current) {
+      window.history.pushState({ shortsModal: true }, '');
+      shortsModalHistoryRef.current = true;
+    }
+  }, [onCloseFromHome]);
+
+  const finishCloseModal = useCallback(() => {
+    setModalOpen(false);
+    setSlideState(null);
+    setMusicModalOpen(false);
+    setModalVideoMuted(false);
   }, []);
 
   const closeModal = useCallback(() => {
@@ -340,25 +354,48 @@ const ShortsVideos = ({
       onCloseFromHome();
       return;
     }
-    setModalOpen(false);
-    setSlideState(null);
-    setMusicModalOpen(false);
-    setModalVideoMuted(false);
-  }, [onCloseFromHome]);
+    if (shortsModalHistoryRef.current) {
+      shortsModalHistoryRef.current = false;
+      window.history.back();
+      return;
+    }
+    finishCloseModal();
+  }, [onCloseFromHome, finishCloseModal]);
+
+  // Shorts grid dan ochilgan modal: qurilma «ortga» → faqat modal yopilsin
+  useEffect(() => {
+    if (!modalOpen || onCloseFromHome) return undefined;
+    const onPopState = () => {
+      shortsModalHistoryRef.current = false;
+      finishCloseModal();
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [modalOpen, onCloseFromHome, finishCloseModal]);
 
   // "Tomosha qilish" bosilganda faqat modal yopiladi, onCloseFromHome chaqirilmaydi
   // (chunki Link film sahifasiga o'tadi; onCloseFromHome ortga qaytaradi)
   const handleWatchClick = useCallback(() => {
-    setModalOpen(false);
-    setSlideState(null);
-    setMusicModalOpen(false);
-  }, []);
+    if (shortsModalHistoryRef.current) {
+      shortsModalHistoryRef.current = false;
+      window.history.replaceState(null, '');
+    }
+    finishCloseModal();
+  }, [finishCloseModal]);
 
   const toggleModalVideoPlay = useCallback(() => {
     const v = modalVideoRef.current;
     if (!v) return;
     if (v.paused) { v.play().catch(() => {}); }
     else { v.pause(); }
+  }, []);
+
+  const handleModalVideoPlay = useCallback(() => {
+    setModalVideoState((s) => ({ ...s, isPlaying: true }));
+  }, []);
+
+  const handleModalVideoPause = useCallback(() => {
+    setModalVideoState((s) => ({ ...s, isPlaying: false }));
   }, []);
 
   const toggleModalVideoMute = useCallback((e) => {
@@ -374,10 +411,10 @@ const ShortsVideos = ({
     v.currentTime = percent * v.duration;
   }, []);
 
-  // Video event listeners
+  // Video event listeners (desktop ref + fallback)
   useEffect(() => {
     const v = modalVideoRef.current;
-    if (!v || !modalOpen) return;
+    if (!v || !modalOpen) return undefined;
     const onTimeUpdate = () => setModalVideoState((s) => ({ ...s, currentTime: v.currentTime }));
     const onLoadedMetadata = () => setModalVideoState((s) => ({ ...s, duration: v.duration }));
     const onPlay = () => setModalVideoState((s) => ({ ...s, isPlaying: true }));
@@ -388,6 +425,13 @@ const ShortsVideos = ({
     v.addEventListener('play', onPlay);
     v.addEventListener('pause', onPause);
     v.addEventListener('ended', onEnded);
+    // Ref kechroq ulansa ham holatni sinxronlash
+    setModalVideoState((s) => ({
+      ...s,
+      isPlaying: !v.paused,
+      currentTime: v.currentTime,
+      duration: v.duration || s.duration,
+    }));
     return () => {
       v.removeEventListener('timeupdate', onTimeUpdate);
       v.removeEventListener('loadedmetadata', onLoadedMetadata);
@@ -395,7 +439,7 @@ const ShortsVideos = ({
       v.removeEventListener('pause', onPause);
       v.removeEventListener('ended', onEnded);
     };
-  }, [modalOpen, activeIndex]);
+  }, [modalOpen, activeIndex, shortsList.length]);
 
   useEffect(() => {
     setDescriptionExpanded(false);
@@ -405,17 +449,21 @@ const ShortsVideos = ({
     setClipVideoFullscreen(false);
 
     const v = modalVideoRef.current;
-    if (v) {
-      v.muted = modalVideoMuted;
-      if (v.paused) v.play().catch(() => {});
+    if (!v) return;
+    v.muted = modalVideoMuted;
+    if (v.paused) {
+      v.play()
+        .then(() => setModalVideoState((s) => ({ ...s, isPlaying: true })))
+        .catch(() => {});
+    } else {
       setModalVideoState((s) => ({
         ...s,
-        isPlaying: !v.paused,
+        isPlaying: true,
         currentTime: v.currentTime,
         duration: v.duration || s.duration,
       }));
     }
-  }, [activeIndex, modalVideoMuted]);
+  }, [activeIndex, modalVideoMuted, modalOpen, shortsList.length]);
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -714,6 +762,9 @@ const ShortsVideos = ({
           muted={isCenter ? modalVideoMuted : true}
           preload="auto"
           className="shorts-modal-video shorts-modal-mobile-video-el"
+          onPlay={isCenter ? handleModalVideoPlay : undefined}
+          onPlaying={isCenter ? handleModalVideoPlay : undefined}
+          onPause={isCenter ? handleModalVideoPause : undefined}
           onTouchStart={isCenter ? (e) => {
             mobileVideoTapRef.current = { startY: e.touches[0].clientY, moved: false };
           } : undefined}
@@ -836,6 +887,8 @@ const ShortsVideos = ({
     descriptionExpanded,
     getVideo,
     handleMobileVideoTap,
+    handleModalVideoPause,
+    handleModalVideoPlay,
     handleMusicBlockClick,
     handleShortsCommentClick,
     handleShortsSaveClick,
@@ -996,6 +1049,9 @@ const ShortsVideos = ({
                   loop
                   muted={modalVideoMuted}
                   className="shorts-modal-video shorts-modal-desktop-video-el"
+                  onPlay={handleModalVideoPlay}
+                  onPlaying={handleModalVideoPlay}
+                  onPause={handleModalVideoPause}
                   onClick={() => { collapseDescription(); toggleModalVideoPlay(); }}
                 />
                 {desktopHover && !slideState && (

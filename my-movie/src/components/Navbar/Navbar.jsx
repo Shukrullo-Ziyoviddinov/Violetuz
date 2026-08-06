@@ -20,7 +20,7 @@ const Navbar = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, profile } = useAuth();
   const isMusicPage = location.pathname === '/music';
   const isMusicSection = location.pathname.startsWith('/music');
   const isFeedPage = location.pathname === '/feed';
@@ -223,7 +223,15 @@ const Navbar = () => {
             }}
             aria-label={t('navbar.profile')}
           >
-            <i className="fa-solid fa-user" aria-hidden="true" />
+            {profile?.avatar ? (
+              <img
+                src={profile.avatar}
+                alt=""
+                className="navbar-user-avatar"
+              />
+            ) : (
+              <i className="fa-solid fa-user" aria-hidden="true" />
+            )}
           </button>
 
           <div className="navbar-language-wrapper" ref={languageWrapperRef}>

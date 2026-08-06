@@ -177,6 +177,15 @@
   background-color: rgba(155, 79, 231, 0.1);
 }
 
+.navbar-user-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+}
+
 .navbar-icon-active {
   color: #9b4fe7 !important;
   background-color: rgba(155, 79, 231, 0.15) !important;

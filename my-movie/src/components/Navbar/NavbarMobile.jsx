@@ -17,7 +17,7 @@ const NavbarMobile = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, profile } = useAuth();
   const pathname = location.pathname;
   const [showSearch, setShowSearch] = useState(false);
   const [showShortsPicker, setShowShortsPicker] = useState(false);
@@ -93,7 +93,15 @@ const NavbarMobile = () => {
           }}
           aria-label={t('navbar.mobileProfile')}
         >
-          <i className="fa-solid fa-user" aria-hidden="true" />
+          {profile?.avatar ? (
+            <img
+              src={profile.avatar}
+              alt=""
+              className="navbar-user-avatar navbar-user-avatar--mobile"
+            />
+          ) : (
+            <i className="fa-solid fa-user" aria-hidden="true" />
+          )}
           <span>{t('navbar.mobileProfile')}</span>
         </button>
       </nav>
