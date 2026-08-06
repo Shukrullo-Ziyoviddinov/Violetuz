@@ -40,6 +40,7 @@
   transition: opacity 0.3s;
   padding: 0;
   margin: 0;
+  margin-top: 15px;
 }
 
 .navbar-logo:hover {
@@ -48,8 +49,8 @@
 
 .navbar-logo-img {
   height: auto;
-  max-height: 60px;
-  max-width: 110px;
+  max-height: 100px;
+  max-width: 150px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -399,9 +400,9 @@
   }
 
   .navbar-logo-img {
-    max-height: 36px;
+    max-height: 42px;
     height: auto;
-    max-width: 100px;
+    max-width: 120px;
     width: auto;
     object-fit: contain;
     object-position: center;

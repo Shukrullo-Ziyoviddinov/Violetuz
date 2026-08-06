@@ -168,19 +168,19 @@
   pointer-events: auto;
 }
 
-/* Mobil: play/pause markazda, rang #9b4fe7 */
+/* Mobil: play/pause markazda */
 .shorts-modal-play-pause-mobile {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 64px;
-  height: 64px;
+  width: 50px;
+  height: 50px;
 }
 
 .shorts-modal-play-pause-mobile svg {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
 }
 
 .shorts-modal-info-overlay.shorts-modal-info-mobile {
@@ -419,23 +419,23 @@
 
 /* Play/Pause - video markazida, rang #9b4fe7 */
 .shorts-modal-play-pause-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
+  align-items: center;
+  animation: shorts-play-pause-fade 0.2s ease;
+  background: #9b4fe7e6;
   border: none;
-  background: rgba(155, 79, 231, 0.9);
+  border-radius: 50%;
   color: #fff;
   cursor: pointer;
   display: flex;
-  align-items: center;
+  height: 50px;
   justify-content: center;
-  z-index: 6;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
   transition: all 0.2s ease;
-  animation: shorts-play-pause-fade 0.2s ease;
+  width: 50px;
+  z-index: 6;
 }
 
 @keyframes shorts-play-pause-fade {
@@ -449,8 +449,8 @@
 }
 
 .shorts-modal-play-pause-center svg {
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
 }
 
 .shorts-modal-info-desktop {
