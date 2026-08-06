@@ -141,7 +141,7 @@ const Navbar = () => {
       <div className="navbar-container">
         <div className="navbar-left">
           <div className="navbar-logo" onClick={() => navigate('/')}>
-            <img src="/img/newlogo.jpg" alt="VIOLET" className="navbar-logo-img" />
+            <img src="/img/newlogo_preview_rev_1.png" alt="VIOLET" className="navbar-logo-img" />
           </div>
           <button
             className="navbar-mobile-search-trigger"
