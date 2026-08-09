@@ -1,12 +1,17 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import TrillerCard from './TrillerCard';
-import trillers from '../../data/triller.json';
+import { fetchAllTrillers } from '../../api/trillersApi';
 import './TrillerSection.css';
 
 const TrillerSection = () => {
-  const list = Array.isArray(trillers) ? trillers : [];
-  if (!list.length) return null;
+  const { data: list = [], isPending } = useQuery({
+    queryKey: ['trillers'],
+    queryFn: fetchAllTrillers,
+  });
+
+  if (!isPending && !list.length) return null;
 
   return (
     <section className="triller-section">
@@ -16,9 +21,14 @@ const TrillerSection = () => {
         </div>
         <div className="triller-section-scroll">
           <HorizontalScroll>
-            {list.map((item) => (
-              <TrillerCard key={item.id} triller={item} />
-            ))}
+            {(list.length ? list : Array.from({ length: 6 }, (_, i) => ({ id: `sk-${i}`, _skeleton: true }))).map(
+              (item) =>
+                item._skeleton ? (
+                  <div key={item.id} className="triller-card triller-card--skeleton" aria-hidden="true" />
+                ) : (
+                  <TrillerCard key={item.id} triller={item} />
+                )
+            )}
           </HorizontalScroll>
         </div>
       </div>

@@ -1,0 +1,97 @@
+.triller-side-card {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr) 24px;
+  gap: 0.65rem;
+  align-items: start;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.triller-side-card-thumb {
+  position: relative;
+  width: 168px;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.triller-side-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.triller-side-card-age {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #fff;
+  color: #111;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  z-index: 1;
+}
+
+.triller-side-card-duration {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  z-index: 1;
+}
+
+.triller-side-card-body {
+  min-width: 0;
+  padding-top: 0.1rem;
+}
+
+.triller-side-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.triller-side-card-more {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.55);
+  padding-top: 0.15rem;
+}
+
+.triller-side-card:hover .triller-side-card-more {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 900px) {
+  .triller-side-card {
+    grid-template-columns: 140px minmax(0, 1fr) 24px;
+  }
+
+  .triller-side-card-thumb {
+    width: 140px;
+  }
+}

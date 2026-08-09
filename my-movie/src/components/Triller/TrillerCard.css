@@ -44,6 +44,21 @@
   text-overflow: ellipsis;
 }
 
+.triller-card--skeleton {
+  pointer-events: none;
+}
+
+.triller-card--skeleton .triller-card-image-wrap,
+.triller-card--skeleton.triller-card {
+  min-height: 0;
+}
+
+.triller-card--skeleton {
+  height: 220px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
 @media (max-width: 768px) {
   .triller-card {
     width: 260px;

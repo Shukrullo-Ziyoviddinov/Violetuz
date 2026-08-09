@@ -6,13 +6,14 @@
       "ru": "Душа — Трейлер"
     },
     "video": {
-      "uz": "/video/video1.mp4",
-      "ru": "/video/video1.mp4"
+      "uz": "/video/The Amateur _ Official Trailer.mp4",
+      "ru": "/video/The Amateur _ Official Trailer.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-1.avif",
       "ru": "/img/movie-4.5-1.avif"
     },
+    "ageLimit": 6,
     "like": 0,
     "dislike": 0
   },
@@ -23,13 +24,14 @@
       "ru": "Оппенгеймер — Трейлер"
     },
     "video": {
-      "uz": "/video/video1.mp4",
-      "ru": "/video/video1.mp4"
+      "uz": "/video/Zivert - Life   Премьера клипа.mp4",
+      "ru": "/video/Zivert - Life   Премьера клипа.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-2.jpeg",
       "ru": "/img/movie-4.5-2.jpeg"
     },
+    "ageLimit": 18,
     "like": 0,
     "dislike": 0
   },
@@ -40,13 +42,14 @@
       "ru": "The First Recon — Трейлер"
     },
     "video": {
-      "uz": "/video/video1.mp4",
-      "ru": "/video/video1.mp4"
+      "uz": "/video/The Amateur _ Official Trailer.mp4",
+      "ru": "/video/The Amateur _ Official Trailer.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-3.jpg",
       "ru": "/img/movie-4.5-3.jpg"
     },
+    "ageLimit": 18,
     "like": 0,
     "dislike": 0
   },
@@ -57,13 +60,14 @@
       "ru": "Суперсемейка — Трейлер"
     },
     "video": {
-      "uz": "/video/video1.mp4",
-      "ru": "/video/video1.mp4"
+      "uz": "/video/Zivert - Life   Премьера клипа.mp4",
+      "ru": "/video/Zivert - Life   Премьера клипа.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-4.webp",
       "ru": "/img/movie-4.5-4.webp"
     },
+    "ageLimit": 6,
     "like": 0,
     "dislike": 0
   },
@@ -74,13 +78,14 @@
       "ru": "Homestead — Трейлер"
     },
     "video": {
-      "uz": "/video/mainDetailvideo.mp4",
-      "ru": "/video/mainDetailvideo.mp4"
+      "uz": "/video/The Amateur _ Official Trailer.mp4",
+      "ru": "/video/The Amateur _ Official Trailer.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-5.jpg",
       "ru": "/img/movie-4.5-5.jpg"
     },
+    "ageLimit": 16,
     "like": 0,
     "dislike": 0
   },
@@ -91,13 +96,14 @@
       "ru": "Человек-паук — Трейлер"
     },
     "video": {
-      "uz": "/video/mainDetailvideo.mp4",
-      "ru": "/video/mainDetailvideo.mp4"
+      "uz": "/video/Zivert - Life   Премьера клипа.mp4",
+      "ru": "/video/Zivert - Life   Премьера клипа.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-6.avif",
       "ru": "/img/movie-4.5-6.avif"
     },
+    "ageLimit": 12,
     "like": 0,
     "dislike": 0
   },
@@ -108,13 +114,14 @@
       "ru": "Красавица и чудовище — Трейлер"
     },
     "video": {
-      "uz": "/video/mainDetailvideo.mp4",
-      "ru": "/video/mainDetailvideo.mp4"
+      "uz": "/video/The Amateur _ Official Trailer.mp4",
+      "ru": "/video/The Amateur _ Official Trailer.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-7.jpg",
       "ru": "/img/movie-4.5-7.jpg"
     },
+    "ageLimit": 6,
     "like": 0,
     "dislike": 0
   },
@@ -125,13 +132,14 @@
       "ru": "Трейлер 8"
     },
     "video": {
-      "uz": "/video/video1.mp4",
-      "ru": "/video/video1.mp4"
+      "uz": "/video/Zivert - Life   Премьера клипа.mp4",
+      "ru": "/video/Zivert - Life   Премьера клипа.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-8.jpg",
       "ru": "/img/movie-4.5-8.jpg"
     },
+    "ageLimit": 12,
     "like": 0,
     "dislike": 0
   },
@@ -142,13 +150,14 @@
       "ru": "Трейлер 9"
     },
     "video": {
-      "uz": "/video/video1.mp4",
-      "ru": "/video/video1.mp4"
+      "uz": "/video/The Amateur _ Official Trailer.mp4",
+      "ru": "/video/The Amateur _ Official Trailer.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-9.jpg",
       "ru": "/img/movie-4.5-9.jpg"
     },
+    "ageLimit": 16,
     "like": 0,
     "dislike": 0
   },
@@ -159,13 +168,14 @@
       "ru": "Трейлер 10"
     },
     "video": {
-      "uz": "/video/video1.mp4",
-      "ru": "/video/video1.mp4"
+      "uz": "/video/Zivert - Life   Премьера клипа.mp4",
+      "ru": "/video/Zivert - Life   Премьера клипа.mp4"
     },
     "videoImg": {
       "uz": "/img/movie-4.5-10.jpg",
       "ru": "/img/movie-4.5-10.jpg"
     },
+    "ageLimit": 18,
     "like": 0,
     "dislike": 0
   }
