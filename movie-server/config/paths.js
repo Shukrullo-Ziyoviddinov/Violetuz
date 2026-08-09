@@ -19,6 +19,7 @@ module.exports = {
   CATEGORIES_JSON: path.join(ROOT, 'data', 'categories.json'),
   ADS_JSON: path.join(ROOT, 'data', 'ads.json'),
   SHORTS_VIDEOS_JSON: path.join(ROOT, 'data', 'shortsVideos.json'),
+  TRILLERS_JSON: path.join(ROOT, 'data', 'triller.json'),
   SOCIAL_LINKS_JSON: path.join(ROOT, 'data', 'socialLinks.json'),
   VIDEO_BANNERS_JSON: path.join(ROOT, 'data', 'videoBanners.json'),
   ARTISTS_JSON: path.join(ROOT, 'data', 'artists.json'),

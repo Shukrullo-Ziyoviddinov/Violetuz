@@ -8,6 +8,7 @@ import Categories from '../components/Categories';
 import Movies from '../components/Movies/Movies';
 import TopRatedContent from '../components/TopRatedContent/TopRatedContent';
 import RecommendedActors from '../components/RecommendedActors/RecommendedActors';
+import TrillerSection from '../components/Triller/TrillerSection';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import './Home.css';
 
@@ -90,15 +91,17 @@ const Home = () => {
             } = section;
             const filteredMovies = getMoviesByCategory(categoryName);
             return (
-              <Movies
-                key={sectionType}
-                sectionType={sectionType}
-                filteredMovies={filteredMovies}
-                limit={DEFAULT_LIMIT}
-                showHorizontalScroll={!!showHorizontalScroll}
-                headerTitle={t(titleKey)}
-                moreTo={moreTo}
-              />
+              <React.Fragment key={sectionType}>
+                <Movies
+                  sectionType={sectionType}
+                  filteredMovies={filteredMovies}
+                  limit={DEFAULT_LIMIT}
+                  showHorizontalScroll={!!showHorizontalScroll}
+                  headerTitle={t(titleKey)}
+                  moreTo={moreTo}
+                />
+                {sectionType === 'koreaDrama' ? <TrillerSection /> : null}
+              </React.Fragment>
             );
           })}
     </div>

@@ -18,6 +18,7 @@
     "seed:categories": "node seeds/seedCategories.js",
     "seed:ads": "node seeds/seedAds.js",
     "seed:shorts": "node seeds/seedShortVideos.js",
+    "seed:trillers": "node seeds/seedTrillers.js",
     "seed:site-links": "node seeds/seedSiteLinks.js",
     "seed:video-banners": "node seeds/seedVideoBanners.js",
     "seed:artists": "node seeds/seedArtists.js",

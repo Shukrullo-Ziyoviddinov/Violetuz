@@ -22,6 +22,7 @@ import ActorsPage from './pages/ActorsPage';
 import LikeHistoryPage from './pages/LikeHistoryPage';
 import RatingPage from './pages/RatingPage';
 import TrailerPage from './pages/TrailerPage';
+import TrillerPage from './pages/TrillerPage';
 import MovieDetail from './components/MovieDetail/MovieDetail';
 import PullToRefresh from './components/PullToRefresh/PullToRefresh';
 import AuthModalHost from './components/AuthModal/AuthModalHost';
@@ -67,6 +68,8 @@ function App() {
                                 <Route path="/similar-movies/:movieId" element={<RecommendedPage />} />
                                 <Route path="/movie/:id" element={<MovieDetail />} />
                                 <Route path="/movie/:id/trailer" element={<TrailerPage />} />
+                                <Route path="/triller" element={<TrillerPage />} />
+                                <Route path="/triller/:id" element={<TrillerPage />} />
                                 <Route path="/recommended" element={<RecommendedPage />} />
                                 <Route path="/wishlist" element={<WishlistPage />} />
                                 <Route path="/profile" element={<ProfilePage />} />

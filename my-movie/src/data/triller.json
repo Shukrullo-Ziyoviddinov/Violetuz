@@ -1,0 +1,172 @@
+[
+  {
+    "id": 1,
+    "title": {
+      "uz": "Soul — Trailer",
+      "ru": "Душа — Трейлер"
+    },
+    "video": {
+      "uz": "/video/video1.mp4",
+      "ru": "/video/video1.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-1.avif",
+      "ru": "/img/movie-4.5-1.avif"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 2,
+    "title": {
+      "uz": "Oppenheimer — Trailer",
+      "ru": "Оппенгеймер — Трейлер"
+    },
+    "video": {
+      "uz": "/video/video1.mp4",
+      "ru": "/video/video1.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-2.jpeg",
+      "ru": "/img/movie-4.5-2.jpeg"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 3,
+    "title": {
+      "uz": "The First Recon — Trailer",
+      "ru": "The First Recon — Трейлер"
+    },
+    "video": {
+      "uz": "/video/video1.mp4",
+      "ru": "/video/video1.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-3.jpg",
+      "ru": "/img/movie-4.5-3.jpg"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 4,
+    "title": {
+      "uz": "The Incredibles — Trailer",
+      "ru": "Суперсемейка — Трейлер"
+    },
+    "video": {
+      "uz": "/video/video1.mp4",
+      "ru": "/video/video1.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-4.webp",
+      "ru": "/img/movie-4.5-4.webp"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 5,
+    "title": {
+      "uz": "Homestead — Trailer",
+      "ru": "Homestead — Трейлер"
+    },
+    "video": {
+      "uz": "/video/mainDetailvideo.mp4",
+      "ru": "/video/mainDetailvideo.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-5.jpg",
+      "ru": "/img/movie-4.5-5.jpg"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 6,
+    "title": {
+      "uz": "Spider-Man — Trailer",
+      "ru": "Человек-паук — Трейлер"
+    },
+    "video": {
+      "uz": "/video/mainDetailvideo.mp4",
+      "ru": "/video/mainDetailvideo.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-6.avif",
+      "ru": "/img/movie-4.5-6.avif"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 7,
+    "title": {
+      "uz": "Beauty and the Beast — Trailer",
+      "ru": "Красавица и чудовище — Трейлер"
+    },
+    "video": {
+      "uz": "/video/mainDetailvideo.mp4",
+      "ru": "/video/mainDetailvideo.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-7.jpg",
+      "ru": "/img/movie-4.5-7.jpg"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 8,
+    "title": {
+      "uz": "Trailer 8",
+      "ru": "Трейлер 8"
+    },
+    "video": {
+      "uz": "/video/video1.mp4",
+      "ru": "/video/video1.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-8.jpg",
+      "ru": "/img/movie-4.5-8.jpg"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 9,
+    "title": {
+      "uz": "Trailer 9",
+      "ru": "Трейлер 9"
+    },
+    "video": {
+      "uz": "/video/video1.mp4",
+      "ru": "/video/video1.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-9.jpg",
+      "ru": "/img/movie-4.5-9.jpg"
+    },
+    "like": 0,
+    "dislike": 0
+  },
+  {
+    "id": 10,
+    "title": {
+      "uz": "Trailer 10",
+      "ru": "Трейлер 10"
+    },
+    "video": {
+      "uz": "/video/video1.mp4",
+      "ru": "/video/video1.mp4"
+    },
+    "videoImg": {
+      "uz": "/img/movie-4.5-10.jpg",
+      "ru": "/img/movie-4.5-10.jpg"
+    },
+    "like": 0,
+    "dislike": 0
+  }
+]

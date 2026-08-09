@@ -501,6 +501,16 @@ const validateShortVideoListQuery = (req, _res, next) => {
   next();
 };
 
+const validateTrillerIdParam = (req, _res, next) => {
+  const numericId = Number(req.params.id);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return next(badRequest('Invalid triller id. It must be a positive integer.'));
+  }
+
+  req.params.id = String(numericId);
+  next();
+};
+
 const validateVideoBannerIdParam = (req, _res, next) => {
   const numericId = Number(req.params.id);
   if (!Number.isInteger(numericId) || numericId <= 0) {
@@ -643,6 +653,7 @@ module.exports = {
   validateShortVideoIdParam,
   validateShortVideoMovieIdParam,
   validateShortVideoListQuery,
+  validateTrillerIdParam,
   validateVideoBannerIdParam,
   validateVideoBannerTypeParam,
   validateVideoBannerListQuery,

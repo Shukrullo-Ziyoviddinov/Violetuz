@@ -23,6 +23,7 @@ const artistMusicStoryRoutes = require('./artistMusicStory.routes');
 const artistRoutes = require('./artist.routes');
 const musicShortRoutes = require('./musicShort.routes');
 const musicBannerRoutes = require('./musicBanner.routes');
+const trillerRoutes = require('./triller.routes');
 
 const router = Router();
 
@@ -50,5 +51,6 @@ router.use('/artist-music-stories', artistMusicStoryRoutes);
 router.use('/artists', artistRoutes);
 router.use('/music-shorts', musicShortRoutes);
 router.use('/music-banners', musicBannerRoutes);
+router.use('/trillers', trillerRoutes);
 
 module.exports = router;
