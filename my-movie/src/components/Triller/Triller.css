@@ -27,18 +27,22 @@
 }
 
 .triller-player-frame {
+  position: relative;
   width: 100%;
-  background: #000;
+  aspect-ratio: 16 / 9;
   border-radius: 12px;
   overflow: hidden;
+  background: transparent;
 }
 
 .triller-player-video {
   display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  background: #000;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
+  background: transparent;
 }
 
 .triller-player-title {
@@ -51,9 +55,7 @@
 
 .triller-side {
   min-width: 0;
-  max-height: calc(100vh - 110px);
-  overflow-y: auto;
-  padding-right: 0.15rem;
+  overflow: visible;
 }
 
 .triller-side-list {
