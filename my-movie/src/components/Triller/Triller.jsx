@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { fetchAllTrillers } from '../../api/trillersApi';
+import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import TrillerSideCard from './TrillerSideCard';
 import './Triller.css';
 
@@ -57,16 +58,13 @@ const Triller = ({ activeId }) => {
       <div className="triller-main">
         <div className="triller-player">
           <div className="triller-player-frame">
-            {videoSrc ? (
-              <video
-                key={activeTriller.id}
-                className="triller-player-video"
-                src={encodeURI(videoSrc)}
-                controls
-                playsInline
-                poster={poster || undefined}
-              />
-            ) : null}
+            <VideoPlayerControls
+              src={videoSrc ? encodeURI(videoSrc) : ''}
+              poster={poster || undefined}
+              resetKey={activeTriller.id}
+              videoClassName="trailer-modal-video"
+              objectFit="cover"
+            />
           </div>
           {title ? <h1 className="triller-player-title">{title}</h1> : null}
         </div>
