@@ -70,23 +70,44 @@ const Triller = ({ activeId }) => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [activeTriller?.id]);
 
+  /*
+   * Filter ochilishi: title pastga scroll.
+   * Yopilishi: faqat yuqoriga (title) qaytganda — hysteresis.
+   * Genre tanlash listni qisqartirsa ham filter ochiq qoladi.
+   */
   const handleScrollAreaScroll = () => {
     const root = scrollRef.current;
     const titleEl = mobileTitleRef.current;
     if (!root || !titleEl) return;
+
     const threshold = Math.max(titleEl.offsetHeight - 2, 0);
-    const next = root.scrollTop >= threshold;
-    filterPinnedRef.current = next;
-    setShowGenreFilter(next);
+    const top = root.scrollTop;
+
+    if (top >= threshold) {
+      if (!filterPinnedRef.current) {
+        filterPinnedRef.current = true;
+        setShowGenreFilter(true);
+      }
+      return;
+    }
+
+    /* Faqat deyarli yuqorida — title qaytib ko‘ringanda */
+    if (top <= 8) {
+      if (filterPinnedRef.current) {
+        filterPinnedRef.current = false;
+        setShowGenreFilter(false);
+      }
+    }
   };
 
-  /* Genre tanlanganda list qisqarsa scroll ortga qaytadi — filter yopilmasin */
   useLayoutEffect(() => {
     if (!filterPinnedRef.current) return;
     const root = scrollRef.current;
     const titleEl = mobileTitleRef.current;
     if (!root || !titleEl) return;
-    const threshold = Math.max(titleEl.offsetHeight - 2, 0);
+
+    const threshold = Math.max(titleEl.offsetHeight, 0);
+    /* List qisqarganda title yana ko‘rinmasin */
     if (root.scrollTop < threshold) {
       root.scrollTop = threshold;
     }
@@ -94,6 +115,8 @@ const Triller = ({ activeId }) => {
   }, [selectedGenre, filteredSideTrillers.length]);
 
   const handleGenreSelect = (id) => {
+    filterPinnedRef.current = true;
+    setShowGenreFilter(true);
     setSelectedGenre(id);
   };
 
@@ -144,7 +167,7 @@ const Triller = ({ activeId }) => {
           display:block (flex emas) — sticky + title scroll bug oldini olish
         */}
         <div
-          className="triller-scroll-area"
+          className={`triller-scroll-area${showGenreFilter ? ' is-filter-pinned' : ''}`}
           ref={scrollRef}
           onScroll={handleScrollAreaScroll}
         >

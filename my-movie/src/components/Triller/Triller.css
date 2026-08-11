@@ -302,6 +302,11 @@
     overflow-x: hidden;
   }
 
+  /* Filter ochiq: list qisqa bo‘lsa ham scroll title ostida qolsin */
+  .triller-scroll-area.is-filter-pinned .triller-side {
+    min-height: calc(100% + 5rem);
+  }
+
   .triller-side-list {
     width: 100%;
     max-width: 100%;
