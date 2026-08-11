@@ -17,17 +17,22 @@
 .triller-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 402px;
-  grid-template-areas:
-    'pin side'
-    'title side';
+  grid-template-areas: 'primary side';
   gap: 1.5rem;
   max-width: 1600px;
   margin: 0 auto;
   align-items: start;
 }
 
+.triller-primary {
+  grid-area: primary;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
 .triller-pin {
-  grid-area: pin;
   min-width: 0;
 }
 
@@ -61,12 +66,15 @@
 }
 
 .triller-player-title {
-  grid-area: title;
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.35;
   color: #fff;
+}
+
+.triller-player-title--mobile {
+  display: none;
 }
 
 .triller-side {
@@ -83,7 +91,6 @@
   color: #fff;
 }
 
-/* Desktop: "Sizga yoqadi" faqat o'ng side da */
 .triller-side-title--pin {
   display: none;
 }
@@ -101,11 +108,6 @@
   }
 }
 
-/*
- * ≤900px:
- * pin = video (joyida)
- * scroll: player-title (video ostida, scroll) → sticky "Sizga yoqadi" (video bilan yopishgan) → cards
- */
 @media (max-width: 900px) {
   .triller {
     height: 100%;
@@ -129,6 +131,19 @@
     grid-template-areas: unset;
   }
 
+  /* pin alohida flex child bo‘lsin */
+  .triller-primary {
+    display: contents;
+  }
+
+  .triller-player-title--desktop {
+    display: none;
+  }
+
+  .triller-player-title--mobile {
+    display: block;
+  }
+
   .triller-pin {
     display: block;
     flex: 0 0 auto;
@@ -142,7 +157,6 @@
 
   .triller-player-frame {
     border-radius: 10px;
-    /* Pastki radius 0 — sticky title bilan chok ochilmasin */
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -157,14 +171,12 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     touch-action: pan-y;
-    /* padding-top: 0 — sticky title video bilan orasi ochilmasin */
     padding: 0 0.7rem 1.25rem;
     box-sizing: border-box;
     background: #000;
   }
 
-  /* Activ video title — frame dan keyin */
-  .triller-player-title {
+  .triller-player-title--mobile {
     font-size: 1.15rem;
     margin: 0;
     padding: 0.75rem 0 0.65rem;
@@ -172,11 +184,6 @@
     background: #000;
   }
 
-  /*
-   * Sticky sidebar title:
-   * scroll qilganda video pastiga yopishadi (top: 0),
-   * orasida bo'sh joy qolmasligi uchun background #000 + shadow yo'q gap
-   */
   .triller-side-title--pin {
     display: block;
     position: -webkit-sticky;
@@ -185,7 +192,7 @@
     z-index: 15;
     flex-shrink: 0;
     margin: 0 -0.7rem;
-    padding: 0.55rem 0.7rem 0.55rem;
+    padding: 0.15rem 0.7rem;
     background: #000;
     border-bottom: 2px solid rgba(155, 79, 231, 0.3);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.95);
@@ -197,5 +204,12 @@
 
   .triller-side {
     margin: 0.75rem 0 0;
+    grid-area: unset;
+  }
+}
+
+@media (max-width: 450px) {
+  .triller-side-title--pin {
+    font-size: 1rem;
   }
 }

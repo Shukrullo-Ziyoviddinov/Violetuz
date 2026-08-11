@@ -59,23 +59,29 @@ const Triller = ({ activeId }) => {
   return (
     <div className="triller">
       <div className="triller-main">
-        <div className="triller-pin">
-          <div className="triller-player-frame">
-            <VideoPlayerControls
-              src={videoSrc ? encodeURI(videoSrc) : ''}
-              poster={poster || undefined}
-              resetKey={activeTriller.id}
-              videoClassName="trailer-modal-video"
-              objectFit="cover"
-            />
+        {/* Desktop: video + title chapda birga */}
+        <div className="triller-primary">
+          <div className="triller-pin">
+            <div className="triller-player-frame">
+              <VideoPlayerControls
+                src={videoSrc ? encodeURI(videoSrc) : ''}
+                poster={poster || undefined}
+                resetKey={activeTriller.id}
+                videoClassName="trailer-modal-video"
+                objectFit="cover"
+              />
+            </div>
           </div>
+          {title ? (
+            <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
+          ) : null}
         </div>
 
         <div className="triller-scroll-area">
-          {/* Activ video nomi — video pastdan, scroll bilan ketadi */}
-          {title ? <h1 className="triller-player-title">{title}</h1> : null}
+          {title ? (
+            <h1 className="triller-player-title triller-player-title--mobile">{title}</h1>
+          ) : null}
 
-          {/* Sticky: scroll’da video pastiga yopishib qoladi, orasi ochilmaydi */}
           <h2 className="triller-side-title triller-side-title--pin">{forYouTitle}</h2>
 
           <aside className="triller-side">
