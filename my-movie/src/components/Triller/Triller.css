@@ -83,7 +83,7 @@
   color: #fff;
 }
 
-/* Desktop: title side column da */
+/* Desktop: "Sizga yoqadi" faqat o'ng side da */
 .triller-side-title--pin {
   display: none;
 }
@@ -102,9 +102,9 @@
 }
 
 /*
- * ≤900px: trailer-modal pin + scroll-area usuli
- * Sahifa scroll qilmaydi — faqat .triller-scroll-area scroll qiladi.
- * Video + "Sizga yoqadi" pin da joyida qoladi.
+ * ≤900px:
+ * pin = faqat video (scroll qilmaydi)
+ * scroll-area: player-title (scroll) → "Sizga yoqadi" (sticky, video ostida qoladi) → cards
  */
 @media (max-width: 900px) {
   .triller {
@@ -144,17 +144,6 @@
     border-radius: 10px;
   }
 
-  .triller-side-title--pin {
-    display: block;
-    margin: 0.65rem 0 0;
-    padding: 0.35rem 0 0.55rem;
-    border-bottom: 2px solid rgba(155, 79, 231, 0.3);
-  }
-
-  .triller-side-title--side {
-    display: none;
-  }
-
   .triller-scroll-area {
     display: flex;
     flex-direction: column;
@@ -165,16 +154,37 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     touch-action: pan-y;
-    padding: 0.85rem 0.7rem 1.25rem;
+    padding: 0.75rem 0.7rem 1.25rem;
     box-sizing: border-box;
   }
 
+  /* Videodan keyin — scroll bilan ketadi */
   .triller-player-title {
     font-size: 1.15rem;
-    margin: 0 0 1rem;
+    margin: 0 0 0.85rem;
+    flex-shrink: 0;
+  }
+
+  /* Scroll ichida sticky: video ostida qolib turadi */
+  .triller-side-title--pin {
+    display: block;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0.45rem 0 0.55rem;
+    background: #000;
+    border-bottom: 2px solid rgba(155, 79, 231, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.9);
+  }
+
+  .triller-side-title--side {
+    display: none;
   }
 
   .triller-side {
-    margin: 0;
+    margin: 0.75rem 0 0;
   }
 }
