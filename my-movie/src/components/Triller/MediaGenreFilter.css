@@ -3,11 +3,16 @@
   align-items: center;
   gap: 0.45rem;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   padding: 0.1rem 0;
+  touch-action: pan-x;
 }
 
 .media-genre-filter::-webkit-scrollbar {

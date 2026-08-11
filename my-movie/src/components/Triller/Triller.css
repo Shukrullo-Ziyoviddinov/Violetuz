@@ -121,6 +121,8 @@
     height: 100%;
     min-height: 0;
     max-height: 100%;
+    width: 100%;
+    max-width: 100%;
     padding: 0;
     overflow: hidden;
     display: flex;
@@ -132,11 +134,14 @@
     flex-direction: column;
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
     height: 100%;
-    max-width: none;
     gap: 0;
     grid-template-columns: unset;
     grid-template-areas: unset;
+    overflow-x: hidden;
   }
 
   /* pin alohida flex child bo‘lsin */
@@ -156,6 +161,8 @@
     display: block;
     flex: 0 0 auto;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     position: relative;
     z-index: 6;
     background: #000;
@@ -167,6 +174,7 @@
     border-radius: 10px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    max-width: 100%;
   }
 
   .triller-scroll-area {
@@ -174,6 +182,9 @@
     flex-direction: column;
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -190,6 +201,7 @@
     padding: 0.75rem 0 0.65rem;
     flex-shrink: 0;
     background: #000;
+    max-width: 100%;
   }
 
   .triller-sticky-bar {
@@ -199,13 +211,17 @@
     top: 0;
     z-index: 15;
     flex-shrink: 0;
+    width: auto;
+    max-width: none;
+    min-width: 0;
     margin: 0 -0.7rem;
     padding: 0.15rem 0.7rem;
+    box-sizing: border-box;
     background: #000;
     border-bottom: 2px solid rgba(155, 79, 231, 0.3);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.95);
     min-height: 2.1rem;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .triller-sticky-title,
@@ -221,10 +237,19 @@
     background: transparent;
     border-bottom: none;
     box-shadow: none;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .triller-sticky-filter {
     display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   /* Default: title ko‘rinadi, filter yashirin */
@@ -236,16 +261,24 @@
 
   .triller-sticky-bar:not(.is-filter) .triller-sticky-filter {
     position: absolute;
-    inset: 0.15rem 0.7rem;
+    left: 0.7rem;
+    right: 0.7rem;
+    top: 0.15rem;
+    bottom: 0.15rem;
+    width: auto;
+    max-width: calc(100% - 1.4rem);
     opacity: 0;
     transform: translateY(10px);
     pointer-events: none;
+    overflow: hidden;
   }
 
   /* Sticky yetganda: filter title o‘rniga animatsiya bilan */
   .triller-sticky-bar.is-filter .triller-sticky-title {
     position: absolute;
-    inset: 0.15rem 0.7rem;
+    left: 0.7rem;
+    right: 0.7rem;
+    top: 0.15rem;
     opacity: 0;
     transform: translateY(-10px);
     pointer-events: none;
@@ -253,10 +286,16 @@
 
   .triller-sticky-bar.is-filter .triller-sticky-filter {
     position: relative;
-    inset: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 100%;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    overflow: hidden;
   }
 
   .triller-side-title--side {
@@ -266,6 +305,16 @@
   .triller-side {
     margin: 0.75rem 0 0;
     grid-area: unset;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .triller-side-list {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 }
 
