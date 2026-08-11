@@ -36,8 +36,10 @@
   min-width: 0;
 }
 
+/* display:contents YO‘Q — desktopda side panel, mobilda scroll container */
 .triller-scroll-area {
-  display: contents;
+  grid-area: side;
+  min-width: 0;
 }
 
 .triller-player-frame {
@@ -78,7 +80,6 @@
 }
 
 .triller-side {
-  grid-area: side;
   min-width: 0;
   overflow: visible;
 }
@@ -116,6 +117,13 @@
   }
 }
 
+/*
+ * ≤900px tartib:
+ * 1) video (pin)
+ * 2) .triller-player-title--mobile (scroll)
+ * 3) sticky «Sizga yoqadi» → genre
+ * 4) cards (scroll)
+ */
 @media (max-width: 900px) {
   .triller {
     height: 100%;
@@ -144,7 +152,6 @@
     overflow: hidden;
   }
 
-  /* pin — flex child (contents emas: scroll height ishonchli ishlashi uchun) */
   .triller-primary {
     display: block;
     flex: 0 0 auto;
@@ -184,11 +191,13 @@
   .triller-scroll-area {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    flex: 1 1 0;
+    grid-area: unset;
     min-height: 0;
     min-width: 0;
     width: 100%;
     max-width: 100%;
+    height: 0; /* flex child scroll uchun: qolgan joyani oladi */
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -258,7 +267,6 @@
     overflow: hidden;
   }
 
-  /* Default: title ko‘rinadi, filter yashirin */
   .triller-sticky-bar:not(.is-filter) .triller-sticky-title {
     opacity: 1;
     transform: translateY(0);
@@ -279,7 +287,6 @@
     overflow: hidden;
   }
 
-  /* Sticky yetganda: filter title o‘rniga animatsiya bilan */
   .triller-sticky-bar.is-filter .triller-sticky-title {
     position: absolute;
     left: 0.7rem;
@@ -310,7 +317,6 @@
 
   .triller-side {
     margin: 0.75rem 0 0;
-    grid-area: unset;
     width: 100%;
     max-width: 100%;
     min-width: 0;

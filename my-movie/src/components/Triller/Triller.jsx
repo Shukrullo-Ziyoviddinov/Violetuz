@@ -68,16 +68,18 @@ const Triller = ({ activeId }) => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [activeTriller?.id]);
 
-  /* Mobile: title scroll qilib chiqib ketganda sticky «Sizga yoqadi» → genre */
+  /*
+   * Title scroll chiqib ketganda sticky «Sizga yoqadi» → genre.
+   * scrollTop ishonchliroq (display:contents / IntersectionObserver muammolarisiz).
+   */
   useEffect(() => {
     const root = scrollRef.current;
     const titleEl = mobileTitleRef.current;
     if (!root || !titleEl || isPending) return undefined;
 
     const update = () => {
-      const rootTop = root.getBoundingClientRect().top;
-      const titleBottom = titleEl.getBoundingClientRect().bottom;
-      setShowGenreFilter(titleBottom <= rootTop + 2);
+      const threshold = Math.max(titleEl.offsetHeight - 2, 0);
+      setShowGenreFilter(root.scrollTop >= threshold);
     };
 
     update();
@@ -130,6 +132,7 @@ const Triller = ({ activeId }) => {
           ) : null}
         </div>
 
+        {/* Desktop: side panel. Mobile: pin ostidagi yagona scroll container */}
         <div className="triller-scroll-area" ref={scrollRef}>
           {title ? (
             <h1
