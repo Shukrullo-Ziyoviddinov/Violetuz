@@ -57,21 +57,10 @@ const Triller = ({ activeId }) => {
     );
   }, [sideTrillers, selectedGenre]);
 
-  useEffect(() => {
-    const titleEl = mobileTitleRef.current;
-    const root = scrollRef.current;
-    if (!titleEl || !root) return undefined;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setShowGenreFilter(!entry.isIntersecting);
-      },
-      { root, threshold: 0, rootMargin: '0px' }
-    );
-
-    observer.observe(titleEl);
-    return () => observer.disconnect();
-  }, [activeTriller?.id, isPending]);
+  const videoSrc = getLocalizedField(activeTriller?.video, contentLang);
+  const title = getLocalizedField(activeTriller?.title, contentLang);
+  const poster = getLocalizedField(activeTriller?.videoImg, contentLang);
+  const forYouTitle = t('triller.forYou', 'Sizga yoqadi');
 
   useEffect(() => {
     setSelectedGenre('all');
@@ -79,10 +68,26 @@ const Triller = ({ activeId }) => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [activeTriller?.id]);
 
-  const videoSrc = getLocalizedField(activeTriller?.video, contentLang);
-  const title = getLocalizedField(activeTriller?.title, contentLang);
-  const poster = getLocalizedField(activeTriller?.videoImg, contentLang);
-  const forYouTitle = t('triller.forYou', 'Sizga yoqadi');
+  /* Mobile: title scroll qilib chiqib ketganda sticky «Sizga yoqadi» → genre */
+  useEffect(() => {
+    const root = scrollRef.current;
+    const titleEl = mobileTitleRef.current;
+    if (!root || !titleEl || isPending) return undefined;
+
+    const update = () => {
+      const rootTop = root.getBoundingClientRect().top;
+      const titleBottom = titleEl.getBoundingClientRect().bottom;
+      setShowGenreFilter(titleBottom <= rootTop + 2);
+    };
+
+    update();
+    root.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      root.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [activeTriller?.id, isPending, title]);
 
   const handleSelect = (item) => {
     if (!item?.id) return;
