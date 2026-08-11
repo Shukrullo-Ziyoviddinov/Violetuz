@@ -3,7 +3,7 @@
   min-height: calc(100vh - 80px);
   padding: 1.5rem 1.5rem 2rem;
   box-sizing: border-box;
-  background: #0f0f0f;
+  background: #000;
 }
 
 .triller--empty {

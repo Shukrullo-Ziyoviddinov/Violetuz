@@ -88,10 +88,10 @@
 
 @media (max-width: 900px) {
   .triller-side-card {
-    grid-template-columns: 140px minmax(0, 1fr) 24px;
+    grid-template-columns: 160px minmax(0, 1fr) 24px;
   }
 
   .triller-side-card-thumb {
-    width: 140px;
+    width: 160px;
   }
 }

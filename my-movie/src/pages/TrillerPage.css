@@ -1,4 +1,10 @@
 .triller-page {
   min-height: 100vh;
-  background: #0f0f0f;
+  background: #000;
+}
+
+@media (max-width: 768px) {
+  body.triller-page-active .navbar {
+    display: none !important;
+  }
 }
