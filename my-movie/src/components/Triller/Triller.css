@@ -95,6 +95,14 @@
   display: none;
 }
 
+.triller-sticky-bar {
+  display: none;
+}
+
+.triller-sticky-filter {
+  display: none;
+}
+
 .triller-side-list {
   display: flex;
   flex-direction: column;
@@ -184,7 +192,7 @@
     background: #000;
   }
 
-  .triller-side-title--pin {
+  .triller-sticky-bar {
     display: block;
     position: -webkit-sticky;
     position: sticky;
@@ -196,6 +204,59 @@
     background: #000;
     border-bottom: 2px solid rgba(155, 79, 231, 0.3);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.95);
+    min-height: 2.1rem;
+    overflow: hidden;
+  }
+
+  .triller-sticky-title,
+  .triller-sticky-filter {
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .triller-side-title--pin {
+    display: block;
+    position: static;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border-bottom: none;
+    box-shadow: none;
+  }
+
+  .triller-sticky-filter {
+    display: block;
+  }
+
+  /* Default: title ko‘rinadi, filter yashirin */
+  .triller-sticky-bar:not(.is-filter) .triller-sticky-title {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .triller-sticky-bar:not(.is-filter) .triller-sticky-filter {
+    position: absolute;
+    inset: 0.15rem 0.7rem;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+  }
+
+  /* Sticky yetganda: filter title o‘rniga animatsiya bilan */
+  .triller-sticky-bar.is-filter .triller-sticky-title {
+    position: absolute;
+    inset: 0.15rem 0.7rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+
+  .triller-sticky-bar.is-filter .triller-sticky-filter {
+    position: relative;
+    inset: auto;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
   }
 
   .triller-side-title--side {
@@ -209,7 +270,12 @@
 }
 
 @media (max-width: 450px) {
+  .triller-player-title--mobile,
   .triller-side-title--pin {
     font-size: 1rem;
+  }
+
+  .triller-sticky-bar {
+    min-height: 1.9rem;
   }
 }

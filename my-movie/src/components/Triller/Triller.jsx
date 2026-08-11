@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -7,12 +7,17 @@ import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { fetchAllTrillers } from '../../api/trillersApi';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import TrillerSideCard from './TrillerSideCard';
+import MediaGenreFilter from './MediaGenreFilter';
 import './Triller.css';
 
 const Triller = ({ activeId }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const scrollRef = useRef(null);
+  const mobileTitleRef = useRef(null);
+  const [selectedGenre, setSelectedGenre] = useState('all');
+  const [showGenreFilter, setShowGenreFilter] = useState(false);
 
   const { data: list = [], isPending, isError } = useQuery({
     queryKey: ['trillers'],
@@ -29,6 +34,50 @@ const Triller = ({ activeId }) => {
     if (!activeTriller) return list;
     return list.filter((item) => item.id !== activeTriller.id);
   }, [list, activeTriller]);
+
+  const genreOptions = useMemo(() => {
+    const map = new Map();
+    for (const item of list) {
+      const genre = item?.trillerGenre;
+      if (!genre || typeof genre !== 'object') continue;
+      const id = String(genre.uz || genre.ru || '').trim();
+      if (!id || map.has(id)) continue;
+      map.set(id, {
+        id,
+        label: getLocalizedField(genre, contentLang) || id,
+      });
+    }
+    return Array.from(map.values());
+  }, [list, contentLang]);
+
+  const filteredSideTrillers = useMemo(() => {
+    if (selectedGenre === 'all') return sideTrillers;
+    return sideTrillers.filter(
+      (item) => String(item?.trillerGenre?.uz || '').trim() === selectedGenre
+    );
+  }, [sideTrillers, selectedGenre]);
+
+  useEffect(() => {
+    const titleEl = mobileTitleRef.current;
+    const root = scrollRef.current;
+    if (!titleEl || !root) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowGenreFilter(!entry.isIntersecting);
+      },
+      { root, threshold: 0, rootMargin: '0px' }
+    );
+
+    observer.observe(titleEl);
+    return () => observer.disconnect();
+  }, [activeTriller?.id, isPending]);
+
+  useEffect(() => {
+    setSelectedGenre('all');
+    setShowGenreFilter(false);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [activeTriller?.id]);
 
   const videoSrc = getLocalizedField(activeTriller?.video, contentLang);
   const title = getLocalizedField(activeTriller?.title, contentLang);
@@ -59,7 +108,6 @@ const Triller = ({ activeId }) => {
   return (
     <div className="triller">
       <div className="triller-main">
-        {/* Desktop: video + title chapda birga */}
         <div className="triller-primary">
           <div className="triller-pin">
             <div className="triller-player-frame">
@@ -77,17 +125,35 @@ const Triller = ({ activeId }) => {
           ) : null}
         </div>
 
-        <div className="triller-scroll-area">
+        <div className="triller-scroll-area" ref={scrollRef}>
           {title ? (
-            <h1 className="triller-player-title triller-player-title--mobile">{title}</h1>
+            <h1
+              ref={mobileTitleRef}
+              className="triller-player-title triller-player-title--mobile"
+            >
+              {title}
+            </h1>
           ) : null}
 
-          <h2 className="triller-side-title triller-side-title--pin">{forYouTitle}</h2>
+          <div
+            className={`triller-sticky-bar${showGenreFilter ? ' is-filter' : ''}`}
+          >
+            <h2 className="triller-side-title triller-side-title--pin triller-sticky-title">
+              {forYouTitle}
+            </h2>
+            <div className="triller-sticky-filter" aria-hidden={!showGenreFilter}>
+              <MediaGenreFilter
+                genres={genreOptions}
+                selectedId={selectedGenre}
+                onSelect={setSelectedGenre}
+              />
+            </div>
+          </div>
 
           <aside className="triller-side">
             <h2 className="triller-side-title triller-side-title--side">{forYouTitle}</h2>
             <div className="triller-side-list">
-              {sideTrillers.map((item) => (
+              {filteredSideTrillers.map((item) => (
                 <TrillerSideCard key={item.id} triller={item} onSelect={handleSelect} />
               ))}
             </div>

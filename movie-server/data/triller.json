@@ -13,6 +13,10 @@
       "uz": "/img/movie-4.5-1.avif",
       "ru": "/img/movie-4.5-1.avif"
     },
+    "trillerGenre": {
+      "uz": "Multfilm",
+      "ru": "Мультфильм"
+    },
     "ageLimit": 6,
     "like": 0,
     "dislike": 0
@@ -30,6 +34,10 @@
     "videoImg": {
       "uz": "/img/movie-4.5-2.jpeg",
       "ru": "/img/movie-4.5-2.jpeg"
+    },
+    "trillerGenre": {
+      "uz": "Drama",
+      "ru": "Драма"
     },
     "ageLimit": 18,
     "like": 0,
@@ -49,6 +57,10 @@
       "uz": "/img/movie-4.5-3.jpg",
       "ru": "/img/movie-4.5-3.jpg"
     },
+    "trillerGenre": {
+      "uz": "Triller",
+      "ru": "Триллер"
+    },
     "ageLimit": 18,
     "like": 0,
     "dislike": 0
@@ -66,6 +78,10 @@
     "videoImg": {
       "uz": "/img/movie-4.5-4.webp",
       "ru": "/img/movie-4.5-4.webp"
+    },
+    "trillerGenre": {
+      "uz": "Multfilm",
+      "ru": "Мультфильм"
     },
     "ageLimit": 6,
     "like": 0,
@@ -85,6 +101,10 @@
       "uz": "/img/movie-4.5-5.jpg",
       "ru": "/img/movie-4.5-5.jpg"
     },
+    "trillerGenre": {
+      "uz": "Jangari",
+      "ru": "Боевик"
+    },
     "ageLimit": 16,
     "like": 0,
     "dislike": 0
@@ -102,6 +122,10 @@
     "videoImg": {
       "uz": "/img/movie-4.5-6.avif",
       "ru": "/img/movie-4.5-6.avif"
+    },
+    "trillerGenre": {
+      "uz": "Fantastika",
+      "ru": "Фантастика"
     },
     "ageLimit": 12,
     "like": 0,
@@ -121,6 +145,10 @@
       "uz": "/img/movie-4.5-7.jpg",
       "ru": "/img/movie-4.5-7.jpg"
     },
+    "trillerGenre": {
+      "uz": "Fantaziya",
+      "ru": "Фэнтези"
+    },
     "ageLimit": 6,
     "like": 0,
     "dislike": 0
@@ -138,6 +166,10 @@
     "videoImg": {
       "uz": "/img/movie-4.5-8.jpg",
       "ru": "/img/movie-4.5-8.jpg"
+    },
+    "trillerGenre": {
+      "uz": "Komediya",
+      "ru": "Комедия"
     },
     "ageLimit": 12,
     "like": 0,
@@ -157,6 +189,10 @@
       "uz": "/img/movie-4.5-9.jpg",
       "ru": "/img/movie-4.5-9.jpg"
     },
+    "trillerGenre": {
+      "uz": "Sarguzasht",
+      "ru": "Приключения"
+    },
     "ageLimit": 16,
     "like": 0,
     "dislike": 0
@@ -174,6 +210,10 @@
     "videoImg": {
       "uz": "/img/movie-4.5-10.jpg",
       "ru": "/img/movie-4.5-10.jpg"
+    },
+    "trillerGenre": {
+      "uz": "Qo'rqinchli",
+      "ru": "Ужасы"
     },
     "ageLimit": 18,
     "like": 0,

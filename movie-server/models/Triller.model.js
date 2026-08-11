@@ -30,6 +30,11 @@ const trillerSchema = new mongoose.Schema(
       required: true,
       default: () => ({ uz: '', ru: '' }),
     },
+    trillerGenre: {
+      type: localizedStringSchema,
+      required: true,
+      default: () => ({ uz: '', ru: '' }),
+    },
     ageLimit: {
       type: Number,
       default: 0,

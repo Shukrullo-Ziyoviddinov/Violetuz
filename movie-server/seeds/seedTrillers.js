@@ -25,6 +25,7 @@ const seedTrillers = async () => {
       title: data.title,
       video: data.video,
       videoImg: data.videoImg,
+      trillerGenre: data.trillerGenre,
       ageLimit: Number.isFinite(Number(data.ageLimit)) ? Number(data.ageLimit) : 0,
       like: Number.isFinite(Number(data.like)) ? Number(data.like) : 0,
       dislike: Number.isFinite(Number(data.dislike)) ? Number(data.dislike) : 0,

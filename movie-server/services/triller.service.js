@@ -71,6 +71,7 @@ class TrillerService {
       title: normalizeLocalized(raw.title, 'title'),
       video: normalizeLocalized(raw.video, 'video'),
       videoImg: normalizeLocalized(raw.videoImg, 'videoImg'),
+      trillerGenre: normalizeLocalized(raw.trillerGenre, 'trillerGenre'),
       ageLimit: normalizeCount(raw.ageLimit, 'ageLimit', 0),
       like: normalizeCount(raw.like, 'like', 0),
       dislike: normalizeCount(raw.dislike, 'dislike', 0),
