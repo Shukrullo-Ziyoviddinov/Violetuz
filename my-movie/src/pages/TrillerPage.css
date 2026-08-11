@@ -7,12 +7,15 @@ body.triller-page-active {
   overscroll-behavior: none;
 }
 
-/* ≤900px: trailer-page usuli — body/App scroll yo'q, ichki scroll-area ishlaydi */
+/* ≤900px: body/App scroll yo'q — faqat .triller-scroll-area scroll qiladi */
 @media (max-width: 900px) {
+  html.triller-page-lock,
   body.triller-page-active {
     position: fixed;
+    inset: 0;
     width: 100%;
     height: 100%;
+    max-height: 100%;
     overflow: hidden;
   }
 
@@ -22,22 +25,27 @@ body.triller-page-active {
   }
 
   body.triller-page-active .App {
+    height: 100%;
     height: 100dvh;
     max-height: 100dvh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   body.triller-page-active .App-main {
-    height: 100dvh;
-    max-height: 100dvh;
+    flex: 1 1 0;
     min-height: 0;
+    height: auto;
+    max-height: none;
     overflow: hidden;
     padding-bottom: 0 !important;
     margin: 0;
+    position: relative;
   }
 
   .triller-page {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 900;
     width: 100%;
@@ -52,9 +60,9 @@ body.triller-page-active {
   }
 
   .triller-page .triller {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-height: 0;
     height: auto;
-    max-height: 100%;
+    max-height: none;
   }
 }

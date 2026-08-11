@@ -36,7 +36,7 @@
   min-width: 0;
 }
 
-/* display:contents YO‘Q — desktopda side panel, mobilda scroll container */
+/* Desktop: o‘ng panel (display:contents YO‘Q) */
 .triller-scroll-area {
   grid-area: side;
   min-width: 0;
@@ -118,19 +118,16 @@
 }
 
 /*
- * ≤900px tartib:
- * 1) video (pin)
- * 2) .triller-player-title--mobile (scroll)
- * 3) sticky «Sizga yoqadi» → genre
- * 4) cards (scroll)
+ * ≤900px:
+ * pin = video
+ * scroll-area = title + sticky (Sizga yoqadi/genre) + cards
+ * Ichki scroll ishlashi uchun: flex: 1 1 0 + min-height: 0 (height:100% zanjiri yo‘q)
  */
 @media (max-width: 900px) {
   .triller {
-    height: 100%;
-    min-height: 0;
-    max-height: 100%;
     width: 100%;
     max-width: 100%;
+    min-height: 0;
     padding: 0;
     overflow: hidden;
     display: flex;
@@ -140,12 +137,11 @@
   .triller-main {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-height: 0;
     min-width: 0;
     width: 100%;
     max-width: 100%;
-    height: 100%;
     gap: 0;
     grid-template-columns: unset;
     grid-template-areas: unset;
@@ -197,7 +193,6 @@
     min-width: 0;
     width: 100%;
     max-width: 100%;
-    height: 0; /* flex child scroll uchun: qolgan joyani oladi */
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
