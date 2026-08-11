@@ -59,7 +59,6 @@ const Triller = ({ activeId }) => {
   return (
     <div className="triller">
       <div className="triller-main">
-        {/* Pin: video + "Sizga yoqadi" — birga, orasida bo‘shliq ochilmaydi */}
         <div className="triller-pin">
           <div className="triller-player-frame">
             <VideoPlayerControls
@@ -70,12 +69,14 @@ const Triller = ({ activeId }) => {
               objectFit="cover"
             />
           </div>
-          <h2 className="triller-side-title triller-side-title--pin">{forYouTitle}</h2>
         </div>
 
-        {/* Scroll: player title + kartochkalar */}
         <div className="triller-scroll-area">
+          {/* Activ video nomi — video pastdan, scroll bilan ketadi */}
           {title ? <h1 className="triller-player-title">{title}</h1> : null}
+
+          {/* Sticky: scroll’da video pastiga yopishib qoladi, orasi ochilmaydi */}
+          <h2 className="triller-side-title triller-side-title--pin">{forYouTitle}</h2>
 
           <aside className="triller-side">
             <h2 className="triller-side-title triller-side-title--side">{forYouTitle}</h2>
