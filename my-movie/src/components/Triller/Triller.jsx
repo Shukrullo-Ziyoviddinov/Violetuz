@@ -100,6 +100,7 @@ const Triller = ({ activeId }) => {
     }
   };
 
+  /* Genre tanlanganda: scroll sticky bar ostidan — kartalar yuqorida yashirinmasin */
   useLayoutEffect(() => {
     if (!filterPinnedRef.current) return;
     const root = scrollRef.current;
@@ -107,12 +108,9 @@ const Triller = ({ activeId }) => {
     if (!root || !titleEl) return;
 
     const threshold = Math.max(titleEl.offsetHeight, 0);
-    /* List qisqarganda title yana ko‘rinmasin */
-    if (root.scrollTop < threshold) {
-      root.scrollTop = threshold;
-    }
+    root.scrollTop = threshold;
     setShowGenreFilter(true);
-  }, [selectedGenre, filteredSideTrillers.length]);
+  }, [selectedGenre]);
 
   const handleGenreSelect = (id) => {
     filterPinnedRef.current = true;
