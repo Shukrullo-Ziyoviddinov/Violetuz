@@ -59,30 +59,33 @@ const Triller = ({ activeId }) => {
   return (
     <div className="triller">
       <div className="triller-main">
-        <div className="triller-player">
-          <div className="triller-sticky-pin">
-            <div className="triller-player-frame">
-              <VideoPlayerControls
-                src={videoSrc ? encodeURI(videoSrc) : ''}
-                poster={poster || undefined}
-                resetKey={activeTriller.id}
-                videoClassName="trailer-modal-video"
-                objectFit="cover"
-              />
-            </div>
-            <h2 className="triller-side-title triller-side-title--in-pin">{forYouTitle}</h2>
+        {/* Pin: video joyida qoladi (mobile) — scroll qilmaydi */}
+        <div className="triller-pin">
+          <div className="triller-player-frame">
+            <VideoPlayerControls
+              src={videoSrc ? encodeURI(videoSrc) : ''}
+              poster={poster || undefined}
+              resetKey={activeTriller.id}
+              videoClassName="trailer-modal-video"
+              objectFit="cover"
+            />
           </div>
-          {title ? <h1 className="triller-player-title">{title}</h1> : null}
+          <h2 className="triller-side-title triller-side-title--pin">{forYouTitle}</h2>
         </div>
 
-        <aside className="triller-side">
-          <h2 className="triller-side-title triller-side-title--in-side">{forYouTitle}</h2>
-          <div className="triller-side-list">
-            {sideTrillers.map((item) => (
-              <TrillerSideCard key={item.id} triller={item} onSelect={handleSelect} />
-            ))}
-          </div>
-        </aside>
+        {/* Scroll area: video title + side list */}
+        <div className="triller-scroll-area">
+          {title ? <h1 className="triller-player-title">{title}</h1> : null}
+
+          <aside className="triller-side">
+            <h2 className="triller-side-title triller-side-title--side">{forYouTitle}</h2>
+            <div className="triller-side-list">
+              {sideTrillers.map((item) => (
+                <TrillerSideCard key={item.id} triller={item} onSelect={handleSelect} />
+              ))}
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

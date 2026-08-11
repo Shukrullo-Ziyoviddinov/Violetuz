@@ -11,24 +11,28 @@
   align-items: center;
   justify-content: center;
   color: rgba(255, 255, 255, 0.7);
+  min-height: 50vh;
 }
 
 .triller-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 402px;
+  grid-template-areas:
+    'pin side'
+    'title side';
   gap: 1.5rem;
   max-width: 1600px;
   margin: 0 auto;
   align-items: start;
 }
 
-.triller-player {
+.triller-pin {
+  grid-area: pin;
   min-width: 0;
 }
 
-.triller-sticky-pin {
-  position: relative;
-  z-index: 1;
+.triller-scroll-area {
+  display: contents;
 }
 
 .triller-player-frame {
@@ -57,7 +61,8 @@
 }
 
 .triller-player-title {
-  margin: 1rem 0 0;
+  grid-area: title;
+  margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.35;
@@ -65,6 +70,7 @@
 }
 
 .triller-side {
+  grid-area: side;
   min-width: 0;
   overflow: visible;
 }
@@ -77,7 +83,8 @@
   color: #fff;
 }
 
-.triller-side-title--in-pin {
+/* Desktop: title side column da */
+.triller-side-title--pin {
   display: none;
 }
 
@@ -94,59 +101,80 @@
   }
 }
 
-/* Stacked layout: video pin + "Sizga yoqadi" sticky (kabi trailer-modal-pin) */
+/*
+ * ≤900px: trailer-modal pin + scroll-area usuli
+ * Sahifa scroll qilmaydi — faqat .triller-scroll-area scroll qiladi.
+ * Video + "Sizga yoqadi" pin da joyida qoladi.
+ */
 @media (max-width: 900px) {
   .triller {
-    padding: 1rem 0.7rem 1.5rem;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .triller-main {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    max-width: none;
     gap: 0;
+    grid-template-columns: unset;
+    grid-template-areas: unset;
   }
 
-  .triller-sticky-pin {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 72px;
-    z-index: 25;
-    background: #000;
-    margin: 0 -0.7rem;
-    padding: 0 0.7rem 0.35rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.85);
-  }
-
-  .triller-side-title--in-pin {
+  .triller-pin {
     display: block;
-    margin: 0.65rem 0 0;
-    padding: 0.35rem 0 0.5rem;
-    border-bottom: 2px solid rgba(155, 79, 231, 0.3);
-  }
-
-  .triller-side-title--in-side {
-    display: none;
-  }
-
-  .triller-player-title {
-    font-size: 1.15rem;
-    margin-top: 0.85rem;
-    margin-bottom: 1rem;
-  }
-
-  .triller-side {
-    max-height: none;
-    overflow: visible;
-    margin-top: 0.25rem;
+    flex: 0 0 auto;
+    width: 100%;
+    position: relative;
+    z-index: 5;
+    background: #000;
+    padding: 0.5rem 0.7rem 0;
+    box-sizing: border-box;
   }
 
   .triller-player-frame {
     border-radius: 10px;
   }
-}
 
-/* Navbar yashirilganda (triller-page) sticky top 0 */
-@media (max-width: 768px) {
-  body.triller-page-active .triller-sticky-pin {
-    top: 0;
+  .triller-side-title--pin {
+    display: block;
+    margin: 0.65rem 0 0;
+    padding: 0.35rem 0 0.55rem;
+    border-bottom: 2px solid rgba(155, 79, 231, 0.3);
+  }
+
+  .triller-side-title--side {
+    display: none;
+  }
+
+  .triller-scroll-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    padding: 0.85rem 0.7rem 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .triller-player-title {
+    font-size: 1.15rem;
+    margin: 0 0 1rem;
+  }
+
+  .triller-side {
+    margin: 0;
   }
 }
