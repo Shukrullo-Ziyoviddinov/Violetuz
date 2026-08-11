@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ const Triller = ({ activeId }) => {
   const { contentLang } = useContentLanguage();
   const scrollRef = useRef(null);
   const mobileTitleRef = useRef(null);
+  const filterPinnedRef = useRef(false);
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [showGenreFilter, setShowGenreFilter] = useState(false);
 
@@ -65,6 +66,7 @@ const Triller = ({ activeId }) => {
   useEffect(() => {
     setSelectedGenre('all');
     setShowGenreFilter(false);
+    filterPinnedRef.current = false;
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [activeTriller?.id]);
 
@@ -73,7 +75,26 @@ const Triller = ({ activeId }) => {
     const titleEl = mobileTitleRef.current;
     if (!root || !titleEl) return;
     const threshold = Math.max(titleEl.offsetHeight - 2, 0);
-    setShowGenreFilter(root.scrollTop >= threshold);
+    const next = root.scrollTop >= threshold;
+    filterPinnedRef.current = next;
+    setShowGenreFilter(next);
+  };
+
+  /* Genre tanlanganda list qisqarsa scroll ortga qaytadi — filter yopilmasin */
+  useLayoutEffect(() => {
+    if (!filterPinnedRef.current) return;
+    const root = scrollRef.current;
+    const titleEl = mobileTitleRef.current;
+    if (!root || !titleEl) return;
+    const threshold = Math.max(titleEl.offsetHeight - 2, 0);
+    if (root.scrollTop < threshold) {
+      root.scrollTop = threshold;
+    }
+    setShowGenreFilter(true);
+  }, [selectedGenre, filteredSideTrillers.length]);
+
+  const handleGenreSelect = (id) => {
+    setSelectedGenre(id);
   };
 
   const handleSelect = (item) => {
@@ -146,7 +167,7 @@ const Triller = ({ activeId }) => {
               <MediaGenreFilter
                 genres={genreOptions}
                 selectedId={selectedGenre}
-                onSelect={setSelectedGenre}
+                onSelect={handleGenreSelect}
               />
             </div>
           </div>
