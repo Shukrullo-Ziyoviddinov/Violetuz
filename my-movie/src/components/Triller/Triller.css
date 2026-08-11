@@ -103,8 +103,8 @@
 
 /*
  * ≤900px:
- * pin = faqat video (scroll qilmaydi)
- * scroll-area: player-title (scroll) → "Sizga yoqadi" (sticky, video ostida qoladi) → cards
+ * pin = video + "Sizga yoqadi" (birga, orasida bo‘shliq yo‘q)
+ * scroll-area = player-title + cards (scroll)
  */
 @media (max-width: 900px) {
   .triller {
@@ -144,6 +144,18 @@
     border-radius: 10px;
   }
 
+  .triller-side-title--pin {
+    display: block;
+    margin: 0;
+    padding: 0.55rem 0 0.5rem;
+    border-bottom: 2px solid rgba(155, 79, 231, 0.3);
+    background: #000;
+  }
+
+  .triller-side-title--side {
+    display: none;
+  }
+
   .triller-scroll-area {
     display: flex;
     flex-direction: column;
@@ -158,33 +170,13 @@
     box-sizing: border-box;
   }
 
-  /* Videodan keyin — scroll bilan ketadi */
   .triller-player-title {
     font-size: 1.15rem;
     margin: 0 0 0.85rem;
     flex-shrink: 0;
   }
 
-  /* Scroll ichida sticky: video ostida qolib turadi */
-  .triller-side-title--pin {
-    display: block;
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 15;
-    flex-shrink: 0;
-    margin: 0;
-    padding: 0.45rem 0 0.55rem;
-    background: #000;
-    border-bottom: 2px solid rgba(155, 79, 231, 0.3);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.9);
-  }
-
-  .triller-side-title--side {
-    display: none;
-  }
-
   .triller-side {
-    margin: 0.75rem 0 0;
+    margin: 0;
   }
 }
