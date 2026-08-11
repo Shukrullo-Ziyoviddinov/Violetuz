@@ -26,6 +26,11 @@
   min-width: 0;
 }
 
+.triller-sticky-pin {
+  position: relative;
+  z-index: 1;
+}
+
 .triller-player-frame {
   position: relative;
   width: 100%;
@@ -64,6 +69,18 @@
   overflow: visible;
 }
 
+.triller-side-title {
+  margin: 0 0 0.85rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.triller-side-title--in-pin {
+  display: none;
+}
+
 .triller-side-list {
   display: flex;
   flex-direction: column;
@@ -77,6 +94,7 @@
   }
 }
 
+/* Stacked layout: video pin + "Sizga yoqadi" sticky (kabi trailer-modal-pin) */
 @media (max-width: 900px) {
   .triller {
     padding: 1rem 0.7rem 1.5rem;
@@ -84,14 +102,51 @@
 
   .triller-main {
     grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .triller-sticky-pin {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 72px;
+    z-index: 25;
+    background: #000;
+    margin: 0 -0.7rem;
+    padding: 0 0.7rem 0.35rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.85);
+  }
+
+  .triller-side-title--in-pin {
+    display: block;
+    margin: 0.65rem 0 0;
+    padding: 0.35rem 0 0.5rem;
+    border-bottom: 2px solid rgba(155, 79, 231, 0.3);
+  }
+
+  .triller-side-title--in-side {
+    display: none;
+  }
+
+  .triller-player-title {
+    font-size: 1.15rem;
+    margin-top: 0.85rem;
+    margin-bottom: 1rem;
   }
 
   .triller-side {
     max-height: none;
     overflow: visible;
+    margin-top: 0.25rem;
   }
 
-  .triller-player-title {
-    font-size: 1.15rem;
+  .triller-player-frame {
+    border-radius: 10px;
+  }
+}
+
+/* Navbar yashirilganda (triller-page) sticky top 0 */
+@media (max-width: 768px) {
+  body.triller-page-active .triller-sticky-pin {
+    top: 0;
   }
 }

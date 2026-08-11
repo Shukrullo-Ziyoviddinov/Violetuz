@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { fetchAllTrillers } from '../../api/trillersApi';
@@ -10,6 +11,7 @@ import './Triller.css';
 
 const Triller = ({ activeId }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
 
   const { data: list = [], isPending, isError } = useQuery({
@@ -31,6 +33,7 @@ const Triller = ({ activeId }) => {
   const videoSrc = getLocalizedField(activeTriller?.video, contentLang);
   const title = getLocalizedField(activeTriller?.title, contentLang);
   const poster = getLocalizedField(activeTriller?.videoImg, contentLang);
+  const forYouTitle = t('triller.forYou', 'Sizga yoqadi');
 
   const handleSelect = (item) => {
     if (!item?.id) return;
@@ -57,19 +60,23 @@ const Triller = ({ activeId }) => {
     <div className="triller">
       <div className="triller-main">
         <div className="triller-player">
-          <div className="triller-player-frame">
-            <VideoPlayerControls
-              src={videoSrc ? encodeURI(videoSrc) : ''}
-              poster={poster || undefined}
-              resetKey={activeTriller.id}
-              videoClassName="trailer-modal-video"
-              objectFit="cover"
-            />
+          <div className="triller-sticky-pin">
+            <div className="triller-player-frame">
+              <VideoPlayerControls
+                src={videoSrc ? encodeURI(videoSrc) : ''}
+                poster={poster || undefined}
+                resetKey={activeTriller.id}
+                videoClassName="trailer-modal-video"
+                objectFit="cover"
+              />
+            </div>
+            <h2 className="triller-side-title triller-side-title--in-pin">{forYouTitle}</h2>
           </div>
           {title ? <h1 className="triller-player-title">{title}</h1> : null}
         </div>
 
         <aside className="triller-side">
+          <h2 className="triller-side-title triller-side-title--in-side">{forYouTitle}</h2>
           <div className="triller-side-list">
             {sideTrillers.map((item) => (
               <TrillerSideCard key={item.id} triller={item} onSelect={handleSelect} />
