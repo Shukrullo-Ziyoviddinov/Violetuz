@@ -68,28 +68,13 @@ const Triller = ({ activeId }) => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [activeTriller?.id]);
 
-  /*
-   * Title scroll chiqib ketganda sticky «Sizga yoqadi» → genre.
-   * scrollTop ishonchliroq (display:contents / IntersectionObserver muammolarisiz).
-   */
-  useEffect(() => {
+  const handleScrollAreaScroll = () => {
     const root = scrollRef.current;
     const titleEl = mobileTitleRef.current;
-    if (!root || !titleEl || isPending) return undefined;
-
-    const update = () => {
-      const threshold = Math.max(titleEl.offsetHeight - 2, 0);
-      setShowGenreFilter(root.scrollTop >= threshold);
-    };
-
-    update();
-    root.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    return () => {
-      root.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-    };
-  }, [activeTriller?.id, isPending, title]);
+    if (!root || !titleEl) return;
+    const threshold = Math.max(titleEl.offsetHeight - 2, 0);
+    setShowGenreFilter(root.scrollTop >= threshold);
+  };
 
   const handleSelect = (item) => {
     if (!item?.id) return;
@@ -115,25 +100,33 @@ const Triller = ({ activeId }) => {
   return (
     <div className="triller">
       <div className="triller-main">
-        <div className="triller-primary">
-          <div className="triller-pin">
-            <div className="triller-player-frame">
-              <VideoPlayerControls
-                src={videoSrc ? encodeURI(videoSrc) : ''}
-                poster={poster || undefined}
-                resetKey={activeTriller.id}
-                videoClassName="trailer-modal-video"
-                objectFit="cover"
-              />
-            </div>
+        {/* Pin: faqat video */}
+        <div className="triller-pin">
+          <div className="triller-player-frame">
+            <VideoPlayerControls
+              src={videoSrc ? encodeURI(videoSrc) : ''}
+              poster={poster || undefined}
+              resetKey={activeTriller.id}
+              videoClassName="trailer-modal-video"
+              objectFit="cover"
+            />
           </div>
-          {title ? (
-            <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
-          ) : null}
         </div>
 
-        {/* Desktop: side panel. Mobile: pin ostidagi yagona scroll container */}
-        <div className="triller-scroll-area" ref={scrollRef}>
+        {/* Desktop title (grid: primary o‘rniga pin+shu) */}
+        {title ? (
+          <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
+        ) : null}
+
+        {/*
+          Mobile scroll: title → sticky bar → cards
+          display:block (flex emas) — sticky + title scroll bug oldini olish
+        */}
+        <div
+          className="triller-scroll-area"
+          ref={scrollRef}
+          onScroll={handleScrollAreaScroll}
+        >
           {title ? (
             <h1
               ref={mobileTitleRef}
