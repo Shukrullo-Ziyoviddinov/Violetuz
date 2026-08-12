@@ -531,7 +531,7 @@ const Triller = ({ activeId }) => {
                 poster={poster || undefined}
                 resetKey={activeTriller.id}
                 videoClassName="trailer-modal-video"
-                objectFit={isImmersiveVideo ? 'contain' : 'cover'}
+                objectFit="contain"
                 onExpandToggle={isMobileViewport() ? handleExpandToggle : undefined}
                 expanded={isImmersiveVideo}
               />

@@ -380,20 +380,47 @@
     touch-action: manipulation;
   }
 
+  /* Expand/immersive: trailer-page kabi full-bleed — yon padding yo‘q */
+  .triller--sheet-dragging .triller-pin,
+  .triller--expanding .triller-pin,
+  .triller--immersive .triller-pin {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+  }
+
   .triller-player-frame {
     border-radius: 10px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     max-width: 100%;
+    width: 100%;
     aspect-ratio: 16 / 9;
     height: auto;
     max-height: 100dvh;
+    overflow: hidden;
+    background: #000;
     transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .triller-player-frame .trailer-modal-video-wrapper {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: inherit;
+  }
+
+  .triller-player-frame .trailer-modal-video,
+  .triller-player-frame video {
+    object-fit: contain !important;
   }
 
   .triller:not(.triller--immersive).triller--expanding .triller-player-frame,
   .triller:not(.triller--immersive).triller--sheet-dragging .triller-player-frame {
     aspect-ratio: auto;
+    border-radius: 0;
     height: calc(
       56.25vw + (100dvh - 56.25vw) * var(--triller-sheet-progress, 0)
     );
@@ -434,8 +461,8 @@
   .triller--immersive .triller-pin {
     flex: 1 1 auto;
     min-height: 0;
-    padding: 0;
     display: flex;
+    flex-direction: column;
     align-items: stretch;
     overflow: hidden;
     touch-action: pan-y;
@@ -444,22 +471,46 @@
   .triller--immersive .triller-player-frame {
     width: 100%;
     height: 100%;
-    max-height: 100%;
+    max-height: none;
     aspect-ratio: unset;
     border-radius: 0;
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
     transition: none;
     background: #000;
+    overflow: hidden;
+    position: relative;
   }
 
   .triller--immersive .triller-player-frame .trailer-modal-video-wrapper {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
     background: #000;
   }
 
-  .triller--immersive .triller-player-frame .trailer-modal-video,
-  .triller--immersive .triller-player-frame video {
-    object-fit: contain !important;
+  .triller--immersive .trailer-modal-bottom-controls {
+    padding: 0.85rem 1rem max(0.85rem, env(safe-area-inset-bottom, 0px));
+    z-index: 70;
+  }
+
+  .triller--immersive .trailer-modal-bottom-controls.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+  }
+
+  .triller--immersive .trailer-modal-controls-bar {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    min-height: 40px;
+    opacity: 1;
+    visibility: visible;
   }
 
   .triller--immersive .triller-scroll-area {
@@ -476,7 +527,7 @@
       max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Collapse: scroll qaytadi, video kichrayadi */
+  /* Collapse: scroll qaytadi, video kichrayadi — full-bleed saqlanadi */
   .triller--immersive.triller--collapsing .triller-scroll-area {
     flex: 1 1 auto;
     width: 100%;
@@ -502,7 +553,7 @@
 
   .triller--immersive.triller--collapsing .triller-pin {
     flex: 0 0 auto;
-    padding: 0.5rem 0.7rem 0;
+    padding: 0;
   }
 
   .triller--immersive.triller--collapsing .triller-player-frame {
@@ -511,9 +562,7 @@
     );
     max-height: 100dvh;
     flex: 0 0 auto;
-    border-radius: 10px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: 0;
   }
 
   .triller--immersive.triller--collapsing.triller--sheet-dragging .triller-player-frame {

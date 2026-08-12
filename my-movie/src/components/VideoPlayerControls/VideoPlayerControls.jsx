@@ -105,6 +105,14 @@ const VideoPlayerControls = ({
   }, [isPlaying]);
 
   useEffect(() => {
+    if (!expanded) return undefined;
+    setShowControls(true);
+    showControlsRef.current = true;
+    showControlsWithDelay();
+    return undefined;
+  }, [expanded]);
+
+  useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
