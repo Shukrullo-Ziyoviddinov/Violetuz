@@ -15,6 +15,8 @@ const ShareButton = ({
   portalTarget = null,
   label = null,
   className = '',
+  buttonClassName = '',
+  icon = 'nodes', // 'nodes' | 'send' (yuborish)
 }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
@@ -227,27 +229,33 @@ const ShareButton = ({
   );
 
   const shareLabel = label ?? t('share.share', 'Ulashish');
+  const useSendIcon = icon === 'send' || Boolean(label);
+
+  const sendIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1.5-4.5 4.5-8.5 11-9V9z" />
+    </svg>
+  );
+
+  const nodesIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+    </svg>
+  );
 
   return (
     <div className={`share-button-wrapper ${className}`.trim()} ref={dropdownRef}>
       <button
-        className={`share-button ${label ? 'share-button--labeled' : ''}`.trim()}
+        type="button"
+        className={`share-button ${label ? 'share-button--labeled' : ''} ${useSendIcon ? 'share-button--send' : ''} ${buttonClassName}`.trim()}
         onClick={() => setIsOpen(!isOpen)}
         aria-label={shareLabel}
       >
-        {label ? (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1.5-4.5 4.5-8.5 11-9V9z" />
-          </svg>
-        ) : (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="18" cy="5" r="3" />
-            <circle cx="6" cy="12" r="3" />
-            <circle cx="18" cy="19" r="3" />
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-          </svg>
-        )}
+        {useSendIcon ? sendIcon : nodesIcon}
         {label ? <span className="share-button-label">{label}</span> : null}
       </button>
 

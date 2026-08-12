@@ -1753,6 +1753,12 @@ const MovieDetail = () => {
                     route: `/movie/${movie.id}`,
                   }}
                 />
+                <ShareButton
+                  movie={movie}
+                  icon="send"
+                  className="movie-detail-share-wrapper"
+                  buttonClassName="movie-detail-action-btn movie-detail-action-btn-share"
+                />
               </ScrollTouch>
 
               <div

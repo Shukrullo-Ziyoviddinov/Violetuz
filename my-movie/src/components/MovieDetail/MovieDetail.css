@@ -398,6 +398,38 @@
   flex-wrap: wrap;
 }
 
+.movie-detail-actions .movie-detail-share-wrapper.share-button-wrapper {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: 2;
+}
+
+.movie-detail-actions .share-button.movie-detail-action-btn-share {
+  width: auto;
+  height: auto;
+  min-height: calc(0.75rem * 2 + 1.125rem * 1.2);
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(70, 65, 80, 0.238);
+  background: rgba(45, 45, 50, 0.3);
+  color: #ffffff;
+  backdrop-filter: none;
+  transform: none;
+}
+
+.movie-detail-actions .share-button.movie-detail-action-btn-share:hover {
+  background: rgba(45, 45, 50, 0.45);
+  border-color: rgba(155, 79, 231, 0.45);
+  color: #fff;
+  transform: none;
+}
+
+.movie-detail-actions .share-button.movie-detail-action-btn-share svg {
+  width: 24px;
+  height: 24px;
+}
+
 .movie-detail-actions.scroll-touch {
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -2345,6 +2377,12 @@
     min-height: calc(0.3rem * 2 + 1.125rem * 1.2);
   }
 
+  .movie-detail-actions .share-button.movie-detail-action-btn-share {
+    padding: 0.3rem 0.5rem;
+    border-radius: 10px;
+    min-height: calc(0.3rem * 2 + 1.125rem * 1.2);
+  }
+
   .movie-detail-actions .repost-btn.movie-detail-action-btn {
     padding: 0.3rem 0.5rem;
     border-radius: 10px;
@@ -2378,6 +2416,17 @@
     width: 18px;
     height: 18px;
     flex-shrink: 0;
+  }
+
+  .movie-detail-actions .share-button.movie-detail-action-btn-share {
+    padding: 0.3rem 0.5rem;
+    min-height: 0;
+    font-size: 0.9rem;
+  }
+
+  .movie-detail-actions .share-button.movie-detail-action-btn-share svg {
+    width: 18px;
+    height: 18px;
   }
 
   .movie-detail-rate-icon {
