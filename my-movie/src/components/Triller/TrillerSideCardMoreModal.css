@@ -1,0 +1,155 @@
+html.triller-side-more-open,
+body.triller-side-more-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* —— Desktop: ⋯ ostidan —— */
+.triller-side-more-desktop {
+  position: fixed;
+  z-index: 1250;
+  min-width: 180px;
+  padding: 0.4rem;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  pointer-events: none;
+}
+
+.triller-side-more-desktop.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* —— Mobile sheet —— */
+.triller-side-more-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1250;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.triller-side-more-overlay.is-visible {
+  opacity: 1;
+}
+
+.triller-side-more-sheet {
+  width: 100%;
+  max-width: 100%;
+  background: #121212;
+  border-radius: 16px 16px 0 0;
+  color: #fff;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  overscroll-behavior: none;
+  will-change: transform;
+}
+
+.triller-side-more-sheet.is-open {
+  transform: translateY(0);
+}
+
+.triller-side-more-sheet.is-dragging {
+  transition: none;
+}
+
+.triller-side-more-sheet.is-closing {
+  pointer-events: none;
+}
+
+.triller-side-more-drag-zone {
+  padding: 0.55rem 1rem 0.25rem;
+  touch-action: none;
+  user-select: none;
+}
+
+.triller-side-more-handle {
+  width: 42px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  margin: 0 auto;
+}
+
+.triller-side-more-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem 1rem;
+}
+
+.triller-side-more-desktop .triller-side-more-actions {
+  padding: 0;
+  gap: 0.2rem;
+}
+
+.triller-side-more-share-wrap,
+.triller-side-more-share-wrap .share-button-wrapper,
+.triller-side-more-share {
+  width: 100%;
+  display: block;
+}
+
+.triller-side-more-share-wrap .share-button-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.triller-side-more-action,
+.triller-side-more-share-wrap .share-button.share-button--labeled,
+.triller-side-more-action--share {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 0.9rem !important;
+  border: none;
+  border-radius: 10px;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  box-sizing: border-box;
+  min-height: 48px;
+}
+
+.triller-side-more-action:hover,
+.triller-side-more-share-wrap .share-button.share-button--labeled:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.triller-side-more-action svg,
+.triller-side-more-share-wrap .share-button.share-button--labeled svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.triller-side-more-action--save.is-active {
+  color: #e0aaff !important;
+}
+
+.triller-side-more-desktop .triller-side-more-action,
+.triller-side-more-desktop .triller-side-more-share-wrap .share-button.share-button--labeled {
+  padding: 0.65rem 0.75rem !important;
+  min-height: 42px;
+  font-size: 0.88rem;
+}
