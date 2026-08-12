@@ -162,10 +162,13 @@ const Triller = ({ activeId }) => {
             ) : null}
             <TrillerMetaRow
               className="triller-meta-row--desktop"
+              trillerId={activeTriller.id}
               like={activeTriller.like}
               dislike={activeTriller.dislike}
               reytingImdb={activeTriller.reytingImdb}
               reytingKinopoisk={activeTriller.reytingKinopoisk}
+              title={title}
+              image={poster}
             />
           </div>
         </div>
@@ -188,10 +191,13 @@ const Triller = ({ activeId }) => {
 
             <TrillerMetaRow
               className="triller-meta-row--mobile"
+              trillerId={activeTriller.id}
               like={activeTriller.like}
               dislike={activeTriller.dislike}
               reytingImdb={activeTriller.reytingImdb}
               reytingKinopoisk={activeTriller.reytingKinopoisk}
+              title={title}
+              image={poster}
             />
           </div>
 

@@ -101,7 +101,43 @@
   gap: 0.75rem;
 }
 
-.triller-meta-chip,
+/* LikeButton trailerModal — Triller sahifasida TrailerModal.css bo‘lmasa ham ishlasin */
+.triller-meta-likes .trailer-modal-controls-like,
+.triller-meta-likes .trailer-modal-controls-dislike {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+}
+
+.triller-meta-likes .trailer-modal-controls-like:hover {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.triller-meta-likes .trailer-modal-controls-like.active {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.triller-meta-likes .trailer-modal-controls-dislike:hover {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.triller-meta-likes .trailer-modal-controls-dislike.active {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.2);
+}
+
 .triller-meta-rating {
   display: inline-flex;
   align-items: center;
@@ -112,11 +148,6 @@
   line-height: 1;
   user-select: none;
   pointer-events: none;
-}
-
-.triller-meta-chip svg {
-  flex-shrink: 0;
-  opacity: 0.9;
 }
 
 .triller-meta-rating-img {
