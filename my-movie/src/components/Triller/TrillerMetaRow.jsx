@@ -1,5 +1,8 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import LikeButton from '../../Music/LikeButton/LikeButton';
+import ShareButton from '../ShareButton/ShareButton';
+import { useWishlist } from '../../context/WishlistContext';
 import { formatActionCount } from '../../utils/utils';
 
 const formatRating = (value) => {
@@ -10,7 +13,7 @@ const formatRating = (value) => {
 };
 
 /**
- * Title ostidagi meta: LikeButton (likesSlice) + IMDb/Kinopoisk.
+ * Title ostidagi meta: like/dislike + reytinglar | ulashish + saqlash.
  */
 const TrillerMetaRow = ({
   trillerId,
@@ -22,9 +25,12 @@ const TrillerMetaRow = ({
   image = '',
   className = '',
 }) => {
+  const { t } = useTranslation();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const imdbLabel = formatRating(reytingImdb);
   const kpLabel = formatRating(reytingKinopoisk);
   const persistKey = trillerId != null ? `triller-${trillerId}` : undefined;
+  const saved = trillerId != null && isInWishlist(trillerId, 'triller');
 
   const likeMeta = useMemo(() => {
     if (trillerId == null) return undefined;
@@ -36,34 +42,77 @@ const TrillerMetaRow = ({
     };
   }, [trillerId, title, image]);
 
+  const shareMovie = useMemo(
+    () => ({
+      id: trillerId,
+      title: title || '',
+    }),
+    [trillerId, title]
+  );
+
   return (
     <div className={`triller-meta-row${className ? ` ${className}` : ''}`} aria-label="Reytinglar">
-      <div className="triller-meta-likes">
-        <LikeButton
-          key={persistKey || 'triller-like'}
-          variant="trailerModal"
-          contentId={trillerId}
-          persistKey={persistKey}
-          initialLikeCount={like}
-          initialDislikeCount={dislike}
-          countFormatter={formatActionCount}
-          likeMeta={likeMeta}
-        />
+      <div className="triller-meta-left">
+        <div className="triller-meta-likes">
+          <LikeButton
+            key={persistKey || 'triller-like'}
+            variant="trailerModal"
+            contentId={trillerId}
+            persistKey={persistKey}
+            initialLikeCount={like}
+            initialDislikeCount={dislike}
+            countFormatter={formatActionCount}
+            likeMeta={likeMeta}
+          />
+        </div>
+
+        <div className="triller-meta-ratings">
+          {imdbLabel != null ? (
+            <span className="triller-meta-rating" aria-label={`IMDb ${imdbLabel}`}>
+              <img className="triller-meta-rating-img" src="/img/imdb.jpg" alt="" />
+              <span className="triller-meta-rating-value">{imdbLabel}</span>
+            </span>
+          ) : null}
+          {kpLabel != null ? (
+            <span className="triller-meta-rating" aria-label={`Kinopoisk ${kpLabel}`}>
+              <img className="triller-meta-rating-img" src="/img/kinopoisk.jpg" alt="" />
+              <span className="triller-meta-rating-value">{kpLabel}</span>
+            </span>
+          ) : null}
+        </div>
       </div>
 
-      <div className="triller-meta-ratings">
-        {imdbLabel != null ? (
-          <span className="triller-meta-rating" aria-label={`IMDb ${imdbLabel}`}>
-            <img className="triller-meta-rating-img" src="/img/imdb.jpg" alt="" />
-            <span className="triller-meta-rating-value">{imdbLabel}</span>
-          </span>
-        ) : null}
-        {kpLabel != null ? (
-          <span className="triller-meta-rating" aria-label={`Kinopoisk ${kpLabel}`}>
-            <img className="triller-meta-rating-img" src="/img/kinopoisk.jpg" alt="" />
-            <span className="triller-meta-rating-value">{kpLabel}</span>
-          </span>
-        ) : null}
+      <div className="triller-meta-actions">
+        <div className="triller-meta-share-wrap">
+          <ShareButton
+            movie={shareMovie}
+            dropdownInPortal
+            icon="send"
+            label={t('share.share', 'Ulashish')}
+          />
+        </div>
+        <button
+          type="button"
+          className={`triller-meta-save-btn${saved ? ' is-active' : ''}`}
+          onClick={() => trillerId != null && toggleWishlist(trillerId, 'triller')}
+          aria-label={t('wishlist.save', 'Saqlash')}
+          aria-pressed={saved}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill={saved ? 'currentColor' : 'none'}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>{t('wishlist.save', 'Saqlash')}</span>
+        </button>
       </div>
     </div>
   );

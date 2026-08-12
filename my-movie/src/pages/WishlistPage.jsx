@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { useWishlist } from '../context/WishlistContext';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
+import { fetchAllTrillers } from '../api/trillersApi';
+import { getLocalizedField } from '../utils/shortsMovieUtils';
 import Movies from '../components/Movies/Movies';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
@@ -106,6 +109,11 @@ const WishlistTabIcons = {
       <line x1="8" y1="23" x2="16" y2="23" />
     </svg>
   ),
+  triller: (
+    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="5 3 19 12 5 21 5 3" />
+    </svg>
+  ),
 };
 
 const WishlistPage = () => {
@@ -125,10 +133,19 @@ const WishlistPage = () => {
     clipsLoading,
     concertsLoading,
   } = useMusicApi();
+  const { data: allTrillers = [], isPending: trillersLoading } = useQuery({
+    queryKey: ['trillers', 'with-ratings'],
+    queryFn: fetchAllTrillers,
+  });
   const [activeTab, setActiveTab] = useState('movie');
 
   const wishlistCatalogLoading =
-    moviesLoading || musicLoading || albumsLoading || clipsLoading || concertsLoading;
+    moviesLoading ||
+    musicLoading ||
+    albumsLoading ||
+    clipsLoading ||
+    concertsLoading ||
+    trillersLoading;
 
   const normalizeType = (raw) => {
     const v = String(raw || '').toLowerCase();
@@ -137,6 +154,7 @@ const WishlistPage = () => {
     if (v === 'album') return 'album';
     if (v === 'klip' || v === 'clip') return 'klip';
     if (v === 'konsert' || v === 'concert') return 'konsert';
+    if (v === 'triller' || v === 'trailer') return 'triller';
     return '';
   };
 
@@ -149,14 +167,24 @@ const WishlistPage = () => {
   const wishlistMusic = allMusic.filter((m) => matchWishlist(m.id, 'music'));
   const wishlistClips = allClips.filter((c) => matchWishlist(c.id, normalizeType(c.type) || 'klip'));
   const wishlistConcerts = allConcerts.filter((c) => matchWishlist(c.id, normalizeType(c.type) || 'konsert'));
+  const wishlistTrillers = allTrillers.filter((item) => matchWishlist(item.id, 'triller'));
 
   const hasMovies = wishlistMovies.length > 0;
   const hasMusic = wishlistMusic.length > 0;
   const hasAlbums = wishlistAlbums.length > 0;
   const hasClips = wishlistClips.length > 0;
   const hasConcerts = wishlistConcerts.length > 0;
-  const isEmpty = !hasMovies && !hasMusic && !hasAlbums && !hasClips && !hasConcerts;
-  const showTabs = (hasMovies ? 1 : 0) + (hasMusic ? 1 : 0) + (hasAlbums ? 1 : 0) + (hasClips ? 1 : 0) + (hasConcerts ? 1 : 0) >= 2;
+  const hasTrillers = wishlistTrillers.length > 0;
+  const isEmpty =
+    !hasMovies && !hasMusic && !hasAlbums && !hasClips && !hasConcerts && !hasTrillers;
+  const showTabs =
+    (hasMovies ? 1 : 0) +
+      (hasMusic ? 1 : 0) +
+      (hasAlbums ? 1 : 0) +
+      (hasClips ? 1 : 0) +
+      (hasConcerts ? 1 : 0) +
+      (hasTrillers ? 1 : 0) >=
+    2;
 
   const getDefaultTab = () => {
     if (hasMovies) return 'movie';
@@ -164,6 +192,7 @@ const WishlistPage = () => {
     if (hasAlbums) return 'album';
     if (hasClips) return 'klip';
     if (hasConcerts) return 'konsert';
+    if (hasTrillers) return 'triller';
     return 'movie';
   };
 
@@ -195,6 +224,11 @@ const WishlistPage = () => {
     toggleWishlist(id, normalizeType(type) || 'klip');
   };
 
+  const handleTrillerWishlistClick = (e, id) => {
+    e.stopPropagation();
+    toggleWishlist(id, 'triller');
+  };
+
   if (isEmpty) {
     if (wishlistCatalogLoading) {
       return <WishlistEmptySkeleton />;
@@ -202,10 +236,18 @@ const WishlistPage = () => {
     return <WishlistEmpty />;
   }
 
+  const tabIsValid =
+    (activeTab === 'movie' && hasMovies) ||
+    (activeTab === 'music' && hasMusic) ||
+    (activeTab === 'album' && hasAlbums) ||
+    (activeTab === 'klip' && hasClips) ||
+    (activeTab === 'konsert' && hasConcerts) ||
+    (activeTab === 'triller' && hasTrillers);
+
   const effectiveTab = showTabs
-    ? ((activeTab === 'movie' && hasMovies) || (activeTab === 'music' && hasMusic) || (activeTab === 'album' && hasAlbums) || (activeTab === 'klip' && hasClips) || (activeTab === 'konsert' && hasConcerts)
-        ? activeTab
-        : getDefaultTab())
+    ? tabIsValid
+      ? activeTab
+      : getDefaultTab()
     : hasMovies
       ? 'movie'
       : hasMusic
@@ -214,7 +256,9 @@ const WishlistPage = () => {
           ? 'album'
           : hasClips
             ? 'klip'
-            : 'konsert';
+            : hasConcerts
+              ? 'konsert'
+              : 'triller';
 
   return (
     <div className="wishlist-page">
@@ -263,6 +307,15 @@ const WishlistPage = () => {
             >
               <span className="wishlist-tab-icon">{WishlistTabIcons.konsert}</span>
               {t('wishlist.tabKonserts', 'Konsert')}
+            </button>
+          )}
+          {hasTrillers && (
+            <button
+              className={`wishlist-tab ${effectiveTab === 'triller' ? 'active' : ''}`}
+              onClick={() => setActiveTab('triller')}
+            >
+              <span className="wishlist-tab-icon">{WishlistTabIcons.triller}</span>
+              {t('wishlist.tabTriller', 'Triller')}
             </button>
           )}
         </ScrollTouch>
@@ -444,6 +497,61 @@ const WishlistPage = () => {
                     </div>
                   </div>
                 ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {effectiveTab === 'triller' && (
+        <div className="wishlist-music wishlist-music--clips">
+          <div className="wishlist-music-container">
+            <div className="wishlist-music-grid wishlist-music-grid--clips">
+              {wishlistTrillers.map((item) => {
+                const itemTitle = getLocalizedField(item.title, contentLang) || '';
+                const itemImg =
+                  getLocalizedField(item.videoImg, contentLang) || '/img/movie1.jpg';
+                return (
+                  <div
+                    key={`triller-${item.id}`}
+                    className="wishlist-music-item wishlist-music-item--klip wishlist-music-item--triller"
+                    onClick={() => navigate(`/triller/${item.id}`)}
+                  >
+                    <div className="wishlist-music-item-image-wrapper">
+                      <img
+                        src={itemImg}
+                        alt={itemTitle}
+                        className="wishlist-music-item-image"
+                      />
+                      <button
+                        className="wishlist-music-item-wishlist-btn active"
+                        onClick={(e) => handleTrillerWishlistClick(e, item.id)}
+                        aria-label="Sevimlilardan olib tashlash"
+                      >
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="wishlist-music-item-info">
+                      <h3 className="wishlist-music-item-title">{itemTitle}</h3>
+                    </div>
+                    <div className="wishlist-music-item-play">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21" />
+                      </svg>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

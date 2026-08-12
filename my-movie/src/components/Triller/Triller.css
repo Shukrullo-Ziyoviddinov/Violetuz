@@ -86,7 +86,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.85rem 1.25rem;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
   margin-top: 0.15rem;
 }
 
@@ -94,11 +95,82 @@
   display: none;
 }
 
+.triller-meta-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.1rem;
+  min-width: 0;
+}
+
 .triller-meta-likes,
-.triller-meta-ratings {
+.triller-meta-ratings,
+.triller-meta-actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.triller-meta-actions {
+  gap: 0.45rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.triller-meta-share-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.triller-meta-share-wrap .share-button-wrapper {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: 2;
+}
+
+.triller-meta-share-wrap .share-button.share-button--labeled,
+.triller-meta-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: max-content;
+  height: auto;
+  min-height: 34px;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: none;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.triller-meta-share-wrap .share-button.share-button--labeled:hover,
+.triller-meta-save-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  transform: none;
+  border: none;
+}
+
+.triller-meta-share-wrap .share-button.share-button--labeled svg,
+.triller-meta-save-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.triller-meta-save-btn.is-active {
+  color: #9b4fe7;
+  background: rgba(155, 79, 231, 0.18);
 }
 
 /* LikeButton trailerModal — Triller sahifasida TrailerModal.css bo‘lmasa ham ishlasin */
@@ -280,6 +352,12 @@
     display: flex;
     margin: 0 0 0.35rem;
     padding: 0 0 0.35rem;
+  }
+
+  .triller-meta-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
   }
 
   .triller-player-frame {
