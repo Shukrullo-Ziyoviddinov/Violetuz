@@ -1364,7 +1364,6 @@ const MovieDetail = () => {
                       className="movie-detail-video-skeleton"
                     />
                   )}
-                  {!showVideoSkeleton && <ShareButton movie={movie} />}
                   <video
                     ref={videoRef}
                     key={movieVideo}
