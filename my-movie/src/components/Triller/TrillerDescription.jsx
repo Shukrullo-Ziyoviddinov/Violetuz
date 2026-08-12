@@ -19,8 +19,8 @@ const pickDescription = (description, lang) => {
 };
 
 /**
- * Desktop: 4 qator + expand animatsiya (modal yo‘q).
- * Mobile: 2 qator + «Ko‘proq ko‘rsatish» → TrillerInfoModal.
+ * Desktop: 4 qator; «Ko‘proq» → text + yil/davlat/janr expand.
+ * Mobile: 2 qator; «Ko‘proq» → modal (text + specs).
  */
 const TrillerDescription = ({ description, className = '' }) => {
   const { t } = useTranslation();
@@ -55,6 +55,8 @@ const TrillerDescription = ({ description, className = '' }) => {
     { key: 'genre', label: t('triller.infoGenre', 'Janr'), value: data.genre },
   ].filter((row) => row.value);
 
+  const showSpecs = !isMobile && expanded && rows.length > 0;
+
   const handleMore = () => {
     if (isMobile) {
       setModalOpen(true);
@@ -86,8 +88,12 @@ const TrillerDescription = ({ description, className = '' }) => {
         </div>
       ) : null}
 
-      {rows.length > 0 ? (
-        <dl className="triller-info-specs triller-description-specs">
+      {showSpecs ? (
+        <dl
+          className={`triller-info-specs triller-description-specs${
+            expanded ? ' is-open' : ''
+          }`}
+        >
           {rows.map((row) => (
             <div className="triller-info-spec-row" key={row.key}>
               <dt>{row.label}</dt>

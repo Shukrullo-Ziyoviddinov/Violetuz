@@ -28,6 +28,8 @@ const MODAL_SELECTOR = [
   '.trailer-modal-overlay',
   '.trailer-page-overlay',
   '.trailer-modal-scroll-area',
+  '.triller-info-modal-overlay',
+  '.triller-info-modal',
   '.comentaria-history-modal',
   '.profile-edit-modal',
   '.profile-edit-overlay',

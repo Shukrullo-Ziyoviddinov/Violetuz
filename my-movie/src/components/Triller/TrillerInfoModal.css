@@ -1,3 +1,10 @@
+html.triller-info-modal-open,
+body.triller-info-modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+}
+
 .triller-info-modal-overlay {
   position: fixed;
   inset: 0;
@@ -6,6 +13,15 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  touch-action: none;
+}
+
+.triller-info-modal-overlay.is-visible {
+  opacity: 1;
 }
 
 .triller-info-modal {
@@ -19,12 +35,24 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   padding-bottom: env(safe-area-inset-bottom, 0);
+  overscroll-behavior: none;
+  touch-action: none;
+  will-change: transform;
+}
+
+.triller-info-modal.is-open {
+  transform: translateY(0);
 }
 
 .triller-info-modal.is-dragging {
   transition: none;
+}
+
+.triller-info-modal.is-closing {
+  pointer-events: none;
 }
 
 .triller-info-modal-drag-zone {
@@ -54,6 +82,8 @@
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   padding: 0.35rem 1rem 1.25rem;
 }
 
