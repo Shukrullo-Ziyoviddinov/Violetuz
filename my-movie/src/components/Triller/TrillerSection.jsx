@@ -7,7 +7,7 @@ import './TrillerSection.css';
 
 const TrillerSection = () => {
   const { data: list = [], isPending } = useQuery({
-    queryKey: ['trillers'],
+    queryKey: ['trillers', 'with-ratings'],
     queryFn: fetchAllTrillers,
   });
 

@@ -120,16 +120,24 @@
 }
 
 .triller-meta-rating-img {
-  width: 1.35rem;
-  height: 1.35rem;
-  object-fit: cover;
+  width: 1.4rem;
+  height: 1.4rem;
+  max-width: 1.4rem;
+  max-height: 1.4rem;
+  object-fit: contain;
   border-radius: 4px;
   flex-shrink: 0;
   display: block;
+  background: #111;
 }
 
 .triller-meta-rating-value {
-  min-width: 1.4em;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  min-width: 1.5em;
+  white-space: nowrap;
 }
 
 .triller-player-title--mobile {

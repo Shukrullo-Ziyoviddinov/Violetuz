@@ -13,8 +13,9 @@ const ThumbDownIcon = () => (
 );
 
 const formatRating = (value) => {
+  if (value == null || value === '') return null;
   const num = Number(value);
-  if (!Number.isFinite(num)) return '—';
+  if (!Number.isFinite(num)) return null;
   return Number.isInteger(num) ? String(num) : num.toFixed(1);
 };
 
@@ -27,33 +28,39 @@ const TrillerMetaRow = ({
   reytingImdb,
   reytingKinopoisk,
   className = '',
-}) => (
-  <div className={`triller-meta-row${className ? ` ${className}` : ''}`} aria-label="Reytinglar">
-    <div className="triller-meta-likes">
-      <span className="triller-meta-chip triller-meta-like" aria-label={`Like ${like}`}>
-        <ThumbUpIcon />
-        <span>{like}</span>
-      </span>
-      <span className="triller-meta-chip triller-meta-dislike" aria-label={`Dislike ${dislike}`}>
-        <ThumbDownIcon />
-        <span>{dislike}</span>
-      </span>
-    </div>
+}) => {
+  const imdbLabel = formatRating(reytingImdb);
+  const kpLabel = formatRating(reytingKinopoisk);
 
-    <div className="triller-meta-ratings">
-      <span className="triller-meta-rating" aria-label={`IMDb ${formatRating(reytingImdb)}`}>
-        <img className="triller-meta-rating-img" src="/img/imdb.jpg" alt="" />
-        <span className="triller-meta-rating-value">{formatRating(reytingImdb)}</span>
-      </span>
-      <span
-        className="triller-meta-rating"
-        aria-label={`Kinopoisk ${formatRating(reytingKinopoisk)}`}
-      >
-        <img className="triller-meta-rating-img" src="/img/kinopoisk.jpg" alt="" />
-        <span className="triller-meta-rating-value">{formatRating(reytingKinopoisk)}</span>
-      </span>
+  return (
+    <div className={`triller-meta-row${className ? ` ${className}` : ''}`} aria-label="Reytinglar">
+      <div className="triller-meta-likes">
+        <span className="triller-meta-chip triller-meta-like" aria-label={`Like ${like}`}>
+          <ThumbUpIcon />
+          <span>{like}</span>
+        </span>
+        <span className="triller-meta-chip triller-meta-dislike" aria-label={`Dislike ${dislike}`}>
+          <ThumbDownIcon />
+          <span>{dislike}</span>
+        </span>
+      </div>
+
+      <div className="triller-meta-ratings">
+        {imdbLabel != null ? (
+          <span className="triller-meta-rating" aria-label={`IMDb ${imdbLabel}`}>
+            <img className="triller-meta-rating-img" src="/img/imdb.jpg" alt="" />
+            <span className="triller-meta-rating-value">{imdbLabel}</span>
+          </span>
+        ) : null}
+        {kpLabel != null ? (
+          <span className="triller-meta-rating" aria-label={`Kinopoisk ${kpLabel}`}>
+            <img className="triller-meta-rating-img" src="/img/kinopoisk.jpg" alt="" />
+            <span className="triller-meta-rating-value">{kpLabel}</span>
+          </span>
+        ) : null}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default TrillerMetaRow;

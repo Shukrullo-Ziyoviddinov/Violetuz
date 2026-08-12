@@ -22,7 +22,7 @@ const Triller = ({ activeId }) => {
   const [showGenreFilter, setShowGenreFilter] = useState(false);
 
   const { data: list = [], isPending, isError } = useQuery({
-    queryKey: ['trillers'],
+    queryKey: ['trillers', 'with-ratings'],
     queryFn: fetchAllTrillers,
   });
 
