@@ -73,7 +73,7 @@ const TrillerMetaRow = ({
         <div className="triller-meta-ratings">
           {imdbLabel != null ? (
             <span className="triller-meta-rating" aria-label={`IMDb ${imdbLabel}`}>
-              <img className="triller-meta-rating-img" src="/img/imdb.jpg" alt="" />
+              <img className="triller-meta-rating-img" src="/img/imdbnew.png" alt="" />
               <span className="triller-meta-rating-value">{imdbLabel}</span>
             </span>
           ) : null}

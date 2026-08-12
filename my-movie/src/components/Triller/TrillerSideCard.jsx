@@ -1,6 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
+import { formatActionCount } from '../../utils/utils';
+import LikeButton from '../../Music/LikeButton/LikeButton';
 import { useVideoDurationLabel } from './useVideoDurationLabel';
 import TrillerSideCardMoreModal from './TrillerSideCardMoreModal';
 import './TrillerSideCard.css';
@@ -20,16 +22,29 @@ const TrillerSideCard = ({ triller, onSelect }) => {
   const [moreOpen, setMoreOpen] = useState(false);
   const [anchorRect, setAnchorRect] = useState(null);
 
+  const title = getLocalizedField(triller?.title, contentLang);
+  const videoImg = getLocalizedField(triller?.videoImg, contentLang);
+
+  const likeMeta = useMemo(() => {
+    if (triller?.id == null) return undefined;
+    return {
+      category: 'other',
+      title: title || '',
+      image: videoImg || '',
+      route: `/triller/${triller.id}`,
+    };
+  }, [triller?.id, title, videoImg]);
+
   if (!triller) return null;
 
-  const title = getLocalizedField(triller.title, contentLang);
-  const videoImg = getLocalizedField(triller.videoImg, contentLang);
   const ageLimit = triller.ageLimit != null ? Number(triller.ageLimit) : null;
   const ageLabel = Number.isFinite(ageLimit) ? `${ageLimit}+` : '';
   const imdbLabel = formatRating(triller.reytingImdb);
   const kpLabel = formatRating(triller.reytingKinopoisk);
   const hasRatings = imdbLabel != null || kpLabel != null;
-
+  const likeCount = Number(triller.like) || 0;
+  const dislikeCount = Number(triller.dislike) || 0;
+  const persistKey = triller.id != null ? `triller-${triller.id}` : undefined;
   const handleClick = () => {
     onSelect?.(triller);
   };
@@ -64,6 +79,10 @@ const TrillerSideCard = ({ triller, onSelect }) => {
     setMoreOpen(true);
   };
 
+  const stopCardNav = (e) => {
+    e.stopPropagation();
+  };
+
   return (
     <>
       <div
@@ -89,7 +108,7 @@ const TrillerSideCard = ({ triller, onSelect }) => {
             <div className="triller-meta-ratings triller-side-card-ratings">
               {imdbLabel != null ? (
                 <span className="triller-meta-rating" aria-label={`IMDb ${imdbLabel}`}>
-                  <img className="triller-meta-rating-img" src="/img/imdb.jpg" alt="" />
+                  <img className="triller-meta-rating-img" src="/img/imdbnew.png" alt="" />
                   <span className="triller-meta-rating-value">{imdbLabel}</span>
                 </span>
               ) : null}
@@ -101,6 +120,22 @@ const TrillerSideCard = ({ triller, onSelect }) => {
               ) : null}
             </div>
           ) : null}
+          <div
+            className="triller-meta-likes triller-side-card-likes"
+            onClick={stopCardNav}
+            onKeyDown={stopCardNav}
+          >
+            <LikeButton
+              key={persistKey || 'triller-side-like'}
+              variant="trailerModal"
+              contentId={triller.id}
+              persistKey={persistKey}
+              initialLikeCount={likeCount}
+              initialDislikeCount={dislikeCount}
+              countFormatter={formatActionCount}
+              likeMeta={likeMeta}
+            />
+          </div>
         </div>
 
         <button
