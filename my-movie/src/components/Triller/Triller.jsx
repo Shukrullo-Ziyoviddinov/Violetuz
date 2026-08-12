@@ -142,23 +142,23 @@ const Triller = ({ activeId }) => {
   return (
     <div className="triller">
       <div className="triller-main">
-        {/* Pin: faqat video */}
-        <div className="triller-pin">
-          <div className="triller-player-frame">
-            <VideoPlayerControls
-              src={videoSrc ? encodeURI(videoSrc) : ''}
-              poster={poster || undefined}
-              resetKey={activeTriller.id}
-              videoClassName="trailer-modal-video"
-              objectFit="cover"
-            />
+        {/* Desktop: video + title bir ustunda — side balandligi title’ni pastga itarmasin */}
+        <div className="triller-primary">
+          <div className="triller-pin">
+            <div className="triller-player-frame">
+              <VideoPlayerControls
+                src={videoSrc ? encodeURI(videoSrc) : ''}
+                poster={poster || undefined}
+                resetKey={activeTriller.id}
+                videoClassName="trailer-modal-video"
+                objectFit="cover"
+              />
+            </div>
           </div>
+          {title ? (
+            <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
+          ) : null}
         </div>
-
-        {/* Desktop title (grid: primary o‘rniga pin+shu) */}
-        {title ? (
-          <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
-        ) : null}
 
         {/*
           Mobile scroll: title → sticky bar → cards
