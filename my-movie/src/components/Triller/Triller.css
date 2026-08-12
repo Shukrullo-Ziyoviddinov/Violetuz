@@ -234,22 +234,22 @@
 
 .triller-meta-likes .trailer-modal-controls-like:hover {
   color: #4caf50;
-  background: rgba(76, 175, 80, 0.1);
+  background: transparent;
 }
 
 .triller-meta-likes .trailer-modal-controls-like.active {
   color: #4caf50;
-  background: rgba(76, 175, 80, 0.2);
+  background: transparent;
 }
 
 .triller-meta-likes .trailer-modal-controls-dislike:hover {
   color: #f44336;
-  background: rgba(244, 67, 54, 0.1);
+  background: transparent;
 }
 
 .triller-meta-likes .trailer-modal-controls-dislike.active {
   color: #f44336;
-  background: rgba(244, 67, 54, 0.2);
+  background: transparent;
 }
 
 .triller-meta-rating {

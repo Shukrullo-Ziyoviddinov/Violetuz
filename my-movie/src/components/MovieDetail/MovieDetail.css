@@ -1615,7 +1615,7 @@
 
 .movie-detail-description-modal-content {
   position: relative;
-  background: rgba(28, 22, 36, 0.98);
+  background: #121212;
   border-radius: 20px;
   width: 90%;
   max-width: 800px;
@@ -1635,7 +1635,7 @@
   padding: 1.5rem 2rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
-  background: rgba(28, 22, 36, 0.98);
+  background: #121212;
   position: relative;
   user-select: none;
   -webkit-user-select: none;
