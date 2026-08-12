@@ -44,6 +44,15 @@ const normalizeCount = (value, fieldName, fallback = 0) => {
   return num;
 };
 
+const normalizeRating = (value, fieldName, fallback = 0) => {
+  if (value == null || value === '') return fallback;
+  const num = Number(value);
+  if (!Number.isFinite(num) || num < 0) {
+    throw badRequest(`${fieldName} must be a non-negative number`);
+  }
+  return Math.round(num * 10) / 10;
+};
+
 class TrillerService {
   async getAll() {
     const items = await TrillerModel.find({}).sort({ id: 1 }).lean();
@@ -75,6 +84,8 @@ class TrillerService {
       ageLimit: normalizeCount(raw.ageLimit, 'ageLimit', 0),
       like: normalizeCount(raw.like, 'like', 0),
       dislike: normalizeCount(raw.dislike, 'dislike', 0),
+      reytingImdb: normalizeRating(raw.reytingImdb, 'reytingImdb', 0),
+      reytingKinopoisk: normalizeRating(raw.reytingKinopoisk, 'reytingKinopoisk', 0),
     };
 
     const item = new TrillerModel(payload);

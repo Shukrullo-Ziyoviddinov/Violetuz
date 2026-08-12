@@ -29,6 +29,10 @@ const seedTrillers = async () => {
       ageLimit: Number.isFinite(Number(data.ageLimit)) ? Number(data.ageLimit) : 0,
       like: Number.isFinite(Number(data.like)) ? Number(data.like) : 0,
       dislike: Number.isFinite(Number(data.dislike)) ? Number(data.dislike) : 0,
+      reytingImdb: Number.isFinite(Number(data.reytingImdb)) ? Number(data.reytingImdb) : 0,
+      reytingKinopoisk: Number.isFinite(Number(data.reytingKinopoisk))
+        ? Number(data.reytingKinopoisk)
+        : 0,
     });
 
     await triller.save();

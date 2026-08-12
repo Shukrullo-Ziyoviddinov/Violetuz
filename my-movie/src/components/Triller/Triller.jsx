@@ -8,6 +8,7 @@ import { fetchAllTrillers } from '../../api/trillersApi';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import TrillerSideCard from './TrillerSideCard';
 import MediaGenreFilter from './MediaGenreFilter';
+import TrillerMetaRow from './TrillerMetaRow';
 import './Triller.css';
 
 const Triller = ({ activeId }) => {
@@ -155,9 +156,18 @@ const Triller = ({ activeId }) => {
               />
             </div>
           </div>
-          {title ? (
-            <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
-          ) : null}
+          <div className="triller-primary-info">
+            {title ? (
+              <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
+            ) : null}
+            <TrillerMetaRow
+              className="triller-meta-row--desktop"
+              like={activeTriller.like}
+              dislike={activeTriller.dislike}
+              reytingImdb={activeTriller.reytingImdb}
+              reytingKinopoisk={activeTriller.reytingKinopoisk}
+            />
+          </div>
         </div>
 
         {/*
@@ -169,14 +179,21 @@ const Triller = ({ activeId }) => {
           ref={scrollRef}
           onScroll={handleScrollAreaScroll}
         >
-          {title ? (
-            <h1
-              ref={mobileTitleRef}
-              className="triller-player-title triller-player-title--mobile"
-            >
-              {title}
-            </h1>
-          ) : null}
+          <div ref={mobileTitleRef} className="triller-scroll-head">
+            {title ? (
+              <h1 className="triller-player-title triller-player-title--mobile">
+                {title}
+              </h1>
+            ) : null}
+
+            <TrillerMetaRow
+              className="triller-meta-row--mobile"
+              like={activeTriller.like}
+              dislike={activeTriller.dislike}
+              reytingImdb={activeTriller.reytingImdb}
+              reytingKinopoisk={activeTriller.reytingKinopoisk}
+            />
+          </div>
 
           <div
             className={`triller-sticky-bar${showGenreFilter ? ' is-filter' : ''}`}

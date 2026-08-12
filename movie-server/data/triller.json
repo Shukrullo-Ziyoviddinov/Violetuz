@@ -19,7 +19,9 @@
     },
     "ageLimit": 6,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 8.2,
+    "reytingKinopoisk": 7.8
   },
   {
     "id": 2,
@@ -41,7 +43,9 @@
     },
     "ageLimit": 18,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 8.9,
+    "reytingKinopoisk": 8.5
   },
   {
     "id": 3,
@@ -63,7 +67,9 @@
     },
     "ageLimit": 18,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 6.4,
+    "reytingKinopoisk": 6.7
   },
   {
     "id": 4,
@@ -85,7 +91,9 @@
     },
     "ageLimit": 6,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 7.5,
+    "reytingKinopoisk": 7.9
   },
   {
     "id": 5,
@@ -107,7 +115,9 @@
     },
     "ageLimit": 16,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 5.8,
+    "reytingKinopoisk": 6.1
   },
   {
     "id": 6,
@@ -129,7 +139,9 @@
     },
     "ageLimit": 12,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 8.1,
+    "reytingKinopoisk": 7.6
   },
   {
     "id": 7,
@@ -151,7 +163,9 @@
     },
     "ageLimit": 6,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 7,
+    "reytingKinopoisk": 7.2
   },
   {
     "id": 8,
@@ -173,7 +187,9 @@
     },
     "ageLimit": 12,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 4.5,
+    "reytingKinopoisk": 5.1
   },
   {
     "id": 9,
@@ -195,7 +211,9 @@
     },
     "ageLimit": 16,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 6.8,
+    "reytingKinopoisk": 6.3
   },
   {
     "id": 10,
@@ -217,6 +235,8 @@
     },
     "ageLimit": 18,
     "like": 0,
-    "dislike": 0
+    "dislike": 0,
+    "reytingImdb": 5.2,
+    "reytingKinopoisk": 4.9
   }
 ]

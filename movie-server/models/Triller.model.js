@@ -50,6 +50,16 @@ const trillerSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    reytingImdb: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    reytingKinopoisk: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     strict: true,

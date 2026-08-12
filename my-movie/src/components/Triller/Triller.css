@@ -33,6 +33,13 @@
   align-self: start;
 }
 
+.triller-primary-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
 .triller-pin {
   min-width: 0;
 }
@@ -73,6 +80,56 @@
   font-weight: 700;
   line-height: 1.35;
   color: #fff;
+}
+
+.triller-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.25rem;
+  margin-top: 0.15rem;
+}
+
+.triller-meta-row--mobile {
+  display: none;
+}
+
+.triller-meta-likes,
+.triller-meta-ratings {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.triller-meta-chip,
+.triller-meta-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+.triller-meta-chip svg {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.triller-meta-rating-img {
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.triller-meta-rating-value {
+  min-width: 1.4em;
 }
 
 .triller-player-title--mobile {
@@ -172,6 +229,20 @@
     display: none;
   }
 
+  .triller-primary-info {
+    display: none;
+  }
+
+  .triller-meta-row--desktop {
+    display: none;
+  }
+
+  .triller-meta-row--mobile {
+    display: flex;
+    margin: 0 0 0.35rem;
+    padding: 0 0 0.35rem;
+  }
+
   .triller-player-frame {
     border-radius: 10px;
     border-bottom-left-radius: 0;
@@ -204,9 +275,13 @@
     top: auto !important;
     font-size: 1.15rem;
     margin: 0;
-    padding: 0.75rem 0 0.65rem;
+    padding: 0.75rem 0 0.5rem;
     background: #000;
     max-width: 100%;
+  }
+
+  .triller-scroll-head {
+    background: #000;
   }
 
   .triller-sticky-bar {
