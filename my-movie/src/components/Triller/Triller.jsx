@@ -10,6 +10,7 @@ import TrillerSideCard from './TrillerSideCard';
 import MediaGenreFilter from './MediaGenreFilter';
 import TrillerMetaRow from './TrillerMetaRow';
 import TrillerDescription from './TrillerDescription';
+import MovieComments from '../MovieDetail/MovieComments';
 import './Triller.css';
 
 const Triller = ({ activeId }) => {
@@ -64,6 +65,7 @@ const Triller = ({ activeId }) => {
   const title = getLocalizedField(activeTriller?.title, contentLang);
   const poster = getLocalizedField(activeTriller?.videoImg, contentLang);
   const forYouTitle = t('triller.forYou', 'Sizga yoqadi');
+  const commentsMovieId = activeTriller?.id != null ? `triller:${String(activeTriller.id)}` : '';
 
   useEffect(() => {
     setSelectedGenre('all');
@@ -175,6 +177,15 @@ const Triller = ({ activeId }) => {
               className="triller-description--desktop"
               description={activeTriller.description}
             />
+            {commentsMovieId ? (
+              <div className="triller-comments triller-comments--desktop">
+                <MovieComments
+                  key={`triller-comments-desktop-${activeTriller.id}`}
+                  movieId={commentsMovieId}
+                  previewLimit={4}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -208,6 +219,15 @@ const Triller = ({ activeId }) => {
               className="triller-description--mobile"
               description={activeTriller.description}
             />
+            {commentsMovieId ? (
+              <div className="triller-comments triller-comments--mobile">
+                <MovieComments
+                  key={`triller-comments-mobile-${activeTriller.id}`}
+                  movieId={commentsMovieId}
+                  previewLimit={1}
+                />
+              </div>
+            ) : null}
           </div>
 
           <div

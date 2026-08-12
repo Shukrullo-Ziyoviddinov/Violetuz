@@ -44,6 +44,27 @@
   display: none;
 }
 
+.triller-comments--mobile {
+  display: none;
+}
+
+/* video-detail .movie-detail-comments bilan bir xil look */
+.triller-comments .movie-detail-comments {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem 1rem;
+  border-radius: 15px;
+  margin-bottom: 0.5rem;
+}
+
+.triller-comments .movie-detail-comments-input-wrap {
+  background: rgba(45, 45, 50, 0.71);
+  border: 1px solid rgba(70, 65, 80, 0.4);
+}
+
+.triller-comments .movie-detail-comments-list {
+  margin-bottom: 0;
+}
+
 .triller-pin {
   min-width: 0;
 }
@@ -371,6 +392,16 @@
 
   .triller-description--mobile {
     display: block;
+  }
+
+  .triller-comments--desktop {
+    display: none;
+  }
+
+  .triller-comments--mobile {
+    display: block;
+    margin-top: 0.35rem;
+    margin-bottom: 0.5rem;
   }
 
   .triller-meta-row--desktop {

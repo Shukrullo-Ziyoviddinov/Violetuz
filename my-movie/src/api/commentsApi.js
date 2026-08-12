@@ -152,8 +152,9 @@ function removeCommentByIdFromTree(list, commentId) {
 }
 
 /**
- * Kino / klip / konsert — bitta comment matnini yangilash.
+ * Kino / klip / konsert / triller — bitta comment matnini yangilash.
  * Hozir: localStorage. Backend: shu nom va parametrlar bilan `fetch` qo‘ying; oxirida `dispatchMovieCommentsChanged` chaqirilsin.
+ * Kalitlar: movieId | `music:id` | `triller:id`
  *
  * @returns {Promise<void>}
  */

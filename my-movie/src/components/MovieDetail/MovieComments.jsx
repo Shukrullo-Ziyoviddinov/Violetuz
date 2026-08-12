@@ -25,6 +25,7 @@ const toggleCommentLike = (movieId, commentId, comments, setComments) => {
   const updated = updateInTree(comments);
   setComments(updated);
   commentsApi.saveComments(movieId, updated);
+  commentsApi.dispatchMovieCommentsChanged(movieId);
 
   if (isLiked) liked.delete(String(commentId));
   else liked.add(String(commentId));
@@ -37,20 +38,20 @@ const migrateComment = (c) => ({
   replies: Array.isArray(c.replies) ? c.replies.map(migrateComment) : [],
 });
 
-const PREVIEW_LIMIT = 4;
+const PREVIEW_LIMIT_DEFAULT = 4;
 
 /** Jami kommentlar soni (asosiy + barcha javoblar, ichki javoblar bilan) */
 const countTotalComments = (comments) => {
   return comments.reduce((sum, c) => sum + 1 + countTotalComments(c.replies || []), 0);
 };
 
-/** Tashqarida ko'rsatish uchun max PREVIEW_LIMIT ta (asosiy + javoblar, ichki javoblar bilan) */
-const getDisplayedComments = (comments) => {
+/** Tashqarida ko'rsatish uchun max limit ta (asosiy + javoblar) */
+const getDisplayedComments = (comments, limit = PREVIEW_LIMIT_DEFAULT) => {
   let count = 0;
   const takeFrom = (list) => {
     const out = [];
     for (const c of list) {
-      if (count >= PREVIEW_LIMIT) break;
+      if (count >= limit) break;
       count++;
       out.push({ ...c, replies: takeFrom(c.replies || []) });
     }
@@ -68,7 +69,7 @@ const EMOJI_LIST = [
 
 const VL_EMOJI_IMG = '/img/photo_2026-02-16_20-30-31_preview_rev_1.png';
 
-const MovieComments = forwardRef(({ movieId, onCountChange }, ref) => {
+const MovieComments = forwardRef(({ movieId, onCountChange, previewLimit = PREVIEW_LIMIT_DEFAULT }, ref) => {
   const { t, i18n } = useTranslation();
   const { profile } = useAuth();
   const [comments, setComments] = useState([]);
@@ -78,6 +79,7 @@ const MovieComments = forwardRef(({ movieId, onCountChange }, ref) => {
   const [dragY, setDragY] = useState(0);
   const startYRef = useRef(0);
   const commentsListRef = useRef(null);
+  const limit = Math.max(1, Number(previewLimit) || PREVIEW_LIMIT_DEFAULT);
 
   useEffect(() => {
     const raw = commentsApi.getComments(movieId);
@@ -142,11 +144,13 @@ const MovieComments = forwardRef(({ movieId, onCountChange }, ref) => {
       const updated = addReply(comments, replyingTo.id);
       setComments(updated);
       commentsApi.saveComments(movieId, updated);
+      commentsApi.dispatchMovieCommentsChanged(movieId);
       setReplyingTo(null);
     } else {
       const updated = [newComment, ...comments];
       setComments(updated);
       commentsApi.saveComments(movieId, updated);
+      commentsApi.dispatchMovieCommentsChanged(movieId);
     }
     setInputValue('');
   };
@@ -183,9 +187,9 @@ const MovieComments = forwardRef(({ movieId, onCountChange }, ref) => {
     setDragY(0);
   };
 
-  const displayedComments = getDisplayedComments(comments);
+  const displayedComments = getDisplayedComments(comments, limit);
   const totalCount = countTotalComments(comments);
-  const hasMore = totalCount > PREVIEW_LIMIT;
+  const hasMore = totalCount > limit;
   const likedIds = commentsApi.getLikedIds(movieId);
 
   useImperativeHandle(ref, () => ({
