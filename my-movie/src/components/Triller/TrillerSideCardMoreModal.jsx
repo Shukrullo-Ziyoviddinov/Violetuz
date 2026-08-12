@@ -116,25 +116,12 @@ const TrillerSideCardMoreModal = ({
   }, [open, isMobile, anchorRect]);
 
   useEffect(() => {
-    if (!mounted) return undefined;
-    document.documentElement.classList.add(BODY_LOCK);
-    document.body.classList.add(BODY_LOCK);
-    return () => {
-      document.documentElement.classList.remove(BODY_LOCK);
-      document.body.classList.remove(BODY_LOCK);
-    };
-  }, [mounted]);
-
-  useEffect(
-    () => () => {
-      if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
-    },
-    []
-  );
-
-  useEffect(() => {
     if (!mounted || isMobile) return undefined;
     const onDoc = (e) => {
+      if (e.target.closest?.('.triller-side-card-more')) return;
+      if (e.target.closest?.('.share-button-dropdown') || e.target.closest?.('.share-modal-overlay')) {
+        return;
+      }
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         requestClose();
       }
@@ -149,6 +136,23 @@ const TrillerSideCardMoreModal = ({
       document.removeEventListener('keydown', onKey);
     };
   }, [mounted, isMobile, requestClose]);
+
+  useEffect(() => {
+    if (!mounted || !isMobile) return undefined;
+    document.documentElement.classList.add(BODY_LOCK);
+    document.body.classList.add(BODY_LOCK);
+    return () => {
+      document.documentElement.classList.remove(BODY_LOCK);
+      document.body.classList.remove(BODY_LOCK);
+    };
+  }, [mounted, isMobile]);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+    },
+    []
+  );
 
   const handleTouchStart = (e) => {
     if (closingRef.current || !isMobile) return;

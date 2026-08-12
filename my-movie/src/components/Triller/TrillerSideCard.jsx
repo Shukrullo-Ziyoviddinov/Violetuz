@@ -34,15 +34,23 @@ const TrillerSideCard = ({ triller, onSelect }) => {
   const handleMore = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (moreOpen) {
+      setMoreOpen(false);
+      return;
+    }
     const rect = moreBtnRef.current?.getBoundingClientRect?.() || null;
-    setAnchorRect(rect ? {
-      top: rect.top,
-      bottom: rect.bottom,
-      left: rect.left,
-      right: rect.right,
-      width: rect.width,
-      height: rect.height,
-    } : null);
+    setAnchorRect(
+      rect
+        ? {
+            top: rect.top,
+            bottom: rect.bottom,
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+            height: rect.height,
+          }
+        : null
+    );
     setMoreOpen(true);
   };
 

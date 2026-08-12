@@ -90,6 +90,8 @@ body.triller-side-more-open {
   flex-direction: column;
   gap: 0.35rem;
   padding: 0.35rem 0.75rem 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .triller-side-more-desktop .triller-side-more-actions {
@@ -97,16 +99,26 @@ body.triller-side-more-open {
   gap: 0.2rem;
 }
 
-.triller-side-more-share-wrap,
-.triller-side-more-share-wrap .share-button-wrapper,
-.triller-side-more-share {
-  width: 100%;
+.triller-side-more-share-wrap {
   display: block;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-.triller-side-more-share-wrap .share-button-wrapper {
-  display: block;
-  width: 100%;
+/* ShareButton default absolute (top/right) — menyuda oddiy qator */
+.triller-side-more-share-wrap .share-button-wrapper,
+.triller-side-more-share-wrap .triller-side-more-share.share-button-wrapper {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  z-index: auto !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
 }
 
 .triller-side-more-action,
@@ -116,11 +128,13 @@ body.triller-side-more-open {
   align-items: center;
   justify-content: flex-start;
   gap: 0.75rem;
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
   margin: 0;
   padding: 0.85rem 0.9rem !important;
-  border: none;
-  border-radius: 10px;
+  border: none !important;
+  border-radius: 10px !important;
   background: transparent !important;
   color: rgba(255, 255, 255, 0.92) !important;
   font-size: 0.95rem;
@@ -129,6 +143,11 @@ body.triller-side-more-open {
   cursor: pointer;
   box-sizing: border-box;
   min-height: 48px;
+  height: auto !important;
+  position: relative !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  flex-shrink: 0;
 }
 
 .triller-side-more-action:hover,
