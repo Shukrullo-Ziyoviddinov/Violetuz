@@ -68,8 +68,12 @@ const TrillerDescription = ({ description, className = '' }) => {
   const moreLabel = isMobile
     ? t('triller.showMore', "Ko'proq ko'rsatish")
     : expanded
-      ? t('triller.showLess', 'Yopish')
+      ? t('triller.showLess', "Kamroq ko'rsatish")
       : t('triller.showMore', "Ko'proq ko'rsatish");
+
+  // Desktop expand: tugma specsdan keyin; aks holda text ostida
+  const moreAfterSpecs = !isMobile && expanded;
+  const moreAfterText = !moreAfterSpecs;
 
   return (
     <div className={`triller-description${className ? ` ${className}` : ''}`}>
@@ -82,9 +86,11 @@ const TrillerDescription = ({ description, className = '' }) => {
           >
             {data.text}
           </p>
-          <button type="button" className="triller-description-more" onClick={handleMore}>
-            {moreLabel}
-          </button>
+          {moreAfterText ? (
+            <button type="button" className="triller-description-more" onClick={handleMore}>
+              {moreLabel}
+            </button>
+          ) : null}
         </div>
       ) : null}
 
@@ -101,6 +107,16 @@ const TrillerDescription = ({ description, className = '' }) => {
             </div>
           ))}
         </dl>
+      ) : null}
+
+      {moreAfterSpecs ? (
+        <button
+          type="button"
+          className="triller-description-more triller-description-more--after-specs"
+          onClick={handleMore}
+        >
+          {moreLabel}
+        </button>
       ) : null}
 
       <TrillerInfoModal

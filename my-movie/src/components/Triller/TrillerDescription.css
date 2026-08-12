@@ -55,6 +55,10 @@
   color: #fff;
 }
 
+.triller-description-more--after-specs {
+  margin-top: 0.65rem;
+}
+
 .triller-description-specs {
   margin: 0.75rem 0 0;
   display: flex;
