@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../ShareButton/ShareButton';
+import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import { useWishlist } from '../../context/WishlistContext';
 import { formatActionCount } from '../../utils/utils';
 
@@ -51,7 +52,10 @@ const TrillerMetaRow = ({
   );
 
   return (
-    <div className={`triller-meta-row${className ? ` ${className}` : ''}`} aria-label="Reytinglar">
+    <ScrollTouch
+      className={`triller-meta-row${className ? ` ${className}` : ''}`}
+      aria-label="Reytinglar"
+    >
       <div className="triller-meta-left">
         <div className="triller-meta-likes">
           <LikeButton
@@ -100,8 +104,8 @@ const TrillerMetaRow = ({
         >
           <svg
             viewBox="0 0 24 24"
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             fill={saved ? 'currentColor' : 'none'}
             stroke="currentColor"
             strokeWidth="2"
@@ -114,7 +118,7 @@ const TrillerMetaRow = ({
           <span>{t('wishlist.save', 'Saqlash')}</span>
         </button>
       </div>
-    </div>
+    </ScrollTouch>
   );
 };
 

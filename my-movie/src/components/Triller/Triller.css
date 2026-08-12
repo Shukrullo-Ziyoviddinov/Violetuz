@@ -84,11 +84,15 @@
 
 .triller-meta-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.65rem 1rem;
+  justify-content: flex-start;
+  gap: 0.55rem;
   margin-top: 0.15rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .triller-meta-row--mobile {
@@ -97,30 +101,43 @@
 
 .triller-meta-left {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.75rem 1.1rem;
+  gap: 0.55rem;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .triller-meta-likes,
 .triller-meta-ratings,
 .triller-meta-actions {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.45rem;
+  flex-shrink: 0;
 }
 
 .triller-meta-actions {
-  gap: 0.45rem;
   margin-left: auto;
-  flex-shrink: 0;
+}
+
+@media (min-width: 901px) {
+  .triller-meta-row {
+    justify-content: space-between;
+    gap: 0.65rem 1rem;
+  }
+
+  .triller-meta-left {
+    gap: 0.75rem 1.1rem;
+  }
 }
 
 .triller-meta-share-wrap {
   position: relative;
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .triller-meta-share-wrap .share-button-wrapper {
@@ -134,16 +151,16 @@
 .triller-meta-save-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
   width: max-content;
   height: auto;
-  min-height: 34px;
-  padding: 0.4rem 0.75rem;
+  min-height: 28px;
+  padding: 4px 10px;
   border: none;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.92);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
@@ -163,8 +180,8 @@
 
 .triller-meta-share-wrap .share-button.share-button--labeled svg,
 .triller-meta-save-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
 }
 
@@ -354,10 +371,29 @@
     padding: 0 0 0.35rem;
   }
 
+  .triller-meta-row--mobile.scroll-touch {
+    display: flex;
+  }
+
+  .triller-meta-left,
   .triller-meta-actions {
-    width: 100%;
+    width: auto;
     margin-left: 0;
     justify-content: flex-start;
+  }
+
+  .triller-meta-share-wrap .share-button.share-button--labeled,
+  .triller-meta-save-btn {
+    min-height: 26px;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .triller-meta-share-wrap .share-button.share-button--labeled svg,
+  .triller-meta-save-btn svg {
+    width: 13px;
+    height: 13px;
   }
 
   .triller-player-frame {
