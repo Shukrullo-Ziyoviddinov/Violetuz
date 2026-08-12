@@ -464,27 +464,6 @@ const MovieComments = forwardRef(
                   onTouchEnd={handleTouchEnd}
                 >
                   <div className="movie-detail-comments-modal-drag-handle" />
-                  <div className="movie-detail-comments-modal-header">
-                    <button
-                      className="movie-detail-comments-modal-close movie-detail-comments-modal-close-desktop"
-                      onClick={() => setShowCommentsModal(false)}
-                      aria-label="Yopish"
-                    >
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M19 12H5M12 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                    <h3 className="movie-detail-comments-modal-title">
-                      {i18n.language === 'uz' ? 'Izohlar' : 'Комментарии'}
-                    </h3>
-                  </div>
                 </div>
 
                 <div className="movie-detail-comments-modal-body" ref={commentsListRef}>
