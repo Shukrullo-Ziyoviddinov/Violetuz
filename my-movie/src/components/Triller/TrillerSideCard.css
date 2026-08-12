@@ -60,6 +60,9 @@
 .triller-side-card-body {
   min-width: 0;
   padding-top: 0.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .triller-side-card-title {
@@ -72,6 +75,22 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.triller-side-card-ratings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.triller-side-card .triller-meta-rating-img {
+  width: 22px;
+  height: 22px;
+}
+
+.triller-side-card .triller-meta-rating-value {
+  font-size: 0.82rem;
 }
 
 .triller-side-card-more {

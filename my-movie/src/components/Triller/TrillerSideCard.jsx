@@ -5,6 +5,13 @@ import { useVideoDurationLabel } from './useVideoDurationLabel';
 import TrillerSideCardMoreModal from './TrillerSideCardMoreModal';
 import './TrillerSideCard.css';
 
+const formatRating = (value) => {
+  if (value == null || value === '') return null;
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  return Number.isInteger(num) ? String(num) : num.toFixed(1);
+};
+
 const TrillerSideCard = ({ triller, onSelect }) => {
   const { contentLang } = useContentLanguage();
   const videoSrc = getLocalizedField(triller?.video, contentLang);
@@ -19,6 +26,9 @@ const TrillerSideCard = ({ triller, onSelect }) => {
   const videoImg = getLocalizedField(triller.videoImg, contentLang);
   const ageLimit = triller.ageLimit != null ? Number(triller.ageLimit) : null;
   const ageLabel = Number.isFinite(ageLimit) ? `${ageLimit}+` : '';
+  const imdbLabel = formatRating(triller.reytingImdb);
+  const kpLabel = formatRating(triller.reytingKinopoisk);
+  const hasRatings = imdbLabel != null || kpLabel != null;
 
   const handleClick = () => {
     onSelect?.(triller);
@@ -75,6 +85,22 @@ const TrillerSideCard = ({ triller, onSelect }) => {
 
         <div className="triller-side-card-body">
           <h3 className="triller-side-card-title">{title}</h3>
+          {hasRatings ? (
+            <div className="triller-meta-ratings triller-side-card-ratings">
+              {imdbLabel != null ? (
+                <span className="triller-meta-rating" aria-label={`IMDb ${imdbLabel}`}>
+                  <img className="triller-meta-rating-img" src="/img/imdb.jpg" alt="" />
+                  <span className="triller-meta-rating-value">{imdbLabel}</span>
+                </span>
+              ) : null}
+              {kpLabel != null ? (
+                <span className="triller-meta-rating" aria-label={`Kinopoisk ${kpLabel}`}>
+                  <img className="triller-meta-rating-img" src="/img/kinopoisk.jpg" alt="" />
+                  <span className="triller-meta-rating-value">{kpLabel}</span>
+                </span>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <button
