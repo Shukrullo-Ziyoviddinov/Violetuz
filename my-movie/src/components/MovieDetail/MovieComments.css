@@ -9,6 +9,64 @@
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.movie-detail-comments-count {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1;
+}
+
+.movie-detail-comments-list--open-modal {
+  cursor: pointer;
+}
+
+.movie-detail-comments--sheet-mobile .movie-detail-comments-list {
+  margin-top: 0;
+}
+
+.movie-detail-comments--sheet-mobile .movie-detail-comments-title {
+  margin-bottom: 0.75rem;
+}
+
+.movie-detail-comments-carousel {
+  overflow: hidden;
+  min-height: 4.5rem;
+}
+
+.movie-detail-comments-carousel-slide {
+  animation: movie-comments-slide-up 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.movie-detail-comments-carousel .movie-detail-comment-item {
+  margin: 0;
+}
+
+.movie-detail-comments-carousel .movie-detail-comment-replies,
+.movie-detail-comments-carousel .movie-detail-comment-tag-row {
+  display: none;
+}
+
+@keyframes movie-comments-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .movie-detail-comments-carousel-slide {
+    animation: none;
+  }
 }
 
 .movie-detail-comments-input-wrap {

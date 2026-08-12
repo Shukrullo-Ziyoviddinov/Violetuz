@@ -351,7 +351,12 @@ const VideoPage = () => {
             )}
 
             {video && (
-              <MovieComments key={String(id)} ref={commentsRef} movieId={`music:${String(id)}`} />
+              <MovieComments
+                key={String(id)}
+                ref={commentsRef}
+                movieId={`music:${String(id)}`}
+                mobileSheetUi
+              />
             )}
             <RecommendedClips
               klip={video}

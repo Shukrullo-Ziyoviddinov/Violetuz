@@ -183,6 +183,7 @@ const Triller = ({ activeId }) => {
                   key={`triller-comments-desktop-${activeTriller.id}`}
                   movieId={commentsMovieId}
                   previewLimit={4}
+                  mobileSheetUi
                 />
               </div>
             ) : null}
@@ -225,6 +226,7 @@ const Triller = ({ activeId }) => {
                   key={`triller-comments-mobile-${activeTriller.id}`}
                   movieId={commentsMovieId}
                   previewLimit={1}
+                  mobileSheetUi
                 />
               </div>
             ) : null}
