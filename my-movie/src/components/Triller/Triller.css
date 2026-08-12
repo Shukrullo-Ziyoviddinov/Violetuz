@@ -450,6 +450,16 @@
     flex: 1;
     min-height: 0;
     transition: none;
+    background: #000;
+  }
+
+  .triller--immersive .triller-player-frame .trailer-modal-video-wrapper {
+    background: #000;
+  }
+
+  .triller--immersive .triller-player-frame .trailer-modal-video,
+  .triller--immersive .triller-player-frame video {
+    object-fit: contain !important;
   }
 
   .triller--immersive .triller-scroll-area {
