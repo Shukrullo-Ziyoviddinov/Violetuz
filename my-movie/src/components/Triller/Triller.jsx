@@ -9,6 +9,7 @@ import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import TrillerSideCard from './TrillerSideCard';
 import MediaGenreFilter from './MediaGenreFilter';
 import TrillerMetaRow from './TrillerMetaRow';
+import TrillerDescription from './TrillerDescription';
 import './Triller.css';
 
 const Triller = ({ activeId }) => {
@@ -22,7 +23,7 @@ const Triller = ({ activeId }) => {
   const [showGenreFilter, setShowGenreFilter] = useState(false);
 
   const { data: list = [], isPending, isError } = useQuery({
-    queryKey: ['trillers', 'with-ratings'],
+    queryKey: ['trillers', 'with-description'],
     queryFn: fetchAllTrillers,
   });
 
@@ -170,6 +171,10 @@ const Triller = ({ activeId }) => {
               title={title}
               image={poster}
             />
+            <TrillerDescription
+              className="triller-description--desktop"
+              description={activeTriller.description}
+            />
           </div>
         </div>
 
@@ -198,6 +203,10 @@ const Triller = ({ activeId }) => {
               reytingKinopoisk={activeTriller.reytingKinopoisk}
               title={title}
               image={poster}
+            />
+            <TrillerDescription
+              className="triller-description--mobile"
+              description={activeTriller.description}
             />
           </div>
 

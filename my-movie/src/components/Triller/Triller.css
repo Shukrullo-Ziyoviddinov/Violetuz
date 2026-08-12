@@ -40,6 +40,10 @@
   min-width: 0;
 }
 
+.triller-description--mobile {
+  display: none;
+}
+
 .triller-pin {
   min-width: 0;
 }
@@ -359,6 +363,14 @@
 
   .triller-primary-info {
     display: none;
+  }
+
+  .triller-description--desktop {
+    display: none;
+  }
+
+  .triller-description--mobile {
+    display: block;
   }
 
   .triller-meta-row--desktop {

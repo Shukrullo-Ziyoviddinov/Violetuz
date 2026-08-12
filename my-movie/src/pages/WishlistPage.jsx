@@ -134,7 +134,7 @@ const WishlistPage = () => {
     concertsLoading,
   } = useMusicApi();
   const { data: allTrillers = [], isPending: trillersLoading } = useQuery({
-    queryKey: ['trillers', 'with-ratings'],
+    queryKey: ['trillers', 'with-description'],
     queryFn: fetchAllTrillers,
   });
   const [activeTab, setActiveTab] = useState('movie');

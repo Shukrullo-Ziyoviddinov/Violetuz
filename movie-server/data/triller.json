@@ -21,7 +21,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 8.2,
-    "reytingKinopoisk": 7.8
+    "reytingKinopoisk": 7.8,
+    "description": {
+      "uz": {
+        "text": "Soul — Pixar animatsion filmining rasmiy treyleri. Jozeba musiqa o'qituvchisi Jo Gardner o'limdan keyin hayot, ehtiros va ma'no haqida yangicha nigoh bilan qaraydi. Treyler filmning issiq atmosferasi, jazz ohangi va vizual dunyosini ochib beradi.",
+        "year": "2020",
+        "country": "AQSH",
+        "genre": "Multfilm, Fantaziya, Drama"
+      },
+      "ru": {
+        "text": "Soul — официальный трейлер анимационного фильма Pixar. Учитель джаза Джо Гарднер после смерти по-новому смотрит на жизнь, страсть и смысл. Трейлер передаёт тёплую атмосферу, джаз и визуальный мир картины.",
+        "year": "2020",
+        "country": "США",
+        "genre": "Мультфильм, Фэнтези, Драма"
+      }
+    }
   },
   {
     "id": 2,
@@ -45,7 +59,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 8.9,
-    "reytingKinopoisk": 8.5
+    "reytingKinopoisk": 8.5,
+    "description": {
+      "uz": {
+        "text": "Oppenheimer — Kristofer Nolanning biografik dramasining rasmiy treyleri. Atom bombasini yaratgan Robert Oppenheimerning ichki kurashi, mas'uliyat va tarixiy oqibatlar haqida kuchli hikoya. Treyler filmning intensivi va dramatik ohangini bildiradi.",
+        "year": "2023",
+        "country": "AQSH, Buyuk Britaniya",
+        "genre": "Drama, Tarixiy, Biografiya"
+      },
+      "ru": {
+        "text": "Oppenheimer — официальный трейлер биографической драмы Кристофера Нолана. Внутренняя борьба Роберта Оппенгеймера, создателя атомной бомбы, ответственность и исторические последствия. Трейлер передаёт интенсивность и драматизм фильма.",
+        "year": "2023",
+        "country": "США, Великобритания",
+        "genre": "Драма, История, Биография"
+      }
+    }
   },
   {
     "id": 3,
@@ -69,7 +97,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 6.4,
-    "reytingKinopoisk": 6.7
+    "reytingKinopoisk": 6.7,
+    "description": {
+      "uz": {
+        "text": "The First Recon — jangovar triller treyleri. Maxsus bo'linma xavfli missiyada qolib, dushman hududida omon qolish uchun kurashadi. Tez sur'at, zo'ravonlik va kuchli sahnalar bilan to'yingan treyler.",
+        "year": "2024",
+        "country": "AQSH",
+        "genre": "Triller, Jangari"
+      },
+      "ru": {
+        "text": "The First Recon — трейлер боевого триллера. Спецотряд оказывается в опасной миссии и борется за выживание на вражеской территории. Динамичный трейлер с экшеном и напряжёнными сценами.",
+        "year": "2024",
+        "country": "США",
+        "genre": "Триллер, Боевик"
+      }
+    }
   },
   {
     "id": 4,
@@ -93,7 +135,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 7.5,
-    "reytingKinopoisk": 7.9
+    "reytingKinopoisk": 7.9,
+    "description": {
+      "uz": {
+        "text": "The Incredibles — Pixar oilaviy superqahramonlar filmining treyleri. Oddiy hayotga qaytgan super oila yana dunyoni saqlashga majbur bo'ladi. Kulgili, sarguzashtli va vizual jihatdan boy treyler.",
+        "year": "2004",
+        "country": "AQSH",
+        "genre": "Multfilm, Sarguzasht, Komediya"
+      },
+      "ru": {
+        "text": "The Incredibles — трейлер семейного супергеройского фильма Pixar. Суперсемья, вернувшаяся к обычной жизни, снова вынуждена спасать мир. Весёлый, приключенческий и визуально насыщенный трейлер.",
+        "year": "2004",
+        "country": "США",
+        "genre": "Мультфильм, Приключения, Комедия"
+      }
+    }
   },
   {
     "id": 5,
@@ -117,7 +173,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 5.8,
-    "reytingKinopoisk": 6.1
+    "reytingKinopoisk": 6.1,
+    "description": {
+      "uz": {
+        "text": "Homestead — tirik qolish dramasining rasmiy treyleri. Jamiyat inqirozi sharoitida oila o'z yerini himoya qilishga urinadi. Zo'riqish, qarorlar va omon qolish mavzusi atrofida qurilgan hikoya.",
+        "year": "2024",
+        "country": "AQSH",
+        "genre": "Jangari, Drama, Triller"
+      },
+      "ru": {
+        "text": "Homestead — официальный трейлер драмы о выживании. Семья пытается защитить свой дом в условиях общественного кризиса. История о напряжении, решениях и борьбе за жизнь.",
+        "year": "2024",
+        "country": "США",
+        "genre": "Боевик, Драма, Триллер"
+      }
+    }
   },
   {
     "id": 6,
@@ -141,7 +211,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 8.1,
-    "reytingKinopoisk": 7.6
+    "reytingKinopoisk": 7.6,
+    "description": {
+      "uz": {
+        "text": "Spider-Man — Marvel qahramoni treyleri. Yosh Piter Parker kuchlari va mas'uliyatini muvozanatlashtirishga harakat qiladi. Dinamik janglar, shahar sarguzashtlari va klassik superqahramon ruhida.",
+        "year": "2021",
+        "country": "AQSH",
+        "genre": "Fantastika, Jangari, Sarguzasht"
+      },
+      "ru": {
+        "text": "Spider-Man — трейлер героя Marvel. Юный Питер Паркер пытается совместить силы и ответственность. Динамичные бои, городские приключения и классический супергеройский дух.",
+        "year": "2021",
+        "country": "США",
+        "genre": "Фантастика, Боевик, Приключения"
+      }
+    }
   },
   {
     "id": 7,
@@ -165,7 +249,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 7,
-    "reytingKinopoisk": 7.2
+    "reytingKinopoisk": 7.2,
+    "description": {
+      "uz": {
+        "text": "Beauty and the Beast — ertakning jonli ijro treyleri. Belle va sehrlangan qal'adagi jonzot o'rtasidagi sevgi hikoyasi. Musiqa, sehr va klassik Disney ruhidagi vizual manzara.",
+        "year": "2017",
+        "country": "AQSH",
+        "genre": "Fantaziya, Romantika, Oilaviy"
+      },
+      "ru": {
+        "text": "Beauty and the Beast — трейлер игровой версии сказки. История любви Белль и существа в заколдованном замке. Музыка, волшебство и визуальный стиль классического Disney.",
+        "year": "2017",
+        "country": "США",
+        "genre": "Фэнтези, Мелодрама, Семейный"
+      }
+    }
   },
   {
     "id": 8,
@@ -189,7 +287,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 4.5,
-    "reytingKinopoisk": 5.1
+    "reytingKinopoisk": 5.1,
+    "description": {
+      "uz": {
+        "text": "Trailer 8 — yengil komediya ruhidagi treyler. Qiziqarli qahramonlar, kutilmagan vaziyatlar va kulgili dialoglar bilan to'yingan qisqa taqdimot. Filmning asosiy kayfiyatini ochib beradi.",
+        "year": "2022",
+        "country": "AQSH",
+        "genre": "Komediya"
+      },
+      "ru": {
+        "text": "Трейлер 8 — лёгкий комедийный трейлер. Короткая презентация с яркими персонажами, неожиданными ситуациями и смешными диалогами. Передаёт основное настроение фильма.",
+        "year": "2022",
+        "country": "США",
+        "genre": "Комедия"
+      }
+    }
   },
   {
     "id": 9,
@@ -213,7 +325,21 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 6.8,
-    "reytingKinopoisk": 6.3
+    "reytingKinopoisk": 6.3,
+    "description": {
+      "uz": {
+        "text": "Trailer 9 — sarguzashtli treyler. Qahramonlar noma'lum hududga sayohat qilib, xavf va yangi kashfiyotlarga duch kelishadi. Tez ritm va keng manzaralar bilan taqdim etiladi.",
+        "year": "2023",
+        "country": "AQSH, Kanada",
+        "genre": "Sarguzasht, Drama"
+      },
+      "ru": {
+        "text": "Трейлер 9 — приключенческий трейлер. Герои отправляются в неизведанные земли и сталкиваются с опасностью и открытиями. Динамичный ритм и широкие пейзажи.",
+        "year": "2023",
+        "country": "США, Канада",
+        "genre": "Приключения, Драма"
+      }
+    }
   },
   {
     "id": 10,
@@ -237,6 +363,20 @@
     "like": 0,
     "dislike": 0,
     "reytingImdb": 5.2,
-    "reytingKinopoisk": 4.9
+    "reytingKinopoisk": 4.9,
+    "description": {
+      "uz": {
+        "text": "Trailer 10 — qo'rqinchli atmosferali treyler. Qorong'u joylar, kutilmagan tovushlar va zo'riqishli pauzalar bilan tomoshabinni qo'rqitishga qaratilgan. Filmning dahshatli kayfiyatini oldindan ko'rsatadi.",
+        "year": "2024",
+        "country": "AQSH",
+        "genre": "Qo'rqinchli, Triller"
+      },
+      "ru": {
+        "text": "Трейлер 10 — трейлер с атмосферой ужаса. Тёмные локации, неожиданные звуки и напряжённые паузы. Передаёт жуткое настроение будущего фильма.",
+        "year": "2024",
+        "country": "США",
+        "genre": "Ужасы, Триллер"
+      }
+    }
   }
 ]

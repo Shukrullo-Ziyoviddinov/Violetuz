@@ -8,6 +8,24 @@ const localizedStringSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const descriptionLangSchema = new mongoose.Schema(
+  {
+    text: { type: String, trim: true, default: '' },
+    year: { type: String, trim: true, default: '' },
+    country: { type: String, trim: true, default: '' },
+    genre: { type: String, trim: true, default: '' },
+  },
+  { _id: false }
+);
+
+const localizedDescriptionSchema = new mongoose.Schema(
+  {
+    uz: { type: descriptionLangSchema, default: () => ({}) },
+    ru: { type: descriptionLangSchema, default: () => ({}) },
+  },
+  { _id: false }
+);
+
 const trillerSchema = new mongoose.Schema(
   {
     id: {
@@ -34,6 +52,10 @@ const trillerSchema = new mongoose.Schema(
       type: localizedStringSchema,
       required: true,
       default: () => ({ uz: '', ru: '' }),
+    },
+    description: {
+      type: localizedDescriptionSchema,
+      default: () => ({ uz: {}, ru: {} }),
     },
     ageLimit: {
       type: Number,

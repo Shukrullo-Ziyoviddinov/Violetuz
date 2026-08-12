@@ -53,6 +53,31 @@ const normalizeRating = (value, fieldName, fallback = 0) => {
   return Math.round(num * 10) / 10;
 };
 
+const normalizeDescriptionLang = (value) => {
+  if (!value || typeof value !== 'object') {
+    return { text: '', year: '', country: '', genre: '' };
+  }
+  return {
+    text: value.text != null ? String(value.text).trim() : '',
+    year: value.year != null ? String(value.year).trim() : '',
+    country: value.country != null ? String(value.country).trim() : '',
+    genre: value.genre != null ? String(value.genre).trim() : '',
+  };
+};
+
+const normalizeDescription = (value) => {
+  if (!value || typeof value !== 'object') {
+    return {
+      uz: normalizeDescriptionLang(null),
+      ru: normalizeDescriptionLang(null),
+    };
+  }
+  return {
+    uz: normalizeDescriptionLang(value.uz),
+    ru: normalizeDescriptionLang(value.ru),
+  };
+};
+
 class TrillerService {
   async getAll() {
     const items = await TrillerModel.find({}).sort({ id: 1 }).lean();
@@ -86,6 +111,7 @@ class TrillerService {
       dislike: normalizeCount(raw.dislike, 'dislike', 0),
       reytingImdb: normalizeRating(raw.reytingImdb, 'reytingImdb', 0),
       reytingKinopoisk: normalizeRating(raw.reytingKinopoisk, 'reytingKinopoisk', 0),
+      description: normalizeDescription(raw.description),
     };
 
     const item = new TrillerModel(payload);

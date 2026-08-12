@@ -33,6 +33,7 @@ const seedTrillers = async () => {
       reytingKinopoisk: Number.isFinite(Number(data.reytingKinopoisk))
         ? Number(data.reytingKinopoisk)
         : 0,
+      description: data.description || { uz: {}, ru: {} },
     });
 
     await triller.save();
