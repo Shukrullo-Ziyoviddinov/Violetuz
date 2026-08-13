@@ -101,7 +101,11 @@ const WishlistMovieFilters = ({ movies = [], draft, onChange }) => {
               <img
                 src={RATING_TYPE_LOGOS[field]}
                 alt={t(`filters.ratingTypes.${key}`)}
-                className="filters-modal-reyting-type-img"
+                className={`filters-modal-reyting-type-img${
+                  field === 'ratingNetflix'
+                    ? ' filters-modal-reyting-type-img--netflix'
+                    : ''
+                }`}
               />
             </button>
           ))}

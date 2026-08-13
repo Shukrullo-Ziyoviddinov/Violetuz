@@ -224,6 +224,11 @@
   object-fit: contain;
 }
 
+.filters-modal-reyting-type-img--netflix {
+  width: 40px;
+  height: 40px;
+}
+
 .filters-modal-reyting-type-btn:hover {
   background-color: rgba(3, 19, 234, 0.2);
   border-color: rgb(3, 19, 234);

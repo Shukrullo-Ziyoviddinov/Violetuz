@@ -161,6 +161,11 @@
   object-fit: contain;
 }
 
+.wishlist-filter-panel .filters-modal-reyting-type-img--netflix {
+  width: 40px;
+  height: 40px;
+}
+
 .wishlist-filter-modal-footer {
   flex-shrink: 0;
   display: flex;

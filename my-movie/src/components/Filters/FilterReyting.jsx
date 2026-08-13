@@ -205,7 +205,11 @@ const FilterReyting = ({
                     className={`filters-modal-reyting-type-btn ${effectiveRatingType === field ? 'filters-modal-reyting-type-btn--active' : ''}`}
                     onClick={() => handleRatingTypeClick(field)}
                   >
-                    <img src={RATING_TYPE_LOGOS[field]} alt={t(`filters.ratingTypes.${key}`)} className="filters-modal-reyting-type-img" />
+                    <img
+                      src={RATING_TYPE_LOGOS[field]}
+                      alt={t(`filters.ratingTypes.${key}`)}
+                      className={`filters-modal-reyting-type-img${field === 'ratingNetflix' ? ' filters-modal-reyting-type-img--netflix' : ''}`}
+                    />
                   </button>
                 ))}
               </div>
