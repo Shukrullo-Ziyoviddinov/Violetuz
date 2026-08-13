@@ -141,9 +141,19 @@ const Navbar = () => {
       <div className="navbar-container">
         <div className="navbar-left">
           <div className="navbar-logo" onClick={() => navigate('/')}>
-            <img src="/img/newlogo_preview_rev_1.png" alt="VIOLET" className="navbar-logo-img" />
+            <img
+              src="/img/newlogo_preview_rev_1.png"
+              alt="VIOLET"
+              className="navbar-logo-img navbar-logo-img--desktop"
+            />
+            <img
+              src="/img/vlplay_preview_rev_1.png"
+              alt="VL"
+              className="navbar-logo-img navbar-logo-img--mobile"
+            />
           </div>
           <button
+            type="button"
             className="navbar-mobile-search-trigger"
             onClick={openSearchModal}
             aria-label={t('navbar.search')}
@@ -257,16 +267,37 @@ const Navbar = () => {
           </>
         </div>
 
-        {isFeedPage && (
+        <div className="navbar-mobile-actions">
+          {!isFeedPage ? (
+            <button
+              type="button"
+              className="navbar-mobile-action-btn navbar-mobile-search-btn"
+              onClick={openSearchModal}
+              aria-label={t('navbar.search')}
+            >
+              <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            </button>
+          ) : null}
+
+          {isFeedPage ? (
+            <button
+              type="button"
+              className="navbar-feed-messages-mobile"
+              onClick={requestOpenMessagesModal}
+              aria-label={t('feed.messages')}
+            >
+              <i className="fa-solid fa-comments" aria-hidden="true" />
+            </button>
+          ) : null}
+
           <button
             type="button"
-            className="navbar-feed-messages-mobile"
-            onClick={requestOpenMessagesModal}
-            aria-label={t('feed.messages')}
+            className="navbar-mobile-action-btn navbar-mobile-bell-btn"
+            aria-label={t('navbar.notifications', 'Bildirishnomalar')}
           >
-            <i className="fa-solid fa-comments" aria-hidden="true" />
+            <i className="fa-solid fa-bell" aria-hidden="true" />
           </button>
-        )}
+        </div>
 
         {isProfilePage && (
           <div className="navbar-profile-mobile-actions">
