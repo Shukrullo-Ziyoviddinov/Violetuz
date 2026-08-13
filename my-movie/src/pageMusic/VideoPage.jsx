@@ -133,6 +133,15 @@ const VideoPage = () => {
   const trendItemsToRender = showTrendSectionSkeleton ? trendSkeletonItems : relatedList;
 
   useEffect(() => {
+    document.documentElement.classList.add('video-detail-page-lock');
+    document.body.classList.add('video-detail-page-active');
+    return () => {
+      document.documentElement.classList.remove('video-detail-page-lock');
+      document.body.classList.remove('video-detail-page-active');
+    };
+  }, []);
+
+  useEffect(() => {
     if (videoRef.current && video?.video) {
       videoRef.current.load();
     }
@@ -178,21 +187,23 @@ const VideoPage = () => {
     <div className="video-detail" aria-busy={showHeroDataSkeleton || undefined}>
       <div className="video-detail-container">
         <div className="video-detail-layout">
-          <div className="video-detail-left-scroll">
-            <div className="video-detail-top">
-              {/* Player wrap refreshda ham turadi — skeleton bermaymiz */}
-              <div className="video-detail-player-wrap">
-                {video?.video ? (
-                  <MusicVideoPlayer
-                    ref={videoRef}
-                    src={video.video}
-                    poster={video.img}
-                    autoPlay
-                    onEnded={handleVideoEnded}
-                  />
-                ) : null}
-              </div>
+          <div className="video-detail-pin">
+            <div className="video-detail-player-wrap">
+              {video?.video ? (
+                <MusicVideoPlayer
+                  ref={videoRef}
+                  src={video.video}
+                  poster={video.img}
+                  autoPlay
+                  onEnded={handleVideoEnded}
+                />
+              ) : null}
+            </div>
+          </div>
 
+          <div className="video-detail-body-scroll">
+            <div className="video-detail-main-scroll">
+              <div className="video-detail-top">
               <div
                 className={`video-detail-info${showInfoSkeleton ? ' video-detail-info--skeleton' : ''}`}
                 aria-busy={showInfoSkeleton || undefined}
@@ -369,31 +380,32 @@ const VideoPage = () => {
               forceSkeleton={showHeroDataSkeleton}
             />
             <AlbumsForYou klip={video} forceSkeleton={showHeroDataSkeleton} />
-          </div>
+            </div>
 
-          <div className="video-detail-right-scroll">
-            {showTrendSectionSkeleton ? (
-              <SkeletonLoader
-                variant="video-detail-trend-title"
-                className="video-detail-trend-title-skeleton"
-              />
-            ) : (
-              <h3 className="video-detail-trend-title">{t(relatedTitleKey, relatedTitleDefault)}</h3>
-            )}
-            <div className="video-detail-trend-grid">
-              {showTrendSectionSkeleton
-                ? trendItemsToRender.map((item) => (
-                    <VideoTrendCardSkeleton key={item.id} />
-                  ))
-                : trendItemsToRender.map((item) => (
-                    <VideoDetailTrendCard
-                      key={item.id}
-                      item={item}
-                      isActive={item.id === video?.id}
-                      onClick={() => handleCardClick(item.id)}
-                      getArtistName={getArtistName}
-                    />
-                  ))}
+            <div className="video-detail-right-scroll">
+              {showTrendSectionSkeleton ? (
+                <SkeletonLoader
+                  variant="video-detail-trend-title"
+                  className="video-detail-trend-title-skeleton"
+                />
+              ) : (
+                <h3 className="video-detail-trend-title">{t(relatedTitleKey, relatedTitleDefault)}</h3>
+              )}
+              <div className="video-detail-trend-grid">
+                {showTrendSectionSkeleton
+                  ? trendItemsToRender.map((item) => (
+                      <VideoTrendCardSkeleton key={item.id} />
+                    ))
+                  : trendItemsToRender.map((item) => (
+                      <VideoDetailTrendCard
+                        key={item.id}
+                        item={item}
+                        isActive={item.id === video?.id}
+                        onClick={() => handleCardClick(item.id)}
+                        getArtistName={getArtistName}
+                      />
+                    ))}
+              </div>
             </div>
           </div>
         </div>
