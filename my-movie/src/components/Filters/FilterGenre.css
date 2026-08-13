@@ -90,8 +90,13 @@
     max-height: 70vh;
     border-radius: 20px 20px 0 0;
     border: none;
-    border-top: 1px solid rgba(70, 65, 80, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: #121212;
+    background-image: none;
     animation: filtersModalGenreSlideUp 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .filters-modal-genre--dragging {
@@ -121,14 +126,15 @@
   }
 
   .filters-modal-genre-header {
-    padding-top: 0.5rem;
-    vertical-align: inherit;
+    padding: 0.5rem 1rem 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .filters-modal-genre-title {
     flex: 1;
     text-align: center;
-    vertical-align: inherit;
+    font-size: 1.1rem;
+    font-weight: 600;
   }
 
   .filters-modal-genre-close {
@@ -136,6 +142,12 @@
   }
 
   .filters-modal-genre-body {
-    max-height: 50vh;
+    max-height: none;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.85rem 1rem 1.25rem;
+    gap: 0.75rem;
+    scroll-behavior: smooth;
   }
 }

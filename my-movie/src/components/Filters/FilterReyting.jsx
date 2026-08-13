@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import FiltersSelect from './FiltersSelect';
+import { useIsMobileFilter } from './useIsMobileFilter';
 import './FilterReyting.css';
 
 const RATING_TYPE_KEYS = {
@@ -26,7 +28,9 @@ const FilterReyting = ({
   hideVlFilter = false
 }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobileFilter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isDraggingModal, setIsDraggingModal] = useState(false);
@@ -45,11 +49,26 @@ const FilterReyting = ({
     return movies.filter(m => m[ratingTypeField] == rating).length;
   };
 
-  const closeModal = () => setIsModalOpen(false);
+  const selectOptions = [
+    {
+      value: null,
+      label: `${t('categories.all')} (${movies.length})`,
+    },
+    ...uniqueRatings.map((rating) => ({
+      value: rating,
+      label: `${rating} (${getRatingCount(rating)})`,
+    })),
+  ];
+
+  const closeModal = () => {
+    setSelectOpen(false);
+    setIsModalOpen(false);
+  };
 
   const handleRatingTypeClick = (type) => {
     onRatingTypeSelect(type);
     onRatingSelect(null);
+    setSelectOpen(false);
   };
 
   const handleRatingSelect = (rating) => {
@@ -61,6 +80,18 @@ const FilterReyting = ({
     onRatingSelect(null);
     closeModal();
   };
+
+  const handleSelectPick = (val, wasActive) => {
+    if (val == null || wasActive) {
+      handleClearRating();
+      return;
+    }
+    handleRatingSelect(val);
+  };
+
+  useEffect(() => {
+    if (!isModalOpen) setSelectOpen(false);
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -194,13 +225,14 @@ const FilterReyting = ({
                 <button className="filters-modal-reyting-close" onClick={closeModal}>×</button>
               </div>
             </div>
-            <div className="filters-modal-reyting-body">
+            <div className="filters-modal-reyting-body filters-modal-sheet-body">
               <div className="filters-modal-reyting-type-row">
                 {Object.entries(RATING_TYPE_KEYS)
                   .filter(([field]) => !(hideVlFilter && field === 'rating'))
                   .map(([field, key]) => (
                   <button
                     key={field}
+                    type="button"
                     className={`filters-modal-reyting-type-btn ${effectiveRatingType === field ? 'filters-modal-reyting-type-btn--active' : ''}`}
                     onClick={() => handleRatingTypeClick(field)}
                   >
@@ -208,21 +240,46 @@ const FilterReyting = ({
                   </button>
                 ))}
               </div>
-              <button
-                className={`filters-modal-reyting-option ${selectedRating === null ? 'filters-modal-reyting-option--active' : ''}`}
-                onClick={handleClearRating}
-              >
-                {t('categories.all')} ({movies.length})
-              </button>
-              {uniqueRatings.map((rating) => (
-                <button
-                  key={rating}
-                  className={`filters-modal-reyting-option ${selectedRating === rating ? 'filters-modal-reyting-option--active' : ''}`}
-                  onClick={() => handleRatingSelect(rating)}
-                >
-                  {rating} ({getRatingCount(rating)})
-                </button>
-              ))}
+
+              {isMobile ? (
+                <FiltersSelect
+                  options={selectOptions}
+                  value={selectedRating}
+                  open={selectOpen}
+                  onToggle={setSelectOpen}
+                  onSelect={handleSelectPick}
+                  placeholder={t('detail.rating')}
+                  isOptionActive={(v) =>
+                    v == null ? selectedRating === null : selectedRating == v || Number(selectedRating) === Number(v)
+                  }
+                  hasSelection={selectedRating !== null}
+                  displayText={
+                    selectedRating !== null
+                      ? `${selectedRating} (${getRatingCount(selectedRating)})`
+                      : undefined
+                  }
+                />
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`filters-modal-reyting-option ${selectedRating === null ? 'filters-modal-reyting-option--active' : ''}`}
+                    onClick={handleClearRating}
+                  >
+                    {t('categories.all')} ({movies.length})
+                  </button>
+                  {uniqueRatings.map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      className={`filters-modal-reyting-option ${selectedRating === rating ? 'filters-modal-reyting-option--active' : ''}`}
+                      onClick={() => handleRatingSelect(rating)}
+                    >
+                      {rating} ({getRatingCount(rating)})
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
           </div>
         </div>,

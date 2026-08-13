@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import FiltersSelect from './FiltersSelect';
+import { useIsMobileFilter } from './useIsMobileFilter';
 import './FilterCountry.css';
 
 const FilterCountry = ({ movies = [], selectedCountry, onCountrySelect }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobileFilter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isDraggingModal, setIsDraggingModal] = useState(false);
@@ -18,7 +22,21 @@ const FilterCountry = ({ movies = [], selectedCountry, onCountrySelect }) => {
     return movies.filter(m => m.filterCountry === country).length;
   };
 
-  const closeModal = () => setIsModalOpen(false);
+  const selectOptions = [
+    {
+      value: null,
+      label: `${t('categories.all')} (${movies.length})`,
+    },
+    ...uniqueCountries.map((country) => ({
+      value: country,
+      label: `${t(`filters.countries.${country}`, country)} (${getCountryCount(country)})`,
+    })),
+  ];
+
+  const closeModal = () => {
+    setSelectOpen(false);
+    setIsModalOpen(false);
+  };
 
   const handleCountrySelect = (country) => {
     onCountrySelect(country);
@@ -29,6 +47,18 @@ const FilterCountry = ({ movies = [], selectedCountry, onCountrySelect }) => {
     onCountrySelect(null);
     closeModal();
   };
+
+  const handleSelectPick = (val, wasActive) => {
+    if (val == null || wasActive) {
+      handleClearCountry();
+      return;
+    }
+    handleCountrySelect(val);
+  };
+
+  useEffect(() => {
+    if (!isModalOpen) setSelectOpen(false);
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -158,22 +188,46 @@ const FilterCountry = ({ movies = [], selectedCountry, onCountrySelect }) => {
                 <button className="filters-modal-country-close" onClick={closeModal}>×</button>
               </div>
             </div>
-            <div className="filters-modal-country-body">
-              <button
-                className={`filters-modal-country-option ${selectedCountry === null ? 'filters-modal-country-option--active' : ''}`}
-                onClick={handleClearCountry}
-              >
-                {t('categories.all')} ({movies.length})
-              </button>
-              {uniqueCountries.map((country) => (
-                <button
-                  key={country}
-                  className={`filters-modal-country-option ${selectedCountry === country ? 'filters-modal-country-option--active' : ''}`}
-                  onClick={() => handleCountrySelect(country)}
-                >
-                  {t(`filters.countries.${country}`, country)} ({getCountryCount(country)})
-                </button>
-              ))}
+            <div className="filters-modal-country-body filters-modal-sheet-body">
+              {isMobile ? (
+                <FiltersSelect
+                  options={selectOptions}
+                  value={selectedCountry}
+                  open={selectOpen}
+                  onToggle={setSelectOpen}
+                  onSelect={handleSelectPick}
+                  placeholder={t('filters.country', 'Mamlakat')}
+                  isOptionActive={(v) =>
+                    v == null ? selectedCountry === null : selectedCountry === v
+                  }
+                  hasSelection={selectedCountry !== null}
+                  displayText={
+                    selectedCountry !== null
+                      ? `${t(`filters.countries.${selectedCountry}`, selectedCountry)} (${getCountryCount(selectedCountry)})`
+                      : undefined
+                  }
+                />
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`filters-modal-country-option ${selectedCountry === null ? 'filters-modal-country-option--active' : ''}`}
+                    onClick={handleClearCountry}
+                  >
+                    {t('categories.all')} ({movies.length})
+                  </button>
+                  {uniqueCountries.map((country) => (
+                    <button
+                      key={country}
+                      type="button"
+                      className={`filters-modal-country-option ${selectedCountry === country ? 'filters-modal-country-option--active' : ''}`}
+                      onClick={() => handleCountrySelect(country)}
+                    >
+                      {t(`filters.countries.${country}`, country)} ({getCountryCount(country)})
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
           </div>
         </div>,

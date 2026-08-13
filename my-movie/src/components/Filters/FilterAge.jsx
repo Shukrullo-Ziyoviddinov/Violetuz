@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import FiltersSelect from './FiltersSelect';
+import { useIsMobileFilter } from './useIsMobileFilter';
 import './FilterAge.css';
 
 const FilterAge = ({ movies = [], selectedAge, onAgeSelect }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobileFilter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isDraggingModal, setIsDraggingModal] = useState(false);
@@ -18,7 +22,21 @@ const FilterAge = ({ movies = [], selectedAge, onAgeSelect }) => {
     return movies.filter(m => m.ageRestriction === age).length;
   };
 
-  const closeModal = () => setIsModalOpen(false);
+  const selectOptions = [
+    {
+      value: null,
+      label: `${t('categories.all')} (${movies.length})`,
+    },
+    ...uniqueAges.map((age) => ({
+      value: age,
+      label: `${t(`filters.ages.${age}`, `${age}+`)} (${getAgeCount(age)})`,
+    })),
+  ];
+
+  const closeModal = () => {
+    setSelectOpen(false);
+    setIsModalOpen(false);
+  };
 
   const handleAgeSelect = (age) => {
     onAgeSelect(age);
@@ -29,6 +47,18 @@ const FilterAge = ({ movies = [], selectedAge, onAgeSelect }) => {
     onAgeSelect(null);
     closeModal();
   };
+
+  const handleSelectPick = (val, wasActive) => {
+    if (val == null || wasActive) {
+      handleClearAge();
+      return;
+    }
+    handleAgeSelect(val);
+  };
+
+  useEffect(() => {
+    if (!isModalOpen) setSelectOpen(false);
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -158,22 +188,46 @@ const FilterAge = ({ movies = [], selectedAge, onAgeSelect }) => {
                 <button className="filters-modal-age-close" onClick={closeModal}>×</button>
               </div>
             </div>
-            <div className="filters-modal-age-body">
-              <button
-                className={`filters-modal-age-option ${selectedAge === null ? 'filters-modal-age-option--active' : ''}`}
-                onClick={handleClearAge}
-              >
-                {t('categories.all')} ({movies.length})
-              </button>
-              {uniqueAges.map((age) => (
-                <button
-                  key={age}
-                  className={`filters-modal-age-option ${selectedAge === age ? 'filters-modal-age-option--active' : ''}`}
-                  onClick={() => handleAgeSelect(age)}
-                >
-                  {t(`filters.ages.${age}`, `${age}+`)} ({getAgeCount(age)})
-                </button>
-              ))}
+            <div className="filters-modal-age-body filters-modal-sheet-body">
+              {isMobile ? (
+                <FiltersSelect
+                  options={selectOptions}
+                  value={selectedAge}
+                  open={selectOpen}
+                  onToggle={setSelectOpen}
+                  onSelect={handleSelectPick}
+                  placeholder={t('filters.age', 'Yosh')}
+                  isOptionActive={(v) =>
+                    v == null ? selectedAge === null : selectedAge === v
+                  }
+                  hasSelection={selectedAge !== null}
+                  displayText={
+                    selectedAge !== null
+                      ? `${t(`filters.ages.${selectedAge}`, `${selectedAge}+`)} (${getAgeCount(selectedAge)})`
+                      : undefined
+                  }
+                />
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`filters-modal-age-option ${selectedAge === null ? 'filters-modal-age-option--active' : ''}`}
+                    onClick={handleClearAge}
+                  >
+                    {t('categories.all')} ({movies.length})
+                  </button>
+                  {uniqueAges.map((age) => (
+                    <button
+                      key={age}
+                      type="button"
+                      className={`filters-modal-age-option ${selectedAge === age ? 'filters-modal-age-option--active' : ''}`}
+                      onClick={() => handleAgeSelect(age)}
+                    >
+                      {t(`filters.ages.${age}`, `${age}+`)} ({getAgeCount(age)})
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
           </div>
         </div>,

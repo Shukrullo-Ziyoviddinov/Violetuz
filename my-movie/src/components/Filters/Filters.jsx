@@ -8,6 +8,7 @@ import './FilterReyting.css';
 import './FilterCountry.css';
 import './FilterGenre.css';
 import './FilterAge.css';
+import './FiltersSelect.css';
 
 const getRatingFilter = (movie, selectedRatingType, selectedRating) => {
   if (selectedRating === null) return true;

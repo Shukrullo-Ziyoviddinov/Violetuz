@@ -466,9 +466,9 @@
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
-  background: #f7f7f7;
+  background: #aaa;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid #aaa;
   overflow: hidden;
 }
 
