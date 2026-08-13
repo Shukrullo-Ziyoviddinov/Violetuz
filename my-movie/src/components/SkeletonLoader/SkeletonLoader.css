@@ -1441,7 +1441,7 @@
 .skeleton-loader--triller-side-card-title {
   width: 92%;
   max-width: 100%;
-  height: calc(14px * 1.35 * 2);
+  height: calc(14px * 1.35);
   border-radius: 4px;
 }
 
