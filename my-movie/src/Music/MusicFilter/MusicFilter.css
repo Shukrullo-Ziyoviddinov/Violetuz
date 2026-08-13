@@ -194,21 +194,21 @@
 }
 
 .music-filter-modal-clear {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
+  flex: 0 0 auto;
+  min-width: 7.5rem;
+  border: 1px solid #fff;
+  border-radius: 12px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  padding: 0.25rem 0.15rem;
+  padding: 0.9rem 1rem;
+  box-sizing: border-box;
 }
 
 .music-filter-modal-clear:hover {
-  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .music-filter-modal-close {
@@ -437,8 +437,8 @@
   flex: 0 0 11px;
   height: 11px;
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background-color: #e8e8e8;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: #f3f3f3;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 6px 6px;
@@ -457,14 +457,14 @@
 }
 
 .music-filter-select-scrollbar-btn:hover {
-  background-color: #f5f5f5;
+  background-color: #fafafa;
 }
 
 .music-filter-select-scrollbar-track {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
-  background: #e8e8e8;
+  background: #f3f3f3;
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -475,9 +475,9 @@
   left: 1px;
   right: 1px;
   width: auto;
-  background: #f5f5f5;
+  background: #ffffff;
   border-radius: 7px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   pointer-events: none;
 }
@@ -533,6 +533,9 @@
 
 .music-filter-modal-footer {
   flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0.65rem;
   padding: 0.75rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   background: #121212;
@@ -540,7 +543,9 @@
 }
 
 .music-filter-modal-apply {
-  width: 100%;
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
   border: none;
   border-radius: 12px;
   padding: 0.9rem 1rem;

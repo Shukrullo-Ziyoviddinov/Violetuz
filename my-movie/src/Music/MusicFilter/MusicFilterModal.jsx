@@ -469,30 +469,16 @@ const MusicFilterModal = ({
           <span className="music-filter-modal-drag-bar" aria-hidden="true" />
           <div className="music-filter-modal-header-row">
             <h3 className="music-filter-modal-title">{modalTitle}</h3>
-            {isAll ? (
-              <button
-                type="button"
-                className="music-filter-modal-clear"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClear?.();
-                  setOpenSection(null);
-                }}
-              >
-                {t('music.filterClear', 'Tozalash')}
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="music-filter-modal-close"
-                onClick={onClose}
-                aria-label="Yopish"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                </svg>
-              </button>
-            )}
+            <button
+              type="button"
+              className="music-filter-modal-close"
+              onClick={onClose}
+              aria-label="Yopish"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -517,10 +503,20 @@ const MusicFilterModal = ({
             <div className="music-filter-modal-footer">
               <button
                 type="button"
+                className="music-filter-modal-clear"
+                onClick={() => {
+                  onClear?.();
+                  setOpenSection(null);
+                }}
+              >
+                {t('music.filterClear', 'Tozalash')}
+              </button>
+              <button
+                type="button"
                 className="music-filter-modal-apply"
                 onClick={onApply}
               >
-                {t('music.showResults', "Natijani ko'rsatish")}
+                {t('music.showResults', 'Natijaga')}
                 {resultCount > 0 ? ` (${resultCount})` : ''}
               </button>
             </div>
