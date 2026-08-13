@@ -75,6 +75,36 @@ const MusicFilterSelect = ({
     };
   }, [open, onToggle]);
 
+  /* Pastki select ochilganda modal body yuqoriga scroll — dropdown ko‘rinsin */
+  useEffect(() => {
+    if (!open) return undefined;
+    const timer = setTimeout(() => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const body = el.closest('.music-filter-modal-body');
+      const dropdown = el.querySelector('.music-filter-select-dropdown');
+      if (!body) return;
+
+      const focusEl = dropdown || el;
+      const bodyRect = body.getBoundingClientRect();
+      const focusRect = focusEl.getBoundingClientRect();
+      const pad = 20;
+
+      if (focusRect.bottom > bodyRect.bottom - pad) {
+        body.scrollBy({
+          top: focusRect.bottom - bodyRect.bottom + pad,
+          behavior: 'smooth',
+        });
+      } else if (focusRect.top < bodyRect.top + pad) {
+        body.scrollBy({
+          top: focusRect.top - bodyRect.top - pad,
+          behavior: 'smooth',
+        });
+      }
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [open, options.length]);
+
   return (
     <div
       className={`music-filter-select${open ? ' is-open' : ''}${hasValue ? ' has-value' : ''}`}
