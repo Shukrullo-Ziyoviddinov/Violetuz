@@ -12,9 +12,12 @@ import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCateg
 import { requestOpenProfileInfoMenu } from '../../profileInfoMenuBridge';
 import { requestOpenMessagesModal } from '../../messagesModalBridge';
 import { requestOpenAuthModal } from '../../authModalBridge';
+import { requestOpenSearchModal } from '../../searchModalBridge';
 import { useAuth } from '../../context/AuthContext';
 import ShortsPickerModal from './ShortsPickerModal';
 import './Navbar.css';
+
+const MOBILE_NAV_MAX = 768;
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -43,8 +46,10 @@ const Navbar = () => {
   const modalRef = useRef(null);
 
   const updateModalPosition = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_NAV_MAX) return;
     if (modalRef.current && searchInputRef.current) {
       const rect = searchInputRef.current.getBoundingClientRect();
+      if (!rect.width) return;
       modalRef.current.style.setProperty('--modal-top', `${rect.bottom + 8}px`);
       modalRef.current.style.setProperty('--modal-left', `${rect.left + rect.width / 2}px`);
       modalRef.current.style.setProperty('--modal-width', `${rect.width}px`);
@@ -132,6 +137,10 @@ const Navbar = () => {
   };
 
   const openSearchModal = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_NAV_MAX) {
+      requestOpenSearchModal();
+      return;
+    }
     setShowSearchModal(true);
   };
 

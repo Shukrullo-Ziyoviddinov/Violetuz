@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchModalGenre from '../SearchModalGenre/SearchModalGenre';
@@ -10,6 +10,7 @@ import SearchMusicIstoriy from '../../Music/SearchMusicResults/SearchMusicIstori
 import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCategory';
 import ShortsPickerModal from './ShortsPickerModal';
 import { requestOpenAuthModal } from '../../authModalBridge';
+import { OPEN_SEARCH_EVENT } from '../../searchModalBridge';
 import { useAuth } from '../../context/AuthContext';
 import './NavbarMobile.css';
 
@@ -32,6 +33,12 @@ const NavbarMobile = () => {
   const isProfileActive = pathname === '/profile';
 
   const hasSearchQuery = searchQuery.trim().length > 0;
+
+  useEffect(() => {
+    const open = () => setShowSearch(true);
+    window.addEventListener(OPEN_SEARCH_EVENT, open);
+    return () => window.removeEventListener(OPEN_SEARCH_EVENT, open);
+  }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
