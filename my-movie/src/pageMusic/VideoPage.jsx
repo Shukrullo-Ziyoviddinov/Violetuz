@@ -197,6 +197,7 @@ const VideoPage = () => {
     const threshold = Math.max(head.offsetHeight - 2, 0);
     const top = root.scrollTop;
 
+    // Sticky yopishgan → filter; yuqoriga qaytib head ko‘rinsa → title animatsiya
     if (top >= threshold) {
       if (!filterPinnedRef.current) {
         filterPinnedRef.current = true;
@@ -205,11 +206,9 @@ const VideoPage = () => {
       return;
     }
 
-    if (top <= 8) {
-      if (filterPinnedRef.current) {
-        filterPinnedRef.current = false;
-        setShowGenreFilter(false);
-      }
+    if (filterPinnedRef.current) {
+      filterPinnedRef.current = false;
+      setShowGenreFilter(false);
     }
   };
 
