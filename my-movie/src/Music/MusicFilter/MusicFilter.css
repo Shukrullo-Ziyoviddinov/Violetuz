@@ -387,36 +387,80 @@
   right: 0;
   top: calc(100% + 0.35rem);
   max-height: 220px;
-  overflow-y: auto;
+  overflow-y: hidden;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   background: #1a1a1a;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-  padding: 0.35rem;
+  padding: 0.35rem 0.2rem 0.35rem 0.35rem;
   box-sizing: border-box;
   z-index: 6;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(255, 255, 255, 0.1);
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: #f0f0f0 #d8d8d8;
 }
 
+.music-filter-select-dropdown.has-overflow {
+  overflow-y: scroll;
+}
+
+/* Doim ko‘rinadigan classic scrollbar (WebKit) */
 .music-filter-select-dropdown::-webkit-scrollbar {
-  width: 6px;
+  width: 14px;
+  background: transparent;
 }
 
 .music-filter-select-dropdown::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  margin: 4px 0;
+  background: #e8e8e8;
+  border-radius: 8px;
+  margin: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .music-filter-select-dropdown::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 999px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 2px solid #e8e8e8;
+  min-height: 28px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
 }
 
 .music-filter-select-dropdown::-webkit-scrollbar-thumb:hover {
-  background: #fff;
+  background: #ffffff;
+}
+
+.music-filter-select-dropdown::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Yuqori / pastki strelkalar — brauzer scrollbar kabi */
+.music-filter-select-dropdown::-webkit-scrollbar-button:single-button {
+  display: block;
+  height: 14px;
+  width: 14px;
+  background-color: #e8e8e8;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 8px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:decrement {
+  border-radius: 6px 6px 3px 3px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23333333' d='M4 1.5L7.5 6H.5z'/%3E%3C/svg%3E");
+}
+
+.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:increment {
+  border-radius: 3px 3px 6px 6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23333333' d='M4 6.5L.5 2h7z'/%3E%3C/svg%3E");
+}
+
+.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:decrement:hover,
+.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:increment:hover {
+  background-color: #f5f5f5;
 }
 
 .music-filter-select-option {

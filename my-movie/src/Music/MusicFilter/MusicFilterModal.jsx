@@ -55,6 +55,7 @@ const MusicFilterSelect = ({
   placeholder,
 }) => {
   const wrapRef = useRef(null);
+  const savedScrollTopRef = useRef(null);
   const hasValue = value != null && value !== '' && value !== 'all';
   const display = hasValue
     ? formatOptionLabel(sectionKey, value, yearLabel)
@@ -75,34 +76,43 @@ const MusicFilterSelect = ({
     };
   }, [open, onToggle]);
 
-  /* Pastki select ochilganda modal body yuqoriga scroll — dropdown ko‘rinsin */
+  /* Ochilganda: body yuqoriga; yopilganda: oldingi scroll joyiga pastga */
   useEffect(() => {
-    if (!open) return undefined;
-    const timer = setTimeout(() => {
-      const el = wrapRef.current;
-      if (!el) return;
-      const body = el.closest('.music-filter-modal-body');
-      const dropdown = el.querySelector('.music-filter-select-dropdown');
-      if (!body) return;
+    const el = wrapRef.current;
+    const body = el?.closest('.music-filter-modal-body');
+    if (!body) return undefined;
 
-      const focusEl = dropdown || el;
-      const bodyRect = body.getBoundingClientRect();
-      const focusRect = focusEl.getBoundingClientRect();
-      const pad = 20;
+    if (open) {
+      savedScrollTopRef.current = body.scrollTop;
+      const timer = setTimeout(() => {
+        const dropdown = el.querySelector('.music-filter-select-dropdown');
+        const focusEl = dropdown || el;
+        const bodyRect = body.getBoundingClientRect();
+        const focusRect = focusEl.getBoundingClientRect();
+        const pad = 20;
 
-      if (focusRect.bottom > bodyRect.bottom - pad) {
-        body.scrollBy({
-          top: focusRect.bottom - bodyRect.bottom + pad,
-          behavior: 'smooth',
-        });
-      } else if (focusRect.top < bodyRect.top + pad) {
-        body.scrollBy({
-          top: focusRect.top - bodyRect.top - pad,
-          behavior: 'smooth',
-        });
-      }
-    }, 50);
-    return () => clearTimeout(timer);
+        if (focusRect.bottom > bodyRect.bottom - pad) {
+          body.scrollBy({
+            top: focusRect.bottom - bodyRect.bottom + pad,
+            behavior: 'smooth',
+          });
+        } else if (focusRect.top < bodyRect.top + pad) {
+          body.scrollBy({
+            top: focusRect.top - bodyRect.top - pad,
+            behavior: 'smooth',
+          });
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+
+    if (savedScrollTopRef.current == null) return undefined;
+    const restoreTo = savedScrollTopRef.current;
+    savedScrollTopRef.current = null;
+    const timer = requestAnimationFrame(() => {
+      body.scrollTo({ top: restoreTo, behavior: 'smooth' });
+    });
+    return () => cancelAnimationFrame(timer);
   }, [open, options.length]);
 
   return (
@@ -132,7 +142,12 @@ const MusicFilterSelect = ({
       </button>
 
       {open ? (
-        <div className="music-filter-select-dropdown" role="listbox">
+        <div
+          className={`music-filter-select-dropdown${
+            options.length > 4 ? ' has-overflow' : ''
+          }`}
+          role="listbox"
+        >
           {options.map((opt) => {
             const active = isOptionActive(value, opt);
             return (
