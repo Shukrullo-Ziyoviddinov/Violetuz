@@ -3,13 +3,22 @@ import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import { WishlistTabIcons } from './wishlistTabIcons';
+import WishlistMovieFilters from './WishlistMovieFilters';
+import WishlistMusicFilters from './WishlistMusicFilters';
+import {
+  getFilterPanelKind,
+  countWishlistDraftResults,
+  EMPTY_MOVIE_DRAFT,
+  EMPTY_MUSIC_DRAFT,
+} from './wishlistFilterLogic';
+import '../Filters/FiltersSelect.css';
 import './WishlistFilterModal.css';
 
 const DRAG_CLOSE_THRESHOLD = 80;
 
 /**
- * Wishlist mobil tab filter modal — kino/musiqa filter modaliga o‘xshash drag/sheet.
- * tabs: [{ id, label }]
+ * Wishlist mobil filter modal.
+ * Tab → pastda kino yoki musiqa filter paneli (animatsiya bilan almashtiriladi).
  */
 const WishlistFilterModal = ({
   isOpen,
@@ -17,6 +26,9 @@ const WishlistFilterModal = ({
   tabs = [],
   selectedTab,
   onSelectTab,
+  drafts,
+  onDraftsChange,
+  catalogs = {},
   onApply,
 }) => {
   const { t } = useTranslation();
@@ -28,6 +40,9 @@ const WishlistFilterModal = ({
   const closeTimerRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const panelKind = getFilterPanelKind(selectedTab);
+  const resultCount = countWishlistDraftResults(selectedTab, catalogs, drafts);
 
   useEffect(() => {
     if (closeTimerRef.current) {
@@ -70,6 +85,7 @@ const WishlistFilterModal = ({
 
   const handleDragStart = useCallback((e) => {
     if (e.target.closest?.('.wishlist-tabs')) return;
+    if (e.target.closest?.('.filters-select')) return;
     if (e.target.closest?.('.wishlist-filter-modal-footer')) return;
     isTouch.current = e.type.startsWith('touch');
     isDragging.current = true;
@@ -120,6 +136,13 @@ const WishlistFilterModal = ({
     };
   }, [mounted, visible, handleDragMove, handleDragEnd]);
 
+  const patchDraft = (tabId, nextDraft) => {
+    onDraftsChange?.({
+      ...drafts,
+      [tabId]: nextDraft,
+    });
+  };
+
   if (!mounted) return null;
 
   return createPortal(
@@ -145,7 +168,7 @@ const WishlistFilterModal = ({
           </div>
         </div>
 
-        <div className="wishlist-filter-modal-body">
+        <div className="wishlist-filter-modal-body filters-modal-sheet-body">
           <ScrollTouch className="wishlist-tabs wishlist-tabs--modal">
             {tabs.map((tab) => (
               <button
@@ -161,6 +184,26 @@ const WishlistFilterModal = ({
               </button>
             ))}
           </ScrollTouch>
+
+          <div className="wishlist-filter-panels" aria-live="polite">
+            {panelKind === 'movie' ? (
+              <WishlistMovieFilters
+                key="movie-panel"
+                movies={catalogs.movie || []}
+                draft={drafts?.movie || EMPTY_MOVIE_DRAFT}
+                onChange={(next) => patchDraft('movie', next)}
+              />
+            ) : null}
+
+            {panelKind === 'music' ? (
+              <WishlistMusicFilters
+                key={`music-panel-${selectedTab}`}
+                items={catalogs[selectedTab] || []}
+                draft={drafts?.[selectedTab] || EMPTY_MUSIC_DRAFT}
+                onChange={(next) => patchDraft(selectedTab, next)}
+              />
+            ) : null}
+          </div>
         </div>
 
         <div className="wishlist-filter-modal-footer">
@@ -170,6 +213,7 @@ const WishlistFilterModal = ({
             onClick={onApply}
           >
             {t('music.showResults', 'Natija')}
+            {resultCount > 0 ? ` (${resultCount})` : ''}
           </button>
         </div>
       </div>

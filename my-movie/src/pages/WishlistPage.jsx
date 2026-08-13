@@ -14,10 +14,14 @@ import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import {
   WishlistFilterModal,
   WishlistTabIcons,
+  createEmptyDrafts,
+  cloneDrafts,
+  applyWishlistTabFilters,
 } from '../components/WishlistPageFilter';
 import { useImageReady } from '../utils/useImageReady';
 import './WishlistPage.css';
 import '../components/WishlistPageFilter/WishlistFilterModal.css';
+import '../components/Filters/FiltersSelect.css';
 
 const EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
 const MOBILE_MAX = 768;
@@ -111,6 +115,8 @@ const WishlistPage = () => {
   const [activeTab, setActiveTab] = useState('movie');
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [draftTab, setDraftTab] = useState('movie');
+  const [appliedFilters, setAppliedFilters] = useState(() => createEmptyDrafts());
+  const [draftFilters, setDraftFilters] = useState(() => createEmptyDrafts());
 
   const wishlistCatalogLoading =
     moviesLoading ||
@@ -261,13 +267,50 @@ const WishlistPage = () => {
 
   const openFilterModal = () => {
     setDraftTab(effectiveTab);
+    setDraftFilters(cloneDrafts(appliedFilters));
     setFilterModalOpen(true);
   };
 
   const handleFilterApply = () => {
     setActiveTab(draftTab);
+    setAppliedFilters(cloneDrafts(draftFilters));
     setFilterModalOpen(false);
   };
+
+  const filterCatalogs = {
+    movie: wishlistMovies,
+    music: wishlistMusic,
+    album: wishlistAlbums,
+    klip: wishlistClips,
+    konsert: wishlistConcerts,
+    triller: wishlistTrillers,
+  };
+
+  const visibleMovies = applyWishlistTabFilters(
+    'movie',
+    wishlistMovies,
+    appliedFilters
+  );
+  const visibleMusic = applyWishlistTabFilters(
+    'music',
+    wishlistMusic,
+    appliedFilters
+  );
+  const visibleAlbums = applyWishlistTabFilters(
+    'album',
+    wishlistAlbums,
+    appliedFilters
+  );
+  const visibleClips = applyWishlistTabFilters(
+    'klip',
+    wishlistClips,
+    appliedFilters
+  );
+  const visibleConcerts = applyWishlistTabFilters(
+    'konsert',
+    wishlistConcerts,
+    appliedFilters
+  );
 
   return (
     <div className="wishlist-page">
@@ -369,6 +412,9 @@ const WishlistPage = () => {
               tabs={availableTabs}
               selectedTab={draftTab}
               onSelectTab={setDraftTab}
+              drafts={draftFilters}
+              onDraftsChange={setDraftFilters}
+              catalogs={filterCatalogs}
               onApply={handleFilterApply}
             />
           ) : null}
@@ -379,7 +425,7 @@ const WishlistPage = () => {
         <Movies
           sectionType="wishlist"
           limit={null}
-          filteredMovies={wishlistMovies}
+          filteredMovies={visibleMovies}
           hideHeader
           isLoading={false}
         />
@@ -389,7 +435,7 @@ const WishlistPage = () => {
         <div className="wishlist-music">
           <div className="wishlist-music-container">
             <div className="wishlist-music-grid">
-                {wishlistAlbums.map((album) => (
+                {visibleAlbums.map((album) => (
                   <div
                     key={`album-${album.id}`}
                     className="wishlist-music-item"
@@ -434,7 +480,7 @@ const WishlistPage = () => {
         <div className="wishlist-music">
           <div className="wishlist-music-container">
             <div className="wishlist-music-grid">
-                {wishlistMusic.map((item) => (
+                {visibleMusic.map((item) => (
                   <div
                     key={`music-${item.id}`}
                     className="wishlist-music-item"
@@ -476,7 +522,7 @@ const WishlistPage = () => {
         <div className="wishlist-music wishlist-music--clips">
           <div className="wishlist-music-container">
             <div className="wishlist-music-grid wishlist-music-grid--clips">
-                {wishlistClips.map((item) => (
+                {visibleClips.map((item) => (
                   <div
                     key={`${item.type || 'klip'}-${item.id}`}
                     className="wishlist-music-item wishlist-music-item--klip"
@@ -518,7 +564,7 @@ const WishlistPage = () => {
         <div className="wishlist-music wishlist-music--clips">
           <div className="wishlist-music-container">
             <div className="wishlist-music-grid wishlist-music-grid--clips">
-                {wishlistConcerts.map((item) => (
+                {visibleConcerts.map((item) => (
                   <div
                     key={`konsert-${item.id}`}
                     className="wishlist-music-item wishlist-music-item--klip"
