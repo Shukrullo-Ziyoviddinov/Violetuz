@@ -14,6 +14,8 @@ const MODAL_SELECTOR = [
   '.shorts-modal-content',
   '.shorts-music-modal',
   '.filters-modal-overlay',
+  '.filters-mobile-modal-overlay',
+  '.filters-mobile-modal',
   '.global-modal-dialog',
   '.message-modal--open',
   '.message-search-modal--open',
