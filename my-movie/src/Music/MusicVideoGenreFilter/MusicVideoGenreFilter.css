@@ -1,0 +1,51 @@
+.music-video-genre-filter-wrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.music-video-genre-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.1rem 0;
+}
+
+.music-video-genre-filter-chip {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+  border-radius: 999px;
+  padding: 0.28rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.music-video-genre-filter-chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.music-video-genre-filter-chip.is-active {
+  background: #1e03d24d;
+  border-color: #1f16cc99;
+  color: #fff;
+}
+
+@media (max-width: 450px) {
+  .music-video-genre-filter-chip {
+    font-size: 0.8rem;
+    padding: 0.24rem 0.65rem;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
@@ -10,6 +10,7 @@ import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import LikeButton from '../Music/LikeButton/LikeButton';
 import Repost from '../components/Repost/Repost';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
+import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenreFilter';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
 import MovieComments from '../components/MovieDetail/MovieComments';
 import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
@@ -20,6 +21,12 @@ import { useImageReady } from '../utils/useImageReady';
 import { formatCount } from '../utils/utils';
 import useImmersiveSheetDrag from '../hooks/useImmersiveSheetDrag';
 import './VideoPage.css';
+
+const formatGenreLabel = (genre) => {
+  const value = String(genre || '').trim();
+  if (!value) return '';
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
 
 const TREND_SKELETON_COUNT = 8;
 const ACTION_SKELETON_COUNT = 5;
@@ -63,6 +70,11 @@ const VideoPage = () => {
   } = useMusicApi();
   const videoRef = useRef(null);
   const commentsRef = useRef(null);
+  const mainScrollRef = useRef(null);
+  const filterPinnedRef = useRef(false);
+  const [selectedGenre, setSelectedGenre] = useState('all');
+  const [showGenreFilter, setShowGenreFilter] = useState(false);
+
   const {
     scrollRef,
     pinRef,
@@ -138,14 +150,84 @@ const VideoPage = () => {
     };
   }, [video, clipSections, concertSections, getClipsByCategory, getConcertsByCategory]);
 
-  const relatedList = relatedMeta.list?.length ? relatedMeta.list : allVideoData;
+  const relatedList = Array.isArray(relatedMeta.list) ? relatedMeta.list : [];
   const relatedTitleKey = relatedMeta.titleKey;
   const relatedTitleDefault = relatedMeta.titleDefault;
   const wishlistType = video?.type === 'konsert' ? 'konsert' : 'klip';
 
+  const genreOptions = useMemo(() => {
+    const map = new Map();
+    for (const item of relatedList) {
+      const genreId = String(item?.genre || '').trim();
+      if (!genreId || map.has(genreId)) continue;
+      map.set(genreId, {
+        id: genreId,
+        label: formatGenreLabel(genreId),
+      });
+    }
+    return Array.from(map.values());
+  }, [relatedList]);
+
+  const filteredRelatedList = useMemo(() => {
+    if (selectedGenre === 'all') return relatedList;
+    return relatedList.filter(
+      (item) => String(item?.genre || '').trim() === selectedGenre
+    );
+  }, [relatedList, selectedGenre]);
+
   const showTrendSectionSkeleton =
     showHeroDataSkeleton || (Boolean(videosLoading) && relatedList.length === 0);
-  const trendItemsToRender = showTrendSectionSkeleton ? trendSkeletonItems : relatedList;
+  const trendItemsToRender = showTrendSectionSkeleton
+    ? trendSkeletonItems
+    : filteredRelatedList;
+
+  useEffect(() => {
+    setSelectedGenre('all');
+    setShowGenreFilter(false);
+    filterPinnedRef.current = false;
+  }, [id]);
+
+  const handleBodyScroll = () => {
+    if (isImmersive) return;
+    if (!isMobileViewport()) return;
+    const root = scrollRef.current;
+    const head = mainScrollRef.current;
+    if (!root || !head) return;
+
+    const threshold = Math.max(head.offsetHeight - 2, 0);
+    const top = root.scrollTop;
+
+    if (top >= threshold) {
+      if (!filterPinnedRef.current) {
+        filterPinnedRef.current = true;
+        setShowGenreFilter(true);
+      }
+      return;
+    }
+
+    if (top <= 8) {
+      if (filterPinnedRef.current) {
+        filterPinnedRef.current = false;
+        setShowGenreFilter(false);
+      }
+    }
+  };
+
+  const handleGenreSelect = (genreId) => {
+    filterPinnedRef.current = true;
+    setShowGenreFilter(true);
+    setSelectedGenre(genreId);
+  };
+
+  useLayoutEffect(() => {
+    if (!filterPinnedRef.current || isImmersive) return;
+    if (!isMobileViewport()) return;
+    const root = scrollRef.current;
+    const head = mainScrollRef.current;
+    if (!root || !head) return;
+    root.scrollTop = Math.max(head.offsetHeight, 0);
+    setShowGenreFilter(true);
+  }, [selectedGenre, isImmersive]);
 
   useEffect(() => {
     document.documentElement.classList.add('video-detail-page-lock');
@@ -227,11 +309,12 @@ const VideoPage = () => {
           </div>
 
           <div
-            className="video-detail-body-scroll"
+            className={`video-detail-body-scroll${showGenreFilter ? ' is-filter-pinned' : ''}`}
             ref={scrollRef}
+            onScroll={handleBodyScroll}
             {...scrollTouchHandlers}
           >
-            <div className="video-detail-main-scroll">
+            <div className="video-detail-main-scroll" ref={mainScrollRef}>
               <div className="video-detail-top">
               <div
                 className={`video-detail-info${showInfoSkeleton ? ' video-detail-info--skeleton' : ''}`}
@@ -411,14 +494,41 @@ const VideoPage = () => {
             <AlbumsForYou klip={video} forceSkeleton={showHeroDataSkeleton} />
             </div>
 
+            <div
+              className={`video-detail-sticky-bar${showGenreFilter ? ' is-filter' : ''}`}
+            >
+              {showTrendSectionSkeleton ? (
+                <SkeletonLoader
+                  variant="video-detail-trend-title"
+                  className="video-detail-sticky-title video-detail-trend-title-skeleton"
+                />
+              ) : (
+                <h3 className="video-detail-sticky-title">
+                  {t(relatedTitleKey, relatedTitleDefault)}
+                </h3>
+              )}
+              <div
+                className="video-detail-sticky-filter"
+                aria-hidden={!showGenreFilter}
+              >
+                <MusicVideoGenreFilter
+                  genres={genreOptions}
+                  selectedId={selectedGenre}
+                  onSelect={handleGenreSelect}
+                />
+              </div>
+            </div>
+
             <div className="video-detail-right-scroll">
               {showTrendSectionSkeleton ? (
                 <SkeletonLoader
                   variant="video-detail-trend-title"
-                  className="video-detail-trend-title-skeleton"
+                  className="video-detail-trend-title video-detail-trend-title--side video-detail-trend-title-skeleton"
                 />
               ) : (
-                <h3 className="video-detail-trend-title">{t(relatedTitleKey, relatedTitleDefault)}</h3>
+                <h3 className="video-detail-trend-title video-detail-trend-title--side">
+                  {t(relatedTitleKey, relatedTitleDefault)}
+                </h3>
               )}
               <div className="video-detail-trend-grid">
                 {showTrendSectionSkeleton
