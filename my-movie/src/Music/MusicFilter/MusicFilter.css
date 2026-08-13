@@ -298,10 +298,11 @@
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0.85rem 0 0.5rem;
+  padding: 0.85rem 1rem 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
+  box-sizing: border-box;
 }
 
 .music-filter-modal-section {
@@ -313,7 +314,7 @@
 
 .music-filter-modal-section-title {
   margin: 0;
-  padding: 0 1rem;
+  padding: 0;
   font-size: 0.95rem;
   font-weight: 700;
   color: #fff;
@@ -324,7 +325,7 @@
   align-items: center;
   gap: 0.65rem;
   width: 100%;
-  padding: 0.15rem 1rem;
+  padding: 0.15rem 0;
   box-sizing: border-box;
 }
 
@@ -352,6 +353,7 @@
   padding: 0.75rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   background: #121212;
+  box-sizing: border-box;
 }
 
 .music-filter-modal-apply {
@@ -363,7 +365,7 @@
   font-weight: 700;
   color: #fff;
   cursor: pointer;
-  background: linear-gradient(135deg, #6b3fd4 0%, #3d1fb8 100%);
+  background: linear-gradient(135deg, #b87ff7, #9b4fe7);
 }
 
 .music-filter-modal-apply:hover {

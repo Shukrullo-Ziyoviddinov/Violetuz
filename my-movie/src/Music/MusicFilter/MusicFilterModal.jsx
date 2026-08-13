@@ -98,6 +98,21 @@ const MusicFilterModal = ({
     []
   );
 
+  /* Modal ochiq: body/html scroll blok */
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, [isOpen]);
+
   const handleSelectSingle = (opt) => {
     onChange?.(opt);
     onClose?.();
