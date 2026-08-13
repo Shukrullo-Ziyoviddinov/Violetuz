@@ -423,25 +423,25 @@
 
 /* Custom doimiy scrollbar — yuqori/past strelka + oq track */
 .music-filter-select-scrollbar {
-  flex: 0 0 16px;
-  width: 16px;
+  flex: 0 0 11px;
+  width: 11px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
-  padding: 3px 2px 3px 0;
+  padding: 3px 1px 3px 0;
   box-sizing: border-box;
 }
 
 .music-filter-select-scrollbar-btn {
-  flex: 0 0 14px;
-  height: 14px;
+  flex: 0 0 11px;
+  height: 11px;
   width: 100%;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background-color: #e8e8e8;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 8px 8px;
+  background-size: 6px 6px;
   cursor: pointer;
   padding: 0;
 }

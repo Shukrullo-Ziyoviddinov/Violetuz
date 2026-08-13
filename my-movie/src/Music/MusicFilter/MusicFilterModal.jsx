@@ -47,16 +47,25 @@ const animateScrollTo = (el, to, duration = 340) => {
   const start = el.scrollTop;
   const change = to - start;
   if (Math.abs(change) < 1) return () => {};
+  const prevBehavior = el.style.scrollBehavior;
+  el.style.scrollBehavior = 'auto';
   let raf = 0;
   const t0 = performance.now();
   const step = (now) => {
     const p = Math.min(1, (now - t0) / duration);
     const ease = 1 - (1 - p) ** 3;
     el.scrollTop = start + change * ease;
-    if (p < 1) raf = requestAnimationFrame(step);
+    if (p < 1) {
+      raf = requestAnimationFrame(step);
+    } else {
+      el.style.scrollBehavior = prevBehavior;
+    }
   };
   raf = requestAnimationFrame(step);
-  return () => cancelAnimationFrame(raf);
+  return () => {
+    cancelAnimationFrame(raf);
+    el.style.scrollBehavior = prevBehavior;
+  };
 };
 
 /** Mobile: title ostida select + dropdown (chapda belgi) */
@@ -76,6 +85,7 @@ const MusicFilterSelect = ({
   const trackRef = useRef(null);
   const savedScrollTopRef = useRef(null);
   const didLiftRef = useRef(false);
+  const wasOpenRef = useRef(false);
   const cancelScrollRef = useRef(null);
   const [thumb, setThumb] = useState({ top: 0, height: 32 });
   const hasOverflow = options.length > 4;
@@ -130,21 +140,20 @@ const MusicFilterSelect = ({
     };
   }, [open, hasOverflow, options.length, updateThumb]);
 
-  /* Ochilganda body yuqoriga; yopilganda pastga (smooth) */
+  /* Ochilganda body tez yuqoriga; yopilganda sekin pastga */
   useEffect(() => {
     const el = wrapRef.current;
     const body = el?.closest('.music-filter-modal-body');
     if (!body) return undefined;
 
-    if (cancelScrollRef.current) {
-      cancelScrollRef.current();
-      cancelScrollRef.current = null;
-    }
-
     if (open) {
-      savedScrollTopRef.current = body.scrollTop;
-      didLiftRef.current = false;
+      if (!wasOpenRef.current) {
+        wasOpenRef.current = true;
+        savedScrollTopRef.current = body.scrollTop;
+        didLiftRef.current = false;
+      }
       const timer = setTimeout(() => {
+        if (didLiftRef.current) return;
         const dropdown = el.querySelector('.music-filter-select-dropdown');
         const focusEl = dropdown || el;
         const bodyRect = body.getBoundingClientRect();
@@ -158,15 +167,14 @@ const MusicFilterSelect = ({
         }
         if (Math.abs(delta) >= 1) {
           didLiftRef.current = true;
-          cancelScrollRef.current = animateScrollTo(
-            body,
-            body.scrollTop + delta,
-            340
-          );
+          body.scrollBy({ top: delta, behavior: 'smooth' });
         }
-      }, 60);
+      }, 40);
       return () => clearTimeout(timer);
     }
+
+    if (!wasOpenRef.current) return undefined;
+    wasOpenRef.current = false;
 
     if (!didLiftRef.current || savedScrollTopRef.current == null) {
       savedScrollTopRef.current = null;
@@ -177,17 +185,16 @@ const MusicFilterSelect = ({
     const restoreTo = savedScrollTopRef.current;
     savedScrollTopRef.current = null;
     didLiftRef.current = false;
-    const timer = setTimeout(() => {
-      cancelScrollRef.current = animateScrollTo(body, restoreTo, 340);
-    }, 40);
+    // Native smooth’ni to‘xtatib, sekin pastga
+    body.scrollTo({ top: body.scrollTop, behavior: 'auto' });
+    cancelScrollRef.current = animateScrollTo(body, restoreTo, 560);
     return () => {
-      clearTimeout(timer);
       if (cancelScrollRef.current) {
         cancelScrollRef.current();
         cancelScrollRef.current = null;
       }
     };
-  }, [open, options.length]);
+  }, [open]);
 
   const scrollListBy = (dir) => {
     const el = listRef.current;
