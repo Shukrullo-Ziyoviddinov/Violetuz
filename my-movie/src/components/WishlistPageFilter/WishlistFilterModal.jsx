@@ -140,7 +140,7 @@ const WishlistFilterModal = ({
           <span className="wishlist-filter-modal-drag-bar" aria-hidden="true" />
           <div className="wishlist-filter-modal-header-row">
             <h3 className="wishlist-filter-modal-title">
-              {t('music.searchAndFilter', 'Qidirish va filterlash')}
+              {t('wishlist.sortAndFilter', 'Saralash va filterlash')}
             </h3>
           </div>
         </div>

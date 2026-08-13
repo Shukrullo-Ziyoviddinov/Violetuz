@@ -259,9 +259,6 @@ const WishlistPage = () => {
     });
   }
 
-  const currentTabMeta =
-    availableTabs.find((tab) => tab.id === effectiveTab) || availableTabs[0];
-
   const openFilterModal = () => {
     setDraftTab(effectiveTab);
     setFilterModalOpen(true);
@@ -345,11 +342,23 @@ const WishlistPage = () => {
             onClick={openFilterModal}
           >
             <span className="wishlist-filter-mobile-bar-icon" aria-hidden="true">
-              {currentTabMeta ? WishlistTabIcons[currentTabMeta.id] : null}
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 5h16" />
+                <path d="M7 12h10" />
+                <path d="M10 19h4" />
+              </svg>
             </span>
             <span className="wishlist-filter-mobile-bar-text">
-              {currentTabMeta?.label ||
-                t('music.searchAndFilter', 'Qidirish va filterlash')}
+              {t('wishlist.sortAndFilter', 'Saralash va filterlash')}
             </span>
           </button>
 
