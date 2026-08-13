@@ -231,8 +231,8 @@
 }
 
 .filters-modal-reyting-type-btn--active {
-  background-color: rgba(3, 19, 234, 0.4);
-  border-color: rgb(3, 19, 234);
+  background: #1e03d24d;
+  border-color: #1f16cc99;
   color: #ffffff;
 }
 
@@ -376,8 +376,8 @@
   }
 
   .filters-modal-reyting-type-btn--active {
-    background-color: rgba(155, 79, 231, 0.28);
-    border-color: rgba(155, 79, 231, 0.7);
+    background: #1e03d24d;
+    border-color: #1f16cc99;
   }
 
   .filters-modal-reyting-type-btn:hover {

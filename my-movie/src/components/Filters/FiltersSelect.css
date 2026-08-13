@@ -11,8 +11,6 @@
 
 .filters-select.is-open {
   z-index: 5;
-  /* absolute dropdown uchun scroll body ichida joy */
-  padding-bottom: 12.5rem;
 }
 
 .filters-select-trigger {
