@@ -26,7 +26,6 @@ const TrillerCard = ({ triller, className = '', onSelect }) => {
       type="button"
       className={`triller-card ${className}`.trim()}
       onClick={handleClick}
-      data-allow-navigate
     >
       <div className="triller-card-image-wrap">
         {videoImg ? (
