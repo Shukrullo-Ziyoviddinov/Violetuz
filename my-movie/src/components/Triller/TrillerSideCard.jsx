@@ -40,8 +40,7 @@ const TrillerSideCard = ({ triller, onSelect }) => {
   const ageLimit = triller.ageLimit != null ? Number(triller.ageLimit) : null;
   const ageLabel = Number.isFinite(ageLimit) ? `${ageLimit}+` : '';
   const imdbLabel = formatRating(triller.reytingImdb);
-  const kpLabel = formatRating(triller.reytingKinopoisk);
-  const hasRatings = imdbLabel != null || kpLabel != null;
+  const hasRatings = imdbLabel != null;
   const likeCount = Number(triller.like) || 0;
   const dislikeCount = Number(triller.dislike) || 0;
   const persistKey = triller.id != null ? `triller-${triller.id}` : undefined;
@@ -110,12 +109,6 @@ const TrillerSideCard = ({ triller, onSelect }) => {
                 <span className="triller-meta-rating" aria-label={`IMDb ${imdbLabel}`}>
                   <img className="triller-meta-rating-img" src="/img/imdbnew.png" alt="" />
                   <span className="triller-meta-rating-value">{imdbLabel}</span>
-                </span>
-              ) : null}
-              {kpLabel != null ? (
-                <span className="triller-meta-rating" aria-label={`Kinopoisk ${kpLabel}`}>
-                  <img className="triller-meta-rating-img" src="/img/kinopoisk.jpg" alt="" />
-                  <span className="triller-meta-rating-value">{kpLabel}</span>
                 </span>
               ) : null}
             </div>
