@@ -209,11 +209,27 @@ const WishlistFilterModal = ({
         <div className="wishlist-filter-modal-footer">
           <button
             type="button"
+            className="wishlist-filter-modal-clear"
+            onClick={() => {
+              if (panelKind === 'movie') {
+                patchDraft('movie', {
+                  ...EMPTY_MOVIE_DRAFT,
+                  genres: [],
+                });
+              } else if (panelKind === 'music' && selectedTab) {
+                patchDraft(selectedTab, { ...EMPTY_MUSIC_DRAFT });
+              }
+            }}
+          >
+            {t('music.filterClear', 'Tozalash')}
+          </button>
+          <button
+            type="button"
             className="wishlist-filter-modal-apply"
             onClick={onApply}
           >
             {t('music.showResults', 'Natija')}
-            {resultCount > 0 ? ` (${resultCount})` : ''}
+            {` (${resultCount})`}
           </button>
         </div>
       </div>

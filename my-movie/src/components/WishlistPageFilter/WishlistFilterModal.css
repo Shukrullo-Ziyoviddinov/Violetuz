@@ -163,14 +163,37 @@
 
 .wishlist-filter-modal-footer {
   flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0.65rem;
   padding: 0.75rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   background: #121212;
   box-sizing: border-box;
 }
 
+.wishlist-filter-modal-clear {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid #fff;
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.9rem 1rem;
+  box-sizing: border-box;
+}
+
+.wishlist-filter-modal-clear:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .wishlist-filter-modal-apply {
-  width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
   border: none;
   border-radius: 12px;
   padding: 0.9rem 1rem;
