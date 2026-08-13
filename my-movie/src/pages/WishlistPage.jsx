@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -11,10 +11,28 @@ import { getLocalizedField } from '../utils/shortsMovieUtils';
 import Movies from '../components/Movies/Movies';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import {
+  WishlistFilterModal,
+  WishlistTabIcons,
+} from '../components/WishlistPageFilter';
 import { useImageReady } from '../utils/useImageReady';
 import './WishlistPage.css';
+import '../components/WishlistPageFilter/WishlistFilterModal.css';
 
 const EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
+const MOBILE_MAX = 768;
+
+const useIsMobileWishlist = () => {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX
+  );
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= MOBILE_MAX);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return isMobile;
+};
 
 const WishlistEmptySkeleton = () => (
   <div className="wishlist-page wishlist-page--empty">
@@ -68,57 +86,10 @@ const WishlistEmpty = () => {
   );
 };
 
-const iconSize = 18;
-const WishlistTabIcons = {
-  movie: (
-    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
-      <line x1="7" y1="2" x2="7" y2="22" />
-      <line x1="17" y1="2" x2="17" y2="22" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-      <line x1="2" y1="7" x2="7" y2="7" />
-      <line x1="2" y1="17" x2="7" y2="17" />
-      <line x1="17" y1="17" x2="22" y2="17" />
-      <line x1="17" y1="7" x2="22" y2="7" />
-    </svg>
-  ),
-  music: (
-    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 18V5l12-2v13" />
-      <circle cx="6" cy="18" r="3" />
-      <circle cx="18" cy="16" r="3" />
-    </svg>
-  ),
-  album: (
-    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  ),
-  klip: (
-    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="23 7 16 12 23 17 23 7" />
-      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-    </svg>
-  ),
-  konsert: (
-    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-      <line x1="12" y1="19" x2="12" y2="23" />
-      <line x1="8" y1="23" x2="16" y2="23" />
-    </svg>
-  ),
-  triller: (
-    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="5 3 19 12 5 21 5 3" />
-    </svg>
-  ),
-};
-
 const WishlistPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const isMobile = useIsMobileWishlist();
   const { contentLang } = useContentLanguage();
   const { wishlistItems, toggleWishlist } = useWishlist();
   const { allMovies: apiMovies, moviesLoading } = useMoviesApi();
@@ -138,6 +109,8 @@ const WishlistPage = () => {
     queryFn: fetchAllTrillers,
   });
   const [activeTab, setActiveTab] = useState('movie');
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [draftTab, setDraftTab] = useState('movie');
 
   const wishlistCatalogLoading =
     moviesLoading ||
@@ -260,65 +233,137 @@ const WishlistPage = () => {
               ? 'konsert'
               : 'triller';
 
+  const availableTabs = [];
+  if (hasMovies) {
+    availableTabs.push({ id: 'movie', label: t('wishlist.tabMovies', 'Kino') });
+  }
+  if (hasMusic) {
+    availableTabs.push({ id: 'music', label: t('wishlist.tabMusic', 'Musiqa') });
+  }
+  if (hasAlbums) {
+    availableTabs.push({ id: 'album', label: t('wishlist.tabAlbums', 'Albom') });
+  }
+  if (hasClips) {
+    availableTabs.push({ id: 'klip', label: t('wishlist.tabClips', 'Klip') });
+  }
+  if (hasConcerts) {
+    availableTabs.push({
+      id: 'konsert',
+      label: t('wishlist.tabKonserts', 'Konsert'),
+    });
+  }
+  if (hasTrillers) {
+    availableTabs.push({
+      id: 'triller',
+      label: t('wishlist.tabTriller', 'Triller'),
+    });
+  }
+
+  const currentTabMeta =
+    availableTabs.find((tab) => tab.id === effectiveTab) || availableTabs[0];
+
+  const openFilterModal = () => {
+    setDraftTab(effectiveTab);
+    setFilterModalOpen(true);
+  };
+
+  const handleFilterApply = () => {
+    setActiveTab(draftTab);
+    setFilterModalOpen(false);
+  };
+
   return (
     <div className="wishlist-page">
       {showTabs && (
-        <ScrollTouch className="wishlist-tabs">
-          {hasMovies && (
-            <button
-              className={`wishlist-tab ${effectiveTab === 'movie' ? 'active' : ''}`}
-              onClick={() => setActiveTab('movie')}
-            >
-              <span className="wishlist-tab-icon">{WishlistTabIcons.movie}</span>
-              {t('wishlist.tabMovies', 'Kino')}
-            </button>
-          )}
-          {hasMusic && (
-            <button
-              className={`wishlist-tab ${effectiveTab === 'music' ? 'active' : ''}`}
-              onClick={() => setActiveTab('music')}
-            >
-              <span className="wishlist-tab-icon">{WishlistTabIcons.music}</span>
-              {t('wishlist.tabMusic', 'Musiqa')}
-            </button>
-          )}
-          {hasAlbums && (
-            <button
-              className={`wishlist-tab ${effectiveTab === 'album' ? 'active' : ''}`}
-              onClick={() => setActiveTab('album')}
-            >
-              <span className="wishlist-tab-icon">{WishlistTabIcons.album}</span>
-              {t('wishlist.tabAlbums', 'Albom')}
-            </button>
-          )}
-          {hasClips && (
-            <button
-              className={`wishlist-tab ${effectiveTab === 'klip' ? 'active' : ''}`}
-              onClick={() => setActiveTab('klip')}
-            >
-              <span className="wishlist-tab-icon">{WishlistTabIcons.klip}</span>
-              {t('wishlist.tabClips', 'Klip')}
-            </button>
-          )}
-          {hasConcerts && (
-            <button
-              className={`wishlist-tab ${effectiveTab === 'konsert' ? 'active' : ''}`}
-              onClick={() => setActiveTab('konsert')}
-            >
-              <span className="wishlist-tab-icon">{WishlistTabIcons.konsert}</span>
-              {t('wishlist.tabKonserts', 'Konsert')}
-            </button>
-          )}
-          {hasTrillers && (
-            <button
-              className={`wishlist-tab ${effectiveTab === 'triller' ? 'active' : ''}`}
-              onClick={() => setActiveTab('triller')}
-            >
-              <span className="wishlist-tab-icon">{WishlistTabIcons.triller}</span>
-              {t('wishlist.tabTriller', 'Triller')}
-            </button>
-          )}
-        </ScrollTouch>
+        <>
+          <ScrollTouch className="wishlist-tabs wishlist-tabs--desktop">
+            {hasMovies && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'movie' ? 'active' : ''}`}
+                onClick={() => setActiveTab('movie')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.movie}</span>
+                {t('wishlist.tabMovies', 'Kino')}
+              </button>
+            )}
+            {hasMusic && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'music' ? 'active' : ''}`}
+                onClick={() => setActiveTab('music')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.music}</span>
+                {t('wishlist.tabMusic', 'Musiqa')}
+              </button>
+            )}
+            {hasAlbums && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'album' ? 'active' : ''}`}
+                onClick={() => setActiveTab('album')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.album}</span>
+                {t('wishlist.tabAlbums', 'Albom')}
+              </button>
+            )}
+            {hasClips && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'klip' ? 'active' : ''}`}
+                onClick={() => setActiveTab('klip')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.klip}</span>
+                {t('wishlist.tabClips', 'Klip')}
+              </button>
+            )}
+            {hasConcerts && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'konsert' ? 'active' : ''}`}
+                onClick={() => setActiveTab('konsert')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.konsert}</span>
+                {t('wishlist.tabKonserts', 'Konsert')}
+              </button>
+            )}
+            {hasTrillers && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'triller' ? 'active' : ''}`}
+                onClick={() => setActiveTab('triller')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.triller}</span>
+                {t('wishlist.tabTriller', 'Triller')}
+              </button>
+            )}
+          </ScrollTouch>
+
+          <button
+            type="button"
+            className="wishlist-filter-mobile-bar"
+            onClick={openFilterModal}
+          >
+            <span className="wishlist-filter-mobile-bar-icon" aria-hidden="true">
+              {currentTabMeta ? WishlistTabIcons[currentTabMeta.id] : null}
+            </span>
+            <span className="wishlist-filter-mobile-bar-text">
+              {currentTabMeta?.label ||
+                t('music.searchAndFilter', 'Qidirish va filterlash')}
+            </span>
+          </button>
+
+          {isMobile ? (
+            <WishlistFilterModal
+              isOpen={filterModalOpen}
+              onClose={() => setFilterModalOpen(false)}
+              tabs={availableTabs}
+              selectedTab={draftTab}
+              onSelectTab={setDraftTab}
+              onApply={handleFilterApply}
+            />
+          ) : null}
+        </>
       )}
 
       {effectiveTab === 'movie' && (
