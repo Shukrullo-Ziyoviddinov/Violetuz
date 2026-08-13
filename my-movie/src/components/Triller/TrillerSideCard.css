@@ -137,6 +137,11 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
+.triller-side-card--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
 @media (max-width: 900px) {
   .triller-side-card {
     grid-template-columns: 160px minmax(0, 1fr) 24px;

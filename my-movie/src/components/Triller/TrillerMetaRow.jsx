@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../ShareButton/ShareButton';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useWishlist } from '../../context/WishlistContext';
 import { formatActionCount } from '../../utils/utils';
 
@@ -25,6 +26,7 @@ const TrillerMetaRow = ({
   title = '',
   image = '',
   className = '',
+  loading = false,
 }) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -50,6 +52,30 @@ const TrillerMetaRow = ({
     }),
     [trillerId, title]
   );
+
+  if (loading) {
+    return (
+      <ScrollTouch
+        className={`triller-meta-row${className ? ` ${className}` : ''}`}
+        aria-hidden="true"
+      >
+        <div className="triller-meta-left">
+          <div className="triller-meta-likes">
+            <SkeletonLoader variant="triller-meta-like" />
+            <SkeletonLoader variant="triller-meta-like" />
+          </div>
+          <div className="triller-meta-ratings">
+            <SkeletonLoader variant="triller-meta-rating" />
+            <SkeletonLoader variant="triller-meta-rating" />
+          </div>
+        </div>
+        <div className="triller-meta-actions">
+          <SkeletonLoader variant="triller-meta-save" />
+          <SkeletonLoader variant="triller-meta-save" />
+        </div>
+      </ScrollTouch>
+    );
+  }
 
   return (
     <ScrollTouch

@@ -1411,6 +1411,135 @@
   }
 }
 
+/* Triller page — matches real block sizes (desktop / ≤900 mobile) */
+.skeleton-loader--triller-player-title {
+  width: min(18rem, 85%);
+  max-width: 100%;
+  height: calc(1.35rem * 1.35);
+  border-radius: 6px;
+  margin: 0;
+}
+
+.skeleton-loader--triller-side-title {
+  width: 10rem;
+  max-width: 70%;
+  height: calc(1.2rem * 1.3);
+  margin: 0 0 0.85rem;
+  border-radius: 6px;
+}
+
+.skeleton-loader--triller-side-card-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit;
+}
+
+.skeleton-loader--triller-side-card-title {
+  width: 92%;
+  max-width: 100%;
+  height: calc(14px * 1.35 * 2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--triller-meta-rating {
+  width: calc(1rem + 0.4rem + 2.4rem);
+  height: calc(0.95rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--triller-meta-like {
+  width: 4.75rem;
+  height: calc(0.9rem * 1.2 + 0.25rem * 2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--triller-side-card-like {
+  width: 3.6rem;
+  height: 28px;
+  border-radius: 6px;
+}
+
+.skeleton-loader--triller-meta-save {
+  width: 5.5rem;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.skeleton-loader--triller-description-text {
+  width: 100%;
+  height: calc(0.92rem * 1.45 * 4);
+  border-radius: 6px;
+}
+
+.skeleton-loader--triller-description-more {
+  width: 7.5rem;
+  height: calc(0.85rem * 1.3);
+  margin-top: 0.35rem;
+  border-radius: 4px;
+}
+
+.skeleton-loader--triller-comments-title {
+  width: 7rem;
+  height: calc(1rem * 1.2);
+  margin: 0 0 1rem;
+  border-radius: 6px;
+}
+
+.skeleton-loader--movie-detail-comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-loader--movie-detail-comment-author {
+  width: 6.5rem;
+  max-width: 50%;
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--movie-detail-comment-text {
+  width: 100%;
+  height: calc(0.95rem * 1.4);
+  margin-top: 0.25rem;
+  border-radius: 4px;
+}
+
+@media (max-width: 900px) {
+  .skeleton-loader--triller-player-title {
+    width: min(14rem, 80%);
+    height: calc(1.15rem * 1.35);
+  }
+
+  .triller-scroll-head > .skeleton-loader--triller-player-title {
+    padding: 0.75rem 0 0.5rem;
+    box-sizing: content-box;
+  }
+
+  .skeleton-loader--triller-side-title {
+    width: 8.5rem;
+    margin: 0;
+  }
+
+  .skeleton-loader--triller-meta-save {
+    width: 5rem;
+    height: 26px;
+  }
+
+  .skeleton-loader--triller-description-text {
+    height: calc(0.88rem * 1.45 * 2);
+  }
+
+  .skeleton-loader--triller-comments-title {
+    margin-bottom: 0.75rem;
+  }
+}
+
 /* Alias used by Banner.css (.loader-skeleton) */
 .skeleton-loader.loader-skeleton,
 .manga-image-skeleton.skeleton-loader,

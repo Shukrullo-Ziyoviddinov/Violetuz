@@ -14,6 +14,10 @@
   min-height: 50vh;
 }
 
+.triller--loading {
+  pointer-events: none;
+}
+
 .triller-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 402px;

@@ -6,6 +6,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { fetchAllTrillers } from '../../api/trillersApi';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import TrillerSideCard from './TrillerSideCard';
 import MediaGenreFilter from './MediaGenreFilter';
 import TrillerMetaRow from './TrillerMetaRow';
@@ -18,6 +19,28 @@ const SHEET_ACTIVATE_PX = 18;
 const SHEET_FLING_VELOCITY = 0.72;
 const SHEET_FLING_MIN_RATIO = 0.18;
 const SHEET_SETTLE_MS = 420;
+const SIDE_SKELETON_COUNT = 6;
+
+const TrillerCommentsSkeleton = ({ className = '', count = 4 }) => (
+  <div className={`triller-comments${className ? ` ${className}` : ''}`} aria-hidden="true">
+    <div className="movie-detail-comments">
+      <SkeletonLoader variant="triller-comments-title" />
+      <div className="movie-detail-comments-list">
+        {Array.from({ length: count }, (_, i) => (
+          <div key={i} className="movie-detail-comment-item">
+            <div className="movie-detail-comment-main">
+              <SkeletonLoader variant="movie-detail-comment-avatar" />
+              <div className="movie-detail-comment-body">
+                <SkeletonLoader variant="movie-detail-comment-author" />
+                <SkeletonLoader variant="movie-detail-comment-text" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const emptySheetDrag = () => ({
   active: false,
@@ -483,15 +506,9 @@ const Triller = ({ activeId }) => {
     navigate(`/triller/${item.id}`, { replace: true });
   };
 
-  if (isPending) {
-    return (
-      <div className="triller triller--empty">
-        <p>Yuklanmoqda...</p>
-      </div>
-    );
-  }
+  const showLoading = Boolean(isPending);
 
-  if (isError || !activeTriller) {
+  if (!showLoading && (isError || !activeTriller)) {
     return (
       <div className="triller triller--empty">
         <p>Triller topilmadi</p>
@@ -501,6 +518,7 @@ const Triller = ({ activeId }) => {
 
   const trillerClassName = [
     'triller',
+    showLoading ? 'triller--loading' : '',
     isImmersiveVideo ? 'triller--immersive' : '',
     isSheetDragging ? 'triller--sheet-dragging' : '',
     sheetGesture === 'collapse' || sheetSettling === 'collapse' ? 'triller--collapsing' : '',
@@ -514,48 +532,63 @@ const Triller = ({ activeId }) => {
     ? { '--triller-sheet-progress': sheetDragProgress }
     : undefined;
 
+  const sideItems = showLoading
+    ? Array.from({ length: SIDE_SKELETON_COUNT }, (_, i) => ({ id: `sk-side-${i}` }))
+    : filteredSideTrillers;
+
   return (
-    <div className={trillerClassName} style={trillerStyle}>
+    <div className={trillerClassName} style={trillerStyle} aria-busy={showLoading || undefined}>
       <div className="triller-main">
         <div className="triller-primary">
           <div
             className="triller-pin"
             ref={pinRef}
-            onTouchStart={handleCollapseTouchStart}
-            onTouchEnd={handleCollapseTouchEnd}
-            onTouchCancel={handleCollapseTouchEnd}
+            onTouchStart={showLoading ? undefined : handleCollapseTouchStart}
+            onTouchEnd={showLoading ? undefined : handleCollapseTouchEnd}
+            onTouchCancel={showLoading ? undefined : handleCollapseTouchEnd}
           >
             <div className="triller-player-frame">
               <VideoPlayerControls
                 src={videoSrc ? encodeURI(videoSrc) : ''}
                 poster={poster || undefined}
-                resetKey={activeTriller.id}
+                resetKey={activeTriller?.id ?? 'triller-pending'}
                 videoClassName="trailer-modal-video"
                 objectFit="contain"
-                onExpandToggle={isMobileViewport() ? handleExpandToggle : undefined}
+                onExpandToggle={
+                  !showLoading && isMobileViewport() ? handleExpandToggle : undefined
+                }
                 expanded={isImmersiveVideo}
               />
             </div>
           </div>
           <div className="triller-primary-info">
-            {title ? (
+            {showLoading ? (
+              <SkeletonLoader
+                variant="triller-player-title"
+                className="triller-player-title triller-player-title--desktop"
+              />
+            ) : title ? (
               <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
             ) : null}
             <TrillerMetaRow
               className="triller-meta-row--desktop"
-              trillerId={activeTriller.id}
-              like={activeTriller.like}
-              dislike={activeTriller.dislike}
-              reytingImdb={activeTriller.reytingImdb}
-              reytingKinopoisk={activeTriller.reytingKinopoisk}
+              loading={showLoading}
+              trillerId={activeTriller?.id}
+              like={activeTriller?.like}
+              dislike={activeTriller?.dislike}
+              reytingImdb={activeTriller?.reytingImdb}
+              reytingKinopoisk={activeTriller?.reytingKinopoisk}
               title={title}
               image={poster}
             />
             <TrillerDescription
               className="triller-description--desktop"
-              description={activeTriller.description}
+              loading={showLoading}
+              description={activeTriller?.description}
             />
-            {commentsMovieId ? (
+            {showLoading ? (
+              <TrillerCommentsSkeleton className="triller-comments--desktop" count={4} />
+            ) : commentsMovieId ? (
               <div className="triller-comments triller-comments--desktop">
                 <MovieComments
                   key={`triller-comments-desktop-${activeTriller.id}`}
@@ -571,31 +604,40 @@ const Triller = ({ activeId }) => {
         <div
           className={`triller-scroll-area${showGenreFilter ? ' is-filter-pinned' : ''}`}
           ref={scrollRef}
-          onScroll={handleScrollAreaScroll}
-          onTouchStart={handleSheetTouchStart}
-          onTouchEnd={handleSheetTouchEnd}
-          onTouchCancel={handleSheetTouchEnd}
+          onScroll={showLoading ? undefined : handleScrollAreaScroll}
+          onTouchStart={showLoading ? undefined : handleSheetTouchStart}
+          onTouchEnd={showLoading ? undefined : handleSheetTouchEnd}
+          onTouchCancel={showLoading ? undefined : handleSheetTouchEnd}
         >
           <div ref={mobileTitleRef} className="triller-scroll-head">
-            {title ? (
+            {showLoading ? (
+              <SkeletonLoader
+                variant="triller-player-title"
+                className="triller-player-title triller-player-title--mobile"
+              />
+            ) : title ? (
               <h1 className="triller-player-title triller-player-title--mobile">{title}</h1>
             ) : null}
 
             <TrillerMetaRow
               className="triller-meta-row--mobile"
-              trillerId={activeTriller.id}
-              like={activeTriller.like}
-              dislike={activeTriller.dislike}
-              reytingImdb={activeTriller.reytingImdb}
-              reytingKinopoisk={activeTriller.reytingKinopoisk}
+              loading={showLoading}
+              trillerId={activeTriller?.id}
+              like={activeTriller?.like}
+              dislike={activeTriller?.dislike}
+              reytingImdb={activeTriller?.reytingImdb}
+              reytingKinopoisk={activeTriller?.reytingKinopoisk}
               title={title}
               image={poster}
             />
             <TrillerDescription
               className="triller-description--mobile"
-              description={activeTriller.description}
+              loading={showLoading}
+              description={activeTriller?.description}
             />
-            {commentsMovieId ? (
+            {showLoading ? (
+              <TrillerCommentsSkeleton className="triller-comments--mobile" count={1} />
+            ) : commentsMovieId ? (
               <div className="triller-comments triller-comments--mobile">
                 <MovieComments
                   key={`triller-comments-mobile-${activeTriller.id}`}
@@ -608,24 +650,44 @@ const Triller = ({ activeId }) => {
           </div>
 
           <div className={`triller-sticky-bar${showGenreFilter ? ' is-filter' : ''}`}>
-            <h2 className="triller-side-title triller-side-title--pin triller-sticky-title">
-              {forYouTitle}
-            </h2>
-            <div className="triller-sticky-filter" aria-hidden={!showGenreFilter}>
-              <MediaGenreFilter
-                genres={genreOptions}
-                selectedId={selectedGenre}
-                onSelect={handleGenreSelect}
+            {showLoading ? (
+              <SkeletonLoader
+                variant="triller-side-title"
+                className="triller-side-title triller-side-title--pin triller-sticky-title"
               />
+            ) : (
+              <h2 className="triller-side-title triller-side-title--pin triller-sticky-title">
+                {forYouTitle}
+              </h2>
+            )}
+            <div className="triller-sticky-filter" aria-hidden={!showGenreFilter}>
+              {!showLoading ? (
+                <MediaGenreFilter
+                  genres={genreOptions}
+                  selectedId={selectedGenre}
+                  onSelect={handleGenreSelect}
+                />
+              ) : null}
             </div>
           </div>
 
           <aside className="triller-side">
-            <h2 className="triller-side-title triller-side-title--side">{forYouTitle}</h2>
+            {showLoading ? (
+              <SkeletonLoader
+                variant="triller-side-title"
+                className="triller-side-title triller-side-title--side"
+              />
+            ) : (
+              <h2 className="triller-side-title triller-side-title--side">{forYouTitle}</h2>
+            )}
             <div className="triller-side-list">
-              {filteredSideTrillers.map((item) => (
-                <TrillerSideCard key={item.id} triller={item} onSelect={handleSelect} />
-              ))}
+              {sideItems.map((item) =>
+                showLoading ? (
+                  <TrillerSideCard key={item.id} loading />
+                ) : (
+                  <TrillerSideCard key={item.id} triller={item} onSelect={handleSelect} />
+                )
+              )}
             </div>
           </aside>
         </div>

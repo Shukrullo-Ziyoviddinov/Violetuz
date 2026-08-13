@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import TrillerInfoModal from './TrillerInfoModal';
 import './TrillerDescription.css';
 
@@ -22,7 +23,7 @@ const pickDescription = (description, lang) => {
  * Desktop: 4 qator; «Ko‘proq» → text + yil/davlat/janr expand.
  * Mobile: 2 qator; «Ko‘proq» → modal (text + specs).
  */
-const TrillerDescription = ({ description, className = '' }) => {
+const TrillerDescription = ({ description, className = '', loading = false }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const [isMobile, setIsMobile] = useState(
@@ -46,6 +47,20 @@ const TrillerDescription = ({ description, className = '' }) => {
     setExpanded(false);
     setModalOpen(false);
   }, [description, contentLang]);
+
+  if (loading) {
+    return (
+      <div
+        className={`triller-description${className ? ` ${className}` : ''}`}
+        aria-hidden="true"
+      >
+        <div className="triller-description-text-wrap">
+          <SkeletonLoader variant="triller-description-text" />
+          <SkeletonLoader variant="triller-description-more" />
+        </div>
+      </div>
+    );
+  }
 
   if (!data) return null;
 

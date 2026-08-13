@@ -3,6 +3,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { formatActionCount } from '../../utils/utils';
 import LikeButton from '../../Music/LikeButton/LikeButton';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useVideoDurationLabel } from './useVideoDurationLabel';
 import TrillerSideCardMoreModal from './TrillerSideCardMoreModal';
 import './TrillerSideCard.css';
@@ -14,28 +15,48 @@ const formatRating = (value) => {
   return Number.isInteger(num) ? String(num) : num.toFixed(1);
 };
 
-const TrillerSideCard = ({ triller, onSelect }) => {
+const TrillerSideCard = ({ triller, onSelect, loading = false }) => {
   const { contentLang } = useContentLanguage();
-  const videoSrc = getLocalizedField(triller?.video, contentLang);
+  const isSkeleton = Boolean(loading) || !triller;
+  const videoSrc = isSkeleton ? '' : getLocalizedField(triller?.video, contentLang);
   const durationLabel = useVideoDurationLabel(videoSrc);
   const moreBtnRef = useRef(null);
   const [moreOpen, setMoreOpen] = useState(false);
   const [anchorRect, setAnchorRect] = useState(null);
 
-  const title = getLocalizedField(triller?.title, contentLang);
-  const videoImg = getLocalizedField(triller?.videoImg, contentLang);
+  const title = isSkeleton ? '' : getLocalizedField(triller?.title, contentLang);
+  const videoImg = isSkeleton ? '' : getLocalizedField(triller?.videoImg, contentLang);
 
   const likeMeta = useMemo(() => {
-    if (triller?.id == null) return undefined;
+    if (isSkeleton || triller?.id == null) return undefined;
     return {
       category: 'other',
       title: title || '',
       image: videoImg || '',
       route: `/triller/${triller.id}`,
     };
-  }, [triller?.id, title, videoImg]);
+  }, [isSkeleton, triller?.id, title, videoImg]);
 
-  if (!triller) return null;
+  if (isSkeleton) {
+    return (
+      <div className="triller-side-card triller-side-card--skeleton" aria-hidden="true">
+        <div className="triller-side-card-thumb">
+          <SkeletonLoader variant="triller-side-card-thumb" />
+        </div>
+        <div className="triller-side-card-body">
+          <SkeletonLoader variant="triller-side-card-title" />
+          <div className="triller-meta-ratings triller-side-card-ratings">
+            <SkeletonLoader variant="triller-meta-rating" />
+          </div>
+          <div className="triller-meta-likes triller-side-card-likes">
+            <SkeletonLoader variant="triller-side-card-like" />
+            <SkeletonLoader variant="triller-side-card-like" />
+          </div>
+        </div>
+        <span className="triller-side-card-more" aria-hidden="true" />
+      </div>
+    );
+  }
 
   const ageLimit = triller.ageLimit != null ? Number(triller.ageLimit) : null;
   const ageLabel = Number.isFinite(ageLimit) ? `${ageLimit}+` : '';
