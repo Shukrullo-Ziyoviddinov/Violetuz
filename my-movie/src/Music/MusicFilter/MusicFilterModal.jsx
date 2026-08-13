@@ -1,7 +1,6 @@
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
-import ScrollTouch from '../../components/ScrollTouch/ScrollTouch';
 import './MusicFilter.css';
 
 const norm = (v) => (typeof v === 'string' ? v.toLowerCase().trim() : v);
@@ -26,27 +25,126 @@ const CountryIcon = () => (
   </svg>
 );
 
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 12l5 5L20 7" />
+  </svg>
+);
+
 const isOptionActive = (value, opt) => {
   if (value == null || value === '' || value === 'all') return false;
   if (typeof opt === 'number' && typeof value === 'number') return opt === value;
   return opt && value && norm(String(opt)) === norm(String(value));
 };
 
+const formatOptionLabel = (sectionKey, opt, yearLabel) => {
+  if (sectionKey === 'year') return `${opt}-${yearLabel}`;
+  return String(opt);
+};
+
+/** Mobile: title ostida select + dropdown (chapda belgi) */
+const MusicFilterSelect = ({
+  sectionKey,
+  title,
+  options = [],
+  value,
+  open,
+  onToggle,
+  onSelect,
+  yearLabel,
+  placeholder,
+}) => {
+  const wrapRef = useRef(null);
+  const hasValue = value != null && value !== '' && value !== 'all';
+  const display = hasValue
+    ? formatOptionLabel(sectionKey, value, yearLabel)
+    : placeholder || title;
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        onToggle?.(false);
+      }
+    };
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('touchstart', onDoc, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('touchstart', onDoc);
+    };
+  }, [open, onToggle]);
+
+  return (
+    <div
+      className={`music-filter-select${open ? ' is-open' : ''}${hasValue ? ' has-value' : ''}`}
+      ref={wrapRef}
+    >
+      <h4 className="music-filter-modal-section-title">{title}</h4>
+      <button
+        type="button"
+        className="music-filter-select-trigger"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => onToggle?.(!open)}
+      >
+        <span className="music-filter-select-trigger-text">{display}</span>
+        <svg
+          className="music-filter-select-arrow"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M7 10l5 5 5-5z" />
+        </svg>
+      </button>
+
+      {open ? (
+        <div className="music-filter-select-dropdown" role="listbox">
+          {options.map((opt) => {
+            const active = isOptionActive(value, opt);
+            return (
+              <button
+                key={`${sectionKey}-${opt}`}
+                type="button"
+                role="option"
+                aria-selected={active}
+                className={`music-filter-select-option${active ? ' is-active' : ''}`}
+                onClick={() => {
+                  onSelect?.(sectionKey, active ? null : opt);
+                  onToggle?.(false);
+                }}
+              >
+                <span className={`music-filter-select-check${active ? ' is-on' : ''}`}>
+                  {active ? <CheckIcon /> : null}
+                </span>
+                <span className="music-filter-select-option-text">
+                  {formatOptionLabel(sectionKey, opt, yearLabel)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 /**
  * Desktop: bitta filter turi (ro‘yxat)
- * Mobile: barcha filterlar bitta sheetda (ScrollTouch qatorlar)
+ * Mobile: barcha filterlar — select dropdown
  */
 const MusicFilterModal = ({
   variant = 'single',
   isOpen,
   onClose,
-  /* single */
   modalType,
   title,
   options = [],
   value,
   onChange,
-  /* all (mobile) */
   sections = [],
   onSelect,
   onClear,
@@ -61,7 +159,9 @@ const MusicFilterModal = ({
   const isTouch = useRef(false);
   const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [openSection, setOpenSection] = useState(null);
   const closeTimerRef = useRef(null);
+  const yearLabel = t('music.filterYear', 'Yil');
 
   useEffect(() => {
     if (closeTimerRef.current) {
@@ -78,6 +178,7 @@ const MusicFilterModal = ({
     }
 
     setVisible(false);
+    setOpenSection(null);
     closeTimerRef.current = setTimeout(() => {
       setMounted(false);
       closeTimerRef.current = null;
@@ -98,7 +199,6 @@ const MusicFilterModal = ({
     []
   );
 
-  /* Modal ochiq: body/html scroll blok */
   useEffect(() => {
     if (!isOpen) return undefined;
     const html = document.documentElement;
@@ -119,17 +219,13 @@ const MusicFilterModal = ({
   };
 
   const formatSingleOption = (opt) => {
-    if (modalType === 'year') return `${opt} - ${t('music.filterYear', 'Yil')}`;
-    return opt;
-  };
-
-  const formatChipLabel = (sectionKey, opt) => {
-    if (sectionKey === 'year') return `${opt}-${t('music.filterYear', 'Yil')}`;
+    if (modalType === 'year') return `${opt} - ${yearLabel}`;
     return opt;
   };
 
   const handleDragStart = useCallback((e) => {
     if (variant === 'single' && window.innerWidth >= MOBILE_BREAKPOINT) return;
+    if (e.target.closest?.('.music-filter-select')) return;
     isTouch.current = e.type.startsWith('touch');
     isDragging.current = true;
     dragStartY.current = isTouch.current ? e.touches[0].clientY : e.clientY;
@@ -219,6 +315,7 @@ const MusicFilterModal = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   onClear?.();
+                  setOpenSection(null);
                 }}
               >
                 {t('music.filterClear', 'Tozalash')}
@@ -242,29 +339,18 @@ const MusicFilterModal = ({
           <>
             <div className="music-filter-modal-body">
               {sections.map((section) => (
-                <div key={section.key} className="music-filter-modal-section">
-                  <h4 className="music-filter-modal-section-title">{section.title}</h4>
-                  <ScrollTouch className="music-filter-modal-chips">
-                    {section.options.map((opt) => {
-                      const active = isOptionActive(section.value, opt);
-                      return (
-                        <button
-                          key={`${section.key}-${opt}`}
-                          type="button"
-                          className={`music-filter-modal-chip${active ? ' is-active' : ''}`}
-                          onClick={() =>
-                            onSelect?.(
-                              section.key,
-                              active ? null : opt
-                            )
-                          }
-                        >
-                          {formatChipLabel(section.key, opt)}
-                        </button>
-                      );
-                    })}
-                  </ScrollTouch>
-                </div>
+                <MusicFilterSelect
+                  key={section.key}
+                  sectionKey={section.key}
+                  title={section.title}
+                  options={section.options}
+                  value={section.value}
+                  open={openSection === section.key}
+                  onToggle={(next) => setOpenSection(next ? section.key : null)}
+                  onSelect={onSelect}
+                  yearLabel={yearLabel}
+                  placeholder={section.title}
+                />
               ))}
             </div>
             <div className="music-filter-modal-footer">
@@ -273,7 +359,7 @@ const MusicFilterModal = ({
                 className="music-filter-modal-apply"
                 onClick={onApply}
               >
-                {t('music.showResults', 'Natijani ko\'rsatish')}
+                {t('music.showResults', "Natijani ko'rsatish")}
                 {resultCount > 0 ? ` (${resultCount})` : ''}
               </button>
             </div>
