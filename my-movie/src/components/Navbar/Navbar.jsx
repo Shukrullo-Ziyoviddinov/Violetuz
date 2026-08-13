@@ -147,7 +147,7 @@ const Navbar = () => {
               className="navbar-logo-img navbar-logo-img--desktop"
             />
             <img
-              src="/img/VLplay11_preview_rev_2.png"
+              src="/img/vlvioletplay_preview_rev_1.png"
               alt="VL"
               className="navbar-logo-img navbar-logo-img--mobile"
             />
