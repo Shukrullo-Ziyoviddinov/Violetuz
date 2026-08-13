@@ -14,10 +14,10 @@ const RATING_TYPE_KEYS = {
 };
 
 const RATING_TYPE_LOGOS = {
-  rating: '/img/photo_2026-02-16_20-30-31_preview_rev_1.png',
-  ratingImdb: '/img/imdb.jpg',
+  rating: '/img/vlplay_preview_rev_1.png',
+  ratingImdb: '/img/imdbnew.png',
   ratingKinopoisk: '/img/kinopoisk.jpg',
-  ratingNetflix: '/img/netflix.jpg',
+  ratingNetflix: '/img/netflixnew1.webp',
 };
 
 const GENRE_ORDER = [
