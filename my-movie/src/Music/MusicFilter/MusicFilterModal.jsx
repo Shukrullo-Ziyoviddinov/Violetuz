@@ -60,15 +60,43 @@ const MusicFilterModal = ({
   const isDragging = useRef(false);
   const isTouch = useRef(false);
   const [visible, setVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const closeTimerRef = useRef(null);
 
   useEffect(() => {
-    if (!isOpen) {
-      setVisible(false);
-      return undefined;
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
     }
-    const id = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(id);
+
+    if (isOpen) {
+      setMounted(true);
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+      return () => cancelAnimationFrame(id);
+    }
+
+    setVisible(false);
+    closeTimerRef.current = setTimeout(() => {
+      setMounted(false);
+      closeTimerRef.current = null;
+    }, 320);
+
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
   }, [isOpen]);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    },
+    []
+  );
 
   const handleSelectSingle = (opt) => {
     onChange?.(opt);
@@ -117,7 +145,7 @@ const MusicFilterModal = ({
   }, [onClose]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!mounted || !visible) return undefined;
     const onMove = (e) => {
       if (isTouch.current) handleDragMove(e);
     };
@@ -130,10 +158,10 @@ const MusicFilterModal = ({
       document.removeEventListener('touchend', onEnd);
       document.removeEventListener('touchcancel', onEnd);
     };
-  }, [isOpen, handleDragMove, handleDragEnd]);
+  }, [mounted, visible, handleDragMove, handleDragEnd]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!mounted || !visible) return undefined;
     const onMouseMove = (e) => handleDragMove(e);
     const onMouseUp = () => handleDragEnd();
     document.addEventListener('mousemove', onMouseMove);
@@ -142,9 +170,9 @@ const MusicFilterModal = ({
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
-  }, [isOpen, handleDragMove, handleDragEnd]);
+  }, [mounted, visible, handleDragMove, handleDragEnd]);
 
-  if (!isOpen) return null;
+  if (!mounted) return null;
 
   const isAll = variant === 'all';
   const modalTitle = isAll

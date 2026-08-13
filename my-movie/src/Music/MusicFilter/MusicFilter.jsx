@@ -317,10 +317,10 @@ const MusicFilter = ({ data = [], onFilteredChange, forceSkeleton = false }) => 
         onClick={openMobileModal}
       >
         <span className="music-filter-mobile-bar-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3-3" strokeLinecap="round" />
-            <path d="M4 5h6M4 12h4M4 19h8" strokeLinecap="round" />
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 5h16" />
+            <path d="M7 12h10" />
+            <path d="M10 19h4" />
           </svg>
         </span>
         <span className="music-filter-mobile-bar-text">

@@ -420,7 +420,16 @@
 }
 
 @media (max-width: 768px) {
-    .music-more-page-container {
+  .music-more-page-container {
     padding: 0 0.7rem;
-}
+  }
+
+  /* Music more: mobil navbar yashirin — filter bar pastga tushadi */
+  body:has(.music-more-page) .navbar-mobile {
+    display: none !important;
+  }
+
+  body:has(.music-more-page) .App-main {
+    padding-bottom: 0 !important;
+  }
 }

@@ -135,7 +135,7 @@
   background: #121212;
   border-radius: 16px 16px 0 0;
   transform: translateY(100%);
-  transition: transform 0.28s ease-out;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -322,7 +322,7 @@
 .music-filter-modal-chips {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.65rem;
   width: 100%;
   padding: 0.15rem 1rem;
   box-sizing: border-box;
@@ -330,11 +330,11 @@
 
 .music-filter-modal-chip {
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.88);
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
   border-radius: 999px;
-  padding: 0.32rem 0.8rem;
+  padding: 0.35rem 0.85rem;
   font-size: 0.85rem;
   font-weight: 600;
   line-height: 1.2;
@@ -344,7 +344,6 @@
 
 .music-filter-modal-chip.is-active {
   background: #1e03d24d;
-  border-color: #1f16cc99;
   color: #fff;
 }
 
@@ -383,13 +382,13 @@
     max-width: 420px;
     max-height: 75vh;
     border-radius: 16px;
-    transform: scale(0.9);
+    transform: scale(0.9) translateY(0);
     opacity: 0;
-    transition: transform 0.28s ease-out, opacity 0.25s ease;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
 
   .music-filter-modal-overlay.open .music-filter-modal {
-    transform: scale(1);
+    transform: scale(1) translateY(0);
     opacity: 1;
   }
 
@@ -420,16 +419,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.55rem;
+    gap: 0.5rem;
     position: fixed;
-    left: 10px;
-    right: 10px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: calc(100% - 24px);
     bottom: calc(67px + 12px + env(safe-area-inset-bottom, 0px));
     z-index: 1000;
-    height: 48px;
-    padding: 0 1rem;
+    height: 44px;
+    padding: 0 1.1rem;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
+    border-radius: 999px;
     background: rgba(18, 18, 18, 0.96);
     color: #fff;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
@@ -468,9 +470,13 @@
     display: none;
   }
 
-  /* Grid pastida bar + navbar joyi */
+  /* music-more: navbar yo‘q — filter bar pastga (navbar o‘rniga) */
+  body:has(.music-more-page) .music-filter-mobile-bar {
+    bottom: calc(7px + env(safe-area-inset-bottom, 0px));
+  }
+
   .music-more-page:not(.music-more-page--artists) {
-    padding-bottom: calc(67px + 12px + 48px + 1.25rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(7px + 44px + 1.25rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -481,6 +487,6 @@
 
   .music-filter-modal-chip {
     font-size: 0.8rem;
-    padding: 0.28rem 0.7rem;
+    padding: 0.3rem 0.75rem;
   }
 }
