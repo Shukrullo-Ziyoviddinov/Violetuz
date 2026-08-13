@@ -784,6 +784,178 @@ body.video-detail-page-active {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
+
+  /* —— Immersive sheet drag (Triller bilan bir xil) —— */
+  .video-detail-body-scroll {
+    opacity: calc(1 - var(--video-detail-sheet-progress, 0) * 0.92);
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .video-detail-player-wrap {
+    transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .video-detail.is-sheet-dragging .video-detail-pin,
+  .video-detail.is-expanding .video-detail-pin,
+  .video-detail.is-immersive .video-detail-pin {
+    padding-top: 0;
+  }
+
+  .video-detail:not(.is-immersive).is-expanding .video-detail-player-wrap,
+  .video-detail:not(.is-immersive).is-sheet-dragging .video-detail-player-wrap {
+    aspect-ratio: auto;
+    border-radius: 0;
+    height: calc(
+      56.25vw + (100dvh - 56.25vw) * var(--video-detail-sheet-progress, 0)
+    );
+  }
+
+  .video-detail.is-sheet-dragging .video-detail-player-wrap {
+    transition: none;
+  }
+
+  .video-detail.is-sheet-dragging .video-detail-body-scroll {
+    transition: none;
+    touch-action: none;
+  }
+
+  .video-detail.is-expanding .video-detail-body-scroll {
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .video-detail.is-sheet-snap .video-detail-body-scroll,
+  .video-detail.is-sheet-snap .video-detail-pin,
+  .video-detail.is-sheet-snap .video-detail-player-wrap {
+    transition: none !important;
+  }
+
+  .video-detail.is-immersive .video-detail-layout {
+    background: #000;
+  }
+
+  .video-detail.is-immersive .video-detail-pin {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+    touch-action: pan-y;
+    padding: 0;
+  }
+
+  .video-detail.is-immersive .video-detail-player-wrap {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: unset;
+    border-radius: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    transition: none;
+    background: #000;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .video-detail.is-immersive .video-detail-player-wrap .music-vp-video-wrapper {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100%;
+    height: 100%;
+    min-height: 0 !important;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background: #000;
+  }
+
+  .video-detail.is-sheet-dragging .video-detail-player-wrap .music-vp-video-wrapper,
+  .video-detail.is-expanding .video-detail-player-wrap .music-vp-video-wrapper,
+  .video-detail.is-collapsing .video-detail-player-wrap .music-vp-video-wrapper {
+    min-height: 0 !important;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  .video-detail.is-immersive .music-vp-bottom-controls {
+    padding: 0.85rem 1rem max(0.85rem, env(safe-area-inset-bottom, 0px));
+    z-index: 70;
+  }
+
+  .video-detail.is-immersive .music-vp-bottom-controls.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+  }
+
+  .video-detail.is-immersive .music-vp-controls-bar {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    min-height: 40px;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .video-detail.is-immersive .video-detail-body-scroll {
+    flex: 0 0 0;
+    max-height: 0;
+    min-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition:
+      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .video-detail.is-immersive.is-collapsing .video-detail-body-scroll {
+    flex: 1 1 auto;
+    width: 100%;
+    max-height: none;
+    min-height: 0;
+    opacity: clamp(0.15, var(--video-detail-sheet-progress, 0), 1);
+    overflow: hidden;
+    pointer-events: none;
+    padding: 0.75rem 0.7rem 1.25rem;
+  }
+
+  .video-detail.is-immersive.is-collapsing.is-sheet-dragging .video-detail-body-scroll {
+    transition: none;
+  }
+
+  .video-detail.is-immersive.is-collapsing:not(.is-sheet-dragging) .video-detail-body-scroll {
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .video-detail.is-immersive.is-collapsing .video-detail-pin {
+    flex: 0 0 auto;
+    padding: 0;
+  }
+
+  .video-detail.is-immersive.is-collapsing .video-detail-player-wrap {
+    height: calc(
+      100dvh - (100dvh - 56.25vw) * var(--video-detail-sheet-progress, 0)
+    );
+    max-height: 100dvh;
+    flex: 0 0 auto;
+    border-radius: 0;
+  }
+
+  .video-detail.is-immersive.is-collapsing.is-sheet-dragging .video-detail-player-wrap {
+    transition: none;
+  }
+
+  .video-detail.is-immersive.is-collapsing:not(.is-sheet-dragging) .video-detail-player-wrap {
+    transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }
 
 @media (max-width: 822px) {

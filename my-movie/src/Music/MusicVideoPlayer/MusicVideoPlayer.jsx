@@ -3,7 +3,7 @@ import './MusicVideoPlayer.css';
 
 const speedOptions = [1, 1.5, 2];
 
-const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded }, ref) => {
+const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandToggle, expanded = false }, ref) => {
   const videoRef = useRef(null);
   const videoWrapperRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -127,6 +127,11 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded }, ref) =>
     document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
 
   const handleFullscreen = () => {
+    if (typeof onExpandToggle === 'function' && window.innerWidth <= 900) {
+      onExpandToggle();
+      showControlsWithDelay();
+      return;
+    }
     if (!videoWrapperRef.current) return;
     try {
       const isFs = getFullscreenElement();
@@ -146,6 +151,11 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded }, ref) =>
       console.error('Error toggling fullscreen:', error);
     }
   };
+
+  const showExpandedIcon =
+    typeof onExpandToggle === 'function' && window.innerWidth <= 900
+      ? expanded
+      : isFullscreen;
 
   const formatTime = (seconds) => {
     if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return '0:00';
@@ -292,6 +302,14 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded }, ref) =>
       clearHideTimeout();
     };
   }, []);
+
+  useEffect(() => {
+    if (!expanded) return undefined;
+    setShowControls(true);
+    showControlsRef.current = true;
+    showControlsWithDelay();
+    return undefined;
+  }, [expanded]);
 
   useEffect(() => {
     const checkDuration = setInterval(() => {
@@ -697,7 +715,7 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded }, ref) =>
               }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                {isFullscreen ? (
+                {showExpandedIcon ? (
                   <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" />
                 ) : (
                   <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />

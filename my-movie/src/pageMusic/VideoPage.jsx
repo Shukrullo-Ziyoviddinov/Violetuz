@@ -18,6 +18,7 @@ import AlbumsForYou from '../Music/AlbumsForYou/AlbumsForYou';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
 import { formatCount } from '../utils/utils';
+import useImmersiveSheetDrag from '../hooks/useImmersiveSheetDrag';
 import './VideoPage.css';
 
 const TREND_SKELETON_COUNT = 8;
@@ -62,6 +63,20 @@ const VideoPage = () => {
   } = useMusicApi();
   const videoRef = useRef(null);
   const commentsRef = useRef(null);
+  const {
+    scrollRef,
+    pinRef,
+    isImmersive,
+    rootClassNames: sheetClassNames,
+    sheetStyle,
+    handleExpandToggle,
+    isMobileViewport,
+    scrollTouchHandlers,
+    pinTouchHandlers,
+  } = useImmersiveSheetDrag({
+    mobileMax: 900,
+    resetKey: id,
+  });
 
   const videosLoading = Boolean(clipsLoading) || Boolean(concertsLoading);
 
@@ -184,10 +199,18 @@ const VideoPage = () => {
   }
 
   return (
-    <div className="video-detail" aria-busy={showHeroDataSkeleton || undefined}>
+    <div
+      className={['video-detail', sheetClassNames].filter(Boolean).join(' ')}
+      style={sheetStyle}
+      aria-busy={showHeroDataSkeleton || undefined}
+    >
       <div className="video-detail-container">
         <div className="video-detail-layout">
-          <div className="video-detail-pin">
+          <div
+            className="video-detail-pin"
+            ref={pinRef}
+            {...pinTouchHandlers}
+          >
             <div className="video-detail-player-wrap">
               {video?.video ? (
                 <MusicVideoPlayer
@@ -196,12 +219,18 @@ const VideoPage = () => {
                   poster={video.img}
                   autoPlay
                   onEnded={handleVideoEnded}
+                  onExpandToggle={isMobileViewport() ? handleExpandToggle : undefined}
+                  expanded={isImmersive}
                 />
               ) : null}
             </div>
           </div>
 
-          <div className="video-detail-body-scroll">
+          <div
+            className="video-detail-body-scroll"
+            ref={scrollRef}
+            {...scrollTouchHandlers}
+          >
             <div className="video-detail-main-scroll">
               <div className="video-detail-top">
               <div
