@@ -42,6 +42,23 @@ const formatOptionLabel = (sectionKey, opt, yearLabel) => {
   return String(opt);
 };
 
+const animateScrollTo = (el, to, duration = 340) => {
+  if (!el) return () => {};
+  const start = el.scrollTop;
+  const change = to - start;
+  if (Math.abs(change) < 1) return () => {};
+  let raf = 0;
+  const t0 = performance.now();
+  const step = (now) => {
+    const p = Math.min(1, (now - t0) / duration);
+    const ease = 1 - (1 - p) ** 3;
+    el.scrollTop = start + change * ease;
+    if (p < 1) raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+  return () => cancelAnimationFrame(raf);
+};
+
 /** Mobile: title ostida select + dropdown (chapda belgi) */
 const MusicFilterSelect = ({
   sectionKey,
@@ -55,11 +72,34 @@ const MusicFilterSelect = ({
   placeholder,
 }) => {
   const wrapRef = useRef(null);
+  const listRef = useRef(null);
+  const trackRef = useRef(null);
   const savedScrollTopRef = useRef(null);
+  const didLiftRef = useRef(false);
+  const cancelScrollRef = useRef(null);
+  const [thumb, setThumb] = useState({ top: 0, height: 32 });
+  const hasOverflow = options.length > 4;
   const hasValue = value != null && value !== '' && value !== 'all';
   const display = hasValue
     ? formatOptionLabel(sectionKey, value, yearLabel)
     : placeholder || title;
+
+  const updateThumb = useCallback(() => {
+    const el = listRef.current;
+    const track = trackRef.current;
+    if (!el || !track) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const trackH = track.clientHeight;
+    if (scrollHeight <= clientHeight + 1 || trackH <= 0) {
+      setThumb({ top: 0, height: trackH || 32 });
+      return;
+    }
+    const height = Math.max(28, (clientHeight / scrollHeight) * trackH);
+    const maxTop = Math.max(0, trackH - height);
+    const top =
+      (scrollTop / Math.max(1, scrollHeight - clientHeight)) * maxTop;
+    setThumb({ top, height });
+  }, []);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -76,44 +116,84 @@ const MusicFilterSelect = ({
     };
   }, [open, onToggle]);
 
-  /* Ochilganda: body yuqoriga; yopilganda: oldingi scroll joyiga pastga */
+  useEffect(() => {
+    if (!open || !hasOverflow) return undefined;
+    const el = listRef.current;
+    if (!el) return undefined;
+    updateThumb();
+    el.addEventListener('scroll', updateThumb, { passive: true });
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateThumb) : null;
+    ro?.observe(el);
+    return () => {
+      el.removeEventListener('scroll', updateThumb);
+      ro?.disconnect();
+    };
+  }, [open, hasOverflow, options.length, updateThumb]);
+
+  /* Ochilganda body yuqoriga; yopilganda pastga (smooth) */
   useEffect(() => {
     const el = wrapRef.current;
     const body = el?.closest('.music-filter-modal-body');
     if (!body) return undefined;
 
+    if (cancelScrollRef.current) {
+      cancelScrollRef.current();
+      cancelScrollRef.current = null;
+    }
+
     if (open) {
       savedScrollTopRef.current = body.scrollTop;
+      didLiftRef.current = false;
       const timer = setTimeout(() => {
         const dropdown = el.querySelector('.music-filter-select-dropdown');
         const focusEl = dropdown || el;
         const bodyRect = body.getBoundingClientRect();
         const focusRect = focusEl.getBoundingClientRect();
         const pad = 20;
-
+        let delta = 0;
         if (focusRect.bottom > bodyRect.bottom - pad) {
-          body.scrollBy({
-            top: focusRect.bottom - bodyRect.bottom + pad,
-            behavior: 'smooth',
-          });
+          delta = focusRect.bottom - bodyRect.bottom + pad;
         } else if (focusRect.top < bodyRect.top + pad) {
-          body.scrollBy({
-            top: focusRect.top - bodyRect.top - pad,
-            behavior: 'smooth',
-          });
+          delta = focusRect.top - bodyRect.top - pad;
         }
-      }, 50);
+        if (Math.abs(delta) >= 1) {
+          didLiftRef.current = true;
+          cancelScrollRef.current = animateScrollTo(
+            body,
+            body.scrollTop + delta,
+            340
+          );
+        }
+      }, 60);
       return () => clearTimeout(timer);
     }
 
-    if (savedScrollTopRef.current == null) return undefined;
+    if (!didLiftRef.current || savedScrollTopRef.current == null) {
+      savedScrollTopRef.current = null;
+      didLiftRef.current = false;
+      return undefined;
+    }
+
     const restoreTo = savedScrollTopRef.current;
     savedScrollTopRef.current = null;
-    const timer = requestAnimationFrame(() => {
-      body.scrollTo({ top: restoreTo, behavior: 'smooth' });
-    });
-    return () => cancelAnimationFrame(timer);
+    didLiftRef.current = false;
+    const timer = setTimeout(() => {
+      cancelScrollRef.current = animateScrollTo(body, restoreTo, 340);
+    }, 40);
+    return () => {
+      clearTimeout(timer);
+      if (cancelScrollRef.current) {
+        cancelScrollRef.current();
+        cancelScrollRef.current = null;
+      }
+    };
   }, [open, options.length]);
+
+  const scrollListBy = (dir) => {
+    const el = listRef.current;
+    if (!el) return;
+    el.scrollBy({ top: dir * 56, behavior: 'smooth' });
+  };
 
   return (
     <div
@@ -143,34 +223,63 @@ const MusicFilterSelect = ({
 
       {open ? (
         <div
-          className={`music-filter-select-dropdown${
-            options.length > 4 ? ' has-overflow' : ''
-          }`}
+          className={`music-filter-select-dropdown${hasOverflow ? ' has-overflow' : ''}`}
           role="listbox"
         >
-          {options.map((opt) => {
-            const active = isOptionActive(value, opt);
-            return (
+          <div
+            className="music-filter-select-dropdown-scroll"
+            ref={listRef}
+          >
+            {options.map((opt) => {
+              const active = isOptionActive(value, opt);
+              return (
+                <button
+                  key={`${sectionKey}-${opt}`}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  className={`music-filter-select-option${active ? ' is-active' : ''}`}
+                  onClick={() => {
+                    onSelect?.(sectionKey, active ? null : opt);
+                    onToggle?.(false);
+                  }}
+                >
+                  <span className={`music-filter-select-check${active ? ' is-on' : ''}`}>
+                    {active ? <CheckIcon /> : null}
+                  </span>
+                  <span className="music-filter-select-option-text">
+                    {formatOptionLabel(sectionKey, opt, yearLabel)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {hasOverflow ? (
+            <div className="music-filter-select-scrollbar" aria-hidden="true">
               <button
-                key={`${sectionKey}-${opt}`}
                 type="button"
-                role="option"
-                aria-selected={active}
-                className={`music-filter-select-option${active ? ' is-active' : ''}`}
-                onClick={() => {
-                  onSelect?.(sectionKey, active ? null : opt);
-                  onToggle?.(false);
-                }}
-              >
-                <span className={`music-filter-select-check${active ? ' is-on' : ''}`}>
-                  {active ? <CheckIcon /> : null}
-                </span>
-                <span className="music-filter-select-option-text">
-                  {formatOptionLabel(sectionKey, opt, yearLabel)}
-                </span>
-              </button>
-            );
-          })}
+                className="music-filter-select-scrollbar-btn music-filter-select-scrollbar-btn--up"
+                tabIndex={-1}
+                onClick={() => scrollListBy(-1)}
+              />
+              <div className="music-filter-select-scrollbar-track" ref={trackRef}>
+                <div
+                  className="music-filter-select-scrollbar-thumb"
+                  style={{
+                    height: `${thumb.height}px`,
+                    transform: `translateY(${thumb.top}px)`,
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                className="music-filter-select-scrollbar-btn music-filter-select-scrollbar-btn--down"
+                tabIndex={-1}
+                onClick={() => scrollListBy(1)}
+              />
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

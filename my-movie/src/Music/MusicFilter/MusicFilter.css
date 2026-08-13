@@ -387,80 +387,99 @@
   right: 0;
   top: calc(100% + 0.35rem);
   max-height: 220px;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   background: #1a1a1a;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-  padding: 0.35rem 0.2rem 0.35rem 0.35rem;
   box-sizing: border-box;
   z-index: 6;
-  scrollbar-gutter: stable;
-  scrollbar-width: auto;
-  scrollbar-color: #f0f0f0 #d8d8d8;
+  overflow: hidden;
 }
 
-.music-filter-select-dropdown.has-overflow {
-  overflow-y: scroll;
+.music-filter-select-dropdown-scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-height: 220px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.35rem;
+  box-sizing: border-box;
+  scrollbar-width: none;
 }
 
-/* Doim ko‘rinadigan classic scrollbar (WebKit) */
-.music-filter-select-dropdown::-webkit-scrollbar {
-  width: 14px;
-  background: transparent;
+.music-filter-select-dropdown-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
-.music-filter-select-dropdown::-webkit-scrollbar-track {
-  background: #e8e8e8;
-  border-radius: 8px;
-  margin: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+.music-filter-select-dropdown.has-overflow .music-filter-select-dropdown-scroll {
+  padding-right: 0.25rem;
 }
 
-.music-filter-select-dropdown::-webkit-scrollbar-thumb {
-  background: #f5f5f5;
-  border-radius: 8px;
-  border: 2px solid #e8e8e8;
-  min-height: 28px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+/* Custom doimiy scrollbar — yuqori/past strelka + oq track */
+.music-filter-select-scrollbar {
+  flex: 0 0 16px;
+  width: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 3px 2px 3px 0;
+  box-sizing: border-box;
 }
 
-.music-filter-select-dropdown::-webkit-scrollbar-thumb:hover {
-  background: #ffffff;
-}
-
-.music-filter-select-dropdown::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* Yuqori / pastki strelkalar — brauzer scrollbar kabi */
-.music-filter-select-dropdown::-webkit-scrollbar-button:single-button {
-  display: block;
+.music-filter-select-scrollbar-btn {
+  flex: 0 0 14px;
   height: 14px;
-  width: 14px;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   background-color: #e8e8e8;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 8px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  padding: 0;
 }
 
-.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:decrement {
+.music-filter-select-scrollbar-btn--up {
   border-radius: 6px 6px 3px 3px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23333333' d='M4 1.5L7.5 6H.5z'/%3E%3C/svg%3E");
 }
 
-.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:increment {
+.music-filter-select-scrollbar-btn--down {
   border-radius: 3px 3px 6px 6px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23333333' d='M4 6.5L.5 2h7z'/%3E%3C/svg%3E");
 }
 
-.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:decrement:hover,
-.music-filter-select-dropdown::-webkit-scrollbar-button:single-button:vertical:increment:hover {
+.music-filter-select-scrollbar-btn:hover {
   background-color: #f5f5f5;
+}
+
+.music-filter-select-scrollbar-track {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #e8e8e8;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.music-filter-select-scrollbar-thumb {
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  width: auto;
+  background: #f5f5f5;
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
 .music-filter-select-option {
