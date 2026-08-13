@@ -665,7 +665,7 @@
 
   /* music-more: navbar yo‘q — filter bar pastga (navbar o‘rniga) */
   body:has(.music-more-page) .music-filter-mobile-bar {
-    bottom: calc(7px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(25px + env(safe-area-inset-bottom, 0px));
   }
 
   .music-more-page:not(.music-more-page--artists) {
