@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import FiltersSelect from './FiltersSelect';
-import { useIsMobileFilter } from './useIsMobileFilter';
 import './FilterGenre.css';
 
 const GENRE_ORDER = [
@@ -12,9 +10,7 @@ const GENRE_ORDER = [
 
 const FilterGenre = ({ movies = [], selectedGenres = [], onGenreSelect }) => {
   const { t } = useTranslation();
-  const isMobile = useIsMobileFilter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectOpen, setSelectOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isDraggingModal, setIsDraggingModal] = useState(false);
@@ -29,21 +25,7 @@ const FilterGenre = ({ movies = [], selectedGenres = [], onGenreSelect }) => {
     return movies.filter(m => (m.filterGenre || []).includes(genre)).length;
   };
 
-  const selectOptions = [
-    {
-      value: null,
-      label: `${t('categories.all')} (${movies.length})`,
-    },
-    ...uniqueGenres.map((genre) => ({
-      value: genre,
-      label: `${t(`filters.genres.${genre}`, genre)} (${getGenreCount(genre)})`,
-    })),
-  ];
-
-  const closeModal = () => {
-    setSelectOpen(false);
-    setIsModalOpen(false);
-  };
+  const closeModal = () => setIsModalOpen(false);
 
   const handleGenreToggle = (genre) => {
     const isSelected = selectedGenres.includes(genre);
@@ -59,24 +41,6 @@ const FilterGenre = ({ movies = [], selectedGenres = [], onGenreSelect }) => {
     onGenreSelect([]);
     closeModal();
   };
-
-  const handleSelectPick = (val, wasActive) => {
-    if (val == null) {
-      handleClearGenres();
-      return;
-    }
-    if (wasActive) {
-      onGenreSelect(selectedGenres.filter((g) => g !== val));
-      closeModal();
-      return;
-    }
-    onGenreSelect([...selectedGenres, val]);
-    closeModal();
-  };
-
-  useEffect(() => {
-    if (!isModalOpen) setSelectOpen(false);
-  }, [isModalOpen]);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -165,11 +129,6 @@ const FilterGenre = ({ movies = [], selectedGenres = [], onGenreSelect }) => {
     setTouchEnd(null);
   };
 
-  const genreDisplay =
-    selectedGenres.length > 0
-      ? selectedGenres.map((g) => t(`filters.genres.${g}`, g)).join(', ')
-      : undefined;
-
   return (
     <>
       <button
@@ -212,41 +171,24 @@ const FilterGenre = ({ movies = [], selectedGenres = [], onGenreSelect }) => {
                 <button className="filters-modal-genre-close" onClick={closeModal}>×</button>
               </div>
             </div>
-            <div className="filters-modal-genre-body filters-modal-sheet-body">
-              {isMobile ? (
-                <FiltersSelect
-                  options={selectOptions}
-                  open={selectOpen}
-                  onToggle={setSelectOpen}
-                  onSelect={handleSelectPick}
-                  placeholder={t('filters.genre', 'Janr')}
-                  isOptionActive={(v) =>
-                    v == null ? selectedGenres.length === 0 : selectedGenres.includes(v)
-                  }
-                  hasSelection={selectedGenres.length > 0}
-                  displayText={genreDisplay}
-                />
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className={`filters-modal-genre-option ${selectedGenres.length === 0 ? 'filters-modal-genre-option--active' : ''}`}
-                    onClick={handleClearGenres}
-                  >
-                    {t('categories.all')} ({movies.length})
-                  </button>
-                  {uniqueGenres.map((genre) => (
-                    <button
-                      key={genre}
-                      type="button"
-                      className={`filters-modal-genre-option ${selectedGenres.includes(genre) ? 'filters-modal-genre-option--active' : ''}`}
-                      onClick={() => handleGenreToggle(genre)}
-                    >
-                      {t(`filters.genres.${genre}`, genre)} ({getGenreCount(genre)})
-                    </button>
-                  ))}
-                </>
-              )}
+            <div className="filters-modal-genre-body">
+              <button
+                type="button"
+                className={`filters-modal-genre-option ${selectedGenres.length === 0 ? 'filters-modal-genre-option--active' : ''}`}
+                onClick={handleClearGenres}
+              >
+                {t('categories.all')} ({movies.length})
+              </button>
+              {uniqueGenres.map((genre) => (
+                <button
+                  key={genre}
+                  type="button"
+                  className={`filters-modal-genre-option ${selectedGenres.includes(genre) ? 'filters-modal-genre-option--active' : ''}`}
+                  onClick={() => handleGenreToggle(genre)}
+                >
+                  {t(`filters.genres.${genre}`, genre)} ({getGenreCount(genre)})
+                </button>
+              ))}
             </div>
           </div>
         </div>,
