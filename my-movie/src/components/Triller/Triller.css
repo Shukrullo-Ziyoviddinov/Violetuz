@@ -374,7 +374,7 @@
     position: relative;
     z-index: 6;
     background: #000;
-    padding: 0.5rem 0.7rem 0;
+    padding: 0;
     box-sizing: border-box;
     flex: 0 0 auto;
     touch-action: manipulation;
@@ -390,9 +390,7 @@
   }
 
   .triller-player-frame {
-    border-radius: 10px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: 0;
     max-width: 100%;
     width: 100%;
     aspect-ratio: 16 / 9;
