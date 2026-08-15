@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+﻿import React, { useEffect, useState, useCallback } from 'react';
 import AuthModal from './AuthModal';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -6,6 +6,7 @@ import {
   clearAuthModalHandler,
   readNeedsAvatar,
   clearNeedsAvatar,
+  markNeedsAvatar,
 } from '../../authModalBridge';
 
 const AuthModalHost = () => {
@@ -15,6 +16,12 @@ const AuthModalHost = () => {
   const [step, setStep] = useState('form');
 
   const openModal = useCallback((nextMode = 'register', options = {}) => {
+    if (readNeedsAvatar() && options.step !== 'form') {
+      setMode('register');
+      setStep('avatar');
+      setOpen(true);
+      return;
+    }
     setMode(nextMode === 'login' ? 'login' : 'register');
     setStep(options.step === 'avatar' ? 'avatar' : 'form');
     setOpen(true);
@@ -25,37 +32,44 @@ const AuthModalHost = () => {
     return () => clearAuthModalHandler(openModal);
   }, [openModal]);
 
-  /** Register tugagan, lekin avatar yuklanmagan — refresh/yopilganda qayta ochish */
+  /**
+   * Avatar majburiy: sessiya bor, rasm yo‘q → avatar qadami.
+   * Saqlangach profile.avatar paydo bo‘ladi va modal yopilishi mumkin.
+   */
   useEffect(() => {
-    if (!authReady || !isLoggedIn || open) return;
+    if (!authReady || !isLoggedIn) return;
 
-    const needsAvatar = readNeedsAvatar();
-    const hasAvatar = Boolean(profile?.avatar);
-
-    if (hasAvatar) {
+    if (profile?.avatar) {
       clearNeedsAvatar();
       return;
     }
 
-    if (needsAvatar) {
-      setMode('register');
-      setStep('avatar');
-      setOpen(true);
-    }
-  }, [authReady, isLoggedIn, profile?.avatar, open]);
+    markNeedsAvatar();
+    setMode('register');
+    setStep('avatar');
+    setOpen(true);
+  }, [authReady, isLoggedIn, profile?.avatar]);
+
+  const handleClose = useCallback(() => {
+    /* Faqat rasm hali majburiy bo‘lsa yopilmasin (saqlagach flag tozalanadi) */
+    if (readNeedsAvatar()) return;
+    setOpen(false);
+    setStep('form');
+  }, []);
 
   if (!open) return null;
 
   return (
     <AuthModal
-      initialMode={mode}
-      initialStep={step}
-      onClose={() => {
-        /* Avatar majburiy: flag hali turgan bo‘lsa yopilmasin */
-        if (step === 'avatar' && readNeedsAvatar()) return;
-        setOpen(false);
+      mode={mode}
+      step={step}
+      onModeChange={(next) => {
+        if (readNeedsAvatar() || step === 'avatar') return;
+        setMode(next);
         setStep('form');
       }}
+      onStepChange={setStep}
+      onClose={handleClose}
     />
   );
 };

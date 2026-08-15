@@ -26,10 +26,14 @@ const AVATAR_MIME = new Set([
   'image/gif',
 ]);
 
-const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) => {
+const AuthModal = ({
+  mode = 'register',
+  step = 'form',
+  onModeChange,
+  onStepChange,
+  onClose,
+}) => {
   const { setAuthSession, updateProfile } = useAuth();
-  const [mode, setMode] = useState(initialMode === 'login' ? 'login' : 'register');
-  const [step, setStep] = useState(initialStep === 'avatar' ? 'avatar' : 'form');
   const [loginMethod, setLoginMethod] = useState('gmail'); // gmail | username
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -70,16 +74,6 @@ const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) 
       revokePreviewUrl();
     };
   }, [revokePreviewUrl]);
-
-  useEffect(() => {
-    setMode(initialMode === 'login' ? 'login' : 'register');
-    setStep(initialStep === 'avatar' ? 'avatar' : 'form');
-    setError('');
-    setCode('');
-    if (initialStep !== 'avatar') {
-      resetAvatarPick();
-    }
-  }, [initialMode, initialStep, resetAvatarPick]);
 
   const runUsernameCheck = useCallback(async (value) => {
     const clean = value.trim().replace(/^@+/, '');
@@ -145,8 +139,7 @@ const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) 
   }, [username, mode, step, runUsernameCheck]);
 
   const switchMode = (next) => {
-    setMode(next);
-    setStep('form');
+    onModeChange?.(next);
     setError('');
     setCode('');
     setPassword('');
@@ -191,14 +184,14 @@ const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) 
           email: email.trim(),
           password,
         });
-        setStep('verify');
+        onStepChange?.('verify');
         setCode('');
       } else if (loginMethod === 'gmail') {
         if (!EMAIL_RE.test(email.trim())) {
           throw new Error('Gmail manzil noto‘g‘ri');
         }
         await loginStart({ email: email.trim() });
-        setStep('verify');
+        onStepChange?.('verify');
         setCode('');
       } else {
         if (!username.trim() || !password) {
@@ -233,14 +226,14 @@ const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) 
           ? await registerVerify(payload)
           : await loginVerify(payload);
 
-      setAuthSession({ user: data.user });
-
       if (mode === 'register') {
         markNeedsAvatar();
-        resetAvatarPick();
-        setStep('avatar');
+        onStepChange?.('avatar');
+        setAuthSession({ user: data.user });
         setError('');
+        resetAvatarPick();
       } else {
+        setAuthSession({ user: data.user });
         onClose?.();
       }
     } catch (err) {
@@ -670,7 +663,8 @@ const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) 
                 type="button"
                 className="auth-modal-back"
                 onClick={() => {
-                  setStep('form');
+                  resetAvatarPick();
+                  onStepChange?.('form');
                   setError('');
                   setCode('');
                 }}
@@ -680,7 +674,7 @@ const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) 
               </button>
             </form>
           </>
-        ) : (
+        ) : step === 'avatar' ? (
           <>
             <h2 className="auth-modal-title">Profil rasmi</h2>
             <p className="auth-modal-subtitle">
@@ -771,7 +765,7 @@ const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) 
               </button>
             </form>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
