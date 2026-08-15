@@ -51,6 +51,8 @@ const MODAL_SELECTOR = [
   '.comentaria-history-modal',
   '.profile-edit-modal',
   '.profile-edit-overlay',
+  '.add-account-modal',
+  '.add-account-overlay',
 ].join(', ');
 
 const getMaxDrop = () =>

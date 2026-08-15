@@ -28,11 +28,13 @@ const AVATAR_MIME = new Set([
 const AuthModal = ({
   mode = 'register',
   step = 'form',
+  copyVariant = 'default',
   onModeChange,
   onStepChange,
   onClose,
 }) => {
   const { setAuthSession, updateProfile } = useAuth();
+  const isAddAccount = copyVariant === 'addAccount' && mode === 'register';
   const [loginMethod, setLoginMethod] = useState('gmail'); // gmail | username
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -332,11 +334,17 @@ const AuthModal = ({
         {step === 'form' ? (
           <>
             <h2 className="auth-modal-title">
-              {mode === 'register' ? "Ro'yxatdan o'tish" : 'Kirish'}
+              {mode === 'register'
+                ? isAddAccount
+                  ? 'Hisob yaratish'
+                  : "Ro'yxatdan o'tish"
+                : 'Kirish'}
             </h2>
             <p className="auth-modal-subtitle">
               {mode === 'register'
-                ? 'Sevimli Kino va Musiqalaringizga tashrif buyuring'
+                ? isAddAccount
+                  ? 'Yangi hisob uchun maʼlumotlarni kiriting'
+                  : 'Sevimli Kino va Musiqalaringizga tashrif buyuring'
                 : 'Hisobingizga kiring'}
             </p>
 
@@ -587,7 +595,9 @@ const AuthModal = ({
                 {busy
                   ? 'Kutilmoqda...'
                   : mode === 'register'
-                    ? "Ro'yxatdan o'tish"
+                    ? isAddAccount
+                      ? 'Hisob yaratish'
+                      : "Ro'yxatdan o'tish"
                     : loginMethod === 'username'
                       ? 'Hisobga kirish'
                       : 'Davom etish'}
@@ -596,16 +606,29 @@ const AuthModal = ({
 
             <p className="auth-modal-footer">
               {mode === 'register' ? (
-                <>
-                  Profilingiz bormi?{' '}
-                  <button
-                    type="button"
-                    className="auth-modal-link"
-                    onClick={() => switchMode('login')}
-                  >
-                    Kirish
-                  </button>
-                </>
+                isAddAccount ? (
+                  <>
+                    Boshqa hisobga o‘tmoqchimisiz?{' '}
+                    <button
+                      type="button"
+                      className="auth-modal-link"
+                      onClick={() => switchMode('login')}
+                    >
+                      Kirish
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Profilingiz bormi?{' '}
+                    <button
+                      type="button"
+                      className="auth-modal-link"
+                      onClick={() => switchMode('login')}
+                    >
+                      Kirish
+                    </button>
+                  </>
+                )
               ) : (
                 <>
                   Hisobingiz yo‘qmi?{' '}

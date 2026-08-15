@@ -3,11 +3,13 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
 const AuthOtp = require('../models/AuthOtp.model');
+const DeviceAccountLink = require('../models/DeviceAccountLink.model');
 const { sendOtpEmail } = require('./brevoEmail.service');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/env');
 const { badRequest, notFound, createHttpError } = require('../utils/errors');
 const { syncAdminRole } = require('../utils/adminRole');
 const { assertR2MediaUrl } = require('../utils/assertR2MediaUrl');
+const { hashDeviceKey } = require('../utils/authCookie');
 
 const OTP_TTL_MS = 2 * 60 * 1000;
 const OTP_MAX_ATTEMPTS = 5;
@@ -354,6 +356,109 @@ const updateProfile = async (userId, { name, username, bio, avatar }) => {
   return user.toPublicJSON();
 };
 
+/** Login/register/me: shu qurilmaga userni bog‘lash */
+const linkUserToDevice = async (deviceKey, userId) => {
+  const key = String(deviceKey || '').trim();
+  if (!key || !userId) return;
+  const deviceKeyHash = hashDeviceKey(key);
+  await DeviceAccountLink.findOneAndUpdate(
+    { deviceKeyHash, userId },
+    { $set: { lastUsedAt: new Date() } },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+};
+
+/**
+ * Ko‘p hisob switch — client JWT yubormaydi.
+ * Faqat httpOnly violet_device + userId (shu qurilmada login qilingan bo‘lishi kerak).
+ */
+const switchAccountSession = async ({ userId, deviceKey }) => {
+  const id = String(userId || '').trim();
+  const key = String(deviceKey || '').trim();
+  if (!id) {
+    throw badRequest('userId majburiy');
+  }
+  if (!key) {
+    throw createHttpError(401, 'Qurilma sessiyasi topilmadi');
+  }
+
+  const deviceKeyHash = hashDeviceKey(key);
+  const link = await DeviceAccountLink.findOne({
+    deviceKeyHash,
+    userId: id,
+  })
+    .select('_id')
+    .lean();
+
+  if (!link) {
+    throw createHttpError(403, 'Bu hisob ushbu qurilmada bog‘lanmagan');
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    throw createHttpError(401, 'Foydalanuvchi topilmadi');
+  }
+
+  await DeviceAccountLink.updateOne(
+    { _id: link._id },
+    { $set: { lastUsedAt: new Date() } }
+  );
+
+  return issueAuthSession(user);
+};
+
+/** Shu qurilmaga bog‘langan hisoblar (UI ro‘yxati — server manba) */
+const listDeviceAccounts = async (deviceKey, activeUserId = null) => {
+  const key = String(deviceKey || '').trim();
+  if (!key) {
+    return { accounts: [], activeUserId: null };
+  }
+
+  const deviceKeyHash = hashDeviceKey(key);
+  const links = await DeviceAccountLink.find({ deviceKeyHash })
+    .sort({ lastUsedAt: -1 })
+    .select('userId lastUsedAt')
+    .lean();
+
+  if (!links.length) {
+    return { accounts: [], activeUserId: activeUserId ? String(activeUserId) : null };
+  }
+
+  const ids = links.map((l) => l.userId);
+  const users = await User.find({ _id: { $in: ids } });
+  const byId = new Map(users.map((u) => [String(u._id), u]));
+
+  const accounts = [];
+  const orphanIds = [];
+  for (const link of links) {
+    const user = byId.get(String(link.userId));
+    if (!user) {
+      orphanIds.push(link.userId);
+      continue;
+    }
+    const pub = user.toPublicJSON();
+    accounts.push({
+      id: pub.id,
+      name: pub.name,
+      username: pub.username,
+      email: pub.email,
+      avatar: pub.avatar || null,
+    });
+  }
+
+  if (orphanIds.length) {
+    await DeviceAccountLink.deleteMany({
+      deviceKeyHash,
+      userId: { $in: orphanIds },
+    });
+  }
+
+  return {
+    accounts,
+    activeUserId: activeUserId ? String(activeUserId) : null,
+  };
+};
+
 module.exports = {
   checkUsernameAvailability,
   startRegister,
@@ -362,4 +467,8 @@ module.exports = {
   verifyLogin,
   loginWithUsername,
   updateProfile,
+  issueAuthSession,
+  linkUserToDevice,
+  switchAccountSession,
+  listDeviceAccounts,
 };

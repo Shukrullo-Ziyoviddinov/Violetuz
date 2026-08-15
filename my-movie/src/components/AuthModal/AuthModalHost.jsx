@@ -14,6 +14,7 @@ const AuthModalHost = () => {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState('register');
   const [step, setStep] = useState('form');
+  const [copyVariant, setCopyVariant] = useState('default');
 
   const openModal = useCallback((nextMode = 'register', options = {}) => {
     if (readNeedsAvatar() && options.step !== 'form') {
@@ -24,6 +25,7 @@ const AuthModalHost = () => {
     }
     setMode(nextMode === 'login' ? 'login' : 'register');
     setStep(options.step === 'avatar' ? 'avatar' : 'form');
+    setCopyVariant(options.copyVariant === 'addAccount' ? 'addAccount' : 'default');
     setOpen(true);
   }, []);
 
@@ -51,10 +53,10 @@ const AuthModalHost = () => {
   }, [authReady, isLoggedIn, profile?.avatar]);
 
   const handleClose = useCallback(() => {
-    /* Faqat rasm hali majburiy bo‘lsa yopilmasin (saqlagach flag tozalanadi) */
     if (readNeedsAvatar()) return;
     setOpen(false);
     setStep('form');
+    setCopyVariant('default');
   }, []);
 
   if (!open) return null;
@@ -63,10 +65,12 @@ const AuthModalHost = () => {
     <AuthModal
       mode={mode}
       step={step}
+      copyVariant={copyVariant}
       onModeChange={(next) => {
         if (readNeedsAvatar() || step === 'avatar') return;
         setMode(next);
         setStep('form');
+        if (next === 'login') setCopyVariant('default');
       }}
       onStepChange={setStep}
       onClose={handleClose}

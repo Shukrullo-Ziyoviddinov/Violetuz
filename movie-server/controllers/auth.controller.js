@@ -1,15 +1,31 @@
 const asyncHandler = require('../middleware/asyncHandler');
 const { sendSuccess } = require('../utils/response');
 const authService = require('../services/auth.service');
-const { setAuthCookie, clearAuthCookie } = require('../utils/authCookie');
+const {
+  setAuthCookie,
+  clearAuthCookie,
+  ensureDeviceKey,
+  readDeviceKey,
+} = require('../utils/authCookie');
 
-const sendAuthSuccess = (res, payload, status = 200) => {
+const sendAuthSuccess = async (res, req, payload, status = 200) => {
   setAuthCookie(res, payload.token);
+  const deviceKey = ensureDeviceKey(req, res);
+  const userId = payload.user?.id;
+  if (userId) {
+    await authService.linkUserToDevice(deviceKey, userId);
+  }
+  /* Token faqat httpOnly cookie da — JS/localStorage ga berilmaydi */
   return sendSuccess(res, { data: { user: payload.user } }, status);
 };
 
 const checkUsername = asyncHandler(async (req, res) => {
-  const excludeUserId = req.authUser?._id || null;
+  /** Faqat profil tahririda o‘z usernameini exclude qilish; yangi hisob/register da yo‘q */
+  const excludeSelf =
+    req.query.excludeSelf === '1' ||
+    req.query.excludeSelf === 'true' ||
+    req.query.excludeSelf === 'yes';
+  const excludeUserId = excludeSelf ? req.authUser?._id || null : null;
   const result = await authService.checkUsernameAvailability(
     req.query.username || req.params.username,
     excludeUserId
@@ -24,7 +40,7 @@ const registerStart = asyncHandler(async (req, res) => {
 
 const registerVerify = asyncHandler(async (req, res) => {
   const data = await authService.verifyRegister(req.body || {});
-  return sendAuthSuccess(res, data, 201);
+  return sendAuthSuccess(res, req, data, 201);
 });
 
 const loginStart = asyncHandler(async (req, res) => {
@@ -34,19 +50,37 @@ const loginStart = asyncHandler(async (req, res) => {
 
 const loginVerify = asyncHandler(async (req, res) => {
   const data = await authService.verifyLogin(req.body || {});
-  return sendAuthSuccess(res, data, 200);
+  return sendAuthSuccess(res, req, data, 200);
 });
 
 const loginUsername = asyncHandler(async (req, res) => {
   const data = await authService.loginWithUsername(req.body || {});
-  return sendAuthSuccess(res, data, 200);
+  return sendAuthSuccess(res, req, data, 200);
 });
 
 const me = asyncHandler(async (req, res) => {
   if (!req.authUser) {
     return sendSuccess(res, { data: { user: null } }, 200);
   }
-  return sendSuccess(res, { data: { user: req.authUser.toPublicJSON() } }, 200);
+  const data = await authService.issueAuthSession(req.authUser);
+  return sendAuthSuccess(res, req, data, 200);
+});
+
+const switchAccount = asyncHandler(async (req, res) => {
+  const deviceKey = readDeviceKey(req);
+  const data = await authService.switchAccountSession({
+    userId: req.body?.userId,
+    deviceKey,
+  });
+  return sendAuthSuccess(res, req, data, 200);
+});
+
+/** Qurilmadagi hisoblar ro‘yxati — manba server (device cookie) */
+const listDeviceAccounts = asyncHandler(async (req, res) => {
+  const deviceKey = readDeviceKey(req) || ensureDeviceKey(req, res);
+  const activeUserId = req.authUser?._id ? String(req.authUser._id) : null;
+  const data = await authService.listDeviceAccounts(deviceKey, activeUserId);
+  return sendSuccess(res, { data }, 200);
 });
 
 const logout = asyncHandler(async (_req, res) => {
@@ -67,6 +101,8 @@ module.exports = {
   loginVerify,
   loginUsername,
   me,
+  switchAccount,
+  listDeviceAccounts,
   logout,
   updateProfile,
 };

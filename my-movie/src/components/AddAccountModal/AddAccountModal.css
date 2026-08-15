@@ -1,0 +1,266 @@
+.add-account-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.add-account-modal {
+  position: fixed;
+  z-index: 1401;
+  --drag-y: 0px;
+  width: 90%;
+  max-width: 400px;
+  background-image:
+    linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%),
+    linear-gradient(135deg, rgb(15, 15, 18), rgb(45, 45, 50), rgb(25, 25, 28), rgb(15, 15, 18));
+  border: 1px solid rgba(70, 65, 80, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+}
+
+.add-account-modal--dragging {
+  transition: none;
+}
+
+.add-account-drag-handle {
+  display: none;
+  width: 40px;
+  height: 4px;
+  margin: 0.75rem auto 0.25rem;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.add-account-sheet-top {
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.add-account-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.add-account-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.add-account-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.add-account-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.add-account-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.15rem 1.35rem;
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+}
+
+.add-account-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(70, 65, 80, 0.45);
+  background: rgba(45, 45, 50, 0.28);
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.add-account-row:hover:not(:disabled) {
+  background: rgba(3, 19, 234, 0.18);
+  border-color: rgba(3, 19, 234, 0.55);
+}
+
+.add-account-row:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.add-account-row--active {
+  border-color: rgba(76, 175, 80, 0.45);
+  background: rgba(76, 175, 80, 0.08);
+}
+
+.add-account-row--create {
+  margin-top: 0.25rem;
+}
+
+.add-account-avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.add-account-avatar--add {
+  border-color: rgba(3, 19, 234, 0.75);
+  background: rgba(3, 19, 234, 0.28);
+  color: #fff;
+}
+
+.add-account-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.add-account-avatar-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.add-account-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.add-account-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.add-account-username {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.add-account-check {
+  flex-shrink: 0;
+  color: #69f0ae;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-account-busy {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  animation: add-account-spin 0.7s linear infinite;
+}
+
+@keyframes add-account-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.add-account-error {
+  margin: 0.35rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  background: rgba(244, 67, 54, 0.15);
+  color: #ff8a80;
+  font-size: 0.82rem;
+}
+
+.add-account-empty {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+/* Desktop — markazda, X close */
+@media (min-width: 769px) {
+  .add-account-modal {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 16px;
+  }
+
+  .add-account-drag-handle {
+    display: none !important;
+  }
+}
+
+/* Mobile — pastdan sheet, drag, X yo‘q */
+@media (max-width: 768px) {
+  .add-account-modal {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    transform: translateY(var(--drag-y, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .add-account-drag-handle {
+    display: block;
+  }
+
+  .add-account-close--desktop {
+    display: none !important;
+  }
+
+  .add-account-header {
+    justify-content: center;
+    padding-top: 0.35rem;
+  }
+
+  .add-account-title {
+    text-align: center;
+  }
+
+  .add-account-content {
+    max-height: 65vh;
+  }
+}

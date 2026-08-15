@@ -31,6 +31,7 @@ const userSlice = createSlice({
       state.authReady = true;
       if (user) {
         state.profile = parseStoredProfile({
+          id: user.id || user._id,
           name: user.name,
           username: user.username,
           bio: user.bio !== undefined ? user.bio : state.profile.bio,
@@ -48,13 +49,18 @@ const userSlice = createSlice({
       clearAuthStorage();
     },
     setProfile: (state, action) => {
-      state.profile = parseStoredProfile(action.payload);
+      state.profile = parseStoredProfile({
+        ...state.profile,
+        ...action.payload,
+        id: action.payload?.id ?? state.profile.id,
+      });
       state.isLoggedIn = true;
       writeProfileCache(state.profile);
     },
     updateProfile: (state, action) => {
       const data = action.payload || {};
       state.profile = {
+        id: data.id !== undefined ? String(data.id || '') : state.profile.id,
         name: data.name?.trim() || state.profile.name,
         username: normalizeUsername(
           data.username !== undefined ? data.username : state.profile.username

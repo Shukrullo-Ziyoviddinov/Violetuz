@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ProfileEditModal from '../components/Profile/ProfileEditModal';
+import AddAccountModal from '../components/AddAccountModal/AddAccountModal';
 import { useAuth } from '../context/AuthContext';
 import ProfileLanguageModal from '../components/Profile/ProfileLanguageModal';
 import ProfileContactModal from '../components/Profile/ProfileContactModal';
@@ -111,6 +112,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { profile, updateProfile, isLoggedIn, authReady } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddAccountModal, setShowAddAccountModal] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
@@ -296,7 +298,30 @@ const ProfilePage = () => {
               </div>
               <div className="profile-info">
                 <div className="profile-name-row">
-                  <div className="profile-name">{profile.name}</div>
+                  <button
+                    type="button"
+                    className="profile-name profile-name--switcher"
+                    onClick={() => setShowAddAccountModal(true)}
+                    aria-label="Hisoblar"
+                  >
+                    <span className="profile-name-text">{profile.name}</span>
+                    <svg
+                      className="profile-name-chevron"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      fill="none"
+                    >
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
                   <button
                     className="profile-edit-btn"
                     onClick={() => setShowEditModal(true)}
@@ -444,6 +469,10 @@ const ProfilePage = () => {
           onSave={handleSaveProfile}
           onClose={() => setShowEditModal(false)}
         />
+      )}
+
+      {showAddAccountModal && (
+        <AddAccountModal onClose={() => setShowAddAccountModal(false)} />
       )}
 
       {showLangModal && (

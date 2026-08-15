@@ -12,6 +12,11 @@ import {
   selectProfile,
   selectFeedProfileHeader,
 } from '../store/slices/userSlice';
+import {
+  upsertAccountFromSession,
+  patchActiveAccountProfile,
+  setActiveAccountId,
+} from '../accounts/accountsStorage';
 
 /** @deprecated Redux Provider yetarli — eski importlar buzilmasligi uchun qoldirilgan */
 export const AuthProvider = ({ children }) => children;
@@ -28,17 +33,31 @@ export const useAuth = () => {
   );
 
   const updateProfile = useCallback(
-    (data) => dispatch(updateProfileAction(data)),
+    (data) => {
+      dispatch(updateProfileAction(data));
+      patchActiveAccountProfile(data || {});
+    },
     [dispatch]
   );
 
   const setProfile = useCallback(
-    (data) => dispatch(setProfileAction(data)),
+    (data) => {
+      dispatch(setProfileAction(data));
+      if (data) {
+        patchActiveAccountProfile(data);
+      }
+    },
     [dispatch]
   );
 
   const setAuthSession = useCallback(
-    (payload) => dispatch(setAuthSessionAction(payload)),
+    (payload) => {
+      dispatch(setAuthSessionAction(payload));
+      const user = payload?.user;
+      if (user) {
+        upsertAccountFromSession(user);
+      }
+    },
     [dispatch]
   );
 
@@ -49,6 +68,7 @@ export const useAuth = () => {
       /* cookie yo‘q bo‘lsa ham UI tozalanadi */
     }
     dispatch(clearAuthSessionAction());
+    setActiveAccountId(null);
   }, [dispatch]);
 
   return {

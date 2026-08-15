@@ -108,7 +108,7 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
       setUsernameMessage('');
 
       try {
-        const data = await checkUsernameAvailable(clean);
+        const data = await checkUsernameAvailable(clean, { excludeSelf: true });
         if (reqId !== usernameReqIdRef.current) return;
         if (data?.available) {
           setUsernameStatus('available');

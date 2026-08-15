@@ -29,9 +29,10 @@ const parseJson = async (response) => {
   return body?.data ?? body;
 };
 
-export const checkUsernameAvailable = async (username) => {
+export const checkUsernameAvailable = async (username, { excludeSelf = false } = {}) => {
   const q = encodeURIComponent(String(username || '').trim());
-  const res = await authFetch(`/auth/username-available?username=${q}`);
+  const exclude = excludeSelf ? '&excludeSelf=1' : '';
+  const res = await authFetch(`/auth/username-available?username=${q}${exclude}`);
   return parseJson(res);
 };
 
@@ -83,6 +84,21 @@ export const fetchMe = async () => {
 
 export const logoutRequest = async () => {
   const res = await authFetch('/auth/logout', { method: 'POST' });
+  return parseJson(res);
+};
+
+/** Qurilmadagi boshqa hisobga o‘tish (httpOnly device cookie + userId) */
+export const switchAccountRequest = async ({ userId }) => {
+  const res = await authFetch('/auth/switch', {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+  });
+  return parseJson(res);
+};
+
+/** Shu qurilmaga bog‘langan hisoblar (server manba) */
+export const fetchDeviceAccounts = async () => {
+  const res = await authFetch('/auth/device-accounts');
   return parseJson(res);
 };
 

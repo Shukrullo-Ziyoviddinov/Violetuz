@@ -15,7 +15,7 @@ export function clearAuthModalHandler(fn) {
 
 /**
  * @param {'register'|'login'} [mode]
- * @param {{ step?: 'form'|'avatar' }} [options]
+ * @param {{ step?: 'form'|'avatar', copyVariant?: 'default'|'addAccount' }} [options]
  */
 export function requestOpenAuthModal(mode = 'register', options = {}) {
   authModalHandler?.(mode, options);

@@ -15,6 +15,8 @@ router.post('/login/start', authController.loginStart);
 router.post('/login/verify', authController.loginVerify);
 router.post('/login/username', authController.loginUsername);
 router.get('/me', optionalAuth, authController.me);
+router.get('/device-accounts', optionalAuth, authController.listDeviceAccounts);
+router.post('/switch', authController.switchAccount);
 router.post('/logout', authController.logout);
 router.patch('/profile', requireAuth, authController.updateProfile);
 

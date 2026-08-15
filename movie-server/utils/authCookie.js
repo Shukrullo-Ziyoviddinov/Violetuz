@@ -1,6 +1,8 @@
+const crypto = require('crypto');
 const { NODE_ENV, JWT_EXPIRES_IN } = require('../config/env');
 
 const AUTH_COOKIE_NAME = 'violet_auth';
+const DEVICE_COOKIE_NAME = 'violet_device';
 
 /** JWT_EXPIRES_IN (masalan 30d) → cookie maxAge (ms) */
 const parseExpiresToMs = (value) => {
@@ -15,17 +17,26 @@ const parseExpiresToMs = (value) => {
 
 const isProd = NODE_ENV === 'production';
 
-const getCookieOptions = () => ({
+/** Auth JWT — qisqa/o‘rtacha muddat */
+const getAuthCookieOptions = () => ({
   httpOnly: true,
   secure: isProd,
-  // Cross-site (Vercel ↔ Render) uchun productionda None; localda Lax
   sameSite: isProd ? 'none' : 'lax',
   path: '/',
   maxAge: parseExpiresToMs(JWT_EXPIRES_IN),
 });
 
+/** Qurilma kaliti — ko‘p hisob bog‘lash uchun uzoq muddat (1 yil) */
+const getDeviceCookieOptions = () => ({
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? 'none' : 'lax',
+  path: '/',
+  maxAge: 365 * 24 * 60 * 60 * 1000,
+});
+
 const setAuthCookie = (res, token) => {
-  res.cookie(AUTH_COOKIE_NAME, token, getCookieOptions());
+  res.cookie(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
 };
 
 const clearAuthCookie = (res) => {
@@ -37,8 +48,34 @@ const clearAuthCookie = (res) => {
   });
 };
 
+const hashDeviceKey = (raw) =>
+  crypto.createHash('sha256').update(String(raw)).digest('hex');
+
+/**
+ * httpOnly qurilma kalitini o‘qiydi yoki yangisini yozadi.
+ * JS localStorage ga token qo‘ymaydi — faqat server biladi.
+ */
+const ensureDeviceKey = (req, res) => {
+  const existing = req.cookies?.[DEVICE_COOKIE_NAME];
+  if (existing && String(existing).length >= 32) {
+    return String(existing);
+  }
+  const created = crypto.randomBytes(32).toString('hex');
+  res.cookie(DEVICE_COOKIE_NAME, created, getDeviceCookieOptions());
+  return created;
+};
+
+const readDeviceKey = (req) => {
+  const raw = req.cookies?.[DEVICE_COOKIE_NAME];
+  return raw && String(raw).length >= 32 ? String(raw) : null;
+};
+
 module.exports = {
   AUTH_COOKIE_NAME,
+  DEVICE_COOKIE_NAME,
   setAuthCookie,
   clearAuthCookie,
+  ensureDeviceKey,
+  readDeviceKey,
+  hashDeviceKey,
 };

@@ -658,6 +658,35 @@
   text-overflow: ellipsis;
 }
 
+.profile-name--switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.profile-name-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-name-chevron {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.profile-name--switcher:hover .profile-name-chevron {
+  color: #fff;
+}
+
 .profile-username {
   font-size: 0.82rem;
   font-weight: 500;

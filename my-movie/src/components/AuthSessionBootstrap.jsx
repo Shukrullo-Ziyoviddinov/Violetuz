@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { fetchMe } from '../api/authApi';
 import { useAppDispatch } from '../store/hooks';
 import { setAuthSession, clearAuthSession, setAuthReady } from '../store/slices/userSlice';
+import { upsertAccountFromSession } from '../accounts/accountsStorage';
 
 /** App ochilganda httpOnly cookie orqali sessiyani tiklaydi */
 const AuthSessionBootstrap = () => {
@@ -16,6 +17,7 @@ const AuthSessionBootstrap = () => {
         if (cancelled) return;
         if (data?.user) {
           dispatch(setAuthSession({ user: data.user }));
+          upsertAccountFromSession(data.user);
         } else {
           dispatch(clearAuthSession());
         }

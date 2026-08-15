@@ -1,6 +1,7 @@
 export const PROFILE_STORAGE_KEY = 'violet_profile';
 
 export const DEFAULT_PROFILE = {
+  id: '',
   name: '',
   username: '',
   bio: '',
@@ -26,7 +27,9 @@ export const parseStoredProfile = (parsed) => {
     (rawAvatar.startsWith('http://') || rawAvatar.startsWith('https://'))
       ? rawAvatar
       : null;
+  const id = parsed.id != null && parsed.id !== '' ? String(parsed.id) : '';
   return {
+    id,
     name: parsed.name?.trim() || '',
     username,
     bio,
