@@ -307,20 +307,103 @@
   cursor: pointer;
 }
 
+.auth-modal-card--avatar {
+  display: flex;
+  flex-direction: column;
+  min-height: min(520px, 88vh);
+}
+
+.auth-modal-card--avatar .auth-modal-subtitle {
+  margin-bottom: 1rem;
+}
+
 .auth-modal-avatar-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
+  min-height: 0;
 }
 
-.auth-modal-avatar-form .profile-edit-avatar-field {
-  margin-top: 0.35rem;
+.auth-modal-avatar-panel {
+  padding: 1.15rem 1rem;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.auth-modal-avatar-form .profile-edit-avatar-preview.profile-avatar-wrap {
-  width: 84px;
-  height: 84px;
+.auth-modal-avatar-field {
+  margin: 0;
+  gap: 0.85rem;
+}
+
+.auth-modal-avatar-row {
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.auth-modal-avatar-form .auth-modal-avatar-preview.profile-avatar-wrap {
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  border: 3px solid rgba(3, 19, 234, 0.85);
+  border: 3px solid rgba(3, 19, 234, 0.9);
+  background: rgba(8, 8, 12, 0.85);
   box-sizing: border-box;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.auth-modal-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.05rem;
+  border: 1px solid rgb(3, 19, 234);
+  border-radius: 12px;
+  background: rgba(3, 19, 234, 0.35);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.auth-modal-upload-btn:hover:not(:disabled) {
+  background: rgba(3, 19, 234, 0.5);
+  transform: translateY(-1px);
+}
+
+.auth-modal-upload-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-modal-upload-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.auth-modal-avatar-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.auth-modal-avatar-form .auth-modal-error {
+  margin-top: 0;
+}
+
+.auth-modal-submit--footer {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+.auth-modal-submit--footer:disabled {
+  opacity: 0.45;
+  background-color: #0313ea;
+  box-shadow: none;
 }
 
 @media (max-width: 480px) {
@@ -334,6 +417,24 @@
     max-height: 100%;
     border-radius: 0;
     padding: 4.5rem 1.25rem 2rem;
+  }
+
+  .auth-modal-card--avatar {
+    min-height: 100%;
+  }
+
+  .auth-modal-avatar-panel {
+    padding: 1.25rem 1rem;
+  }
+
+  .auth-modal-avatar-form .auth-modal-avatar-preview.profile-avatar-wrap {
+    width: 88px;
+    height: 88px;
+  }
+
+  .auth-modal-submit--footer {
+    margin-top: auto;
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
   .auth-modal-close {

@@ -333,7 +333,7 @@ const AuthModal = ({
         </button>
       ) : null}
 
-      <div className="auth-modal-card">
+      <div className={`auth-modal-card${step === 'avatar' ? ' auth-modal-card--avatar' : ''}`}>
         {step === 'form' ? (
           <>
             <h2 className="auth-modal-title">
@@ -682,73 +682,102 @@ const AuthModal = ({
             </p>
 
             <form className="auth-modal-form auth-modal-avatar-form" onSubmit={handleAvatarSubmit}>
-              <div className="profile-edit-field profile-edit-avatar-field">
-                <span className="profile-edit-avatar-heading" id="auth-avatar-heading">
-                  Avatar
-                </span>
-                <div className="profile-edit-avatar-row">
-                  <div className="profile-edit-avatar-preview profile-avatar-wrap" aria-hidden="true">
-                    {avatarPreview ? (
-                      <img src={avatarPreview} alt="" className="profile-edit-avatar-img" />
-                    ) : (
-                      <svg
-                        className="profile-edit-avatar-placeholder"
-                        width="40"
-                        height="40"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="profile-edit-avatar-actions">
-                    <input
-                      ref={avatarInputRef}
-                      type="file"
-                      accept={AVATAR_ACCEPT}
-                      className="profile-edit-avatar-input"
-                      aria-labelledby="auth-avatar-heading"
-                      onChange={handleAvatarFile}
-                    />
-                    <div className="profile-edit-avatar-btn-row">
-                      <button
-                        type="button"
-                        className="profile-edit-avatar-btn"
-                        onClick={() => avatarInputRef.current?.click()}
-                        disabled={busy}
-                      >
-                        Rasm yuklash
-                      </button>
+              <div className="auth-modal-avatar-panel">
+                <div className="profile-edit-field profile-edit-avatar-field auth-modal-avatar-field">
+                  <span className="profile-edit-avatar-heading" id="auth-avatar-heading">
+                    Avatar
+                  </span>
+                  <div className="profile-edit-avatar-row auth-modal-avatar-row">
+                    <div
+                      className="profile-edit-avatar-preview profile-avatar-wrap auth-modal-avatar-preview"
+                      aria-hidden="true"
+                    >
                       {avatarPreview ? (
+                        <img src={avatarPreview} alt="" className="profile-edit-avatar-img" />
+                      ) : (
+                        <svg
+                          className="profile-edit-avatar-placeholder"
+                          width="44"
+                          height="44"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="profile-edit-avatar-actions">
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept={AVATAR_ACCEPT}
+                        className="profile-edit-avatar-input"
+                        aria-labelledby="auth-avatar-heading"
+                        onChange={handleAvatarFile}
+                      />
+                      <div className="profile-edit-avatar-btn-row">
                         <button
                           type="button"
-                          className="profile-edit-avatar-remove"
-                          onClick={handleRemoveAvatar}
+                          className="profile-edit-avatar-btn auth-modal-upload-btn"
+                          onClick={() => avatarInputRef.current?.click()}
                           disabled={busy}
-                          aria-label="Rasmni olib tashlash"
-                          title="Rasmni olib tashlash"
                         >
                           <svg
-                            className="profile-edit-avatar-remove-icon"
-                            width="20"
-                            height="20"
+                            className="auth-modal-upload-icon"
+                            width="18"
+                            height="18"
                             viewBox="0 0 24 24"
                             aria-hidden="true"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
-                              d="M9 3v1H4v2h1v13a2 2 0 002 2h10a2 2 0 002-2V6h1V4h-5V3H9zm0 5h2v9H9V8zm4 0h2v9h-2V8z"
-                              fill="currentColor"
+                              d="M12 16V4m0 0l-4 4m4-4l4 4"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M4 16.5V18a2 2 0 002 2h12a2 2 0 002-2v-1.5"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
                             />
                           </svg>
+                          Rasm yuklash
                         </button>
-                      ) : null}
+                        {avatarPreview ? (
+                          <button
+                            type="button"
+                            className="profile-edit-avatar-remove"
+                            onClick={handleRemoveAvatar}
+                            disabled={busy}
+                            aria-label="Rasmni olib tashlash"
+                            title="Rasmni olib tashlash"
+                          >
+                            <svg
+                              className="profile-edit-avatar-remove-icon"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M9 3v1H4v2h1v13a2 2 0 002 2h10a2 2 0 002-2V6h1V4h-5V3H9zm0 5h2v9H9V8zm4 0h2v9h-2V8z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </button>
+                        ) : null}
+                      </div>
+                      <p className="auth-modal-avatar-hint">JPEG, PNG, WebP · max 2 MB</p>
                     </div>
                   </div>
                 </div>
@@ -758,7 +787,7 @@ const AuthModal = ({
 
               <button
                 type="submit"
-                className="auth-modal-submit"
+                className="auth-modal-submit auth-modal-submit--footer"
                 disabled={busy || !avatarReady}
               >
                 {busy ? 'Yuklanmoqda...' : 'Davom etish'}
