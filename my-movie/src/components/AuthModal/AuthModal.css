@@ -307,6 +307,22 @@
   cursor: pointer;
 }
 
+.auth-modal-avatar-form {
+  gap: 1rem;
+}
+
+.auth-modal-avatar-form .profile-edit-avatar-field {
+  margin-top: 0.35rem;
+}
+
+.auth-modal-avatar-form .profile-edit-avatar-preview.profile-avatar-wrap {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 3px solid rgba(3, 19, 234, 0.85);
+  box-sizing: border-box;
+}
+
 @media (max-width: 480px) {
   .auth-modal-overlay {
     padding: 0;

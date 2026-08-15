@@ -7,16 +7,29 @@ import {
   loginWithUsername,
   registerStart,
   registerVerify,
+  updateProfileRequest,
 } from '../../api/authApi';
+import { uploadFileDirectToR2 } from '../../api/uploadsApi';
+import { markNeedsAvatar, clearNeedsAvatar } from '../../authModalBridge';
+import '../Profile/ProfileEditModal.css';
 import './AuthModal.css';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const AVATAR_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif,image/gif';
+const AVATAR_MIME = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+  'image/gif',
+]);
 
-const AuthModal = ({ initialMode = 'register', onClose }) => {
-  const { setAuthSession } = useAuth();
+const AuthModal = ({ initialMode = 'register', initialStep = 'form', onClose }) => {
+  const { setAuthSession, updateProfile } = useAuth();
   const [mode, setMode] = useState(initialMode === 'login' ? 'login' : 'register');
-  const [step, setStep] = useState('form'); // form | verify
+  const [step, setStep] = useState(initialStep === 'avatar' ? 'avatar' : 'form');
   const [loginMethod, setLoginMethod] = useState('gmail'); // gmail | username
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -29,23 +42,44 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
   /** idle | checking | available | taken | invalid */
   const [usernameStatus, setUsernameStatus] = useState('idle');
   const [usernameMessage, setUsernameMessage] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState(null);
   const usernameTimerRef = useRef(null);
   const usernameReqIdRef = useRef(0);
+  const avatarInputRef = useRef(null);
+  const pendingFileRef = useRef(null);
+  const previewUrlRef = useRef(null);
+
+  const revokePreviewUrl = useCallback(() => {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+  }, []);
+
+  const resetAvatarPick = useCallback(() => {
+    revokePreviewUrl();
+    pendingFileRef.current = null;
+    setAvatarPreview(null);
+  }, [revokePreviewUrl]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prev;
+      revokePreviewUrl();
     };
-  }, []);
+  }, [revokePreviewUrl]);
 
   useEffect(() => {
     setMode(initialMode === 'login' ? 'login' : 'register');
-    setStep('form');
+    setStep(initialStep === 'avatar' ? 'avatar' : 'form');
     setError('');
     setCode('');
-  }, [initialMode]);
+    if (initialStep !== 'avatar') {
+      resetAvatarPick();
+    }
+  }, [initialMode, initialStep, resetAvatarPick]);
 
   const runUsernameCheck = useCallback(async (value) => {
     const clean = value.trim().replace(/^@+/, '');
@@ -120,6 +154,7 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
     setLoginMethod('gmail');
     setUsernameStatus('idle');
     setUsernameMessage('');
+    resetAvatarPick();
   };
 
   const handleFormSubmit = async (e) => {
@@ -199,9 +234,73 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
           : await loginVerify(payload);
 
       setAuthSession({ user: data.user });
-      onClose?.();
+
+      if (mode === 'register') {
+        markNeedsAvatar();
+        resetAvatarPick();
+        setStep('avatar');
+        setError('');
+      } else {
+        onClose?.();
+      }
     } catch (err) {
       setError(err.message || 'Kod noto‘g‘ri');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleAvatarFile = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!AVATAR_MIME.has(file.type)) {
+      setError('Faqat JPEG, PNG, WebP, AVIF yoki GIF');
+      return;
+    }
+    if (file.size > MAX_AVATAR_BYTES) {
+      setError('Rasm 2 MB dan katta bo‘lmasligi kerak');
+      return;
+    }
+
+    revokePreviewUrl();
+    const previewUrl = URL.createObjectURL(file);
+    previewUrlRef.current = previewUrl;
+    pendingFileRef.current = file;
+    setAvatarPreview(previewUrl);
+    setError('');
+  };
+
+  const handleRemoveAvatar = () => {
+    resetAvatarPick();
+    setError('');
+  };
+
+  const handleAvatarSubmit = async (e) => {
+    e.preventDefault();
+    if (!pendingFileRef.current || busy) {
+      setError('Profil rasmini yuklash majburiy');
+      return;
+    }
+
+    setError('');
+    setBusy(true);
+    try {
+      const { publicUrl } = await uploadFileDirectToR2({
+        folder: 'avatars',
+        file: pendingFileRef.current,
+      });
+
+      const data = await updateProfileRequest({ avatar: publicUrl });
+      const savedAvatar = data.user?.avatar || publicUrl;
+
+      updateProfile({ avatar: savedAvatar });
+      clearNeedsAvatar();
+      revokePreviewUrl();
+      pendingFileRef.current = null;
+      onClose?.();
+    } catch (err) {
+      setError(err.message || 'Rasm yuklanmadi');
     } finally {
       setBusy(false);
     }
@@ -218,6 +317,9 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
     .filter(Boolean)
     .join(' ');
 
+  const avatarReady = Boolean(avatarPreview);
+  const canClose = step !== 'avatar';
+
   return (
     <div className="auth-modal-overlay" role="dialog" aria-modal="true">
       <div
@@ -227,14 +329,16 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
       />
       <div className="auth-modal-scrim" aria-hidden="true" />
 
-      <button
-        type="button"
-        className="auth-modal-close"
-        onClick={onClose}
-        aria-label="Yopish"
-      >
-        ×
-      </button>
+      {canClose ? (
+        <button
+          type="button"
+          className="auth-modal-close"
+          onClick={onClose}
+          aria-label="Yopish"
+        >
+          ×
+        </button>
+      ) : null}
 
       <div className="auth-modal-card">
         {step === 'form' ? (
@@ -528,7 +632,7 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
               )}
             </p>
           </>
-        ) : (
+        ) : step === 'verify' ? (
           <>
             <h2 className="auth-modal-title">Kodni tasdiqlang</h2>
             <p className="auth-modal-subtitle">
@@ -573,6 +677,97 @@ const AuthModal = ({ initialMode = 'register', onClose }) => {
                 disabled={busy}
               >
                 Orqaga
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <h2 className="auth-modal-title">Profil rasmi</h2>
+            <p className="auth-modal-subtitle">
+              Davom etish uchun profil rasmingizni yuklang
+            </p>
+
+            <form className="auth-modal-form auth-modal-avatar-form" onSubmit={handleAvatarSubmit}>
+              <div className="profile-edit-field profile-edit-avatar-field">
+                <span className="profile-edit-avatar-heading" id="auth-avatar-heading">
+                  Avatar
+                </span>
+                <div className="profile-edit-avatar-row">
+                  <div className="profile-edit-avatar-preview profile-avatar-wrap" aria-hidden="true">
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="" className="profile-edit-avatar-img" />
+                    ) : (
+                      <svg
+                        className="profile-edit-avatar-placeholder"
+                        width="40"
+                        height="40"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="profile-edit-avatar-actions">
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept={AVATAR_ACCEPT}
+                      className="profile-edit-avatar-input"
+                      aria-labelledby="auth-avatar-heading"
+                      onChange={handleAvatarFile}
+                    />
+                    <div className="profile-edit-avatar-btn-row">
+                      <button
+                        type="button"
+                        className="profile-edit-avatar-btn"
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={busy}
+                      >
+                        Rasm yuklash
+                      </button>
+                      {avatarPreview ? (
+                        <button
+                          type="button"
+                          className="profile-edit-avatar-remove"
+                          onClick={handleRemoveAvatar}
+                          disabled={busy}
+                          aria-label="Rasmni olib tashlash"
+                          title="Rasmni olib tashlash"
+                        >
+                          <svg
+                            className="profile-edit-avatar-remove-icon"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9 3v1H4v2h1v13a2 2 0 002 2h10a2 2 0 002-2V6h1V4h-5V3H9zm0 5h2v9H9V8zm4 0h2v9h-2V8z"
+                              fill="currentColor"
+                            />
+                          </svg>
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {error ? <p className="auth-modal-error">{error}</p> : null}
+
+              <button
+                type="submit"
+                className="auth-modal-submit"
+                disabled={busy || !avatarReady}
+              >
+                {busy ? 'Yuklanmoqda...' : 'Davom etish'}
               </button>
             </form>
           </>
