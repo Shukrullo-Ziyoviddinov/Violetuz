@@ -357,15 +357,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.65rem 1.05rem;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
   border: 1px solid rgb(3, 19, 234);
-  border-radius: 12px;
+  border-radius: 8px;
   background: rgba(3, 19, 234, 0.35);
   color: #fff;
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 600;
   line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.15s ease;
 }
@@ -383,6 +384,27 @@
 .auth-modal-upload-icon {
   display: block;
   flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+
+.auth-modal-avatar-form .profile-edit-avatar-btn-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.auth-modal-avatar-form .profile-edit-avatar-remove {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.auth-modal-avatar-form .profile-edit-avatar-remove-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .auth-modal-avatar-hint {

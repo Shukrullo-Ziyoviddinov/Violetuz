@@ -127,9 +127,9 @@
 .profile-edit-avatar-btn-row {
   display: flex;
   flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .profile-edit-avatar-input {
@@ -145,12 +145,12 @@
 }
 
 .profile-edit-avatar-btn {
-  padding: 0.55rem 1rem;
-  border-radius: 10px;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
   background-color: rgba(3, 19, 234, 0.3);
   border-color: rgb(3, 19, 234);
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
@@ -166,11 +166,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #c62828;
   color: #fff;
   cursor: pointer;
