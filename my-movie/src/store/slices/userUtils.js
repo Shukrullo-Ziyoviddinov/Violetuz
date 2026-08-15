@@ -6,6 +6,7 @@ export const DEFAULT_PROFILE = {
   bio: '',
   avatar: null,
   email: '',
+  role: 'user',
 };
 
 /** @siz saqlanadi; ko‘rinishda @ qo‘shiladi */
@@ -18,12 +19,20 @@ export const parseStoredProfile = (parsed) => {
   const usernameRaw = parsed.username ?? parsed.surname ?? '';
   const username = normalizeUsername(usernameRaw);
   const bio = (parsed.bio ?? parsed.phone ?? '').trim() || '';
+  const rawAvatar = parsed.avatar ?? null;
+  // Drop legacy base64 avatars — only HTTP(S) R2 URLs are kept
+  const avatar =
+    typeof rawAvatar === 'string' &&
+    (rawAvatar.startsWith('http://') || rawAvatar.startsWith('https://'))
+      ? rawAvatar
+      : null;
   return {
     name: parsed.name?.trim() || '',
     username,
     bio,
-    avatar: parsed.avatar ?? null,
+    avatar,
     email: parsed.email?.trim() || '',
+    role: parsed.role === 'admin' ? 'admin' : 'user',
   };
 };
 

@@ -6,6 +6,8 @@ const AuthOtp = require('../models/AuthOtp.model');
 const { sendOtpEmail } = require('./brevoEmail.service');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/env');
 const { badRequest, notFound, createHttpError } = require('../utils/errors');
+const { syncAdminRole } = require('../utils/adminRole');
+const { assertR2MediaUrl } = require('../utils/assertR2MediaUrl');
 
 const OTP_TTL_MS = 2 * 60 * 1000;
 const OTP_MAX_ATTEMPTS = 5;
@@ -32,6 +34,13 @@ const publicUserPayload = (user, token) => ({
   token,
   user: user.toPublicJSON(),
 });
+
+/** Sync ADMIN_EMAILS/USERNAMES → role, then issue JWT + public user */
+const issueAuthSession = async (user) => {
+  const synced = await syncAdminRole(user);
+  const token = signToken(synced);
+  return publicUserPayload(synced, token);
+};
 
 const assertUsernameFormat = (username) => {
   if (username.includes('-')) {
@@ -198,8 +207,7 @@ const verifyRegister = async ({ email, code }) => {
   });
 
   await otp.deleteOne();
-  const token = signToken(user);
-  return publicUserPayload(user, token);
+  return issueAuthSession(user);
 };
 
 const startLogin = async ({ email }) => {
@@ -257,8 +265,7 @@ const loginWithUsername = async ({ username, password }) => {
     throw createHttpError(401, 'Parol yoki username xato');
   }
 
-  const token = signToken(user);
-  return publicUserPayload(user, token);
+  return issueAuthSession(user);
 };
 
 const verifyLogin = async ({ email, code }) => {
@@ -297,11 +304,10 @@ const verifyLogin = async ({ email, code }) => {
   }
 
   await otp.deleteOne();
-  const token = signToken(user);
-  return publicUserPayload(user, token);
+  return issueAuthSession(user);
 };
 
-const updateProfile = async (userId, { name, username, bio }) => {
+const updateProfile = async (userId, { name, username, bio, avatar }) => {
   const user = await User.findById(userId);
   if (!user) {
     throw notFound('Foydalanuvchi topilmadi');
@@ -328,10 +334,21 @@ const updateProfile = async (userId, { name, username, bio }) => {
     throw badRequest(`Bio maksimal ${BIO_MAX_CHARS} belgi`);
   }
 
+  const cleanAvatar = assertR2MediaUrl(avatar, {
+    field: 'avatar',
+    allowEmpty: true,
+    allowLegacyRelative: false,
+    requirePrefix: 'avatars/',
+    maxLength: 500,
+  });
+
   user.name = trimmedName;
   user.username = cleanUsername;
   user.usernameNormalized = usernameNormalized;
   user.bio = cleanBio;
+  if (cleanAvatar !== undefined) {
+    user.avatar = cleanAvatar;
+  }
   await user.save();
 
   return user.toPublicJSON();

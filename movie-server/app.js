@@ -31,8 +31,9 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+// Auth/admin JSON only — media goes direct-to-R2 (no base64 bodies)
+app.use(express.json({ limit: '256kb' }));
+app.use(express.urlencoded({ extended: true, limit: '256kb' }));
 
 if (NODE_ENV !== 'production') {
   app.use(morgan('dev'));

@@ -34,8 +34,9 @@ const userSlice = createSlice({
           name: user.name,
           username: user.username,
           bio: user.bio !== undefined ? user.bio : state.profile.bio,
-          avatar: state.profile.avatar,
+          avatar: user.avatar !== undefined ? user.avatar || null : state.profile.avatar,
           email: user.email,
+          role: user.role,
         });
         writeProfileCache(state.profile);
       }
@@ -61,6 +62,7 @@ const userSlice = createSlice({
         bio: data.bio !== undefined ? String(data.bio).trim() : state.profile.bio,
         avatar: data.avatar !== undefined ? data.avatar : state.profile.avatar,
         email: data.email !== undefined ? data.email : state.profile.email,
+        role: data.role === 'admin' ? 'admin' : data.role === 'user' ? 'user' : state.profile.role,
       };
       state.isLoggedIn = true;
       writeProfileCache(state.profile);

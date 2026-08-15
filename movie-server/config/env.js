@@ -13,6 +13,33 @@ const BREVO_SENDER_EMAIL = String(process.env.BREVO_SENDER_EMAIL || '').trim();
 const BREVO_SENDER_NAME = String(process.env.BREVO_SENDER_NAME || 'VioletPlay').trim();
 const JWT_SECRET = process.env.JWT_SECRET || 'violet-dev-jwt-secret-change-me';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '30d';
+
+const R2_ACCOUNT_ID = String(process.env.R2_ACCOUNT_ID || '').trim();
+const R2_ACCESS_KEY_ID = String(process.env.R2_ACCESS_KEY_ID || '').trim();
+const R2_SECRET_ACCESS_KEY = String(process.env.R2_SECRET_ACCESS_KEY || '').trim();
+const R2_BUCKET_NAME = String(process.env.R2_BUCKET_NAME || 'violetplay').trim();
+const R2_PUBLIC_URL = String(process.env.R2_PUBLIC_URL || '')
+  .trim()
+  .replace(/\/+$/, '');
+const R2_ENDPOINT = String(
+  process.env.R2_ENDPOINT ||
+    (R2_ACCOUNT_ID ? `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : '')
+).trim();
+
+/** Comma-separated emails/usernames promoted to admin on login/me */
+const ADMIN_EMAILS = new Set(
+  String(process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean)
+);
+const ADMIN_USERNAMES = new Set(
+  String(process.env.ADMIN_USERNAMES || '')
+    .split(',')
+    .map((item) => item.trim().toLowerCase().replace(/^@+/, ''))
+    .filter(Boolean)
+);
+
 const ALLOWED_ORIGINS = Array.from(
   new Set([
     CLIENT_URL,
@@ -37,4 +64,12 @@ module.exports = {
   BREVO_SENDER_NAME,
   JWT_SECRET,
   JWT_EXPIRES_IN,
+  R2_ACCOUNT_ID,
+  R2_ACCESS_KEY_ID,
+  R2_SECRET_ACCESS_KEY,
+  R2_ENDPOINT,
+  R2_BUCKET_NAME,
+  R2_PUBLIC_URL,
+  ADMIN_EMAILS,
+  ADMIN_USERNAMES,
 };

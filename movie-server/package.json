@@ -30,6 +30,10 @@
     "seed:music-sections": "node seeds/seedMusicSections.js",
     "seed:music-page-content": "node seeds/seedMusicPageContent.js",
     "seed:clip-sections": "node seeds/seedClipSections.js",
+    "migrate:media-to-r2": "node scripts/migrateMediaToR2.js",
+    "migrate:media-to-r2:dry": "node scripts/migrateMediaToR2.js --dry-run",
+    "prune:public-media": "node scripts/prunePublicCatalogMedia.js",
+    "prune:public-media:execute": "node scripts/prunePublicCatalogMedia.js --execute",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -37,6 +41,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1111.0",
+    "@aws-sdk/s3-request-presigner": "^3.1111.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

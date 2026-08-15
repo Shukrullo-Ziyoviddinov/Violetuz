@@ -11,6 +11,11 @@
 # production
 /build
 
+# env / secrets — never commit
+.env
+.env.*
+!.env.example
+
 # misc
 .DS_Store
 .env.local
@@ -21,3 +26,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Large catalog media: keep in public/ until Variant D migrate to R2 succeeds.
+# Only ignore AFTER migrate+CDN rewrite, then prune. Do not ignore while using /img|/video paths.
+# /public/video/
+# /public/music/*.mp3

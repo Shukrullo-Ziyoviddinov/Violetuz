@@ -1,19 +1,32 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { checkUsernameAvailable, updateProfileRequest } from '../../api/authApi';
+import { uploadFileDirectToR2, deleteUpload } from '../../api/uploadsApi';
 import './ProfileEditModal.css';
 
 const normalizeUsername = (raw) => (raw ?? '').trim().replace(/^@+/, '').trim();
 const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 const BIO_MAX_CHARS = 65;
+const AVATAR_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif,image/gif';
+const AVATAR_MIME = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+  'image/gif',
+]);
+
+const isHttpUrl = (value) =>
+  typeof value === 'string' &&
+  (value.startsWith('http://') || value.startsWith('https://'));
 
 const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const { t } = useTranslation();
   const [name, setName] = useState(profile.name || '');
   const [username, setUsername] = useState(normalizeUsername(profile.username));
   const [bio, setBio] = useState(profile.bio || '');
-  const [avatar, setAvatar] = useState(profile.avatar ?? null);
+  const [avatar, setAvatar] = useState(profile.avatar || null);
   const [dragY, setDragY] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -24,6 +37,10 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const avatarInputRef = useRef(null);
   const usernameTimerRef = useRef(null);
   const usernameReqIdRef = useRef(0);
+  const pendingFileRef = useRef(null);
+  const previewUrlRef = useRef(null);
+  const initialAvatarRef = useRef(profile.avatar || null);
+  const avatarRemovedRef = useRef(false);
   const originalUsername = normalizeUsername(profile.username).toLowerCase();
 
   const isNameInvalid = !name.trim() || name.trim().length < 2;
@@ -31,15 +48,26 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const isFormValid = !isNameInvalid && usernameOk && !busy;
   const bioRemaining = BIO_MAX_CHARS - bio.length;
 
+  const revokePreviewUrl = useCallback(() => {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
     setName(profile.name || '');
     setUsername(normalizeUsername(profile.username));
     setBio(profile.bio || '');
-    setAvatar(profile.avatar ?? null);
+    revokePreviewUrl();
+    pendingFileRef.current = null;
+    avatarRemovedRef.current = false;
+    initialAvatarRef.current = profile.avatar || null;
+    setAvatar(profile.avatar || null);
     setUsernameStatus('same');
     setUsernameMessage('');
     setError('');
-  }, [profile]);
+  }, [profile, revokePreviewUrl]);
 
   useEffect(() => {
     if (window.innerWidth <= 768) {
@@ -47,8 +75,9 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
     }
     return () => {
       document.body.style.overflow = '';
+      revokePreviewUrl();
     };
-  }, []);
+  }, [revokePreviewUrl]);
 
   const runUsernameCheck = useCallback(
     async (value) => {
@@ -142,17 +171,39 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const handleAvatarFile = (e) => {
     const file = e.target.files?.[0];
     e.target.value = '';
-    if (!file || !file.type.startsWith('image/')) return;
+    if (!file) return;
+    if (!AVATAR_MIME.has(file.type)) {
+      setError('Faqat JPEG, PNG, WebP, AVIF yoki GIF');
+      return;
+    }
     if (file.size > MAX_AVATAR_BYTES) {
       window.alert(t('profile.avatarTooLarge'));
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      setAvatar(typeof result === 'string' ? result : null);
-    };
-    reader.readAsDataURL(file);
+
+    revokePreviewUrl();
+    const previewUrl = URL.createObjectURL(file);
+    previewUrlRef.current = previewUrl;
+    pendingFileRef.current = file;
+    avatarRemovedRef.current = false;
+    setAvatar(previewUrl);
+    setError('');
+  };
+
+  const handleRemoveAvatar = () => {
+    revokePreviewUrl();
+    pendingFileRef.current = null;
+    avatarRemovedRef.current = true;
+    setAvatar(null);
+  };
+
+  const maybeDeleteOldAvatar = async (oldUrl) => {
+    if (!isHttpUrl(oldUrl)) return;
+    try {
+      await deleteUpload({ url: oldUrl });
+    } catch {
+      /* eski fayl o‘chmasa ham yangi avatar saqlanishi kerak */
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -160,17 +211,50 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
     if (!isFormValid || busy) return;
     setError('');
     setBusy(true);
+
+    const previousAvatar = initialAvatarRef.current;
+    let nextAvatar = previousAvatar || '';
+
     try {
-      const data = await updateProfileRequest({
+      if (pendingFileRef.current) {
+        const { publicUrl } = await uploadFileDirectToR2({
+          folder: 'avatars',
+          file: pendingFileRef.current,
+        });
+        nextAvatar = publicUrl;
+        if (previousAvatar && previousAvatar !== publicUrl) {
+          await maybeDeleteOldAvatar(previousAvatar);
+        }
+      } else if (avatarRemovedRef.current) {
+        nextAvatar = '';
+        if (previousAvatar) {
+          await maybeDeleteOldAvatar(previousAvatar);
+        }
+      }
+
+      const payload = {
         name: name.trim(),
         username: normalizeUsername(username),
         bio,
-      });
+      };
+
+      if (pendingFileRef.current || avatarRemovedRef.current) {
+        payload.avatar = nextAvatar;
+      }
+
+      const data = await updateProfileRequest(payload);
+      const savedAvatar =
+        data.user?.avatar !== undefined ? data.user.avatar || null : nextAvatar || null;
+
+      revokePreviewUrl();
+      pendingFileRef.current = null;
+      avatarRemovedRef.current = false;
+
       onSave({
         name: data.user?.name ?? name.trim(),
         username: data.user?.username ?? normalizeUsername(username),
         bio: data.user?.bio ?? bio,
-        avatar,
+        avatar: savedAvatar,
       });
     } catch (err) {
       setError(err.message || 'Saqlab bo‘lmadi');
@@ -245,7 +329,7 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
                 <input
                   ref={avatarInputRef}
                   type="file"
-                  accept="image/*"
+                  accept={AVATAR_ACCEPT}
                   className="profile-edit-avatar-input"
                   aria-labelledby="profile-avatar-heading"
                   onChange={handleAvatarFile}
@@ -255,6 +339,7 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
                     type="button"
                     className="profile-edit-avatar-btn"
                     onClick={() => avatarInputRef.current?.click()}
+                    disabled={busy}
                   >
                     {t('profile.uploadPhoto')}
                   </button>
@@ -262,7 +347,8 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
                     <button
                       type="button"
                       className="profile-edit-avatar-remove"
-                      onClick={() => setAvatar(null)}
+                      onClick={handleRemoveAvatar}
+                      disabled={busy}
                       aria-label={t('profile.removeAvatar')}
                       title={t('profile.removeAvatar')}
                     >

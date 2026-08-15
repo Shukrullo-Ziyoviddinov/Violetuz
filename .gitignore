@@ -1,0 +1,8 @@
+# Repo-wide ignores (each package also has its own .gitignore)
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+*.log
+.vercel

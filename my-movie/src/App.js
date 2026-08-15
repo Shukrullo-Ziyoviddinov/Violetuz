@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navbar from './components/Navbar/Navbar';
 import NavbarMobile from './components/Navbar/NavbarMobile';
@@ -23,6 +23,7 @@ import LikeHistoryPage from './pages/LikeHistoryPage';
 import RatingPage from './pages/RatingPage';
 import TrailerPage from './pages/TrailerPage';
 import TrillerPage from './pages/TrillerPage';
+import AdminPage from './pages/admin/AdminPage';
 import MovieDetail from './components/MovieDetail/MovieDetail';
 import PullToRefresh from './components/PullToRefresh/PullToRefresh';
 import AuthModalHost from './components/AuthModal/AuthModalHost';
@@ -43,6 +44,59 @@ function MusicDetailWithKey() {
   return <MusicDetail />;
 }
 
+function AppShell() {
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith('/admin');
+
+  if (isAdmin) {
+    return (
+      <>
+        <Routes>
+          <Route path="/admin/*" element={<AdminPage />} />
+        </Routes>
+        <AuthModalHost />
+      </>
+    );
+  }
+
+  return (
+    <PullToRefresh>
+      <div className="App">
+        <Navbar />
+        <main className="App-main">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/feed" element={<FeedPage />} />
+            <Route path="/category/:categoryId" element={<RecommendedPage />} />
+            <Route path="/similar-movies/:movieId" element={<RecommendedPage />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+            <Route path="/movie/:id/trailer" element={<TrailerPage />} />
+            <Route path="/triller" element={<TrillerPage />} />
+            <Route path="/triller/:id" element={<TrillerPage />} />
+            <Route path="/recommended" element={<RecommendedPage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/shorts" element={<ShortsPage />} />
+            <Route path="/music" element={<MusicPage />} />
+            <Route path="/music/shorts" element={<MusicShortsPage />} />
+            <Route path="/music/more" element={<MusicMorePage />} />
+            <Route path="/music/more/:section" element={<MusicMorePage />} />
+            <Route path="/music/artist/:id" element={<ArtistDetail />} />
+            <Route path="/music/album/:id" element={<MusicAlbumDetail />} />
+            <Route path="/music/video/:id" element={<VideoPage />} />
+            <Route path="/music/:id" element={<MusicDetailWithKey />} />
+            <Route path="/actor/:id" element={<ActorsPage />} />
+            <Route path="/like-history" element={<LikeHistoryPage />} />
+            <Route path="/rating-page" element={<RatingPage />} />
+          </Routes>
+        </main>
+        <NavbarMobile />
+        <AuthModalHost />
+      </div>
+    </PullToRefresh>
+  );
+}
+
 function App() {
   return (
     <Provider store={store}>
@@ -57,40 +111,7 @@ function App() {
                   <ContentLanguageProvider>
                     <MusicPlayerProvider>
                       <LoadingProvider>
-                        <PullToRefresh>
-                          <div className="App">
-                            <Navbar />
-                            <main className="App-main">
-                              <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/feed" element={<FeedPage />} />
-                                <Route path="/category/:categoryId" element={<RecommendedPage />} />
-                                <Route path="/similar-movies/:movieId" element={<RecommendedPage />} />
-                                <Route path="/movie/:id" element={<MovieDetail />} />
-                                <Route path="/movie/:id/trailer" element={<TrailerPage />} />
-                                <Route path="/triller" element={<TrillerPage />} />
-                                <Route path="/triller/:id" element={<TrillerPage />} />
-                                <Route path="/recommended" element={<RecommendedPage />} />
-                                <Route path="/wishlist" element={<WishlistPage />} />
-                                <Route path="/profile" element={<ProfilePage />} />
-                                <Route path="/shorts" element={<ShortsPage />} />
-                                <Route path="/music" element={<MusicPage />} />
-                                <Route path="/music/shorts" element={<MusicShortsPage />} />
-                                <Route path="/music/more" element={<MusicMorePage />} />
-                                <Route path="/music/more/:section" element={<MusicMorePage />} />
-                                <Route path="/music/artist/:id" element={<ArtistDetail />} />
-                                <Route path="/music/album/:id" element={<MusicAlbumDetail />} />
-                                <Route path="/music/video/:id" element={<VideoPage />} />
-                                <Route path="/music/:id" element={<MusicDetailWithKey />} />
-                                <Route path="/actor/:id" element={<ActorsPage />} />
-                                <Route path="/like-history" element={<LikeHistoryPage />} />
-                                <Route path="/rating-page" element={<RatingPage />} />
-                              </Routes>
-                            </main>
-                            <NavbarMobile />
-                            <AuthModalHost />
-                          </div>
-                        </PullToRefresh>
+                        <AppShell />
                       </LoadingProvider>
                     </MusicPlayerProvider>
                   </ContentLanguageProvider>

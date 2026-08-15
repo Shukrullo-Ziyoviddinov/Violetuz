@@ -53,6 +53,43 @@ class BannerService {
     await item.save();
     return stripMongoId(item);
   }
+
+  async update(id, data) {
+    const numericId = Number(id);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      throw badRequest(`Invalid banner id: ${id}`);
+    }
+
+    const item = await BannerModel.findOne({ id: numericId });
+    if (!item) {
+      throw notFound(`Banner not found: ${id}`);
+    }
+
+    const patch = { ...(data || {}) };
+    delete patch.id;
+
+    if (patch.lang !== undefined) item.lang = String(patch.lang).trim();
+    if (patch.movieId !== undefined) item.movieId = Number(patch.movieId);
+    if (patch.image !== undefined) item.image = patch.image;
+    if (patch.video !== undefined) item.video = patch.video;
+
+    await item.save();
+    return stripMongoId(item);
+  }
+
+  async remove(id) {
+    const numericId = Number(id);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      throw badRequest(`Invalid banner id: ${id}`);
+    }
+
+    const item = await BannerModel.findOneAndDelete({ id: numericId }).lean();
+    if (!item) {
+      throw notFound(`Banner not found: ${id}`);
+    }
+
+    return stripMongoId(item);
+  }
 }
 
 module.exports = new BannerService();

@@ -466,7 +466,7 @@ const Banner = () => {
                     onLoad={() => markSrcReady(src)}
                     onError={(e) => {
                         markSrcReady(src);
-                        e.target.src = normalizeImagePath('/img/no-image.png');
+                        e.target.src = normalizeImagePath('/img/movie1.jpg');
                     }}
                 />
                 {isActiveCenter && videoSrc ? (

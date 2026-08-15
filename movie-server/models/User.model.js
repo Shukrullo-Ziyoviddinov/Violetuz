@@ -50,6 +50,19 @@ const userSchema = new mongoose.Schema(
       maxlength: 65,
       default: '',
     },
+    /** Public R2 URL (or empty). Never store base64. */
+    avatar: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: '',
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+      index: true,
+    },
   },
   {
     timestamps: true,
@@ -64,8 +77,14 @@ userSchema.methods.toPublicJSON = function toPublicJSON() {
     username: this.username,
     email: this.email,
     bio: this.bio || '',
+    avatar: this.avatar || '',
+    role: this.role || 'user',
     createdAt: this.createdAt,
   };
+};
+
+userSchema.methods.isAdmin = function isAdmin() {
+  return this.role === 'admin';
 };
 
 module.exports = mongoose.model('User', userSchema);

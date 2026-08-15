@@ -51,6 +51,43 @@ class GenreService {
     await item.save();
     return stripMongoId(item);
   }
+
+  async update(id, data) {
+    const genreId = String(id || '').trim();
+    if (!genreId) {
+      throw badRequest(`Invalid genre id: ${id}`);
+    }
+
+    const item = await GenreModel.findOne({ id: genreId });
+    if (!item) {
+      throw notFound(`Genre not found: ${id}`);
+    }
+
+    const patch = { ...(data || {}) };
+    delete patch.id;
+
+    if (patch.title !== undefined) item.title = patch.title;
+    if (patch.img !== undefined) item.img = patch.img;
+    if (patch.filterGenre !== undefined) item.filterGenre = patch.filterGenre;
+    if (patch.sortOrder !== undefined) item.sortOrder = Number(patch.sortOrder) || 0;
+
+    await item.save();
+    return stripMongoId(item);
+  }
+
+  async remove(id) {
+    const genreId = String(id || '').trim();
+    if (!genreId) {
+      throw badRequest(`Invalid genre id: ${id}`);
+    }
+
+    const item = await GenreModel.findOneAndDelete({ id: genreId }).lean();
+    if (!item) {
+      throw notFound(`Genre not found: ${id}`);
+    }
+
+    return stripMongoId(item);
+  }
 }
 
 module.exports = new GenreService();
