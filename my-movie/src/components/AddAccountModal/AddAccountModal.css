@@ -4,6 +4,7 @@
   z-index: 1400;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
+  opacity: 1;
 }
 
 .add-account-modal {
@@ -12,16 +13,14 @@
   --drag-y: 0px;
   width: 90%;
   max-width: 400px;
-  background-image:
-    linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%),
-    linear-gradient(135deg, rgb(15, 15, 18), rgb(45, 45, 50), rgb(25, 25, 28), rgb(15, 15, 18));
+  background: #121212;
   border: 1px solid rgba(70, 65, 80, 0.5);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   box-sizing: border-box;
 }
 
 .add-account-modal--dragging {
-  transition: none;
+  transition: none !important;
 }
 
 .add-account-drag-handle {
@@ -89,7 +88,7 @@
   align-items: center;
   gap: 0.85rem;
   width: 100%;
-  padding: 0.7rem 0.85rem;
+  padding: 0.3rem 0.25rem;
   border-radius: 12px;
   border: 1px solid rgba(70, 65, 80, 0.45);
   background: rgba(45, 45, 50, 0.28);
@@ -97,12 +96,12 @@
   text-align: left;
   cursor: pointer;
   box-sizing: border-box;
-  transition: background 0.2s, border-color 0.2s;
 }
 
-.add-account-row:hover:not(:disabled) {
-  background: rgba(3, 19, 234, 0.18);
-  border-color: rgba(3, 19, 234, 0.55);
+.add-account-row--skeleton {
+  cursor: default;
+  pointer-events: none;
+  min-height: 64px;
 }
 
 .add-account-row:disabled {
@@ -227,8 +226,21 @@
   }
 }
 
-/* Mobile — pastdan sheet, drag, X yo‘q */
+/* Mobile — pastdan sheet + silliq ochilish/yopilish */
 @media (max-width: 768px) {
+  .add-account-overlay {
+    opacity: 0;
+    transition: opacity 0.34s ease;
+  }
+
+  .add-account-overlay--open {
+    opacity: 1;
+  }
+
+  .add-account-overlay--closing {
+    opacity: 0;
+  }
+
   .add-account-modal {
     top: auto;
     bottom: 0;
@@ -238,9 +250,19 @@
     max-width: 100%;
     border-radius: 20px 20px 0 0;
     border-bottom: none;
-    transform: translateY(var(--drag-y, 0px));
     padding-bottom: env(safe-area-inset-bottom, 0);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    transform: translate3d(0, 100%, 0);
+    transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+  }
+
+  .add-account-modal--open {
+    transform: translate3d(0, var(--drag-y, 0px), 0);
+  }
+
+  .add-account-modal--closing {
+    transform: translate3d(0, 100%, 0);
   }
 
   .add-account-drag-handle {

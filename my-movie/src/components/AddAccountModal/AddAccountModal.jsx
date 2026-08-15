@@ -9,12 +9,28 @@ import {
 } from '../../accounts/accountsStorage';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { normalizeUsername } from '../../store/slices/userUtils';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './AddAccountModal.css';
+
+const CLOSE_MS = 340;
 
 const formatUsername = (raw) => {
   const u = normalizeUsername(raw);
   return u ? `@${u}` : '';
 };
+
+const isMobileViewport = () =>
+  typeof window !== 'undefined' && window.innerWidth <= 768;
+
+const AddAccountRowSkeleton = () => (
+  <div className="add-account-row add-account-row--skeleton" aria-hidden="true">
+    <SkeletonLoader variant="add-account-avatar" />
+    <div className="add-account-meta">
+      <SkeletonLoader variant="add-account-name" />
+      <SkeletonLoader variant="add-account-username" />
+    </div>
+  </div>
+);
 
 const AddAccountModal = ({ onClose }) => {
   const { profile, setAuthSession } = useAuth();
@@ -26,8 +42,11 @@ const AddAccountModal = ({ onClose }) => {
   const [busyId, setBusyId] = useState(null);
   const [error, setError] = useState('');
   const [dragY, setDragY] = useState(0);
+  const [sheetOpen, setSheetOpen] = useState(() => !isMobileViewport());
+  const [exiting, setExiting] = useState(false);
   const startYRef = useRef(0);
   const dragYRef = useRef(0);
+  const closeTimerRef = useRef(null);
 
   const applyList = useCallback((nextAccounts, nextActiveId) => {
     const cached = replaceAccountsCache(nextAccounts, nextActiveId);
@@ -58,24 +77,51 @@ const AddAccountModal = ({ onClose }) => {
   }, [loadFromServer]);
 
   useEffect(() => {
-    const isMobile = window.innerWidth <= 768;
+    const isMobile = isMobileViewport();
     if (isMobile) {
       document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      if (isMobile) {
+      const id = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setSheetOpen(true));
+      });
+      return () => {
+        window.cancelAnimationFrame(id);
         document.body.style.overflow = '';
-      }
-    };
+      };
+    }
+    setSheetOpen(true);
+    return undefined;
   }, []);
 
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+    },
+    []
+  );
+
+  const requestClose = useCallback(() => {
+    if (exiting) return;
+    if (!isMobileViewport()) {
+      onClose?.();
+      return;
+    }
+    setExiting(true);
+    setSheetOpen(false);
+    setDragY(0);
+    dragYRef.current = 0;
+    closeTimerRef.current = window.setTimeout(() => {
+      onClose?.();
+    }, CLOSE_MS);
+  }, [exiting, onClose]);
+
   const handleTouchStart = (e) => {
+    if (exiting) return;
     startYRef.current = e.touches[0].clientY;
     dragYRef.current = 0;
   };
 
   const handleTouchMove = (e) => {
-    if (window.innerWidth > 768) return;
+    if (exiting || !isMobileViewport()) return;
     const y = e.touches[0].clientY;
     const diff = y - startYRef.current;
     if (diff > 0) {
@@ -85,13 +131,17 @@ const AddAccountModal = ({ onClose }) => {
   };
 
   const handleTouchEnd = () => {
-    if (dragYRef.current > 80) onClose();
+    if (exiting) return;
+    if (dragYRef.current > 80) {
+      requestClose();
+      return;
+    }
     dragYRef.current = 0;
     setDragY(0);
   };
 
   const handleSelectAccount = async (account) => {
-    if (!account?.id || busyId) return;
+    if (!account?.id || busyId || exiting) return;
     if (account.id === activeId) return;
 
     setError('');
@@ -100,7 +150,7 @@ const AddAccountModal = ({ onClose }) => {
       const data = await switchAccountRequest({ userId: account.id });
       setAuthSession({ user: data.user });
       await loadFromServer();
-      onClose?.();
+      requestClose();
     } catch (err) {
       if (err.status === 403 || err.status === 401) {
         removeAccount(account.id);
@@ -113,17 +163,39 @@ const AddAccountModal = ({ onClose }) => {
   };
 
   const handleCreateAccount = () => {
-    onClose?.();
-    requestOpenAuthModal('register', { copyVariant: 'addAccount' });
+    requestClose();
+    window.setTimeout(() => {
+      requestOpenAuthModal('register', { copyVariant: 'addAccount' });
+    }, isMobileViewport() ? CLOSE_MS : 0);
   };
 
   const currentId = activeId || null;
+  const overlayClass = [
+    'add-account-overlay',
+    sheetOpen ? 'add-account-overlay--open' : '',
+    exiting ? 'add-account-overlay--closing' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const modalClass = [
+    'add-account-modal',
+    sheetOpen ? 'add-account-modal--open' : '',
+    dragY > 0 && !exiting ? 'add-account-modal--dragging' : '',
+    exiting ? 'add-account-modal--closing' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <>
-      <div className="add-account-overlay" onClick={onClose} aria-hidden="true" />
       <div
-        className={`add-account-modal ${dragY > 0 ? 'add-account-modal--dragging' : ''}`}
+        className={overlayClass}
+        onClick={requestClose}
+        aria-hidden="true"
+      />
+      <div
+        className={modalClass}
         style={{ '--drag-y': `${dragY}px` }}
         role="dialog"
         aria-modal="true"
@@ -144,7 +216,7 @@ const AddAccountModal = ({ onClose }) => {
             <button
               type="button"
               className="add-account-close add-account-close--desktop"
-              onClick={onClose}
+              onClick={requestClose}
               aria-label="Yopish"
             >
               ×
@@ -154,7 +226,11 @@ const AddAccountModal = ({ onClose }) => {
 
         <div className="add-account-content">
           {loading ? (
-            <p className="add-account-empty">Yuklanmoqda...</p>
+            <>
+              <AddAccountRowSkeleton />
+              <AddAccountRowSkeleton />
+              <AddAccountRowSkeleton />
+            </>
           ) : accounts.length === 0 ? (
             <p className="add-account-empty">Hozircha saqlangan hisob yo‘q</p>
           ) : null}
@@ -169,7 +245,7 @@ const AddAccountModal = ({ onClose }) => {
                   type="button"
                   className={`add-account-row${isActive ? ' add-account-row--active' : ''}`}
                   onClick={() => handleSelectAccount(account)}
-                  disabled={Boolean(busyId)}
+                  disabled={Boolean(busyId) || exiting}
                 >
                   <div className="add-account-avatar" aria-hidden="true">
                     {account.avatar ? (
@@ -215,7 +291,7 @@ const AddAccountModal = ({ onClose }) => {
             type="button"
             className="add-account-row add-account-row--create"
             onClick={handleCreateAccount}
-            disabled={Boolean(busyId) || loading}
+            disabled={Boolean(busyId) || loading || exiting}
           >
             <div className="add-account-avatar add-account-avatar--add" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">

@@ -1548,3 +1548,25 @@
   height: 100%;
   border-radius: inherit;
 }
+
+/* AddAccountModal — .add-account-row skeleton */
+.skeleton-loader--add-account-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.skeleton-loader--add-account-name {
+  width: 55%;
+  max-width: 140px;
+  height: 14px;
+  border-radius: 6px;
+}
+
+.skeleton-loader--add-account-username {
+  width: 40%;
+  max-width: 100px;
+  height: 11px;
+  margin-top: 2px;
+  border-radius: 6px;
+}
