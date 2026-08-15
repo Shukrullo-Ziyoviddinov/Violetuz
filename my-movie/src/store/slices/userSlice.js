@@ -1,7 +1,6 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 import {
   DEFAULT_PROFILE,
-  normalizeUsername,
   parseStoredProfile,
   loadLegacyUserState,
   writeProfileCache,
@@ -59,17 +58,15 @@ const userSlice = createSlice({
     },
     updateProfile: (state, action) => {
       const data = action.payload || {};
-      state.profile = {
-        id: data.id !== undefined ? String(data.id || '') : state.profile.id,
-        name: data.name?.trim() || state.profile.name,
-        username: normalizeUsername(
-          data.username !== undefined ? data.username : state.profile.username
-        ),
-        bio: data.bio !== undefined ? String(data.bio).trim() : state.profile.bio,
+      state.profile = parseStoredProfile({
+        id: data.id !== undefined ? data.id : state.profile.id,
+        name: data.name !== undefined ? data.name : state.profile.name,
+        username: data.username !== undefined ? data.username : state.profile.username,
+        bio: data.bio !== undefined ? data.bio : state.profile.bio,
         avatar: data.avatar !== undefined ? data.avatar : state.profile.avatar,
         email: data.email !== undefined ? data.email : state.profile.email,
-        role: data.role === 'admin' ? 'admin' : data.role === 'user' ? 'user' : state.profile.role,
-      };
+        role: data.role !== undefined ? data.role : state.profile.role,
+      });
       state.isLoggedIn = true;
       writeProfileCache(state.profile);
     },

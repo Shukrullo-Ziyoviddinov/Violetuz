@@ -282,9 +282,18 @@ const AuthModal = ({
       });
 
       const data = await updateProfileRequest({ avatar: publicUrl });
-      const savedAvatar = data.user?.avatar || publicUrl;
+      const savedUser = data?.user;
+      const savedAvatar = savedUser?.avatar || publicUrl;
+      if (!savedAvatar || !/^https?:\/\//i.test(savedAvatar)) {
+        throw new Error('Avatar URL saqlanmadi — qayta urinib ko‘ring');
+      }
 
-      updateProfile({ avatar: savedAvatar });
+      /* To‘liq sessiya sync: faqat avatar patch emas — /me bilan bir xil */
+      if (savedUser) {
+        setAuthSession({ user: { ...savedUser, avatar: savedAvatar } });
+      } else {
+        updateProfile({ avatar: savedAvatar });
+      }
       clearNeedsAvatar();
       revokePreviewUrl();
       pendingFileRef.current = null;

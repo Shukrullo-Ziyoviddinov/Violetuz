@@ -249,7 +249,16 @@ const AddAccountModal = ({ onClose }) => {
                 >
                   <div className="add-account-avatar" aria-hidden="true">
                     {account.avatar ? (
-                      <img src={account.avatar} alt="" className="add-account-avatar-img" />
+                      <img
+                        src={account.avatar}
+                        alt=""
+                        className="add-account-avatar-img"
+                        referrerPolicy="no-referrer"
+                        decoding="async"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
                     ) : (
                       <svg
                         className="add-account-avatar-placeholder"

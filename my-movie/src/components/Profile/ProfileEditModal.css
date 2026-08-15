@@ -7,6 +7,7 @@
   background: rgba(0, 0, 0, 0.8);
   z-index: 1300;
   backdrop-filter: blur(4px);
+  opacity: 1;
 }
 
 .profile-edit-modal {
@@ -16,14 +17,24 @@
   transform: translate(-50%, -50%);
   width: 90%;
   max-width: 400px;
-  --drag-y: 0;
-  background-image: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%), linear-gradient(135deg, rgb(15, 15, 18), rgb(45, 45, 50), rgb(25, 25, 28), rgb(15, 15, 18));
+  --drag-y: 0px;
+  background: #121212;
   border-radius: 16px;
   padding: 0.5rem 1.5rem;
   z-index: 1301;
   border: 1px solid rgba(70, 65, 80, 0.5);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   padding-bottom: env(safe-area-inset-bottom, 1.5rem);
+  box-sizing: border-box;
+}
+
+.profile-edit-modal--dragging {
+  transition: none !important;
+}
+
+.profile-edit-sheet-top {
+  flex-shrink: 0;
+  touch-action: none;
 }
 
 .profile-edit-drag-handle {
@@ -360,24 +371,50 @@
   .profile-edit-modal {
     transform: translate(-50%, -50%);
   }
+
+  .profile-edit-drag-handle {
+    display: none !important;
+  }
 }
 
-/* Mobile - pastdan chiqadigan modal, drag bilan yopish */
+/* Mobile — pastdan sheet + silliq ochilish/yopilish */
 @media (max-width: 768px) {
+  .profile-edit-overlay {
+    opacity: 0;
+    transition: opacity 0.34s ease;
+  }
+
+  .profile-edit-overlay--open {
+    opacity: 1;
+  }
+
+  .profile-edit-overlay--closing {
+    opacity: 0;
+  }
+
   .profile-edit-modal {
     top: auto;
     bottom: 0;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-width: 100vw;
-    transform: translateY(var(--drag-y, 0));
-    border-radius: 40px 40px 0 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
     border-bottom: none;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
     max-height: 85vh;
     overflow-y: auto;
-    box-sizing: border-box;
+    transform: translate3d(0, 100%, 0);
+    transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+  }
+
+  .profile-edit-modal--open {
+    transform: translate3d(0, var(--drag-y, 0px), 0);
+  }
+
+  .profile-edit-modal--closing {
+    transform: translate3d(0, 100%, 0);
   }
 
   .profile-edit-drag-handle {

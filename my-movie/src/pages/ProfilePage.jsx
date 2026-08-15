@@ -110,9 +110,10 @@ const getCurrentLanguage = () => {
 const ProfilePage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { profile, updateProfile, isLoggedIn, authReady } = useAuth();
+  const { profile, updateProfile, setAuthSession, isLoggedIn, authReady } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddAccountModal, setShowAddAccountModal] = useState(false);
+  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
@@ -125,6 +126,10 @@ const ProfilePage = () => {
   const { allArtists } = useMusicApi();
   const repostItems = useRepostItems();
   const [repostFilter, setRepostFilter] = useState('all');
+
+  useEffect(() => {
+    setAvatarImgFailed(false);
+  }, [profile.avatar]);
 
   useEffect(() => {
     if (!authReady) return;
@@ -222,13 +227,16 @@ const ProfilePage = () => {
   };
 
   const handleSaveProfile = (data) => {
-    updateProfile({
-      name: data.name,
-      username: data.username,
-      bio: data.bio,
-      avatar: data.avatar,
-    });
-    setShowEditModal(false);
+    if (data?.user) {
+      setAuthSession({ user: data.user });
+    } else {
+      updateProfile({
+        name: data.name,
+        username: data.username,
+        bio: data.bio,
+        avatar: data.avatar,
+      });
+    }
   };
 
   const handleLanguageChange = (langCode) => {
@@ -279,8 +287,15 @@ const ProfilePage = () => {
             <div className="profile-page-top">
               <>
               <div className="profile-avatar-wrap" aria-hidden="true">
-                {profile.avatar ? (
-                  <img src={profile.avatar} alt="" className="profile-avatar-img" />
+                {profile.avatar && !avatarImgFailed ? (
+                  <img
+                    src={profile.avatar}
+                    alt=""
+                    className="profile-avatar-img"
+                    referrerPolicy="no-referrer"
+                    decoding="async"
+                    onError={() => setAvatarImgFailed(true)}
+                  />
                 ) : (
                   <svg
                     className="profile-avatar-icon"

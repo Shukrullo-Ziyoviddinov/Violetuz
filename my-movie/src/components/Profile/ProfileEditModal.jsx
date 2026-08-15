@@ -21,6 +21,11 @@ const isHttpUrl = (value) =>
   typeof value === 'string' &&
   (value.startsWith('http://') || value.startsWith('https://'));
 
+const CLOSE_MS = 340;
+
+const isMobileViewport = () =>
+  typeof window !== 'undefined' && window.innerWidth <= 768;
+
 const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const { t } = useTranslation();
   const [name, setName] = useState(profile.name || '');
@@ -28,12 +33,16 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   const [bio, setBio] = useState(profile.bio || '');
   const [avatar, setAvatar] = useState(profile.avatar || null);
   const [dragY, setDragY] = useState(0);
+  const [sheetOpen, setSheetOpen] = useState(() => !isMobileViewport());
+  const [exiting, setExiting] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   /** idle | same | checking | available | taken | invalid */
   const [usernameStatus, setUsernameStatus] = useState('same');
   const [usernameMessage, setUsernameMessage] = useState('');
   const startYRef = useRef(0);
+  const dragYRef = useRef(0);
+  const closeTimerRef = useRef(null);
   const avatarInputRef = useRef(null);
   const usernameTimerRef = useRef(null);
   const usernameReqIdRef = useRef(0);
@@ -70,14 +79,45 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   }, [profile, revokePreviewUrl]);
 
   useEffect(() => {
-    if (window.innerWidth <= 768) {
+    const isMobile = isMobileViewport();
+    if (isMobile) {
       document.body.style.overflow = 'hidden';
+      const id = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setSheetOpen(true));
+      });
+      return () => {
+        window.cancelAnimationFrame(id);
+        document.body.style.overflow = '';
+        revokePreviewUrl();
+      };
     }
+    setSheetOpen(true);
     return () => {
-      document.body.style.overflow = '';
       revokePreviewUrl();
     };
   }, [revokePreviewUrl]);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+    },
+    []
+  );
+
+  const requestClose = useCallback(() => {
+    if (exiting) return;
+    if (!isMobileViewport()) {
+      onClose?.();
+      return;
+    }
+    setExiting(true);
+    setSheetOpen(false);
+    setDragY(0);
+    dragYRef.current = 0;
+    closeTimerRef.current = window.setTimeout(() => {
+      onClose?.();
+    }, CLOSE_MS);
+  }, [exiting, onClose]);
 
   const runUsernameCheck = useCallback(
     async (value) => {
@@ -153,18 +193,28 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
   }, [username, originalUsername, runUsernameCheck]);
 
   const handleTouchStart = (e) => {
+    if (exiting) return;
     startYRef.current = e.touches[0].clientY;
+    dragYRef.current = 0;
   };
 
   const handleTouchMove = (e) => {
-    if (window.innerWidth > 768) return;
+    if (exiting || !isMobileViewport()) return;
     const y = e.touches[0].clientY;
     const diff = y - startYRef.current;
-    if (diff > 0) setDragY(diff);
+    if (diff > 0) {
+      dragYRef.current = diff;
+      setDragY(diff);
+    }
   };
 
   const handleTouchEnd = () => {
-    if (dragY > 80) onClose();
+    if (exiting) return;
+    if (dragYRef.current > 80) {
+      requestClose();
+      return;
+    }
+    dragYRef.current = 0;
     setDragY(0);
   };
 
@@ -208,7 +258,7 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid || busy) return;
+    if (!isFormValid || busy || exiting) return;
     setError('');
     setBusy(true);
 
@@ -243,19 +293,36 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
       }
 
       const data = await updateProfileRequest(payload);
+      const savedUser = data?.user || null;
       const savedAvatar =
-        data.user?.avatar !== undefined ? data.user.avatar || null : nextAvatar || null;
+        savedUser?.avatar !== undefined ? savedUser.avatar || null : nextAvatar || null;
+
+      if (
+        (pendingFileRef.current || avatarRemovedRef.current) &&
+        savedAvatar &&
+        !/^https?:\/\//i.test(savedAvatar)
+      ) {
+        throw new Error('Avatar URL saqlanmadi — qayta urinib ko‘ring');
+      }
 
       revokePreviewUrl();
       pendingFileRef.current = null;
       avatarRemovedRef.current = false;
 
-      onSave({
-        name: data.user?.name ?? name.trim(),
-        username: data.user?.username ?? normalizeUsername(username),
-        bio: data.user?.bio ?? bio,
-        avatar: savedAvatar,
-      });
+      /* To‘liq sessiya sync — register avatar bilan bir xil */
+      if (savedUser) {
+        onSave({
+          user: { ...savedUser, avatar: savedAvatar },
+        });
+      } else {
+        onSave({
+          name: name.trim(),
+          username: normalizeUsername(username),
+          bio,
+          avatar: savedAvatar,
+        });
+      }
+      requestClose();
     } catch (err) {
       setError(err.message || 'Saqlab bo‘lmadi');
       if (err.field === 'username') {
@@ -278,27 +345,51 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
     .filter(Boolean)
     .join(' ');
 
+  const overlayClass = [
+    'profile-edit-overlay',
+    sheetOpen ? 'profile-edit-overlay--open' : '',
+    exiting ? 'profile-edit-overlay--closing' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const modalClass = [
+    'profile-edit-modal',
+    sheetOpen ? 'profile-edit-modal--open' : '',
+    dragY > 0 && !exiting ? 'profile-edit-modal--dragging' : '',
+    exiting ? 'profile-edit-modal--closing' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <>
-      <div className="profile-edit-overlay" onClick={onClose} />
+      <div className={overlayClass} onClick={requestClose} aria-hidden="true" />
       <div
-        className={`profile-edit-modal ${dragY > 0 ? 'profile-edit-modal-dragging' : ''}`}
+        className={modalClass}
         style={{ '--drag-y': `${dragY}px` }}
+        role="dialog"
+        aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
-        <div className="profile-edit-drag-handle" />
-        <div className="profile-edit-header">
-          <h3 className="profile-edit-title">{t('profile.editProfile')}</h3>
-          <button
-            className="profile-edit-close profile-edit-close-desktop"
-            onClick={onClose}
-            aria-label={t('detail.close')}
-          >
-            ×
-          </button>
+        <div
+          className="profile-edit-sheet-top"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="profile-edit-drag-handle" aria-hidden="true" />
+          <div className="profile-edit-header">
+            <h3 className="profile-edit-title">{t('profile.editProfile')}</h3>
+            <button
+              type="button"
+              className="profile-edit-close profile-edit-close-desktop"
+              onClick={requestClose}
+              aria-label={t('detail.close')}
+            >
+              ×
+            </button>
+          </div>
         </div>
         <form onSubmit={handleSubmit} className="profile-edit-form">
           <div className="profile-edit-field profile-edit-avatar-field">
@@ -454,7 +545,7 @@ const ProfileEditModal = ({ profile, onSave, onClose }) => {
           <button
             type="submit"
             className="profile-edit-save"
-            disabled={!isFormValid || busy}
+            disabled={!isFormValid || busy || exiting}
           >
             {busy ? '...' : t('profile.save')}
           </button>
