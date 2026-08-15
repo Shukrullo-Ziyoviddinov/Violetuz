@@ -432,11 +432,6 @@
     height: 88px;
   }
 
-  .auth-modal-submit--footer {
-    margin-top: auto;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-
   .auth-modal-close {
     top: 0.85rem;
     right: 0.85rem;

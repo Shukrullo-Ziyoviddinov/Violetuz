@@ -16,7 +16,6 @@ import './AuthModal.css';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
-const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 const AVATAR_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif,image/gif';
 const AVATAR_MIME = new Set([
   'image/jpeg',
@@ -249,10 +248,6 @@ const AuthModal = ({
     if (!file) return;
     if (!AVATAR_MIME.has(file.type)) {
       setError('Faqat JPEG, PNG, WebP, AVIF yoki GIF');
-      return;
-    }
-    if (file.size > MAX_AVATAR_BYTES) {
-      setError('Rasm 2 MB dan katta bo‘lmasligi kerak');
       return;
     }
 
@@ -777,7 +772,9 @@ const AuthModal = ({
                           </button>
                         ) : null}
                       </div>
-                      <p className="auth-modal-avatar-hint">JPEG, PNG, WebP · max 2 MB</p>
+                      <p className="auth-modal-avatar-hint">
+                        Profilingizda ko‘rinadigan rasmni tanlang
+                      </p>
                     </div>
                   </div>
                 </div>
