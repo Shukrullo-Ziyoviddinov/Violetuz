@@ -5,9 +5,8 @@ const SHEET_MQ = '(max-width: 768px)';
 const TOP_CLOSED_RATIO = 0.16;
 const TOP_CLOSED_MIN = 100;
 const TOP_CLOSED_MAX = 168;
-const KB_MIN = 48;
+const KB_MIN = 40;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
-/** Footer taxminiy balandligi (spacer) */
 const FOOTER_FALLBACK_H = 140;
 
 export const isCommentsSheetViewport = () =>
@@ -17,9 +16,9 @@ const closedTopGap = (h) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, h * TOP_CLOSED_RATIO)));
 
 /**
- * YANGI YO‘L — modal klaviaturaga tegmaydi.
- * Modal: ochilgandagi joyida qoladi (bottom=0, height=fixed).
- * Footer: kb ochiqda position:fixed + bottom=kbInset → input kb USTIDA.
+ * Modal joyida qoladi.
+ * Footer kb da fixed; inset hech qachon past baholanmasin (navbar tushganda).
+ * Yopilganda footer kb bilan pastga kuzatiladi, keyin joyiga qaytadi.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetHeight, setSheetHeight] = useState(0);
@@ -29,7 +28,10 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
   const scrollYRef = useRef(0);
   const focusedRef = useRef(false);
+  const closingRef = useRef(false);
   const baselineHRef = useRef(0);
+  /** Focus paytida eng katta o‘lchangan inset — pastga “cho‘kish”ni oldini oladi */
+  const peakInsetRef = useRef(0);
   const blurTimerRef = useRef(0);
   const blockOverlayRef = useRef(0);
   const rafRef = useRef(0);
@@ -47,58 +49,90 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     const vv = window.visualViewport;
     const vkH = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
 
-    let fromVv = 0;
-    if (vv) {
-      fromVv = Math.max(0, Math.round(inner - vv.offsetTop - vv.height));
-    }
-    const fromBase = vv ? Math.max(0, Math.round(base - vv.height)) : 0;
+    if (!vv) return vkH;
+
+    const fromVv = Math.max(0, Math.round(inner - vv.offsetTop - vv.height));
+    const fromBase = Math.max(0, Math.round(base - vv.height));
     const layoutShrunk = base - inner >= KB_MIN;
 
-    /* Layout resize: inset 0 (footer fixed bottom:0 allaqachon kb ustida) */
+    /* Android resize: layout kb siz — inset 0 */
     if (layoutShrunk && fromVv < KB_MIN && vkH < KB_MIN) {
       return 0;
     }
 
-    return Math.max(vkH, fromVv, fromBase >= KB_MIN ? fromBase : 0);
+    /*
+     * Navbar yashirin ochilgan (katta base), keyin tushganda fromVv kichik
+     * qolishi mumkin — fromBase bilan max (footer kb ichiga kirmasin).
+     */
+    return Math.max(vkH, fromVv, fromBase);
+  }, []);
+
+  const updateFooterSpacer = useCallback(() => {
+    const el = footerElRef.current;
+    if (!el) return;
+    const h = Math.round(el.getBoundingClientRect().height);
+    if (h > 40) setFooterSpacer(h);
   }, []);
 
   const applyKbClosed = useCallback(() => {
-    focusedRef.current = false;
+    closingRef.current = false;
+    peakInsetRef.current = 0;
     setKeyboardOpen(false);
     setKeyboardInset(0);
   }, []);
 
   const applyKbOpen = useCallback(() => {
     let inset = measureInset();
-    if (inset < KB_MIN && focusedRef.current) {
-      inset = Math.round((baselineHRef.current || window.innerHeight) * 0.4);
-    }
-    if (inset < KB_MIN && !focusedRef.current) {
-      applyKbClosed();
-      return;
-    }
-    setKeyboardOpen(true);
-    setKeyboardInset(Math.max(0, inset));
 
-    const el = footerElRef.current;
-    if (el) {
-      const h = Math.round(el.getBoundingClientRect().height);
-      if (h > 40) setFooterSpacer(h);
+    if (inset < KB_MIN && focusedRef.current) {
+      inset = Math.round((baselineHRef.current || window.innerHeight) * 0.42);
     }
+
+    if (inset < KB_MIN) return;
+
+    /* Ratchet: focus davomida inset kamaymasin (navbar animatsiyasi) */
+    peakInsetRef.current = Math.max(peakInsetRef.current, inset);
+    inset = peakInsetRef.current;
+
+    closingRef.current = false;
+    setKeyboardOpen(true);
+    setKeyboardInset(inset);
+    updateFooterSpacer();
+  }, [measureInset, updateFooterSpacer]);
+
+  /** Blur: kb bilan pastga kuzatish */
+  const applyKbClosing = useCallback(() => {
+    const inset = measureInset();
+    if (inset >= KB_MIN) {
+      closingRef.current = true;
+      peakInsetRef.current = 0;
+      setKeyboardOpen(true);
+      setKeyboardInset(inset);
+      return true;
+    }
+    applyKbClosed();
+    return false;
   }, [applyKbClosed, measureInset]);
 
   const schedule = useCallback(() => {
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
-      if (focusedRef.current) applyKbOpen();
-      else applyKbClosed();
+      if (focusedRef.current) {
+        applyKbOpen();
+      } else if (closingRef.current) {
+        applyKbClosing();
+      } else {
+        applyKbClosed();
+      }
     });
-  }, [applyKbClosed, applyKbOpen]);
+  }, [applyKbClosed, applyKbClosing, applyKbOpen]);
 
   useLayoutEffect(() => {
     if (!active) {
       focusedRef.current = false;
+      closingRef.current = false;
+      peakInsetRef.current = 0;
       clearTimers();
       window.clearTimeout(blurTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -194,11 +228,13 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const onModalInputFocus = useCallback(() => {
     if (!isCommentsSheetViewport()) return;
     focusedRef.current = true;
+    closingRef.current = false;
+    peakInsetRef.current = 0;
     window.clearTimeout(blurTimerRef.current);
     clearTimers();
     blockOverlayRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
     applyKbOpen();
-    [40, 100, 180, 300, 450, 650, 900].forEach((ms) => {
+    [40, 100, 180, 280, 400, 550, 750, 1000].forEach((ms) => {
       timersRef.current.push(
         window.setTimeout(() => {
           if (focusedRef.current) applyKbOpen();
@@ -211,11 +247,22 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     focusedRef.current = false;
     clearTimers();
     window.clearTimeout(blurTimerRef.current);
-    applyKbClosed();
+    /* Darhol 0 qilmaymiz — kb bilan pastga kuzatamiz */
+    closingRef.current = true;
+    applyKbClosing();
+    [80, 160, 280, 400, 550].forEach((ms) => {
+      timersRef.current.push(
+        window.setTimeout(() => {
+          if (focusedRef.current) return;
+          if (!applyKbClosing()) return;
+        }, ms)
+      );
+    });
     blurTimerRef.current = window.setTimeout(() => {
-      if (!focusedRef.current) applyKbClosed();
-    }, 80);
-  }, [applyKbClosed]);
+      if (focusedRef.current) return;
+      applyKbClosed();
+    }, 700);
+  }, [applyKbClosed, applyKbClosing]);
 
   const canCloseFromOverlay = useCallback(
     () => Date.now() >= blockOverlayRef.current,
@@ -227,7 +274,6 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   }, []);
 
   return {
-    /** Modal pastga yopishgan — kb da o‘zgarmaydi */
     sheetBottom: 0,
     sheetHeight,
     keyboardInset,

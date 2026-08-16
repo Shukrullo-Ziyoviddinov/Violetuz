@@ -590,6 +590,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+    transition: bottom 0.12s linear;
   }
 
   .shorts-comments-modal.is-open.shorts-comments-modal--keyboard {
