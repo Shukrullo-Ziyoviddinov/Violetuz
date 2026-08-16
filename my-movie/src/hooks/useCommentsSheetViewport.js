@@ -17,6 +17,8 @@ const KB_MIN = 40;
 const KB_ESTIMATE_RATIO = 0.42;
 
 const CLOSE_SUPPRESS_MS = 280;
+/** Input bosilganda ghost-click overlayni yopmasin */
+const OVERLAY_CLOSE_BLOCK_MS = 750;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -42,6 +44,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const blurTimerRef = useRef(0);
   const syncTimersRef = useRef([]);
   const suppressOpenUntilRef = useRef(0);
+  const blockOverlayCloseUntilRef = useRef(0);
 
   const clearSyncTimers = () => {
     syncTimersRef.current.forEach((id) => window.clearTimeout(id));
@@ -182,6 +185,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       window.clearTimeout(blurTimerRef.current);
       clearSyncTimers();
       suppressOpenUntilRef.current = 0;
+      blockOverlayCloseUntilRef.current = 0;
       setSheetBottom(0);
       setSheetHeight(0);
       setKeyboardOpen(false);
@@ -295,14 +299,19 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     window.clearTimeout(blurTimerRef.current);
     clearSyncTimers();
     suppressOpenUntilRef.current = 0;
+    /* Ghost click overlayga tushib modal yopilmasin */
+    blockOverlayCloseUntilRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
 
-    /* Darhol ko‘tarish (taxminiy yoki real), keyin aniqlash */
-    applyOpen();
-    [40, 100, 180, 280, 400, 560].forEach((ms) => {
-      const id = window.setTimeout(() => {
-        if (!inputFocusRef.current) return;
-        applyOpen();
-      }, ms);
+    /* Click tugagach ko‘tarish — aks holda click overlayga o‘tadi */
+    const tryOpen = () => {
+      if (!inputFocusRef.current) return;
+      blockOverlayCloseUntilRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
+      applyOpen();
+    };
+    const first = window.setTimeout(tryOpen, 60);
+    syncTimersRef.current.push(first);
+    [140, 220, 320, 450, 600].forEach((ms) => {
+      const id = window.setTimeout(tryOpen, ms);
       syncTimersRef.current.push(id);
     });
   }, [applyOpen]);
@@ -318,11 +327,17 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     }, 100);
   }, [applyClosed]);
 
+  const canCloseFromOverlay = useCallback(
+    () => Date.now() >= blockOverlayCloseUntilRef.current,
+    []
+  );
+
   return {
     sheetBottom,
     sheetHeight,
     keyboardOpen,
     onModalInputFocus,
     onModalInputBlur,
+    canCloseFromOverlay,
   };
 }

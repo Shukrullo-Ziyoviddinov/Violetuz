@@ -125,7 +125,7 @@ const MovieComments = forwardRef(
     const [isDraggingModal, setIsDraggingModal] = useState(false);
     const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-    const { sheetBottom, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur } =
+    const { sheetBottom, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur, canCloseFromOverlay } =
       useCommentsSheetViewport(showCommentsModal, '.movie-detail-comments-modal-body');
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
@@ -637,7 +637,10 @@ const MovieComments = forwardRef(
                 className={`movie-detail-comments-modal-overlay${
                   commentsModalOpen && !isDismissingModal ? ' is-open' : ''
                 }`}
-                onClick={closeModal}
+                onClick={() => {
+                  if (!canCloseFromOverlay()) return;
+                  closeModal();
+                }}
               />
               <div
                 className={`movie-detail-comments-modal${
@@ -746,9 +749,6 @@ const MovieComments = forwardRef(
                       }
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      onTouchStart={() => {
-                        onModalInputFocus();
-                      }}
                       onFocus={() => {
                         onModalInputFocus();
                       }}
