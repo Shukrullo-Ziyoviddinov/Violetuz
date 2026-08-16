@@ -602,12 +602,13 @@
   }
 }
 
-/* Mobile: faqat bottom + height; kb ochiqda transition yo‘q (klaviatura bilan sync) */
+/* Mobile: yopiqda bottom+height; kb da top+height = visualViewport (chrome/kb ichiga kirmaydi) */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
+    --sheet-top: auto;
     --sheet-bottom: 0px;
     --sheet-height: 84dvh;
-    top: auto !important;
+    top: var(--sheet-top);
     bottom: var(--sheet-bottom);
     left: 0 !important;
     right: 0 !important;
@@ -636,7 +637,8 @@
   .movie-detail-comments-modal--keyboard {
     padding-bottom: 0;
     border-radius: 16px 16px 0 0;
-    /* Klaviatura animatsiyasi bilan birga — kechikish yo‘q */
+    /* Stretch bug yo‘q: faqat top + height */
+    bottom: auto !important;
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
   }
 

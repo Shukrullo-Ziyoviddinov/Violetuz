@@ -5,8 +5,7 @@ const SHEET_MQ = '(max-width: 768px)';
 const TOP_CLOSED_RATIO = 0.16;
 const TOP_CLOSED_MIN = 100;
 const TOP_CLOSED_MAX = 168;
-/** Visual viewport tepasidan (brauzer chrome ostidan) gap */
-const TOP_SAFE_GAP = 12;
+const TOP_SAFE_GAP = 10;
 const KB_MIN = 30;
 const CLOSE_LOCK_MS = 450;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
@@ -18,13 +17,13 @@ const closedTopGap = (screenH) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, screenH * TOP_CLOSED_RATIO)));
 
 /**
- * Klaviatura bilan birga:
- * - bottom = layout pastidan VV pastigacha (klaviatura usti)
- * - height = min(saqlangan, vv.height - gap) → yuqori chrome ichiga kirmaydi
- * - kb ochiqda CSS transition yo‘q → input kb bilan sync
- * - yopilganda bottom=0, height=ochilishdagi balandlik
+ * Yopiq: bottom=0, top=auto, height=saqlangan.
+ * Ochiq: visualViewport ga pin (top + height, bottom=auto).
+ *   → navbar tushganda offsetTop/height yangilanadi:
+ *     modal yuqorisi chrome ostida, footer kb ustida qoladi.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
+  const [sheetTop, setSheetTop] = useState(null);
   const [sheetBottom, setSheetBottom] = useState(0);
   const [sheetHeight, setSheetHeight] = useState(0);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -37,6 +36,12 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const closeLockUntilRef = useRef(0);
   const blockOverlayCloseUntilRef = useRef(0);
   const rafRef = useRef(0);
+  const retryTimersRef = useRef([]);
+
+  const clearRetries = () => {
+    retryTimersRef.current.forEach((id) => window.clearTimeout(id));
+    retryTimersRef.current = [];
+  };
 
   const applyClosed = useCallback(() => {
     const h =
@@ -47,8 +52,19 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
           closedTopGap(baselineHRef.current || window.innerHeight)
       );
     setKeyboardOpen(false);
+    setSheetTop(null);
     setSheetBottom(0);
     setSheetHeight(h);
+  }, []);
+
+  /** Modalni aynan visualViewport ichiga joylash */
+  const pinToVisualViewport = useCallback((vv) => {
+    const top = Math.max(0, Math.round(vv.offsetTop + TOP_SAFE_GAP));
+    const height = Math.max(200, Math.round(vv.height - TOP_SAFE_GAP));
+    setKeyboardOpen(true);
+    setSheetTop(top);
+    setSheetBottom(0);
+    setSheetHeight(height);
   }, []);
 
   const applyFromViewport = useCallback(() => {
@@ -66,23 +82,17 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     const vk = typeof navigator !== 'undefined' ? navigator.virtualKeyboard : null;
     const vkH = vk?.boundingRect?.height ? Math.round(vk.boundingRect.height) : 0;
 
-    let bottom = 0;
-    if (vkH >= KB_MIN) {
-      bottom = vkH;
-    } else if (vv) {
-      bottom = Math.max(0, Math.round(innerH - vv.offsetTop - vv.height));
-    }
-
+    const layoutKb = vv
+      ? Math.max(0, Math.round(innerH - vv.offsetTop - vv.height))
+      : 0;
     const kbVisible =
-      bottom >= KB_MIN || (vv && vv.height < baseH - KB_MIN);
+      vkH >= KB_MIN ||
+      layoutKb >= KB_MIN ||
+      (vv && vv.height < baseH - KB_MIN);
 
-    /* Focus yo‘q, lekin kb hali yopilmoqda — pastga birga kuzatamiz */
+    /* Kb yopilmoqda — VV bilan pastga kuzatish */
     if (!focused && kbVisible && vv) {
-      const visibleH = Math.round(vv.height);
-      const height = Math.max(200, Math.min(closedH, visibleH - TOP_SAFE_GAP));
-      setKeyboardOpen(true);
-      setSheetBottom(bottom);
-      setSheetHeight(height);
+      pinToVisualViewport(vv);
       return;
     }
 
@@ -93,18 +103,26 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
     if (!kbVisible) {
       setKeyboardOpen(false);
+      setSheetTop(null);
       setSheetBottom(0);
       setSheetHeight(closedH);
       return;
     }
 
-    const visibleH = vv ? Math.round(vv.height) : Math.max(200, innerH - bottom);
-    const height = Math.max(200, Math.min(closedH, visibleH - TOP_SAFE_GAP));
+    /* Asosiy: VV pin — chrome tushsa ham top/footer to‘g‘ri */
+    if (vv) {
+      pinToVisualViewport(vv);
+      return;
+    }
 
-    setKeyboardOpen(true);
-    setSheetBottom(bottom);
-    setSheetHeight(height);
-  }, [applyClosed]);
+    /* Faqat VirtualKeyboard */
+    if (vkH >= KB_MIN) {
+      setKeyboardOpen(true);
+      setSheetTop(null);
+      setSheetBottom(vkH);
+      setSheetHeight(Math.max(200, Math.round(innerH - vkH - TOP_SAFE_GAP)));
+    }
+  }, [applyClosed, pinToVisualViewport]);
 
   const scheduleSync = useCallback(() => {
     if (rafRef.current) return;
@@ -118,10 +136,12 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     if (!active) {
       inputFocusRef.current = false;
       window.clearTimeout(blurTimerRef.current);
+      clearRetries();
       closeLockUntilRef.current = 0;
       blockOverlayCloseUntilRef.current = 0;
       if (rafRef.current) window.cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
+      setSheetTop(null);
       setSheetBottom(0);
       setSheetHeight(0);
       setKeyboardOpen(false);
@@ -221,26 +241,30 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     if (!isCommentsSheetViewport()) return;
     inputFocusRef.current = true;
     window.clearTimeout(blurTimerRef.current);
+    clearRetries();
     closeLockUntilRef.current = 0;
     blockOverlayCloseUntilRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
     applyFromViewport();
-    /* Animatsiya davomida bir necha marta */
-    [50, 120, 220, 350, 500, 700].forEach((ms) => {
-      window.setTimeout(() => {
-        if (inputFocusRef.current) applyFromViewport();
-      }, ms);
+    /* Chrome + kb animatsiyasi — uzoqroq kuzatish */
+    [40, 100, 180, 280, 400, 550, 750, 1000].forEach((ms) => {
+      retryTimersRef.current.push(
+        window.setTimeout(() => {
+          if (inputFocusRef.current) applyFromViewport();
+        }, ms)
+      );
     });
   }, [applyFromViewport]);
 
   const onModalInputBlur = useCallback(() => {
     inputFocusRef.current = false;
+    clearRetries();
     window.clearTimeout(blurTimerRef.current);
     applyFromViewport();
     blurTimerRef.current = window.setTimeout(() => {
       if (inputFocusRef.current) return;
       closeLockUntilRef.current = Date.now() + CLOSE_LOCK_MS;
       applyClosed();
-    }, 380);
+    }, 400);
   }, [applyClosed, applyFromViewport]);
 
   const canCloseFromOverlay = useCallback(
@@ -249,6 +273,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   );
 
   return {
+    sheetTop,
     sheetBottom,
     sheetHeight,
     keyboardOpen,
