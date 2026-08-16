@@ -50,115 +50,174 @@ const pickLocalized = (value) => {
   return value.uz || value.ru || value.en || '';
 };
 
-const buildTargetSnapshot = async (targetType, targetId) => {
-  const numericId = Number(targetId);
-  const useNumeric =
-    Number.isInteger(numericId) && String(numericId) === String(targetId);
+const toCatalogId = (raw) => {
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+};
 
-  switch (targetType) {
-    case 'movie': {
-      const doc = useNumeric ? await Movie.findOne({ id: numericId }).lean() : null;
-      if (!doc) throw notFound(`Kino topilmadi: ${targetId}`);
-      return {
-        kind: 'movie',
-        movieId: doc.id,
-        title: doc.title || null,
-        homeImg: doc.homeImg || null,
-        image: doc.poster || doc.image || null,
-        route: `/movie/${doc.id}`,
-        rating: doc.rating ?? 0,
-        ratingImdb: doc.ratingImdb ?? null,
-        ratingKinopoisk: doc.ratingKinopoisk ?? null,
-        ratingNetflix: doc.ratingNetflix ?? null,
-        like: doc.like ?? 0,
-        dislike: doc.dislike ?? 0,
-        category: doc.category || null,
-        genre: doc.genre || null,
-        description: doc.description || null,
-        ageRestriction: doc.ageRestriction ?? null,
-      };
-    }
-    case 'triller': {
-      const doc = useNumeric ? await Triller.findOne({ id: numericId }).lean() : null;
-      if (!doc) throw notFound(`Triller topilmadi: ${targetId}`);
-      return {
-        kind: 'triller',
-        trillerId: doc.id,
-        title: doc.title || null,
-        image: doc.videoImg || doc.poster || null,
-        route: `/triller/${doc.id}`,
-      };
-    }
-    case 'klip': {
-      const doc = useNumeric ? await Clip.findOne({ id: numericId }).lean() : null;
-      if (!doc) throw notFound(`Klip topilmadi: ${targetId}`);
-      return {
-        kind: 'video',
-        videoType: 'klip',
-        videoId: doc.id,
-        title: doc.title || '',
-        image: doc.img || null,
-        route: `/music/video/${doc.id}`,
-        artistId: doc.artistId || null,
-        like: doc.like ?? 0,
-        dislike: doc.dislike ?? 0,
-      };
-    }
-    case 'konsert': {
-      const doc = useNumeric ? await Concert.findOne({ id: numericId }).lean() : null;
-      if (!doc) throw notFound(`Konsert topilmadi: ${targetId}`);
-      return {
-        kind: 'video',
-        videoType: 'konsert',
-        videoId: doc.id,
-        title: doc.title || '',
-        image: doc.img || null,
-        route: `/music/video/${doc.id}`,
-        artistId: doc.artistId || null,
-        like: doc.like ?? 0,
-        dislike: doc.dislike ?? 0,
-      };
-    }
-    case 'shorts': {
-      const doc = useNumeric
-        ? await ShortVideo.findOne({ id: numericId }).lean()
-        : null;
-      if (!doc) throw notFound(`Shorts topilmadi: ${targetId}`);
-      let title = null;
-      if (doc.movieId != null) {
-        const movie = await Movie.findOne({ id: doc.movieId }).lean();
-        title = movie?.title || null;
+/**
+ * History uchun yengil snapshot.
+ * Topilmasa — create yiqilmasin (minimal snapshot).
+ */
+const buildTargetSnapshot = async (targetType, targetId) => {
+  const numericId = toCatalogId(targetId);
+  const fallback = {
+    kind: targetType,
+    id: targetId,
+    title: null,
+    image: null,
+    route: null,
+  };
+
+  try {
+    switch (targetType) {
+      case 'movie': {
+        if (numericId == null) return { ...fallback, kind: 'movie', movieId: targetId };
+        const doc = await Movie.findOne({ id: numericId })
+          .select('id title homeImg poster image rating category')
+          .lean();
+        if (!doc) return { ...fallback, kind: 'movie', movieId: targetId, route: `/movie/${targetId}` };
+        return {
+          kind: 'movie',
+          movieId: doc.id,
+          title: doc.title || null,
+          homeImg: doc.homeImg || null,
+          image: doc.poster || doc.image || null,
+          route: `/movie/${doc.id}`,
+          rating: doc.rating ?? 0,
+          category: doc.category || null,
+        };
       }
-      return {
-        kind: 'shorts',
-        shortsSource: 'movieShorts',
-        shortsType: doc.type || 'movieShorts',
-        shortsId: doc.id,
-        movieId: doc.movieId ?? null,
-        title,
-        video: doc.video || null,
-        description: doc.description || null,
-      };
+      case 'triller': {
+        if (numericId == null) return { ...fallback, kind: 'triller', trillerId: targetId };
+        const doc = await Triller.findOne({ id: numericId })
+          .select('id title videoImg')
+          .lean();
+        if (!doc) {
+          return {
+            ...fallback,
+            kind: 'triller',
+            trillerId: targetId,
+            route: `/triller/${targetId}`,
+          };
+        }
+        return {
+          kind: 'triller',
+          trillerId: doc.id,
+          title: doc.title || null,
+          image: doc.videoImg || null,
+          route: `/triller/${doc.id}`,
+        };
+      }
+      case 'klip':
+      case 'konsert': {
+        const Model = targetType === 'konsert' ? Concert : Clip;
+        if (numericId == null) {
+          return {
+            ...fallback,
+            kind: 'video',
+            videoType: targetType,
+            videoId: targetId,
+            route: `/music/video/${targetId}`,
+          };
+        }
+        const doc = await Model.findOne({ id: numericId })
+          .select('id title img artistId like dislike')
+          .lean();
+        if (!doc) {
+          return {
+            ...fallback,
+            kind: 'video',
+            videoType: targetType,
+            videoId: targetId,
+            route: `/music/video/${targetId}`,
+          };
+        }
+        return {
+          kind: 'video',
+          videoType: targetType,
+          videoId: doc.id,
+          title: doc.title || '',
+          image: doc.img || null,
+          route: `/music/video/${doc.id}`,
+          artistId: doc.artistId || null,
+          like: doc.like ?? 0,
+          dislike: doc.dislike ?? 0,
+        };
+      }
+      case 'shorts': {
+        if (numericId == null) {
+          return {
+            ...fallback,
+            kind: 'shorts',
+            shortsSource: 'movieShorts',
+            shortsId: targetId,
+          };
+        }
+        const doc = await ShortVideo.findOne({ id: numericId })
+          .select('id type movieId video description')
+          .lean();
+        if (!doc) {
+          return {
+            ...fallback,
+            kind: 'shorts',
+            shortsSource: 'movieShorts',
+            shortsId: targetId,
+          };
+        }
+        let title = null;
+        if (doc.movieId != null) {
+          const movie = await Movie.findOne({ id: doc.movieId }).select('title').lean();
+          title = movie?.title || null;
+        }
+        return {
+          kind: 'shorts',
+          shortsSource: 'movieShorts',
+          shortsType: doc.type || 'movieShorts',
+          shortsId: doc.id,
+          movieId: doc.movieId ?? null,
+          title,
+          video: doc.video || null,
+          description: doc.description || null,
+        };
+      }
+      case 'musicShorts': {
+        if (numericId == null) {
+          return {
+            ...fallback,
+            kind: 'shorts',
+            shortsSource: 'musicshorts',
+            shortsId: targetId,
+          };
+        }
+        const doc = await MusicShort.findOne({ id: numericId })
+          .select('id type musicId contentType video description')
+          .lean();
+        if (!doc) {
+          return {
+            ...fallback,
+            kind: 'shorts',
+            shortsSource: 'musicshorts',
+            shortsId: targetId,
+          };
+        }
+        return {
+          kind: 'shorts',
+          shortsSource: 'musicshorts',
+          shortsType: doc.type || 'musicshorts',
+          shortsId: doc.id,
+          musicId: doc.musicId ?? null,
+          contentType: doc.contentType || 'music',
+          title: doc.description || null,
+          video: doc.video || null,
+          description: doc.description || null,
+        };
+      }
+      default:
+        return fallback;
     }
-    case 'musicShorts': {
-      const doc = useNumeric
-        ? await MusicShort.findOne({ id: numericId }).lean()
-        : null;
-      if (!doc) throw notFound(`Music shorts topilmadi: ${targetId}`);
-      return {
-        kind: 'shorts',
-        shortsSource: 'musicshorts',
-        shortsType: doc.type || 'musicshorts',
-        shortsId: doc.id,
-        musicId: doc.musicId ?? null,
-        contentType: doc.contentType || 'music',
-        title: doc.description || null,
-        video: doc.video || null,
-        description: doc.description || null,
-      };
-    }
-    default:
-      throw badRequest(`Noma’lum targetType: ${targetType}`);
+  } catch {
+    return fallback;
   }
 };
 
@@ -221,26 +280,33 @@ const listComments = async ({ targetType, targetId }, viewerId = null) => {
   return buildCommentTree(rows, viewerId);
 };
 
-const createComment = async (userId, { targetType, targetId, text, parentId }) => {
+const createComment = async (userOrId, { targetType, targetId, text, parentId }) => {
   const type = assertType(targetType);
   const id = normalizeTargetId(targetId);
   const body = normalizeText(text);
 
-  const user = await User.findById(userId).lean();
+  /* Controller authUser bersa — qo‘shimcha User.findById yo‘q */
+  let user = null;
+  if (userOrId && typeof userOrId === 'object' && userOrId._id) {
+    user = userOrId;
+  } else {
+    user = await User.findById(userOrId).lean();
+  }
   if (!user) throw createHttpError(401, 'Sessiya yaroqsiz');
+  const userId = user._id;
 
   let parent = null;
   const parentOid = toObjectId(parentId);
   if (parentId) {
     if (!parentOid) throw badRequest('parentId noto‘g‘ri');
-    parent = await Comment.findById(parentOid).lean();
+    parent = await Comment.findById(parentOid).select('targetType targetId targetSnapshot').lean();
     if (!parent) throw notFound('Javob beriladigan komment topilmadi');
-    if (parent.targetType !== type || parent.targetId !== id) {
+    if (parent.targetType !== type || String(parent.targetId) !== id) {
       throw badRequest('parentId boshqa kontentga tegishli');
     }
   }
 
-  const targetSnapshot = parent
+  const targetSnapshot = parent?.targetSnapshot
     ? parent.targetSnapshot
     : await buildTargetSnapshot(type, id);
 
@@ -257,7 +323,7 @@ const createComment = async (userId, { targetType, targetId, text, parentId }) =
     targetSnapshot,
   });
 
-  return toClientComment(row.toObject(), userId);
+  return toClientComment(row.toObject ? row.toObject() : row, userId);
 };
 
 const updateComment = async (userId, commentId, { text }) => {

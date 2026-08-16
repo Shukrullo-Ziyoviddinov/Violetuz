@@ -478,6 +478,39 @@
   transform: scale(1.05);
 }
 
+.shorts-comments-modal-send-btn:disabled,
+.shorts-comments-modal-send-btn.is-loading {
+  cursor: wait;
+  opacity: 0.9;
+}
+
+.shorts-comments-modal-send-btn.is-loading:hover {
+  transform: none;
+}
+
+.shorts-comments-modal-send-loader {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  animation: shorts-comments-send-spin 0.7s linear infinite;
+}
+
+@keyframes shorts-comments-send-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.shorts-comments-modal-submit-error {
+  margin: 0.45rem 0 0;
+  padding: 0 0.25rem;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: #ff8f8f;
+}
+
 /* Desktop: centered modal */
 @media (min-width: 769px) {
   .shorts-comments-modal {

@@ -112,6 +112,7 @@ const MovieComments = forwardRef(
     );
     const [carouselIndex, setCarouselIndex] = useState(0);
     const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
     const startYRef = useRef(0);
     const commentsListRef = useRef(null);
 
@@ -140,8 +141,7 @@ const MovieComments = forwardRef(
         setComments(tree);
         setLikedIds(collectLikedIds(tree));
       } catch {
-        setComments([]);
-        setLikedIds(new Set());
+        /* mavjud listni o‘chirmaymiz — tarmoq xatosida bo‘sh qilib yubormaslik */
       }
     }, [target.targetType, target.targetId]);
 
@@ -155,6 +155,7 @@ const MovieComments = forwardRef(
       setReplyingTo(null);
       setInputValue('');
       setShowCommentsModal(false);
+      setSubmitError('');
       reloadComments();
     }, [movieId, targetTypeProp, reloadComments]);
 
@@ -162,6 +163,8 @@ const MovieComments = forwardRef(
       const mid = commentsApi.toMovieKey(movieId);
       const onRemote = (e) => {
         if (e.detail?.movieId !== mid) return;
+        /* O‘zimiz create/like qilganimizda qayta GET qilmaymiz — sekinlik sababi */
+        if (e.detail?.skipReload) return;
         reloadComments();
       };
       window.addEventListener(commentsApi.COMMENTS_CHANGED_EVENT, onRemote);
@@ -215,7 +218,10 @@ const MovieComments = forwardRef(
           else next.delete(String(commentId));
           return next;
         });
-        commentsApi.dispatchMovieCommentsChanged(movieId, target);
+        commentsApi.dispatchMovieCommentsChanged(movieId, {
+          ...target,
+          skipReload: true,
+        });
       } catch {
         /* ignore */
       }
@@ -229,6 +235,7 @@ const MovieComments = forwardRef(
       if (!target.targetId) return;
 
       setSubmitting(true);
+      setSubmitError('');
       try {
         const data = await commentsApi.createCommentRequest({
           targetType: target.targetType,
@@ -250,9 +257,17 @@ const MovieComments = forwardRef(
           await reloadComments();
         }
         setInputValue('');
-        commentsApi.dispatchMovieCommentsChanged(movieId, target);
-      } catch {
-        /* ignore */
+        commentsApi.dispatchMovieCommentsChanged(movieId, {
+          ...target,
+          skipReload: true,
+        });
+      } catch (err) {
+        setSubmitError(
+          err?.message ||
+            (i18n.language === 'uz'
+              ? 'Komment yuborilmadi. Qayta urinib ko‘ring.'
+              : 'Не удалось отправить комментарий.')
+        );
       } finally {
         setSubmitting(false);
       }
@@ -609,24 +624,35 @@ const MovieComments = forwardRef(
                     />
                     <button
                       type="submit"
-                      className="movie-detail-comments-modal-send-btn"
+                      className={`movie-detail-comments-modal-send-btn${
+                        submitting ? ' is-loading' : ''
+                      }`}
                       aria-label="Yuborish"
+                      disabled={submitting}
+                      aria-busy={submitting || undefined}
                     >
-                      <svg
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <line x1="22" y1="2" x2="11" y2="13" />
-                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                      </svg>
+                      {submitting ? (
+                        <span className="movie-detail-comments-modal-send-loader" aria-hidden />
+                      ) : (
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <line x1="22" y1="2" x2="11" y2="13" />
+                          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                      )}
                     </button>
                   </form>
+                  {submitError ? (
+                    <p className="movie-detail-comments-modal-submit-error">{submitError}</p>
+                  ) : null}
                 </div>
               </div>
             </>,

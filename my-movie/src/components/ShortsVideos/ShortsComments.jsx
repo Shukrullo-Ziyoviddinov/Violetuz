@@ -87,6 +87,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [replyingToShorts, setReplyingToShorts] = useState(null);
   const [dragY, setDragY] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const startYRef = useRef(0);
   const shortsCommentsListRef = useRef(null);
 
@@ -108,8 +109,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       setShortsComments(tree);
       setLikedShortsIds(collectLikedIds(tree));
     } catch {
-      setShortsComments([]);
-      setLikedShortsIds(new Set());
+      /* listni o‘chirmaymiz */
     }
   }, [shortsId, targetType]);
 
@@ -117,6 +117,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     setReplyingToShorts(null);
     setShortsInputValue('');
     setShowShortsCommentsModal(false);
+    setSubmitError('');
     reloadComments();
   }, [shortsId, targetType, reloadComments]);
 
@@ -124,6 +125,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     const sid = shortsCommentsApi.toShortsKey(shortsId);
     const onRemote = (e) => {
       if (e.detail?.shortsId !== sid) return;
+      if (e.detail?.skipReload) return;
       reloadComments();
     };
     window.addEventListener(shortsCommentsApi.SHORTS_COMMENTS_CHANGED_EVENT, onRemote);
@@ -157,7 +159,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
         else next.delete(String(commentId));
         return next;
       });
-      shortsCommentsApi.dispatchShortsCommentsChanged(shortsId);
+      shortsCommentsApi.dispatchShortsCommentsChanged(shortsId, { skipReload: true });
     } catch {
       /* ignore */
     }
@@ -170,6 +172,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     if (!requireAuth()) return;
 
     setSubmitting(true);
+    setSubmitError('');
     try {
       const data = await shortsCommentsApi.createShortsCommentRequest({
         shortsId,
@@ -191,9 +194,14 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
         await reloadComments();
       }
       setShortsInputValue('');
-      shortsCommentsApi.dispatchShortsCommentsChanged(shortsId);
-    } catch {
-      /* ignore */
+      shortsCommentsApi.dispatchShortsCommentsChanged(shortsId, { skipReload: true });
+    } catch (err) {
+      setSubmitError(
+        err?.message ||
+          (i18n.language === 'uz'
+            ? 'Komment yuborilmadi. Qayta urinib ko‘ring.'
+            : 'Не удалось отправить комментарий.')
+      );
     } finally {
       setSubmitting(false);
     }
@@ -492,16 +500,35 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                   />
                   <button
                     type="submit"
-                    className="shorts-comments-modal-send-btn"
+                    className={`shorts-comments-modal-send-btn${
+                      submitting ? ' is-loading' : ''
+                    }`}
                     aria-label="Yuborish"
                     disabled={submitting}
+                    aria-busy={submitting || undefined}
                   >
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="22" y1="2" x2="11" y2="13" />
-                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
+                    {submitting ? (
+                      <span className="shorts-comments-modal-send-loader" aria-hidden />
+                    ) : (
+                      <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="22" y1="2" x2="11" y2="13" />
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                      </svg>
+                    )}
                   </button>
                 </form>
+                {submitError ? (
+                  <p className="shorts-comments-modal-submit-error">{submitError}</p>
+                ) : null}
               </div>
             </div>
           </>,

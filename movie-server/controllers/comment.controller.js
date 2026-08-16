@@ -15,7 +15,7 @@ const listComments = asyncHandler(async (req, res) => {
 });
 
 const createComment = asyncHandler(async (req, res) => {
-  const item = await commentService.createComment(req.authUser._id, {
+  const item = await commentService.createComment(req.authUser, {
     targetType: req.body?.targetType,
     targetId: req.body?.targetId ?? req.body?.id,
     text: req.body?.text,
