@@ -11,6 +11,7 @@ const {
   COMMENT_TYPES,
   MAX_COMMENT_LENGTH,
 } = require('../constants/comment.constants');
+const { sortCommentListByLikes } = require('../algo/commentLikeSortAlgo');
 
 const assertType = (raw) => {
   const type = String(raw || '').trim();
@@ -208,14 +209,7 @@ const buildCommentTree = (rows, viewerId = null) => {
     }
   }
 
-  const sortRecursive = (list) => {
-    list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-    list.forEach((n) => {
-      if (n.replies?.length) sortRecursive(n.replies);
-    });
-  };
-  sortRecursive(roots);
-  return roots;
+  return sortCommentListByLikes(roots);
 };
 
 const listComments = async ({ targetType, targetId }, viewerId = null) => {

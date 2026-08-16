@@ -6,6 +6,7 @@ import * as shortsCommentsApi from '../../api/shortsCommentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { formatActionCount } from '../../utils/utils';
+import { sortCommentListByLikes } from '../../algo/commentLikeSortAlgo';
 import './ShortsComments.css';
 
 const migrateShortsComment = (c) => ({
@@ -103,7 +104,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     }
     try {
       const raw = await shortsCommentsApi.getComments(shortsId, targetType);
-      const tree = raw.map(migrateShortsComment);
+      const tree = sortCommentListByLikes(raw.map(migrateShortsComment));
       setShortsComments(tree);
       setLikedShortsIds(collectLikedIds(tree));
     } catch {
@@ -147,7 +148,9 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       const data = await shortsCommentsApi.toggleShortsCommentLikeRequest(commentId);
       const likes = data?.likes ?? 0;
       const liked = Boolean(data?.liked);
-      setShortsComments((prev) => updateLikesInTree(prev, commentId, likes, liked));
+      setShortsComments((prev) =>
+        sortCommentListByLikes(updateLikesInTree(prev, commentId, likes, liked))
+      );
       setLikedShortsIds((prev) => {
         const next = new Set(prev);
         if (liked) next.add(String(commentId));
@@ -177,10 +180,12 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       const item = data?.item ? migrateShortsComment(data.item) : null;
       if (item) {
         if (replyingToShorts) {
-          setShortsComments((prev) => insertReplyInTree(prev, replyingToShorts.id, item));
+          setShortsComments((prev) =>
+            sortCommentListByLikes(insertReplyInTree(prev, replyingToShorts.id, item))
+          );
           setReplyingToShorts(null);
         } else {
-          setShortsComments((prev) => [item, ...prev]);
+          setShortsComments((prev) => sortCommentListByLikes([item, ...prev]));
         }
       } else {
         await reloadComments();

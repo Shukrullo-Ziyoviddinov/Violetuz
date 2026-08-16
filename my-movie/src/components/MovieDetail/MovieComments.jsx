@@ -5,6 +5,8 @@ import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import * as commentsApi from '../../api/commentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
+import { sortCommentListByLikes } from '../../algo/commentLikeSortAlgo';
+import { formatActionCount } from '../../utils/utils';
 import './MovieComments.css';
 
 const MOBILE_MAX = 900;
@@ -134,7 +136,7 @@ const MovieComments = forwardRef(
       }
       try {
         const raw = await commentsApi.fetchComments(target);
-        const tree = raw.map(migrateComment);
+        const tree = sortCommentListByLikes(raw.map(migrateComment));
         setComments(tree);
         setLikedIds(collectLikedIds(tree));
       } catch {
@@ -204,7 +206,9 @@ const MovieComments = forwardRef(
         const data = await commentsApi.toggleCommentLikeRequest(commentId);
         const likes = data?.likes ?? 0;
         const liked = Boolean(data?.liked);
-        setComments((prev) => updateLikesInTree(prev, commentId, likes, liked));
+        setComments((prev) =>
+          sortCommentListByLikes(updateLikesInTree(prev, commentId, likes, liked))
+        );
         setLikedIds((prev) => {
           const next = new Set(prev);
           if (liked) next.add(String(commentId));
@@ -235,10 +239,12 @@ const MovieComments = forwardRef(
         const item = data?.item ? migrateComment(data.item) : null;
         if (item) {
           if (replyingTo) {
-            setComments((prev) => insertReplyInTree(prev, replyingTo.id, item));
+            setComments((prev) =>
+              sortCommentListByLikes(insertReplyInTree(prev, replyingTo.id, item))
+            );
             setReplyingTo(null);
           } else {
-            setComments((prev) => [item, ...prev]);
+            setComments((prev) => sortCommentListByLikes([item, ...prev]));
           }
         } else {
           await reloadComments();
@@ -370,7 +376,9 @@ const MovieComments = forwardRef(
               </svg>
             </button>
             {(c.likes || 0) > 0 && (
-              <span className="movie-detail-comment-like-count">{c.likes}</span>
+              <span className="movie-detail-comment-like-count">
+                {formatActionCount(c.likes)}
+              </span>
             )}
           </div>
         </div>

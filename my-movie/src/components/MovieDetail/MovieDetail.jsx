@@ -2125,13 +2125,18 @@ const MovieDetail = () => {
         language={i18n.language === 'uz' ? 'uz' : 'ru'}
         initialRating={userLastVote}
         onSubmit={async (value) => {
+          if (!movie?.id) {
+            throw new Error(
+              i18n.language === 'uz' ? 'Kino topilmadi' : 'Фильм не найден'
+            );
+          }
           const data = await submitMovieRatingRequest({
             movieId: movie.id,
             value,
           });
           if (data?.movieRating != null) {
             setMovieRatingValue(Number(data.movieRating) || 0);
-            if (movie) movie.rating = Number(data.movieRating) || 0;
+            movie.rating = Number(data.movieRating) || 0;
           }
           setUserLastVote(
             data?.userVote != null ? Math.floor(Number(data.userVote)) : value

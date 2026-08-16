@@ -6,6 +6,8 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
   const [dragStartY, setDragStartY] = useState(0);
   const [dragCurrentY, setDragCurrentY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!isOpen) {
@@ -13,10 +15,15 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
       setDragStartY(0);
       setDragCurrentY(0);
       setIsDragging(false);
+      setSubmitting(false);
+      setError('');
       return;
     }
-    const safeInitial = Number.isFinite(Number(initialRating)) ? Math.max(1, Math.min(10, Math.floor(Number(initialRating)))) : 0;
+    const safeInitial = Number.isFinite(Number(initialRating))
+      ? Math.max(1, Math.min(10, Math.floor(Number(initialRating))))
+      : 0;
     setSelectedRating(safeInitial);
+    setError('');
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = '';
@@ -25,9 +32,12 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
 
   if (!isOpen) return null;
 
-  const questionText = language === 'uz' ? `${movieTitle} kinosiga baho bering` : `Оцените фильм ${movieTitle}`;
+  const questionText =
+    language === 'uz' ? `${movieTitle} kinosiga baho bering` : `Оцените фильм ${movieTitle}`;
   const buttonText = language === 'uz' ? 'Baholash' : 'Оценить';
+  const submittingText = language === 'uz' ? 'Saqlanmoqda…' : 'Сохранение…';
   const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 500;
+  const canSubmit = selectedRating >= 1 && selectedRating <= 10 && !submitting;
 
   const handleDragStart = (e) => {
     if (!isSmallScreen) return;
@@ -56,12 +66,38 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
     setDragStartY(0);
   };
 
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+    setSubmitting(true);
+    setError('');
+    try {
+      await Promise.resolve(onSubmit(selectedRating));
+      onClose();
+    } catch (err) {
+      const msg =
+        err?.message ||
+        (language === 'uz' ? 'Reyting saqlanmadi. Qayta urinib ko‘ring.' : 'Не удалось сохранить оценку.');
+      setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <div className="rating-modal-overlay" onClick={() => { if (!isSmallScreen) onClose(); }}>
+    <div
+      className="rating-modal-overlay"
+      onClick={() => {
+        if (!isSmallScreen && !submitting) onClose();
+      }}
+    >
       <div
         className={`rating-modal-content ${isDragging ? 'dragging' : ''}`}
         onClick={(e) => e.stopPropagation()}
-        style={isSmallScreen && isDragging && dragCurrentY > dragStartY ? { transform: `translateY(${dragCurrentY - dragStartY}px)` } : {}}
+        style={
+          isSmallScreen && isDragging && dragCurrentY > dragStartY
+            ? { transform: `translateY(${dragCurrentY - dragStartY}px)` }
+            : {}
+        }
       >
         <div
           className="rating-modal-drag-zone"
@@ -72,7 +108,12 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
           <span className="rating-modal-drag-handle" />
         </div>
 
-        <button className="rating-modal-close" onClick={onClose} aria-label="Close">
+        <button
+          className="rating-modal-close"
+          onClick={onClose}
+          aria-label="Close"
+          disabled={submitting}
+        >
           ×
         </button>
 
@@ -91,8 +132,13 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
                 key={value}
                 type="button"
                 className={`rating-modal-star-btn ${selectedRating >= value ? 'active' : ''}`}
-                onClick={() => setSelectedRating(value)}
+                onClick={() => {
+                  if (submitting) return;
+                  setSelectedRating(value);
+                  setError('');
+                }}
                 aria-label={`${value}`}
+                disabled={submitting}
               >
                 ★
               </button>
@@ -100,21 +146,15 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
           })}
         </div>
 
+        {error ? <p className="rating-modal-error">{error}</p> : null}
+
         <button
           type="button"
-          className={`rating-modal-submit ${selectedRating === 0 ? 'disabled' : ''}`}
-          onClick={async () => {
-            if (!selectedRating) return;
-            try {
-              await Promise.resolve(onSubmit(selectedRating));
-              onClose();
-            } catch {
-              /* xato — modal ochiq qoladi */
-            }
-          }}
-          disabled={selectedRating === 0}
+          className={`rating-modal-submit ${!canSubmit ? 'disabled' : ''}`}
+          onClick={handleSubmit}
+          disabled={!canSubmit}
         >
-          {buttonText}
+          {submitting ? submittingText : buttonText}
         </button>
       </div>
     </div>

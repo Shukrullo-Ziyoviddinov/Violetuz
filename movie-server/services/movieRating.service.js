@@ -46,10 +46,8 @@ const toClientItem = (row) => ({
 
 const findMovieByCatalogId = async (movieIdStr) => {
   const numericId = Number(movieIdStr);
-  if (Number.isInteger(numericId) && String(numericId) === movieIdStr) {
-    return Movie.findOne({ id: numericId });
-  }
-  return null;
+  if (!Number.isFinite(numericId)) return null;
+  return Movie.findOne({ id: numericId });
 };
 
 /** Profil → reyting history */
@@ -100,8 +98,9 @@ const submitRating = async (userId, { movieId: movieIdRaw, value }) => {
     nextRating = applyVoteToRating(nextRating, voteValue);
   }
 
+  /* To‘liq save() o‘rniga faqat rating — eski hujjat validatsiyasida yiqilmasin */
+  await Movie.updateOne({ _id: movie._id }, { $set: { rating: nextRating } });
   movie.rating = nextRating;
-  await movie.save();
 
   const snapshot = buildMovieSnapshot(movie, nextRating);
   const row = await MovieRating.findOneAndUpdate(
