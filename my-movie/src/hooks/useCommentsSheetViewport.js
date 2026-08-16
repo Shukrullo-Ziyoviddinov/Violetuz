@@ -7,11 +7,11 @@ const TOP_CLOSED_RATIO = 0.16;
 const TOP_CLOSED_MIN = 100;
 const TOP_CLOSED_MAX = 168;
 
-/** Klaviatura ochiq — kichik yuqori gap */
-const TOP_OPEN_MIN = 12;
-const TOP_OPEN_MAX = 28;
+/** Klaviatura ochiq — kichik yuqori gap (visual viewport ichida) */
+const TOP_OPEN_GAP = 12;
 
-const KB_PX = 50;
+const KB_PX = 80;
+const CLOSE_SUPPRESS_MS = 320;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -19,92 +19,92 @@ export const isCommentsSheetViewport = () =>
 const closedTopGap = (screenH) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, screenH * TOP_CLOSED_RATIO)));
 
-const openTopGap = () => TOP_OPEN_MIN;
-
 /**
- * Modal layout:
- * - yopiq: top=gap, bottom=0, height=screen-gap  (pastda bo‘shliq yo‘q)
- * - ochiq: top=kichik gap, bottom=klaviatura balandligi → footer klaviatura USTIDA
+ * Modal layout (mobile sheet):
+ * - yopiq: baseline top + height (pastda bo‘shliq yo‘q)
+ * - ochiq: visualViewport ga pin — footer klaviatura USTIDA
+ * - yopilganda: aynan ochilishdagi baseline ga qaytadi
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetTop, setSheetTop] = useState(0);
-  const [sheetBottom, setSheetBottom] = useState(0);
   const [sheetHeight, setSheetHeight] = useState(0);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   const scrollYRef = useRef(0);
   const keyboardRef = useRef(false);
   const inputFocusRef = useRef(false);
-  const baselineVvHRef = useRef(0);
-  const baselineInnerHRef = useRef(0);
+  const baselineHRef = useRef(0);
   const blurTimerRef = useRef(0);
   const syncTimersRef = useRef([]);
+  const suppressOpenUntilRef = useRef(0);
 
   const clearSyncTimers = () => {
     syncTimersRef.current.forEach((id) => window.clearTimeout(id));
     syncTimersRef.current = [];
   };
 
+  const measureKeyboard = useCallback(() => {
+    const vv = window.visualViewport;
+    const layoutH = window.innerHeight;
+    if (!vv) return 0;
+    /* Layout pastidagi klaviatura zonasi (overlays-content) */
+    return Math.max(0, Math.round(layoutH - vv.height - vv.offsetTop));
+  }, []);
+
   const applyClosed = useCallback(() => {
-    const innerH = window.innerHeight;
-    const top = closedTopGap(baselineInnerHRef.current || innerH);
+    const baseH = baselineHRef.current || window.innerHeight;
+    const top = closedTopGap(baseH);
     keyboardRef.current = false;
     setKeyboardOpen(false);
     setSheetTop(top);
-    setSheetBottom(0);
-    setSheetHeight(Math.max(240, innerH - top));
+    setSheetHeight(Math.max(240, baseH - top));
   }, []);
 
   const applyOpen = useCallback(() => {
     const vv = window.visualViewport;
-    const innerH = window.innerHeight;
-    const vvH = vv ? vv.height : innerH;
-    const vvTop = vv ? vv.offsetTop : 0;
+    const kb = measureKeyboard();
+    if (!vv || kb < KB_PX) {
+      /* Klaviatura hali chiqmagan — kutamiz, yopiq layoutni buzmaymiz */
+      return false;
+    }
 
-    /* Layout pastdagi klaviatura zonasi */
-    const belowVv = Math.max(0, Math.round(innerH - vvTop - vvH));
-    const vvShrink = Math.max(0, Math.round(baselineVvHRef.current - vvH));
-    const innerShrink = Math.max(0, Math.round(baselineInnerHRef.current - vvH));
-    const bottom = Math.max(belowVv, vvShrink, innerShrink);
+    /* Visual viewport tepasiga pin: footer = VV past = klaviatura ustida */
+    const top = Math.round(vv.offsetTop + TOP_OPEN_GAP);
+    const height = Math.max(200, Math.round(vv.height - TOP_OPEN_GAP));
 
-    const top = openTopGap();
     keyboardRef.current = true;
     setKeyboardOpen(true);
     setSheetTop(top);
-    setSheetBottom(Math.max(bottom, 0));
-    /* height auto: top↔bottom orasini to‘ldiradi — footer bottom da = kb ustida */
-    setSheetHeight(0);
-  }, []);
+    setSheetHeight(height);
+    return true;
+  }, [measureKeyboard]);
 
   const syncLayout = useCallback(
     (mode) => {
-      const vv = window.visualViewport;
-      const innerH = window.innerHeight;
-      const vvH = vv ? vv.height : innerH;
-      const vvTop = vv ? vv.offsetTop : 0;
-      const belowVv = Math.max(0, Math.round(innerH - vvTop - vvH));
-      const vvShrink = Math.max(0, Math.round(baselineVvHRef.current - vvH));
-      const kb = Math.max(belowVv, vvShrink);
-
-      if (mode === 'open' || mode === true) {
-        applyOpen();
-        return;
-      }
       if (mode === 'close' || mode === false) {
         applyClosed();
         return;
       }
 
-      /* auto */
+      if (mode === 'open' || mode === true) {
+        applyOpen();
+        return;
+      }
+
+      /* auto — faqat focus yoki aniq kb */
+      const kb = measureKeyboard();
+      const now = Date.now();
+      const suppress = now < suppressOpenUntilRef.current;
+
       const wantOpen =
-        inputFocusRef.current ||
-        kb > KB_PX ||
-        (keyboardRef.current && kb > 30);
+        !suppress &&
+        (inputFocusRef.current || keyboardRef.current) &&
+        kb >= KB_PX;
 
       if (wantOpen) applyOpen();
-      else applyClosed();
+      else if (!inputFocusRef.current) applyClosed();
     },
-    [applyClosed, applyOpen]
+    [applyClosed, applyOpen, measureKeyboard]
   );
 
   useLayoutEffect(() => {
@@ -113,15 +113,14 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       inputFocusRef.current = false;
       window.clearTimeout(blurTimerRef.current);
       clearSyncTimers();
+      suppressOpenUntilRef.current = 0;
       setSheetTop(0);
-      setSheetBottom(0);
       setSheetHeight(0);
       setKeyboardOpen(false);
       return;
     }
-    const vv = window.visualViewport;
-    baselineInnerHRef.current = window.innerHeight;
-    baselineVvHRef.current = vv ? vv.height : window.innerHeight;
+    /* Ochilishdagi ekran balandligi — yopilganda shunga qaytamiz */
+    baselineHRef.current = window.innerHeight;
     applyClosed();
   }, [active, applyClosed]);
 
@@ -202,32 +201,24 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     };
   }, [active, syncLayout]);
 
-  const keepScrollLocked = useCallback(() => {
-    if (!isCommentsSheetViewport()) return;
-    if (document.body.style.position === 'fixed') {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-    }
-  }, []);
-
   const onModalInputFocus = useCallback(() => {
     if (!isCommentsSheetViewport()) return;
     inputFocusRef.current = true;
     window.clearTimeout(blurTimerRef.current);
     clearSyncTimers();
-    keepScrollLocked();
+    suppressOpenUntilRef.current = 0;
 
-    /* Darhol ochiq layout; keyin klaviatura balandligini bir necha marta o‘lchash */
-    syncLayout('open');
-    [50, 100, 180, 280, 400].forEach((ms) => {
-      const id = window.setTimeout(() => {
-        if (!inputFocusRef.current) return;
-        syncLayout('open');
-        keepScrollLocked();
-      }, ms);
+    /* Klaviatura animatsiyasi davomida bir necha marta o‘lchash */
+    const tryOpen = () => {
+      if (!inputFocusRef.current) return;
+      applyOpen();
+    };
+    tryOpen();
+    [50, 120, 200, 320, 480].forEach((ms) => {
+      const id = window.setTimeout(tryOpen, ms);
       syncTimersRef.current.push(id);
     });
-  }, [keepScrollLocked, syncLayout]);
+  }, [applyOpen]);
 
   const onModalInputBlur = useCallback(() => {
     inputFocusRef.current = false;
@@ -235,17 +226,16 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     window.clearTimeout(blurTimerRef.current);
     blurTimerRef.current = window.setTimeout(() => {
       if (inputFocusRef.current) return;
-      /* Majburiy yopiq holat — avvalgi balandlik */
-      syncLayout('close');
-    }, 160);
-  }, [syncLayout]);
+      /* Yopiq baseline — avvalgi balandlik; auto-open qisqa vaqtga blok */
+      suppressOpenUntilRef.current = Date.now() + CLOSE_SUPPRESS_MS;
+      applyClosed();
+    }, 120);
+  }, [applyClosed]);
 
   return {
     sheetTop,
-    sheetBottom,
     sheetHeight,
     keyboardOpen,
-    keepScrollLocked,
     onModalInputFocus,
     onModalInputBlur,
   };

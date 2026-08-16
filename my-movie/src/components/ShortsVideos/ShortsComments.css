@@ -545,11 +545,11 @@
   }
 }
 
-/* Mobile: top + bottom — footer klaviatura ustida; yopiqda past to‘liq */
+/* Mobile: top + height — footer visualViewport pastida (klaviatura ustida) */
 @media (max-width: 768px) {
   .shorts-comments-modal {
     --sheet-top: 16vh;
-    --sheet-bottom: 0px;
+    --sheet-bottom: auto;
     --sheet-height: 84dvh;
     top: var(--sheet-top);
     bottom: var(--sheet-bottom);
@@ -565,9 +565,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      top 0.34s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.34s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+      top 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.28s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
@@ -581,7 +580,6 @@
   .shorts-comments-modal--keyboard {
     padding-bottom: 0;
     border-radius: 16px 16px 0 0;
-    height: auto;
   }
 
   .shorts-comments-modal-footer {
