@@ -602,24 +602,23 @@
   }
 }
 
-/* Mobile: bottom sheet — visualViewport ga pin (klaviatura sakrashisiz) */
+/* Mobile: bottom sheet — yuqorida bo‘sh joy, visualViewport pin */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
-    --sheet-top: auto;
-    --sheet-height: 85dvh;
-    top: var(--sheet-top, auto);
+    --sheet-top: 14vh;
+    --sheet-height: 78dvh;
+    top: var(--sheet-top);
     bottom: auto;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100vw;
-    height: var(--sheet-height, 85dvh);
+    height: var(--sheet-height);
     max-height: none;
     transform: translateY(105%);
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    /* Faqat ochilish/yopilish — top/height transition YO‘Q (sakrash sababi) */
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
@@ -633,7 +632,7 @@
 
   .movie-detail-comments-modal--keyboard {
     padding-bottom: 0;
-    border-radius: 12px 12px 0 0;
+    border-radius: 16px 16px 0 0;
   }
 
   .movie-detail-comments-modal-drag-handle {

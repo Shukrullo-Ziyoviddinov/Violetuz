@@ -752,11 +752,7 @@ const MovieComments = forwardRef(
                       onChange={(e) => setInputValue(e.target.value)}
                       onFocus={() => {
                         keepScrollLocked();
-                        window.requestAnimationFrame(() => {
-                          keepScrollLocked();
-                          window.setTimeout(keepScrollLocked, 50);
-                          window.setTimeout(keepScrollLocked, 150);
-                        });
+                        window.requestAnimationFrame(keepScrollLocked);
                       }}
                     />
                     <button
