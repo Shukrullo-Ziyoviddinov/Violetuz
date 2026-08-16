@@ -50,6 +50,10 @@ const insertReplyInTree = (list, parentId, reply) =>
   });
 
 const PREVIEW_LIMIT = 4;
+const COMMENTS_SHEET_MQ = '(max-width: 768px)';
+
+const isCommentsSheetViewport = () =>
+  typeof window !== 'undefined' && window.matchMedia(COMMENTS_SHEET_MQ).matches;
 
 const countTotalShortsComments = (comments) =>
   comments.reduce((sum, c) => sum + 1 + countTotalShortsComments(c.replies || []), 0);
@@ -83,13 +87,17 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [shortsComments, setShortsComments] = useState([]);
   const [likedShortsIds, setLikedShortsIds] = useState(() => new Set());
   const [showShortsCommentsModal, setShowShortsCommentsModal] = useState(false);
+  const [shortsModalOpen, setShortsModalOpen] = useState(false);
   const [shortsInputValue, setShortsInputValue] = useState('');
   const [replyingToShorts, setReplyingToShorts] = useState(null);
   const [dragY, setDragY] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const startYRef = useRef(0);
   const shortsCommentsListRef = useRef(null);
+  const modalInputRef = useRef(null);
+  const modalClosingRef = useRef(false);
 
   const requireAuth = useCallback(() => {
     if (isLoggedIn) return true;
@@ -116,7 +124,10 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   useEffect(() => {
     setReplyingToShorts(null);
     setShortsInputValue('');
+    modalClosingRef.current = false;
+    setShortsModalOpen(false);
     setShowShortsCommentsModal(false);
+    setDragY(0);
     setSubmitError('');
     reloadComments();
   }, [shortsId, targetType, reloadComments]);
@@ -138,9 +149,59 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
+      setKeyboardInset(0);
     }
     return () => {
       document.body.style.overflow = '';
+    };
+  }, [showShortsCommentsModal]);
+
+  useEffect(() => {
+    if (!showShortsCommentsModal) return undefined;
+    modalClosingRef.current = false;
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setShortsModalOpen(true));
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [showShortsCommentsModal]);
+
+  useEffect(() => {
+    if (!showShortsCommentsModal || shortsModalOpen || !modalClosingRef.current) return undefined;
+    const t = window.setTimeout(() => {
+      modalClosingRef.current = false;
+      setShowShortsCommentsModal(false);
+      setDragY(0);
+      setKeyboardInset(0);
+    }, 420);
+    return () => window.clearTimeout(t);
+  }, [showShortsCommentsModal, shortsModalOpen]);
+
+  useEffect(() => {
+    if (!showShortsCommentsModal || !shortsModalOpen) return;
+    if (isCommentsSheetViewport()) return;
+    modalInputRef.current?.focus();
+  }, [showShortsCommentsModal, shortsModalOpen]);
+
+  useEffect(() => {
+    if (!showShortsCommentsModal) return undefined;
+    const vv = window.visualViewport;
+    if (!vv) return undefined;
+
+    const update = () => {
+      if (!isCommentsSheetViewport()) {
+        setKeyboardInset(0);
+        return;
+      }
+      const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      setKeyboardInset(inset);
+    };
+
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
     };
   }, [showShortsCommentsModal]);
 
@@ -220,8 +281,38 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     setShortsInputValue((prev) => prev + ' VL');
   };
 
-  const handleShortsInputClick = () => {
+  const openShortsModal = useCallback(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    modalClosingRef.current = false;
+    setDragY(0);
+    if (showShortsCommentsModal) {
+      setShortsModalOpen(true);
+      return;
+    }
+    setShortsModalOpen(false);
     setShowShortsCommentsModal(true);
+  }, [showShortsCommentsModal]);
+
+  const closeShortsModal = useCallback(() => {
+    if (!showShortsCommentsModal || modalClosingRef.current) return;
+    modalClosingRef.current = true;
+    setShortsModalOpen(false);
+  }, [showShortsCommentsModal]);
+
+  const handleModalTransitionEnd = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
+    if (!modalClosingRef.current) return;
+    modalClosingRef.current = false;
+    setShowShortsCommentsModal(false);
+    setDragY(0);
+    setKeyboardInset(0);
+  };
+
+  const handleShortsInputClick = () => {
+    openShortsModal();
   };
 
   const handleTouchStart = (e) => {
@@ -236,7 +327,10 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   };
 
   const handleTouchEnd = () => {
-    if (dragY > 80) setShowShortsCommentsModal(false);
+    if (dragY > 80) {
+      closeShortsModal();
+      return;
+    }
     setDragY(0);
   };
 
@@ -247,9 +341,9 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   useImperativeHandle(
     ref,
     () => ({
-      openShortsModal: () => setShowShortsCommentsModal(true),
+      openShortsModal,
     }),
-    []
+    [openShortsModal]
   );
 
   useEffect(() => {
@@ -362,7 +456,13 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                 e.stopPropagation();
                 handleShortsInputClick();
               }}
+              onFocus={(e) => {
+                e.target.blur();
+                handleShortsInputClick();
+              }}
               readOnly
+              inputMode="none"
+              tabIndex={-1}
             />
             <button
               type="button"
@@ -394,7 +494,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
             <button
               type="button"
               className="shorts-comments-more-btn"
-              onClick={() => setShowShortsCommentsModal(true)}
+              onClick={openShortsModal}
             >
               {moreShortsBtnText}
             </button>
@@ -406,13 +506,19 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
         createPortal(
           <>
             <div
-              className="shorts-comments-modal-overlay"
-              onClick={() => setShowShortsCommentsModal(false)}
+              className={`shorts-comments-modal-overlay${shortsModalOpen ? ' is-open' : ''}`}
+              onClick={closeShortsModal}
             />
             <div
-              className={`shorts-comments-modal ${dragY > 0 ? 'shorts-comments-modal-dragging' : ''}`}
-              style={{ '--drag-y': `${dragY}px` }}
+              className={`shorts-comments-modal${shortsModalOpen ? ' is-open' : ''}${
+                dragY > 0 ? ' shorts-comments-modal-dragging' : ''
+              }${keyboardInset > 0 ? ' shorts-comments-modal--keyboard' : ''}`}
+              style={{
+                '--drag-y': `${dragY}px`,
+                '--keyboard-inset': `${keyboardInset}px`,
+              }}
               onClick={(e) => e.stopPropagation()}
+              onTransitionEnd={handleModalTransitionEnd}
             >
               <div
                 className="shorts-comments-modal-header-wrap"
@@ -483,6 +589,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                     )}
                   </div>
                   <input
+                    ref={modalInputRef}
                     type="text"
                     className="shorts-comments-modal-input"
                     placeholder={
@@ -496,7 +603,6 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                     }
                     value={shortsInputValue}
                     onChange={(e) => setShortsInputValue(e.target.value)}
-                    autoFocus
                   />
                   <button
                     type="submit"

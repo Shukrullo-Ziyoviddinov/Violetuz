@@ -288,6 +288,16 @@
   right: 0;
   bottom: 0;
   z-index: 100000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.34s ease, visibility 0.34s ease;
+}
+
+.shorts-comments-modal-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .shorts-comments-modal {
@@ -295,7 +305,7 @@
   left: 50%;
   width: 90%;
   max-width: 500px;
-  --drag-y: 0;
+  --drag-y: 0px;
   background: #121212;
   border-radius: 16px 16px 0 0;
   z-index: 100001;
@@ -306,10 +316,6 @@
   display: flex;
   flex-direction: column;
   max-height: 75vh;
-}
-
-.shorts-comments-modal-dragging {
-  transition: none;
 }
 
 .shorts-comments-modal-header-wrap {
@@ -516,27 +522,53 @@
   .shorts-comments-modal {
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    opacity: 0;
+    transform: translate(-50%, -44%) scale(0.98);
     border-radius: 16px;
     border: 1px solid rgba(70, 65, 80, 0.5);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    transition:
+      transform 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.28s ease;
+  }
+
+  .shorts-comments-modal.is-open {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
 /* Mobile: bottom sheet, slide from bottom */
 @media (max-width: 768px) {
   .shorts-comments-modal {
-    bottom: 0;
+    --keyboard-inset: 0px;
+    bottom: var(--keyboard-inset, 0px);
     top: auto;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100vw;
-    transform: translateY(var(--drag-y, 0));
-    max-height: 85vh;
+    transform: translateY(105%);
+    max-height: min(85vh, calc(100dvh - var(--keyboard-inset, 0px)));
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow-x: hidden;
+    transition:
+      transform 0.38s cubic-bezier(0.32, 0.72, 0, 1),
+      bottom 0.2s ease,
+      max-height 0.2s ease;
+  }
+
+  .shorts-comments-modal.is-open {
+    transform: translateY(var(--drag-y, 0px));
+  }
+
+  .shorts-comments-modal-dragging {
+    transition: none;
+  }
+
+  .shorts-comments-modal--keyboard {
+    padding-bottom: 0;
   }
 
   .shorts-comments-modal-drag-handle {

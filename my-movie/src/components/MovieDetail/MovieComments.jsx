@@ -10,7 +10,12 @@ import { formatActionCount } from '../../utils/utils';
 import './MovieComments.css';
 
 const MOBILE_MAX = 900;
+/** Bottom-sheet modal + klaviatura (CSS bilan bir xil) */
+const COMMENTS_SHEET_MQ = '(max-width: 768px)';
 const PREVIEW_LIMIT_DEFAULT = 4;
+
+const isCommentsSheetViewport = () =>
+  typeof window !== 'undefined' && window.matchMedia(COMMENTS_SHEET_MQ).matches;
 
 const migrateComment = (c) => ({
   ...c,
@@ -104,6 +109,7 @@ const MovieComments = forwardRef(
     const [comments, setComments] = useState([]);
     const [likedIds, setLikedIds] = useState(() => new Set());
     const [showCommentsModal, setShowCommentsModal] = useState(false);
+    const [commentsModalOpen, setCommentsModalOpen] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [replyingTo, setReplyingTo] = useState(null);
     const [dragY, setDragY] = useState(0);
@@ -113,8 +119,11 @@ const MovieComments = forwardRef(
     const [carouselIndex, setCarouselIndex] = useState(0);
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
+    const [keyboardInset, setKeyboardInset] = useState(0);
     const startYRef = useRef(0);
     const commentsListRef = useRef(null);
+    const modalInputRef = useRef(null);
+    const modalClosingRef = useRef(false);
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
 
@@ -154,7 +163,10 @@ const MovieComments = forwardRef(
     useEffect(() => {
       setReplyingTo(null);
       setInputValue('');
+      modalClosingRef.current = false;
+      setCommentsModalOpen(false);
       setShowCommentsModal(false);
+      setDragY(0);
       setSubmitError('');
       reloadComments();
     }, [movieId, targetTypeProp, reloadComments]);
@@ -176,9 +188,63 @@ const MovieComments = forwardRef(
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = '';
+        setKeyboardInset(0);
       }
       return () => {
         document.body.style.overflow = '';
+      };
+    }, [showCommentsModal]);
+
+    /* Ochilish: keyingi frame da is-open — CSS slide-up ishlashi uchun */
+    useEffect(() => {
+      if (!showCommentsModal) return undefined;
+      modalClosingRef.current = false;
+      const id = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setCommentsModalOpen(true));
+      });
+      return () => window.cancelAnimationFrame(id);
+    }, [showCommentsModal]);
+
+    /* Yopilish timeout (transitionend ishlamasa) */
+    useEffect(() => {
+      if (!showCommentsModal || commentsModalOpen || !modalClosingRef.current) return undefined;
+      const t = window.setTimeout(() => {
+        modalClosingRef.current = false;
+        setShowCommentsModal(false);
+        setDragY(0);
+        setKeyboardInset(0);
+      }, 420);
+      return () => window.clearTimeout(t);
+    }, [showCommentsModal, commentsModalOpen]);
+
+    /* Desktop: modal ochilganda focus. Mobile: autoFocus yo‘q — klaviatura faqat input bosilganda */
+    useEffect(() => {
+      if (!showCommentsModal || !commentsModalOpen) return;
+      if (isCommentsSheetViewport()) return;
+      modalInputRef.current?.focus();
+    }, [showCommentsModal, commentsModalOpen]);
+
+    /* Mobile: klaviatura ochilganda modal pastdan yuqoriga (visualViewport) */
+    useEffect(() => {
+      if (!showCommentsModal) return undefined;
+      const vv = window.visualViewport;
+      if (!vv) return undefined;
+
+      const update = () => {
+        if (!isCommentsSheetViewport()) {
+          setKeyboardInset(0);
+          return;
+        }
+        const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+        setKeyboardInset(inset);
+      };
+
+      update();
+      vv.addEventListener('resize', update);
+      vv.addEventListener('scroll', update);
+      return () => {
+        vv.removeEventListener('resize', update);
+        vv.removeEventListener('scroll', update);
       };
     }, [showCommentsModal]);
 
@@ -286,7 +352,36 @@ const MovieComments = forwardRef(
       setInputValue((prev) => prev + ' VL');
     };
 
-    const openModal = () => setShowCommentsModal(true);
+    const openModal = useCallback(() => {
+      /* Preview input focus bo‘lib klaviatura ochilmasin */
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      modalClosingRef.current = false;
+      setDragY(0);
+      if (showCommentsModal) {
+        setCommentsModalOpen(true);
+        return;
+      }
+      setCommentsModalOpen(false);
+      setShowCommentsModal(true);
+    }, [showCommentsModal]);
+
+    const closeModal = useCallback(() => {
+      if (!showCommentsModal || modalClosingRef.current) return;
+      modalClosingRef.current = true;
+      setCommentsModalOpen(false);
+    }, [showCommentsModal]);
+
+    const handleModalTransitionEnd = (e) => {
+      if (e.target !== e.currentTarget) return;
+      if (e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
+      if (!modalClosingRef.current) return;
+      modalClosingRef.current = false;
+      setShowCommentsModal(false);
+      setDragY(0);
+      setKeyboardInset(0);
+    };
 
     const handleTouchStart = (e) => {
       startYRef.current = e.touches[0].clientY;
@@ -300,7 +395,10 @@ const MovieComments = forwardRef(
     };
 
     const handleTouchEnd = () => {
-      if (dragY > 80) setShowCommentsModal(false);
+      if (dragY > 80) {
+        closeModal();
+        return;
+      }
       setDragY(0);
     };
 
@@ -319,7 +417,7 @@ const MovieComments = forwardRef(
       ? { ...comments[carouselSafeIndex], replies: [] }
       : null;
 
-    useImperativeHandle(ref, () => ({ openModal }), []);
+    useImperativeHandle(ref, () => ({ openModal }), [openModal]);
     useEffect(() => {
       onCountChange?.(totalCount);
     }, [totalCount, onCountChange]);
@@ -439,7 +537,13 @@ const MovieComments = forwardRef(
                   e.stopPropagation();
                   openModal();
                 }}
+                onFocus={(e) => {
+                  e.target.blur();
+                  openModal();
+                }}
                 readOnly
+                inputMode="none"
+                tabIndex={-1}
               />
               <button
                 type="button"
@@ -518,15 +622,23 @@ const MovieComments = forwardRef(
           createPortal(
             <>
               <div
-                className="movie-detail-comments-modal-overlay"
-                onClick={() => setShowCommentsModal(false)}
+                className={`movie-detail-comments-modal-overlay${
+                  commentsModalOpen ? ' is-open' : ''
+                }`}
+                onClick={closeModal}
               />
               <div
-                className={`movie-detail-comments-modal ${
-                  dragY > 0 ? 'movie-detail-comments-modal-dragging' : ''
+                className={`movie-detail-comments-modal${
+                  commentsModalOpen ? ' is-open' : ''
+                }${dragY > 0 ? ' movie-detail-comments-modal-dragging' : ''}${
+                  keyboardInset > 0 ? ' movie-detail-comments-modal--keyboard' : ''
                 }`}
-                style={{ '--drag-y': `${dragY}px` }}
+                style={{
+                  '--drag-y': `${dragY}px`,
+                  '--keyboard-inset': `${keyboardInset}px`,
+                }}
                 onClick={(e) => e.stopPropagation()}
+                onTransitionEnd={handleModalTransitionEnd}
               >
                 <div
                   className="movie-detail-comments-modal-header-wrap"
@@ -607,6 +719,7 @@ const MovieComments = forwardRef(
                       )}
                     </div>
                     <input
+                      ref={modalInputRef}
                       type="text"
                       className="movie-detail-comments-modal-input"
                       placeholder={
@@ -620,7 +733,6 @@ const MovieComments = forwardRef(
                       }
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      autoFocus
                     />
                     <button
                       type="submit"
