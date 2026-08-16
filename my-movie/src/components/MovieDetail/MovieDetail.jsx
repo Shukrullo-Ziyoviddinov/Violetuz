@@ -18,7 +18,13 @@ import LikeButton from '../../Music/LikeButton/LikeButton';
 import Repost from '../Repost/Repost';
 import { formatActionCount } from '../../utils/utils';
 import RatingModal from '../Rating/RatingModal';
-import { calculateMovieRating, formatMovieRating, getMovieLastVote, submitMovieRating } from '../Rating/CalculateRating';
+import { formatMovieRating } from '../Rating/CalculateRating';
+import {
+  fetchMyMovieRating,
+  submitMovieRatingRequest,
+} from '../../api/ratingApi';
+import { useAuth } from '../../context/AuthContext';
+import { requestOpenAuthModal } from '../../authModalBridge';
 import '../Rating/CalculateRating.css';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
@@ -551,6 +557,7 @@ const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addMovie } = useViewedMovies();
   const [showWatchModal, setShowWatchModal] = useState(false);
@@ -726,9 +733,31 @@ const MovieDetail = () => {
 
   useEffect(() => {
     if (!movie) return;
-    setMovieRatingValue(calculateMovieRating(movie.id, movie.rating));
-    setUserLastVote(getMovieLastVote(movie.id));
-  }, [movie]);
+    setMovieRatingValue(Number(movie.rating) || 0);
+    setUserLastVote(null);
+
+    if (!isLoggedIn || movie.id == null) return undefined;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await fetchMyMovieRating(movie.id);
+        if (cancelled) return;
+        const vote = data?.item?.value;
+        setUserLastVote(
+          Number.isFinite(Number(vote)) && vote >= 1 && vote <= 10
+            ? Math.floor(Number(vote))
+            : null
+        );
+      } catch {
+        if (!cancelled) setUserLastVote(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [movie, isLoggedIn]);
 
   const sceneSrcs = useMemo(() => {
     const raw = movie?.scenes;
@@ -1726,7 +1755,13 @@ const MovieDetail = () => {
 
                 <button
                   className="movie-detail-action-btn movie-detail-action-btn-rate"
-                  onClick={() => setShowRatingModal(true)}
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      requestOpenAuthModal('register');
+                      return;
+                    }
+                    setShowRatingModal(true);
+                  }}
                   aria-label={i18n.language === 'uz' ? 'Baholash' : 'Оценить'}
                 >
                   <span className="movie-detail-rate-icon">★</span>
@@ -2088,10 +2123,18 @@ const MovieDetail = () => {
         movieTitle={getMovieTitle()}
         language={i18n.language === 'uz' ? 'uz' : 'ru'}
         initialRating={userLastVote}
-        onSubmit={(value) => {
-          const updated = submitMovieRating(movie.id, movie.rating, value);
-          setMovieRatingValue(updated);
-          setUserLastVote(value);
+        onSubmit={async (value) => {
+          const data = await submitMovieRatingRequest({
+            movieId: movie.id,
+            value,
+          });
+          if (data?.movieRating != null) {
+            setMovieRatingValue(Number(data.movieRating) || 0);
+            if (movie) movie.rating = Number(data.movieRating) || 0;
+          }
+          setUserLastVote(
+            data?.userVote != null ? Math.floor(Number(data.userVote)) : value
+          );
         }}
       />
 

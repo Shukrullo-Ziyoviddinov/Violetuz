@@ -433,8 +433,8 @@
 }
 
 .profile-following-avatar {
-  width: 46px;
-  height: 46px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: 1px solid #ddd;
   object-fit: cover;
@@ -486,6 +486,8 @@
 
 .profile-following-action .following-btn {
   width: fit-content;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.675rem;
 }
 
 .profile-following-empty {

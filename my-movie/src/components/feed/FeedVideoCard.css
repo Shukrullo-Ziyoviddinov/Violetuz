@@ -172,11 +172,13 @@
 }
 
 .feed-video-like-button .like-button-btn {
-  padding: 0.28rem 0.52rem;
-  font-size: 0.78rem;
+  height: 26px;
+  padding: 0 0.45rem;
+  font-size: 0.72rem;
+  box-sizing: border-box;
 }
 
 .feed-video-like-button .like-button-icon-wrap svg {
-  width: 16px;
-  height: 16px;
+  width: 0.72rem;
+  height: 0.72rem;
 }

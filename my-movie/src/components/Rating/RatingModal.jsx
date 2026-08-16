@@ -103,10 +103,14 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
         <button
           type="button"
           className={`rating-modal-submit ${selectedRating === 0 ? 'disabled' : ''}`}
-          onClick={() => {
+          onClick={async () => {
             if (!selectedRating) return;
-            onSubmit(selectedRating);
-            onClose();
+            try {
+              await Promise.resolve(onSubmit(selectedRating));
+              onClose();
+            } catch {
+              /* xato — modal ochiq qoladi */
+            }
           }}
           disabled={selectedRating === 0}
         >
