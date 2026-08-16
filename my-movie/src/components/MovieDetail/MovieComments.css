@@ -637,9 +637,14 @@
   .movie-detail-comments-modal--keyboard {
     padding-bottom: 0;
     border-radius: 16px 16px 0 0;
-    /* Stretch bug yo‘q: faqat top + height */
     bottom: auto !important;
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
+  }
+
+  .movie-detail-comments-modal--keyboard .movie-detail-comments-modal-footer {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 3;
   }
 
   .movie-detail-comments-modal-footer {

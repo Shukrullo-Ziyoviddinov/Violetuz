@@ -17,10 +17,10 @@ const closedTopGap = (screenH) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, screenH * TOP_CLOSED_RATIO)));
 
 /**
- * Yopiq: bottom=0, top=auto, height=saqlangan.
- * Ochiq: visualViewport ga pin (top + height, bottom=auto).
- *   → navbar tushganda offsetTop/height yangilanadi:
- *     modal yuqorisi chrome ostida, footer kb ustida qoladi.
+ * Yopiq: bottom=0, height=saqlangan (navbar gacha ochilish/yopilish saqlanadi).
+ * Ochiq: birinchi marta VV tepasiga pin (navbar osti).
+ * Keyin top QULFLANADI — footer/kb bilan faqat height o‘zgaradi,
+ * modal yana yuqoriga surilmaydi. Footer = VV past = kb usti.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetTop, setSheetTop] = useState(null);
@@ -32,6 +32,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const inputFocusRef = useRef(false);
   const baselineHRef = useRef(0);
   const closedHeightRef = useRef(0);
+  const lockedTopRef = useRef(null);
   const blurTimerRef = useRef(0);
   const closeLockUntilRef = useRef(0);
   const blockOverlayCloseUntilRef = useRef(0);
@@ -51,16 +52,33 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
         (baselineHRef.current || window.innerHeight) -
           closedTopGap(baselineHRef.current || window.innerHeight)
       );
+    lockedTopRef.current = null;
     setKeyboardOpen(false);
     setSheetTop(null);
     setSheetBottom(0);
     setSheetHeight(h);
   }, []);
 
-  /** Modalni aynan visualViewport ichiga joylash */
+  /**
+   * top: birinchi pin + chrome uchun faqat pastga (oshirish) ruxsat.
+   * height: VV pastigacha — footer kb ustida, modal yuqoriga qo‘shimcha surilmaydi.
+   */
   const pinToVisualViewport = useCallback((vv) => {
-    const top = Math.max(0, Math.round(vv.offsetTop + TOP_SAFE_GAP));
-    const height = Math.max(200, Math.round(vv.height - TOP_SAFE_GAP));
+    const vvTop = Math.max(0, Math.round(vv.offsetTop + TOP_SAFE_GAP));
+    const vvBottom = Math.round(vv.offsetTop + vv.height);
+
+    let top;
+    if (lockedTopRef.current == null) {
+      top = vvTop;
+      lockedTopRef.current = top;
+    } else {
+      /* Navbar tushsa top oshadi; yuqoriga kamaytirib surilmasin */
+      top = Math.max(lockedTopRef.current, vvTop);
+      lockedTopRef.current = top;
+    }
+
+    const height = Math.max(200, vvBottom - top);
+
     setKeyboardOpen(true);
     setSheetTop(top);
     setSheetBottom(0);
@@ -90,7 +108,6 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       layoutKb >= KB_MIN ||
       (vv && vv.height < baseH - KB_MIN);
 
-    /* Kb yopilmoqda — VV bilan pastga kuzatish */
     if (!focused && kbVisible && vv) {
       pinToVisualViewport(vv);
       return;
@@ -102,6 +119,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     }
 
     if (!kbVisible) {
+      lockedTopRef.current = null;
       setKeyboardOpen(false);
       setSheetTop(null);
       setSheetBottom(0);
@@ -109,13 +127,11 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       return;
     }
 
-    /* Asosiy: VV pin — chrome tushsa ham top/footer to‘g‘ri */
     if (vv) {
       pinToVisualViewport(vv);
       return;
     }
 
-    /* Faqat VirtualKeyboard */
     if (vkH >= KB_MIN) {
       setKeyboardOpen(true);
       setSheetTop(null);
@@ -139,6 +155,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       clearRetries();
       closeLockUntilRef.current = 0;
       blockOverlayCloseUntilRef.current = 0;
+      lockedTopRef.current = null;
       if (rafRef.current) window.cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
       setSheetTop(null);
@@ -243,9 +260,10 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     window.clearTimeout(blurTimerRef.current);
     clearRetries();
     closeLockUntilRef.current = 0;
+    /* Yangi focus — top qulfini reset (birinchi pin qayta) */
+    lockedTopRef.current = null;
     blockOverlayCloseUntilRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
     applyFromViewport();
-    /* Chrome + kb animatsiyasi — uzoqroq kuzatish */
     [40, 100, 180, 280, 400, 550, 750, 1000].forEach((ms) => {
       retryTimersRef.current.push(
         window.setTimeout(() => {
