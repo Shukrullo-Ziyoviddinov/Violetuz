@@ -545,18 +545,18 @@
   }
 }
 
-/* Mobile: top fixed, faqat bottom klaviatura bilan siljiydi */
+/* Mobile: visualViewport pin — footer klaviatura ustida */
 @media (max-width: 768px) {
   .shorts-comments-modal {
     --sheet-top: 16vh;
-    --kb-inset: 0px;
+    --sheet-height: 84dvh;
     top: var(--sheet-top);
-    bottom: var(--kb-inset, 0px);
+    bottom: auto;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100vw;
-    height: auto;
+    height: var(--sheet-height);
     max-height: none;
     transform: translateY(105%);
     border-radius: 20px 20px 0 0;
@@ -564,8 +564,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.36s cubic-bezier(0.32, 0.72, 0, 1),
-      top 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+      top 0.36s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.36s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
@@ -591,5 +591,7 @@
 
   .shorts-comments-modal-body {
     scroll-behavior: smooth;
+    min-height: 0;
+    flex: 1 1 auto;
   }
 }
