@@ -622,8 +622,13 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                     }
                     value={shortsInputValue}
                     onChange={(e) => setShortsInputValue(e.target.value)}
-                    onFocus={() => {
+                    onFocus={(e) => {
                       onModalInputFocus();
+                      try {
+                        e.target.focus({ preventScroll: true });
+                      } catch {
+                        /* ignore */
+                      }
                     }}
                     onBlur={() => {
                       onModalInputBlur();

@@ -749,8 +749,14 @@ const MovieComments = forwardRef(
                       }
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      onFocus={() => {
+                      onFocus={(e) => {
                         onModalInputFocus();
+                        /* Sahifa scroll / navbar tushishini kamaytirish */
+                        try {
+                          e.target.focus({ preventScroll: true });
+                        } catch {
+                          /* ignore */
+                        }
                       }}
                       onBlur={() => {
                         onModalInputBlur();
