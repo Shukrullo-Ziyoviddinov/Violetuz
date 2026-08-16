@@ -602,13 +602,12 @@
   }
 }
 
-/* Mobile: top + height — footer visualViewport pastida (klaviatura ustida) */
+/* Mobile: bottom + height — klaviatura ochilganda butun sheet yuqoriga */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
-    --sheet-top: 16vh;
-    --sheet-bottom: auto;
+    --sheet-bottom: 0px;
     --sheet-height: 84dvh;
-    top: var(--sheet-top);
+    top: auto;
     bottom: var(--sheet-bottom);
     left: 0 !important;
     right: 0 !important;
@@ -622,8 +621,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      top 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+      bottom 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.22s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {

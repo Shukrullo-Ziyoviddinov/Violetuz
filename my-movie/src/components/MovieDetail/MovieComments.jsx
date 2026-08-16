@@ -125,7 +125,7 @@ const MovieComments = forwardRef(
     const [isDraggingModal, setIsDraggingModal] = useState(false);
     const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-    const { sheetTop, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur } =
+    const { sheetBottom, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur } =
       useCommentsSheetViewport(showCommentsModal, '.movie-detail-comments-modal-body');
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
@@ -647,8 +647,7 @@ const MovieComments = forwardRef(
                 }`}
                 style={{
                   '--drag-y': `${dragY}px`,
-                  '--sheet-top': `${sheetTop}px`,
-                  '--sheet-bottom': 'auto',
+                  '--sheet-bottom': `${sheetBottom}px`,
                   '--sheet-height': sheetHeight > 0 ? `${sheetHeight}px` : '84dvh',
                 }}
                 onClick={(e) => e.stopPropagation()}
@@ -747,6 +746,9 @@ const MovieComments = forwardRef(
                       }
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
+                      onTouchStart={() => {
+                        onModalInputFocus();
+                      }}
                       onFocus={() => {
                         onModalInputFocus();
                       }}

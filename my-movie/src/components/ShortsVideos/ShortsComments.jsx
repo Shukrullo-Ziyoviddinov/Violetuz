@@ -101,7 +101,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [isDraggingModal, setIsDraggingModal] = useState(false);
   const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-  const { sheetTop, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur } =
+  const { sheetBottom, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur } =
     useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
 
   const requireAuth = useCallback(() => {
@@ -530,8 +530,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
               }${keyboardOpen ? ' shorts-comments-modal--keyboard' : ''}`}
               style={{
                 '--drag-y': `${dragY}px`,
-                '--sheet-top': `${sheetTop}px`,
-                '--sheet-bottom': 'auto',
+                '--sheet-bottom': `${sheetBottom}px`,
                 '--sheet-height': sheetHeight > 0 ? `${sheetHeight}px` : '84dvh',
               }}
               onClick={(e) => e.stopPropagation()}
@@ -620,6 +619,9 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                     }
                     value={shortsInputValue}
                     onChange={(e) => setShortsInputValue(e.target.value)}
+                    onTouchStart={() => {
+                      onModalInputFocus();
+                    }}
                     onFocus={() => {
                       onModalInputFocus();
                     }}
