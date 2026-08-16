@@ -12,7 +12,7 @@ const TOP_OPEN_RATIO = 0.028;
 const TOP_OPEN_MIN = 16;
 const TOP_OPEN_MAX = 36;
 
-const KB_DETECT_PX = 70;
+const KB_DETECT_PX = 60;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -31,11 +31,19 @@ export const resolveSheetTop = (
   );
 };
 
+/** Klaviatura balandligi — bir necha usuldan eng ishonchlisi */
+const measureKeyboardBottom = (vv, baselineVvH, baselineInnerH) => {
+  const innerH = window.innerHeight;
+  const vvH = vv.height;
+  const rawInset = Math.max(0, Math.round(innerH - vvH - vv.offsetTop));
+  const vvShrink = Math.max(0, Math.round(baselineVvH - vvH));
+  const fromBaselineInner = Math.max(0, Math.round(baselineInnerH - vvH - vv.offsetTop));
+  return Math.max(rawInset, vvShrink, fromBaselineInner);
+};
+
 /**
- * Klaviatura aniqlash:
- * 1) visualViewport qisqarishi (resizes-content)
- * 2) layout − vv inset (overlays-content)
- * Input focus → zaxira signal.
+ * Input klaviatura ustida (bottom = kb height).
+ * Yopilganda top/bottom silliq eski holatga.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetTop, setSheetTop] = useState(() => resolveSheetTop());
@@ -45,6 +53,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const keyboardRef = useRef(false);
   const lastInsetRef = useRef(0);
   const settleTimerRef = useRef(0);
+  const pollTimerRef = useRef(0);
   const baselineVvHRef = useRef(0);
   const baselineInnerHRef = useRef(0);
   const inputFocusRef = useRef(false);
@@ -54,6 +63,8 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       keyboardRef.current = false;
       lastInsetRef.current = 0;
       inputFocusRef.current = false;
+      window.clearTimeout(settleTimerRef.current);
+      window.clearTimeout(pollTimerRef.current);
       setKbInset(0);
       setKeyboardOpen(false);
       setSheetTop(resolveSheetTop(window.innerHeight, false));
@@ -63,6 +74,10 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     baselineInnerHRef.current = window.innerHeight;
     baselineVvHRef.current = vv ? vv.height : window.innerHeight;
     setSheetTop(resolveSheetTop(window.innerHeight, false));
+    setKbInset(0);
+    setKeyboardOpen(false);
+    keyboardRef.current = false;
+    lastInsetRef.current = 0;
   }, [active]);
 
   useEffect(() => {
@@ -129,22 +144,9 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
     let raf = 0;
 
-    const readMetrics = () => {
-      const innerH = window.innerHeight;
-      const vvH = vv.height;
-      const rawInset = Math.max(0, Math.round(innerH - vvH - vv.offsetTop));
-      const vvShrink = Math.max(0, Math.round(baselineVvHRef.current - vvH));
-      const innerShrink = Math.max(0, Math.round(baselineInnerHRef.current - innerH));
-      /* resizes-content: inset~0, lekin vv/inner qisqaradi */
-      const keyboard =
-        rawInset > KB_DETECT_PX ||
-        vvShrink > KB_DETECT_PX ||
-        (inputFocusRef.current && (vvShrink > 40 || innerShrink > 40 || rawInset > 40));
-      return { innerH, vvH, rawInset, vvShrink, innerShrink, keyboard };
-    };
-
     const closeKeyboard = () => {
       window.clearTimeout(settleTimerRef.current);
+      window.clearTimeout(pollTimerRef.current);
       keyboardRef.current = false;
       lastInsetRef.current = 0;
       setKbInset(0);
@@ -152,57 +154,43 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       setSheetTop(resolveSheetTop(window.innerHeight, false));
     };
 
-    const openKeyboardExpand = (innerH, inset) => {
+    const applyOpen = (bottom) => {
       keyboardRef.current = true;
+      lastInsetRef.current = bottom;
       setKeyboardOpen(true);
-      setSheetTop(resolveSheetTop(innerH, true));
-      lastInsetRef.current = inset;
-      setKbInset(inset);
+      setSheetTop(resolveSheetTop(window.innerHeight, true));
+      setKbInset(bottom);
     };
 
     const apply = () => {
       raf = 0;
-      const { innerH, rawInset, keyboard } = readMetrics();
+      const bottom = measureKeyboardBottom(
+        vv,
+        baselineVvHRef.current,
+        baselineInnerHRef.current
+      );
+      const keyboard =
+        bottom > KB_DETECT_PX ||
+        (inputFocusRef.current && bottom > 40);
       const wasKeyboard = keyboardRef.current;
 
-      /* Yopilish: focus yo‘q va qisqarish yo‘q */
-      if (wasKeyboard && !keyboard) {
+      if (wasKeyboard && !keyboard && !inputFocusRef.current) {
         closeKeyboard();
         return;
       }
 
       if (!keyboard) return;
 
-      /* overlays: bottom = inset; resizes-content: inset~0, faqat top kengayadi */
-      const bottomInset = rawInset > KB_DETECT_PX ? rawInset : 0;
-
       if (!wasKeyboard) {
-        openKeyboardExpand(innerH, bottomInset);
-        /* settle — aniqroq inset */
-        window.clearTimeout(settleTimerRef.current);
-        settleTimerRef.current = window.setTimeout(() => {
-          const m = readMetrics();
-          if (!m.keyboard) {
-            closeKeyboard();
-            return;
-          }
-          const inset = m.rawInset > KB_DETECT_PX ? m.rawInset : 0;
-          lastInsetRef.current = inset;
-          setKbInset(inset);
-          setSheetTop(resolveSheetTop(window.innerHeight, true));
-          setKeyboardOpen(true);
-          keyboardRef.current = true;
-        }, 100);
+        applyOpen(bottom);
         return;
       }
 
-      if (Math.abs(lastInsetRef.current - bottomInset) > 40) {
-        window.clearTimeout(settleTimerRef.current);
-        settleTimerRef.current = window.setTimeout(() => {
-          lastInsetRef.current = bottomInset;
-          setKbInset(bottomInset);
-          setSheetTop(resolveSheetTop(window.innerHeight, true));
-        }, 80);
+      /* Ochiq: bottom ni yangilab input klaviatura ustida qolsin */
+      if (Math.abs(lastInsetRef.current - bottom) >= 8) {
+        lastInsetRef.current = bottom;
+        setKbInset(bottom);
+        setSheetTop(resolveSheetTop(window.innerHeight, true));
       }
     };
 
@@ -218,6 +206,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
       window.clearTimeout(settleTimerRef.current);
+      window.clearTimeout(pollTimerRef.current);
       vv.removeEventListener('resize', schedule);
       vv.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
@@ -234,46 +223,49 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     }
   }, []);
 
-  /** Input focus — klaviatura signal (zaxira) */
+  const pollKeyboardBottom = useCallback((attempt = 0) => {
+    const vv = window.visualViewport;
+    if (!vv || !inputFocusRef.current) return;
+    const bottom = measureKeyboardBottom(
+      vv,
+      baselineVvHRef.current,
+      baselineInnerHRef.current
+    );
+    if (bottom > KB_DETECT_PX) {
+      lastInsetRef.current = bottom;
+      setKbInset(bottom);
+      setSheetTop(resolveSheetTop(window.innerHeight, true));
+      setKeyboardOpen(true);
+      keyboardRef.current = true;
+      return;
+    }
+    if (attempt < 20) {
+      pollTimerRef.current = window.setTimeout(() => pollKeyboardBottom(attempt + 1), 50);
+    }
+  }, []);
+
   const onModalInputFocus = useCallback(() => {
     if (!isCommentsSheetViewport()) return;
     inputFocusRef.current = true;
     keepScrollLocked();
-    /* Optimistik: top ni darhol ochiq holatga — balandlik oshsin */
+
+    /* Darhol yuqoriga kengaytirish */
     setSheetTop(resolveSheetTop(window.innerHeight, true));
     setKeyboardOpen(true);
     keyboardRef.current = true;
+
+    window.clearTimeout(pollTimerRef.current);
     window.requestAnimationFrame(() => {
       keepScrollLocked();
-      const vv = window.visualViewport;
-      if (!vv) return;
-      const rawInset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-      const vvShrink = Math.max(0, Math.round(baselineVvHRef.current - vv.height));
-      const inset = rawInset > KB_DETECT_PX ? rawInset : 0;
-      if (rawInset > 40 || vvShrink > 40) {
-        lastInsetRef.current = inset;
-        setKbInset(inset);
-      }
+      pollKeyboardBottom(0);
     });
-    window.setTimeout(() => {
-      const vv = window.visualViewport;
-      if (!vv || !inputFocusRef.current) return;
-      const rawInset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-      const vvShrink = Math.max(0, Math.round(baselineVvHRef.current - vv.height));
-      const inset = rawInset > KB_DETECT_PX ? rawInset : 0;
-      setSheetTop(resolveSheetTop(window.innerHeight, true));
-      setKeyboardOpen(true);
-      keyboardRef.current = true;
-      if (rawInset > 40 || vvShrink > 40) {
-        lastInsetRef.current = inset;
-        setKbInset(inset);
-      }
-    }, 120);
-  }, [keepScrollLocked]);
+  }, [keepScrollLocked, pollKeyboardBottom]);
 
   const onModalInputBlur = useCallback(() => {
     inputFocusRef.current = false;
-    window.setTimeout(() => {
+    window.clearTimeout(pollTimerRef.current);
+    window.clearTimeout(settleTimerRef.current);
+    settleTimerRef.current = window.setTimeout(() => {
       if (inputFocusRef.current) return;
       const vv = window.visualViewport;
       if (!vv) {
@@ -284,16 +276,19 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
         setSheetTop(resolveSheetTop(window.innerHeight, false));
         return;
       }
-      const rawInset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-      const vvShrink = Math.max(0, Math.round(baselineVvHRef.current - vv.height));
-      if (rawInset < 32 && vvShrink < 32) {
+      const bottom = measureKeyboardBottom(
+        vv,
+        baselineVvHRef.current,
+        baselineInnerHRef.current
+      );
+      if (bottom < 40) {
         keyboardRef.current = false;
         lastInsetRef.current = 0;
         setKbInset(0);
         setKeyboardOpen(false);
         setSheetTop(resolveSheetTop(window.innerHeight, false));
       }
-    }, 150);
+    }, 180);
   }, []);
 
   return {

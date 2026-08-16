@@ -564,8 +564,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.32s cubic-bezier(0.32, 0.72, 0, 1),
-      top 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+      bottom 0.36s cubic-bezier(0.32, 0.72, 0, 1),
+      top 0.36s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
@@ -579,7 +579,10 @@
   .shorts-comments-modal--keyboard {
     padding-bottom: 0;
     border-radius: 16px 16px 0 0;
-    --sheet-top: 28px;
+  }
+
+  .shorts-comments-modal-footer {
+    flex-shrink: 0;
   }
 
   .shorts-comments-modal-drag-handle {
