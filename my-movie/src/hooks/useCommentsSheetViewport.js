@@ -2,15 +2,15 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const SHEET_MQ = '(max-width: 768px)';
 
-/** Klaviatura YOPIQ — yuqorida ko‘proq joy (oddiy bottom-sheet) */
+/** Klaviatura YOPIQ — yuqorida ko‘proq joy */
 const TOP_CLOSED_RATIO = 0.16;
 const TOP_CLOSED_MIN = 100;
 const TOP_CLOSED_MAX = 168;
 
-/** Klaviatura OCHIQ — yuqori joy kamroq → modal balandroq, lekin tepaga yopishmaydi */
-const TOP_OPEN_RATIO = 0.055;
-const TOP_OPEN_MIN = 36;
-const TOP_OPEN_MAX = 64;
+/** Klaviatura OCHIQ — top pastga (kichik) → modal aniq balandroq */
+const TOP_OPEN_RATIO = 0.03;
+const TOP_OPEN_MIN = 20;
+const TOP_OPEN_MAX = 40;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -30,8 +30,8 @@ export const resolveSheetTop = (
 };
 
 /**
- * Klaviatura yopiq: oddiy balandlik (yuqorida joy).
- * Klaviatura ochiq: top biroz kamayadi → modal balandroq, tepaga kirmaydi.
+ * Klaviatura ochilganda: avval top kamayadi (modal yuqoriga kengayadi),
+ * keyin bottom = klaviatura. Yopiq holat balandligi o‘zgarmaydi.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetTop, setSheetTop] = useState(() => resolveSheetTop());
@@ -118,47 +118,62 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
     let raf = 0;
 
-    const commitInset = (nextInset, keyboard) => {
-      lastInsetRef.current = nextInset;
-      keyboardRef.current = keyboard;
-      setKbInset(nextInset);
-      setKeyboardOpen(keyboard);
-      setSheetTop(resolveSheetTop(window.innerHeight, keyboard));
+    const closeKeyboard = () => {
+      window.clearTimeout(settleTimerRef.current);
+      keyboardRef.current = false;
+      lastInsetRef.current = 0;
+      setKbInset(0);
+      setKeyboardOpen(false);
+      setSheetTop(resolveSheetTop(window.innerHeight, false));
+    };
+
+    const openKeyboardExpand = (h) => {
+      /* Darhol yuqoriga kengaytirish — balandlik oshishi shu */
+      keyboardRef.current = true;
+      setKeyboardOpen(true);
+      setSheetTop(resolveSheetTop(h, true));
     };
 
     const apply = () => {
       raf = 0;
       const h = window.innerHeight;
       const rawInset = Math.max(0, Math.round(h - vv.height - vv.offsetTop));
-
       const wasKeyboard = keyboardRef.current;
-      let keyboard = wasKeyboard;
-      if (!keyboard && rawInset > 80) keyboard = true;
-      if (keyboard && rawInset < 32) keyboard = false;
 
       window.clearTimeout(settleTimerRef.current);
 
-      if (!keyboard) {
-        if (lastInsetRef.current !== 0 || wasKeyboard) {
-          commitInset(0, false);
-        }
+      /* Yopilish */
+      if (wasKeyboard && rawInset < 32) {
+        closeKeyboard();
+        return;
+      }
+      if (!wasKeyboard && rawInset < 80) {
         return;
       }
 
-      if (!wasKeyboard) {
+      /* Birinchi marta ochilish */
+      if (!wasKeyboard && rawInset > 80) {
+        openKeyboardExpand(h);
         settleTimerRef.current = window.setTimeout(() => {
           const settled = Math.max(
             0,
             Math.round(window.innerHeight - vv.height - vv.offsetTop)
           );
-          commitInset(settled > 80 ? settled : rawInset, true);
+          const inset = settled > 80 ? settled : rawInset;
+          lastInsetRef.current = inset;
+          setKbInset(inset);
+          /* top ochiq holatda qolsin */
+          setSheetTop(resolveSheetTop(window.innerHeight, true));
         }, 90);
         return;
       }
 
-      if (Math.abs(lastInsetRef.current - rawInset) > 48) {
+      /* Allaqachon ochiq — inset katta o‘zgarsa */
+      if (wasKeyboard && Math.abs(lastInsetRef.current - rawInset) > 48) {
         settleTimerRef.current = window.setTimeout(() => {
-          commitInset(rawInset, true);
+          lastInsetRef.current = rawInset;
+          setKbInset(rawInset);
+          setSheetTop(resolveSheetTop(window.innerHeight, true));
         }, 80);
       }
     };
