@@ -125,7 +125,7 @@ const MovieComments = forwardRef(
     const [isDraggingModal, setIsDraggingModal] = useState(false);
     const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-    const { sheetTop, kbInset, keyboardOpen, keepScrollLocked } =
+    const { sheetTop, kbInset, keyboardOpen, keepScrollLocked, onModalInputFocus, onModalInputBlur } =
       useCommentsSheetViewport(showCommentsModal, '.movie-detail-comments-modal-body');
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
@@ -747,8 +747,10 @@ const MovieComments = forwardRef(
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onFocus={() => {
-                        keepScrollLocked();
-                        window.requestAnimationFrame(keepScrollLocked);
+                        onModalInputFocus();
+                      }}
+                      onBlur={() => {
+                        onModalInputBlur();
                       }}
                     />
                     <button

@@ -101,7 +101,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [isDraggingModal, setIsDraggingModal] = useState(false);
   const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-  const { sheetTop, kbInset, keyboardOpen, keepScrollLocked } =
+  const { sheetTop, kbInset, keyboardOpen, keepScrollLocked, onModalInputFocus, onModalInputBlur } =
     useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
 
   const requireAuth = useCallback(() => {
@@ -620,8 +620,10 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                     value={shortsInputValue}
                     onChange={(e) => setShortsInputValue(e.target.value)}
                     onFocus={() => {
-                      keepScrollLocked();
-                      window.requestAnimationFrame(keepScrollLocked);
+                      onModalInputFocus();
+                    }}
+                    onBlur={() => {
+                      onModalInputBlur();
                     }}
                   />
                   <button
