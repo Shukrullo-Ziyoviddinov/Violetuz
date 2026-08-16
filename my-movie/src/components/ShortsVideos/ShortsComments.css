@@ -545,13 +545,14 @@
   }
 }
 
-/* Mobile: visualViewport pin — footer klaviatura ustida */
+/* Mobile: top + bottom — footer klaviatura ustida; yopiqda past to‘liq */
 @media (max-width: 768px) {
   .shorts-comments-modal {
     --sheet-top: 16vh;
+    --sheet-bottom: 0px;
     --sheet-height: 84dvh;
     top: var(--sheet-top);
-    bottom: auto;
+    bottom: var(--sheet-bottom);
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
@@ -564,8 +565,9 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      top 0.36s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+      top 0.34s cubic-bezier(0.32, 0.72, 0, 1),
+      bottom 0.34s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.34s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
@@ -579,6 +581,7 @@
   .shorts-comments-modal--keyboard {
     padding-bottom: 0;
     border-radius: 16px 16px 0 0;
+    height: auto;
   }
 
   .shorts-comments-modal-footer {
@@ -590,8 +593,10 @@
   }
 
   .shorts-comments-modal-body {
-    scroll-behavior: smooth;
     min-height: 0;
     flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
   }
 }
