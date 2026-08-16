@@ -24,37 +24,27 @@ export const getLocalizedText = (text, lang) => {
 };
 
 /**
- * Katta sonlarni qisqartirish: 1000→1k, 10000→10k, 1000000→1M
- * @param {number} n - Son
- * @returns {string}
+ * 0–999 aniq; 1000+ → 1K / 1.1K (pastga, 0.1K qadam).
+ * 1000–1099 → 1K, 1100 → 1.1K, 1560 → 1.5K, 10245 → 10.2K
  */
-export const formatCount = (n) => {
-  const num = Number(n) || 0;
-  if (num < 1000) return String(num);
-  if (num < 1000000) {
-    if (num % 1000 === 0) return num / 1000 + 'k';
-    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-  }
-  if (num % 1000000 === 0) return num / 1000000 + 'M';
-  return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-};
-
-/** Shorts like soni: 0-99 aniq, 100-999 → 100+, 1000+ → 1k */
-export const formatShortsLikeCount = (n) => {
+const formatCompactCount = (n) => {
   const num = Number(n);
   if (!Number.isFinite(num) || num < 0) return '0';
-  if (num < 100) return String(num);
-  if (num < 1000) return Math.floor(num / 100) * 100 + '+';
-  const k = num / 1000;
-  if (k % 1 === 0) return `${k}k`;
-  return `${k.toFixed(1).replace(/\.0$/, '')}k`;
+  const whole = Math.floor(num);
+  if (whole < 1000) return String(whole);
+  if (whole < 1_000_000) {
+    const k = Math.floor(whole / 100) / 10;
+    return Number.isInteger(k) ? `${k}K` : `${k.toFixed(1)}K`;
+  }
+  const m = Math.floor(whole / 100_000) / 10;
+  return Number.isInteger(m) ? `${m}M` : `${m.toFixed(1)}M`;
 };
 
-/** 0-99: aniq, 100-999: 100+, 1000+: 1k, 1.1k */
-export const formatActionCount = (n) => {
-  const num = Number(n) || 0;
-  if (num < 100) return String(num);
-  if (num < 1000) return num + '+';
-  if (num % 1000 === 0) return (num / 1000) + 'k';
-  return (num / 1000).toFixed(1) + 'k';
-};
+/** Obunachi va umumiy sonlar */
+export const formatCount = (n) => formatCompactCount(n);
+
+/** Shorts like soni */
+export const formatShortsLikeCount = (n) => formatCompactCount(n);
+
+/** Movie / konsert / triller like-dislike / comment */
+export const formatActionCount = (n) => formatCompactCount(n);

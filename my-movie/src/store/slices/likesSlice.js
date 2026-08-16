@@ -5,12 +5,38 @@ const initialState = {
   items: [],
   reactions: {},
   shortsLikedIds: [],
+  status: 'idle',
+  synced: false,
 };
 
 const likesSlice = createSlice({
   name: 'likes',
   initialState,
   reducers: {
+    setLikesStatus: (state, action) => {
+      state.status = action.payload || 'idle';
+    },
+    hydrateLikesFromServer: (state, action) => {
+      const { reactions, shortsLikedIds, history } = action.payload || {};
+      if (reactions && typeof reactions === 'object') {
+        state.reactions = reactions;
+      }
+      if (Array.isArray(shortsLikedIds)) {
+        state.shortsLikedIds = shortsLikedIds.map(String);
+      }
+      if (Array.isArray(history)) {
+        state.items = history;
+      }
+      state.synced = true;
+      state.status = 'ready';
+    },
+    clearLikes: (state) => {
+      state.items = [];
+      state.reactions = {};
+      state.shortsLikedIds = [];
+      state.synced = false;
+      state.status = 'idle';
+    },
     upsertLikeHistoryItem: (state, action) => {
       const { meta, contentId } = action.payload || {};
       state.items = upsertItemInList(state.items, meta, contentId);
@@ -18,6 +44,9 @@ const likesSlice = createSlice({
     removeLikeHistoryItem: (state, action) => {
       const { meta, contentId } = action.payload || {};
       state.items = removeItemFromList(state.items, meta, contentId);
+    },
+    setLikeHistoryItems: (state, action) => {
+      state.items = Array.isArray(action.payload) ? action.payload : [];
     },
     setReaction: (state, action) => {
       const { key, value } = action.payload || {};
@@ -38,14 +67,24 @@ const likesSlice = createSlice({
         state.shortsLikedIds.push(id);
       }
     },
+    setShortsLikedIds: (state, action) => {
+      state.shortsLikedIds = Array.isArray(action.payload)
+        ? action.payload.map(String)
+        : [];
+    },
   },
 });
 
 export const {
+  setLikesStatus,
+  hydrateLikesFromServer,
+  clearLikes,
   upsertLikeHistoryItem,
   removeLikeHistoryItem,
+  setLikeHistoryItems,
   setReaction,
   toggleShortsLike,
+  setShortsLikedIds,
 } = likesSlice.actions;
 
 export const selectLikeHistoryItems = (state) => state.likes.items;

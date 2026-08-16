@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { formatCount, formatShortsLikeCount } from '../../utils/utils';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { useAuth } from '../../context/AuthContext';
+import { requestOpenAuthModal } from '../../authModalBridge';
 import {
   upsertLikeHistoryItem,
   removeLikeHistoryItem,
@@ -13,6 +15,11 @@ import {
   reactionKeyForPersist,
   reactionKeyForTrailer,
 } from '../../store/slices/likesUtils';
+import {
+  setReactionRequest,
+  toggleShortsLikeRequest,
+} from '../../api/reactionApi';
+import { resolveReactionTypeFromProps } from '../../reactions/reactionKeys';
 import './LikeButton.css';
 
 const parseBase = (v) => {
@@ -22,9 +29,7 @@ const parseBase = (v) => {
 };
 
 /**
- * LikeButton — barcha like turlari (musiqa, kino, trailer, shorts)
- * @param {string} [persistTrailerKey] — trailer reactions kaliti
- * @param {'pill'|'movieDetail'|'trailerModal'|'trailerSimilar'|'shorts'} [variant]
+ * LikeButton — movie / klip / konsert / triller / shorts
  */
 const LikeButton = ({
   contentId,
@@ -42,7 +47,15 @@ const LikeButton = ({
   likeMeta,
 }) => {
   const dispatch = useAppDispatch();
+  const { isLoggedIn } = useAuth();
   const fmt = countFormatter || formatCount;
+
+  const reactionType = resolveReactionTypeFromProps({
+    variant,
+    likeMeta,
+    persistKey,
+    persistTrailerKey,
+  });
 
   const reactionKey = persistTrailerKey
     ? reactionKeyForTrailer(persistTrailerKey)
@@ -67,17 +80,37 @@ const LikeButton = ({
   const likeCount = baseL + (userState === 'like' ? 1 : 0);
   const dislikeCount = baseD + (userState === 'dislike' ? 1 : 0);
 
+  const requireAuth = useCallback(() => {
+    if (isLoggedIn) return true;
+    requestOpenAuthModal('register');
+    return false;
+  }, [isLoggedIn]);
+
   const addToHistory = useCallback(() => {
-    if (likeMeta && contentId) {
-      dispatch(upsertLikeHistoryItem({ meta: likeMeta, contentId }));
+    if (
+      !likeMeta ||
+      !contentId ||
+      reactionType === 'triller' ||
+      reactionType === 'movieTriller' ||
+      reactionType === 'shorts'
+    ) {
+      return;
     }
-  }, [dispatch, likeMeta, contentId]);
+    dispatch(upsertLikeHistoryItem({ meta: likeMeta, contentId }));
+  }, [dispatch, likeMeta, contentId, reactionType]);
 
   const removeFromHistory = useCallback(() => {
-    if (likeMeta && contentId) {
-      dispatch(removeLikeHistoryItem({ meta: likeMeta, contentId }));
+    if (
+      !likeMeta ||
+      !contentId ||
+      reactionType === 'triller' ||
+      reactionType === 'movieTriller' ||
+      reactionType === 'shorts'
+    ) {
+      return;
     }
-  }, [dispatch, likeMeta, contentId]);
+    dispatch(removeLikeHistoryItem({ meta: likeMeta, contentId }));
+  }, [dispatch, likeMeta, contentId, reactionType]);
 
   const persistReaction = useCallback(
     (next) => {
@@ -90,32 +123,60 @@ const LikeButton = ({
     [dispatch, reactionKey]
   );
 
+  const syncReactionToServer = useCallback(
+    async (next) => {
+      if (!isLoggedIn || !reactionType || contentId == null) return;
+      try {
+        await setReactionRequest({
+          id: contentId,
+          type: reactionType,
+          value: next,
+        });
+      } catch {
+        /* optimistic UI qoladi; keyingi refresh serverdan tuzatadi */
+      }
+    },
+    [isLoggedIn, reactionType, contentId]
+  );
+
   const wrapClick = (fn) => (e) => {
     if (stopPropagation) e.stopPropagation();
     fn();
   };
 
   const handleShortsClick = useCallback(() => {
+    if (!requireAuth()) return;
     if (contentId == null) return;
     dispatch(toggleShortsLike(contentId));
-  }, [dispatch, contentId]);
+    if (isLoggedIn) {
+      toggleShortsLikeRequest({ id: contentId }).catch(() => {
+        dispatch(toggleShortsLike(contentId));
+      });
+    }
+  }, [requireAuth, contentId, dispatch, isLoggedIn]);
 
   const handleLikeClick = useCallback(() => {
+    if (!requireAuth()) return;
+
     if (userState === 'like') {
       persistReaction('none');
       removeFromHistory();
+      syncReactionToServer('none');
       onLikeChange?.(contentId, 'unlike', likeCount - 1);
     } else if (userState === 'dislike') {
       persistReaction('like');
       addToHistory();
+      syncReactionToServer('like');
       onDislikeChange?.(contentId, 'undo', dislikeCount - 1);
       onLikeChange?.(contentId, 'like', likeCount + 1);
     } else {
       persistReaction('like');
       addToHistory();
+      syncReactionToServer('like');
       onLikeChange?.(contentId, 'like', likeCount + 1);
     }
   }, [
+    requireAuth,
     userState,
     likeCount,
     dislikeCount,
@@ -125,22 +186,29 @@ const LikeButton = ({
     persistReaction,
     addToHistory,
     removeFromHistory,
+    syncReactionToServer,
   ]);
 
   const handleDislikeClick = useCallback(() => {
+    if (!requireAuth()) return;
+
     if (userState === 'dislike') {
       persistReaction('none');
+      syncReactionToServer('none');
       onDislikeChange?.(contentId, 'undo', dislikeCount - 1);
     } else if (userState === 'like') {
       persistReaction('dislike');
       removeFromHistory();
+      syncReactionToServer('dislike');
       onLikeChange?.(contentId, 'unlike', likeCount - 1);
       onDislikeChange?.(contentId, 'dislike', dislikeCount + 1);
     } else {
       persistReaction('dislike');
+      syncReactionToServer('dislike');
       onDislikeChange?.(contentId, 'dislike', dislikeCount + 1);
     }
   }, [
+    requireAuth,
     userState,
     likeCount,
     dislikeCount,
@@ -149,6 +217,7 @@ const LikeButton = ({
     onDislikeChange,
     persistReaction,
     removeFromHistory,
+    syncReactionToServer,
   ]);
 
   if (variant === 'shorts') {

@@ -38,7 +38,7 @@ const TrillerMetaRow = ({
   const likeMeta = useMemo(() => {
     if (trillerId == null) return undefined;
     return {
-      category: 'other',
+      category: 'triller',
       title: title || '',
       image: image || '',
       route: `/triller/${trillerId}`,

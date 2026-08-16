@@ -59,7 +59,7 @@ const TrillerSideCard = ({ triller, onSelect, loading = false }) => {
   const likeMeta = useMemo(() => {
     if (pageLoading || triller?.id == null) return undefined;
     return {
-      category: 'other',
+      category: 'triller',
       title: title || '',
       image: videoImg || '',
       route: `/triller/${triller.id}`,
