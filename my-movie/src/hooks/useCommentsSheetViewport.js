@@ -1,20 +1,37 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const SHEET_MQ = '(max-width: 768px)';
-/** Modal tepasi — ekrandan pastga (kichikroq = modal balandroq) */
-const SHEET_TOP_RATIO = 0.08;
-const SHEET_TOP_MIN = 48;
-const SHEET_TOP_MAX = 88;
+
+/** Klaviatura YOPIQ — yuqorida ko‘proq joy (oddiy bottom-sheet) */
+const TOP_CLOSED_RATIO = 0.16;
+const TOP_CLOSED_MIN = 100;
+const TOP_CLOSED_MAX = 168;
+
+/** Klaviatura OCHIQ — yuqori joy kamroq → modal balandroq, lekin tepaga yopishmaydi */
+const TOP_OPEN_RATIO = 0.055;
+const TOP_OPEN_MIN = 36;
+const TOP_OPEN_MAX = 64;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
 
-export const resolveSheetTop = (screenH = typeof window !== 'undefined' ? window.innerHeight : 700) =>
-  Math.round(Math.min(SHEET_TOP_MAX, Math.max(SHEET_TOP_MIN, screenH * SHEET_TOP_RATIO)));
+export const resolveSheetTop = (
+  screenH = typeof window !== 'undefined' ? window.innerHeight : 700,
+  keyboardOpen = false
+) => {
+  if (keyboardOpen) {
+    return Math.round(
+      Math.min(TOP_OPEN_MAX, Math.max(TOP_OPEN_MIN, screenH * TOP_OPEN_RATIO))
+    );
+  }
+  return Math.round(
+    Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, screenH * TOP_CLOSED_RATIO))
+  );
+};
 
 /**
- * Top fixed (yuqori chekka qimirlamaydi).
- * Faqat bottom = klaviatura balandligi — body qisqarib scroll ochiladi.
+ * Klaviatura yopiq: oddiy balandlik (yuqorida joy).
+ * Klaviatura ochiq: top biroz kamayadi → modal balandroq, tepaga kirmaydi.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetTop, setSheetTop] = useState(() => resolveSheetTop());
@@ -31,9 +48,10 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       lastInsetRef.current = 0;
       setKbInset(0);
       setKeyboardOpen(false);
+      setSheetTop(resolveSheetTop(window.innerHeight, false));
       return;
     }
-    setSheetTop(resolveSheetTop(window.innerHeight));
+    setSheetTop(resolveSheetTop(window.innerHeight, false));
   }, [active]);
 
   useEffect(() => {
@@ -94,6 +112,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     if (!vv || !isCommentsSheetViewport()) {
       setKbInset(0);
       setKeyboardOpen(false);
+      setSheetTop(resolveSheetTop(window.innerHeight, false));
       return undefined;
     }
 
@@ -104,6 +123,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       keyboardRef.current = keyboard;
       setKbInset(nextInset);
       setKeyboardOpen(keyboard);
+      setSheetTop(resolveSheetTop(window.innerHeight, keyboard));
     };
 
     const apply = () => {
@@ -118,7 +138,6 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
       window.clearTimeout(settleTimerRef.current);
 
-      /* Yopilish: bir marta → CSS bottom silliq 0 ga */
       if (!keyboard) {
         if (lastInsetRef.current !== 0 || wasKeyboard) {
           commitInset(0, false);
@@ -126,7 +145,6 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
         return;
       }
 
-      /* Ochilish: klaviatura joylashsin, keyin BIR marta bottom qo‘yiladi */
       if (!wasKeyboard) {
         settleTimerRef.current = window.setTimeout(() => {
           const settled = Math.max(
@@ -138,7 +156,6 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
         return;
       }
 
-      /* Allaqachon ochiq: faqat katta farqda yangilash (orientatsiya) */
       if (Math.abs(lastInsetRef.current - rawInset) > 48) {
         settleTimerRef.current = window.setTimeout(() => {
           commitInset(rawInset, true);

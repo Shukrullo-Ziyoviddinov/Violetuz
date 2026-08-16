@@ -530,7 +530,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
               }${keyboardOpen ? ' shorts-comments-modal--keyboard' : ''}`}
               style={{
                 '--drag-y': `${dragY}px`,
-                '--sheet-top': sheetTop > 0 ? `${sheetTop}px` : '8vh',
+                '--sheet-top': sheetTop > 0 ? `${sheetTop}px` : '16vh',
                 '--kb-inset': `${kbInset}px`,
               }}
               onClick={(e) => e.stopPropagation()}

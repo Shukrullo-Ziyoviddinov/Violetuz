@@ -605,7 +605,7 @@
 /* Mobile: top fixed, faqat bottom klaviatura bilan siljiydi */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
-    --sheet-top: 8vh;
+    --sheet-top: 16vh;
     --kb-inset: 0px;
     top: var(--sheet-top);
     bottom: var(--kb-inset, 0px);
@@ -621,7 +621,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+      bottom 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+      top 0.32s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {
