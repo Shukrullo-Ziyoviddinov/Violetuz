@@ -602,7 +602,7 @@
   }
 }
 
-/* Mobile: faqat bottom + height (top yo‘q — stretch bug oldini olish) */
+/* Mobile: faqat bottom + height; kb ochiqda transition yo‘q (klaviatura bilan sync) */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
     --sheet-bottom: 0px;
@@ -621,8 +621,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.32s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+      bottom 0.34s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.34s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {
@@ -636,6 +636,8 @@
   .movie-detail-comments-modal--keyboard {
     padding-bottom: 0;
     border-radius: 16px 16px 0 0;
+    /* Klaviatura animatsiyasi bilan birga — kechikish yo‘q */
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
   }
 
   .movie-detail-comments-modal-footer {
