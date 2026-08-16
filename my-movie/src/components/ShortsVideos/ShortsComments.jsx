@@ -101,8 +101,16 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [isDraggingModal, setIsDraggingModal] = useState(false);
   const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-  const { sheetBottom, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur, canCloseFromOverlay } =
-    useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
+  const {
+    sheetHeight,
+    keyboardInset,
+    keyboardOpen,
+    footerSpacer,
+    setFooterRef,
+    onModalInputFocus,
+    onModalInputBlur,
+    canCloseFromOverlay,
+  } = useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
 
   const requireAuth = useCallback(() => {
     if (isLoggedIn) return true;
@@ -533,8 +541,9 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
               }${keyboardOpen ? ' shorts-comments-modal--keyboard' : ''}`}
               style={{
                 '--drag-y': `${dragY}px`,
-                '--sheet-bottom': `${sheetBottom}px`,
+                '--sheet-bottom': '0px',
                 '--sheet-height': sheetHeight > 0 ? `${sheetHeight}px` : '84dvh',
+                '--kb-inset': `${keyboardInset}px`,
               }}
               onClick={(e) => e.stopPropagation()}
               onTransitionEnd={handleModalTransitionEnd}
@@ -558,7 +567,15 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                 )}
               </div>
 
-              <div className="shorts-comments-modal-footer">
+              {keyboardOpen ? (
+                <div
+                  className="shorts-comments-modal-footer-spacer"
+                  style={{ height: footerSpacer }}
+                  aria-hidden
+                />
+              ) : null}
+
+              <div className="shorts-comments-modal-footer" ref={setFooterRef}>
                 {replyingToShorts && (
                   <div className="shorts-comments-replying-bar">
                     <span>

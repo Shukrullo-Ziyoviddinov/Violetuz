@@ -602,11 +602,12 @@
   }
 }
 
-/* Mobile: faqat bottom + height — footer kb ustida; yopilganda pastga qaytadi */
+/* Mobile: modal joyida qoladi; footer kb da fixed */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
     --sheet-bottom: 0px;
     --sheet-height: 84dvh;
+    --kb-inset: 0px;
     top: auto !important;
     bottom: var(--sheet-bottom);
     left: 0 !important;
@@ -619,10 +620,7 @@
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    transition:
-      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {
@@ -633,11 +631,27 @@
     transition: none !important;
   }
 
-  .movie-detail-comments-modal--keyboard {
-    padding-bottom: 0 !important;
-    border-radius: 16px 16px 0 0;
-    /* Kb ochiqda kechikish yo‘q — footer kb bilan */
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
+  .movie-detail-comments-modal-footer-spacer {
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .movie-detail-comments-modal--keyboard .movie-detail-comments-modal-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--kb-inset, 0px);
+    z-index: 10001;
+    max-width: 100vw;
+    margin: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* transform fixed ni buzadi — kb da o‘chiramiz */
+  .movie-detail-comments-modal.is-open.movie-detail-comments-modal--keyboard {
+    transform: none !important;
   }
 
   .movie-detail-comments-modal-footer {

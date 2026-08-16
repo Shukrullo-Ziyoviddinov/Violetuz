@@ -5,9 +5,10 @@ const SHEET_MQ = '(max-width: 768px)';
 const TOP_CLOSED_RATIO = 0.16;
 const TOP_CLOSED_MIN = 100;
 const TOP_CLOSED_MAX = 168;
-const TOP_SAFE = 12;
 const KB_MIN = 48;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
+/** Footer taxminiy balandligi (spacer) */
+const FOOTER_FALLBACK_H = 140;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -16,94 +17,84 @@ const closedTopGap = (h) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, h * TOP_CLOSED_RATIO)));
 
 /**
- * Sodda model (faqat bottom + height):
- * - yopiq: bottom=0, height=ochilishdagi balandlik
- * - ochiq: bottom=klaviatura, height=ko‘rinadigan zona (footer kb USTIDA)
- * - blur: DARHOL yopiq holat (pastga qaytish)
+ * YANGI YO‘L — modal klaviaturaga tegmaydi.
+ * Modal: ochilgandagi joyida qoladi (bottom=0, height=fixed).
+ * Footer: kb ochiqda position:fixed + bottom=kbInset → input kb USTIDA.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
-  const [sheetBottom, setSheetBottom] = useState(0);
   const [sheetHeight, setSheetHeight] = useState(0);
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const [footerSpacer, setFooterSpacer] = useState(FOOTER_FALLBACK_H);
 
   const scrollYRef = useRef(0);
   const focusedRef = useRef(false);
   const baselineHRef = useRef(0);
-  const closedHRef = useRef(0);
   const blurTimerRef = useRef(0);
   const blockOverlayRef = useRef(0);
   const rafRef = useRef(0);
   const timersRef = useRef([]);
+  const footerElRef = useRef(null);
 
   const clearTimers = () => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
     timersRef.current = [];
   };
 
-  const applyClosed = useCallback(() => {
-    const h =
-      closedHRef.current ||
-      Math.max(240, (baselineHRef.current || window.innerHeight) - closedTopGap(baselineHRef.current || window.innerHeight));
-    /* Avval transition yoqiladi, keyin pastga animatsiya */
-    setKeyboardOpen(false);
-    requestAnimationFrame(() => {
-      setSheetBottom(0);
-      setSheetHeight(h);
-    });
-  }, []);
-
-  const applyOpen = useCallback(() => {
+  const measureInset = useCallback(() => {
     const inner = window.innerHeight;
     const base = baselineHRef.current || inner;
-    const closedH = closedHRef.current || Math.round(inner * 0.84);
     const vv = window.visualViewport;
-
-    const vk = navigator.virtualKeyboard?.boundingRect?.height;
-    const vkH = vk ? Math.round(vk) : 0;
+    const vkH = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
 
     let fromVv = 0;
-    let fromBase = 0;
     if (vv) {
       fromVv = Math.max(0, Math.round(inner - vv.offsetTop - vv.height));
-      fromBase = Math.max(0, Math.round(base - vv.height));
     }
-
+    const fromBase = vv ? Math.max(0, Math.round(base - vv.height)) : 0;
     const layoutShrunk = base - inner >= KB_MIN;
 
-    /* Android: layout allaqachon kb siz — bottom=0 */
+    /* Layout resize: inset 0 (footer fixed bottom:0 allaqachon kb ustida) */
     if (layoutShrunk && fromVv < KB_MIN && vkH < KB_MIN) {
-      setKeyboardOpen(true);
-      setSheetBottom(0);
-      setSheetHeight(Math.max(200, Math.min(closedH, inner - TOP_SAFE)));
-      return;
+      return 0;
     }
 
-    let bottom = Math.max(vkH, fromVv);
-    if (fromBase >= KB_MIN) bottom = Math.max(bottom, fromBase);
-
-    if (bottom < KB_MIN) {
-      if (!focusedRef.current) return;
-      bottom = Math.round(Math.max(base, inner) * 0.42);
-    }
-
-    const height = Math.max(200, Math.min(closedH, inner - bottom - TOP_SAFE));
-    setKeyboardOpen(true);
-    setSheetBottom(bottom);
-    setSheetHeight(height);
+    return Math.max(vkH, fromVv, fromBase >= KB_MIN ? fromBase : 0);
   }, []);
 
-  const sync = useCallback(() => {
-    if (focusedRef.current) applyOpen();
-    else applyClosed();
-  }, [applyClosed, applyOpen]);
+  const applyKbClosed = useCallback(() => {
+    focusedRef.current = false;
+    setKeyboardOpen(false);
+    setKeyboardInset(0);
+  }, []);
+
+  const applyKbOpen = useCallback(() => {
+    let inset = measureInset();
+    if (inset < KB_MIN && focusedRef.current) {
+      inset = Math.round((baselineHRef.current || window.innerHeight) * 0.4);
+    }
+    if (inset < KB_MIN && !focusedRef.current) {
+      applyKbClosed();
+      return;
+    }
+    setKeyboardOpen(true);
+    setKeyboardInset(Math.max(0, inset));
+
+    const el = footerElRef.current;
+    if (el) {
+      const h = Math.round(el.getBoundingClientRect().height);
+      if (h > 40) setFooterSpacer(h);
+    }
+  }, [applyKbClosed, measureInset]);
 
   const schedule = useCallback(() => {
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
-      sync();
+      if (focusedRef.current) applyKbOpen();
+      else applyKbClosed();
     });
-  }, [sync]);
+  }, [applyKbClosed, applyKbOpen]);
 
   useLayoutEffect(() => {
     if (!active) {
@@ -112,16 +103,16 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       window.clearTimeout(blurTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
-      setSheetBottom(0);
       setSheetHeight(0);
+      setKeyboardInset(0);
       setKeyboardOpen(false);
       return;
     }
     const h = window.innerHeight;
     baselineHRef.current = h;
-    closedHRef.current = Math.max(240, h - closedTopGap(h));
-    applyClosed();
-  }, [active, applyClosed]);
+    setSheetHeight(Math.max(240, h - closedTopGap(h)));
+    applyKbClosed();
+  }, [active, applyKbClosed]);
 
   useEffect(() => {
     if (!active || !isCommentsSheetViewport()) return undefined;
@@ -206,36 +197,43 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     window.clearTimeout(blurTimerRef.current);
     clearTimers();
     blockOverlayRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
-    applyOpen();
-    [50, 120, 200, 320, 480, 700, 1000].forEach((ms) => {
+    applyKbOpen();
+    [40, 100, 180, 300, 450, 650, 900].forEach((ms) => {
       timersRef.current.push(
         window.setTimeout(() => {
-          if (focusedRef.current) applyOpen();
+          if (focusedRef.current) applyKbOpen();
         }, ms)
       );
     });
-  }, [applyOpen]);
+  }, [applyKbOpen]);
 
   const onModalInputBlur = useCallback(() => {
     focusedRef.current = false;
     clearTimers();
     window.clearTimeout(blurTimerRef.current);
-    /* Darhol pastga — kutmasdan */
-    applyClosed();
+    applyKbClosed();
     blurTimerRef.current = window.setTimeout(() => {
-      if (!focusedRef.current) applyClosed();
-    }, 50);
-  }, [applyClosed]);
+      if (!focusedRef.current) applyKbClosed();
+    }, 80);
+  }, [applyKbClosed]);
 
   const canCloseFromOverlay = useCallback(
     () => Date.now() >= blockOverlayRef.current,
     []
   );
 
+  const setFooterRef = useCallback((node) => {
+    footerElRef.current = node;
+  }, []);
+
   return {
-    sheetBottom,
+    /** Modal pastga yopishgan — kb da o‘zgarmaydi */
+    sheetBottom: 0,
     sheetHeight,
+    keyboardInset,
     keyboardOpen,
+    footerSpacer,
+    setFooterRef,
     onModalInputFocus,
     onModalInputBlur,
     canCloseFromOverlay,

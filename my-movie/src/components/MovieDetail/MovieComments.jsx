@@ -125,8 +125,16 @@ const MovieComments = forwardRef(
     const [isDraggingModal, setIsDraggingModal] = useState(false);
     const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-    const { sheetBottom, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur, canCloseFromOverlay } =
-      useCommentsSheetViewport(showCommentsModal, '.movie-detail-comments-modal-body');
+    const {
+      sheetHeight,
+      keyboardInset,
+      keyboardOpen,
+      footerSpacer,
+      setFooterRef,
+      onModalInputFocus,
+      onModalInputBlur,
+      canCloseFromOverlay,
+    } = useCommentsSheetViewport(showCommentsModal, '.movie-detail-comments-modal-body');
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
 
@@ -650,8 +658,9 @@ const MovieComments = forwardRef(
                 }`}
                 style={{
                   '--drag-y': `${dragY}px`,
-                  '--sheet-bottom': `${sheetBottom}px`,
+                  '--sheet-bottom': '0px',
                   '--sheet-height': sheetHeight > 0 ? `${sheetHeight}px` : '84dvh',
+                  '--kb-inset': `${keyboardInset}px`,
                 }}
                 onClick={(e) => e.stopPropagation()}
                 onTransitionEnd={handleModalTransitionEnd}
@@ -675,7 +684,15 @@ const MovieComments = forwardRef(
                   )}
                 </div>
 
-                <div className="movie-detail-comments-modal-footer">
+                {keyboardOpen ? (
+                  <div
+                    className="movie-detail-comments-modal-footer-spacer"
+                    style={{ height: footerSpacer }}
+                    aria-hidden
+                  />
+                ) : null}
+
+                <div className="movie-detail-comments-modal-footer" ref={setFooterRef}>
                   {replyingTo && (
                     <div className="movie-detail-comments-replying-bar">
                       <span>
