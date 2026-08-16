@@ -27,7 +27,7 @@
   flex-direction: column;
   width: min(960px, 100%);
   max-height: min(88vh, 900px);
-  background: linear-gradient(165deg, rgba(28, 26, 36, 0.98) 0%, rgba(12, 11, 18, 0.99) 100%);
+  background: #121212;
   border: 1px solid rgba(120, 100, 160, 0.25);
   border-radius: 16px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
