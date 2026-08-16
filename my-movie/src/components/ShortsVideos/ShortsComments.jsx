@@ -94,10 +94,15 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [keyboardInset, setKeyboardInset] = useState(0);
+  const [vvHeight, setVvHeight] = useState(0);
   const startYRef = useRef(0);
+  const dragYRef = useRef(0);
   const shortsCommentsListRef = useRef(null);
   const modalInputRef = useRef(null);
   const modalClosingRef = useRef(false);
+  const keyboardInsetRef = useRef(0);
+  const [isDraggingModal, setIsDraggingModal] = useState(false);
+  const [isDismissingModal, setIsDismissingModal] = useState(false);
 
   const requireAuth = useCallback(() => {
     if (isLoggedIn) return true;
@@ -127,7 +132,10 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     modalClosingRef.current = false;
     setShortsModalOpen(false);
     setShowShortsCommentsModal(false);
+    dragYRef.current = 0;
     setDragY(0);
+    setIsDraggingModal(false);
+    setIsDismissingModal(false);
     setSubmitError('');
     reloadComments();
   }, [shortsId, targetType, reloadComments]);
@@ -149,7 +157,9 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
+      keyboardInsetRef.current = 0;
       setKeyboardInset(0);
+      setVvHeight(0);
     }
     return () => {
       document.body.style.overflow = '';
@@ -166,15 +176,22 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   }, [showShortsCommentsModal]);
 
   useEffect(() => {
-    if (!showShortsCommentsModal || shortsModalOpen || !modalClosingRef.current) return undefined;
+    if (!showShortsCommentsModal || !modalClosingRef.current) return undefined;
+    if (shortsModalOpen && !isDismissingModal) return undefined;
     const t = window.setTimeout(() => {
       modalClosingRef.current = false;
       setShowShortsCommentsModal(false);
+      setShortsModalOpen(false);
+      dragYRef.current = 0;
       setDragY(0);
+      setIsDraggingModal(false);
+      setIsDismissingModal(false);
+      keyboardInsetRef.current = 0;
       setKeyboardInset(0);
-    }, 420);
+      setVvHeight(0);
+    }, 500);
     return () => window.clearTimeout(t);
-  }, [showShortsCommentsModal, shortsModalOpen]);
+  }, [showShortsCommentsModal, shortsModalOpen, isDismissingModal]);
 
   useEffect(() => {
     if (!showShortsCommentsModal || !shortsModalOpen) return;
@@ -187,21 +204,39 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     const vv = window.visualViewport;
     if (!vv) return undefined;
 
-    const update = () => {
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
       if (!isCommentsSheetViewport()) {
+        keyboardInsetRef.current = 0;
         setKeyboardInset(0);
+        setVvHeight(0);
         return;
       }
-      const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-      setKeyboardInset(inset);
+      const nextInset = Math.max(
+        0,
+        Math.round(window.innerHeight - vv.height - vv.offsetTop)
+      );
+      const nextH = Math.round(vv.height);
+      if (Math.abs(keyboardInsetRef.current - nextInset) >= 6) {
+        keyboardInsetRef.current = nextInset;
+        setKeyboardInset(nextInset);
+      }
+      setVvHeight((prev) => (Math.abs(prev - nextH) >= 4 ? nextH : prev));
     };
 
-    update();
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(apply);
+    };
+
+    apply();
+    vv.addEventListener('resize', schedule);
+    vv.addEventListener('scroll', schedule);
     return () => {
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
+      if (raf) window.cancelAnimationFrame(raf);
+      vv.removeEventListener('resize', schedule);
+      vv.removeEventListener('scroll', schedule);
     };
   }, [showShortsCommentsModal]);
 
@@ -286,7 +321,10 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       document.activeElement.blur();
     }
     modalClosingRef.current = false;
+    dragYRef.current = 0;
     setDragY(0);
+    setIsDraggingModal(false);
+    setIsDismissingModal(false);
     if (showShortsCommentsModal) {
       setShortsModalOpen(true);
       return;
@@ -298,17 +336,29 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const closeShortsModal = useCallback(() => {
     if (!showShortsCommentsModal || modalClosingRef.current) return;
     modalClosingRef.current = true;
+    setIsDraggingModal(false);
+    setIsDismissingModal(true);
     setShortsModalOpen(false);
   }, [showShortsCommentsModal]);
+
+  const finishCloseShortsModal = () => {
+    if (!modalClosingRef.current) return;
+    modalClosingRef.current = false;
+    setShowShortsCommentsModal(false);
+    setShortsModalOpen(false);
+    dragYRef.current = 0;
+    setDragY(0);
+    setIsDraggingModal(false);
+    setIsDismissingModal(false);
+    keyboardInsetRef.current = 0;
+    setKeyboardInset(0);
+    setVvHeight(0);
+  };
 
   const handleModalTransitionEnd = (e) => {
     if (e.target !== e.currentTarget) return;
     if (e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
-    if (!modalClosingRef.current) return;
-    modalClosingRef.current = false;
-    setShowShortsCommentsModal(false);
-    setDragY(0);
-    setKeyboardInset(0);
+    finishCloseShortsModal();
   };
 
   const handleShortsInputClick = () => {
@@ -316,22 +366,37 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   };
 
   const handleTouchStart = (e) => {
+    if (modalClosingRef.current) return;
     startYRef.current = e.touches[0].clientY;
+    dragYRef.current = 0;
+    setIsDraggingModal(true);
   };
 
   const handleTouchMove = (e) => {
-    if (window.innerWidth > 768) return;
-    const y = e.touches[0].clientY;
-    const diff = y - startYRef.current;
-    if (diff > 0) setDragY(diff);
+    if (window.innerWidth > 768 || modalClosingRef.current) return;
+    const diff = Math.max(0, e.touches[0].clientY - startYRef.current);
+    dragYRef.current = diff;
+    setDragY(diff);
   };
 
   const handleTouchEnd = () => {
-    if (dragY > 80) {
-      closeShortsModal();
-      return;
-    }
-    setDragY(0);
+    if (window.innerWidth > 768 || modalClosingRef.current) return;
+    const y = dragYRef.current;
+    setIsDraggingModal(false);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (y > 80) {
+          modalClosingRef.current = true;
+          setIsDismissingModal(true);
+          const dismissY = Math.max(window.innerHeight, y + 24);
+          dragYRef.current = dismissY;
+          setDragY(dismissY);
+        } else {
+          dragYRef.current = 0;
+          setDragY(0);
+        }
+      });
+    });
   };
 
   const displayedShortsComments = getDisplayedShortsComments(shortsComments);
@@ -506,16 +571,19 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
         createPortal(
           <>
             <div
-              className={`shorts-comments-modal-overlay${shortsModalOpen ? ' is-open' : ''}`}
+              className={`shorts-comments-modal-overlay${
+                shortsModalOpen && !isDismissingModal ? ' is-open' : ''
+              }`}
               onClick={closeShortsModal}
             />
             <div
               className={`shorts-comments-modal${shortsModalOpen ? ' is-open' : ''}${
-                dragY > 0 ? ' shorts-comments-modal-dragging' : ''
-              }${keyboardInset > 0 ? ' shorts-comments-modal--keyboard' : ''}`}
+                isDraggingModal ? ' shorts-comments-modal-dragging' : ''
+              }${keyboardInset > 48 ? ' shorts-comments-modal--keyboard' : ''}`}
               style={{
                 '--drag-y': `${dragY}px`,
                 '--keyboard-inset': `${keyboardInset}px`,
+                '--vv-height': vvHeight > 0 ? `${vvHeight}px` : '85dvh',
               }}
               onClick={(e) => e.stopPropagation()}
               onTransitionEnd={handleModalTransitionEnd}
@@ -603,6 +671,14 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                     }
                     value={shortsInputValue}
                     onChange={(e) => setShortsInputValue(e.target.value)}
+                    onFocus={() => {
+                      if (!isCommentsSheetViewport()) return;
+                      window.requestAnimationFrame(() => {
+                        window.scrollTo(0, 0);
+                        document.documentElement.scrollTop = 0;
+                        document.body.scrollTop = 0;
+                      });
+                    }}
                   />
                   <button
                     type="submit"

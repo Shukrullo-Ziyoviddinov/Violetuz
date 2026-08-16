@@ -120,10 +120,15 @@ const MovieComments = forwardRef(
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
     const [keyboardInset, setKeyboardInset] = useState(0);
+    const [vvHeight, setVvHeight] = useState(0);
     const startYRef = useRef(0);
+    const dragYRef = useRef(0);
     const commentsListRef = useRef(null);
     const modalInputRef = useRef(null);
     const modalClosingRef = useRef(false);
+    const keyboardInsetRef = useRef(0);
+    const [isDraggingModal, setIsDraggingModal] = useState(false);
+    const [isDismissingModal, setIsDismissingModal] = useState(false);
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
 
@@ -166,7 +171,10 @@ const MovieComments = forwardRef(
       modalClosingRef.current = false;
       setCommentsModalOpen(false);
       setShowCommentsModal(false);
+      dragYRef.current = 0;
       setDragY(0);
+      setIsDraggingModal(false);
+      setIsDismissingModal(false);
       setSubmitError('');
       reloadComments();
     }, [movieId, targetTypeProp, reloadComments]);
@@ -188,7 +196,9 @@ const MovieComments = forwardRef(
         document.body.style.overflow = 'hidden';
       } else {
         document.body.style.overflow = '';
+        keyboardInsetRef.current = 0;
         setKeyboardInset(0);
+        setVvHeight(0);
       }
       return () => {
         document.body.style.overflow = '';
@@ -207,15 +217,22 @@ const MovieComments = forwardRef(
 
     /* Yopilish timeout (transitionend ishlamasa) */
     useEffect(() => {
-      if (!showCommentsModal || commentsModalOpen || !modalClosingRef.current) return undefined;
+      if (!showCommentsModal || !modalClosingRef.current) return undefined;
+      if (commentsModalOpen && !isDismissingModal) return undefined;
       const t = window.setTimeout(() => {
         modalClosingRef.current = false;
         setShowCommentsModal(false);
+        setCommentsModalOpen(false);
+        dragYRef.current = 0;
         setDragY(0);
+        setIsDraggingModal(false);
+        setIsDismissingModal(false);
+        keyboardInsetRef.current = 0;
         setKeyboardInset(0);
-      }, 420);
+        setVvHeight(0);
+      }, 500);
       return () => window.clearTimeout(t);
-    }, [showCommentsModal, commentsModalOpen]);
+    }, [showCommentsModal, commentsModalOpen, isDismissingModal]);
 
     /* Desktop: modal ochilganda focus. Mobile: autoFocus yo‘q — klaviatura faqat input bosilganda */
     useEffect(() => {
@@ -224,27 +241,46 @@ const MovieComments = forwardRef(
       modalInputRef.current?.focus();
     }, [showCommentsModal, commentsModalOpen]);
 
-    /* Mobile: klaviatura ochilganda modal pastdan yuqoriga (visualViewport) */
+    /* Mobile: klaviatura — faqat visualViewport (ikkilamchi hisob yo‘q, sakrash kamayadi) */
     useEffect(() => {
       if (!showCommentsModal) return undefined;
       const vv = window.visualViewport;
       if (!vv) return undefined;
 
-      const update = () => {
+      let raf = 0;
+      const apply = () => {
+        raf = 0;
         if (!isCommentsSheetViewport()) {
+          keyboardInsetRef.current = 0;
           setKeyboardInset(0);
+          setVvHeight(0);
           return;
         }
-        const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-        setKeyboardInset(inset);
+        const nextInset = Math.max(
+          0,
+          Math.round(window.innerHeight - vv.height - vv.offsetTop)
+        );
+        const nextH = Math.round(vv.height);
+        /* kichik tebranishlarni ignore — sakrash oldini olish */
+        if (Math.abs(keyboardInsetRef.current - nextInset) >= 6) {
+          keyboardInsetRef.current = nextInset;
+          setKeyboardInset(nextInset);
+        }
+        setVvHeight((prev) => (Math.abs(prev - nextH) >= 4 ? nextH : prev));
       };
 
-      update();
-      vv.addEventListener('resize', update);
-      vv.addEventListener('scroll', update);
+      const schedule = () => {
+        if (raf) return;
+        raf = window.requestAnimationFrame(apply);
+      };
+
+      apply();
+      vv.addEventListener('resize', schedule);
+      vv.addEventListener('scroll', schedule);
       return () => {
-        vv.removeEventListener('resize', update);
-        vv.removeEventListener('scroll', update);
+        if (raf) window.cancelAnimationFrame(raf);
+        vv.removeEventListener('resize', schedule);
+        vv.removeEventListener('scroll', schedule);
       };
     }, [showCommentsModal]);
 
@@ -358,7 +394,10 @@ const MovieComments = forwardRef(
         document.activeElement.blur();
       }
       modalClosingRef.current = false;
+      dragYRef.current = 0;
       setDragY(0);
+      setIsDraggingModal(false);
+      setIsDismissingModal(false);
       if (showCommentsModal) {
         setCommentsModalOpen(true);
         return;
@@ -370,36 +409,64 @@ const MovieComments = forwardRef(
     const closeModal = useCallback(() => {
       if (!showCommentsModal || modalClosingRef.current) return;
       modalClosingRef.current = true;
+      setIsDraggingModal(false);
+      setIsDismissingModal(true);
       setCommentsModalOpen(false);
     }, [showCommentsModal]);
+
+    const finishCloseModal = () => {
+      if (!modalClosingRef.current) return;
+      modalClosingRef.current = false;
+      setShowCommentsModal(false);
+      setCommentsModalOpen(false);
+      dragYRef.current = 0;
+      setDragY(0);
+      setIsDraggingModal(false);
+      setIsDismissingModal(false);
+      keyboardInsetRef.current = 0;
+      setKeyboardInset(0);
+      setVvHeight(0);
+    };
 
     const handleModalTransitionEnd = (e) => {
       if (e.target !== e.currentTarget) return;
       if (e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
-      if (!modalClosingRef.current) return;
-      modalClosingRef.current = false;
-      setShowCommentsModal(false);
-      setDragY(0);
-      setKeyboardInset(0);
+      finishCloseModal();
     };
 
     const handleTouchStart = (e) => {
+      if (modalClosingRef.current) return;
       startYRef.current = e.touches[0].clientY;
+      dragYRef.current = 0;
+      setIsDraggingModal(true);
     };
 
     const handleTouchMove = (e) => {
-      if (window.innerWidth > 768) return;
-      const y = e.touches[0].clientY;
-      const diff = y - startYRef.current;
-      if (diff > 0) setDragY(diff);
+      if (window.innerWidth > 768 || modalClosingRef.current) return;
+      const diff = Math.max(0, e.touches[0].clientY - startYRef.current);
+      dragYRef.current = diff;
+      setDragY(diff);
     };
 
     const handleTouchEnd = () => {
-      if (dragY > 80) {
-        closeModal();
-        return;
-      }
-      setDragY(0);
+      if (window.innerWidth > 768 || modalClosingRef.current) return;
+      const y = dragYRef.current;
+      setIsDraggingModal(false);
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          if (y > 80) {
+            /* is-open saqlanadi — dragY pastga silliq davom etadi */
+            modalClosingRef.current = true;
+            setIsDismissingModal(true);
+            const dismissY = Math.max(window.innerHeight, y + 24);
+            dragYRef.current = dismissY;
+            setDragY(dismissY);
+          } else {
+            dragYRef.current = 0;
+            setDragY(0);
+          }
+        });
+      });
     };
 
     const displayedComments = getDisplayedComments(comments, limit);
@@ -623,19 +690,20 @@ const MovieComments = forwardRef(
             <>
               <div
                 className={`movie-detail-comments-modal-overlay${
-                  commentsModalOpen ? ' is-open' : ''
+                  commentsModalOpen && !isDismissingModal ? ' is-open' : ''
                 }`}
                 onClick={closeModal}
               />
               <div
                 className={`movie-detail-comments-modal${
                   commentsModalOpen ? ' is-open' : ''
-                }${dragY > 0 ? ' movie-detail-comments-modal-dragging' : ''}${
-                  keyboardInset > 0 ? ' movie-detail-comments-modal--keyboard' : ''
+                }${isDraggingModal ? ' movie-detail-comments-modal-dragging' : ''}${
+                  keyboardInset > 48 ? ' movie-detail-comments-modal--keyboard' : ''
                 }`}
                 style={{
                   '--drag-y': `${dragY}px`,
                   '--keyboard-inset': `${keyboardInset}px`,
+                  '--vv-height': vvHeight > 0 ? `${vvHeight}px` : '85dvh',
                 }}
                 onClick={(e) => e.stopPropagation()}
                 onTransitionEnd={handleModalTransitionEnd}
@@ -733,6 +801,15 @@ const MovieComments = forwardRef(
                       }
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
+                      onFocus={() => {
+                        /* iOS page scroll sakrashini kamaytirish */
+                        if (!isCommentsSheetViewport()) return;
+                        window.requestAnimationFrame(() => {
+                          window.scrollTo(0, 0);
+                          document.documentElement.scrollTop = 0;
+                          document.body.scrollTop = 0;
+                        });
+                      }}
                     />
                     <button
                       type="submit"
