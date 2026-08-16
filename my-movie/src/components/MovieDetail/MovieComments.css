@@ -602,13 +602,12 @@
   }
 }
 
-/* Mobile: yopiqda bottom+height; kb da top+height = visualViewport (chrome/kb ichiga kirmaydi) */
+/* Mobile: faqat bottom + height — footer kb ustida; yopilganda pastga qaytadi */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
-    --sheet-top: auto;
     --sheet-bottom: 0px;
     --sheet-height: 84dvh;
-    top: var(--sheet-top);
+    top: auto !important;
     bottom: var(--sheet-bottom);
     left: 0 !important;
     right: 0 !important;
@@ -622,8 +621,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.34s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+      bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.3s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {
@@ -635,16 +634,10 @@
   }
 
   .movie-detail-comments-modal--keyboard {
-    padding-bottom: 0;
+    padding-bottom: 0 !important;
     border-radius: 16px 16px 0 0;
-    bottom: auto !important;
+    /* Kb ochiqda kechikish yo‘q — footer kb bilan */
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
-  }
-
-  .movie-detail-comments-modal--keyboard .movie-detail-comments-modal-footer {
-    flex-shrink: 0;
-    position: relative;
-    z-index: 3;
   }
 
   .movie-detail-comments-modal-footer {
@@ -660,7 +653,6 @@
     flex: 1 1 auto;
     overflow-x: hidden;
     overflow-y: auto;
-    scroll-behavior: smooth;
   }
 }
 
