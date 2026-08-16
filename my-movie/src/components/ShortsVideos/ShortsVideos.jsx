@@ -1199,6 +1199,9 @@ const ShortsVideos = ({
           <ShortsComments
             ref={shortsCommentsRef}
             shortsId={shortsList[activeIndex].id}
+            targetType={
+              shortsList[activeIndex]?.type === 'musicshorts' ? 'musicShorts' : 'shorts'
+            }
             compact
             onCountChange={setShortsCommentCount}
           />

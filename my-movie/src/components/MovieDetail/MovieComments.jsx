@@ -1,45 +1,54 @@
-import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import * as commentsApi from '../../api/commentsApi';
 import { useAuth } from '../../context/AuthContext';
+import { requestOpenAuthModal } from '../../authModalBridge';
 import './MovieComments.css';
 
 const MOBILE_MAX = 900;
 const PREVIEW_LIMIT_DEFAULT = 4;
-
-const toggleCommentLike = (movieId, commentId, comments, setComments) => {
-  const liked = commentsApi.getLikedIds(movieId);
-  const isLiked = liked.has(String(commentId));
-
-  const updateInTree = (list) => {
-    return list.map((c) => {
-      if (String(c.id) === String(commentId)) {
-        return { ...c, likes: Math.max(0, (c.likes || 0) + (isLiked ? -1 : 1)) };
-      }
-      if (c.replies?.length) {
-        return { ...c, replies: updateInTree(c.replies) };
-      }
-      return c;
-    });
-  };
-
-  const updated = updateInTree(comments);
-  setComments(updated);
-  commentsApi.saveComments(movieId, updated);
-  commentsApi.dispatchMovieCommentsChanged(movieId);
-
-  if (isLiked) liked.delete(String(commentId));
-  else liked.add(String(commentId));
-  commentsApi.saveLikedIds(movieId, liked);
-};
 
 const migrateComment = (c) => ({
   ...c,
   likes: c.likes ?? 0,
   replies: Array.isArray(c.replies) ? c.replies.map(migrateComment) : [],
 });
+
+const collectLikedIds = (list, acc = new Set()) => {
+  if (!Array.isArray(list)) return acc;
+  for (const c of list) {
+    if (c?.likedByMe) acc.add(String(c.id));
+    if (c?.replies?.length) collectLikedIds(c.replies, acc);
+  }
+  return acc;
+};
+
+const updateLikesInTree = (list, commentId, likes, likedByMe) =>
+  list.map((c) => {
+    if (String(c.id) === String(commentId)) {
+      return { ...c, likes, likedByMe };
+    }
+    if (c.replies?.length) {
+      return {
+        ...c,
+        replies: updateLikesInTree(c.replies, commentId, likes, likedByMe),
+      };
+    }
+    return c;
+  });
+
+const insertReplyInTree = (list, parentId, reply) =>
+  list.map((c) => {
+    if (String(c.id) === String(parentId)) {
+      return { ...c, replies: [...(c.replies || []), reply] };
+    }
+    if (c.replies?.length) {
+      return { ...c, replies: insertReplyInTree(c.replies, parentId, reply) };
+    }
+    return c;
+  });
 
 /** Jami kommentlar soni (asosiy + barcha javoblar) */
 const countTotalComments = (comments) => {
@@ -75,12 +84,23 @@ const CAROUSEL_MS = 4000;
  * mobileSheetUi — klip/konsert/triller mobil UX:
  * komment yo‘q → input; bor → list (input yashirin), list bosilsa modal; more-btn yo‘q; titleda son.
  * Desktop o‘zgarmaydi.
+ * targetType: movie | triller | klip | konsert (ixtiyoriy; movieId prefiksidan ham aniqlanadi)
  */
 const MovieComments = forwardRef(
-  ({ movieId, onCountChange, previewLimit = PREVIEW_LIMIT_DEFAULT, mobileSheetUi = false }, ref) => {
+  (
+    {
+      movieId,
+      targetType: targetTypeProp,
+      onCountChange,
+      previewLimit = PREVIEW_LIMIT_DEFAULT,
+      mobileSheetUi = false,
+    },
+    ref
+  ) => {
     const { i18n } = useTranslation();
-    const { profile } = useAuth();
+    const { profile, isLoggedIn } = useAuth();
     const [comments, setComments] = useState([]);
+    const [likedIds, setLikedIds] = useState(() => new Set());
     const [showCommentsModal, setShowCommentsModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [replyingTo, setReplyingTo] = useState(null);
@@ -89,13 +109,39 @@ const MovieComments = forwardRef(
       () => typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX
     );
     const [carouselIndex, setCarouselIndex] = useState(0);
+    const [submitting, setSubmitting] = useState(false);
     const startYRef = useRef(0);
     const commentsListRef = useRef(null);
+
+    const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
 
     const sheetMobile = Boolean(mobileSheetUi) && isMobile;
     const limit = sheetMobile
       ? 1
       : Math.max(1, Number(previewLimit) || PREVIEW_LIMIT_DEFAULT);
+
+    const requireAuth = useCallback(() => {
+      if (isLoggedIn) return true;
+      requestOpenAuthModal('register');
+      return false;
+    }, [isLoggedIn]);
+
+    const reloadComments = useCallback(async () => {
+      if (!target.targetId) {
+        setComments([]);
+        setLikedIds(new Set());
+        return;
+      }
+      try {
+        const raw = await commentsApi.fetchComments(target);
+        const tree = raw.map(migrateComment);
+        setComments(tree);
+        setLikedIds(collectLikedIds(tree));
+      } catch {
+        setComments([]);
+        setLikedIds(new Set());
+      }
+    }, [target.targetType, target.targetId]);
 
     useEffect(() => {
       const onResize = () => setIsMobile(window.innerWidth <= MOBILE_MAX);
@@ -104,23 +150,21 @@ const MovieComments = forwardRef(
     }, []);
 
     useEffect(() => {
-      const raw = commentsApi.getComments(movieId);
-      setComments(raw.map(migrateComment));
       setReplyingTo(null);
       setInputValue('');
       setShowCommentsModal(false);
-    }, [movieId]);
+      reloadComments();
+    }, [movieId, targetTypeProp, reloadComments]);
 
     useEffect(() => {
       const mid = commentsApi.toMovieKey(movieId);
       const onRemote = (e) => {
         if (e.detail?.movieId !== mid) return;
-        const raw = commentsApi.getComments(movieId);
-        setComments(raw.map(migrateComment));
+        reloadComments();
       };
       window.addEventListener(commentsApi.COMMENTS_CHANGED_EVENT, onRemote);
       return () => window.removeEventListener(commentsApi.COMMENTS_CHANGED_EVENT, onRemote);
-    }, [movieId]);
+    }, [movieId, reloadComments]);
 
     useEffect(() => {
       if (showCommentsModal) {
@@ -154,55 +198,62 @@ const MovieComments = forwardRef(
       setCarouselIndex((i) => (i >= comments.length ? 0 : i));
     }, [comments.length]);
 
-    const handleSubmitComment = (e) => {
+    const handleToggleLike = async (commentId) => {
+      if (!requireAuth()) return;
+      try {
+        const data = await commentsApi.toggleCommentLikeRequest(commentId);
+        const likes = data?.likes ?? 0;
+        const liked = Boolean(data?.liked);
+        setComments((prev) => updateLikesInTree(prev, commentId, likes, liked));
+        setLikedIds((prev) => {
+          const next = new Set(prev);
+          if (liked) next.add(String(commentId));
+          else next.delete(String(commentId));
+          return next;
+        });
+        commentsApi.dispatchMovieCommentsChanged(movieId, target);
+      } catch {
+        /* ignore */
+      }
+    };
+
+    const handleSubmitComment = async (e) => {
       e?.preventDefault();
       const text = inputValue.trim();
-      if (!text) return;
+      if (!text || submitting) return;
+      if (!requireAuth()) return;
+      if (!target.targetId) return;
 
-      const handle = (profile.username || '').trim();
-      const handlePart = handle ? `@${handle}` : '';
-      const fullName =
-        [profile.name, handlePart].filter(Boolean).join(' ') ||
-        (i18n.language === 'uz' ? 'Foydalanuvchi' : 'Пользователь');
-      const newComment = {
-        id: Date.now(),
-        movieId: commentsApi.toMovieKey(movieId),
-        parentId: replyingTo ? replyingTo.id : null,
-        text,
-        authorName: fullName,
-        authorAvatar: profile.avatar,
-        createdAt: new Date().toISOString(),
-        likes: 0,
-        replies: [],
-      };
-
-      if (replyingTo) {
-        const addReply = (list, parentId) => {
-          return list.map((c) => {
-            if (String(c.id) === String(parentId)) {
-              return { ...c, replies: [...(c.replies || []), newComment] };
-            }
-            if (c.replies?.length) {
-              return { ...c, replies: addReply(c.replies, parentId) };
-            }
-            return c;
-          });
-        };
-        const updated = addReply(comments, replyingTo.id);
-        setComments(updated);
-        commentsApi.saveComments(movieId, updated);
-        commentsApi.dispatchMovieCommentsChanged(movieId);
-        setReplyingTo(null);
-      } else {
-        const updated = [newComment, ...comments];
-        setComments(updated);
-        commentsApi.saveComments(movieId, updated);
-        commentsApi.dispatchMovieCommentsChanged(movieId);
+      setSubmitting(true);
+      try {
+        const data = await commentsApi.createCommentRequest({
+          targetType: target.targetType,
+          targetId: target.targetId,
+          text,
+          parentId: replyingTo ? replyingTo.id : null,
+        });
+        const item = data?.item ? migrateComment(data.item) : null;
+        if (item) {
+          if (replyingTo) {
+            setComments((prev) => insertReplyInTree(prev, replyingTo.id, item));
+            setReplyingTo(null);
+          } else {
+            setComments((prev) => [item, ...prev]);
+          }
+        } else {
+          await reloadComments();
+        }
+        setInputValue('');
+        commentsApi.dispatchMovieCommentsChanged(movieId, target);
+      } catch {
+        /* ignore */
+      } finally {
+        setSubmitting(false);
       }
-      setInputValue('');
     };
 
     const handleReplyClick = (comment) => {
+      if (!requireAuth()) return;
       setReplyingTo(comment);
     };
 
@@ -236,7 +287,6 @@ const MovieComments = forwardRef(
     const totalCount = countTotalComments(comments);
     const hasComments = totalCount > 0;
     const hasMore = totalCount > limit;
-    const likedIds = commentsApi.getLikedIds(movieId);
 
     const showInlineInput = !sheetMobile || !hasComments;
     const showPreviewList = !sheetMobile || hasComments;
@@ -298,13 +348,11 @@ const MovieComments = forwardRef(
             className={`movie-detail-comment-like-wrap ${likedIds.has(String(c.id)) ? 'active' : ''}`}
             onClick={(e) => {
               e.stopPropagation();
-              toggleCommentLike(movieId, String(c.id), comments, setComments);
+              handleToggleLike(String(c.id));
             }}
             role="button"
             tabIndex={0}
-            onKeyDown={(ev) =>
-              ev.key === 'Enter' && toggleCommentLike(movieId, String(c.id), comments, setComments)
-            }
+            onKeyDown={(ev) => ev.key === 'Enter' && handleToggleLike(String(c.id))}
             aria-label="Like"
           >
             <button type="button" className="movie-detail-comment-like-btn">
@@ -517,7 +565,7 @@ const MovieComments = forwardRef(
                     onSubmit={handleSubmitComment}
                   >
                     <div className="movie-detail-comments-modal-avatar">
-                      {profile.avatar ? (
+                      {profile?.avatar ? (
                         <img src={profile.avatar} alt="" className="profile-avatar-img" />
                       ) : (
                         <div className="movie-detail-comment-avatar-placeholder">

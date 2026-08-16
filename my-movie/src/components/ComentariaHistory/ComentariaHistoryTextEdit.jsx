@@ -16,6 +16,7 @@ const ComentariaHistoryTextEdit = ({
   commentId,
   variant,
   entityKey,
+  targetTypeHint,
   initialText,
   onPersist,
   deleteSlot,
@@ -43,7 +44,12 @@ const ComentariaHistoryTextEdit = ({
       if (variant === 'movieVideo') {
         await commentsApi.updateCommentTextById(entityKey, commentId, trimmed);
       } else {
-        await shortsCommentsApi.updateCommentTextById(entityKey, commentId, trimmed);
+        await shortsCommentsApi.updateCommentTextById(
+          entityKey,
+          commentId,
+          trimmed,
+          targetTypeHint
+        );
       }
       setText(trimmed);
       setDraft(trimmed);

@@ -1,26 +1,191 @@
 /**
- * Profil "Sharhlar" tarixi: commentsApi (kino + klip/konsert) va shortsCommentsApi (shorts) dan yig‘iladi.
- * VideoPage bilan bir xil klip manbalari — kalitlar mos kelishi uchun.
+ * Profil "Sharhlar" tarixi — server `/comments/history` dan.
+ * Snapshot + katalog ma’lumotlari bilan UI entry yasaydi.
  */
-import * as commentsApi from '../../api/commentsApi';
-import * as shortsCommentsApi from '../../api/shortsCommentsApi';
+import { fetchMyCommentHistory } from '../../api/commentsApi';
 import { formatMovieRating } from '../Rating/CalculateRating';
-import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 
-function uniqueVideosById(clipList = [], concertList = []) {
-  const seen = new Set();
-  const out = [];
-  for (const v of [
-    ...(Array.isArray(clipList) ? clipList : []),
-    ...(Array.isArray(concertList) ? concertList : []),
-  ]) {
-    if (!v || v.id == null) continue;
-    const id = String(v.id);
-    if (seen.has(id)) continue;
-    seen.add(id);
-    out.push(v);
+function pickLocalized(value, lang) {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value[lang] || value.uz || value.ru || '';
+}
+
+function getMovieGenresList(genre, lang) {
+  if (!genre) return [];
+  if (typeof genre === 'object') {
+    return Array.isArray(genre[lang])
+      ? genre[lang]
+      : genre[lang]
+        ? [genre[lang]]
+        : genre.uz || genre.ru || [];
   }
-  return out;
+  return Array.isArray(genre) ? genre : [genre];
+}
+
+function parseLikeCount(v) {
+  if (v === '' || v == null) return 0;
+  const n = parseInt(String(v), 10);
+  return Number.isNaN(n) ? 0 : n;
+}
+
+function getMovieDescriptionText(description, lang) {
+  if (!description) return '';
+  if (typeof description === 'object') {
+    const block = description[lang] || description.uz || description.ru;
+    if (block && typeof block === 'object' && block.text) return String(block.text || '').trim();
+    if (typeof block === 'string') return block.trim();
+  }
+  if (typeof description === 'string') return description.trim();
+  return '';
+}
+
+function getShortsVideoSrc(snap, lang) {
+  const v = snap?.video;
+  if (typeof v === 'string' && v.trim()) return v;
+  if (v && typeof v === 'object') {
+    const src = v[lang] || v.uz || v.ru || '';
+    if (src) return src;
+  }
+  return '';
+}
+
+function getShortsDescription(snap, lang) {
+  if (!snap?.description) return '';
+  if (typeof snap.description === 'object') {
+    return String(
+      snap.description[lang] || snap.description.uz || snap.description.ru || ''
+    ).trim();
+  }
+  return String(snap.description).trim();
+}
+
+function mapHistoryItemToEntry(item, lang) {
+  const snap = item.targetSnapshot || {};
+  const comment = {
+    id: item.id,
+    text: item.text,
+    authorName: item.authorName,
+    authorAvatar: item.authorAvatar,
+    createdAt: item.createdAt,
+    likes: item.likes || 0,
+    parentId: item.parentId,
+    replies: [],
+  };
+
+  if (item.targetType === 'movie' || snap.kind === 'movie') {
+    const movieId = snap.movieId ?? item.targetId;
+    return {
+      key: `movie-${movieId}-${item.id}`,
+      filter: 'movie',
+      createdAt: item.createdAt || '',
+      comment,
+      target: {
+        kind: 'movie',
+        movieId,
+        title: pickLocalized(snap.title, lang),
+        image:
+          pickLocalized(snap.homeImg, lang) ||
+          snap.image ||
+          '/img/movie1.jpg',
+        route: snap.route || `/movie/${movieId}`,
+        genres: getMovieGenresList(snap.genre, lang),
+        movieCategory: snap.category,
+        rating: snap.rating,
+        ratingImdb: snap.ratingImdb,
+        ratingKinopoisk: snap.ratingKinopoisk,
+        ratingNetflix: snap.ratingNetflix,
+        ratingDisplay: formatMovieRating(snap.rating),
+        likeCount: parseLikeCount(snap.like),
+        dislikeCount: parseLikeCount(snap.dislike),
+        descriptionPreview: getMovieDescriptionText(snap.description, lang),
+      },
+    };
+  }
+
+  if (
+    item.targetType === 'klip' ||
+    item.targetType === 'konsert' ||
+    snap.kind === 'video'
+  ) {
+    const videoId = snap.videoId ?? item.targetId;
+    const videoType =
+      snap.videoType ||
+      (item.targetType === 'konsert' ? 'konsert' : 'klip');
+    return {
+      key: `mv-${videoId}-${item.id}`,
+      filter: videoType === 'konsert' ? 'konsert' : 'klip',
+      createdAt: item.createdAt || '',
+      comment,
+      target: {
+        kind: 'video',
+        videoType,
+        title: snap.title || '',
+        image: snap.image || '/img/movie1.jpg',
+        route: snap.route || `/music/video/${videoId}`,
+        videoId,
+        artistName: '',
+        likeCount: parseLikeCount(snap.like),
+        dislikeCount: parseLikeCount(snap.dislike),
+      },
+    };
+  }
+
+  if (item.targetType === 'triller' || snap.kind === 'triller') {
+    const trillerId = snap.trillerId ?? item.targetId;
+    return {
+      key: `triller-${trillerId}-${item.id}`,
+      filter: 'triller',
+      createdAt: item.createdAt || '',
+      comment,
+      target: {
+        kind: 'triller',
+        trillerId,
+        title: pickLocalized(snap.title, lang),
+        image: pickLocalized(snap.image, lang) || '/img/movie1.jpg',
+        route: snap.route || `/triller/${trillerId}`,
+      },
+    };
+  }
+
+  const shortsId = snap.shortsId ?? item.targetId;
+  const shortsSource =
+    snap.shortsSource ||
+    (item.targetType === 'musicShorts' ? 'musicshorts' : 'movieShorts');
+  return {
+    key: `shorts-${shortsSource}-${shortsId}-${item.id}`,
+    filter: 'shorts',
+    createdAt: item.createdAt || '',
+    comment,
+    target: {
+      kind: 'shorts',
+      shortsType: snap.shortsType || shortsSource,
+      shortsSource,
+      shortsId,
+      movieId: snap.movieId ?? null,
+      musicId: snap.musicId ?? null,
+      contentType: snap.contentType || null,
+      title: pickLocalized(snap.title, lang),
+      videoSrc: getShortsVideoSrc(snap, lang),
+      descriptionPreview: getShortsDescription(snap, lang),
+    },
+  };
+}
+
+/** @deprecated sync o‘rniga fetchCommentHistoryEntries ishlating */
+export function buildCommentHistoryEntries() {
+  return [];
+}
+
+export async function fetchCommentHistoryEntries(lang = 'uz') {
+  const history = await fetchMyCommentHistory();
+  const entries = history.map((item) => mapHistoryItemToEntry(item, lang));
+  entries.sort((a, b) => {
+    const ta = new Date(a.createdAt || 0).getTime();
+    const tb = new Date(b.createdAt || 0).getTime();
+    return tb - ta;
+  });
+  return entries;
 }
 
 export function flattenCommentTree(list) {
@@ -36,296 +201,16 @@ export function flattenCommentTree(list) {
   return out;
 }
 
-function getVideoArtistName(video, artistsList = []) {
-  if (!video?.artistId) return '';
-  const a = artistsList.find((x) => x.id === video.artistId);
-  return a?.name || '';
-}
-
-function getMovieGenresList(m, lang) {
-  if (m.genre && typeof m.genre === 'object') {
-    return Array.isArray(m.genre[lang])
-      ? m.genre[lang]
-      : m.genre[lang]
-        ? [m.genre[lang]]
-        : m.genre.uz || m.genre.ru || [];
+export function getShortsRouteFromHistory(target) {
+  if (!target || target.kind !== 'shorts') return '/shorts';
+  const id = target.shortsId;
+  if (id == null) return '/shorts';
+  if (target.shortsSource === 'musicshorts') {
+    return `/shorts?source=musicshorts&id=${id}`;
   }
-  return Array.isArray(m.genre) ? m.genre : [m.genre || ''];
+  return `/shorts?id=${id}`;
 }
 
-function parseMovieLikeCount(v) {
-  if (v === '' || v == null) return 0;
-  const n = parseInt(String(v), 10);
-  return Number.isNaN(n) ? 0 : n;
-}
-
-function isMovieRecord(m) {
-  if (!m?.type) return true;
-  return m.type === 'movie';
-}
-
-function getMovieTitle(m, lang) {
-  return m?.title?.[lang] || m?.title?.uz || m?.title?.ru || '';
-}
-
-function getMovieImage(m, lang) {
-  return m?.homeImg?.[lang] || m?.homeImg?.uz || m?.homeImg?.ru || '/img/movie1.jpg';
-}
-
-/** MovieDetail dagi tavsif matni — faqat string */
-function getMovieDescriptionText(m, lang) {
-  if (!m?.description) return '';
-  if (typeof m.description === 'object') {
-    const block = m.description[lang] || m.description.uz || m.description.ru;
-    if (block && typeof block === 'object' && block.text) return String(block.text || '').trim();
-    if (typeof block === 'string') return block.trim();
-  }
-  if (typeof m.description === 'string') return m.description.trim();
-  return '';
-}
-
-function getShortsTitle(item, lang) {
-  if (typeof item.title === 'string') return item.title;
-  return item.title?.[lang] || item.title?.uz || item.title?.ru || '';
-}
-
-/** ShortsVideos getDescription bilan bir xil */
-function getShortsDescription(item, lang) {
-  if (!item?.description) return '';
-  if (typeof item.description === 'object') {
-    return String(item.description[lang] || item.description.uz || item.description.ru || '').trim();
-  }
-  if (typeof item.description === 'string') return item.description.trim();
-  return '';
-}
-
-/** Shorts kartochkasi — kino rasmi emas, aynan qisqa video fayli (ShortsVideos bilan mos). */
-function getShortsVideoSrc(item, lang) {
-  const v = item?.video;
-  if (typeof v === 'string' && v.trim()) return v;
-  if (v && typeof v === 'object') {
-    const src = v[lang] || v.uz || v.ru || '';
-    if (src) return src;
-  }
-  const mv = item?.musics?.video;
-  if (typeof mv === 'string' && mv.trim()) return mv;
-  return '';
-}
-
-/**
- * Sharh tarixidagi (izohi bor) shortslar — yangi → eski tartibda, har bir short bir marta.
- * movieShorts (kino bo‘limi) va musicshorts (musiqa bo‘limi) bir xil playlistda aralash;
- * scroll keyingi/prev video shu yagona ro‘yxat bo‘yicha (ShortsVideos buildRepostShortsList).
- */
-export function buildShortsHistoryPlaylist(
-  lang = 'uz',
-  clipsList = [],
-  concertsList = [],
-  moviesList = [],
-  movieShortsList = [],
-  musicList = [],
-  artistsList = [],
-  musicShortsList = []
-) {
-  const all = buildCommentHistoryEntries(
-    lang,
-    clipsList,
-    concertsList,
-    moviesList,
-    movieShortsList,
-    musicList,
-    artistsList,
-    musicShortsList
-  );
-  const shortsRows = all.filter((e) => e.filter === 'shorts');
-  const seen = new Set();
-  const playlist = [];
-  for (const e of shortsRows) {
-    const t = e.target;
-    if (t.kind !== 'shorts' || t.shortsId == null) continue;
-    const repostType = t.shortsSource === 'musicshorts' ? 'musicshorts' : 'movieShorts';
-    const k = `${repostType}:${t.shortsId}`;
-    if (seen.has(k)) continue;
-    seen.add(k);
-    playlist.push({ type: repostType, id: t.shortsId });
-  }
-  return playlist;
-}
-
-/**
- * Sharh tarixidan ochilganda: barcha shorts playlist + bosilgan short indeksi.
- */
-export function getShortsRouteFromHistory(
-  target,
-  lang = 'uz',
-  clipsList = [],
-  concertsList = [],
-  moviesList = [],
-  movieShortsList = [],
-  musicList = [],
-  artistsList = [],
-  musicShortsList = []
-) {
-  if (target?.kind !== 'shorts' || target.shortsId == null) return '/shorts';
-  const playlist = buildShortsHistoryPlaylist(
-    lang,
-    clipsList,
-    concertsList,
-    moviesList,
-    movieShortsList,
-    musicList,
-    artistsList,
-    musicShortsList
-  );
-  const repostType = target.shortsSource === 'musicshorts' ? 'musicshorts' : 'movieShorts';
-  const idx = playlist.findIndex(
-    (p) => p.type === repostType && String(p.id) === String(target.shortsId)
-  );
-  const startIndex = idx >= 0 ? idx : 0;
-  const p = new URLSearchParams();
-  if (playlist.length) {
-    p.set('repostShorts', playlist.map((x) => `${x.type}:${x.id}`).join(','));
-  } else {
-    p.set('repostShorts', `${repostType}:${target.shortsId}`);
-  }
-  p.set('startIndex', String(startIndex));
-  return `/shorts?${p.toString()}`;
-}
-
-export function buildCommentHistoryEntries(
-  lang = 'uz',
-  clipsList = [],
-  concertsList = [],
-  moviesList = [],
-  movieShortsList = [],
-  musicList = [],
-  artistsList = [],
-  musicShortsList = []
-) {
-  const entries = [];
-  const allVideoData = uniqueVideosById(clipsList, concertsList);
-  const allMovies = Array.isArray(moviesList) ? moviesList : [];
-  const movieShortsCatalog = resolveShortsWithMovies(
-    movieShortsList,
-    allMovies,
-    musicList,
-    clipsList,
-    concertsList
-  );
-
-  for (const m of allMovies) {
-    if (!isMovieRecord(m)) continue;
-    const id = m.id;
-    const raw = commentsApi.getComments(id);
-    const flat = flattenCommentTree(raw);
-    for (const c of flat) {
-      entries.push({
-        key: `movie-${id}-${c.id}`,
-        filter: 'movie',
-        createdAt: c.createdAt || '',
-        comment: c,
-        target: {
-          kind: 'movie',
-          movieId: id,
-          title: getMovieTitle(m, lang),
-          image: getMovieImage(m, lang),
-          route: `/movie/${id}`,
-          genres: getMovieGenresList(m, lang),
-          movieCategory: m.category,
-          rating: m.rating,
-          ratingImdb: m.ratingImdb,
-          ratingKinopoisk: m.ratingKinopoisk,
-          ratingNetflix: m.ratingNetflix,
-          ratingDisplay: formatMovieRating(m.rating),
-          likeCount: parseMovieLikeCount(m.like),
-          dislikeCount: parseMovieLikeCount(m.dislike),
-          descriptionPreview: getMovieDescriptionText(m, lang),
-        },
-      });
-    }
-  }
-
-  for (const v of allVideoData) {
-    const storageKey = `music:${String(v.id)}`;
-    const raw = commentsApi.getComments(storageKey);
-    const flat = flattenCommentTree(raw);
-    const filter = v.type === 'konsert' ? 'konsert' : 'klip';
-    for (const c of flat) {
-      entries.push({
-        key: `mv-${v.id}-${c.id}`,
-        filter,
-        createdAt: c.createdAt || '',
-        comment: c,
-        target: {
-          kind: 'video',
-          videoType: v.type || 'klip',
-          title: v.title || '',
-          image: v.img || '/img/movie1.jpg',
-          route: `/music/video/${v.id}`,
-          videoId: v.id,
-          artistName: getVideoArtistName(v, artistsList),
-          likeCount: parseInt(v.like, 10) || 0,
-          dislikeCount: parseInt(v.dislike, 10) || 0,
-        },
-      });
-    }
-  }
-
-  movieShortsCatalog.forEach((s) => {
-    const raw = shortsCommentsApi.getComments(s.id);
-    const flat = flattenCommentTree(raw);
-    for (const c of flat) {
-      entries.push({
-        key: `ms-${s.id}-${c.id}`,
-        filter: 'shorts',
-        createdAt: c.createdAt || '',
-        comment: c,
-        target: {
-          kind: 'shorts',
-          shortsType: s.type || 'movieShorts',
-          shortsSource: 'movieShorts',
-          shortsId: s.id,
-          movieId: s.movieId ?? null,
-          musicId: null,
-          contentType: null,
-          title: getShortsTitle(s, lang),
-          videoSrc: getShortsVideoSrc(s, lang),
-          descriptionPreview: getShortsDescription(s, lang),
-        },
-      });
-    }
-  });
-
-  (Array.isArray(musicShortsList) ? musicShortsList : []).forEach((s) => {
-    const raw = shortsCommentsApi.getComments(s.id);
-    const flat = flattenCommentTree(raw);
-    for (const c of flat) {
-      entries.push({
-        key: `mus-${s.id}-${c.id}`,
-        filter: 'shorts',
-        createdAt: c.createdAt || '',
-        comment: c,
-        target: {
-          kind: 'shorts',
-          shortsType: s.type || 'musicshorts',
-          shortsSource: 'musicshorts',
-          shortsId: s.id,
-          movieId: s.movieId ?? null,
-          musicId: s.musicId ?? null,
-          contentType: s.contentType || 'music',
-          title: getShortsTitle(s, lang),
-          videoSrc: getShortsVideoSrc(s, lang),
-          descriptionPreview: getShortsDescription(s, lang),
-        },
-      });
-    }
-  });
-
-  entries.sort((a, b) => {
-    const ta = new Date(a.createdAt || 0).getTime();
-    const tb = new Date(b.createdAt || 0).getTime();
-    return tb - ta;
-  });
-
-  return entries;
+export function buildShortsHistoryPlaylist() {
+  return [];
 }

@@ -478,6 +478,7 @@ const VideoPage = () => {
                 key={String(id)}
                 ref={commentsRef}
                 movieId={`music:${String(id)}`}
+                targetType={video.type === 'konsert' ? 'konsert' : 'klip'}
                 mobileSheetUi
               />
             )}

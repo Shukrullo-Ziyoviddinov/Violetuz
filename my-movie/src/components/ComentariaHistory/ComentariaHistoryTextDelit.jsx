@@ -5,7 +5,14 @@ import * as shortsCommentsApi from '../../api/shortsCommentsApi';
 import './ComentariaHistoryTextDelit.css';
 
 /** O‘chirish `commentsApi` / `shortsCommentsApi.deleteCommentById` (async) — backendda shu funksiyalar ichida `fetch`. */
-const ComentariaHistoryTextDelit = ({ lang, commentId, variant, entityKey, onDeleted }) => {
+const ComentariaHistoryTextDelit = ({
+  lang,
+  commentId,
+  variant,
+  entityKey,
+  targetTypeHint,
+  onDeleted,
+}) => {
   const ru = lang === 'ru';
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -40,7 +47,11 @@ const ComentariaHistoryTextDelit = ({ lang, commentId, variant, entityKey, onDel
       if (variant === 'movieVideo') {
         await commentsApi.deleteCommentById(entityKey, commentId);
       } else {
-        await shortsCommentsApi.deleteCommentById(entityKey, commentId);
+        await shortsCommentsApi.deleteCommentById(
+          entityKey,
+          commentId,
+          targetTypeHint
+        );
       }
       setConfirmOpen(false);
       onDeleted?.();

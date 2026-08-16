@@ -2,9 +2,10 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
-import { useMusicApi } from '../../context/MusicApiContext';
-import { useMoviesApi } from '../../context/MoviesApiContext';
-import { buildCommentHistoryEntries, getShortsRouteFromHistory } from './commentHistoryAggregator';
+import { fetchCommentHistoryEntries, getShortsRouteFromHistory } from './commentHistoryAggregator';
+import { COMMENTS_CHANGED_EVENT } from '../../api/commentsApi';
+import { SHORTS_COMMENTS_CHANGED_EVENT } from '../../api/shortsCommentsApi';
+import { useAuth } from '../../context/AuthContext';
 import ComentariaHistoryFilter from './ComentariaHistoryFilter';
 import ComentariaMovieCard from './ComentariaMovieCard';
 import ComentariaVideoCard from './ComentariaVideoCard';
@@ -35,6 +36,9 @@ function groupKeyFromRow(row) {
     const m = t.route?.match(/\/movie\/(\d+)/);
     return m ? `movie:${m[1]}` : row.key;
   }
+  if (t.kind === 'triller') {
+    return t.trillerId != null ? `triller:${t.trillerId}` : row.key;
+  }
   if (t.kind === 'video') {
     const m = t.route?.match(/\/music\/video\/(\d+)/);
     return m ? `video:${m[1]}` : row.key;
@@ -64,17 +68,25 @@ function groupCommentHistoryRows(rows) {
   });
 }
 
-/** localStorage kaliti — tahrir/o‘chirish */
+/** localStorage kaliti emas — tahrir/o‘chirish uchun API entityKey */
 function getCommentPersistence(target) {
   if (!target) return null;
   if (target.kind === 'movie' && target.movieId != null) {
     return { variant: 'movieVideo', entityKey: target.movieId };
   }
+  if (target.kind === 'triller' && target.trillerId != null) {
+    return { variant: 'movieVideo', entityKey: `triller:${target.trillerId}` };
+  }
   if (target.kind === 'video' && target.videoId != null) {
     return { variant: 'movieVideo', entityKey: `music:${target.videoId}` };
   }
   if (target.kind === 'shorts' && target.shortsId != null) {
-    return { variant: 'shorts', entityKey: target.shortsId };
+    return {
+      variant: 'shorts',
+      entityKey: target.shortsId,
+      targetTypeHint:
+        target.shortsSource === 'musicshorts' ? 'musicShorts' : 'shorts',
+    };
   }
   return null;
 }
@@ -82,12 +94,12 @@ function getCommentPersistence(target) {
 const ComentariaHistoryModal = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
-  const { allClips, allConcerts, allMusic, allArtists, musicShortsCatalog } = useMusicApi();
-  const { allMovies, allShortsVideos } = useMoviesApi();
-  const musicShortsList = musicShortsCatalog;
+  const { isLoggedIn, authReady } = useAuth();
   const lang = contentLang === 'ru' ? 'ru' : 'uz';
   const [filter, setFilter] = useState('all');
   const [tick, setTick] = useState(0);
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(() => setTick((x) => x + 1), []);
 
@@ -97,12 +109,14 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
 
   useEffect(() => {
     if (!open) return undefined;
-    const onStorage = () => refresh();
-    window.addEventListener('storage', onStorage);
-    window.addEventListener('focus', onStorage);
+    const onRemote = () => refresh();
+    window.addEventListener(COMMENTS_CHANGED_EVENT, onRemote);
+    window.addEventListener(SHORTS_COMMENTS_CHANGED_EVENT, onRemote);
+    window.addEventListener('focus', onRemote);
     return () => {
-      window.removeEventListener('storage', onStorage);
-      window.removeEventListener('focus', onStorage);
+      window.removeEventListener(COMMENTS_CHANGED_EVENT, onRemote);
+      window.removeEventListener(SHORTS_COMMENTS_CHANGED_EVENT, onRemote);
+      window.removeEventListener('focus', onRemote);
     };
   }, [open, refresh]);
 
@@ -117,12 +131,31 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
     };
   }, [open]);
 
-  const [entries, setEntries] = useState([]);
-
   useEffect(() => {
-    if (!open) return;
-    setEntries(buildCommentHistoryEntries(lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList));
-  }, [open, lang, tick, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList]);
+    if (!open || !authReady) return undefined;
+    if (!isLoggedIn) {
+      setEntries([]);
+      setLoading(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      try {
+        const list = await fetchCommentHistoryEntries(lang);
+        if (!cancelled) setEntries(list);
+      } catch {
+        if (!cancelled) setEntries([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, lang, tick, authReady, isLoggedIn]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return entries;
@@ -166,7 +199,13 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
         <ComentariaHistoryFilter active={filter} onChange={setFilter} lang={lang} />
 
         <div className="comentaria-history-modal-body">
-          {groupedRows.length === 0 ? (
+          {loading ? (
+            <div className="comentaria-history-modal-empty">
+              <p className="comentaria-history-modal-empty-text">
+                {lang === 'ru' ? 'Загрузка…' : 'Yuklanmoqda…'}
+              </p>
+            </div>
+          ) : groupedRows.length === 0 ? (
             <div className="comentaria-history-modal-empty">
               <img
                 className="comentaria-history-modal-empty-img"
@@ -198,10 +237,10 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                 const t = group.target;
                 const f = group.filter;
                 const cardClick = () =>
-                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList) : t.route);
+                  go(t.kind === 'shorts' ? getShortsRouteFromHistory(t) : t.route);
 
                 let media = null;
-                if (t.kind === 'movie') {
+                if (t.kind === 'movie' || t.kind === 'triller') {
                   media = <ComentariaMovieCard title={t.title} image={t.image} onClick={cardClick} />;
                 } else if (t.kind === 'video') {
                   const badge =
@@ -220,14 +259,17 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                 }
 
                 const elementTitle =
-                  t.kind === 'movie' || t.kind === 'video' || t.kind === 'shorts'
+                  t.kind === 'movie' ||
+                  t.kind === 'triller' ||
+                  t.kind === 'video' ||
+                  t.kind === 'shorts'
                     ? t.title || '—'
                     : '—';
 
                 const mediaClass =
                   t.kind === 'video'
                     ? 'comentaria-history-item-media comentaria-history-item-media--video'
-                    : t.kind === 'movie'
+                    : t.kind === 'movie' || t.kind === 'triller'
                       ? 'comentaria-history-item-media comentaria-history-item-media--movie'
                       : 'comentaria-history-item-media comentaria-history-item-media--shorts';
 
@@ -254,7 +296,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                             movieId={t.movieId}
                             musicId={t.musicId}
                             contentType={t.contentType}
-                            repostRoute={getShortsRouteFromHistory(t, lang, allClips, allConcerts, allMovies, allShortsVideos, allMusic, allArtists, musicShortsList)}
+                            repostRoute={getShortsRouteFromHistory(t)}
                             repostTitle={t.title || ''}
                             videoSrc={t.videoSrc || ''}
                           />
@@ -372,6 +414,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                                   commentId={c.id}
                                   variant={persist.variant}
                                   entityKey={persist.entityKey}
+                                  targetTypeHint={persist.targetTypeHint}
                                   initialText={c.text}
                                   onPersist={refresh}
                                   deleteSlot={
@@ -380,6 +423,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                                       commentId={c.id}
                                       variant={persist.variant}
                                       entityKey={persist.entityKey}
+                                      targetTypeHint={persist.targetTypeHint}
                                       onDeleted={refresh}
                                     />
                                   }

@@ -2069,6 +2069,7 @@ const MovieDetail = () => {
               <MovieComments
                 ref={commentsModalRef}
                 movieId={movie.id}
+                targetType="movie"
                 onCountChange={setCommentsCount}
               />
             </div>

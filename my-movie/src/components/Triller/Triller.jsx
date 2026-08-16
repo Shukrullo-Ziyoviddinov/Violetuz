@@ -591,11 +591,12 @@ const Triller = ({ activeId }) => {
             ) : commentsMovieId ? (
               <div className="triller-comments triller-comments--desktop">
                 <MovieComments
-                  key={`triller-comments-desktop-${activeTriller.id}`}
-                  movieId={commentsMovieId}
-                  previewLimit={4}
-                  mobileSheetUi
-                />
+                key={`triller-comments-desktop-${activeTriller.id}`}
+                movieId={commentsMovieId}
+                targetType="triller"
+                previewLimit={4}
+                mobileSheetUi
+              />
               </div>
             ) : null}
           </div>
@@ -642,6 +643,7 @@ const Triller = ({ activeId }) => {
                 <MovieComments
                   key={`triller-comments-mobile-${activeTriller.id}`}
                   movieId={commentsMovieId}
+                  targetType="triller"
                   previewLimit={1}
                   mobileSheetUi
                 />

@@ -1,186 +1,162 @@
 /**
- * Comments API - Backendga mos
- * Hozir localStorage, keyin fetch/axios bilan almashtiriladi
- *
- * Backend endpoint'lari (kelajakda):
- * GET    /api/movies/:movieId/comments
- * POST   /api/movies/:movieId/comments
- * PATCH  /api/movies/:movieId/comments/:commentId/like
- * GET    /api/movies/:movieId/comments/liked
+ * Comments API — faqat server (localStorage yo‘q).
+ * Base: /api/comments
  */
 
-const STORAGE_PREFIX = 'violet_movie_comments_';
-const LIKED_PREFIX = 'violet_comment_liked_';
+import { resolveApiBaseUrl } from './apiBase';
 
-/** Avatarsiz nusxa — localStorage kvota / stringify xatoligida qayta urinish uchun */
-const stripAuthorAvatars = (items) => {
-  if (!Array.isArray(items)) return items;
-  return items.map((c) => ({
-    ...c,
-    authorAvatar: null,
-    replies: c.replies?.length ? stripAuthorAvatars(c.replies) : [],
-  }));
+const API_BASE_URL = resolveApiBaseUrl();
+
+const commentFetch = (path, options = {}) =>
+  fetch(`${API_BASE_URL}${path}`, {
+    credentials: 'include',
+    ...options,
+    headers: {
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...options.headers,
+    },
+  });
+
+const parseJson = async (response) => {
+  let body = null;
+  try {
+    body = await response.json();
+  } catch {
+    body = null;
+  }
+  if (!response.ok || body?.success === false) {
+    const err = new Error(body?.message || 'Comment request failed');
+    err.status = response.status;
+    err.details = body?.details;
+    throw err;
+  }
+  return body?.data ?? body;
 };
 
-/** movieId har doim bir xil formatda (aralashmasin) */
+/** UI kalitidan { targetType, targetId } */
+export const resolveCommentTarget = (entityKey, targetTypeHint) => {
+  const raw = String(entityKey ?? '').trim();
+  if (!raw) return { targetType: targetTypeHint || 'movie', targetId: '' };
+
+  if (raw.startsWith('triller:')) {
+    return { targetType: 'triller', targetId: raw.slice('triller:'.length) };
+  }
+  if (raw.startsWith('music:')) {
+    const type =
+      targetTypeHint === 'konsert' || targetTypeHint === 'klip'
+        ? targetTypeHint
+        : 'klip';
+    return { targetType: type, targetId: raw.slice('music:'.length) };
+  }
+  if (targetTypeHint) {
+    return { targetType: targetTypeHint, targetId: raw };
+  }
+  return { targetType: 'movie', targetId: raw };
+};
+
+/** Eski API mosligi */
 export const toMovieKey = (movieId) => String(movieId);
-
-/**
- * @param {string|number} movieId - Kino ID
- * @returns {Array} Kommentlar ro'yxati (faqat shu kinoga tegishli)
- */
-export const getComments = (movieId) => {
-  try {
-    const key = `${STORAGE_PREFIX}${toMovieKey(movieId)}`;
-    let stored = localStorage.getItem(key);
-    // VideoPage: avvalgi mv_<id> kalitidan bir martalik ko'chirish
-    if (!stored && String(movieId).startsWith('music:')) {
-      const bare = String(movieId).slice(7);
-      const legacyKey = `${STORAGE_PREFIX}mv_${bare}`;
-      const legacy = localStorage.getItem(legacyKey);
-      if (legacy) {
-        try {
-          localStorage.setItem(key, legacy);
-        } catch (e) {
-          console.warn('getComments migrate legacy error:', legacyKey, e);
-        }
-        stored = legacy;
-      }
-    }
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return Array.isArray(parsed) ? parsed : [];
-    }
-  } catch (e) {
-    console.warn('getComments error:', e);
-  }
-  return [];
-};
-
-/**
- * @param {string|number} movieId - Kino ID
- * @param {Array} comments - Yangilangan kommentlar
- */
-export const saveComments = (movieId, comments) => {
-  const key = `${STORAGE_PREFIX}${toMovieKey(movieId)}`;
-  try {
-    localStorage.setItem(key, JSON.stringify(comments));
-  } catch (e) {
-    try {
-      localStorage.setItem(key, JSON.stringify(stripAuthorAvatars(comments)));
-    } catch (e2) {
-      console.warn('saveComments error:', key, e2);
-    }
-  }
-};
-
-/**
- * @param {string|number} movieId - Kino ID
- * @returns {Set<string>} Like qilingan comment ID'lar (faqat shu kinoga)
- */
-export const getLikedIds = (movieId) => {
-  try {
-    const key = `${LIKED_PREFIX}${toMovieKey(movieId)}`;
-    let stored = localStorage.getItem(key);
-    if (!stored && String(movieId).startsWith('music:')) {
-      const bare = String(movieId).slice(7);
-      const legacyKey = `${LIKED_PREFIX}mv_${bare}`;
-      const legacy = localStorage.getItem(legacyKey);
-      if (legacy) {
-        try {
-          localStorage.setItem(key, legacy);
-        } catch (e) {
-          console.warn('getLikedIds migrate legacy error:', legacyKey, e);
-        }
-        stored = legacy;
-      }
-    }
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return new Set(Array.isArray(parsed) ? parsed : []);
-    }
-  } catch (e) {
-    console.warn('getLikedIds error:', e);
-  }
-  return new Set();
-};
-
-/**
- * @param {string|number} movieId - Kino ID
- * @param {Set<string>} likedIds - Yangilangan like ID'lar
- */
-export const saveLikedIds = (movieId, likedIds) => {
-  const key = `${LIKED_PREFIX}${toMovieKey(movieId)}`;
-  try {
-    localStorage.setItem(key, JSON.stringify([...likedIds]));
-  } catch (e) {
-    console.warn('saveLikedIds error:', key, e);
-  }
-};
 
 const COMMENTS_CHANGED_EVENT = 'violet-movie-comments-changed';
 
-export const dispatchMovieCommentsChanged = (movieId) => {
+export const dispatchMovieCommentsChanged = (movieId, extra = {}) => {
   try {
     window.dispatchEvent(
-      new CustomEvent(COMMENTS_CHANGED_EVENT, { detail: { movieId: toMovieKey(movieId) } })
+      new CustomEvent(COMMENTS_CHANGED_EVENT, {
+        detail: { movieId: toMovieKey(movieId), ...extra },
+      })
     );
-  } catch (e) {
+  } catch {
     /* ignore */
   }
 };
 
-function updateCommentTextInTree(list, commentId, newText) {
-  return list.map((c) => {
-    if (String(c.id) === String(commentId)) {
-      return { ...c, text: newText };
-    }
-    if (c.replies?.length) {
-      return { ...c, replies: updateCommentTextInTree(c.replies, commentId, newText) };
-    }
-    return c;
+export const fetchComments = async ({ targetType, targetId }) => {
+  const q = new URLSearchParams({
+    targetType: String(targetType),
+    targetId: String(targetId),
   });
-}
-
-function removeCommentByIdFromTree(list, commentId) {
-  return list
-    .filter((c) => String(c.id) !== String(commentId))
-    .map((c) => ({
-      ...c,
-      replies: c.replies?.length ? removeCommentByIdFromTree(c.replies, commentId) : [],
-    }));
-}
-
-/**
- * Kino / klip / konsert / triller — bitta comment matnini yangilash.
- * Hozir: localStorage. Backend: shu nom va parametrlar bilan `fetch` qo‘ying; oxirida `dispatchMovieCommentsChanged` chaqirilsin.
- * Kalitlar: movieId | `music:id` | `triller:id`
- *
- * @returns {Promise<void>}
- */
-export const updateCommentTextById = async (movieId, commentId, newText) => {
-  const text = String(newText ?? '').trim();
-  if (!text) return;
-  const raw = getComments(movieId);
-  const updated = updateCommentTextInTree(raw, commentId, text);
-  saveComments(movieId, updated);
-  dispatchMovieCommentsChanged(movieId);
+  const res = await commentFetch(`/comments?${q}`);
+  const data = await parseJson(res);
+  return Array.isArray(data?.comments) ? data.comments : [];
 };
 
-/**
- * Kino / klip / konsert — commentni olib tashlash.
- * Backend ulanganda: DELETE muvaffaqiyatdan keyin local cache + `dispatchMovieCommentsChanged`.
- *
- * @returns {Promise<void>}
- */
-export const deleteCommentById = async (movieId, commentId) => {
-  const raw = getComments(movieId);
-  const updated = removeCommentByIdFromTree(raw, commentId);
-  saveComments(movieId, updated);
-  const liked = getLikedIds(movieId);
-  liked.delete(String(commentId));
-  saveLikedIds(movieId, liked);
-  dispatchMovieCommentsChanged(movieId);
+/** entityKey + optional type hint (MovieComments uchun) */
+export const getComments = async (entityKey, targetTypeHint) => {
+  const target = resolveCommentTarget(entityKey, targetTypeHint);
+  if (!target.targetId) return [];
+  return fetchComments(target);
+};
+
+export const createCommentRequest = async ({
+  targetType,
+  targetId,
+  text,
+  parentId = null,
+}) => {
+  const res = await commentFetch('/comments', {
+    method: 'POST',
+    body: JSON.stringify({ targetType, targetId, text, parentId }),
+  });
+  return parseJson(res);
+};
+
+export const updateCommentTextById = async (entityKey, commentId, newText, targetTypeHint) => {
+  const text = String(newText ?? '').trim();
+  if (!text || commentId == null) return;
+  const res = await commentFetch(`/comments/${encodeURIComponent(commentId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ text }),
+  });
+  await parseJson(res);
+  dispatchMovieCommentsChanged(entityKey, {
+    ...resolveCommentTarget(entityKey, targetTypeHint),
+  });
+};
+
+export const deleteCommentById = async (entityKey, commentId, targetTypeHint) => {
+  if (commentId == null) return;
+  const res = await commentFetch(`/comments/${encodeURIComponent(commentId)}`, {
+    method: 'DELETE',
+  });
+  await parseJson(res);
+  dispatchMovieCommentsChanged(entityKey, {
+    ...resolveCommentTarget(entityKey, targetTypeHint),
+  });
+};
+
+export const toggleCommentLikeRequest = async (commentId) => {
+  const res = await commentFetch(`/comments/${encodeURIComponent(commentId)}/like`, {
+    method: 'POST',
+  });
+  return parseJson(res);
+};
+
+export const fetchCommentLikedIds = async ({ targetType, targetId }) => {
+  const q = new URLSearchParams({
+    targetType: String(targetType),
+    targetId: String(targetId),
+  });
+  const res = await commentFetch(`/comments/liked?${q}`);
+  const data = await parseJson(res);
+  return new Set(Array.isArray(data?.likedIds) ? data.likedIds.map(String) : []);
+};
+
+export const getLikedIds = async (entityKey, targetTypeHint) => {
+  const target = resolveCommentTarget(entityKey, targetTypeHint);
+  if (!target.targetId) return new Set();
+  try {
+    return await fetchCommentLikedIds(target);
+  } catch (err) {
+    if (err?.status === 401) return new Set();
+    throw err;
+  }
+};
+
+export const fetchMyCommentHistory = async () => {
+  const res = await commentFetch('/comments/history');
+  const data = await parseJson(res);
+  return Array.isArray(data?.history) ? data.history : [];
 };
 
 export { COMMENTS_CHANGED_EVENT };
