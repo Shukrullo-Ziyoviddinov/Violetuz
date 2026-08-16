@@ -545,13 +545,12 @@
   }
 }
 
-/* Mobile: yopiqda bottom+height; ochiqda top+height = visualViewport pin */
+/* Mobile: faqat bottom + height (top yo‘q — stretch bug oldini olish) */
 @media (max-width: 768px) {
   .shorts-comments-modal {
-    --sheet-top: auto;
     --sheet-bottom: 0px;
     --sheet-height: 84dvh;
-    top: var(--sheet-top);
+    top: auto !important;
     bottom: var(--sheet-bottom);
     left: 0 !important;
     right: 0 !important;
@@ -565,9 +564,8 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      top 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      bottom 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.32s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
