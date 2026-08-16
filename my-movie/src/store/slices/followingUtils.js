@@ -8,7 +8,12 @@ export const loadLegacyFollowingIds = () => {
     const raw = localStorage.getItem(FOLLOWING_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && Array.isArray(parsed.items)) {
+      return parsed.items.map((x) => (typeof x === 'object' ? x.id : x)).filter((id) => id != null);
+    }
+    if (parsed && Array.isArray(parsed.ids)) return parsed.ids;
+    return [];
   } catch {
     return [];
   }
@@ -23,15 +28,32 @@ const uniqueById = (list) => {
   });
 };
 
+/** following: id[] yoki { id, type }[] */
+const normalizeEntries = (following = []) =>
+  (Array.isArray(following) ? following : []).map((x) => {
+    if (x != null && typeof x === 'object' && x.id != null) {
+      return {
+        id: String(x.id),
+        type: x.type === 'actor' || x.type === 'artist' ? x.type : null,
+      };
+    }
+    return { id: String(x), type: null };
+  });
+
 /** Profil sahifasi — obuna bo'lgan aktyor/artist ro'yxati */
-export const getFollowedPeople = (ids = [], lang = 'uz', actorsList = [], artistsList = []) => {
-  const normalized = new Set(ids.map((id) => String(id)));
+export const getFollowedPeople = (following = [], lang = 'uz', actorsList = [], artistsList = []) => {
+  const entries = normalizeEntries(following);
   const actors = Array.isArray(actorsList) ? actorsList : [];
   const artists = Array.isArray(artistsList) ? artistsList : [];
 
+  const wantActor = (id) =>
+    entries.some((e) => e.id === String(id) && (e.type === 'actor' || e.type == null));
+  const wantArtist = (id) =>
+    entries.some((e) => e.id === String(id) && (e.type === 'artist' || e.type == null));
+
   const followedActors = uniqueById(
     actors
-      .filter((actor) => normalized.has(String(actor.id)))
+      .filter((actor) => wantActor(actor.id))
       .map((actor) => ({
         id: `actor-${actor.id}`,
         followId: actor.id,
@@ -49,7 +71,7 @@ export const getFollowedPeople = (ids = [], lang = 'uz', actorsList = [], artist
 
   const followedArtists = uniqueById(
     artists
-      .filter((artist) => normalized.has(String(artist.id)))
+      .filter((artist) => wantArtist(artist.id))
       .map((artist) => ({
         id: `artist-${artist.id}`,
         followId: artist.id,
@@ -65,13 +87,23 @@ export const getFollowedPeople = (ids = [], lang = 'uz', actorsList = [], artist
 };
 
 /** Feed header — obuna bo'lganlar avatari */
-export const getFeedHeaderFollowedPeople = (ids, lang = 'uz', actorsList = [], artistsList = []) => {
-  const normalized = new Set(ids.map((id) => String(id)));
+export const getFeedHeaderFollowedPeople = (
+  following,
+  lang = 'uz',
+  actorsList = [],
+  artistsList = []
+) => {
+  const entries = normalizeEntries(following);
   const actors = Array.isArray(actorsList) ? actorsList : [];
   const artists = Array.isArray(artistsList) ? artistsList : [];
 
+  const wantActor = (id) =>
+    entries.some((e) => e.id === String(id) && (e.type === 'actor' || e.type == null));
+  const wantArtist = (id) =>
+    entries.some((e) => e.id === String(id) && (e.type === 'artist' || e.type == null));
+
   const followedActors = actors
-    .filter((actor) => normalized.has(String(actor.id)))
+    .filter((actor) => wantActor(actor.id))
     .map((actor) => ({
       key: `actor-${actor.id}`,
       followId: actor.id,
@@ -85,7 +117,7 @@ export const getFeedHeaderFollowedPeople = (ids, lang = 'uz', actorsList = [], a
     }));
 
   const followedArtists = artists
-    .filter((artist) => normalized.has(String(artist.id)))
+    .filter((artist) => wantArtist(artist.id))
     .map((artist) => ({
       key: `artist-${artist.id}`,
       followId: artist.id,

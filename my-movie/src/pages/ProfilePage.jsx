@@ -10,7 +10,7 @@ import ProfileSocialModal from '../components/Profile/ProfileSocialModal';
 import ProfileInfoModal from '../components/Profile/ProfileInfoModal';
 import GlobalModal from '../components/GlobalModal/GlobalModal';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
-import { useFollowingIds } from '../context/FollowingContext';
+import { useFollowingItems } from '../context/FollowingContext';
 import { getFollowedPeople } from '../store/slices/followingUtils';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
@@ -121,7 +121,7 @@ const ProfilePage = () => {
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [statsModalType, setStatsModalType] = useState('following');
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage);
-  const followingIds = useFollowingIds();
+  const followingItems = useFollowingItems();
   const { allActors } = useActorsApi();
   const { allArtists } = useMusicApi();
   const repostItems = useRepostItems();
@@ -149,7 +149,7 @@ const ProfilePage = () => {
     return () => clearProfileInfoMenuHandler(open);
   }, []);
 
-  const followedPeople = getFollowedPeople(followingIds, currentLanguage, allActors, allArtists);
+  const followedPeople = getFollowedPeople(followingItems, currentLanguage, allActors, allArtists);
   const followersPeople = [];
 
   /** Kino + musiqa shortslari profil tartibida (scroll ikkalasini ham o‘z ichiga oladi) */
@@ -559,6 +559,7 @@ const ProfilePage = () => {
                 </div>
                 <FollowingButton
                   artistId={person.followId}
+                  entityType={person.entityType === 'actor' ? 'actor' : 'artist'}
                   wrapperClassName="profile-following-action"
                   stopPropagation
                 />

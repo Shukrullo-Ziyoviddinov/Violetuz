@@ -4,19 +4,40 @@ import {
 } from './slices/followingUtils';
 
 /**
- * redux-persist — `violet_following_artists` kalitini saqlab qoladi
- * (eski format: [artistId, actorId, ...])
+ * redux-persist — eski `[id,…]` yoki yangi `{ items: [{id,type}] }`
  */
 const followingLegacyStorage = {
   getItem() {
     return new Promise((resolve) => {
       try {
-        const ids = loadLegacyFollowingIds();
-        if (ids.length === 0) {
+        const raw = localStorage.getItem(FOLLOWING_STORAGE_KEY);
+        if (!raw) {
           resolve(null);
           return;
         }
-        resolve(JSON.stringify({ ids }));
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const items = parsed
+            .filter((id) => id != null && id !== '')
+            .map((id) => ({ id, type: null }));
+          resolve(items.length ? JSON.stringify({ items }) : null);
+          return;
+        }
+        if (parsed && Array.isArray(parsed.items)) {
+          resolve(JSON.stringify({ items: parsed.items }));
+          return;
+        }
+        if (parsed && Array.isArray(parsed.ids)) {
+          const items = parsed.ids.map((id) => ({ id, type: null }));
+          resolve(JSON.stringify({ items }));
+          return;
+        }
+        const ids = loadLegacyFollowingIds();
+        resolve(
+          ids.length
+            ? JSON.stringify({ items: ids.map((id) => ({ id, type: null })) })
+            : null
+        );
       } catch {
         resolve(null);
       }
@@ -27,8 +48,8 @@ const followingLegacyStorage = {
     return new Promise((resolve) => {
       try {
         const state = JSON.parse(value);
-        const ids = Array.isArray(state.ids) ? state.ids : [];
-        localStorage.setItem(FOLLOWING_STORAGE_KEY, JSON.stringify(ids));
+        const items = Array.isArray(state.items) ? state.items : [];
+        localStorage.setItem(FOLLOWING_STORAGE_KEY, JSON.stringify({ items }));
       } catch {
         /* ignore */
       }

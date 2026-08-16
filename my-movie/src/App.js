@@ -28,6 +28,8 @@ import MovieDetail from './components/MovieDetail/MovieDetail';
 import PullToRefresh from './components/PullToRefresh/PullToRefresh';
 import AuthModalHost from './components/AuthModal/AuthModalHost';
 import AuthSessionBootstrap from './components/AuthSessionBootstrap';
+import WishlistBootstrap from './components/WishlistBootstrap';
+import FollowingBootstrap from './components/FollowingBootstrap';
 import { ViewedMoviesProvider } from './context/ViewedMoviesContext';
 import { ContentLanguageProvider } from './context/ContentLanguageContext';
 import { MusicPlayerProvider } from './context/MusicPlayerContext';
@@ -103,6 +105,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <PersistGate loading={null} persistor={persistor}>
           <AuthSessionBootstrap />
+          <WishlistBootstrap />
+          <FollowingBootstrap />
           <ViewedMoviesProvider>
             <MoviesApiProvider>
               <ActorsApiProvider>

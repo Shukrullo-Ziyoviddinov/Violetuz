@@ -860,6 +860,7 @@ const ActorsPage = () => {
                   <div className="actors-page-follow-btn--desktop">
                     <FollowingButton
                       artistId={actor.id}
+                      entityType="actor"
                       onSubscribeChange={handleActorSubscribeChange}
                     />
                   </div>
@@ -870,6 +871,7 @@ const ActorsPage = () => {
         <div className="actors-page-follow-btn--mobile">
             <FollowingButton
               artistId={actor.id}
+              entityType="actor"
               onSubscribeChange={handleActorSubscribeChange}
             />
           </div>

@@ -82,6 +82,7 @@ const RecommendedActorCard = ({ actor, lang, onOpen, t }) => {
           <p className="recommended-actors-name">{name}</p>
           <FollowingButton
             artistId={actor.id}
+            entityType="actor"
             wrapperClassName="recommended-actors-follow"
             stopPropagation
           />

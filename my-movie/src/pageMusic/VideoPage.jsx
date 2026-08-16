@@ -464,6 +464,7 @@ const VideoPage = () => {
                     </div>
                     <FollowingButton
                       artistId={artist.id}
+                      entityType="artist"
                       wrapperClassName="video-detail-artist-card-btn"
                       stopPropagation
                     />

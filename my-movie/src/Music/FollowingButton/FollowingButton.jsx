@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useFollowing, useIsFollowing } from '../../context/FollowingContext';
+import { requestOpenAuthModal } from '../../authModalBridge';
 import Toast from '../../components/Toast/Toast';
 import './FollowingButton.css';
 
@@ -10,16 +11,14 @@ const stopEventBubble = (e) => {
 };
 
 /**
- * FollowingButton — barcha obuna tugmalari (aktyor, artist, profil, video, feed)
- * Redux: followingSlice orqali `violet_following_artists` da saqlanadi
+ * FollowingButton — aktyor / artist obuna.
  *
- * @param {string|number} artistId — aktyor yoki artist id
- * @param {string} [wrapperClassName] — `.recommended-actors-follow`, `.video-detail-artist-card-btn` va h.k.
- * @param {boolean} [stopPropagation] — karta ichida bosilganda navigatsiyani to'xtatish
- * @param {function} [onSubscribeChange] — obuna holati o'zgarganda (masalan, obunachilar soni)
+ * @param {string|number} artistId — target id
+ * @param {'actor'|'artist'} [entityType='artist'] — DB type
  */
 const FollowingButton = ({
   artistId,
+  entityType = 'artist',
   wrapperClassName = '',
   stopPropagation = false,
   onSubscribeChange,
@@ -27,7 +26,8 @@ const FollowingButton = ({
   const { i18n } = useTranslation();
   const { isLoggedIn } = useAuth();
   const { follow, unfollow } = useFollowing();
-  const isFollowing = useIsFollowing(artistId);
+  const type = entityType === 'actor' ? 'actor' : 'artist';
+  const isFollowing = useIsFollowing(artistId, type);
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
@@ -39,16 +39,17 @@ const FollowingButton = ({
       if (stopPropagation) e.stopPropagation();
       if (!isLoggedIn) {
         setShowToast(true);
+        requestOpenAuthModal('register');
         return;
       }
       if (artistId == null || artistId === '') return;
       if (isFollowing) {
-        unfollow(artistId);
+        unfollow(artistId, type);
       } else {
-        follow(artistId);
+        follow(artistId, type);
       }
     },
-    [stopPropagation, isLoggedIn, artistId, isFollowing, unfollow, follow]
+    [stopPropagation, isLoggedIn, artistId, isFollowing, unfollow, follow, type]
   );
 
   const lang = i18n.language || '';
@@ -63,8 +64,8 @@ const FollowingButton = ({
     subscribeLabel = '+ Obuna';
     followingLabel = '- Bekor qilish';
   } else {
-    subscribeLabel = 'Obuna bo\'lish';
-    followingLabel = 'Obuna bo\'ldi';
+    subscribeLabel = "Obuna bo'lish";
+    followingLabel = "Obuna bo'ldi";
   }
 
   const button = (

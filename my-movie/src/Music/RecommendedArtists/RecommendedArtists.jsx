@@ -50,6 +50,7 @@ const RecommendedArtists = () => {
                 <p className="recommended-artists-name">{artist.name}</p>
                 <FollowingButton
                   artistId={artist.id}
+                  entityType="artist"
                   wrapperClassName="recommended-artists-follow"
                   stopPropagation
                 />

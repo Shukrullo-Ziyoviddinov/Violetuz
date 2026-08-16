@@ -746,6 +746,7 @@ const MusicDetail = () => {
                     </div>
                     <FollowingButton
                       artistId={pageArtist.id}
+                      entityType="artist"
                       wrapperClassName="music-detail-artist-card-btn"
                       stopPropagation
                     />

@@ -26,6 +26,8 @@ const artistRoutes = require('./artist.routes');
 const musicShortRoutes = require('./musicShort.routes');
 const musicBannerRoutes = require('./musicBanner.routes');
 const trillerRoutes = require('./triller.routes');
+const wishlistRoutes = require('./wishlist.routes');
+const followingRoutes = require('./following.routes');
 
 const router = Router();
 
@@ -33,6 +35,8 @@ router.use('/health', healthRoutes);
 router.use('/auth', authRoutes);
 router.use('/uploads', uploadRoutes);
 router.use('/admin', adminRoutes);
+router.use('/wishlist', wishlistRoutes);
+router.use('/following', followingRoutes);
 router.use('/movies', movieRoutes);
 router.use('/actors', actorRoutes);
 router.use('/actor-page-labels', actorPageLabelRoutes);

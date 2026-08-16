@@ -521,6 +521,7 @@ const ArtistDetail = () => {
                 <div className="artist-detail-stats-follow">
                   <FollowingButton
                     artistId={artist.id}
+                    entityType="artist"
                     onSubscribeChange={(isSubscribed) => {
                       const el = document.querySelector('[data-subscriber-count]');
                       if (el) {

@@ -6,7 +6,7 @@ import FeedList from '../components/feed/FeedList';
 import MessageModal from '../components/Messages/MessageModal';
 import { OPEN_MESSAGES_EVENT } from '../messagesModalBridge';
 import { useFeedProfile } from '../context/AuthContext';
-import { useFollowingIds } from '../context/FollowingContext';
+import { useFollowingIds, useFollowingItems } from '../context/FollowingContext';
 import { getFeedHeaderFollowedPeople } from '../store/slices/followingUtils';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMoviesApi } from '../context/MoviesApiContext';
@@ -37,6 +37,7 @@ const FeedPage = () => {
   const feedLang = i18n.language?.toLowerCase().startsWith('ru') ? 'ru' : 'uz';
   const [activeCategory, setActiveCategory] = useState('all');
   const followingIds = useFollowingIds();
+  const followingItems = useFollowingItems();
   const feedProfileUser = useFeedProfile();
   const [messagesOpen, setMessagesOpen] = useState(false);
   const {
@@ -76,8 +77,8 @@ const FeedPage = () => {
   }, []);
 
   const headerFollowedPeople = useMemo(
-    () => getFeedHeaderFollowedPeople(followingIds, feedLang, allActors, allArtists),
-    [followingIds, feedLang, allActors, allArtists]
+    () => getFeedHeaderFollowedPeople(followingItems, feedLang, allActors, allArtists),
+    [followingItems, feedLang, allActors, allArtists]
   );
 
   const feedItems = useMemo(() => {

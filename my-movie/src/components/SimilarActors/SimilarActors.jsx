@@ -128,6 +128,7 @@ const SimilarActorCard = ({
         </button>
         <FollowingButton
           artistId={actor.id}
+          entityType="actor"
           wrapperClassName="actor-similar-card__follow-wrap"
           stopPropagation
         />
