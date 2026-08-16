@@ -647,7 +647,7 @@ const MovieComments = forwardRef(
                 }`}
                 style={{
                   '--drag-y': `${dragY}px`,
-                  '--sheet-top': sheetTop > 0 ? `${sheetTop}px` : '16vh',
+                  '--sheet-top': sheetTop > 0 ? `${sheetTop}px` : '8vh',
                   '--kb-inset': `${kbInset}px`,
                 }}
                 onClick={(e) => e.stopPropagation()}

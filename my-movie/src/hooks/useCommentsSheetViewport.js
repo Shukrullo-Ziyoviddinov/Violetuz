@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const SHEET_MQ = '(max-width: 768px)';
-/** Modal tepasi — ekrandan pastga, doim bir xil (sakramaydi) */
-const SHEET_TOP_RATIO = 0.16;
-const SHEET_TOP_MIN = 100;
-const SHEET_TOP_MAX = 168;
+/** Modal tepasi — ekrandan pastga (kichikroq = modal balandroq) */
+const SHEET_TOP_RATIO = 0.08;
+const SHEET_TOP_MIN = 48;
+const SHEET_TOP_MAX = 88;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;

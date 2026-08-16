@@ -605,7 +605,7 @@
 /* Mobile: top fixed, faqat bottom klaviatura bilan siljiydi */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
-    --sheet-top: 16vh;
+    --sheet-top: 8vh;
     --kb-inset: 0px;
     top: var(--sheet-top);
     bottom: var(--kb-inset, 0px);
