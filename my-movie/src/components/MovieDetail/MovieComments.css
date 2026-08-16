@@ -602,13 +602,13 @@
   }
 }
 
-/* Mobile: bottom sheet — yuqorida bo‘sh joy, visualViewport pin */
+/* Mobile: bottom sheet — klaviatura bilan silliq ko‘tarilish/tushish */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
-    --sheet-top: 14vh;
+    --kb-inset: 0px;
     --sheet-height: 78dvh;
-    top: var(--sheet-top);
-    bottom: auto;
+    top: auto;
+    bottom: var(--kb-inset, 0px);
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
@@ -619,7 +619,10 @@
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition:
+      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+      bottom 0.34s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.34s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {
@@ -637,6 +640,10 @@
 
   .movie-detail-comments-modal-drag-handle {
     display: block;
+  }
+
+  .movie-detail-comments-modal-body {
+    scroll-behavior: smooth;
   }
 }
 
