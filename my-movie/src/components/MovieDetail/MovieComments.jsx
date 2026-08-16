@@ -7,16 +7,14 @@ import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { sortCommentListByLikes } from '../../algo/commentLikeSortAlgo';
 import { formatActionCount } from '../../utils/utils';
+import {
+  isCommentsSheetViewport,
+  useCommentsSheetViewport,
+} from '../../hooks/useCommentsSheetViewport';
 import './MovieComments.css';
 
 const MOBILE_MAX = 900;
-/** Bottom-sheet modal + klaviatura (CSS bilan bir xil) */
-const COMMENTS_SHEET_MQ = '(max-width: 768px)';
 const PREVIEW_LIMIT_DEFAULT = 4;
-
-const isCommentsSheetViewport = () =>
-  typeof window !== 'undefined' && window.matchMedia(COMMENTS_SHEET_MQ).matches;
-
 const migrateComment = (c) => ({
   ...c,
   likes: c.likes ?? 0,
@@ -119,16 +117,16 @@ const MovieComments = forwardRef(
     const [carouselIndex, setCarouselIndex] = useState(0);
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
-    const [keyboardInset, setKeyboardInset] = useState(0);
-    const [vvHeight, setVvHeight] = useState(0);
     const startYRef = useRef(0);
     const dragYRef = useRef(0);
     const commentsListRef = useRef(null);
     const modalInputRef = useRef(null);
     const modalClosingRef = useRef(false);
-    const keyboardInsetRef = useRef(0);
     const [isDraggingModal, setIsDraggingModal] = useState(false);
     const [isDismissingModal, setIsDismissingModal] = useState(false);
+
+    const { sheetTop, sheetHeight, keyboardOpen, keepScrollLocked } =
+      useCommentsSheetViewport(showCommentsModal, '.movie-detail-comments-modal-body');
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
 
@@ -192,14 +190,10 @@ const MovieComments = forwardRef(
     }, [movieId, reloadComments]);
 
     useEffect(() => {
-      if (showCommentsModal) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-        keyboardInsetRef.current = 0;
-        setKeyboardInset(0);
-        setVvHeight(0);
-      }
+      /* scroll lock hook ichida; desktop overflow */
+      if (!showCommentsModal) return undefined;
+      if (isCommentsSheetViewport()) return undefined;
+      document.body.style.overflow = 'hidden';
       return () => {
         document.body.style.overflow = '';
       };
@@ -227,9 +221,6 @@ const MovieComments = forwardRef(
         setDragY(0);
         setIsDraggingModal(false);
         setIsDismissingModal(false);
-        keyboardInsetRef.current = 0;
-        setKeyboardInset(0);
-        setVvHeight(0);
       }, 500);
       return () => window.clearTimeout(t);
     }, [showCommentsModal, commentsModalOpen, isDismissingModal]);
@@ -238,51 +229,8 @@ const MovieComments = forwardRef(
     useEffect(() => {
       if (!showCommentsModal || !commentsModalOpen) return;
       if (isCommentsSheetViewport()) return;
-      modalInputRef.current?.focus();
+      modalInputRef.current?.focus({ preventScroll: true });
     }, [showCommentsModal, commentsModalOpen]);
-
-    /* Mobile: klaviatura — faqat visualViewport (ikkilamchi hisob yo‘q, sakrash kamayadi) */
-    useEffect(() => {
-      if (!showCommentsModal) return undefined;
-      const vv = window.visualViewport;
-      if (!vv) return undefined;
-
-      let raf = 0;
-      const apply = () => {
-        raf = 0;
-        if (!isCommentsSheetViewport()) {
-          keyboardInsetRef.current = 0;
-          setKeyboardInset(0);
-          setVvHeight(0);
-          return;
-        }
-        const nextInset = Math.max(
-          0,
-          Math.round(window.innerHeight - vv.height - vv.offsetTop)
-        );
-        const nextH = Math.round(vv.height);
-        /* kichik tebranishlarni ignore — sakrash oldini olish */
-        if (Math.abs(keyboardInsetRef.current - nextInset) >= 6) {
-          keyboardInsetRef.current = nextInset;
-          setKeyboardInset(nextInset);
-        }
-        setVvHeight((prev) => (Math.abs(prev - nextH) >= 4 ? nextH : prev));
-      };
-
-      const schedule = () => {
-        if (raf) return;
-        raf = window.requestAnimationFrame(apply);
-      };
-
-      apply();
-      vv.addEventListener('resize', schedule);
-      vv.addEventListener('scroll', schedule);
-      return () => {
-        if (raf) window.cancelAnimationFrame(raf);
-        vv.removeEventListener('resize', schedule);
-        vv.removeEventListener('scroll', schedule);
-      };
-    }, [showCommentsModal]);
 
     /* Sheet mobile: kommentlar har 4s pastdan tepaga almashadi, oxirida qayta boshlanadi */
     useEffect(() => {
@@ -423,9 +371,6 @@ const MovieComments = forwardRef(
       setDragY(0);
       setIsDraggingModal(false);
       setIsDismissingModal(false);
-      keyboardInsetRef.current = 0;
-      setKeyboardInset(0);
-      setVvHeight(0);
     };
 
     const handleModalTransitionEnd = (e) => {
@@ -698,12 +643,16 @@ const MovieComments = forwardRef(
                 className={`movie-detail-comments-modal${
                   commentsModalOpen ? ' is-open' : ''
                 }${isDraggingModal ? ' movie-detail-comments-modal-dragging' : ''}${
-                  keyboardInset > 48 ? ' movie-detail-comments-modal--keyboard' : ''
+                  keyboardOpen ? ' movie-detail-comments-modal--keyboard' : ''
                 }`}
                 style={{
                   '--drag-y': `${dragY}px`,
-                  '--keyboard-inset': `${keyboardInset}px`,
-                  '--vv-height': vvHeight > 0 ? `${vvHeight}px` : '85dvh',
+                  ...(sheetHeight > 0
+                    ? {
+                        '--sheet-top': `${sheetTop}px`,
+                        '--sheet-height': `${sheetHeight}px`,
+                      }
+                    : null),
                 }}
                 onClick={(e) => e.stopPropagation()}
                 onTransitionEnd={handleModalTransitionEnd}
@@ -802,12 +751,11 @@ const MovieComments = forwardRef(
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onFocus={() => {
-                        /* iOS page scroll sakrashini kamaytirish */
-                        if (!isCommentsSheetViewport()) return;
+                        keepScrollLocked();
                         window.requestAnimationFrame(() => {
-                          window.scrollTo(0, 0);
-                          document.documentElement.scrollTop = 0;
-                          document.body.scrollTop = 0;
+                          keepScrollLocked();
+                          window.setTimeout(keepScrollLocked, 50);
+                          window.setTimeout(keepScrollLocked, 150);
                         });
                       }}
                     />

@@ -7,6 +7,10 @@ import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { formatActionCount } from '../../utils/utils';
 import { sortCommentListByLikes } from '../../algo/commentLikeSortAlgo';
+import {
+  isCommentsSheetViewport,
+  useCommentsSheetViewport,
+} from '../../hooks/useCommentsSheetViewport';
 import './ShortsComments.css';
 
 const migrateShortsComment = (c) => ({
@@ -50,10 +54,6 @@ const insertReplyInTree = (list, parentId, reply) =>
   });
 
 const PREVIEW_LIMIT = 4;
-const COMMENTS_SHEET_MQ = '(max-width: 768px)';
-
-const isCommentsSheetViewport = () =>
-  typeof window !== 'undefined' && window.matchMedia(COMMENTS_SHEET_MQ).matches;
 
 const countTotalShortsComments = (comments) =>
   comments.reduce((sum, c) => sum + 1 + countTotalShortsComments(c.replies || []), 0);
@@ -93,16 +93,16 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [dragY, setDragY] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
-  const [keyboardInset, setKeyboardInset] = useState(0);
-  const [vvHeight, setVvHeight] = useState(0);
   const startYRef = useRef(0);
   const dragYRef = useRef(0);
   const shortsCommentsListRef = useRef(null);
   const modalInputRef = useRef(null);
   const modalClosingRef = useRef(false);
-  const keyboardInsetRef = useRef(0);
   const [isDraggingModal, setIsDraggingModal] = useState(false);
   const [isDismissingModal, setIsDismissingModal] = useState(false);
+
+  const { sheetTop, sheetHeight, keyboardOpen, keepScrollLocked } =
+    useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
 
   const requireAuth = useCallback(() => {
     if (isLoggedIn) return true;
@@ -153,14 +153,9 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   }, [shortsId, reloadComments]);
 
   useEffect(() => {
-    if (showShortsCommentsModal) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      keyboardInsetRef.current = 0;
-      setKeyboardInset(0);
-      setVvHeight(0);
-    }
+    if (!showShortsCommentsModal) return undefined;
+    if (isCommentsSheetViewport()) return undefined;
+    document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = '';
     };
@@ -186,9 +181,6 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       setDragY(0);
       setIsDraggingModal(false);
       setIsDismissingModal(false);
-      keyboardInsetRef.current = 0;
-      setKeyboardInset(0);
-      setVvHeight(0);
     }, 500);
     return () => window.clearTimeout(t);
   }, [showShortsCommentsModal, shortsModalOpen, isDismissingModal]);
@@ -196,49 +188,8 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   useEffect(() => {
     if (!showShortsCommentsModal || !shortsModalOpen) return;
     if (isCommentsSheetViewport()) return;
-    modalInputRef.current?.focus();
+    modalInputRef.current?.focus({ preventScroll: true });
   }, [showShortsCommentsModal, shortsModalOpen]);
-
-  useEffect(() => {
-    if (!showShortsCommentsModal) return undefined;
-    const vv = window.visualViewport;
-    if (!vv) return undefined;
-
-    let raf = 0;
-    const apply = () => {
-      raf = 0;
-      if (!isCommentsSheetViewport()) {
-        keyboardInsetRef.current = 0;
-        setKeyboardInset(0);
-        setVvHeight(0);
-        return;
-      }
-      const nextInset = Math.max(
-        0,
-        Math.round(window.innerHeight - vv.height - vv.offsetTop)
-      );
-      const nextH = Math.round(vv.height);
-      if (Math.abs(keyboardInsetRef.current - nextInset) >= 6) {
-        keyboardInsetRef.current = nextInset;
-        setKeyboardInset(nextInset);
-      }
-      setVvHeight((prev) => (Math.abs(prev - nextH) >= 4 ? nextH : prev));
-    };
-
-    const schedule = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(apply);
-    };
-
-    apply();
-    vv.addEventListener('resize', schedule);
-    vv.addEventListener('scroll', schedule);
-    return () => {
-      if (raf) window.cancelAnimationFrame(raf);
-      vv.removeEventListener('resize', schedule);
-      vv.removeEventListener('scroll', schedule);
-    };
-  }, [showShortsCommentsModal]);
 
   const handleToggleLike = async (commentId) => {
     if (!requireAuth()) return;
@@ -350,9 +301,6 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     setDragY(0);
     setIsDraggingModal(false);
     setIsDismissingModal(false);
-    keyboardInsetRef.current = 0;
-    setKeyboardInset(0);
-    setVvHeight(0);
   };
 
   const handleModalTransitionEnd = (e) => {
@@ -579,11 +527,15 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
             <div
               className={`shorts-comments-modal${shortsModalOpen ? ' is-open' : ''}${
                 isDraggingModal ? ' shorts-comments-modal-dragging' : ''
-              }${keyboardInset > 48 ? ' shorts-comments-modal--keyboard' : ''}`}
+              }${keyboardOpen ? ' shorts-comments-modal--keyboard' : ''}`}
               style={{
                 '--drag-y': `${dragY}px`,
-                '--keyboard-inset': `${keyboardInset}px`,
-                '--vv-height': vvHeight > 0 ? `${vvHeight}px` : '85dvh',
+                ...(sheetHeight > 0
+                  ? {
+                      '--sheet-top': `${sheetTop}px`,
+                      '--sheet-height': `${sheetHeight}px`,
+                    }
+                  : null),
               }}
               onClick={(e) => e.stopPropagation()}
               onTransitionEnd={handleModalTransitionEnd}
@@ -672,11 +624,11 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                     value={shortsInputValue}
                     onChange={(e) => setShortsInputValue(e.target.value)}
                     onFocus={() => {
-                      if (!isCommentsSheetViewport()) return;
+                      keepScrollLocked();
                       window.requestAnimationFrame(() => {
-                        window.scrollTo(0, 0);
-                        document.documentElement.scrollTop = 0;
-                        document.body.scrollTop = 0;
+                        keepScrollLocked();
+                        window.setTimeout(keepScrollLocked, 50);
+                        window.setTimeout(keepScrollLocked, 150);
                       });
                     }}
                   />

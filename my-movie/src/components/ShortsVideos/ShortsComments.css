@@ -545,26 +545,24 @@
   }
 }
 
-/* Mobile: bottom sheet, slide from bottom */
+/* Mobile: bottom sheet — visualViewport ga pin */
 @media (max-width: 768px) {
   .shorts-comments-modal {
-    --keyboard-inset: 0px;
-    --vv-height: 85dvh;
-    bottom: var(--keyboard-inset, 0px);
-    top: auto;
+    --sheet-top: auto;
+    --sheet-height: 85dvh;
+    top: var(--sheet-top, auto);
+    bottom: auto;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100vw;
+    height: var(--sheet-height, 85dvh);
+    max-height: none;
     transform: translateY(105%);
-    max-height: min(85dvh, var(--vv-height, 85dvh));
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    transition:
-      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-      max-height 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
@@ -577,7 +575,7 @@
 
   .shorts-comments-modal--keyboard {
     padding-bottom: 0;
-    max-height: max(240px, calc(var(--vv-height, 100dvh) - 8px));
+    border-radius: 12px 12px 0 0;
   }
 
   .shorts-comments-modal-drag-handle {
