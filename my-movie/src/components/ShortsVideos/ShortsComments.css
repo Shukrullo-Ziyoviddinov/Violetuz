@@ -545,12 +545,13 @@
   }
 }
 
-/* Mobile: bottom + height — klaviatura ochilganda butun sheet yuqoriga */
+/* Mobile: yopiqda bottom+height; ochiqda top+height = visualViewport pin */
 @media (max-width: 768px) {
   .shorts-comments-modal {
+    --sheet-top: auto;
     --sheet-bottom: 0px;
     --sheet-height: 84dvh;
-    top: auto;
+    top: var(--sheet-top);
     bottom: var(--sheet-bottom);
     left: 0 !important;
     right: 0 !important;
@@ -564,8 +565,9 @@
     overflow: hidden;
     transition:
       transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.22s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+      top 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+      bottom 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.3s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
