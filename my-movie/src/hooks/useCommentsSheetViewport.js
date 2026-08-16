@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 const SHEET_MQ = '(max-width: 768px)';
+/** Ekran yuqorisida modal ustida qoladigan bo‘sh joy (px) */
+const SHEET_TOP_GAP_MIN = 52;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -91,10 +93,13 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       const vvH = Math.max(1, Math.round(vv.height));
       const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
       const keyboard = inset > 60;
+      /* Yuqorida bo‘sh joy — modal ekran tepasiga yopishib ketmasin */
+      const topGap = Math.max(SHEET_TOP_GAP_MIN, Math.round(vvH * 0.07));
+      const available = Math.max(240, vvH - topGap);
       const height = keyboard
-        ? Math.max(240, vvH)
-        : Math.max(240, Math.round(Math.min(vvH * 0.85, vvH)));
-      const top = keyboard ? vvTop : vvTop + Math.max(0, vvH - height);
+        ? available
+        : Math.min(available, Math.round(vvH * 0.85));
+      const top = vvTop + Math.max(0, vvH - height);
 
       const prev = metricsRef.current;
       /* Faqat sezilarli o‘zgarishda yangilash — tebranish/sakrash kamayadi */
