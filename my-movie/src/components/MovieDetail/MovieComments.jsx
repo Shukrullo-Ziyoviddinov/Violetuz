@@ -125,7 +125,7 @@ const MovieComments = forwardRef(
     const [isDraggingModal, setIsDraggingModal] = useState(false);
     const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-    const { kbInset, sheetHeight, keyboardOpen, keepScrollLocked } =
+    const { sheetTop, kbInset, keyboardOpen, keepScrollLocked } =
       useCommentsSheetViewport(showCommentsModal, '.movie-detail-comments-modal-body');
 
     const target = commentsApi.resolveCommentTarget(movieId, targetTypeProp);
@@ -647,10 +647,8 @@ const MovieComments = forwardRef(
                 }`}
                 style={{
                   '--drag-y': `${dragY}px`,
+                  '--sheet-top': sheetTop > 0 ? `${sheetTop}px` : '16vh',
                   '--kb-inset': `${kbInset}px`,
-                  ...(sheetHeight > 0
-                    ? { '--sheet-height': `${sheetHeight}px` }
-                    : null),
                 }}
                 onClick={(e) => e.stopPropagation()}
                 onTransitionEnd={handleModalTransitionEnd}

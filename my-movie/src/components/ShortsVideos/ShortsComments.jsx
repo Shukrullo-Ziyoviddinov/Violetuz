@@ -101,7 +101,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [isDraggingModal, setIsDraggingModal] = useState(false);
   const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-  const { kbInset, sheetHeight, keyboardOpen, keepScrollLocked } =
+  const { sheetTop, kbInset, keyboardOpen, keepScrollLocked } =
     useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
 
   const requireAuth = useCallback(() => {
@@ -530,10 +530,8 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
               }${keyboardOpen ? ' shorts-comments-modal--keyboard' : ''}`}
               style={{
                 '--drag-y': `${dragY}px`,
+                '--sheet-top': sheetTop > 0 ? `${sheetTop}px` : '16vh',
                 '--kb-inset': `${kbInset}px`,
-                ...(sheetHeight > 0
-                  ? { '--sheet-height': `${sheetHeight}px` }
-                  : null),
               }}
               onClick={(e) => e.stopPropagation()}
               onTransitionEnd={handleModalTransitionEnd}
