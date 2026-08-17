@@ -1,3 +1,15 @@
+
+
+
+
+
+
+
+
+
+
+
+
 /* Comments block - after movie-detail-actors */
 .movie-detail-comments {
   /* margin-top: 2rem; */
@@ -632,7 +644,6 @@
 
   .movie-detail-comments-modal--keyboard {
     padding-bottom: 0 !important;
-    /* Kb bilan sync — transition yo‘q */
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
   }
 
