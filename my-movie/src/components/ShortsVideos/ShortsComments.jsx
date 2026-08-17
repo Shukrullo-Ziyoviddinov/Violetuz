@@ -42,6 +42,21 @@ const updateLikesInTree = (list, commentId, likes, likedByMe) =>
     return c;
   });
 
+const toggleLikeOptimisticInTree = (list, commentId, nextLiked) =>
+  list.map((c) => {
+    if (String(c.id) === String(commentId)) {
+      const likes = Math.max(0, (Number(c.likes) || 0) + (nextLiked ? 1 : -1));
+      return { ...c, likes, likedByMe: nextLiked };
+    }
+    if (c.replies?.length) {
+      return {
+        ...c,
+        replies: toggleLikeOptimisticInTree(c.replies, commentId, nextLiked),
+      };
+    }
+    return c;
+  });
+
 const insertReplyInTree = (list, parentId, reply) =>
   list.map((c) => {
     if (String(c.id) === String(parentId)) {
@@ -98,6 +113,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const shortsCommentsListRef = useRef(null);
   const modalInputRef = useRef(null);
   const modalClosingRef = useRef(false);
+  const likeBusyRef = useRef(new Set());
   const [isDraggingModal, setIsDraggingModal] = useState(false);
   const [isDismissingModal, setIsDismissingModal] = useState(false);
 
@@ -193,22 +209,48 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
 
   const handleToggleLike = async (commentId) => {
     if (!requireAuth()) return;
+    const id = String(commentId);
+    if (likeBusyRef.current.has(id)) return;
+    likeBusyRef.current.add(id);
+
+    const wasLiked = likedShortsIds.has(id);
+    const nextLiked = !wasLiked;
+    setShortsComments((prev) =>
+      sortCommentListByLikes(toggleLikeOptimisticInTree(prev, id, nextLiked))
+    );
+    setLikedShortsIds((prev) => {
+      const next = new Set(prev);
+      if (nextLiked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+
     try {
-      const data = await shortsCommentsApi.toggleShortsCommentLikeRequest(commentId);
+      const data = await shortsCommentsApi.toggleShortsCommentLikeRequest(id);
       const likes = data?.likes ?? 0;
       const liked = Boolean(data?.liked);
       setShortsComments((prev) =>
-        sortCommentListByLikes(updateLikesInTree(prev, commentId, likes, liked))
+        sortCommentListByLikes(updateLikesInTree(prev, id, likes, liked))
       );
       setLikedShortsIds((prev) => {
         const next = new Set(prev);
-        if (liked) next.add(String(commentId));
-        else next.delete(String(commentId));
+        if (liked) next.add(id);
+        else next.delete(id);
         return next;
       });
       shortsCommentsApi.dispatchShortsCommentsChanged(shortsId, { skipReload: true });
     } catch {
-      /* ignore */
+      setShortsComments((prev) =>
+        sortCommentListByLikes(toggleLikeOptimisticInTree(prev, id, wasLiked))
+      );
+      setLikedShortsIds((prev) => {
+        const next = new Set(prev);
+        if (wasLiked) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+    } finally {
+      likeBusyRef.current.delete(id);
     }
   };
 

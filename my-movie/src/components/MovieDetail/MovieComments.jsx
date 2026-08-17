@@ -44,6 +44,21 @@ const updateLikesInTree = (list, commentId, likes, likedByMe) =>
     return c;
   });
 
+const toggleLikeOptimisticInTree = (list, commentId, nextLiked) =>
+  list.map((c) => {
+    if (String(c.id) === String(commentId)) {
+      const likes = Math.max(0, (Number(c.likes) || 0) + (nextLiked ? 1 : -1));
+      return { ...c, likes, likedByMe: nextLiked };
+    }
+    if (c.replies?.length) {
+      return {
+        ...c,
+        replies: toggleLikeOptimisticInTree(c.replies, commentId, nextLiked),
+      };
+    }
+    return c;
+  });
+
 const insertReplyInTree = (list, parentId, reply) =>
   list.map((c) => {
     if (String(c.id) === String(parentId)) {
@@ -122,6 +137,7 @@ const MovieComments = forwardRef(
     const commentsListRef = useRef(null);
     const modalInputRef = useRef(null);
     const modalClosingRef = useRef(false);
+    const likeBusyRef = useRef(new Set());
     const [isDraggingModal, setIsDraggingModal] = useState(false);
     const [isDismissingModal, setIsDismissingModal] = useState(false);
 
@@ -255,17 +271,33 @@ const MovieComments = forwardRef(
 
     const handleToggleLike = async (commentId) => {
       if (!requireAuth()) return;
+      const id = String(commentId);
+      if (likeBusyRef.current.has(id)) return;
+      likeBusyRef.current.add(id);
+
+      const wasLiked = likedIds.has(id);
+      const nextLiked = !wasLiked;
+      setComments((prev) =>
+        sortCommentListByLikes(toggleLikeOptimisticInTree(prev, id, nextLiked))
+      );
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        if (nextLiked) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+
       try {
-        const data = await commentsApi.toggleCommentLikeRequest(commentId);
+        const data = await commentsApi.toggleCommentLikeRequest(id);
         const likes = data?.likes ?? 0;
         const liked = Boolean(data?.liked);
         setComments((prev) =>
-          sortCommentListByLikes(updateLikesInTree(prev, commentId, likes, liked))
+          sortCommentListByLikes(updateLikesInTree(prev, id, likes, liked))
         );
         setLikedIds((prev) => {
           const next = new Set(prev);
-          if (liked) next.add(String(commentId));
-          else next.delete(String(commentId));
+          if (liked) next.add(id);
+          else next.delete(id);
           return next;
         });
         commentsApi.dispatchMovieCommentsChanged(movieId, {
@@ -273,7 +305,17 @@ const MovieComments = forwardRef(
           skipReload: true,
         });
       } catch {
-        /* ignore */
+        setComments((prev) =>
+          sortCommentListByLikes(toggleLikeOptimisticInTree(prev, id, wasLiked))
+        );
+        setLikedIds((prev) => {
+          const next = new Set(prev);
+          if (wasLiked) next.add(id);
+          else next.delete(id);
+          return next;
+        });
+      } finally {
+        likeBusyRef.current.delete(id);
       }
     };
 

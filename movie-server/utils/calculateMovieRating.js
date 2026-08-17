@@ -36,7 +36,11 @@ const reverseVoteFromRating = (currentRating, vote) => {
 
 const formatMovieRating = (rating) => {
   const value = safeNumber(rating);
-  return value.toFixed(1).replace(/\.0$/, '');
+  if (!Number.isFinite(value)) return '';
+  const sign = value < 0 ? '-' : '';
+  const [whole, frac = ''] = String(Math.abs(value)).split('.');
+  const tenths = (frac + '0').charAt(0);
+  return `${sign}${whole}.${tenths}`;
 };
 
 module.exports = {

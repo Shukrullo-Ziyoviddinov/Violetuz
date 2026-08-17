@@ -8,6 +8,7 @@ import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton, { getDisplayItems, shouldShowMore, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
+import { formatMovieRating } from '../Rating/CalculateRating';
 import './Movies.css';
 
 /** Poster — image + overlay skeletons until poster loads (cache-safe) */
@@ -133,7 +134,7 @@ const MoviePosterItem = ({
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffd700" stroke="none">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                 </svg>
-                <span>{movie.rating}</span>
+                <span>{formatMovieRating(movie.rating)}</span>
               </div>
             )}
           </>

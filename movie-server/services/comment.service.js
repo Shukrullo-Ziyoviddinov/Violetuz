@@ -376,30 +376,33 @@ const toggleLike = async (userId, commentId) => {
   const oid = toObjectId(commentId);
   if (!oid) throw badRequest('commentId noto‘g‘ri');
 
-  const row = await Comment.findById(oid);
-  if (!row) throw notFound('Komment topilmadi');
+  /* Unlike: bitta atomik update — to‘liq save() sekin */
+  const pulled = await Comment.findOneAndUpdate(
+    { _id: oid, likedBy: userId },
+    { $pull: { likedBy: userId }, $inc: { likes: -1 } },
+    { new: true, select: 'likes likedBy' }
+  ).lean();
 
-  const uid = String(userId);
-  const likedBy = (row.likedBy || []).map(String);
-  const idx = likedBy.indexOf(uid);
-  let liked;
-
-  if (idx >= 0) {
-    row.likedBy = row.likedBy.filter((id) => String(id) !== uid);
-    liked = false;
-  } else {
-    row.likedBy.push(userId);
-    liked = true;
+  if (pulled) {
+    const likes = Math.max(0, (pulled.likedBy || []).length);
+    if (Number(pulled.likes) !== likes) {
+      await Comment.updateOne({ _id: oid }, { $set: { likes } });
+    }
+    return { commentId: String(oid), likes, liked: false };
   }
-  row.likes = row.likedBy.length;
-  await row.save();
 
-  return {
-    commentId: String(row._id),
-    likes: row.likes,
-    liked,
-    item: toClientComment(row.toObject(), userId),
-  };
+  const added = await Comment.findOneAndUpdate(
+    { _id: oid, likedBy: { $ne: userId } },
+    { $addToSet: { likedBy: userId }, $inc: { likes: 1 } },
+    { new: true, select: 'likes likedBy' }
+  ).lean();
+
+  if (!added) throw notFound('Komment topilmadi');
+  const likes = (added.likedBy || []).length;
+  if (Number(added.likes) !== likes) {
+    await Comment.updateOne({ _id: oid }, { $set: { likes } });
+  }
+  return { commentId: String(oid), likes, liked: true };
 };
 
 /** Profil → komment history (faqat shu user yozganlari) */
