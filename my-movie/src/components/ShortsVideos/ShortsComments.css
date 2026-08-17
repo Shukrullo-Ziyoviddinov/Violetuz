@@ -549,14 +549,14 @@
 @media (max-width: 768px) {
   .shorts-comments-modal {
     --sheet-top: 16vh;
-    --sheet-bottom: 0px;
+    --sheet-height: 84dvh;
     top: var(--sheet-top);
-    bottom: max(var(--sheet-bottom), env(keyboard-inset-bottom, 0px));
+    bottom: auto;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100vw;
-    height: auto;
+    height: var(--sheet-height);
     max-height: none;
     transform: translateY(105%);
     border-radius: 20px 20px 0 0;

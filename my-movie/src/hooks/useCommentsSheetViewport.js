@@ -32,7 +32,7 @@ if (typeof window !== 'undefined') enableVirtualKeyboard();
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetTop, setSheetTop] = useState(0);
-  const [sheetBottom, setSheetBottom] = useState(0);
+  const [sheetHeight, setSheetHeight] = useState(0);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   const scrollYRef = useRef(0);
@@ -46,14 +46,15 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     const visH = vv ? Math.round(vv.height) : inner;
     const vvKb = Math.max(0, inner - visTop - visH);
     const vkKb = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
-    const kb = Math.max(vvKb, vkKb);
+    /* Faqat visualViewport pastiga yopishamiz — max() bushliq ochadi */
+    const kb = vvKb > 0 ? vvKb : vkKb;
 
     const open = kb >= KB_MIN;
-    const gap = open ? GAP_KEYBOARD : restGap(inner);
+    const gap = open ? GAP_KEYBOARD : restGap(visH);
 
     setKeyboardOpen(open);
     setSheetTop(visTop + gap);
-    setSheetBottom(open ? kb : 0);
+    setSheetHeight(Math.max(180, visH - gap));
   }, []);
 
   const schedule = useCallback(() => {
@@ -69,7 +70,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
       setSheetTop(0);
-      setSheetBottom(0);
+      setSheetHeight(0);
       setKeyboardOpen(false);
       return;
     }
@@ -169,7 +170,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
   return {
     sheetTop,
-    sheetBottom,
+    sheetHeight,
     keyboardOpen,
     onModalInputFocus,
     onModalInputBlur,
