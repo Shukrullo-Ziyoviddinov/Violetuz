@@ -905,27 +905,25 @@
 }
 
 .movie-detail-season-btn {
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.25rem;
   font-size: 0.85rem;
   line-height: 1.2;
   font-weight: 600;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: none;
   border-radius: 8px;
-  background: transparent;
+  background: #2d2d324d;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  min-height: calc(0.4rem * 2 + 0.85rem * 1.2 + 4px);
+  min-height: calc(0.5rem * 2 + 0.85rem * 1.2);
 }
 
 .movie-detail-season-btn:hover {
-  border-color: #9b4fe7;
   color: #ffffff;
 }
 
 .movie-detail-season-btn.active {
-  border-color: #9b4fe7;
   background: rgba(155, 79, 231, 0.2);
   color: #ffffff;
 }
@@ -933,14 +931,14 @@
 .movie-detail-season-btn-skeleton,
 .skeleton-loader--movie-detail-season-btn {
   width: 5.5rem !important;
-  height: calc(0.4rem * 2 + 0.85rem * 1.2 + 4px) !important;
+  height: calc(0.5rem * 2 + 0.85rem * 1.2) !important;
   border-radius: 8px !important;
-  border: 2px solid transparent !important;
+  border: none !important;
   box-sizing: border-box;
 }
 
 .movie-detail-season-btn-skeleton--active {
-  box-shadow: inset 0 0 0 2px rgba(155, 79, 231, 0.55);
+  box-shadow: none;
 }
 
 .movie-detail-seasons-tab {
@@ -948,23 +946,21 @@
   font-size: 0.95rem;
   line-height: 1.2;
   font-weight: 600;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: none;
   border-radius: 8px;
-  background: transparent;
+  background: #2d2d324d;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  min-height: calc(0.5rem * 2 + 0.95rem * 1.2 + 4px);
+  min-height: calc(0.5rem * 2 + 0.95rem * 1.2);
 }
 
 .movie-detail-seasons-tab:hover {
-  border-color: #9b4fe7;
   color: #ffffff;
 }
 
 .movie-detail-seasons-tab.active {
-  border-color: #9b4fe7;
   background: rgba(155, 79, 231, 0.2);
   color: #ffffff;
 }
@@ -972,7 +968,7 @@
 .movie-detail-seasons-tab-skeleton,
 .skeleton-loader--movie-detail-seasons-tab {
   width: 3.25rem !important;
-  height: calc(0.5rem * 2 + 0.95rem * 1.2 + 4px) !important;
+  height: calc(0.5rem * 2 + 0.95rem * 1.2) !important;
   border-radius: 8px !important;
   box-sizing: border-box;
 }
@@ -2098,6 +2094,28 @@
   .skeleton-loader--movie-detail-actor-movies {
     height: calc(0.8rem * 1.2) !important;
     max-width: 4.5rem;
+  }
+
+  .movie-detail-seasons-tab {
+    font-size: 0.75rem;
+    min-height: calc(1.4rem + 5px);
+    padding: 0.1rem 1rem;
+  }
+
+  .movie-detail-season-btn {
+    font-size: 0.75rem;
+    min-height: calc(1.4rem + 5px);
+    padding: 0.1rem 1rem;
+  }
+
+  .movie-detail-season-btn-skeleton,
+  .skeleton-loader--movie-detail-season-btn {
+    height: calc(1.4rem + 5px) !important;
+  }
+
+  .movie-detail-seasons-tab-skeleton,
+  .skeleton-loader--movie-detail-seasons-tab {
+    height: calc(1.4rem + 5px) !important;
   }
 }
 
