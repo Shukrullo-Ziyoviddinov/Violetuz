@@ -101,16 +101,8 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [isDraggingModal, setIsDraggingModal] = useState(false);
   const [isDismissingModal, setIsDismissingModal] = useState(false);
 
-  const {
-    sheetHeight,
-    footerTop,
-    keyboardOpen,
-    footerSpacer,
-    setFooterRef,
-    onModalInputFocus,
-    onModalInputBlur,
-    canCloseFromOverlay,
-  } = useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
+  const { sheetBottom, sheetHeight, keyboardOpen, onModalInputFocus, onModalInputBlur, canCloseFromOverlay } =
+    useCommentsSheetViewport(showShortsCommentsModal, '.shorts-comments-modal-body');
 
   const requireAuth = useCallback(() => {
     if (isLoggedIn) return true;
@@ -541,9 +533,8 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
               }${keyboardOpen ? ' shorts-comments-modal--keyboard' : ''}`}
               style={{
                 '--drag-y': `${dragY}px`,
-                '--sheet-bottom': '0px',
+                '--sheet-bottom': `${sheetBottom}px`,
                 '--sheet-height': sheetHeight > 0 ? `${sheetHeight}px` : '84dvh',
-                '--kb-footer-top': footerTop != null ? `${footerTop}px` : 'auto',
               }}
               onClick={(e) => e.stopPropagation()}
               onTransitionEnd={handleModalTransitionEnd}
@@ -567,15 +558,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                 )}
               </div>
 
-              {keyboardOpen ? (
-                <div
-                  className="shorts-comments-modal-footer-spacer"
-                  style={{ height: footerSpacer }}
-                  aria-hidden
-                />
-              ) : null}
-
-              <div className="shorts-comments-modal-footer" ref={setFooterRef}>
+              <div className="shorts-comments-modal-footer">
                 {replyingToShorts && (
                   <div className="shorts-comments-replying-bar">
                     <span>

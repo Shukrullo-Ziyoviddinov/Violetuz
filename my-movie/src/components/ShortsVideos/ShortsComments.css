@@ -545,12 +545,11 @@
   }
 }
 
-/* Mobile: modal joyida; footer kb da fixed */
+/* Mobile: modal + input kb bilan birga */
 @media (max-width: 768px) {
   .shorts-comments-modal {
     --sheet-bottom: 0px;
     --sheet-height: 84dvh;
-    --kb-footer-top: auto;
     top: auto !important;
     bottom: var(--sheet-bottom);
     left: 0 !important;
@@ -574,27 +573,9 @@
     transition: none !important;
   }
 
-  .shorts-comments-modal-footer-spacer {
-    flex-shrink: 0;
-    pointer-events: none;
-  }
-
-  .shorts-comments-modal--keyboard .shorts-comments-modal-footer {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: var(--kb-footer-top, auto);
-    bottom: auto;
-    z-index: 10001;
-    max-width: 100vw;
-    margin: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
-    padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
-  }
-
-  .shorts-comments-modal.is-open.shorts-comments-modal--keyboard {
-    transform: none !important;
+  .shorts-comments-modal--keyboard {
+    padding-bottom: 0 !important;
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
   }
 
   .shorts-comments-modal-footer {

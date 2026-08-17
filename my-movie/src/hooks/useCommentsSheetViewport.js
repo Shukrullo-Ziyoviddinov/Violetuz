@@ -5,9 +5,9 @@ const SHEET_MQ = '(max-width: 768px)';
 const TOP_CLOSED_RATIO = 0.16;
 const TOP_CLOSED_MIN = 100;
 const TOP_CLOSED_MAX = 168;
+const TOP_SAFE = 8;
 const KB_MIN = 36;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
-const FOOTER_FALLBACK_H = 140;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -16,96 +16,98 @@ const closedTopGap = (h) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, h * TOP_CLOSED_RATIO)));
 
 /**
- * Modal joyida.
- * Footer: visualViewport PASTIGA pin (top = vvBottom - footerH).
- * → kb/navbar o‘zgarsa ham input VV pastida = klaviatura ustida, bushliqsiz.
- * → yopilganda VV bilan birga pastga tushadi.
+ * Modal + input klaviatura bilan BIRGA:
+ * bottom = visualViewport pastidagi bo‘shliq (kb balandligi).
+ * Footer modal ichida → alohida fixed yo‘q → input modal bilan sync.
+ * Blur: inset 0 bo‘lguncha kuzatiladi → pastga birga tushadi.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
+  const [sheetBottom, setSheetBottom] = useState(0);
   const [sheetHeight, setSheetHeight] = useState(0);
-  const [footerTop, setFooterTop] = useState(null);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
-  const [footerSpacer, setFooterSpacer] = useState(FOOTER_FALLBACK_H);
 
   const scrollYRef = useRef(0);
   const focusedRef = useRef(false);
-  const floatingRef = useRef(false);
+  const trackingRef = useRef(false);
   const baselineHRef = useRef(0);
-  const footerHRef = useRef(FOOTER_FALLBACK_H);
+  const closedHRef = useRef(0);
   const blurTimerRef = useRef(0);
   const blockOverlayRef = useRef(0);
   const rafRef = useRef(0);
   const timersRef = useRef([]);
-  const footerElRef = useRef(null);
 
   const clearTimers = () => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
     timersRef.current = [];
   };
 
-  const readFooterHeight = useCallback(() => {
-    const el = footerElRef.current;
-    if (el) {
-      const h = Math.round(el.getBoundingClientRect().height);
-      if (h > 40) {
-        footerHRef.current = h;
-        setFooterSpacer(h);
-        return h;
-      }
-    }
-    return footerHRef.current || FOOTER_FALLBACK_H;
-  }, []);
-
-  /** VV pastki cheti (layout koordinatasida) */
-  const visualBottom = useCallback(() => {
-    const vv = window.visualViewport;
-    if (!vv) return window.innerHeight;
-    return vv.offsetTop + vv.height;
-  }, []);
-
-  const kbLikelyOpen = useCallback(() => {
+  /** Faqat VV — taxminsiz, bushliqsiz */
+  const readInset = useCallback(() => {
     const vv = window.visualViewport;
     const inner = window.innerHeight;
-    const base = baselineHRef.current || inner;
     const vkH = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
-    if (vkH >= KB_MIN) return true;
-    if (!vv) return false;
-    const gap = inner - vv.offsetTop - vv.height;
-    if (gap >= KB_MIN) return true;
-    if (base - vv.height >= KB_MIN) return true;
-    return false;
+    if (!vv) return vkH;
+    const fromVv = Math.max(0, Math.round(inner - vv.offsetTop - vv.height));
+    return Math.max(fromVv, vkH);
   }, []);
 
-  const dockFooter = useCallback(() => {
-    floatingRef.current = false;
+  const applyClosed = useCallback(() => {
+    trackingRef.current = false;
+    const h =
+      closedHRef.current ||
+      Math.max(
+        240,
+        (baselineHRef.current || window.innerHeight) -
+          closedTopGap(baselineHRef.current || window.innerHeight)
+      );
     setKeyboardOpen(false);
-    setFooterTop(null);
+    setSheetBottom(0);
+    setSheetHeight(h);
   }, []);
 
-  /** Footerni VV pastiga mahkamlash */
-  const pinFooterToVv = useCallback(() => {
-    const vvBottom = visualBottom();
-    const fh = readFooterHeight();
-    const top = Math.max(0, Math.round(vvBottom - fh));
-    floatingRef.current = true;
-    setKeyboardOpen(true);
-    setFooterTop(top);
-  }, [readFooterHeight, visualBottom]);
+  const applyLift = useCallback(() => {
+    const inset = readInset();
+    const inner = window.innerHeight;
+    const closedH = closedHRef.current || Math.round(inner * 0.84);
+    const base = baselineHRef.current || inner;
+
+    /* Layout resize (Android): inner allaqachon kichik */
+    const layoutShrunk = base - inner >= KB_MIN;
+    if (layoutShrunk && inset < KB_MIN) {
+      trackingRef.current = true;
+      setKeyboardOpen(true);
+      setSheetBottom(0);
+      setSheetHeight(Math.max(200, Math.min(closedH, inner - TOP_SAFE)));
+      return;
+    }
+
+    if (inset < KB_MIN && !focusedRef.current) {
+      applyClosed();
+      return;
+    }
+
+    const bottom = inset >= KB_MIN ? inset : 0;
+    if (bottom < KB_MIN && focusedRef.current) {
+      /* Hali animatsiya — kutamiz, noto‘g‘ri taxmin qo‘ymaymiz */
+      trackingRef.current = true;
+      setKeyboardOpen(true);
+      return;
+    }
+
+    const height = Math.max(200, Math.min(closedH, inner - bottom - TOP_SAFE));
+    trackingRef.current = true;
+    setKeyboardOpen(bottom >= KB_MIN);
+    setSheetBottom(bottom);
+    setSheetHeight(height);
+  }, [applyClosed, readInset]);
 
   const sync = useCallback(() => {
-    if (focusedRef.current) {
-      pinFooterToVv();
+    if (focusedRef.current || trackingRef.current) {
+      applyLift();
       return;
     }
-    /* Blur: kb hali bor — VV bilan pastga; yo‘q — dock */
-    if (floatingRef.current && kbLikelyOpen()) {
-      pinFooterToVv();
-      return;
-    }
-    if (floatingRef.current && !kbLikelyOpen()) {
-      dockFooter();
-    }
-  }, [dockFooter, kbLikelyOpen, pinFooterToVv]);
+    applyClosed();
+  }, [applyClosed, applyLift]);
 
   const schedule = useCallback(() => {
     if (rafRef.current) return;
@@ -118,21 +120,21 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   useLayoutEffect(() => {
     if (!active) {
       focusedRef.current = false;
-      floatingRef.current = false;
+      trackingRef.current = false;
       clearTimers();
       window.clearTimeout(blurTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
+      setSheetBottom(0);
       setSheetHeight(0);
-      setFooterTop(null);
       setKeyboardOpen(false);
       return;
     }
     const h = window.innerHeight;
     baselineHRef.current = h;
-    setSheetHeight(Math.max(240, h - closedTopGap(h)));
-    dockFooter();
-  }, [active, dockFooter]);
+    closedHRef.current = Math.max(240, h - closedTopGap(h));
+    applyClosed();
+  }, [active, applyClosed]);
 
   useEffect(() => {
     if (!active || !isCommentsSheetViewport()) return undefined;
@@ -214,55 +216,48 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const onModalInputFocus = useCallback(() => {
     if (!isCommentsSheetViewport()) return;
     focusedRef.current = true;
+    trackingRef.current = true;
     window.clearTimeout(blurTimerRef.current);
     clearTimers();
     blockOverlayRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
-    pinFooterToVv();
-    [30, 80, 150, 250, 400, 600, 850].forEach((ms) => {
+    applyLift();
+    [40, 100, 180, 280, 400, 560, 800].forEach((ms) => {
       timersRef.current.push(
         window.setTimeout(() => {
-          if (focusedRef.current) pinFooterToVv();
+          if (focusedRef.current) applyLift();
         }, ms)
       );
     });
-  }, [pinFooterToVv]);
+  }, [applyLift]);
 
   const onModalInputBlur = useCallback(() => {
     focusedRef.current = false;
     clearTimers();
     window.clearTimeout(blurTimerRef.current);
-    /* Kb animatsiyasi bilan pastga — VV sync */
-    sync();
-    [50, 120, 200, 320, 450, 600].forEach((ms) => {
+    trackingRef.current = true;
+    applyLift();
+    [60, 140, 240, 360, 500, 700].forEach((ms) => {
       timersRef.current.push(
         window.setTimeout(() => {
           if (focusedRef.current) return;
-          sync();
+          applyLift();
         }, ms)
       );
     });
     blurTimerRef.current = window.setTimeout(() => {
-      if (!focusedRef.current) dockFooter();
-    }, 750);
-  }, [dockFooter, sync]);
+      if (!focusedRef.current) applyClosed();
+    }, 850);
+  }, [applyClosed, applyLift]);
 
   const canCloseFromOverlay = useCallback(
     () => Date.now() >= blockOverlayRef.current,
     []
   );
 
-  const setFooterRef = useCallback((node) => {
-    footerElRef.current = node;
-  }, []);
-
   return {
-    sheetBottom: 0,
+    sheetBottom,
     sheetHeight,
-    /** null = oddiy flow; number = fixed top (px) */
-    footerTop,
     keyboardOpen,
-    footerSpacer,
-    setFooterRef,
     onModalInputFocus,
     onModalInputBlur,
     canCloseFromOverlay,
