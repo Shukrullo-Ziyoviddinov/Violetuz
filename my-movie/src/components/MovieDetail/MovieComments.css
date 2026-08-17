@@ -635,13 +635,8 @@
 
   .movie-detail-comments-modal--keyboard {
     padding-bottom: 0 !important;
-    /* Kb ochiqda kechikish yo‘q */
+    /* Klaviatura bilan birga — kechikish yo‘q */
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
-  }
-
-  /* Yopilganda leftover inset o‘rtada qoldirmasin */
-  .movie-detail-comments-modal.is-open:not(.movie-detail-comments-modal--keyboard) {
-    bottom: 0 !important;
   }
 
   .movie-detail-comments-modal-footer {

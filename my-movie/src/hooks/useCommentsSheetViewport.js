@@ -5,10 +5,10 @@ const SHEET_MQ = '(max-width: 768px)';
 const TOP_CLOSED_RATIO = 0.16;
 const TOP_CLOSED_MIN = 100;
 const TOP_CLOSED_MAX = 168;
-const TOP_SAFE = 8;
+const TOP_SAFE = 10;
 const KB_MIN = 80;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
-const CLOSE_FORCE_MS = 420;
+const CLOSE_FORCE_MS = 900;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -17,10 +17,10 @@ const closedTopGap = (h) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, h * TOP_CLOSED_RATIO)));
 
 /**
- * Modal + footer klaviatura bilan birga.
- * Ochilganda: bottom = visualViewport inset.
- * Yopilganda: inset pasayishini kuzatadi, keyin majburan bottom=0
- * (navbar qaytganda VV “qotib” footer o‘rtada qolmasin).
+ * Modal visualViewport ichida:
+ * - footer = VV pasti = klaviatura usti
+ * - yuqori = VV tepasi (navbar ichiga kirmaydi)
+ * Yopilganda inset 0 bo‘lguncha kuzatiladi, keyin dock.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetBottom, setSheetBottom] = useState(0);
@@ -32,7 +32,6 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const closingRef = useRef(false);
   const baselineHRef = useRef(0);
   const closedHRef = useRef(0);
-  const lastInsetRef = useRef(0);
   const blurTimerRef = useRef(0);
   const blockOverlayRef = useRef(0);
   const rafRef = useRef(0);
@@ -51,80 +50,57 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
         closedTopGap(baselineHRef.current || window.innerHeight)
     );
 
-  const readInset = useCallback(() => {
-    const vv = window.visualViewport;
+  const readVv = useCallback(() => {
     const inner = window.innerHeight;
+    const vv = window.visualViewport;
     const vkH = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
-    if (!vv) return vkH;
-    const fromVv = Math.max(0, Math.round(inner - vv.offsetTop - vv.height));
-    return Math.max(fromVv, vkH);
+    if (!vv) {
+      return { inset: vkH, visH: inner };
+    }
+    const visH = Math.round(vv.height);
+    const inset = Math.max(0, Math.round(inner - vv.offsetTop - visH), vkH);
+    return { inset, visH };
   }, []);
 
   const applyClosed = useCallback(() => {
     closingRef.current = false;
-    lastInsetRef.current = 0;
     setKeyboardOpen(false);
     setSheetBottom(0);
     setSheetHeight(closedHeight());
   }, []);
 
-  const applyOpen = useCallback(() => {
-    const inset = readInset();
-    const inner = window.innerHeight;
+  /** Modalni ko‘rinadigan zonaga mahkamlash (navbar + kb ichiga kirmasın) */
+  const pinToVisible = useCallback(() => {
+    const { inset, visH } = readVv();
     const closedH = closedHeight();
-    const base = baselineHRef.current || inner;
-    const layoutShrunk = base - inner >= KB_MIN;
+    const maxH = Math.max(200, visH - TOP_SAFE);
+    const height = Math.min(closedH, maxH);
 
-    if (layoutShrunk && inset < KB_MIN) {
-      lastInsetRef.current = 0;
-      setKeyboardOpen(true);
-      setSheetBottom(0);
-      setSheetHeight(Math.max(200, Math.min(closedH, inner - TOP_SAFE)));
-      return;
-    }
-
-    if (inset < KB_MIN) {
-      lastInsetRef.current = inset;
-      return;
-    }
-
-    lastInsetRef.current = inset;
     setKeyboardOpen(true);
     setSheetBottom(inset);
-    setSheetHeight(Math.max(200, Math.min(closedH, inner - inset - TOP_SAFE)));
-  }, [readInset]);
-
-  const applyClosing = useCallback(() => {
-    const inset = readInset();
-    const inner = window.innerHeight;
-    const closedH = closedHeight();
-    const prev = lastInsetRef.current;
-
-    /* Klaviatura pastga ketayapti — footer bilan kuzatamiz */
-    if (inset >= KB_MIN && (prev === 0 || inset <= prev + 8)) {
-      lastInsetRef.current = inset;
-      setKeyboardOpen(true);
-      setSheetBottom(inset);
-      setSheetHeight(Math.max(200, Math.min(closedH, inner - inset - TOP_SAFE)));
-      return;
-    }
-
-    /* VV qotib qolgan / navbar qaytdi — darhol pastga */
-    applyClosed();
-  }, [applyClosed, readInset]);
+    setSheetHeight(height);
+  }, [readVv]);
 
   const sync = useCallback(() => {
+    const { inset } = readVv();
+
     if (focusedRef.current) {
       closingRef.current = false;
-      applyOpen();
+      if (inset >= KB_MIN) pinToVisible();
       return;
     }
+
     if (closingRef.current) {
-      applyClosing();
+      if (inset >= KB_MIN) {
+        pinToVisible();
+        return;
+      }
+      applyClosed();
       return;
     }
+
     applyClosed();
-  }, [applyClosed, applyClosing, applyOpen]);
+  }, [applyClosed, pinToVisible, readVv]);
 
   const schedule = useCallback(() => {
     if (rafRef.current) return;
@@ -138,7 +114,6 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     if (!active) {
       focusedRef.current = false;
       closingRef.current = false;
-      lastInsetRef.current = 0;
       clearTimers();
       window.clearTimeout(blurTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -238,35 +213,37 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     window.clearTimeout(blurTimerRef.current);
     clearTimers();
     blockOverlayRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
-    applyOpen();
+    sync();
     [40, 100, 180, 280, 400, 560, 800].forEach((ms) => {
       timersRef.current.push(
         window.setTimeout(() => {
-          if (focusedRef.current) applyOpen();
+          if (focusedRef.current) sync();
         }, ms)
       );
     });
-  }, [applyOpen]);
+  }, [sync]);
 
   const onModalInputBlur = useCallback(() => {
     focusedRef.current = false;
     closingRef.current = true;
     clearTimers();
     window.clearTimeout(blurTimerRef.current);
-    applyClosing();
-    [50, 120, 200, 300].forEach((ms) => {
+    sync();
+    [40, 100, 180, 280, 400, 560, 720].forEach((ms) => {
       timersRef.current.push(
         window.setTimeout(() => {
           if (focusedRef.current) return;
-          applyClosing();
+          sync();
         }, ms)
       );
     });
-    /* Navbar qaytganda VV qotib qolsa ham footer pastga tushsin */
     blurTimerRef.current = window.setTimeout(() => {
-      if (!focusedRef.current) applyClosed();
+      if (focusedRef.current) return;
+      /* Faqat kb allaqachon kichik bo‘lsa dock; aks holda pin qoladi */
+      const { inset } = readVv();
+      if (inset < KB_MIN) applyClosed();
     }, CLOSE_FORCE_MS);
-  }, [applyClosed, applyClosing]);
+  }, [applyClosed, readVv, sync]);
 
   const canCloseFromOverlay = useCallback(
     () => Date.now() >= blockOverlayRef.current,

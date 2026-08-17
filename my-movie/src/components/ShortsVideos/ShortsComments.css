@@ -581,10 +581,6 @@
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
   }
 
-  .shorts-comments-modal.is-open:not(.shorts-comments-modal--keyboard) {
-    bottom: 0 !important;
-  }
-
   .shorts-comments-modal-footer {
     flex-shrink: 0;
   }
