@@ -1,17 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const SHEET_MQ = '(max-width: 768px)';
@@ -22,7 +8,6 @@ const TOP_CLOSED_MAX = 168;
 const TOP_SAFE = 8;
 const KB_MIN = 36;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
-const BLUR_GRACE_MS = 150;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
@@ -30,22 +15,11 @@ export const isCommentsSheetViewport = () =>
 const closedTopGap = (h) =>
   Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, h * TOP_CLOSED_RATIO)));
 
-const closedHeightFor = (h) => Math.max(240, h - closedTopGap(h));
-
 /**
- * Modal + klaviatura — HAR FREYMDA kuzatiladi (requestAnimationFrame loop),
- * shunchaki resize/scroll hodisalariga tayanib emas. Bu shart, chunki:
- *  - iOS Safari: faqat window.visualViewport qisqaradi, window.innerHeight
- *    o'zgarmaydi.
- *  - Android Chrome (standart holat): window.innerHeight ning o'zi ham
- *    klaviatura bilan birga qisqaradi, shu payt visualViewport deyarli
- *    innerHeight'ga teng bo'lib qoladi.
- * Ikkala holatni ham ("layout shrink" va "visual shrink") birga o'lchab,
- * kattasini klaviatura balandligi sifatida olamiz — shu bilan ikkala
- * brauzer turi ham to'g'ri ishlaydi va bir-biriga zid kelmaydi.
- * Freym-ma-freym o'lchash klaviatura animatsiyasi bilan modalni bir xil
- * tezlikda "yopishtirib" olib boradi — CSS transition kerak emas va
- * hatto zarar qiladi (kechikish/silkinish beradi).
+ * Modal + input klaviatura bilan BIRGA:
+ * bottom = visualViewport pastidagi bo‘shliq (kb balandligi).
+ * Footer modal ichida → alohida fixed yo‘q → input modal bilan sync.
+ * Blur: inset 0 bo‘lguncha kuzatiladi → pastga birga tushadi.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetBottom, setSheetBottom] = useState(0);
@@ -54,83 +28,113 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
   const scrollYRef = useRef(0);
   const focusedRef = useRef(false);
+  const trackingRef = useRef(false);
   const baselineHRef = useRef(0);
-  const loopRef = useRef(0);
+  const closedHRef = useRef(0);
   const blurTimerRef = useRef(0);
   const blockOverlayRef = useRef(0);
+  const rafRef = useRef(0);
+  const timersRef = useRef([]);
 
-  /** Bitta o'lchov: state'larni yangilaydi, joriy klaviatura balandligini qaytaradi. */
-  const measure = useCallback(() => {
-    const inner = window.innerHeight;
+  const clearTimers = () => {
+    timersRef.current.forEach((id) => window.clearTimeout(id));
+    timersRef.current = [];
+  };
+
+  /** Faqat VV — taxminsiz, bushliqsiz */
+  const readInset = useCallback(() => {
     const vv = window.visualViewport;
-    const baseline = baselineHRef.current || inner;
-
-    const layoutShrink = Math.max(0, baseline - inner);
-    const visualBottom = vv
-      ? Math.max(0, Math.round(inner - (vv.offsetTop + vv.height)))
-      : 0;
-    const kbAmount = Math.max(layoutShrink, visualBottom);
-    const isKeyboard = focusedRef.current && kbAmount >= KB_MIN;
-
-    if (!isKeyboard) {
-      setKeyboardOpen(false);
-      setSheetBottom(0);
-      setSheetHeight(closedHeightFor(inner));
-      return kbAmount;
-    }
-
-    /* bottom faqat visual-viewport siljishi (iOS) — Android'da layout
-       o'zi qisqargani uchun position:fixed elementlar allaqachon
-       klaviatura ustida turadi, bottom=0 bo'lishi to'g'ri. */
-    const bottom = visualBottom;
-    const height = Math.min(
-      inner - TOP_SAFE,
-      Math.max(200, inner - bottom - TOP_SAFE)
-    );
-    setKeyboardOpen(true);
-    setSheetBottom(bottom);
-    setSheetHeight(height);
-    return kbAmount;
+    const inner = window.innerHeight;
+    const vkH = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
+    if (!vv) return vkH;
+    const fromVv = Math.max(0, Math.round(inner - vv.offsetTop - vv.height));
+    return Math.max(fromVv, vkH);
   }, []);
 
-  const loop = useCallback(() => {
-    const kbAmount = measure();
-    if (focusedRef.current || kbAmount >= KB_MIN) {
-      loopRef.current = requestAnimationFrame(loop);
-    } else {
-      loopRef.current = 0;
+  const applyClosed = useCallback(() => {
+    trackingRef.current = false;
+    const h =
+      closedHRef.current ||
+      Math.max(
+        240,
+        (baselineHRef.current || window.innerHeight) -
+          closedTopGap(baselineHRef.current || window.innerHeight)
+      );
+    setKeyboardOpen(false);
+    setSheetBottom(0);
+    setSheetHeight(h);
+  }, []);
+
+  const applyLift = useCallback(() => {
+    const inset = readInset();
+    const inner = window.innerHeight;
+    const closedH = closedHRef.current || Math.round(inner * 0.84);
+    const base = baselineHRef.current || inner;
+
+    /* Layout resize (Android): inner allaqachon kichik */
+    const layoutShrunk = base - inner >= KB_MIN;
+    if (layoutShrunk && inset < KB_MIN) {
+      trackingRef.current = true;
+      setKeyboardOpen(true);
+      setSheetBottom(0);
+      setSheetHeight(Math.max(200, Math.min(closedH, inner - TOP_SAFE)));
+      return;
     }
-  }, [measure]);
 
-  const startLoop = useCallback(() => {
-    if (loopRef.current) return;
-    loopRef.current = requestAnimationFrame(loop);
-  }, [loop]);
+    if (inset < KB_MIN && !focusedRef.current) {
+      applyClosed();
+      return;
+    }
 
-  const stopLoop = () => {
-    if (loopRef.current) cancelAnimationFrame(loopRef.current);
-    loopRef.current = 0;
-  };
+    const bottom = inset >= KB_MIN ? inset : 0;
+    if (bottom < KB_MIN && focusedRef.current) {
+      /* Hali animatsiya — kutamiz, noto‘g‘ri taxmin qo‘ymaymiz */
+      trackingRef.current = true;
+      setKeyboardOpen(true);
+      return;
+    }
+
+    const height = Math.max(200, Math.min(closedH, inner - bottom - TOP_SAFE));
+    trackingRef.current = true;
+    setKeyboardOpen(bottom >= KB_MIN);
+    setSheetBottom(bottom);
+    setSheetHeight(height);
+  }, [applyClosed, readInset]);
+
+  const sync = useCallback(() => {
+    if (focusedRef.current || trackingRef.current) {
+      applyLift();
+      return;
+    }
+    applyClosed();
+  }, [applyClosed, applyLift]);
+
+  const schedule = useCallback(() => {
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      sync();
+    });
+  }, [sync]);
 
   useLayoutEffect(() => {
     if (!active) {
       focusedRef.current = false;
-      stopLoop();
+      trackingRef.current = false;
+      clearTimers();
       window.clearTimeout(blurTimerRef.current);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
       setSheetBottom(0);
       setSheetHeight(0);
       setKeyboardOpen(false);
-      return undefined;
+      return;
     }
-    focusedRef.current = false;
-    baselineHRef.current = window.innerHeight;
-    setKeyboardOpen(false);
-    setSheetBottom(0);
-    setSheetHeight(closedHeightFor(window.innerHeight));
-    return () => {
-      stopLoop();
-    };
-  }, [active]);
+    const h = window.innerHeight;
+    baselineHRef.current = h;
+    closedHRef.current = Math.max(240, h - closedTopGap(h));
+    applyClosed();
+  }, [active, applyClosed]);
 
   useEffect(() => {
     if (!active || !isCommentsSheetViewport()) return undefined;
@@ -141,10 +145,9 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     } catch {
       /* ignore */
     }
-    const onGeom = () => startLoop();
-    vk.addEventListener('geometrychange', onGeom);
-    return () => vk.removeEventListener('geometrychange', onGeom);
-  }, [active, startLoop]);
+    vk.addEventListener('geometrychange', schedule);
+    return () => vk.removeEventListener('geometrychange', schedule);
+  }, [active, schedule]);
 
   useEffect(() => {
     if (!active) return undefined;
@@ -194,41 +197,57 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   useEffect(() => {
     if (!active || !isCommentsSheetViewport()) return undefined;
     const vv = window.visualViewport;
-    const onEvt = () => startLoop();
     if (vv) {
-      vv.addEventListener('resize', onEvt);
-      vv.addEventListener('scroll', onEvt);
+      vv.addEventListener('resize', schedule);
+      vv.addEventListener('scroll', schedule);
     }
-    window.addEventListener('resize', onEvt);
+    window.addEventListener('resize', schedule);
     return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
       if (vv) {
-        vv.removeEventListener('resize', onEvt);
-        vv.removeEventListener('scroll', onEvt);
+        vv.removeEventListener('resize', schedule);
+        vv.removeEventListener('scroll', schedule);
       }
-      window.removeEventListener('resize', onEvt);
+      window.removeEventListener('resize', schedule);
     };
-  }, [active, startLoop]);
+  }, [active, schedule]);
 
   const onModalInputFocus = useCallback(() => {
     if (!isCommentsSheetViewport()) return;
-    window.clearTimeout(blurTimerRef.current);
     focusedRef.current = true;
+    trackingRef.current = true;
+    window.clearTimeout(blurTimerRef.current);
+    clearTimers();
     blockOverlayRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
-    startLoop();
-  }, [startLoop]);
+    applyLift();
+    [40, 100, 180, 280, 400, 560, 800].forEach((ms) => {
+      timersRef.current.push(
+        window.setTimeout(() => {
+          if (focusedRef.current) applyLift();
+        }, ms)
+      );
+    });
+  }, [applyLift]);
 
   const onModalInputBlur = useCallback(() => {
+    focusedRef.current = false;
+    clearTimers();
     window.clearTimeout(blurTimerRef.current);
-    /* Qisqa "grace" — reply tugmasi bosilib boshqa inputga fokus
-       o'tayotganda sheet keraksiz yopilib-ochilib ketmasligi uchun.
-       Grace tugagach loop davom etadi va klaviatura yopilish
-       animatsiyasini ham freym-ma-freym kuzatib, silliq pastga
-       qaytaradi. */
+    trackingRef.current = true;
+    applyLift();
+    [60, 140, 240, 360, 500, 700].forEach((ms) => {
+      timersRef.current.push(
+        window.setTimeout(() => {
+          if (focusedRef.current) return;
+          applyLift();
+        }, ms)
+      );
+    });
     blurTimerRef.current = window.setTimeout(() => {
-      focusedRef.current = false;
-      startLoop();
-    }, BLUR_GRACE_MS);
-  }, [startLoop]);
+      if (!focusedRef.current) applyClosed();
+    }, 850);
+  }, [applyClosed, applyLift]);
 
   const canCloseFromOverlay = useCallback(
     () => Date.now() >= blockOverlayRef.current,
