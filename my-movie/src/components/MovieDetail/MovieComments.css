@@ -602,13 +602,13 @@
   }
 }
 
-/* Mobile: modal + input kb bilan birga (bottom = kb inset) */
+/* Mobile: visualViewport ga pin — footer = ko‘rinadigan past, header = navbar osti */
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
-    --sheet-bottom: 0px;
+    --sheet-top: 16vh;
     --sheet-height: 84dvh;
-    top: auto !important;
-    bottom: var(--sheet-bottom);
+    top: var(--sheet-top);
+    bottom: auto;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
@@ -619,10 +619,8 @@
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    transition:
-      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    padding-bottom: 0;
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {
@@ -634,9 +632,7 @@
   }
 
   .movie-detail-comments-modal--keyboard {
-    padding-bottom: 0 !important;
-    /* Klaviatura bilan birga — kechikish yo‘q */
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    padding-bottom: 0;
   }
 
   .movie-detail-comments-modal-footer {

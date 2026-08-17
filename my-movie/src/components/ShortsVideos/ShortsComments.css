@@ -545,13 +545,13 @@
   }
 }
 
-/* Mobile: modal + input kb bilan birga */
+/* Mobile: visualViewport ga pin — footer = ko‘rinadigan past */
 @media (max-width: 768px) {
   .shorts-comments-modal {
-    --sheet-bottom: 0px;
+    --sheet-top: 16vh;
     --sheet-height: 84dvh;
-    top: auto !important;
-    bottom: var(--sheet-bottom);
+    top: var(--sheet-top);
+    bottom: auto;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
@@ -562,10 +562,8 @@
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    transition:
-      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    padding-bottom: 0;
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
@@ -577,8 +575,7 @@
   }
 
   .shorts-comments-modal--keyboard {
-    padding-bottom: 0 !important;
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    padding-bottom: 0;
   }
 
   .shorts-comments-modal-footer {

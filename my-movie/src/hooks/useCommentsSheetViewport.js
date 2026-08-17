@@ -1,149 +1,75 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const SHEET_MQ = '(max-width: 768px)';
-
-const TOP_CLOSED_RATIO = 0.16;
-const TOP_CLOSED_MIN = 100;
-const TOP_CLOSED_MAX = 168;
-const TOP_SAFE = 10;
-const KB_MIN = 80;
+const GAP_RATIO = 0.16;
+const GAP_MIN = 100;
+const GAP_MAX = 168;
+const GAP_KEYBOARD = 8;
+const KB_DELTA = 80;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
-const CLOSE_FORCE_MS = 900;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
 
-const closedTopGap = (h) =>
-  Math.round(Math.min(TOP_CLOSED_MAX, Math.max(TOP_CLOSED_MIN, h * TOP_CLOSED_RATIO)));
+const restGap = (visibleH) =>
+  Math.round(Math.min(GAP_MAX, Math.max(GAP_MIN, visibleH * GAP_RATIO)));
 
 /**
- * Modal visualViewport ichida:
- * - footer = VV pasti = klaviatura usti
- * - yuqori = VV tepasi (navbar ichiga kirmaydi)
- * Yopilganda inset 0 bo‘lguncha kuzatiladi, keyin dock.
+ * Komment sheet — faqat visualViewport.
+ * Footer har doim ko‘rinadigan zonaning pastida (klaviatura ustida).
+ * Yuqori har doim navbar ostida. bottom hisobi yo‘q.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
-  const [sheetBottom, setSheetBottom] = useState(0);
+  const [sheetTop, setSheetTop] = useState(0);
   const [sheetHeight, setSheetHeight] = useState(0);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   const scrollYRef = useRef(0);
-  const focusedRef = useRef(false);
-  const closingRef = useRef(false);
-  const baselineHRef = useRef(0);
-  const closedHRef = useRef(0);
-  const blurTimerRef = useRef(0);
+  const restVisHRef = useRef(0);
   const blockOverlayRef = useRef(0);
   const rafRef = useRef(0);
-  const timersRef = useRef([]);
 
-  const clearTimers = () => {
-    timersRef.current.forEach((id) => window.clearTimeout(id));
-    timersRef.current = [];
-  };
-
-  const closedHeight = () =>
-    closedHRef.current ||
-    Math.max(
-      240,
-      (baselineHRef.current || window.innerHeight) -
-        closedTopGap(baselineHRef.current || window.innerHeight)
-    );
-
-  const readVv = useCallback(() => {
-    const inner = window.innerHeight;
+  const layout = useCallback(() => {
     const vv = window.visualViewport;
-    const vkH = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
-    if (!vv) {
-      return { inset: vkH, visH: inner };
-    }
-    const visH = Math.round(vv.height);
-    const inset = Math.max(0, Math.round(inner - vv.offsetTop - visH), vkH);
-    return { inset, visH };
+    const visTop = vv ? Math.round(vv.offsetTop) : 0;
+    const visH = vv ? Math.round(vv.height) : window.innerHeight;
+
+    if (!restVisHRef.current) restVisHRef.current = visH;
+
+    const kbOpen = restVisHRef.current - visH >= KB_DELTA;
+    const gap = kbOpen ? GAP_KEYBOARD : restGap(visH);
+
+    setKeyboardOpen(kbOpen);
+    setSheetTop(visTop + gap);
+    setSheetHeight(Math.max(180, visH - gap));
   }, []);
-
-  const applyClosed = useCallback(() => {
-    closingRef.current = false;
-    setKeyboardOpen(false);
-    setSheetBottom(0);
-    setSheetHeight(closedHeight());
-  }, []);
-
-  /** Modalni ko‘rinadigan zonaga mahkamlash (navbar + kb ichiga kirmasın) */
-  const pinToVisible = useCallback(() => {
-    const { inset, visH } = readVv();
-    const closedH = closedHeight();
-    const maxH = Math.max(200, visH - TOP_SAFE);
-    const height = Math.min(closedH, maxH);
-
-    setKeyboardOpen(true);
-    setSheetBottom(inset);
-    setSheetHeight(height);
-  }, [readVv]);
-
-  const sync = useCallback(() => {
-    const { inset } = readVv();
-
-    if (focusedRef.current) {
-      closingRef.current = false;
-      if (inset >= KB_MIN) pinToVisible();
-      return;
-    }
-
-    if (closingRef.current) {
-      if (inset >= KB_MIN) {
-        pinToVisible();
-        return;
-      }
-      applyClosed();
-      return;
-    }
-
-    applyClosed();
-  }, [applyClosed, pinToVisible, readVv]);
 
   const schedule = useCallback(() => {
     if (rafRef.current) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = 0;
-      sync();
+      layout();
     });
-  }, [sync]);
+  }, [layout]);
 
   useLayoutEffect(() => {
     if (!active) {
-      focusedRef.current = false;
-      closingRef.current = false;
-      clearTimers();
-      window.clearTimeout(blurTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
-      setSheetBottom(0);
+      restVisHRef.current = 0;
+      setSheetTop(0);
       setSheetHeight(0);
       setKeyboardOpen(false);
       return;
     }
-    const h = window.innerHeight;
-    baselineHRef.current = h;
-    closedHRef.current = Math.max(240, h - closedTopGap(h));
-    applyClosed();
-  }, [active, applyClosed]);
-
-  useEffect(() => {
-    if (!active || !isCommentsSheetViewport()) return undefined;
-    const vk = navigator.virtualKeyboard;
-    if (!vk?.addEventListener) return undefined;
-    try {
-      vk.overlaysContent = true;
-    } catch {
-      /* ignore */
-    }
-    vk.addEventListener('geometrychange', schedule);
-    return () => vk.removeEventListener('geometrychange', schedule);
-  }, [active, schedule]);
+    const vv = window.visualViewport;
+    restVisHRef.current = vv ? Math.round(vv.height) : window.innerHeight;
+    layout();
+  }, [active, layout]);
 
   useEffect(() => {
     if (!active) return undefined;
+
     if (!isCommentsSheetViewport()) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
@@ -189,12 +115,22 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
   useEffect(() => {
     if (!active || !isCommentsSheetViewport()) return undefined;
+
     const vv = window.visualViewport;
+    const vk = navigator.virtualKeyboard;
+    try {
+      if (vk) vk.overlaysContent = true;
+    } catch {
+      /* ignore */
+    }
+
     if (vv) {
       vv.addEventListener('resize', schedule);
       vv.addEventListener('scroll', schedule);
     }
     window.addEventListener('resize', schedule);
+    vk?.addEventListener?.('geometrychange', schedule);
+
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
@@ -203,47 +139,19 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
         vv.removeEventListener('scroll', schedule);
       }
       window.removeEventListener('resize', schedule);
+      vk?.removeEventListener?.('geometrychange', schedule);
     };
   }, [active, schedule]);
 
   const onModalInputFocus = useCallback(() => {
     if (!isCommentsSheetViewport()) return;
-    focusedRef.current = true;
-    closingRef.current = false;
-    window.clearTimeout(blurTimerRef.current);
-    clearTimers();
     blockOverlayRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
-    sync();
-    [40, 100, 180, 280, 400, 560, 800].forEach((ms) => {
-      timersRef.current.push(
-        window.setTimeout(() => {
-          if (focusedRef.current) sync();
-        }, ms)
-      );
-    });
-  }, [sync]);
+    layout();
+  }, [layout]);
 
   const onModalInputBlur = useCallback(() => {
-    focusedRef.current = false;
-    closingRef.current = true;
-    clearTimers();
-    window.clearTimeout(blurTimerRef.current);
-    sync();
-    [40, 100, 180, 280, 400, 560, 720].forEach((ms) => {
-      timersRef.current.push(
-        window.setTimeout(() => {
-          if (focusedRef.current) return;
-          sync();
-        }, ms)
-      );
-    });
-    blurTimerRef.current = window.setTimeout(() => {
-      if (focusedRef.current) return;
-      /* Faqat kb allaqachon kichik bo‘lsa dock; aks holda pin qoladi */
-      const { inset } = readVv();
-      if (inset < KB_MIN) applyClosed();
-    }, CLOSE_FORCE_MS);
-  }, [applyClosed, readVv, sync]);
+    layout();
+  }, [layout]);
 
   const canCloseFromOverlay = useCallback(
     () => Date.now() >= blockOverlayRef.current,
@@ -251,7 +159,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   );
 
   return {
-    sheetBottom,
+    sheetTop,
     sheetHeight,
     keyboardOpen,
     onModalInputFocus,
