@@ -103,7 +103,7 @@
   border: none;
   background: none;
   color: rgba(255, 255, 255, 0.55);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   cursor: pointer;
   padding: 0.15rem 0;
   transition: color 0.2s;
@@ -179,11 +179,11 @@
 }
 
 .shorts-comment-reply .shorts-comment-author {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .shorts-comment-reply .shorts-comment-text {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
 }
 
 .shorts-comments-replying-bar {
@@ -219,8 +219,8 @@
 }
 
 .shorts-comment-avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -248,7 +248,7 @@
 }
 
 .shorts-comment-author {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #fff;
   display: block;
@@ -256,7 +256,7 @@
 }
 
 .shorts-comment-text {
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.85);
   margin: 0;
   line-height: 1.5;
