@@ -31,6 +31,7 @@ const followingRoutes = require('./following.routes');
 const reactionRoutes = require('./reaction.routes');
 const movieRatingRoutes = require('./movieRating.routes');
 const commentRoutes = require('./comment.routes');
+const repostRoutes = require('./repost.routes');
 
 const router = Router();
 
@@ -43,6 +44,7 @@ router.use('/following', followingRoutes);
 router.use('/reactions', reactionRoutes);
 router.use('/movie-ratings', movieRatingRoutes);
 router.use('/comments', commentRoutes);
+router.use('/reposts', repostRoutes);
 router.use('/movies', movieRoutes);
 router.use('/actors', actorRoutes);
 router.use('/actor-page-labels', actorPageLabelRoutes);

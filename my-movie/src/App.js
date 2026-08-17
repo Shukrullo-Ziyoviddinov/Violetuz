@@ -30,6 +30,7 @@ import AuthModalHost from './components/AuthModal/AuthModalHost';
 import AuthSessionBootstrap from './components/AuthSessionBootstrap';
 import WishlistBootstrap from './components/WishlistBootstrap';
 import FollowingBootstrap from './components/FollowingBootstrap';
+import RepostsBootstrap from './components/RepostsBootstrap';
 import ReactionsBootstrap from './components/ReactionsBootstrap';
 import { ViewedMoviesProvider } from './context/ViewedMoviesContext';
 import { ContentLanguageProvider } from './context/ContentLanguageContext';
@@ -108,6 +109,7 @@ function App() {
           <AuthSessionBootstrap />
           <WishlistBootstrap />
           <FollowingBootstrap />
+          <RepostsBootstrap />
           <ReactionsBootstrap />
           <ViewedMoviesProvider>
             <MoviesApiProvider>

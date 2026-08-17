@@ -12,7 +12,7 @@ export { normalizeRepostId, normalizeRepostType, REPOST_ENTITY_TYPES } from './r
 /** @deprecated Redux `useRepostItems` dan foydalaning */
 export const readReposts = () => selectRepostItems(store.getState());
 
-/** @deprecated Redux `toggleRepost` dan foydalaning */
+/** @deprecated `useReposts().toggleRepost` — serverga yozadi */
 export const toggleRepostItem = (item) => {
   store.dispatch(toggleRepost(item));
   return selectRepostItems(store.getState());
