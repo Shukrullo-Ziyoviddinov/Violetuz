@@ -1,3 +1,17 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Shorts Comments - MovieComments bilan bir xil stillar */
 .shorts-comments {
   margin-top: 2rem;
@@ -562,7 +576,10 @@
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition:
+      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+      bottom 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.28s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .shorts-comments-modal.is-open {
@@ -575,7 +592,10 @@
 
   .shorts-comments-modal--keyboard {
     padding-bottom: 0 !important;
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    transition:
+      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+      bottom 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+      height 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
   }
 
   .shorts-comments-modal-footer {
