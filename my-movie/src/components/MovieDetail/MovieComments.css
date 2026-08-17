@@ -606,14 +606,14 @@
 @media (max-width: 768px) {
   .movie-detail-comments-modal {
     --sheet-top: 16vh;
-    --sheet-height: 84dvh;
+    --sheet-bottom: 0px;
     top: var(--sheet-top);
-    bottom: auto;
+    bottom: var(--sheet-bottom);
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
     max-width: 100vw;
-    height: var(--sheet-height);
+    height: auto;
     max-height: none;
     transform: translateY(105%);
     border-radius: 20px 20px 0 0;
