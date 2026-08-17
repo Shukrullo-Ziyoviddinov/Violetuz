@@ -5,43 +5,55 @@ const GAP_RATIO = 0.16;
 const GAP_MIN = 100;
 const GAP_MAX = 168;
 const GAP_KEYBOARD = 8;
-const KB_DELTA = 80;
+const KB_MIN = 60;
 const OVERLAY_CLOSE_BLOCK_MS = 700;
 
 export const isCommentsSheetViewport = () =>
   typeof window !== 'undefined' && window.matchMedia(SHEET_MQ).matches;
 
-const restGap = (visibleH) =>
-  Math.round(Math.min(GAP_MAX, Math.max(GAP_MIN, visibleH * GAP_RATIO)));
+const restGap = (h) =>
+  Math.round(Math.min(GAP_MAX, Math.max(GAP_MIN, h * GAP_RATIO)));
+
+function enableVirtualKeyboard() {
+  const vk = typeof navigator !== 'undefined' ? navigator.virtualKeyboard : null;
+  if (!vk) return;
+  try {
+    vk.overlaysContent = true;
+  } catch {
+    /* ignore */
+  }
+}
+
+if (typeof window !== 'undefined') enableVirtualKeyboard();
 
 /**
- * Komment sheet — faqat visualViewport.
- * Footer har doim ko‘rinadigan zonaning pastida (klaviatura ustida).
- * Yuqori har doim navbar ostida. bottom hisobi yo‘q.
+ * Sheet: top = navbar osti, bottom = klaviatura usti.
+ * Klaviatura balandligi: Virtual Keyboard API + visualViewport.
  */
 export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const [sheetTop, setSheetTop] = useState(0);
-  const [sheetHeight, setSheetHeight] = useState(0);
+  const [sheetBottom, setSheetBottom] = useState(0);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   const scrollYRef = useRef(0);
-  const restVisHRef = useRef(0);
   const blockOverlayRef = useRef(0);
   const rafRef = useRef(0);
 
   const layout = useCallback(() => {
+    const inner = window.innerHeight;
     const vv = window.visualViewport;
     const visTop = vv ? Math.round(vv.offsetTop) : 0;
-    const visH = vv ? Math.round(vv.height) : window.innerHeight;
+    const visH = vv ? Math.round(vv.height) : inner;
+    const vvKb = Math.max(0, inner - visTop - visH);
+    const vkKb = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
+    const kb = Math.max(vvKb, vkKb);
 
-    if (!restVisHRef.current) restVisHRef.current = visH;
+    const open = kb >= KB_MIN;
+    const gap = open ? GAP_KEYBOARD : restGap(inner);
 
-    const kbOpen = restVisHRef.current - visH >= KB_DELTA;
-    const gap = kbOpen ? GAP_KEYBOARD : restGap(visH);
-
-    setKeyboardOpen(kbOpen);
+    setKeyboardOpen(open);
     setSheetTop(visTop + gap);
-    setSheetHeight(Math.max(180, visH - gap));
+    setSheetBottom(open ? kb : 0);
   }, []);
 
   const schedule = useCallback(() => {
@@ -56,14 +68,12 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
     if (!active) {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
-      restVisHRef.current = 0;
       setSheetTop(0);
-      setSheetHeight(0);
+      setSheetBottom(0);
       setKeyboardOpen(false);
       return;
     }
-    const vv = window.visualViewport;
-    restVisHRef.current = vv ? Math.round(vv.height) : window.innerHeight;
+    enableVirtualKeyboard();
     layout();
   }, [active, layout]);
 
@@ -116,13 +126,9 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   useEffect(() => {
     if (!active || !isCommentsSheetViewport()) return undefined;
 
+    enableVirtualKeyboard();
     const vv = window.visualViewport;
     const vk = navigator.virtualKeyboard;
-    try {
-      if (vk) vk.overlaysContent = true;
-    } catch {
-      /* ignore */
-    }
 
     if (vv) {
       vv.addEventListener('resize', schedule);
@@ -146,11 +152,14 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
   const onModalInputFocus = useCallback(() => {
     if (!isCommentsSheetViewport()) return;
     blockOverlayRef.current = Date.now() + OVERLAY_CLOSE_BLOCK_MS;
+    enableVirtualKeyboard();
     layout();
+    [50, 150, 300, 500].forEach((ms) => window.setTimeout(layout, ms));
   }, [layout]);
 
   const onModalInputBlur = useCallback(() => {
     layout();
+    [80, 200, 400].forEach((ms) => window.setTimeout(layout, ms));
   }, [layout]);
 
   const canCloseFromOverlay = useCallback(
@@ -160,7 +169,7 @@ export function useCommentsSheetViewport(active, bodyScrollSelector) {
 
   return {
     sheetTop,
-    sheetHeight,
+    sheetBottom,
     keyboardOpen,
     onModalInputFocus,
     onModalInputBlur,
