@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 /* Comments block - after movie-detail-actors */
 .movie-detail-comments {
   /* margin-top: 2rem; */
@@ -630,10 +619,7 @@
     border-radius: 20px 20px 0 0;
     box-sizing: border-box;
     overflow: hidden;
-    transition:
-      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   .movie-detail-comments-modal.is-open {
@@ -646,11 +632,8 @@
 
   .movie-detail-comments-modal--keyboard {
     padding-bottom: 0 !important;
-    /* Kb bilan sync — bottom/height ham silliq animatsiya bilan o'zgaradi */
-    transition:
-      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
-      bottom 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-      height 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    /* Kb bilan sync — transition yo‘q */
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
   }
 
   .movie-detail-comments-modal-footer {
