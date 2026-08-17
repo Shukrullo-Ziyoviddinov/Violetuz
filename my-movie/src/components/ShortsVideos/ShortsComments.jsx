@@ -103,7 +103,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
 
   const {
     sheetHeight,
-    keyboardInset,
+    footerTop,
     keyboardOpen,
     footerSpacer,
     setFooterRef,
@@ -543,7 +543,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
                 '--drag-y': `${dragY}px`,
                 '--sheet-bottom': '0px',
                 '--sheet-height': sheetHeight > 0 ? `${sheetHeight}px` : '84dvh',
-                '--kb-inset': `${keyboardInset}px`,
+                '--kb-footer-top': footerTop != null ? `${footerTop}px` : 'auto',
               }}
               onClick={(e) => e.stopPropagation()}
               onTransitionEnd={handleModalTransitionEnd}
