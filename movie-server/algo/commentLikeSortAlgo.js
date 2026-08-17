@@ -1,13 +1,13 @@
 /**
- * Komment like tartibi (polimorf kommentlar).
+ * Instagram-uslubidagi izoh tartibi (polimorf kommentlar).
  *
  * Qoidalar:
  * 1) Asosiy kommentlar (root) — faqat o‘zaro: like ko‘p → yuqoriroq.
- * 2) Javoblar — faqat ota-komment ichida: like ko‘p → yuqoriroq.
- * 3) Javob hech qachon asosiy kommentlar qatoriga chiqmaydi.
- * 4) Turli otalarning javoblari bir-biri bilan bahslashmaydi.
+ * 2) Rootga to‘g‘ridan javoblar — faqat shu ota ichida like bo‘yicha.
+ * 3) Javobga javob like bilan otadan yuqoriga chiqmaydi; ota ostida createdAt ketma-ket.
+ * 4) Javob hech qachon asosiy kommentlar qatoriga chiqmaydi.
  *
- * Like teng bo‘lsa — yangiroq komment yuqoriroq (createdAt).
+ * Like teng bo‘lsa — yangiroq komment yuqoriroq (createdAt) — faqat like-sort qatlamida.
  */
 
 const getLikes = (comment) => {
@@ -27,9 +27,19 @@ const compareCommentsByLikes = (a, b) => {
   return getCreatedAtMs(b) - getCreatedAtMs(a);
 };
 
+const compareCommentsByCreatedAtAsc = (a, b) => getCreatedAtMs(a) - getCreatedAtMs(b);
+
+const sortNestedRepliesChronologically = (list) => {
+  if (!Array.isArray(list) || list.length === 0) return Array.isArray(list) ? list : [];
+  return [...list].sort(compareCommentsByCreatedAtAsc).map((node) => ({
+    ...node,
+    replies: sortNestedRepliesChronologically(node.replies || []),
+  }));
+};
+
 /**
- * Bitta darajadagi ro‘yxatni like bo‘yicha tartiblaydi,
- * har bir node.replies ni alohida (rekursiv) tartiblaydi.
+ * Root va to‘g‘ridan javoblarni like bo‘yicha tartiblaydi.
+ * Nested javoblar ota ostida qoladi (like bilan yuqoriga chiqmaydi).
  *
  * @param {Array} list
  * @returns {Array}
@@ -40,10 +50,14 @@ const sortCommentListByLikes = (list) => {
   const sorted = [...list].sort(compareCommentsByLikes);
 
   return sorted.map((node) => {
-    const replies = Array.isArray(node?.replies) ? node.replies : [];
+    const direct = Array.isArray(node?.replies) ? [...node.replies] : [];
+    const sortedDirect = direct.sort(compareCommentsByLikes);
     return {
       ...node,
-      replies: sortCommentListByLikes(replies),
+      replies: sortedDirect.map((reply) => ({
+        ...reply,
+        replies: sortNestedRepliesChronologically(reply.replies || []),
+      })),
     };
   });
 };

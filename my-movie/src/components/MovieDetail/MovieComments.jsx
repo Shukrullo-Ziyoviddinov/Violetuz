@@ -5,7 +5,7 @@ import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import * as commentsApi from '../../api/commentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
-import { sortCommentListByLikes } from '../../algo/commentLikeSortAlgo';
+import { sortCommentListByLikes, flattenThreadReplies, formatReplyMention } from '../../algo/commentLikeSortAlgo';
 import { formatActionCount } from '../../utils/utils';
 import {
   isCommentsSheetViewport,
@@ -479,7 +479,10 @@ const MovieComments = forwardRef(
     const moreBtnText =
       i18n.language === 'uz' ? `Ko'proq (${totalCount})` : `Ещё (${totalCount})`;
 
-    const renderComment = (c, isReply = false, isPreview = false) => (
+    const renderComment = (c, isReply = false, isPreview = false) => {
+      const mention = formatReplyMention(c.replyTo);
+      const threadReplies = !isReply ? flattenThreadReplies(c) : [];
+      return (
       <div
         key={c.id}
         className={`movie-detail-comment-item ${isReply ? 'movie-detail-comment-reply' : ''} ${
@@ -501,7 +504,12 @@ const MovieComments = forwardRef(
           </div>
           <div className="movie-detail-comment-body">
             <span className="movie-detail-comment-author">{c.authorName}</span>
-            <p className="movie-detail-comment-text">{c.text}</p>
+            <p className="movie-detail-comment-text">
+              {mention ? (
+                <span className="movie-detail-comment-mention">{mention} </span>
+              ) : null}
+              {c.text}
+            </p>
             <div className="movie-detail-comment-tag-row">
               <button
                 type="button"
@@ -549,13 +557,14 @@ const MovieComments = forwardRef(
             )}
           </div>
         </div>
-        {c.replies?.length > 0 && (
+        {threadReplies.length > 0 && (
           <div className="movie-detail-comment-replies">
-            {c.replies.map((r) => renderComment(r, true))}
+            {threadReplies.map((r) => renderComment(r, true, isPreview))}
           </div>
         )}
       </div>
-    );
+      );
+    };
 
     return (
       <>

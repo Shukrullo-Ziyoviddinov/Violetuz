@@ -6,7 +6,7 @@ import * as shortsCommentsApi from '../../api/shortsCommentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { formatActionCount } from '../../utils/utils';
-import { sortCommentListByLikes } from '../../algo/commentLikeSortAlgo';
+import { sortCommentListByLikes, flattenThreadReplies, formatReplyMention } from '../../algo/commentLikeSortAlgo';
 import {
   isCommentsSheetViewport,
   useCommentsSheetViewport,
@@ -410,7 +410,10 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       ? `Ko'proq (${totalShortsCount})`
       : `Ещё (${totalShortsCount})`;
 
-  const renderShortsComment = (c, isReply = false, isPreview = false) => (
+  const renderShortsComment = (c, isReply = false, isPreview = false) => {
+    const mention = formatReplyMention(c.replyTo);
+    const threadReplies = !isReply ? flattenThreadReplies(c) : [];
+    return (
     <div
       key={c.id}
       className={`shorts-comment-item ${isReply ? 'shorts-comment-reply' : ''} ${
@@ -432,7 +435,12 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
         </div>
         <div className="shorts-comment-body">
           <span className="shorts-comment-author">{c.authorName}</span>
-          <p className="shorts-comment-text">{c.text}</p>
+          <p className="shorts-comment-text">
+            {mention ? (
+              <span className="shorts-comment-mention">{mention} </span>
+            ) : null}
+            {c.text}
+          </p>
           <div className="shorts-comment-tag-row">
             <button
               type="button"
@@ -478,13 +486,14 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
           )}
         </div>
       </div>
-      {c.replies?.length > 0 && (
+      {threadReplies.length > 0 && (
         <div className="shorts-comment-replies">
-          {c.replies.map((r) => renderShortsComment(r, true))}
+          {threadReplies.map((r) => renderShortsComment(r, true, isPreview))}
         </div>
       )}
     </div>
-  );
+    );
+  };
 
   return (
     <>

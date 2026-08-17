@@ -216,23 +216,26 @@
 }
 
 .movie-detail-comment-replies {
-  margin-left: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-left: calc(40px + 0.75rem);
   margin-top: 0.5rem;
-  padding-left: 0.75rem;
-  border-left: 2px solid rgba(155, 79, 231, 0.3);
+  padding-left: 0;
+  border-left: none;
 }
 
 .movie-detail-comment-reply {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 .movie-detail-comment-reply .movie-detail-comment-main {
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .movie-detail-comment-reply .movie-detail-comment-avatar {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
 }
 
 .movie-detail-comment-reply .movie-detail-comment-author {
@@ -318,6 +321,11 @@
   margin: 0;
   line-height: 1.5;
   word-wrap: break-word;
+}
+
+.movie-detail-comment-mention {
+  color: #4ea3ff;
+  font-weight: 600;
 }
 
 .movie-detail-comments-more-btn {

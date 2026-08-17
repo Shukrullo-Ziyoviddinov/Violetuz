@@ -45,6 +45,11 @@ const commentSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    authorUsername: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     authorAvatar: {
       type: String,
       trim: true,

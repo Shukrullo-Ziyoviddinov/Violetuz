@@ -1,9 +1,14 @@
 /**
- * Komment like tartibi (frontend — server algo bilan bir xil).
+ * Instagram-uslubidagi izoh tartibi (frontend — server algo bilan bir xil).
  *
- * Asosiy kommentlar o‘zaro; javoblar faqat ota ichida.
- * Javob root qatoriga chiqmaydi.
+ * 1) Asosiy (root) kommentlar o‘zaro like bo‘yicha.
+ * 2) Rootga to‘g‘ridan javoblar (Ali → Jovox) — like bo‘yicha, faqat shu ota ichida.
+ * 3) Javobga javob (Jovox → Mardon) like bilan otadan yuqoriga chiqmaydi.
+ *    Ular ota ostida ketma-ket qoladi (createdAt).
+ * 4) Javob root qatoriga chiqmaydi.
  */
+
+const HANDLE_RE = /@([A-Za-z0-9._]+)/;
 
 const getLikes = (comment) => {
   const n = Number(comment?.likes);
@@ -21,6 +26,16 @@ export const compareCommentsByLikes = (a, b) => {
   return getCreatedAtMs(b) - getCreatedAtMs(a);
 };
 
+const compareCommentsByCreatedAtAsc = (a, b) => getCreatedAtMs(a) - getCreatedAtMs(b);
+
+const sortNestedRepliesChronologically = (list) => {
+  if (!Array.isArray(list) || list.length === 0) return Array.isArray(list) ? list : [];
+  return [...list].sort(compareCommentsByCreatedAtAsc).map((node) => ({
+    ...node,
+    replies: sortNestedRepliesChronologically(node.replies || []),
+  }));
+};
+
 /** @param {Array} list */
 export const sortCommentListByLikes = (list) => {
   if (!Array.isArray(list) || list.length === 0) return Array.isArray(list) ? list : [];
@@ -28,10 +43,79 @@ export const sortCommentListByLikes = (list) => {
   const sorted = [...list].sort(compareCommentsByLikes);
 
   return sorted.map((node) => {
-    const replies = Array.isArray(node?.replies) ? node.replies : [];
+    const direct = Array.isArray(node?.replies) ? [...node.replies] : [];
+    const sortedDirect = direct.sort(compareCommentsByLikes);
     return {
       ...node,
-      replies: sortCommentListByLikes(replies),
+      replies: sortedDirect.map((reply) => ({
+        ...reply,
+        replies: sortNestedRepliesChronologically(reply.replies || []),
+      })),
     };
   });
+};
+
+export const getCommentUsername = (comment) => {
+  const stored = String(comment?.authorUsername || '')
+    .trim()
+    .replace(/^@/, '');
+  if (stored) return stored;
+  const match = String(comment?.authorName || '').match(HANDLE_RE);
+  return match ? match[1] : '';
+};
+
+export const getCommentDisplayName = (comment) => {
+  const raw = String(comment?.authorName || '').trim();
+  const withoutHandle = raw.replace(HANDLE_RE, '').replace(/\s+/g, ' ').trim();
+  return withoutHandle || raw;
+};
+
+export const formatReplyMention = (replyTo) => {
+  if (!replyTo) return '';
+  const username = String(replyTo.authorUsername || '')
+    .replace(/^@/, '')
+    .trim();
+  const name = String(replyTo.authorName || '').trim();
+  if (username && name && name.toLowerCase() !== username.toLowerCase()) {
+    return `@${username} ${name}`;
+  }
+  if (username) return `@${username}`;
+  if (name) return name.startsWith('@') ? name : `@${name}`;
+  return '';
+};
+
+/**
+ * Root ostidagi barcha javoblarni bitta darajaga yoyadi.
+ * To‘g‘ridan javoblar like tartibida; ularning bolalari otadan keyin keladi.
+ */
+export const flattenThreadReplies = (root) => {
+  if (!root || !Array.isArray(root.replies) || root.replies.length === 0) return [];
+  const out = [];
+
+  const pushNested = (parent) => {
+    const children = Array.isArray(parent.replies) ? parent.replies : [];
+    for (const child of children) {
+      out.push({
+        ...child,
+        replies: [],
+        replyTo: {
+          id: parent.id,
+          authorName: getCommentDisplayName(parent),
+          authorUsername: getCommentUsername(parent),
+        },
+      });
+      pushNested(child);
+    }
+  };
+
+  for (const direct of root.replies) {
+    out.push({
+      ...direct,
+      replies: [],
+      replyTo: null,
+    });
+    pushNested(direct);
+  }
+
+  return out;
 };

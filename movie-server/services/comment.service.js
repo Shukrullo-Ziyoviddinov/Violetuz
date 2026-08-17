@@ -228,6 +228,15 @@ const formatAuthorName = (user) => {
   return [user.name, handlePart].filter(Boolean).join(' ') || 'Foydalanuvchi';
 };
 
+const formatAuthorUsername = (user, authorName = '') => {
+  const handle = String(user?.username || '')
+    .trim()
+    .replace(/^@/, '');
+  if (handle) return handle;
+  const match = String(authorName || '').match(/@([A-Za-z0-9._]+)/);
+  return match ? match[1] : '';
+};
+
 const toClientComment = (row, viewerId = null) => {
   const id = String(row._id);
   const likedBy = Array.isArray(row.likedBy) ? row.likedBy.map(String) : [];
@@ -240,6 +249,7 @@ const toClientComment = (row, viewerId = null) => {
     text: row.text,
     authorId: row.userId ? String(row.userId) : null,
     authorName: row.authorName || '',
+    authorUsername: row.authorUsername || formatAuthorUsername(null, row.authorName || ''),
     authorAvatar: row.authorAvatar || '',
     createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
     updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
@@ -310,13 +320,15 @@ const createComment = async (userOrId, { targetType, targetId, text, parentId })
     ? parent.targetSnapshot
     : await buildTargetSnapshot(type, id);
 
+  const authorName = formatAuthorName(user);
   const row = await Comment.create({
     userId,
     targetType: type,
     targetId: id,
     parentId: parentOid,
     text: body,
-    authorName: formatAuthorName(user),
+    authorName,
+    authorUsername: formatAuthorUsername(user, authorName),
     authorAvatar: user.avatar || '',
     likes: 0,
     likedBy: [],
