@@ -6,6 +6,7 @@ const {
   validateCategoryParam,
   validateMovieListQuery,
 } = require('../middleware/validators');
+const { optionalAuth } = require('../middleware/auth.middleware');
 
 const router = Router();
 
@@ -14,7 +15,7 @@ router.get(
   validateCategoryParam,
   asyncHandler(movieController.getMoviesByCategory)
 );
-router.get('/:id', validateMovieIdParam, asyncHandler(movieController.getMovieById));
+router.get('/:id', optionalAuth, validateMovieIdParam, asyncHandler(movieController.getMovieById));
 router.get('/', validateMovieListQuery, asyncHandler(movieController.getMovies));
 
 module.exports = router;

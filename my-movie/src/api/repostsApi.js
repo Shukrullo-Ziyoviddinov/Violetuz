@@ -42,7 +42,7 @@ export const fetchRepostIds = async ({ type } = {}) => {
   return parseJson(res);
 };
 
-/** To‘liq almashtirish / localStorage migratsiya */
+/** Bir martalik migratsiya: eski local ro‘yxatni serverga ko‘chirish */
 export const replaceRepostsRequest = async (items) => {
   const res = await repostsFetch('/reposts', {
     method: 'PUT',

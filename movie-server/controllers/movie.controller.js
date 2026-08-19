@@ -1,5 +1,6 @@
 const movieService = require('../services/movie.service');
 const { sendSuccess } = require('../utils/response');
+const { attachDocLikeCounts } = require('../utils/reactionCounts');
 
 const getMovies = async (req, res) => {
   const { categoryName, search } = req.query;
@@ -12,7 +13,8 @@ const getMovies = async (req, res) => {
 
 const getMovieById = async (req, res) => {
   const movie = await movieService.getById(req.params.id);
-  sendSuccess(res, { data: movie });
+  const data = await attachDocLikeCounts('movie', movie, req.authUser?._id);
+  sendSuccess(res, { data });
 };
 
 const getMoviesByCategory = async (req, res) => {

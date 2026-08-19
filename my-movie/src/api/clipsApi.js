@@ -35,7 +35,7 @@ export const normalizeClipSectionsPayload = (payload) => {
 };
 
 const fetchJson = async (url) => {
-  const res = await fetch(url);
+  const res = await fetch(url, { credentials: 'include' });
   if (!res.ok) {
     throw new Error(`Clips API error: ${res.status}`);
   }

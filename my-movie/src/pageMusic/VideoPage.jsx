@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
@@ -64,6 +65,8 @@ const VideoPage = () => {
     getClipsByCategory,
     getConcertsByCategory,
     getArtistById,
+    fetchClipByIdRemote,
+    fetchConcertByIdRemote,
     clipsLoading,
     concertsLoading,
     artistsLoading,
@@ -98,6 +101,16 @@ const VideoPage = () => {
   );
 
   const video = allVideoData.find((v) => matchId(v.id, id));
+  const isConcertVideo = String(video?.type || '').toLowerCase() === 'konsert' || String(video?.type || '').toLowerCase() === 'concert';
+  const videoLikeQuery = useQuery({
+    queryKey: ['catalog-like-counts', isConcertVideo ? 'konsert' : 'klip', video?.id],
+    queryFn: () =>
+      isConcertVideo ? fetchConcertByIdRemote(video.id) : fetchClipByIdRemote(video.id),
+    enabled: video?.id != null,
+    staleTime: 30_000,
+  });
+  const videoLikeCount = videoLikeQuery.data?.like ?? video?.like;
+  const videoDislikeCount = videoLikeQuery.data?.dislike ?? video?.dislike;
   const artist = video ? getArtistById(video.artistId) : null;
 
   const artistImgSrc = artist
@@ -351,8 +364,8 @@ const VideoPage = () => {
                     <LikeButton
                       contentId={String(video.id)}
                       persistKey={`video_${video.id}`}
-                      initialLikeCount={parseInt(video.like, 10) || 0}
-                      initialDislikeCount={parseInt(video.dislike, 10) || 0}
+                      initialLikeCount={videoLikeCount}
+                      initialDislikeCount={videoDislikeCount}
                       likeMeta={{
                         category: video?.type || 'klip',
                         title: video?.title || '',

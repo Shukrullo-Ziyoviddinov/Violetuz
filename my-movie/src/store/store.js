@@ -9,7 +9,6 @@ import wishlistLegacyStorage from './wishlistLegacyStorage';
 import userLegacyStorage from './userLegacyStorage';
 import likesLegacyStorage from './likesLegacyStorage';
 import followingLegacyStorage from './followingLegacyStorage';
-import repostsLegacyStorage from './repostsLegacyStorage';
 import { applyLegacyReaction } from './slices/likesUtils';
 
 const likesLegacySyncMiddleware = () => (next) => (action) => {
@@ -41,17 +40,12 @@ const followingPersistConfig = {
   storage: followingLegacyStorage,
 };
 
-const repostsPersistConfig = {
-  key: 'reposts',
-  storage: repostsLegacyStorage,
-};
-
 const rootReducer = combineReducers({
   wishlist: persistReducer(wishlistPersistConfig, wishlistReducer),
   user: persistReducer(userPersistConfig, userReducer),
   likes: persistReducer(likesPersistConfig, likesReducer),
   following: persistReducer(followingPersistConfig, followingReducer),
-  reposts: persistReducer(repostsPersistConfig, repostsReducer),
+  reposts: repostsReducer,
 });
 
 export const store = configureStore({

@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const clipController = require('../controllers/clip.controller');
 const asyncHandler = require('../middleware/asyncHandler');
+const { optionalAuth } = require('../middleware/auth.middleware');
 const {
   validateClipIdParam,
   validateMusicCategoryParam,
@@ -20,7 +21,7 @@ router.get(
   validateMusicArtistParam,
   asyncHandler(clipController.getClipsByArtist)
 );
-router.get('/:id', validateClipIdParam, asyncHandler(clipController.getClipById));
+router.get('/:id', optionalAuth, validateClipIdParam, asyncHandler(clipController.getClipById));
 router.get('/', validateClipListQuery, asyncHandler(clipController.getClips));
 
 module.exports = router;

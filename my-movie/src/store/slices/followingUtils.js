@@ -128,3 +128,39 @@ export const getFeedHeaderFollowedPeople = (
 
   return [...followedActors, ...followedArtists];
 };
+
+/** Feed header — following snapshot (to‘liq katalog shart emas) */
+export const getFeedHeaderFromFollowingItems = (followingItems = [], lang = 'uz') => {
+  const list = Array.isArray(followingItems) ? followingItems : [];
+  return list
+    .map((row) => {
+      if (!row || row.id == null) return null;
+      const snap = row.snapshot && typeof row.snapshot === 'object' ? row.snapshot : {};
+      if (row.type === 'actor') {
+        const nameObj = snap.name && typeof snap.name === 'object' ? snap.name : null;
+        return {
+          key: `actor-${row.id}`,
+          followId: row.id,
+          entityType: 'actor',
+          name:
+            (lang === 'ru' ? nameObj?.ru : nameObj?.uz) ||
+            nameObj?.uz ||
+            nameObj?.ru ||
+            (typeof snap.name === 'string' ? snap.name : '') ||
+            '',
+          image: snap.image || '/img/movie1.jpg',
+        };
+      }
+      if (row.type === 'artist') {
+        return {
+          key: `artist-${row.id}`,
+          followId: row.id,
+          entityType: 'artist',
+          name: snap.name || '',
+          image: snap.imgArtist || snap.img || '/img/movie1.jpg',
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+};

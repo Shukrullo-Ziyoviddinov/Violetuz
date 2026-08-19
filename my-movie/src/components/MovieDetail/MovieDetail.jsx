@@ -25,6 +25,7 @@ import {
 } from '../../api/ratingApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
+import { useQuery } from '@tanstack/react-query';
 import '../Rating/CalculateRating.css';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
@@ -586,7 +587,7 @@ const MovieDetail = () => {
   const [titleImgReady, setTitleImgReady] = useState(false);
   const [titleImgFailed, setTitleImgFailed] = useState(false);
   const [ratingLogosReady, setRatingLogosReady] = useState({});
-  const { allMovies, moviesLoading } = useMoviesApi();
+  const { allMovies, moviesLoading, fetchMovieByIdRemote } = useMoviesApi();
   const { allActors, actorsLoading } = useActorsApi();
   const { getArtistById, loading: musicApiLoading } = useMusicApi();
   const modalHeaderRef = React.useRef(null);
@@ -594,6 +595,14 @@ const MovieDetail = () => {
   const modalStartYRef = React.useRef(0);
 
   const movie = allMovies.find((m) => m.id === parseInt(id, 10));
+  const movieLikeQuery = useQuery({
+    queryKey: ['catalog-like-counts', 'movie', movie?.id],
+    queryFn: () => fetchMovieByIdRemote(movie.id),
+    enabled: movie?.id != null,
+    staleTime: 30_000,
+  });
+  const movieLikeCount = movieLikeQuery.data?.like ?? movie?.like;
+  const movieDislikeCount = movieLikeQuery.data?.dislike ?? movie?.dislike;
   const movieVideoSrc = useMemo(
     () => resolveMovieVideoSrc(movie, contentLang),
     [movie, contentLang]
@@ -1737,8 +1746,8 @@ const MovieDetail = () => {
                     image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '',
                     route: `/movie/${movie.id}`,
                   }}
-                  initialLikeCount={movie.like}
-                  initialDislikeCount={movie.dislike}
+                  initialLikeCount={movieLikeCount}
+                  initialDislikeCount={movieDislikeCount}
                   countFormatter={formatActionCount}
                 />
 

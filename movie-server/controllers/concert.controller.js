@@ -1,5 +1,6 @@
 const concertService = require('../services/concert.service');
 const { sendSuccess } = require('../utils/response');
+const { attachDocLikeCounts } = require('../utils/reactionCounts');
 
 const getConcerts = async (req, res) => {
   const { categoryNameMusic, artistId, type, search } = req.query;
@@ -13,7 +14,8 @@ const getConcerts = async (req, res) => {
 
 const getConcertById = async (req, res) => {
   const concert = await concertService.getById(req.params.id);
-  sendSuccess(res, { data: concert });
+  const data = await attachDocLikeCounts('konsert', concert, req.authUser?._id);
+  sendSuccess(res, { data });
 };
 
 const getConcertsByCategory = async (req, res) => {

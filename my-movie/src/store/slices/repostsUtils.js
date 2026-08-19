@@ -23,6 +23,16 @@ export const loadLegacyReposts = () => {
   }
 };
 
+/** Login/sync dan keyin eski local keshni o‘chirish — keyin yozilmaydi */
+export const clearLegacyReposts = () => {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.removeItem(REPOST_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+};
+
 export const isRepostedInList = (items, id, type) => {
   const idVal = normalizeRepostId(id);
   const typeVal = normalizeRepostType(type);

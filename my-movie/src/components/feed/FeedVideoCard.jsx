@@ -11,7 +11,7 @@ const FeedVideoCard = ({ item }) => {
   const saved = isInWishlist(item.videoId, wishlistType);
 
   return (
-    <div className="feed-video-card" onClick={() => navigate(`/music/video/${item.videoId}`)} role="button" tabIndex={0}>
+    <div className="feed-video-card" onClick={() => navigate(item.route || `/music/video/${item.videoId}`)} role="button" tabIndex={0}>
       <div className="feed-video-card-profile">
         <img src={item.artistImage} alt={item.artistName} className="feed-video-card-avatar" />
         <div className="feed-video-card-profile-text">
@@ -48,19 +48,28 @@ const FeedVideoCard = ({ item }) => {
         </span>
       </div>
       <div className="feed-video-card-actions" onClick={(e) => e.stopPropagation()} role="presentation">
-        <LikeButton
-          contentId={String(item.videoId)}
-          persistKey={`video_${item.videoId}`}
-          initialLikeCount={parseInt(item.like, 10) || 0}
-          initialDislikeCount={parseInt(item.dislike, 10) || 0}
-          className="feed-video-like-button"
-          likeMeta={{
-            category: item.type || wishlistType || 'klip',
-            title: item.title || '',
-            image: item.cover || '',
-            route: `/music/video/${item.videoId}`,
-          }}
-        />
+        {item.type === 'movieShorts' || item.type === 'musicshorts' ? (
+          <LikeButton
+            variant="shorts"
+            contentId={String(item.shortsId || item.videoId)}
+            stopPropagation
+            className="feed-video-like-button"
+          />
+        ) : (
+          <LikeButton
+            contentId={String(item.videoId)}
+            persistKey={`video_${item.videoId}`}
+            initialLikeCount={item.like}
+            initialDislikeCount={item.dislike}
+            className="feed-video-like-button"
+            likeMeta={{
+              category: item.type || wishlistType || 'klip',
+              title: item.title || '',
+              image: item.cover || '',
+              route: item.route || `/music/video/${item.videoId}`,
+            }}
+          />
+        )}
         <button
           type="button"
           className={`feed-video-card-fav ${saved ? 'active' : ''}`}

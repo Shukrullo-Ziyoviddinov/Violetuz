@@ -1,4 +1,5 @@
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import FeedHeader from '../components/feed/FeedHeader';
 import FeedCategory from '../components/feed/FeedCategory';
@@ -6,67 +7,34 @@ import FeedList from '../components/feed/FeedList';
 import MessageModal from '../components/Messages/MessageModal';
 import { OPEN_MESSAGES_EVENT } from '../messagesModalBridge';
 import { useFeedProfile } from '../context/AuthContext';
-import { useFollowingIds, useFollowingItems } from '../context/FollowingContext';
-import { getFeedHeaderFollowedPeople } from '../store/slices/followingUtils';
-import { useActorsApi } from '../context/ActorsApiContext';
-import { useMoviesApi } from '../context/MoviesApiContext';
-import { useMusicApi } from '../context/MusicApiContext';
+import { useFollowingItems } from '../context/FollowingContext';
+import { getFeedHeaderFromFollowingItems } from '../store/slices/followingUtils';
+import { useAppSelector } from '../store/hooks';
+import { selectAuthReady, selectIsLoggedIn } from '../store/slices/userSlice';
+import { fetchFeed } from '../api/feedApi';
 import './feedPage.css';
 
-const resolveSortKey = (item, fallbackId = 0) => {
-  if (item?.createdAt) {
-    const t = new Date(item.createdAt).getTime();
-    if (!Number.isNaN(t)) return t;
-  }
-  const year = Number(item?.year);
-  if (!Number.isNaN(year) && year > 0) return year * 100000 + Number(fallbackId || 0);
-  return Number(fallbackId || 0);
-};
-
-const normalizeType = (raw) => {
-  const v = String(raw || '').toLowerCase();
-  if (v === 'movie') return 'movie';
-  if (v === 'music') return 'music';
-  if (v === 'klip' || v === 'clip') return 'klip';
-  if (v === 'konsert' || v === 'concert') return 'konsert';
-  return 'other';
-};
+const PAGE_SIZE = 12;
 
 const FeedPage = () => {
   const { i18n } = useTranslation();
   const feedLang = i18n.language?.toLowerCase().startsWith('ru') ? 'ru' : 'uz';
   const [activeCategory, setActiveCategory] = useState('all');
-  const followingIds = useFollowingIds();
   const followingItems = useFollowingItems();
   const feedProfileUser = useFeedProfile();
   const [messagesOpen, setMessagesOpen] = useState(false);
-  const {
-    sections,
-    getMusicByCategory,
-    getAlbumsByCategory,
-    allClips,
-    allConcerts,
-    allArtists,
-    getArtistById,
-    artistsLoading,
-    clipsLoading,
-    concertsLoading,
-    musicLoading,
-    albumsLoading,
-    sectionsLoading,
-  } = useMusicApi();
-  const { allActors, actorsLoading } = useActorsApi();
-  const { allMovies, moviesLoading } = useMoviesApi();
+  const authReady = useAppSelector(selectAuthReady);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const sentinelRef = useRef(null);
 
-  const feedLoading =
-    moviesLoading ||
-    actorsLoading ||
-    artistsLoading ||
-    clipsLoading ||
-    concertsLoading ||
-    musicLoading ||
-    albumsLoading ||
-    sectionsLoading;
+  const followingKey = useMemo(
+    () =>
+      followingItems
+        .map((x) => `${x.type}:${x.id}`)
+        .sort()
+        .join('|'),
+    [followingItems]
+  );
 
   const openMessages = useCallback(() => setMessagesOpen(true), []);
 
@@ -77,121 +45,56 @@ const FeedPage = () => {
   }, []);
 
   const headerFollowedPeople = useMemo(
-    () => getFeedHeaderFollowedPeople(followingItems, feedLang, allActors, allArtists),
-    [followingItems, feedLang, allActors, allArtists]
+    () => getFeedHeaderFromFollowingItems(followingItems, feedLang),
+    [followingItems, feedLang]
   );
 
-  const feedItems = useMemo(() => {
-    const normalized = new Set(followingIds.map((id) => String(id)));
-    const followedActorIds = new Set(
-      allActors.filter((actor) => normalized.has(String(actor.id))).map((actor) => actor.id)
-    );
-    const followedArtistIds = new Set(
-      allArtists.filter((artist) => normalized.has(String(artist.id))).map((artist) => artist.id)
-    );
+  const feedQuery = useInfiniteQuery({
+    queryKey: ['feed', activeCategory, followingKey],
+    queryFn: ({ pageParam = 0 }) =>
+      fetchFeed({ type: activeCategory, offset: pageParam, limit: PAGE_SIZE }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage?.hasMore) return undefined;
+      return lastPage.offset + lastPage.items.length;
+    },
+    enabled: Boolean(authReady && isLoggedIn),
+    staleTime: 60_000,
+    retry: 1,
+  });
 
-    const movieItems = allMovies
-      .filter((movie) => Array.isArray(movie.actors) && movie.actors.some((id) => followedActorIds.has(id)))
-      .slice(0, 30)
-      .map((movie) => {
-        const actorId = movie.actors?.find((id) => followedActorIds.has(id));
-        const actor = allActors.find((a) => a.id === actorId);
-        return {
-          id: `movie-${movie.id}`,
-          type: normalizeType(movie?.type) || 'movie',
-          actorId: actor?.id,
-          actorName: actor?.name?.uz || actor?.name?.ru || 'Movie actor',
-          actorImage: actor?.image || '/img/movie1.jpg',
-          title: movie?.title?.uz || movie?.title?.ru || 'Movie',
-          cover: movie?.homeImg?.uz || movie?.homeImg?.ru || '/img/movie1.jpg',
-          movieId: movie.id,
-          like: movie.like,
-          dislike: movie.dislike,
-          sortKey: resolveSortKey(movie, movie.id),
-        };
-      });
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = feedQuery;
 
-    const musicItemsRaw = [];
+  const feedItems = useMemo(
+    () => (data?.pages || []).flatMap((p) => (Array.isArray(p.items) ? p.items : [])),
+    [data]
+  );
 
-    (sections || []).forEach((section) => {
-      const rows = section.wishlistType === 'album'
-        ? getAlbumsByCategory(section.categoryNameMusic)
-        : getMusicByCategory(section.categoryNameMusic);
-      const isAlbum = section.wishlistType === 'album';
+  const feedLoading = Boolean(authReady && isLoggedIn && isLoading);
+  const loadingMore = Boolean(isFetchingNextPage);
+  const hasMore = Boolean(hasNextPage);
 
-      rows.forEach((item) => {
-        if (!item?.artistId || !followedArtistIds.has(item.artistId)) return;
-        const artist = getArtistById(item.artistId);
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore || loadingMore || feedLoading) return undefined;
 
-        if (isAlbum) {
-          musicItemsRaw.push({
-            id: `music-${section.id}-${item.id}`,
-            type: 'music',
-            artistId: item.artistId,
-            artistName: artist?.name || item.artist || 'Music artist',
-            artistImage: artist?.imgArtist || artist?.img || '/img/movie1.jpg',
-            title: item.title || 'Music',
-            trackTitle: item.songs?.[0]?.title || 'Unknown track',
-            cover: item.img || artist?.imgArtist || artist?.img || '/img/movie1.jpg',
-            audio: item.songs?.[0]?.audio || '',
-            albumId: item.id,
-            trackId: undefined,
-            musicSectionId: section.id,
-            sortKey: resolveSortKey(item, item.id),
-          });
-        } else {
-          musicItemsRaw.push({
-            id: `music-${section.id}-${item.id}`,
-            type: 'music',
-            artistId: item.artistId,
-            artistName: artist?.name || item.artist || 'Music artist',
-            artistImage: artist?.imgArtist || artist?.img || '/img/movie1.jpg',
-            title: item.title || 'Music',
-            trackTitle: item.title || 'Unknown track',
-            cover: item.img || artist?.imgArtist || artist?.img || '/img/movie1.jpg',
-            audio: item.audio || '',
-            albumId: undefined,
-            trackId: item.id,
-            musicSectionId: section.id,
-            sortKey: resolveSortKey(item, item.id),
-          });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          fetchNextPage();
         }
-      });
-    });
-
-    const musicItems = musicItemsRaw.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0)).slice(0, 100);
-
-    const videoSource = [
-      ...(Array.isArray(allClips) ? allClips : []),
-      ...(Array.isArray(allConcerts) ? allConcerts : []),
-    ];
-    const videoItems = videoSource
-      .filter((item) => followedArtistIds.has(item.artistId))
-      .slice(0, 40)
-      .map((item) => {
-        const artist = getArtistById(item.artistId);
-        return {
-          id: `video-${item.id}`,
-          videoId: item.id,
-          type: normalizeType(item.type) || 'klip',
-          wishlistType: normalizeType(item.type) || 'klip',
-          artistId: item.artistId,
-          artistName: artist?.name || 'Music artist',
-          artistImage: artist?.imgArtist || artist?.img || '/img/movie1.jpg',
-          title: item.title || 'Video',
-          cover: item.img || '/img/movie1.jpg',
-          videoKind: normalizeType(item.type) === 'konsert' ? 'Konsert' : 'Klip',
-          sortKey: resolveSortKey(item, item.id),
-        };
-      });
-
-    return [...movieItems, ...musicItems, ...videoItems].sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-  }, [followingIds, sections, getMusicByCategory, getAlbumsByCategory, allClips, allConcerts, allActors, allMovies, allArtists, getArtistById]);
-
-  const filteredItems = useMemo(() => {
-    if (activeCategory === 'all') return feedItems;
-    return feedItems.filter((item) => item.type === activeCategory);
-  }, [feedItems, activeCategory]);
+      },
+      { rootMargin: '160px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, feedLoading, fetchNextPage]);
 
   return (
     <div className="feed-page">
@@ -201,7 +104,15 @@ const FeedPage = () => {
         onChangeCategory={setActiveCategory}
         onOpenMessages={openMessages}
       />
-      <FeedList items={filteredItems} loading={feedLoading} />
+      <FeedList items={feedItems} loading={feedLoading} />
+      {isLoggedIn && hasMore ? (
+        <div ref={sentinelRef} className="feed-page-sentinel" aria-hidden="true" />
+      ) : null}
+      {loadingMore ? (
+        <div className="feed-page-load-more" role="status" aria-label="Yuklanmoqda">
+          <span className="feed-page-load-more-arc" />
+        </div>
+      ) : null}
       <MessageModal open={messagesOpen} onClose={() => setMessagesOpen(false)} />
     </div>
   );

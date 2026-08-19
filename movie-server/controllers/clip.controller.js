@@ -1,5 +1,6 @@
 const clipService = require('../services/clip.service');
 const { sendSuccess } = require('../utils/response');
+const { attachDocLikeCounts } = require('../utils/reactionCounts');
 
 const getClips = async (req, res) => {
   const { categoryNameMusic, artistId, type, search } = req.query;
@@ -13,7 +14,8 @@ const getClips = async (req, res) => {
 
 const getClipById = async (req, res) => {
   const clip = await clipService.getById(req.params.id);
-  sendSuccess(res, { data: clip });
+  const data = await attachDocLikeCounts('klip', clip, req.authUser?._id);
+  sendSuccess(res, { data });
 };
 
 const getClipsByCategory = async (req, res) => {

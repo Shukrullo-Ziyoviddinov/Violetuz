@@ -9,6 +9,7 @@ const categories = [
   { id: 'movie', labelKey: 'feed.categories.movie', icon: 'fa-film' },
   { id: 'klip', labelKey: 'feed.categories.klip', icon: 'fa-circle-play' },
   { id: 'konsert', labelKey: 'feed.categories.konsert', icon: 'fa-microphone-lines' },
+  { id: 'shorts', labelKey: 'feed.categories.shorts', icon: 'fa-mobile-screen-button' },
 ];
 
 const FeedCategory = ({ activeCategory, onChangeCategory, onOpenMessages }) => {

@@ -2,10 +2,8 @@ import React, { useCallback } from 'react';
 import { useIsReposted, useReposts } from '../../context/RepostsContext';
 import { store } from '../../store/store';
 import { selectRepostItems, toggleRepost } from '../../store/slices/repostsSlice';
-import { REPOST_STORAGE_KEY, isRepostedInList } from '../../store/slices/repostsUtils';
+import { isRepostedInList } from '../../store/slices/repostsUtils';
 import './Repost.css';
-
-export { REPOST_STORAGE_KEY };
 
 export { normalizeRepostId, normalizeRepostType, REPOST_ENTITY_TYPES } from './repostTypes';
 
