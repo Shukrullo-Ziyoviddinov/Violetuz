@@ -2,10 +2,9 @@
  * Instagram-uslubidagi izoh tartibi (frontend — server algo bilan bir xil).
  *
  * 1) Asosiy (root) kommentlar o‘zaro like bo‘yicha.
- * 2) Rootga to‘g‘ridan javoblar (Ali → Jovox) — like bo‘yicha, faqat shu ota ichida.
- * 3) Javobga javob (Jovox → Mardon) like bilan otadan yuqoriga chiqmaydi.
- *    Ular ota ostida ketma-ket qoladi (createdAt).
- * 4) Javob root qatoriga chiqmaydi.
+ * 2) Javoblar (to‘g‘ridan ham, javobga javob ham) like bilan tartiblanmaydi.
+ *    Ular yozilgan vaqt ketma-ketligi (createdAt) bo‘yicha qoladi.
+ * 3) Javob root qatoriga chiqmaydi.
  */
 
 const HANDLE_RE = /@([A-Za-z0-9._]+)/;
@@ -42,17 +41,10 @@ export const sortCommentListByLikes = (list) => {
 
   const sorted = [...list].sort(compareCommentsByLikes);
 
-  return sorted.map((node) => {
-    const direct = Array.isArray(node?.replies) ? [...node.replies] : [];
-    const sortedDirect = direct.sort(compareCommentsByLikes);
-    return {
-      ...node,
-      replies: sortedDirect.map((reply) => ({
-        ...reply,
-        replies: sortNestedRepliesChronologically(reply.replies || []),
-      })),
-    };
-  });
+  return sorted.map((node) => ({
+    ...node,
+    replies: sortNestedRepliesChronologically(node.replies || []),
+  }));
 };
 
 export const getCommentUsername = (comment) => {
@@ -86,7 +78,7 @@ export const formatReplyMention = (replyTo) => {
 
 /**
  * Root ostidagi barcha javoblarni bitta darajaga yoyadi.
- * To‘g‘ridan javoblar like tartibida; ularning bolalari otadan keyin keladi.
+ * To‘g‘ridan javoblar yozilgan tartibda; ularning bolalari otadan keyin keladi.
  */
 export const flattenThreadReplies = (root) => {
   if (!root || !Array.isArray(root.replies) || root.replies.length === 0) return [];

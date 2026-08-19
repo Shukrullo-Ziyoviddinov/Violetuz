@@ -3,11 +3,10 @@
  *
  * Qoidalar:
  * 1) Asosiy kommentlar (root) — faqat o‘zaro: like ko‘p → yuqoriroq.
- * 2) Rootga to‘g‘ridan javoblar — faqat shu ota ichida like bo‘yicha.
- * 3) Javobga javob like bilan otadan yuqoriga chiqmaydi; ota ostida createdAt ketma-ket.
- * 4) Javob hech qachon asosiy kommentlar qatoriga chiqmaydi.
+ * 2) Javoblar like bilan tartiblanmaydi; createdAt ketma-ket.
+ * 3) Javob hech qachon asosiy kommentlar qatoriga chiqmaydi.
  *
- * Like teng bo‘lsa — yangiroq komment yuqoriroq (createdAt) — faqat like-sort qatlamida.
+ * Like teng bo‘lsa — yangiroq root komment yuqoriroq (createdAt).
  */
 
 const getLikes = (comment) => {
@@ -38,8 +37,8 @@ const sortNestedRepliesChronologically = (list) => {
 };
 
 /**
- * Root va to‘g‘ridan javoblarni like bo‘yicha tartiblaydi.
- * Nested javoblar ota ostida qoladi (like bilan yuqoriga chiqmaydi).
+ * Faqat asosiy (root) kommentlarni like bo‘yicha tartiblaydi.
+ * Javoblar yozilgan vaqt ketma-ketligi bo‘yicha qoladi.
  *
  * @param {Array} list
  * @returns {Array}
@@ -49,17 +48,10 @@ const sortCommentListByLikes = (list) => {
 
   const sorted = [...list].sort(compareCommentsByLikes);
 
-  return sorted.map((node) => {
-    const direct = Array.isArray(node?.replies) ? [...node.replies] : [];
-    const sortedDirect = direct.sort(compareCommentsByLikes);
-    return {
-      ...node,
-      replies: sortedDirect.map((reply) => ({
-        ...reply,
-        replies: sortNestedRepliesChronologically(reply.replies || []),
-      })),
-    };
-  });
+  return sorted.map((node) => ({
+    ...node,
+    replies: sortNestedRepliesChronologically(node.replies || []),
+  }));
 };
 
 module.exports = {
