@@ -9,8 +9,10 @@ const COMMENT_TYPES = Object.freeze([
 ]);
 
 const MAX_COMMENT_LENGTH = 2000;
+const REPLIES_PAGE_SIZE = 5;
 
 module.exports = {
   COMMENT_TYPES,
   MAX_COMMENT_LENGTH,
+  REPLIES_PAGE_SIZE,
 };

@@ -11,6 +11,7 @@ const router = Router();
 router.get('/', optionalAuth, commentController.listComments);
 router.get('/history', requireAuth, commentController.listHistory);
 router.get('/liked', requireAuth, commentController.listLikedIds);
+router.get('/:id/replies', optionalAuth, commentController.listReplies);
 
 router.post('/', requireAuth, commentController.createComment);
 router.patch('/:id', requireAuth, commentController.updateComment);

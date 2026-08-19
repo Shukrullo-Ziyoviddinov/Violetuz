@@ -71,6 +71,27 @@ export const dispatchMovieCommentsChanged = (movieId, extra = {}) => {
   }
 };
 
+export const COMMENT_REPLIES_PAGE_SIZE = 5;
+
+export const fetchCommentReplies = async (
+  commentId,
+  { skip = 0, limit = COMMENT_REPLIES_PAGE_SIZE } = {}
+) => {
+  const q = new URLSearchParams({
+    skip: String(skip),
+    limit: String(limit),
+  });
+  const res = await commentFetch(
+    `/comments/${encodeURIComponent(commentId)}/replies?${q}`
+  );
+  const data = await parseJson(res);
+  return {
+    replies: Array.isArray(data?.replies) ? data.replies : [],
+    replyCount: Number(data?.replyCount) || 0,
+    hasMore: Boolean(data?.hasMore),
+  };
+};
+
 export const fetchComments = async ({ targetType, targetId }) => {
   const q = new URLSearchParams({
     targetType: String(targetType),

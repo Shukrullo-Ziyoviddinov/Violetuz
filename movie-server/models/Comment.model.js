@@ -33,6 +33,13 @@ const commentSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    /** Asosiy komment id — javoblar shu threadga tegishli */
+    threadRootId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+      default: null,
+      index: true,
+    },
     text: {
       type: String,
       required: true,
@@ -79,5 +86,6 @@ const commentSchema = new mongoose.Schema(
 commentSchema.index({ targetType: 1, targetId: 1, createdAt: -1 });
 commentSchema.index({ userId: 1, createdAt: -1 });
 commentSchema.index({ parentId: 1, createdAt: 1 });
+commentSchema.index({ threadRootId: 1, createdAt: 1 });
 
 module.exports = mongoose.model('Comment', commentSchema);

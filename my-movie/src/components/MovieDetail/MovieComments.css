@@ -328,6 +328,27 @@
   font-weight: 600;
 }
 
+.movie-detail-comment-more-replies {
+  margin: 0.45rem 0 0 calc(40px + 0.75rem);
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.movie-detail-comment-more-replies:hover:not(:disabled) {
+  color: #9b4fe7;
+}
+
+.movie-detail-comment-more-replies:disabled {
+  cursor: default;
+  color: rgba(255, 255, 255, 0.45);
+}
+
 .movie-detail-comments-more-btn {
   padding: 0.4rem 0.4rem;
   background: transparent;

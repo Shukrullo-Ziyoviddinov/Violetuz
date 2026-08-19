@@ -10,8 +10,12 @@ const { badRequest, notFound, createHttpError } = require('../utils/errors');
 const {
   COMMENT_TYPES,
   MAX_COMMENT_LENGTH,
+  REPLIES_PAGE_SIZE,
 } = require('../constants/comment.constants');
-const { sortCommentListByLikes } = require('../algo/commentLikeSortAlgo');
+const {
+  sortCommentListByLikes,
+  flattenThreadReplies,
+} = require('../algo/commentLikeSortAlgo');
 
 const assertType = (raw) => {
   const type = String(raw || '').trim();
@@ -255,8 +259,58 @@ const toClientComment = (row, viewerId = null) => {
     updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
     likes: Number(row.likes) || likedBy.length || 0,
     likedByMe: viewer ? likedBy.includes(viewer) : false,
+    threadRootId: row.threadRootId ? String(row.threadRootId) : null,
+    replyCount: 0,
     replies: [],
   };
+};
+
+const countDescendantsByRoot = (rows) => {
+  const children = new Map();
+  for (const row of rows) {
+    if (!row.parentId) continue;
+    const parentKey = String(row.parentId);
+    if (!children.has(parentKey)) children.set(parentKey, []);
+    children.get(parentKey).push(String(row._id));
+  }
+  const memo = new Map();
+  const walk = (id) => {
+    if (memo.has(id)) return memo.get(id);
+    const kids = children.get(id) || [];
+    let n = kids.length;
+    for (const kid of kids) n += walk(kid);
+    memo.set(id, n);
+    return n;
+  };
+  const counts = new Map();
+  for (const row of rows) {
+    if (row.parentId) continue;
+    counts.set(String(row._id), walk(String(row._id)));
+  }
+  return counts;
+};
+
+const resolveThreadRootId = async (parent) => {
+  if (!parent) return null;
+  if (parent.threadRootId) return parent.threadRootId;
+  if (!parent.parentId) return parent._id;
+  let current = parent;
+  while (current.parentId) {
+    if (current.threadRootId) return current.threadRootId;
+    const up = await Comment.findById(current.parentId)
+      .select('_id parentId threadRootId')
+      .lean();
+    if (!up) return current.parentId;
+    if (!up.parentId) return up._id;
+    current = up;
+  }
+  return current._id;
+};
+
+const parseReplyPage = (raw, fallback) => {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return fallback;
+  return Math.floor(n);
 };
 
 /** Flat ro‘yxatdan daraxt */
@@ -284,10 +338,54 @@ const buildCommentTree = (rows, viewerId = null) => {
 const listComments = async ({ targetType, targetId }, viewerId = null) => {
   const type = assertType(targetType);
   const id = normalizeTargetId(targetId);
-  const rows = await Comment.find({ targetType: type, targetId: id })
+  const meta = await Comment.find({ targetType: type, targetId: id })
+    .select('_id parentId')
+    .lean();
+  const counts = countDescendantsByRoot(meta);
+  const roots = await Comment.find({ targetType: type, targetId: id, parentId: null })
     .sort({ createdAt: 1 })
     .lean();
-  return buildCommentTree(rows, viewerId);
+  return sortCommentListByLikes(
+    roots.map((row) => ({
+      ...toClientComment(row, viewerId),
+      replyCount: counts.get(String(row._id)) || 0,
+      replies: [],
+    }))
+  );
+};
+
+const listReplies = async (rootId, { skip = 0, limit = REPLIES_PAGE_SIZE } = {}, viewerId = null) => {
+  const oid = toObjectId(rootId);
+  if (!oid) throw badRequest('commentId noto‘g‘ri');
+  const root = await Comment.findById(oid).lean();
+  if (!root) throw notFound('Komment topilmadi');
+  if (root.parentId) throw badRequest('Javoblar faqat asosiy komment uchun');
+
+  const safeSkip = parseReplyPage(skip, 0);
+  const safeLimit = Math.min(50, Math.max(1, parseReplyPage(limit, REPLIES_PAGE_SIZE) || REPLIES_PAGE_SIZE));
+
+  const rows = await Comment.find({
+    targetType: root.targetType,
+    targetId: root.targetId,
+  })
+    .sort({ createdAt: 1 })
+    .lean();
+
+  const tree = buildCommentTree(rows, viewerId);
+  const node = tree.find((n) => n.id === String(root._id));
+  const flat = flattenThreadReplies(node).map((item) => ({
+    ...item,
+    threadRootId: String(root._id),
+    replies: [],
+  }));
+  const page = flat.slice(safeSkip, safeSkip + safeLimit);
+  return {
+    replies: page,
+    replyCount: flat.length,
+    skip: safeSkip,
+    limit: safeLimit,
+    hasMore: safeSkip + page.length < flat.length,
+  };
 };
 
 const createComment = async (userOrId, { targetType, targetId, text, parentId }) => {
@@ -309,7 +407,9 @@ const createComment = async (userOrId, { targetType, targetId, text, parentId })
   const parentOid = toObjectId(parentId);
   if (parentId) {
     if (!parentOid) throw badRequest('parentId noto‘g‘ri');
-    parent = await Comment.findById(parentOid).select('targetType targetId targetSnapshot').lean();
+    parent = await Comment.findById(parentOid)
+      .select('targetType targetId targetSnapshot parentId threadRootId')
+      .lean();
     if (!parent) throw notFound('Javob beriladigan komment topilmadi');
     if (parent.targetType !== type || String(parent.targetId) !== id) {
       throw badRequest('parentId boshqa kontentga tegishli');
@@ -321,11 +421,13 @@ const createComment = async (userOrId, { targetType, targetId, text, parentId })
     : await buildTargetSnapshot(type, id);
 
   const authorName = formatAuthorName(user);
+  const threadRootId = parent ? await resolveThreadRootId(parent) : null;
   const row = await Comment.create({
     userId,
     targetType: type,
     targetId: id,
     parentId: parentOid,
+    threadRootId,
     text: body,
     authorName,
     authorUsername: formatAuthorUsername(user, authorName),
@@ -452,6 +554,7 @@ const listLikedIds = async (userId, { targetType, targetId }) => {
 
 module.exports = {
   listComments,
+  listReplies,
   createComment,
   updateComment,
   deleteComment,
@@ -459,5 +562,6 @@ module.exports = {
   listMyHistory,
   listLikedIds,
   COMMENT_TYPES,
+  REPLIES_PAGE_SIZE,
   pickLocalized,
 };

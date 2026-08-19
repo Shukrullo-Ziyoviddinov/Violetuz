@@ -3,10 +3,11 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import * as shortsCommentsApi from '../../api/shortsCommentsApi';
+import { COMMENT_REPLIES_PAGE_SIZE } from '../../api/commentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { formatActionCount } from '../../utils/utils';
-import { sortCommentListByLikes, flattenThreadReplies, formatReplyMention } from '../../algo/commentLikeSortAlgo';
+import { sortCommentListByLikes, formatReplyMention } from '../../algo/commentLikeSortAlgo';
 import {
   isCommentsSheetViewport,
   useCommentsSheetViewport,
@@ -16,6 +17,7 @@ import './ShortsComments.css';
 const migrateShortsComment = (c) => ({
   ...c,
   likes: c.likes ?? 0,
+  replyCount: Number(c.replyCount) || 0,
   replies: Array.isArray(c.replies) ? c.replies.map(migrateShortsComment) : [],
 });
 
@@ -57,35 +59,22 @@ const toggleLikeOptimisticInTree = (list, commentId, nextLiked) =>
     return c;
   });
 
-const insertReplyInTree = (list, parentId, reply) =>
-  list.map((c) => {
-    if (String(c.id) === String(parentId)) {
-      return { ...c, replies: [...(c.replies || []), reply] };
-    }
-    if (c.replies?.length) {
-      return { ...c, replies: insertReplyInTree(c.replies, parentId, reply) };
-    }
-    return c;
-  });
+const remainingRepliesOf = (c) =>
+  Math.max(0, (Number(c.replyCount) || 0) - (Array.isArray(c.replies) ? c.replies.length : 0));
+
+const getThreadRootId = (comment) => {
+  if (!comment) return null;
+  if (comment.threadRootId) return String(comment.threadRootId);
+  if (!comment.parentId) return String(comment.id);
+  return String(comment.parentId);
+};
 
 const PREVIEW_LIMIT = 4;
 
 const countTotalShortsComments = (comments) =>
-  comments.reduce((sum, c) => sum + 1 + countTotalShortsComments(c.replies || []), 0);
+  comments.reduce((sum, c) => sum + 1 + (Number(c.replyCount) || 0), 0);
 
-const getDisplayedShortsComments = (comments) => {
-  let count = 0;
-  const takeFrom = (list) => {
-    const out = [];
-    for (const c of list) {
-      if (count >= PREVIEW_LIMIT) break;
-      count++;
-      out.push({ ...c, replies: takeFrom(c.replies || []) });
-    }
-    return out;
-  };
-  return takeFrom(comments);
-};
+const getDisplayedShortsComments = (comments) => comments.slice(0, PREVIEW_LIMIT);
 
 const EMOJI_LIST = [
   '👍', '❤️', '😂', '😮', '😢', '😡', '🔥', '👏',
@@ -108,6 +97,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
   const [dragY, setDragY] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [loadingRepliesIds, setLoadingRepliesIds] = useState(() => new Set());
   const startYRef = useRef(0);
   const dragYRef = useRef(0);
   const shortsCommentsListRef = useRef(null);
@@ -272,9 +262,38 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       const item = data?.item ? migrateShortsComment(data.item) : null;
       if (item) {
         if (replyingToShorts) {
-          setShortsComments((prev) =>
-            sortCommentListByLikes(insertReplyInTree(prev, replyingToShorts.id, item))
-          );
+          const rootId = getThreadRootId(replyingToShorts);
+          const loaded =
+            shortsComments.find((c) => String(c.id) === String(rootId))?.replies?.length || 0;
+          if (loaded > 0) {
+            const page = await shortsCommentsApi.fetchShortsCommentReplies(rootId, {
+              skip: 0,
+              limit: loaded,
+            });
+            setShortsComments((prev) =>
+              sortCommentListByLikes(
+                prev.map((c) =>
+                  String(c.id) === String(rootId)
+                    ? {
+                        ...c,
+                        replies: (page.replies || []).map(migrateShortsComment),
+                        replyCount: page.replyCount ?? (Number(c.replyCount) || 0) + 1,
+                      }
+                    : c
+                )
+              )
+            );
+          } else {
+            setShortsComments((prev) =>
+              sortCommentListByLikes(
+                prev.map((c) =>
+                  String(c.id) === String(rootId)
+                    ? { ...c, replyCount: (Number(c.replyCount) || 0) + 1 }
+                    : c
+                )
+              )
+            );
+          }
           setReplyingToShorts(null);
         } else {
           setShortsComments((prev) => sortCommentListByLikes([item, ...prev]));
@@ -355,6 +374,58 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     openShortsModal();
   };
 
+  const handleLoadMoreShortsReplies = async (rootComment, isPreview = false) => {
+    if (isPreview) {
+      openShortsModal();
+      return;
+    }
+    const rootId = String(rootComment.id);
+    if (loadingRepliesIds.has(rootId)) return;
+    if (remainingRepliesOf(rootComment) <= 0) return;
+    const skip = Array.isArray(rootComment.replies) ? rootComment.replies.length : 0;
+    setLoadingRepliesIds((prev) => {
+      const next = new Set(prev);
+      next.add(rootId);
+      return next;
+    });
+    try {
+      const data = await shortsCommentsApi.fetchShortsCommentReplies(rootId, {
+        skip,
+        limit: COMMENT_REPLIES_PAGE_SIZE,
+      });
+      const page = (data.replies || []).map(migrateShortsComment);
+      setShortsComments((prev) =>
+        sortCommentListByLikes(
+          prev.map((c) => {
+            if (String(c.id) !== rootId) return c;
+            const seen = new Set((c.replies || []).map((r) => String(r.id)));
+            const appended = page.filter((r) => !seen.has(String(r.id)));
+            return {
+              ...c,
+              replies: [...(c.replies || []), ...appended],
+              replyCount: data.replyCount ?? c.replyCount,
+            };
+          })
+        )
+      );
+      setLikedShortsIds((prev) => {
+        const next = new Set(prev);
+        page.forEach((r) => {
+          if (r.likedByMe) next.add(String(r.id));
+        });
+        return next;
+      });
+    } catch {
+      /* tugma qayta bosilishi mumkin */
+    } finally {
+      setLoadingRepliesIds((prev) => {
+        const next = new Set(prev);
+        next.delete(rootId);
+        return next;
+      });
+    }
+  };
+
   const handleTouchStart = (e) => {
     if (modalClosingRef.current) return;
     startYRef.current = e.touches[0].clientY;
@@ -412,7 +483,9 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
 
   const renderShortsComment = (c, isReply = false, isPreview = false) => {
     const mention = formatReplyMention(c.replyTo);
-    const threadReplies = !isReply ? flattenThreadReplies(c) : [];
+    const loadedReplies = !isReply && Array.isArray(c.replies) ? c.replies : [];
+    const remaining = !isReply ? remainingRepliesOf(c) : 0;
+    const repliesLoading = !isReply && loadingRepliesIds.has(String(c.id));
     return (
     <div
       key={c.id}
@@ -486,10 +559,29 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
           )}
         </div>
       </div>
-      {threadReplies.length > 0 && (
+      {loadedReplies.length > 0 && (
         <div className="shorts-comment-replies">
-          {threadReplies.map((r) => renderShortsComment(r, true, isPreview))}
+          {loadedReplies.map((r) => renderShortsComment(r, true, isPreview))}
         </div>
+      )}
+      {remaining > 0 && (
+        <button
+          type="button"
+          className="shorts-comment-more-replies"
+          disabled={repliesLoading}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleLoadMoreShortsReplies(c, isPreview);
+          }}
+        >
+          {repliesLoading
+            ? i18n.language === 'uz'
+              ? 'Javoblar yuklanmoqda...'
+              : 'Загрузка ответов...'
+            : i18n.language === 'uz'
+              ? `Ko'proq javoblar (${remaining})`
+              : `Ещё ответы (${remaining})`}
+        </button>
       )}
     </div>
     );

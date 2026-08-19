@@ -14,6 +14,19 @@ const listComments = asyncHandler(async (req, res) => {
   return sendSuccess(res, { data: { comments } });
 });
 
+const listReplies = asyncHandler(async (req, res) => {
+  const viewerId = req.authUser?._id || null;
+  const data = await commentService.listReplies(
+    req.params.id,
+    {
+      skip: req.query.skip,
+      limit: req.query.limit,
+    },
+    viewerId
+  );
+  return sendSuccess(res, { data });
+});
+
 const createComment = asyncHandler(async (req, res) => {
   const item = await commentService.createComment(req.authUser, {
     targetType: req.body?.targetType,
@@ -56,6 +69,7 @@ const listLikedIds = asyncHandler(async (req, res) => {
 
 module.exports = {
   listComments,
+  listReplies,
   createComment,
   updateComment,
   deleteComment,

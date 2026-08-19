@@ -54,9 +54,62 @@ const sortCommentListByLikes = (list) => {
   }));
 };
 
+const HANDLE_RE = /@([A-Za-z0-9._]+)/;
+
+const getCommentUsername = (comment) => {
+  const stored = String(comment?.authorUsername || '')
+    .trim()
+    .replace(/^@/, '');
+  if (stored) return stored;
+  const match = String(comment?.authorName || '').match(HANDLE_RE);
+  return match ? match[1] : '';
+};
+
+const getCommentDisplayName = (comment) => {
+  const raw = String(comment?.authorName || '').trim();
+  const withoutHandle = raw.replace(HANDLE_RE, '').replace(/\s+/g, ' ').trim();
+  return withoutHandle || raw;
+};
+
+/**
+ * Root ostidagi javoblarni bitta darajaga yoyadi (UI bilan bir xil tartib).
+ */
+const flattenThreadReplies = (root) => {
+  if (!root || !Array.isArray(root.replies) || root.replies.length === 0) return [];
+  const out = [];
+
+  const pushNested = (parent) => {
+    const children = Array.isArray(parent.replies) ? parent.replies : [];
+    for (const child of children) {
+      out.push({
+        ...child,
+        replies: [],
+        replyTo: {
+          id: parent.id,
+          authorName: getCommentDisplayName(parent),
+          authorUsername: getCommentUsername(parent),
+        },
+      });
+      pushNested(child);
+    }
+  };
+
+  for (const direct of root.replies) {
+    out.push({
+      ...direct,
+      replies: [],
+      replyTo: null,
+    });
+    pushNested(direct);
+  }
+
+  return out;
+};
+
 module.exports = {
   getLikes,
   getCreatedAtMs,
   compareCommentsByLikes,
   sortCommentListByLikes,
+  flattenThreadReplies,
 };

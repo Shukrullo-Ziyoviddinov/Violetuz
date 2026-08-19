@@ -34,6 +34,9 @@ export const getComments = async (shortsId, targetTypeHint) => {
   });
 };
 
+export const fetchShortsCommentReplies = (commentId, page) =>
+  commentsApi.fetchCommentReplies(commentId, page);
+
 export const getLikedIds = async (shortsId, targetTypeHint) => {
   const targetType = resolveShortsType(targetTypeHint);
   try {

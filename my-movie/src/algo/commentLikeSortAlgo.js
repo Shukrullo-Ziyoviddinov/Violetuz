@@ -25,25 +25,13 @@ export const compareCommentsByLikes = (a, b) => {
   return getCreatedAtMs(b) - getCreatedAtMs(a);
 };
 
-const compareCommentsByCreatedAtAsc = (a, b) => getCreatedAtMs(a) - getCreatedAtMs(b);
-
-const sortNestedRepliesChronologically = (list) => {
-  if (!Array.isArray(list) || list.length === 0) return Array.isArray(list) ? list : [];
-  return [...list].sort(compareCommentsByCreatedAtAsc).map((node) => ({
-    ...node,
-    replies: sortNestedRepliesChronologically(node.replies || []),
-  }));
-};
-
-/** @param {Array} list */
+/** Faqat asosiy kommentlar. Yuklangan javoblar tartibi saqlanadi. */
 export const sortCommentListByLikes = (list) => {
   if (!Array.isArray(list) || list.length === 0) return Array.isArray(list) ? list : [];
 
-  const sorted = [...list].sort(compareCommentsByLikes);
-
-  return sorted.map((node) => ({
+  return [...list].sort(compareCommentsByLikes).map((node) => ({
     ...node,
-    replies: sortNestedRepliesChronologically(node.replies || []),
+    replies: Array.isArray(node.replies) ? node.replies : [],
   }));
 };
 
