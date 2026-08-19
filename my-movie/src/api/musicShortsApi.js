@@ -21,7 +21,7 @@ export const normalizeMusicShortsPayload = (payload) => {
 };
 
 const fetchJson = async (url) => {
-  const res = await fetch(url);
+  const res = await fetch(url, { credentials: 'include' });
   if (!res.ok) {
     throw new Error(`Music shorts API error: ${res.status}`);
   }

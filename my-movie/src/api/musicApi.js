@@ -9,7 +9,7 @@ import {
 const API_BASE_URL = resolveApiBaseUrl();
 
 const fetchJson = async (url) => {
-  const res = await fetch(url);
+  const res = await fetch(url, { credentials: 'include' });
   if (!res.ok) {
     throw new Error(`Music API error: ${res.status}`);
   }

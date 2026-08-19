@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -8,9 +8,15 @@ import { useMoviesApi } from '../context/MoviesApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { fetchAllTrillers } from '../api/trillersApi';
 import { getLocalizedField } from '../utils/shortsMovieUtils';
+import { resolveShortsWithMovies } from '../utils/resolveShortsWithMovies';
+import {
+  isShortsWishlistType,
+  shortsWishlistType,
+} from '../store/slices/wishlistUtils';
 import Movies from '../components/Movies/Movies';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import ShortsVideoThumb from '../components/ShortsVideos/ShortsVideoThumb';
 import {
   WishlistFilterModal,
   WishlistTabIcons,
@@ -21,6 +27,7 @@ import {
 import { useImageReady } from '../utils/useImageReady';
 import './WishlistPage.css';
 import '../components/WishlistPageFilter/WishlistFilterModal.css';
+import '../components/ShortsVideos/ShortsVideos.css';
 import '../components/Filters/FiltersSelect.css';
 
 const EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
@@ -96,7 +103,7 @@ const WishlistPage = () => {
   const isMobile = useIsMobileWishlist();
   const { contentLang } = useContentLanguage();
   const { wishlistItems, toggleWishlist } = useWishlist();
-  const { allMovies: apiMovies, moviesLoading } = useMoviesApi();
+  const { allMovies: apiMovies, moviesLoading, allShortsVideos, shortsLoading } = useMoviesApi();
   const {
     allMusic,
     allAlbums,
@@ -107,6 +114,8 @@ const WishlistPage = () => {
     albumsLoading,
     clipsLoading,
     concertsLoading,
+    musicShortsCatalog,
+    musicShortsLoading,
   } = useMusicApi();
   const { data: allTrillers = [], isPending: trillersLoading } = useQuery({
     queryKey: ['trillers', 'with-description'],
@@ -124,7 +133,9 @@ const WishlistPage = () => {
     albumsLoading ||
     clipsLoading ||
     concertsLoading ||
-    trillersLoading;
+    trillersLoading ||
+    shortsLoading ||
+    musicShortsLoading;
 
   const normalizeType = (raw) => {
     const v = String(raw || '').toLowerCase();
@@ -134,6 +145,7 @@ const WishlistPage = () => {
     if (v === 'klip' || v === 'clip') return 'klip';
     if (v === 'konsert' || v === 'concert') return 'konsert';
     if (v === 'triller' || v === 'trailer') return 'triller';
+    if (v === 'shorts' || v === 'movieshorts' || v === 'musicshorts') return 'shorts';
     return '';
   };
 
@@ -148,21 +160,50 @@ const WishlistPage = () => {
   const wishlistConcerts = allConcerts.filter((c) => matchWishlist(c.id, normalizeType(c.type) || 'konsert'));
   const wishlistTrillers = allTrillers.filter((item) => matchWishlist(item.id, 'triller'));
 
+  const movieShortsCatalog = useMemo(
+    () =>
+      resolveShortsWithMovies(allShortsVideos, moviesSource, allMusic, allClips, allConcerts),
+    [allShortsVideos, moviesSource, allMusic, allClips, allConcerts]
+  );
+
+  const wishlistShorts = wishlistItems
+    .filter((x) => isShortsWishlistType(x.type))
+    .map((x) => {
+      const t = String(x.type || '').toLowerCase();
+      if (t === 'musicshorts') {
+        return (musicShortsCatalog || []).find((s) => String(s.id) === String(x.id)) || null;
+      }
+      return (
+        movieShortsCatalog.find((s) => String(s.id) === String(x.id)) ||
+        (musicShortsCatalog || []).find((s) => String(s.id) === String(x.id)) ||
+        null
+      );
+    })
+    .filter(Boolean);
+
   const hasMovies = wishlistMovies.length > 0;
   const hasMusic = wishlistMusic.length > 0;
   const hasAlbums = wishlistAlbums.length > 0;
   const hasClips = wishlistClips.length > 0;
   const hasConcerts = wishlistConcerts.length > 0;
   const hasTrillers = wishlistTrillers.length > 0;
+  const hasShorts = wishlistShorts.length > 0;
   const isEmpty =
-    !hasMovies && !hasMusic && !hasAlbums && !hasClips && !hasConcerts && !hasTrillers;
+    !hasMovies &&
+    !hasMusic &&
+    !hasAlbums &&
+    !hasClips &&
+    !hasConcerts &&
+    !hasTrillers &&
+    !hasShorts;
   const showTabs =
     (hasMovies ? 1 : 0) +
       (hasMusic ? 1 : 0) +
       (hasAlbums ? 1 : 0) +
       (hasClips ? 1 : 0) +
       (hasConcerts ? 1 : 0) +
-      (hasTrillers ? 1 : 0) >=
+      (hasTrillers ? 1 : 0) +
+      (hasShorts ? 1 : 0) >=
     2;
 
   const getDefaultTab = () => {
@@ -172,6 +213,7 @@ const WishlistPage = () => {
     if (hasClips) return 'klip';
     if (hasConcerts) return 'konsert';
     if (hasTrillers) return 'triller';
+    if (hasShorts) return 'shorts';
     return 'movie';
   };
 
@@ -208,6 +250,24 @@ const WishlistPage = () => {
     toggleWishlist(id, 'triller');
   };
 
+  const handleShortsWishlistClick = (e, item) => {
+    e.stopPropagation();
+    if (item?.id == null) return;
+    toggleWishlist(item.id, shortsWishlistType(item));
+  };
+
+  const openWishlistShort = (item) => {
+    const isMusic = item?.type === 'musicshorts';
+    const catalog = isMusic ? musicShortsCatalog : movieShortsCatalog;
+    const startIndex = (catalog || []).findIndex((s) => String(s.id) === String(item.id));
+    const path = isMusic ? '/music/shorts' : '/shorts';
+    if (startIndex < 0) {
+      navigate(path);
+      return;
+    }
+    navigate(`${path}?startIndex=${startIndex}`);
+  };
+
   if (isEmpty) {
     if (wishlistCatalogLoading) {
       return <WishlistEmptySkeleton />;
@@ -221,7 +281,8 @@ const WishlistPage = () => {
     (activeTab === 'album' && hasAlbums) ||
     (activeTab === 'klip' && hasClips) ||
     (activeTab === 'konsert' && hasConcerts) ||
-    (activeTab === 'triller' && hasTrillers);
+    (activeTab === 'triller' && hasTrillers) ||
+    (activeTab === 'shorts' && hasShorts);
 
   const effectiveTab = showTabs
     ? tabIsValid
@@ -237,7 +298,9 @@ const WishlistPage = () => {
             ? 'klip'
             : hasConcerts
               ? 'konsert'
-              : 'triller';
+              : hasTrillers
+                ? 'triller'
+                : 'shorts';
 
   const availableTabs = [];
   if (hasMovies) {
@@ -264,6 +327,12 @@ const WishlistPage = () => {
       label: t('wishlist.tabTriller', 'Triller'),
     });
   }
+  if (hasShorts) {
+    availableTabs.push({
+      id: 'shorts',
+      label: t('wishlist.tabShorts', 'Shorts'),
+    });
+  }
 
   const openFilterModal = () => {
     setDraftTab(effectiveTab);
@@ -284,6 +353,7 @@ const WishlistPage = () => {
     klip: wishlistClips,
     konsert: wishlistConcerts,
     triller: wishlistTrillers,
+    shorts: wishlistShorts,
   };
 
   const visibleMovies = applyWishlistTabFilters(
@@ -375,6 +445,16 @@ const WishlistPage = () => {
               >
                 <span className="wishlist-tab-icon">{WishlistTabIcons.triller}</span>
                 {t('wishlist.tabTriller', 'Triller')}
+              </button>
+            )}
+            {hasShorts && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'shorts' ? 'active' : ''}`}
+                onClick={() => setActiveTab('shorts')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.shorts}</span>
+                {t('wishlist.tabShorts', 'Shorts')}
               </button>
             )}
           </ScrollTouch>
@@ -653,6 +733,42 @@ const WishlistPage = () => {
                 );
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {effectiveTab === 'shorts' && (
+        <div className="wishlist-shorts">
+          <div className="shorts-videos-grid wishlist-shorts-grid">
+            {wishlistShorts.map((item) => (
+              <div
+                key={`${item.type || 'movieShorts'}-${item.id}`}
+                className="shorts-video-card"
+                role="button"
+                tabIndex={0}
+                onClick={() => openWishlistShort(item)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openWishlistShort(item);
+                  }
+                }}
+              >
+                <ShortsVideoThumb
+                  videoSrc={item.video?.[contentLang] || item.video?.uz || ''}
+                />
+                <button
+                  type="button"
+                  className="wishlist-music-item-wishlist-btn active wishlist-shorts-save-btn"
+                  onClick={(e) => handleShortsWishlistClick(e, item)}
+                  aria-label="Sevimlilardan olib tashlash"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                  </svg>
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -6,6 +6,7 @@ const Album = require('../models/Album.model');
 const Clip = require('../models/Clip.model');
 const Concert = require('../models/Concert.model');
 const ShortVideo = require('../models/ShortVideo.model');
+const MusicShort = require('../models/MusicShort.model');
 const Triller = require('../models/Triller.model');
 const { badRequest, notFound } = require('../utils/errors');
 
@@ -22,6 +23,10 @@ const normalizeType = (raw) => {
     .toLowerCase();
   if (type === 'clip') return 'klip';
   if (type === 'concert') return 'konsert';
+  if (type === 'movieshorts' || type === 'movie-shorts') return 'movieShorts';
+  if (type === 'musicshorts' || type === 'music-shorts' || type === 'musicshort') {
+    return 'musicshorts';
+  }
   if (type === 'short' || type === 'shortvideo') return 'shorts';
   return type;
 };
@@ -77,10 +82,23 @@ const resolveCatalogSnapshot = async (type, itemId) => {
         ? await Concert.findOne({ id: numericId }).lean()
         : null;
       break;
+    case 'movieShorts':
+      doc = useNumeric
+        ? await ShortVideo.findOne({ id: numericId }).lean()
+        : null;
+      break;
+    case 'musicshorts':
+      doc = useNumeric
+        ? await MusicShort.findOne({ id: numericId }).lean()
+        : null;
+      break;
     case 'shorts':
       doc = useNumeric
         ? await ShortVideo.findOne({ id: numericId }).lean()
         : null;
+      if (!doc && useNumeric) {
+        doc = await MusicShort.findOne({ id: numericId }).lean();
+      }
       break;
     case 'triller':
       doc = useNumeric

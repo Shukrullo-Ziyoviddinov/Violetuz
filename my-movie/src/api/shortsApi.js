@@ -20,7 +20,7 @@ export const normalizeShortsPayload = (payload) => {
 };
 
 const fetchJson = async (url) => {
-  const res = await fetch(url);
+  const res = await fetch(url, { credentials: 'include' });
   if (!res.ok) {
     throw new Error(`Shorts API error: ${res.status}`);
   }

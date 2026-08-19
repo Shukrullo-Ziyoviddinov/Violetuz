@@ -11,6 +11,8 @@ const WISHLIST_TYPES = Object.freeze([
   'klip',
   'konsert',
   'shorts',
+  'movieShorts',
+  'musicshorts',
   'triller',
 ]);
 
@@ -48,6 +50,7 @@ const wishlistSchema = new mongoose.Schema(
 
 wishlistSchema.index({ userId: 1, type: 1, itemId: 1 }, { unique: true });
 wishlistSchema.index({ userId: 1, createdAt: -1 });
+wishlistSchema.index({ type: 1, itemId: 1 });
 
 wishlistSchema.methods.toClientJSON = function toClientJSON() {
   return {

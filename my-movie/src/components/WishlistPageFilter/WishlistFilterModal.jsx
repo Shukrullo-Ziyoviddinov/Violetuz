@@ -185,6 +185,7 @@ const WishlistFilterModal = ({
             ))}
           </ScrollTouch>
 
+          {panelKind !== 'none' ? (
           <div className="wishlist-filter-panels" aria-live="polite">
             {panelKind === 'movie' ? (
               <WishlistMovieFilters
@@ -204,6 +205,7 @@ const WishlistFilterModal = ({
               />
             ) : null}
           </div>
+          ) : null}
         </div>
 
         <div className="wishlist-filter-modal-footer">

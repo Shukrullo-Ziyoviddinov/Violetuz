@@ -329,3 +329,28 @@
   min-height: inherit;
   border-radius: 50px;
 }
+
+.wishlist-shorts {
+  padding: 0 1rem;
+}
+
+.wishlist-shorts-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.wishlist-shorts .shorts-video-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.wishlist-shorts-save-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}

@@ -17,6 +17,11 @@ import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShortsMovieHead from './ShortsMovieHead';
 import ShortsMusicHead from './ShortsMusicHead';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
+import { formatShortsLikeCount } from '../../utils/utils';
+import {
+  shortsWishlistType,
+  displaySaveCount,
+} from '../../store/slices/wishlistUtils';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import ShortsVideoThumb from './ShortsVideoThumb';
 import './ShortsVideos.css';
@@ -57,6 +62,32 @@ const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
+};
+
+const ShortsSaveButton = ({ item, isInWishlist, onClick }) => {
+  const type = shortsWishlistType(item);
+  const saved = item?.id != null && isInWishlist(item.id, type);
+  const count = displaySaveCount(item?.saveCount, saved);
+  return (
+    <button
+      type="button"
+      className={`shorts-modal-action-btn shorts-modal-save-btn ${saved ? 'active' : ''}`}
+      onClick={onClick}
+      aria-label="Saqlash"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill={saved ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+      </svg>
+      <span className="shorts-modal-action-count">{formatShortsLikeCount(count)}</span>
+    </button>
+  );
 };
 
 const renderShortsModalTitle = (item, contentLang, isMusicSlide = false, onWatchClick) => {
@@ -483,13 +514,9 @@ const ShortsVideos = ({
   const handleShortsSaveClick = useCallback((e) => {
     e.stopPropagation();
     const item = shortsList[activeIndex];
-    if (slideMusic && item?.musicId) {
-      const wishlistType = item?.contentType || 'music';
-      toggleWishlist(item.musicId, wishlistType);
-    } else if (item?.movieId) {
-      toggleWishlist(item.movieId, 'movie');
-    }
-  }, [activeIndex, toggleWishlist, slideMusic, shortsList]);
+    if (item?.id == null) return;
+    toggleWishlist(item.id, shortsWishlistType(item));
+  }, [activeIndex, toggleWishlist, shortsList]);
 
   const getMusicLinkPath = (item) => {
     const ct = item?.contentType;
@@ -498,8 +525,6 @@ const ShortsVideos = ({
     if (ct === 'klip' || ct === 'konsert') return `/music/video/${id}`;
     return `/music/${id}`;
   };
-
-  const getMusicWishlistType = (item) => item?.contentType || 'music';
 
   const getMusicWatchButtonContent = (item) => {
     const ct = item?.contentType || 'music';
@@ -872,16 +897,11 @@ const ShortsVideos = ({
               route: repostShareRoute,
             }}
           />
-          <button
-            type="button"
-            className={`shorts-modal-action-btn shorts-modal-save-btn ${itemMusic ? (isInWishlist(item?.musicId, getMusicWishlistType(item)) ? 'active' : '') : (isInWishlist(item?.movieId, 'movie') ? 'active' : '')}`}
+          <ShortsSaveButton
+            item={item}
+            isInWishlist={isInWishlist}
             onClick={handleShortsSaveClick}
-            aria-label="Saqlash"
-          >
-            <svg viewBox="0 0 24 24" fill={itemMusic ? (isInWishlist(item?.musicId, getMusicWishlistType(item)) ? 'currentColor' : 'none') : (isInWishlist(item?.movieId, 'movie') ? 'currentColor' : 'none')} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-            </svg>
-          </button>
+          />
         </div>
         {renderMusicCornerButton(item, itemMusic, 'shorts-modal-music-corner-mobile')}
           </>
@@ -1168,16 +1188,11 @@ const ShortsVideos = ({
                       route: repostShareRoute,
                     }}
                   />
-                  <button
-                    type="button"
-                    className={`shorts-modal-action-btn shorts-modal-save-btn ${slideMusic ? (isInWishlist(shortsList[activeIndex]?.musicId, getMusicWishlistType(shortsList[activeIndex])) ? 'active' : '') : (isInWishlist(shortsList[activeIndex]?.movieId, 'movie') ? 'active' : '')}`}
+                  <ShortsSaveButton
+                    item={shortsList[activeIndex]}
+                    isInWishlist={isInWishlist}
                     onClick={handleShortsSaveClick}
-                    aria-label="Saqlash"
-                  >
-                    <svg viewBox="0 0 24 24" fill={slideMusic ? (isInWishlist(shortsList[activeIndex]?.musicId, getMusicWishlistType(shortsList[activeIndex])) ? 'currentColor' : 'none') : (isInWishlist(shortsList[activeIndex]?.movieId, 'movie') ? 'currentColor' : 'none')} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                    </svg>
-                  </button>
+                  />
                 </div>
                 {renderMusicCornerButton(shortsList[activeIndex], slideMusic, 'shorts-modal-music-corner-desktop')}
               </div>

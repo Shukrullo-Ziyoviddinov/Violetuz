@@ -2,6 +2,11 @@ import React, { useCallback, useMemo } from 'react';
 import { useWishlist } from '../../context/WishlistContext';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import Repost from '../Repost/Repost';
+import { formatShortsLikeCount } from '../../utils/utils';
+import {
+  shortsWishlistType,
+  displaySaveCount,
+} from '../../store/slices/wishlistUtils';
 
 /**
  * Sharhlar tarixida shorts kartasi — ShortsVideos modal bilan bir xil like / repost / saqlash.
@@ -15,25 +20,27 @@ const ComentariaShortsHeadActions = ({
   repostRoute,
   repostTitle,
   videoSrc,
+  saveCount = 0,
 }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const slideMusic = shortsSource === 'musicshorts';
-  const wishlistType = contentType || 'music';
-  const saveActive = slideMusic && musicId != null
-    ? isInWishlist(musicId, wishlistType)
-    : movieId != null && isInWishlist(movieId, 'movie');
+  const item = {
+    id: shortsId,
+    type: slideMusic ? 'musicshorts' : 'movieShorts',
+    saveCount,
+  };
+  const wishlistType = shortsWishlistType(item);
+  const saveActive = shortsId != null && isInWishlist(shortsId, wishlistType);
+  const shownSaveCount = displaySaveCount(saveCount, saveActive);
 
   const handleSave = useCallback(
     (e) => {
       e.stopPropagation();
-      if (slideMusic && musicId != null) {
-        toggleWishlist(musicId, wishlistType);
-      } else if (movieId != null) {
-        toggleWishlist(movieId, 'movie');
-      }
+      if (shortsId == null) return;
+      toggleWishlist(shortsId, wishlistType);
     },
-    [slideMusic, musicId, movieId, wishlistType, toggleWishlist]
+    [shortsId, wishlistType, toggleWishlist]
   );
 
   const repostItem = useMemo(
@@ -70,6 +77,7 @@ const ComentariaShortsHeadActions = ({
         >
           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
         </svg>
+        <span className="shorts-modal-action-count">{formatShortsLikeCount(shownSaveCount)}</span>
       </button>
     </div>
   );

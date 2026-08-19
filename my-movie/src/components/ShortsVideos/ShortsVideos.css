@@ -1407,6 +1407,11 @@
   fill: currentColor;
 }
 
+.shorts-modal-save-btn .shorts-modal-action-count,
+.shorts-modal-save-btn.active .shorts-modal-action-count {
+  color: #fff;
+}
+
 .shorts-modal-actions-mobile .shorts-modal-action-btn {
   min-width: 44px;
   padding: 6px 4px;
