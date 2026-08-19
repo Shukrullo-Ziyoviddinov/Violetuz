@@ -6,7 +6,7 @@ import * as shortsCommentsApi from '../../api/shortsCommentsApi';
 import { COMMENT_REPLIES_PAGE_SIZE } from '../../api/commentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
-import { formatActionCount } from '../../utils/utils';
+import { formatActionCount, formatCommentTimeAgo } from '../../utils/utils';
 import { sortCommentListByLikes, formatReplyMention } from '../../algo/commentLikeSortAlgo';
 import {
   isCommentsSheetViewport,
@@ -507,7 +507,14 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
           )}
         </div>
         <div className="shorts-comment-body">
-          <span className="shorts-comment-author">{c.authorName}</span>
+          <div className="shorts-comment-meta">
+            <span className="shorts-comment-author">{c.authorName}</span>
+            {c.createdAt ? (
+              <span className="shorts-comment-time">
+                {formatCommentTimeAgo(c.createdAt, i18n.language)}
+              </span>
+            ) : null}
+          </div>
           <p className="shorts-comment-text">
             {mention ? (
               <span className="shorts-comment-mention">{mention} </span>

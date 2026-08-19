@@ -6,7 +6,7 @@ import * as commentsApi from '../../api/commentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { sortCommentListByLikes, formatReplyMention } from '../../algo/commentLikeSortAlgo';
-import { formatActionCount } from '../../utils/utils';
+import { formatActionCount, formatCommentTimeAgo } from '../../utils/utils';
 import {
   isCommentsSheetViewport,
   useCommentsSheetViewport,
@@ -575,7 +575,14 @@ const MovieComments = forwardRef(
             )}
           </div>
           <div className="movie-detail-comment-body">
-            <span className="movie-detail-comment-author">{c.authorName}</span>
+            <div className="movie-detail-comment-meta">
+              <span className="movie-detail-comment-author">{c.authorName}</span>
+              {c.createdAt ? (
+                <span className="movie-detail-comment-time">
+                  {formatCommentTimeAgo(c.createdAt, i18n.language)}
+                </span>
+              ) : null}
+            </div>
             <p className="movie-detail-comment-text">
               {mention ? (
                 <span className="movie-detail-comment-mention">{mention} </span>

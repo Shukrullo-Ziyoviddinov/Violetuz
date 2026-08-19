@@ -250,12 +250,30 @@
   min-width: 0;
 }
 
+.shorts-comment-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+  min-width: 0;
+}
+
 .shorts-comment-author {
   font-size: 0.8rem;
   font-weight: 600;
   color: #fff;
-  display: block;
-  margin-bottom: 0.25rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shorts-comment-time {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
 }
 
 .shorts-comment-text {
