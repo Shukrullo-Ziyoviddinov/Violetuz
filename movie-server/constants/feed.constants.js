@@ -8,8 +8,6 @@ const FEED_TYPES = Object.freeze([
   'music',
   'klip',
   'konsert',
-  'movieShorts',
-  'musicshorts',
 ]);
 
 module.exports = {

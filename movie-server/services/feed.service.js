@@ -5,31 +5,23 @@ const {
   loadActorsByIds,
   loadArtistsByIds,
   fetchMoviesForActor,
-  fetchMovieShortsForActor,
   fetchMusicForArtist,
   fetchClipsForArtist,
   fetchConcertsForArtist,
-  fetchMusicShortsForArtist,
 } = require('./feed/feedQueries');
 const {
   mapMovie,
   mapMusic,
   mapClipOrConcert,
-  mapMovieShort,
-  mapMusicShort,
 } = require('./feed/feedMap');
 
 const matchesCategory = (itemType, category) => {
   if (!category || category === 'all') return true;
-  if (category === 'shorts') {
-    return itemType === 'movieShorts' || itemType === 'musicshorts';
-  }
   return itemType === category;
 };
 
 const parseCategory = (raw) => {
   const v = String(raw || 'all').trim().toLowerCase();
-  if (v === 'shorts' || v === 'short') return 'shorts';
   if (['all', 'movie', 'music', 'klip', 'konsert'].includes(v)) return v;
   return 'all';
 };
@@ -61,7 +53,6 @@ const buildPoolForUser = async (userId, category) => {
   const wantMusic = category === 'all' || category === 'music';
   const wantKlip = category === 'all' || category === 'klip';
   const wantKonsert = category === 'all' || category === 'konsert';
-  const wantShorts = category === 'all' || category === 'shorts';
 
   const tasks = [];
 
@@ -73,13 +64,6 @@ const buildPoolForUser = async (userId, category) => {
     if (wantMovies) {
       tasks.push(
         fetchMoviesForActor(actorId).then((rows) => rows.map((doc) => mapMovie(doc, owner)))
-      );
-    }
-    if (wantShorts) {
-      tasks.push(
-        fetchMovieShortsForActor(actorId).then((rows) =>
-          rows.map((doc) => mapMovieShort(doc, owner))
-        )
       );
     }
   }
@@ -104,13 +88,6 @@ const buildPoolForUser = async (userId, category) => {
       tasks.push(
         fetchConcertsForArtist(artistId).then((rows) =>
           rows.map((doc) => mapClipOrConcert(doc, artist, 'konsert'))
-        )
-      );
-    }
-    if (wantShorts) {
-      tasks.push(
-        fetchMusicShortsForArtist(artistId).then((rows) =>
-          rows.map((doc) => mapMusicShort(doc, artist))
         )
       );
     }
