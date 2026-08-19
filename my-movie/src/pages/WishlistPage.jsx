@@ -738,12 +738,13 @@ const WishlistPage = () => {
       )}
 
       {effectiveTab === 'shorts' && (
-        <div className="wishlist-shorts">
-          <div className="shorts-videos-grid wishlist-shorts-grid">
+        <div className="wishlist-music wishlist-shorts">
+          <div className="wishlist-music-container">
+            <div className="wishlist-music-grid wishlist-shorts-grid">
             {wishlistShorts.map((item) => (
               <div
                 key={`${item.type || 'movieShorts'}-${item.id}`}
-                className="shorts-video-card"
+                className="shorts-video-card wishlist-shorts-card"
                 role="button"
                 tabIndex={0}
                 onClick={() => openWishlistShort(item)}
@@ -769,6 +770,7 @@ const WishlistPage = () => {
                 </button>
               </div>
             ))}
+            </div>
           </div>
         </div>
       )}

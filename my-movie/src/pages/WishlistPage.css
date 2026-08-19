@@ -330,23 +330,20 @@
   border-radius: 50px;
 }
 
-.wishlist-shorts {
-  padding: 0 1rem;
-}
-
 .wishlist-shorts-grid {
-  max-width: 1400px;
-  margin: 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.wishlist-shorts .shorts-video-card {
+.wishlist-shorts-card {
   position: relative;
-  display: block;
-  width: 100%;
-  border: none;
-  padding: 0;
-  background: none;
-  cursor: pointer;
+  border-radius: 12px;
+  border: 1px solid #9b4fe78f;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.wishlist-shorts-card .shorts-video-thumb {
+  aspect-ratio: 1 / 1;
 }
 
 .wishlist-shorts-save-btn {
