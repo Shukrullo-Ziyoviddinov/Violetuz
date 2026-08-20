@@ -808,7 +808,7 @@
 @media (max-width: 450px) {
   .triller-player-title--mobile,
   .triller-side-title--pin {
-    font-size: 1rem;
+    font-size: 18px;
   }
 
   .triller-sticky-bar {

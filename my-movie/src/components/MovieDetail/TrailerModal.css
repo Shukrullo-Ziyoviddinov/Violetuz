@@ -283,6 +283,10 @@
   margin: 0;
 }
 
+.trailer-modal-view-count {
+  margin: 0;
+}
+
 .trailer-modal-controls-actions {
   display: flex;
   gap: 1.5rem;
@@ -1508,7 +1512,7 @@ button.trailer-modal-controls-dislike {
   }
   
   .trailer-modal-controls-title {
-    font-size: 1rem;
+    font-size: 18px;
   }
   
   .trailer-modal-controls-text {

@@ -15,7 +15,9 @@ const TYPE_ALIASES = Object.freeze({
   konsert: 'konsert',
   concert: 'konsert',
   triller: 'triller',
-  trailer: 'triller',
+  /** Kino ichidagi trailer (trailersVideo) — Triller sahifasidan alohida */
+  trailer: 'trailer',
+  movietrailer: 'trailer',
 });
 
 const normalizeType = (raw) => {
@@ -39,6 +41,18 @@ const assertType = (raw) => {
 const normalizeItemId = (id) => {
   if (id == null || id === '') throw badRequest('id majburiy');
   return String(id).trim();
+};
+
+/** itemId: "movieId-trailerId" (LikeButton getTrailerKey bilan bir xil) */
+const parseTrailerItemId = (idStr) => {
+  const parts = String(idStr).split('-');
+  if (parts.length < 2) return null;
+  const movieId = Number(parts[0]);
+  const trailerId = Number(parts[parts.length - 1]);
+  if (!Number.isInteger(movieId) || !Number.isInteger(trailerId)) return null;
+  if (String(movieId) !== parts[0]) return null;
+  if (String(trailerId) !== parts[parts.length - 1]) return null;
+  return { movieId, trailerId };
 };
 
 const assertItemExists = async (type, itemId) => {
@@ -73,6 +87,18 @@ const assertItemExists = async (type, itemId) => {
         ? await Triller.findOne({ id: numericId }).select({ id: 1 }).lean()
         : null;
       break;
+    case 'trailer': {
+      const parsed = parseTrailerItemId(idStr);
+      if (parsed) {
+        doc = await Movie.findOne({
+          id: parsed.movieId,
+          'trailersVideo.id': parsed.trailerId,
+        })
+          .select({ id: 1 })
+          .lean();
+      }
+      break;
+    }
     default:
       break;
   }

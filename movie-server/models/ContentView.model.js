@@ -10,6 +10,7 @@ const VIEW_TYPES = Object.freeze([
   'klip',
   'konsert',
   'triller',
+  'trailer',
 ]);
 
 const contentViewSchema = new mongoose.Schema(
