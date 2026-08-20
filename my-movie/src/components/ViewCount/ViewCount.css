@@ -1,0 +1,12 @@
+/* ViewCount — movie-detail-action-btn stillariga mos, clickable emas */
+.movie-detail-action-btn-views {
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+
+.movie-detail-action-btn-views svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}

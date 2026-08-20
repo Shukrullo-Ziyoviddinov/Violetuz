@@ -16,6 +16,7 @@ import VideoModal from '../VideoModal/VideoModal';
 import ShareButton from '../ShareButton/ShareButton';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import Repost from '../Repost/Repost';
+import ViewCount from '../ViewCount/ViewCount';
 import { formatActionCount } from '../../utils/utils';
 import RatingModal from '../Rating/RatingModal';
 import { formatMovieRating } from '../Rating/CalculateRating';
@@ -1735,6 +1736,7 @@ const MovieDetail = () => {
               </div>
 
               <ScrollTouch className="movie-detail-actions">
+                <ViewCount itemId={movie.id} type="movie" />
                 <LikeButton
                   key={movie.id}
                   variant="movieDetail"
