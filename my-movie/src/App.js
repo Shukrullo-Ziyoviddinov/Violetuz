@@ -42,7 +42,17 @@ import { MusicApiProvider } from './context/MusicApiContext';
 import { store, persistor } from './store/store';
 import './App.css';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Avoid focus storms: ~24 catalog queries were refetching in parallel and
+      // hitting Render's 429 (shown in the browser as a CORS error).
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60_000,
+      retry: 1,
+    },
+  },
+});
 
 function MusicDetailWithKey() {
   return <MusicDetail />;

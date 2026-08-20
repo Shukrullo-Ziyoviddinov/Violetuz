@@ -24,7 +24,9 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(new Error(`CORS blocked for origin: ${origin}`));
+      // Deny without throwing so the request still gets a normal CORS failure
+      // instead of an unhandled error that can omit ACAO headers.
+      return callback(null, false);
     },
     credentials: true,
   })
