@@ -565,6 +565,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                       {selectedTrailer.title?.[contentLang] || selectedTrailer.title?.uz || selectedTrailer.title?.ru || ''}
                     </div>
                     <ViewCount
+                      key={getTrailerKey(selectedTrailer)}
                       itemId={getTrailerKey(selectedTrailer)}
                       type="trailer"
                       variant="text"

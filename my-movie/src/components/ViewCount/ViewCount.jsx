@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { fetchViewCount, recordViewRequest } from '../../api/viewsApi';
@@ -6,7 +6,7 @@ import { formatActionCount } from '../../utils/utils';
 import './ViewCount.css';
 
 /**
- * Umumiy ko‘rishlar komponenti (movie / music / klip / konsert / triller).
+ * Umumiy ko‘rishlar komponenti (movie / music / klip / konsert / triller / trailer).
  * Login user detailga kirganda serverga yozadi; bir user + id = bir marta.
  *
  * variant:
@@ -23,14 +23,9 @@ const ViewCount = ({
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
   const [viewCount, setViewCount] = useState(0);
-  const trackedKeyRef = useRef('');
 
   useEffect(() => {
     if (itemId == null || itemId === '' || !type) return undefined;
-
-    const key = `${type}:${itemId}:${isLoggedIn ? '1' : '0'}`;
-    if (trackedKeyRef.current === key) return undefined;
-    trackedKeyRef.current = key;
 
     let cancelled = false;
 
@@ -44,13 +39,11 @@ const ViewCount = ({
         }
       } catch {
         if (cancelled) return;
-        if (isLoggedIn) {
-          try {
-            const data = await fetchViewCount({ id: itemId, type });
-            if (!cancelled) setViewCount(Number(data?.viewCount) || 0);
-          } catch {
-            /* ignore */
-          }
+        try {
+          const data = await fetchViewCount({ id: itemId, type });
+          if (!cancelled) setViewCount(Number(data?.viewCount) || 0);
+        } catch {
+          /* ignore */
         }
       }
     };

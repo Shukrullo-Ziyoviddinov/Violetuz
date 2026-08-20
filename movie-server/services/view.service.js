@@ -90,12 +90,15 @@ const assertItemExists = async (type, itemId) => {
     case 'trailer': {
       const parsed = parseTrailerItemId(idStr);
       if (parsed) {
-        doc = await Movie.findOne({
-          id: parsed.movieId,
-          'trailersVideo.id': parsed.trailerId,
-        })
-          .select({ id: 1 })
+        const movie = await Movie.findOne({ id: parsed.movieId })
+          .select({ id: 1, trailersVideo: 1 })
           .lean();
+        const list = Array.isArray(movie?.trailersVideo) ? movie.trailersVideo : [];
+        const trailer =
+          list.find((t) => Number(t?.id) === parsed.trailerId) ||
+          list.find((t) => String(t?.id) === String(parsed.trailerId)) ||
+          null;
+        if (movie && trailer) doc = { id: movie.id };
       }
       break;
     }
