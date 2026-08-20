@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { fetchViewCount, recordViewRequest } from '../../api/viewsApi';
 import { formatActionCount } from '../../utils/utils';
@@ -7,13 +8,19 @@ import './ViewCount.css';
 /**
  * Umumiy ko‘rishlar komponenti (movie / music / klip / konsert / triller).
  * Login user detailga kirganda serverga yozadi; bir user + id = bir marta.
+ *
+ * variant:
+ * - "icon"  — ko‘z + son (movie detail)
+ * - "text"  — "1K marta ko'rishlar" (video detail)
  */
 const ViewCount = ({
   itemId,
   type,
-  className = 'movie-detail-action-btn movie-detail-action-btn-views',
+  variant = 'icon',
+  className,
   countFormatter = formatActionCount,
 }) => {
+  const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
   const [viewCount, setViewCount] = useState(0);
   const trackedKeyRef = useRef('');
@@ -37,7 +44,6 @@ const ViewCount = ({
         }
       } catch {
         if (cancelled) return;
-        // Record xato bo‘lsa ham sonni ko‘rsatishga urinish
         if (isLoggedIn) {
           try {
             const data = await fetchViewCount({ id: itemId, type });
@@ -57,11 +63,26 @@ const ViewCount = ({
 
   if (itemId == null || itemId === '' || !type) return null;
 
+  const formatted = countFormatter(viewCount);
+
+  if (variant === 'text') {
+    const label = t('views.times', { count: formatted });
+    return (
+      <div
+        className={className || 'view-count-text'}
+        role="status"
+        aria-label={label}
+      >
+        {label}
+      </div>
+    );
+  }
+
   return (
     <div
-      className={className}
+      className={className || 'movie-detail-action-btn movie-detail-action-btn-views'}
       role="status"
-      aria-label={`Ko‘rishlar: ${viewCount}`}
+      aria-label={`Ko‘rishlar: ${formatted}`}
       title="Ko‘rishlar"
     >
       <svg
@@ -78,7 +99,7 @@ const ViewCount = ({
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
         <circle cx="12" cy="12" r="3" />
       </svg>
-      <span className="movie-detail-action-count">{countFormatter(viewCount)}</span>
+      <span className="movie-detail-action-count">{formatted}</span>
     </div>
   );
 };

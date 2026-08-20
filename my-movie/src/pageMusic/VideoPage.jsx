@@ -10,6 +10,7 @@ import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import LikeButton from '../Music/LikeButton/LikeButton';
 import Repost from '../components/Repost/Repost';
+import ViewCount from '../components/ViewCount/ViewCount';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
 import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenreFilter';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
@@ -345,6 +346,14 @@ const VideoPage = () => {
                   </>
                 )}
               </div>
+
+              {!showInfoSkeleton && video?.id != null && (
+                <ViewCount
+                  itemId={video.id}
+                  type={wishlistType}
+                  variant="text"
+                />
+              )}
 
               <div
                 className="video-detail-actions"

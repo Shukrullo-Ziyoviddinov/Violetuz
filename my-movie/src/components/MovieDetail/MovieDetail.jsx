@@ -1736,7 +1736,6 @@ const MovieDetail = () => {
               </div>
 
               <ScrollTouch className="movie-detail-actions">
-                <ViewCount itemId={movie.id} type="movie" />
                 <LikeButton
                   key={movie.id}
                   variant="movieDetail"
@@ -1763,6 +1762,8 @@ const MovieDetail = () => {
                   </svg>
                   <span className="movie-detail-action-count">{formatActionCount(commentsCount)}</span>
                 </button>
+
+                <ViewCount itemId={movie.id} type="movie" />
 
                 <button
                   className="movie-detail-action-btn movie-detail-action-btn-rate"
