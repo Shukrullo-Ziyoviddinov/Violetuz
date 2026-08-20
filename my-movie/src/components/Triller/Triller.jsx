@@ -12,6 +12,7 @@ import MediaGenreFilter from './MediaGenreFilter';
 import TrillerMetaRow from './TrillerMetaRow';
 import TrillerDescription from './TrillerDescription';
 import MovieComments from '../MovieDetail/MovieComments';
+import ViewCount from '../ViewCount/ViewCount';
 import './Triller.css';
 
 const MOBILE_MAX = 900;
@@ -562,14 +563,24 @@ const Triller = ({ activeId }) => {
             </div>
           </div>
           <div className="triller-primary-info">
-            {showLoading ? (
-              <SkeletonLoader
-                variant="triller-player-title"
-                className="triller-player-title triller-player-title--desktop"
-              />
-            ) : title ? (
-              <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
-            ) : null}
+            <div className="triller-heading triller-heading--desktop">
+              {showLoading ? (
+                <SkeletonLoader
+                  variant="triller-player-title"
+                  className="triller-player-title triller-player-title--desktop"
+                />
+              ) : title ? (
+                <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
+              ) : null}
+              {!showLoading && activeTriller?.id != null ? (
+                <ViewCount
+                  itemId={activeTriller.id}
+                  type="triller"
+                  variant="text"
+                  className="view-count-text triller-view-count"
+                />
+              ) : null}
+            </div>
             <TrillerMetaRow
               className="triller-meta-row--desktop"
               loading={showLoading}
@@ -611,14 +622,24 @@ const Triller = ({ activeId }) => {
           onTouchCancel={showLoading ? undefined : handleSheetTouchEnd}
         >
           <div ref={mobileTitleRef} className="triller-scroll-head">
-            {showLoading ? (
-              <SkeletonLoader
-                variant="triller-player-title"
-                className="triller-player-title triller-player-title--mobile"
-              />
-            ) : title ? (
-              <h1 className="triller-player-title triller-player-title--mobile">{title}</h1>
-            ) : null}
+            <div className="triller-heading triller-heading--mobile">
+              {showLoading ? (
+                <SkeletonLoader
+                  variant="triller-player-title"
+                  className="triller-player-title triller-player-title--mobile"
+                />
+              ) : title ? (
+                <h1 className="triller-player-title triller-player-title--mobile">{title}</h1>
+              ) : null}
+              {!showLoading && activeTriller?.id != null ? (
+                <ViewCount
+                  itemId={activeTriller.id}
+                  type="triller"
+                  variant="text"
+                  className="view-count-text triller-view-count"
+                />
+              ) : null}
+            </div>
 
             <TrillerMetaRow
               className="triller-meta-row--mobile"

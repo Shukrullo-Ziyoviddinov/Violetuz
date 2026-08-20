@@ -44,6 +44,21 @@
   min-width: 0;
 }
 
+.triller-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.triller-heading--mobile {
+  display: none;
+}
+
+.triller-view-count {
+  margin: 0;
+}
+
 .triller-description--mobile {
   display: none;
 }
@@ -663,9 +678,19 @@
     top: auto !important;
     font-size: 1.15rem;
     margin: 0;
-    padding: 0.75rem 0 0.5rem;
+    padding: 0.75rem 0 0;
     background: #000;
     max-width: 100%;
+  }
+
+  .triller-heading--mobile {
+    display: flex;
+    padding-bottom: 0.5rem;
+    background: #000;
+  }
+
+  .triller-heading--mobile .triller-view-count {
+    padding-bottom: 0;
   }
 
   .triller-scroll-head {
