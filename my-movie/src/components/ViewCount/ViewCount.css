@@ -11,7 +11,14 @@
   flex-shrink: 0;
 }
 
-/* Video detail (klip / konsert) — matn variant */
+/* Video detail (klip / konsert) / triller — matn variant */
+.view-count-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .view-count-text {
   margin: 0;
   font-size: 0.9rem;

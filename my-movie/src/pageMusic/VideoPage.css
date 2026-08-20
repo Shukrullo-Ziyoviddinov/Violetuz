@@ -108,12 +108,6 @@ body.video-detail-page-active {
   gap: 1rem;
 }
 
-.video-detail-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
 .video-detail-player-wrap {
   position: relative;
   width: 100%;

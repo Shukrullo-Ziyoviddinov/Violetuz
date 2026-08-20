@@ -563,7 +563,7 @@ const Triller = ({ activeId }) => {
             </div>
           </div>
           <div className="triller-primary-info">
-            <div className="triller-heading triller-heading--desktop">
+            <div className="triller-heading triller-heading--desktop view-count-heading">
               {showLoading ? (
                 <SkeletonLoader
                   variant="triller-player-title"
@@ -622,7 +622,7 @@ const Triller = ({ activeId }) => {
           onTouchCancel={showLoading ? undefined : handleSheetTouchEnd}
         >
           <div ref={mobileTitleRef} className="triller-scroll-head">
-            <div className="triller-heading triller-heading--mobile">
+            <div className="triller-heading triller-heading--mobile view-count-heading">
               {showLoading ? (
                 <SkeletonLoader
                   variant="triller-player-title"

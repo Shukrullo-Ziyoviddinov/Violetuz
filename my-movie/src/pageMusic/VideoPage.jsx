@@ -329,7 +329,7 @@ const VideoPage = () => {
           >
             <div className="video-detail-main-scroll" ref={mainScrollRef}>
               <div className="video-detail-top">
-              <div className="video-detail-heading">
+              <div className="video-detail-heading view-count-heading">
               <div
                 className={`video-detail-info${showInfoSkeleton ? ' video-detail-info--skeleton' : ''}`}
                 aria-busy={showInfoSkeleton || undefined}
