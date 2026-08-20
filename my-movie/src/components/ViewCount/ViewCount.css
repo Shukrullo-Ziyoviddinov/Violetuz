@@ -13,10 +13,10 @@
 
 /* Video detail (klip / konsert) — matn variant */
 .view-count-text {
-  margin: 0.35rem 0 0;
+  margin: 0;
   font-size: 0.9rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.65);
-  line-height: 1.3;
+  line-height: 1.2;
   user-select: none;
 }
