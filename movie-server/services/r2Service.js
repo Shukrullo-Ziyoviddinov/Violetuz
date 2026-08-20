@@ -14,6 +14,12 @@ const { badRequest, createHttpError } = require('../utils/errors');
 /** Default: presigned PUT expires in 10 minutes */
 const DEFAULT_PRESIGN_EXPIRES_IN = 600;
 
+/**
+ * Object keys are UUID-unique (never overwritten), so immutable CDN cache is safe.
+ * Client PUT must send this exact header — it is part of the presign signature.
+ */
+const OBJECT_CACHE_CONTROL = 'public, max-age=31536000, immutable';
+
 const ALLOWED_CONTENT_TYPES = Object.freeze([
   'image/jpeg',
   'image/png',
@@ -200,6 +206,7 @@ const putObject = async ({ key, body, contentType }) => {
         Key: objectKey,
         Body: body,
         ContentType: contentType || 'application/octet-stream',
+        CacheControl: OBJECT_CACHE_CONTROL,
       })
     );
   } catch (err) {
@@ -358,6 +365,7 @@ const createPresignedUpload = async ({
     Bucket: R2_BUCKET_NAME,
     Key: key,
     ContentType: safeContentType,
+    CacheControl: OBJECT_CACHE_CONTROL,
   });
 
   let uploadUrl;
@@ -376,6 +384,7 @@ const createPresignedUpload = async ({
     expiresIn: ttl,
     headers: {
       'Content-Type': safeContentType,
+      'Cache-Control': OBJECT_CACHE_CONTROL,
     },
   };
 };

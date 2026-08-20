@@ -12,6 +12,7 @@ import ShortsPickerModal from './ShortsPickerModal';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { OPEN_SEARCH_EVENT } from '../../searchModalBridge';
 import { useAuth } from '../../context/AuthContext';
+import UserAvatar from '../UserAvatar/UserAvatar';
 import './NavbarMobile.css';
 
 const NavbarMobile = () => {
@@ -100,15 +101,11 @@ const NavbarMobile = () => {
           }}
           aria-label={t('navbar.mobileProfile')}
         >
-          {profile?.avatar ? (
-            <img
-              src={profile.avatar}
-              alt=""
-              className="navbar-user-avatar navbar-user-avatar--mobile"
-            />
-          ) : (
-            <i className="fa-solid fa-user" aria-hidden="true" />
-          )}
+          <UserAvatar
+            src={profile?.avatar}
+            className="navbar-user-avatar navbar-user-avatar--mobile"
+            fallback={<i className="fa-solid fa-user" aria-hidden="true" />}
+          />
           <span>{t('navbar.mobileProfile')}</span>
         </button>
       </nav>

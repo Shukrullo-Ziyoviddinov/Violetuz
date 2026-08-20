@@ -27,6 +27,7 @@ import { setProfileInfoMenuHandler, clearProfileInfoMenuHandler } from '../profi
 import { requestOpenAuthModal } from '../authModalBridge';
 import { normalizeUsername } from '../store/slices/userUtils';
 import { useImageReady } from '../utils/useImageReady';
+import UserAvatar from '../components/UserAvatar/UserAvatar';
 import './ProfilePage.css';
 
 const REPOST_EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
@@ -113,7 +114,6 @@ const ProfilePage = () => {
   const { profile, updateProfile, setAuthSession, isLoggedIn, authReady } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddAccountModal, setShowAddAccountModal] = useState(false);
-  const [avatarImgFailed, setAvatarImgFailed] = useState(false);
   const [showLangModal, setShowLangModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
@@ -126,10 +126,6 @@ const ProfilePage = () => {
   const { allArtists } = useMusicApi();
   const repostItems = useRepostItems();
   const [repostFilter, setRepostFilter] = useState('all');
-
-  useEffect(() => {
-    setAvatarImgFailed(false);
-  }, [profile.avatar]);
 
   useEffect(() => {
     if (!authReady) return;
@@ -287,29 +283,24 @@ const ProfilePage = () => {
             <div className="profile-page-top">
               <>
               <div className="profile-avatar-wrap" aria-hidden="true">
-                {profile.avatar && !avatarImgFailed ? (
-                  <img
-                    src={profile.avatar}
-                    alt=""
-                    className="profile-avatar-img"
-                    referrerPolicy="no-referrer"
-                    decoding="async"
-                    onError={() => setAvatarImgFailed(true)}
-                  />
-                ) : (
-                  <svg
-                    className="profile-avatar-icon"
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                )}
+                <UserAvatar
+                  src={profile.avatar}
+                  className="profile-avatar-img"
+                  fallback={
+                    <svg
+                      className="profile-avatar-icon"
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  }
+                />
               </div>
               <div className="profile-info">
                 <div className="profile-name-row">

@@ -14,6 +14,7 @@ import { requestOpenMessagesModal } from '../../messagesModalBridge';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { requestOpenSearchModal } from '../../searchModalBridge';
 import { useAuth } from '../../context/AuthContext';
+import UserAvatar from '../UserAvatar/UserAvatar';
 import ShortsPickerModal from './ShortsPickerModal';
 import './Navbar.css';
 
@@ -242,15 +243,11 @@ const Navbar = () => {
             }}
             aria-label={t('navbar.profile')}
           >
-            {profile?.avatar ? (
-              <img
-                src={profile.avatar}
-                alt=""
-                className="navbar-user-avatar"
-              />
-            ) : (
-              <i className="fa-solid fa-user" aria-hidden="true" />
-            )}
+            <UserAvatar
+              src={profile?.avatar}
+              className="navbar-user-avatar"
+              fallback={<i className="fa-solid fa-user" aria-hidden="true" />}
+            />
           </button>
 
           <div className="navbar-language-wrapper" ref={languageWrapperRef}>

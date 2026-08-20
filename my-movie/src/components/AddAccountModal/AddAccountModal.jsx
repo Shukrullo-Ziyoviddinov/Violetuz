@@ -10,6 +10,7 @@ import {
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { normalizeUsername } from '../../store/slices/userUtils';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import UserAvatar from '../UserAvatar/UserAvatar';
 import './AddAccountModal.css';
 
 const CLOSE_MS = 340;
@@ -248,31 +249,24 @@ const AddAccountModal = ({ onClose }) => {
                   disabled={Boolean(busyId) || exiting}
                 >
                   <div className="add-account-avatar" aria-hidden="true">
-                    {account.avatar ? (
-                      <img
-                        src={account.avatar}
-                        alt=""
-                        className="add-account-avatar-img"
-                        referrerPolicy="no-referrer"
-                        decoding="async"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <svg
-                        className="add-account-avatar-placeholder"
-                        width="28"
-                        height="28"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    )}
+                    <UserAvatar
+                      src={account.avatar}
+                      className="add-account-avatar-img"
+                      fallback={
+                        <svg
+                          className="add-account-avatar-placeholder"
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      }
+                    />
                   </div>
                   <div className="add-account-meta">
                     <span className="add-account-name">{account.name || 'Foydalanuvchi'}</span>
