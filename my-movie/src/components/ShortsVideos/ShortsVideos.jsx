@@ -885,7 +885,11 @@ const ShortsVideos = ({
             </svg>
             {shortsCommentCount > 0 && <span className="shorts-modal-action-count">{shortsCommentCount}</span>}
           </button>
-          <ShortsShare shortItem={item} />
+          <ShortsShare
+            shortItem={item}
+            shortType={itemMusic ? 'musicshorts' : 'movieShorts'}
+            sharePath={`${itemMusic ? '/music/shorts' : '/shorts'}?shortId=${item?.id}`}
+          />
           <Repost
             className="shorts-modal-action-btn"
             item={{
@@ -1177,7 +1181,11 @@ const ShortsVideos = ({
                     </svg>
                     {shortsCommentCount > 0 && <span className="shorts-modal-action-count">{shortsCommentCount}</span>}
                   </button>
-                  <ShortsShare shortItem={shortsList[activeIndex]} />
+                  <ShortsShare
+                    shortItem={shortsList[activeIndex]}
+                    shortType={slideMusic ? 'musicshorts' : 'movieShorts'}
+                    sharePath={`${slideMusic ? '/music/shorts' : '/shorts'}?shortId=${shortsList[activeIndex]?.id}`}
+                  />
                   <Repost
                     className="shorts-modal-action-btn"
                     item={{

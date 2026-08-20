@@ -2,21 +2,30 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { getShareUrl } from '../../config/api';
+import { recordShortShareRequest } from '../../api/shortSharesApi';
+import { formatShortsLikeCount } from '../../utils/utils';
 import './ShortsShare.css';
 
 const MOBILE_BREAKPOINT = 768;
 const DRAG_THRESHOLD = 8;
 
-const ShortsShare = ({ shortItem, onOpenChange }) => {
+const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenChange }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { isLoggedIn } = useAuth();
   const [isShortsShareOpen, setIsShortsShareOpen] = useState(false);
   const [isShortsMobileView, setIsShortsMobileView] = useState(false);
   const [isShortsDragging, setIsShortsDragging] = useState(false);
   const [shortsModalTranslateY, setShortsModalTranslateY] = useState(0);
+  const [extraShareCount, setExtraShareCount] = useState(0);
   const shortsDropdownRef = useRef(null);
   const shortsModalRef = useRef(null);
+
+  useEffect(() => {
+    setExtraShareCount(0);
+  }, [shortItem?.id, shortItem?.shareCount]);
 
   useEffect(() => {
     const check = () => setIsShortsMobileView(window.innerWidth <= MOBILE_BREAKPOINT);
@@ -33,13 +42,15 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
     return shortItem.title || '';
   };
 
-  const shortsSharePath = shortItem ? `/shorts?shortId=${shortItem.id}` : '/shorts';
+  const fallbackPath = shortType === 'musicshorts' ? '/music/shorts' : '/shorts';
+  const shortsSharePath = sharePath || (shortItem ? `${fallbackPath}?shortId=${shortItem.id}` : fallbackPath);
   const shortsShareUrl = getShareUrl(shortsSharePath);
   const shortsShareText = getShortsTitle();
 
   const shortsShareLinks = [
     {
       name: 'Telegram',
+      channel: 'telegram',
       url: `https://t.me/share/url?url=${encodeURIComponent(shortsShareUrl)}&text=${encodeURIComponent(shortsShareText)}`,
       icon: (
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -49,6 +60,7 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
     },
     {
       name: 'WhatsApp',
+      channel: 'whatsapp',
       url: `https://wa.me/?text=${encodeURIComponent(shortsShareText + ' ' + shortsShareUrl)}`,
       icon: (
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -58,6 +70,7 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
     },
     {
       name: 'Facebook',
+      channel: 'facebook',
       url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shortsShareUrl)}`,
       icon: (
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -67,6 +80,7 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
     },
     {
       name: 'Twitter',
+      channel: 'twitter',
       url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shortsShareUrl)}&text=${encodeURIComponent(shortsShareText)}`,
       icon: (
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -144,8 +158,20 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
     return () => el.removeEventListener('touchmove', handleShortsTouchMove);
   }, [isShortsShareOpen, isShortsMobileView, handleShortsTouchMove]);
 
-  const handleShortsShare = (url) => {
+  const handleShortsShare = (url, channel) => {
     window.open(url, '_blank', 'width=600,height=400');
+
+    if (isLoggedIn && shortItem?.id != null) {
+      setExtraShareCount((n) => n + 1);
+      recordShortShareRequest({
+        id: shortItem.id,
+        type: shortType,
+        channel,
+      }).catch(() => {
+        setExtraShareCount((n) => Math.max(0, n - 1));
+      });
+    }
+
     closeShortsShareModal();
   };
 
@@ -160,6 +186,8 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
 
   if (!shortItem) return null;
 
+  const shownShareCount = (Number(shortItem.shareCount) || 0) + extraShareCount;
+
   const renderShortsShareContent = () => (
     <>
       <div className="shorts-share-drag-zone">
@@ -173,7 +201,7 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
           <button
             key={link.name}
             className="shorts-share-item"
-            onClick={() => handleShortsShare(link.url)}
+            onClick={() => handleShortsShare(link.url, link.channel)}
           >
             <span className="shorts-share-icon">{link.icon}</span>
             <span>{link.name}</span>
@@ -195,6 +223,7 @@ const ShortsShare = ({ shortItem, onOpenChange }) => {
           <line x1="22" y1="2" x2="11" y2="13" />
           <polygon points="22 2 15 22 11 13 2 9 22 2" />
         </svg>
+        <span className="shorts-modal-action-count">{formatShortsLikeCount(shownShareCount)}</span>
       </button>
 
       {isShortsShareOpen && createPortal(

@@ -1411,7 +1411,8 @@
 .shorts-modal-save-btn .shorts-modal-action-count,
 .shorts-modal-save-btn.active .shorts-modal-action-count,
 .repost-btn.shorts-modal-action-btn .shorts-modal-action-count,
-.repost-btn.shorts-modal-action-btn.active .shorts-modal-action-count {
+.repost-btn.shorts-modal-action-btn.active .shorts-modal-action-count,
+.shorts-share-wrapper .shorts-share-trigger-btn .shorts-modal-action-count {
   color: #fff;
 }
 
