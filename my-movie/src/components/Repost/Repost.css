@@ -25,6 +25,11 @@
   color: #9b4fe7;
 }
 
+.shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn .shorts-modal-action-count,
+.shorts-modal-actions-sidebar .repost-btn.shorts-modal-action-btn.active .shorts-modal-action-count {
+  color: #fff;
+}
+
 /* Movie detail action tugmalari bilan bir xil ko'rinish */
 .movie-detail-actions .repost-btn.movie-detail-action-btn {
   background: rgba(45, 45, 50, 0.3);

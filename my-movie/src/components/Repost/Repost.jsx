@@ -3,6 +3,8 @@ import { useIsReposted, useReposts } from '../../context/RepostsContext';
 import { store } from '../../store/store';
 import { selectRepostItems, toggleRepost } from '../../store/slices/repostsSlice';
 import { isRepostedInList } from '../../store/slices/repostsUtils';
+import { formatShortsLikeCount } from '../../utils/utils';
+import { displaySaveCount } from '../../store/slices/wishlistUtils';
 import './Repost.css';
 
 export { normalizeRepostId, normalizeRepostType, REPOST_ENTITY_TYPES } from './repostTypes';
@@ -30,9 +32,12 @@ const RepostIconOutline = () => (
 const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Repost', label = null }) => {
   const { toggleRepost: dispatchToggle } = useReposts();
   const active = useIsReposted(item?.id, item?.type);
+  const isShortsAction = className.includes('shorts-modal-action-btn');
   const useOutlineIcon =
-    className.includes('shorts-modal-action-btn') ||
-    className.includes('video-detail-repost-btn');
+    isShortsAction || className.includes('video-detail-repost-btn');
+  const shortsRepostCount = isShortsAction
+    ? displaySaveCount(item?.repostCount, active)
+    : null;
 
   const handleClick = useCallback(
     (e) => {
@@ -51,6 +56,9 @@ const Repost = ({ item, className = '', stopPropagation = true, ariaLabel = 'Rep
       title="Repost"
     >
       {useOutlineIcon ? <RepostIconOutline /> : <i className="fa-solid fa-repeat" aria-hidden="true" />}
+      {shortsRepostCount != null ? (
+        <span className="shorts-modal-action-count">{formatShortsLikeCount(shortsRepostCount)}</span>
+      ) : null}
       {label ? <span className="repost-btn-label">{label}</span> : null}
     </button>
   );

@@ -895,6 +895,7 @@ const ShortsVideos = ({
               image: '/img/movie1.jpg',
               videoUrl: getVideo(item),
               route: repostShareRoute,
+              repostCount: item.repostCount,
             }}
           />
           <ShortsSaveButton
@@ -1186,6 +1187,7 @@ const ShortsVideos = ({
                       image: '/img/movie1.jpg',
                       videoUrl: getVideo(shortsList[activeIndex]),
                       route: repostShareRoute,
+                      repostCount: shortsList[activeIndex]?.repostCount,
                     }}
                   />
                   <ShortsSaveButton

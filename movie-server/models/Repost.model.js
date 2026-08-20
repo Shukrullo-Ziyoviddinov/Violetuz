@@ -60,6 +60,7 @@ const repostSchema = new mongoose.Schema(
 repostSchema.index({ userId: 1, type: 1, itemId: 1 }, { unique: true });
 repostSchema.index({ userId: 1, createdAt: -1 });
 repostSchema.index({ userId: 1, type: 1, createdAt: -1 });
+repostSchema.index({ type: 1, itemId: 1 });
 
 module.exports = mongoose.model('Repost', repostSchema);
 module.exports.REPOST_TYPES = REPOST_TYPES;
