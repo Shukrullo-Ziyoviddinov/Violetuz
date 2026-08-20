@@ -564,15 +564,15 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                     <div className="trailer-modal-controls-title">
                       {selectedTrailer.title?.[contentLang] || selectedTrailer.title?.uz || selectedTrailer.title?.ru || ''}
                     </div>
-                    <div className="trailer-modal-controls-text">
-                      {selectedTrailer.text?.[contentLang] || selectedTrailer.text?.uz || selectedTrailer.text?.ru || ''}
-                    </div>
                     <ViewCount
                       itemId={getTrailerKey(selectedTrailer)}
                       type="trailer"
                       variant="text"
                       className="view-count-text trailer-modal-view-count"
                     />
+                    <div className="trailer-modal-controls-text">
+                      {selectedTrailer.text?.[contentLang] || selectedTrailer.text?.uz || selectedTrailer.text?.ru || ''}
+                    </div>
                     <div className="trailer-modal-controls-actions">
                       <LikeButton
                         key={getTrailerKey(selectedTrailer) || 'trailer'}
