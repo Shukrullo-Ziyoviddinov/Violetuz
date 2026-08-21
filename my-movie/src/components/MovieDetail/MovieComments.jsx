@@ -93,6 +93,7 @@ const CAROUSEL_MS = 4000;
  * komment yo‘q → input; bor → list (input yashirin), list bosilsa modal; more-btn yo‘q; titleda son.
  * Desktop o‘zgarmaydi.
  * targetType: movie | triller | klip | konsert (ixtiyoriy; movieId prefiksidan ham aniqlanadi)
+ * modalOnly — faqat modal (inline preview yo‘q); tashqi tugma orqali openModal()
  */
 const MovieComments = forwardRef(
   (
@@ -102,6 +103,7 @@ const MovieComments = forwardRef(
       onCountChange,
       previewLimit = PREVIEW_LIMIT_DEFAULT,
       mobileSheetUi = false,
+      modalOnly = false,
     },
     ref
   ) => {
@@ -666,6 +668,7 @@ const MovieComments = forwardRef(
 
     return (
       <>
+        {!modalOnly ? (
         <div
           className={`movie-detail-comments${sheetMobile ? ' movie-detail-comments--sheet-mobile' : ''}`}
         >
@@ -778,6 +781,7 @@ const MovieComments = forwardRef(
             </button>
           ) : null}
         </div>
+        ) : null}
 
         {showCommentsModal &&
           createPortal(

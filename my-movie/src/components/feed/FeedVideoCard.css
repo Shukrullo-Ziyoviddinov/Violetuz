@@ -192,6 +192,44 @@
   height: 0.72rem;
 }
 
+.feed-video-comment-button {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 26px;
+  padding: 0 0.45rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 500;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.feed-video-comment-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.03);
+}
+
+.feed-video-comment-button:active {
+  transform: scale(0.98);
+}
+
+.feed-video-comment-button svg {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex-shrink: 0;
+}
+
+.feed-video-comment-count {
+  line-height: 1;
+}
+
 .feed-video-share-wrapper.share-button-wrapper {
   position: relative;
   top: auto;
