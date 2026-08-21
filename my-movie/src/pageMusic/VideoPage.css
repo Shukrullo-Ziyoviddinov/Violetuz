@@ -686,16 +686,16 @@ body.video-detail-page-active {
 }
 
 .video-detail-trend-card-likes .like-button-icon-wrap {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .video-detail-trend-card-likes .like-button-icon-wrap svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   display: block;
 }
 
