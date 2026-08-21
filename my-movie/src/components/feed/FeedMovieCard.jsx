@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import LikeButton from '../../Music/LikeButton/LikeButton';
+import ShareButton from '../ShareButton/ShareButton';
 import { useWishlist } from '../../context/WishlistContext';
 import { formatActionCount } from '../../utils/utils';
 import './FeedMovieCard.css';
@@ -9,9 +10,10 @@ const FeedMovieCard = ({ item }) => {
   const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const saved = isInWishlist(item.movieId, 'movie');
+  const movieRoute = `/movie/${item.movieId}`;
 
   return (
-    <div className="feed-movie-card" onClick={() => navigate(`/movie/${item.movieId}`)} role="button" tabIndex={0}>
+    <div className="feed-movie-card" onClick={() => navigate(movieRoute)} role="button" tabIndex={0}>
       <div className="feed-movie-card-profile">
         <img src={item.actorImage} alt={item.actorName} className="feed-movie-card-avatar" />
         <div className="feed-movie-card-profile-text">
@@ -34,12 +36,20 @@ const FeedMovieCard = ({ item }) => {
               category: item.type || 'movie',
               title: item.title || '',
               image: item.cover || '',
-              route: `/movie/${item.movieId}`,
+              route: movieRoute,
             }}
             initialLikeCount={item.like}
             initialDislikeCount={item.dislike}
             countFormatter={formatActionCount}
             stopPropagation
+          />
+          <ShareButton
+            movie={{ title: item.title || '' }}
+            sharePath={movieRoute}
+            icon="send"
+            dropdownInPortal
+            className="feed-movie-share-wrapper"
+            buttonClassName="feed-movie-share-button"
           />
         </div>
         <button

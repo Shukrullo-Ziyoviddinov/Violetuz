@@ -85,7 +85,7 @@
 }
 
 .feed-movie-like-button.like-button {
-  margin-right: auto;
+  margin-right: 0;
 }
 
 .feed-movie-like-button .like-button-btn {
@@ -96,6 +96,44 @@
 }
 
 .feed-movie-like-button .like-button-icon-wrap svg {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
+.feed-movie-share-wrapper.share-button-wrapper {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.feed-movie-share-button.share-button {
+  width: auto;
+  height: 26px;
+  min-width: 0;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: none;
+  box-sizing: border-box;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.feed-movie-share-button.share-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.03);
+  border-color: transparent;
+}
+
+.feed-movie-share-button.share-button:active {
+  transform: scale(0.98);
+}
+
+.feed-movie-share-button.share-button svg {
   width: 0.72rem;
   height: 0.72rem;
 }
