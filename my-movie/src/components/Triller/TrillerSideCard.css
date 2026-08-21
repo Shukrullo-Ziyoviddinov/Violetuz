@@ -118,7 +118,7 @@
 .triller-side-card-likes .trailer-modal-controls-like,
 .triller-side-card-likes .trailer-modal-controls-dislike {
   min-height: 28px;
-  padding: 0.2rem 0.45rem;
+  padding: 0.25rem 0.1rem;
   font-size: 0.75rem;
   gap: 0.25rem;
 }

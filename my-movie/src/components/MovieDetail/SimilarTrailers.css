@@ -220,7 +220,7 @@ button.similar-trailer-dislike {
   font-family: inherit;
   transition: color 0.3s ease, background 0.3s ease;
   cursor: pointer;
-  padding: 0.12rem 0.28rem;
+  padding: 0.12rem 0.1rem;
   border-radius: 4px;
   border: none;
   background: transparent;
