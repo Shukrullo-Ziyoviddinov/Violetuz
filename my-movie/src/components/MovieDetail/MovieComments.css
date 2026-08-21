@@ -394,14 +394,14 @@
   z-index: 9998;
   opacity: 0;
   visibility: hidden;
-  pointer-events: none;
+  /* Mount qilingan paytda (yopilish animatsiyasi ham) orqa clicklarni ushlab turadi */
+  pointer-events: auto;
   transition: opacity 0.34s ease, visibility 0.34s ease;
 }
 
 .movie-detail-comments-modal-overlay.is-open {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
 }
 
 .movie-detail-comments-modal {

@@ -790,9 +790,15 @@ const MovieComments = forwardRef(
                 className={`movie-detail-comments-modal-overlay${
                   commentsModalOpen && !isDismissingModal ? ' is-open' : ''
                 }`}
-                onClick={() => {
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   if (!canCloseFromOverlay()) return;
                   closeModal();
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                 }}
               />
               <div
