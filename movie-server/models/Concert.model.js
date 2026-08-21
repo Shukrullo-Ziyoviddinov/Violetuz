@@ -74,6 +74,7 @@ const concertSchema = new mongoose.Schema(
     strict: true,
     collection: 'concerts',
     versionKey: false,
+    timestamps: true,
   }
 );
 

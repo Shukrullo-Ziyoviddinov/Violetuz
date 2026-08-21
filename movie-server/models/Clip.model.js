@@ -74,6 +74,7 @@ const clipSchema = new mongoose.Schema(
     strict: true,
     collection: 'clips',
     versionKey: false,
+    timestamps: true,
   }
 );
 

@@ -11,6 +11,7 @@ import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import LikeButton from '../Music/LikeButton/LikeButton';
 import Repost from '../components/Repost/Repost';
 import ViewCount from '../components/ViewCount/ViewCount';
+import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
 import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenreFilter';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
@@ -349,11 +350,14 @@ const VideoPage = () => {
               </div>
 
               {!showInfoSkeleton && video?.id != null && (
-                <ViewCount
-                  itemId={video.id}
-                  type={wishlistType}
-                  variant="text"
-                />
+                <div className="view-count-meta-row">
+                  <ViewCount
+                    itemId={video.id}
+                    type={wishlistType}
+                    variant="text"
+                  />
+                  <UploadedAtTime at={video.createdAt || video.uploadedAt} />
+                </div>
               )}
               </div>
 

@@ -87,6 +87,7 @@ const trillerSchema = new mongoose.Schema(
     strict: true,
     collection: 'trillers',
     versionKey: false,
+    timestamps: true,
   }
 );
 

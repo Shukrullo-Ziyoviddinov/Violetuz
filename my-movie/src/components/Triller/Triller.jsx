@@ -13,6 +13,7 @@ import TrillerMetaRow from './TrillerMetaRow';
 import TrillerDescription from './TrillerDescription';
 import MovieComments from '../MovieDetail/MovieComments';
 import ViewCount from '../ViewCount/ViewCount';
+import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import './Triller.css';
 
 const MOBILE_MAX = 900;
@@ -573,12 +574,15 @@ const Triller = ({ activeId }) => {
                 <h1 className="triller-player-title triller-player-title--desktop">{title}</h1>
               ) : null}
               {!showLoading && activeTriller?.id != null ? (
-                <ViewCount
-                  itemId={activeTriller.id}
-                  type="triller"
-                  variant="text"
-                  className="view-count-text triller-view-count"
-                />
+                <div className="view-count-meta-row">
+                  <ViewCount
+                    itemId={activeTriller.id}
+                    type="triller"
+                    variant="text"
+                    className="view-count-text triller-view-count"
+                  />
+                  <UploadedAtTime at={activeTriller.createdAt || activeTriller.uploadedAt} />
+                </div>
               ) : null}
             </div>
             <TrillerMetaRow
@@ -632,12 +636,15 @@ const Triller = ({ activeId }) => {
                 <h1 className="triller-player-title triller-player-title--mobile">{title}</h1>
               ) : null}
               {!showLoading && activeTriller?.id != null ? (
-                <ViewCount
-                  itemId={activeTriller.id}
-                  type="triller"
-                  variant="text"
-                  className="view-count-text triller-view-count"
-                />
+                <div className="view-count-meta-row">
+                  <ViewCount
+                    itemId={activeTriller.id}
+                    type="triller"
+                    variant="text"
+                    className="view-count-text triller-view-count"
+                  />
+                  <UploadedAtTime at={activeTriller.createdAt || activeTriller.uploadedAt} />
+                </div>
               ) : null}
             </div>
 
