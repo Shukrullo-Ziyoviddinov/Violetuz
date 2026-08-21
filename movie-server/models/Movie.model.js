@@ -212,6 +212,7 @@ const movieSchema = new mongoose.Schema(
     strict: true,
     collection: 'movies',
     versionKey: false,
+    timestamps: true,
   }
 );
 

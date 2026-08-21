@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../ShareButton/ShareButton';
 import MovieComments from '../MovieDetail/MovieComments';
+import ViewCount from '../ViewCount/ViewCount';
+import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import { useWishlist } from '../../context/WishlistContext';
 import { formatActionCount } from '../../utils/utils';
 import './FeedVideoCard.css';
@@ -54,6 +56,21 @@ const FeedVideoCard = ({ item }) => {
         >
           {item.artistName}
         </span>
+        {!isShorts && item.videoId != null ? (
+          <div className="feed-video-card-meta-row">
+            <ViewCount
+              itemId={item.videoId}
+              type={wishlistType === 'konsert' ? 'konsert' : 'klip'}
+              variant="text"
+              record={false}
+              className="view-count-text feed-video-card-view-count"
+            />
+            <UploadedAtTime
+              at={item.createdAt || item.uploadedAt}
+              className="feed-video-card-uploaded-at"
+            />
+          </div>
+        ) : null}
       </div>
       <div className="feed-video-card-actions" onClick={(e) => e.stopPropagation()} role="presentation">
         <div className="feed-video-card-actions-like-group">

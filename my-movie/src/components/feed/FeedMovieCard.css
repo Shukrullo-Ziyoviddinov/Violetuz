@@ -64,6 +64,53 @@
   display: block;
 }
 
+.feed-movie-card-meta-row {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 0.35rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-movie-card-meta-row .feed-movie-card-view-count,
+.feed-movie-card-meta-row .view-count-text {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.feed-movie-card-meta-row .uploaded-at-time,
+.feed-movie-card-meta-row .feed-movie-card-uploaded-at {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+  flex-shrink: unset;
+  gap: 0;
+}
+
+.feed-movie-card-meta-row .uploaded-at-time-dot {
+  display: inline;
+  margin: 0 0.25rem;
+}
+
+.feed-movie-card-meta-row .uploaded-at-time-text {
+  display: inline;
+}
+
 .feed-movie-card-actions {
   margin-top: 0.45rem;
   display: flex;

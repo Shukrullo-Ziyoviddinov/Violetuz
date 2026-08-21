@@ -283,6 +283,35 @@
   margin: 0;
 }
 
+.trailer-modal-meta-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.trailer-modal-meta-row .trailer-modal-view-count,
+.trailer-modal-meta-row .view-count-text {
+  margin: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-modal-meta-row .uploaded-at-time,
+.trailer-modal-meta-row .trailer-modal-uploaded-at {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .trailer-modal-view-count {
   margin: 0;
 }

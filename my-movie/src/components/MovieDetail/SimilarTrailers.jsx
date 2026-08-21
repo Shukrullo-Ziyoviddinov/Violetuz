@@ -6,6 +6,7 @@ import { formatActionCount } from '../../utils/utils';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import ViewCount from '../ViewCount/ViewCount';
+import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import VerticalScroll from './VerticalScroll';
 import './SimilarTrailers.css';
 
@@ -213,13 +214,19 @@ const SimilarTrailerItem = ({
             <div className="similar-trailer-text">
               {trailer.text?.[contentLang] || trailer.text?.uz || trailer.text?.ru || ''}
             </div>
-            <ViewCount
-              itemId={tKey}
-              type="trailer"
-              variant="text"
-              record={false}
-              className="view-count-text similar-trailer-view-count"
-            />
+            <div className="similar-trailer-meta-row">
+              <ViewCount
+                itemId={tKey}
+                type="trailer"
+                variant="text"
+                record={false}
+                className="view-count-text similar-trailer-view-count"
+              />
+              <UploadedAtTime
+                at={trailer.createdAt || trailer.uploadedAt}
+                className="similar-trailer-uploaded-at"
+              />
+            </div>
             <div className="similar-trailer-actions">
               <LikeButton
                 key={tKey}

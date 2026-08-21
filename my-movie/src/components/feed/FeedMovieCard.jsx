@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../ShareButton/ShareButton';
 import MovieComments from '../MovieDetail/MovieComments';
+import ViewCount from '../ViewCount/ViewCount';
+import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import { useWishlist } from '../../context/WishlistContext';
 import { formatActionCount } from '../../utils/utils';
 import './FeedMovieCard.css';
@@ -28,6 +30,21 @@ const FeedMovieCard = ({ item }) => {
         </div>
       </div>
       <img src={item.cover} alt={item.title} className="feed-movie-card-cover" />
+      {item.movieId != null ? (
+        <div className="feed-movie-card-meta-row">
+          <ViewCount
+            itemId={item.movieId}
+            type="movie"
+            variant="text"
+            record={false}
+            className="view-count-text feed-movie-card-view-count"
+          />
+          <UploadedAtTime
+            at={item.createdAt || item.uploadedAt}
+            className="feed-movie-card-uploaded-at"
+          />
+        </div>
+      ) : null}
       <div className="feed-movie-card-actions" onClick={(e) => e.stopPropagation()} role="presentation">
         <div className="feed-movie-card-actions-like-group">
           <LikeButton

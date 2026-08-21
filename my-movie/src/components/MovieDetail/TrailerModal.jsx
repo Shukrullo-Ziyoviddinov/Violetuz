@@ -7,6 +7,7 @@ import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import SimilarTrailers from './SimilarTrailers';
 import ViewCount from '../ViewCount/ViewCount';
+import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import './TrailerModal.css';
 
 export const TrailerCloseButton = ({ onClick, label = 'Close' }) => (
@@ -564,13 +565,19 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                     <div className="trailer-modal-controls-title">
                       {selectedTrailer.title?.[contentLang] || selectedTrailer.title?.uz || selectedTrailer.title?.ru || ''}
                     </div>
-                    <ViewCount
-                      key={getTrailerKey(selectedTrailer)}
-                      itemId={getTrailerKey(selectedTrailer)}
-                      type="trailer"
-                      variant="text"
-                      className="view-count-text trailer-modal-view-count"
-                    />
+                    <div className="view-count-meta-row trailer-modal-meta-row">
+                      <ViewCount
+                        key={getTrailerKey(selectedTrailer)}
+                        itemId={getTrailerKey(selectedTrailer)}
+                        type="trailer"
+                        variant="text"
+                        className="view-count-text trailer-modal-view-count"
+                      />
+                      <UploadedAtTime
+                        at={selectedTrailer.createdAt || selectedTrailer.uploadedAt}
+                        className="trailer-modal-uploaded-at"
+                      />
+                    </div>
                     <div className="trailer-modal-controls-text">
                       {selectedTrailer.text?.[contentLang] || selectedTrailer.text?.uz || selectedTrailer.text?.ru || ''}
                     </div>

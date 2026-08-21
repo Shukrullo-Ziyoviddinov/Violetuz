@@ -47,6 +47,7 @@ const mapMovie = (doc, actor) =>
       movieId: doc.id,
       like: doc.like,
       dislike: doc.dislike,
+      createdAt: doc.createdAt || null,
     },
     doc,
   });
@@ -86,6 +87,7 @@ const mapClipOrConcert = (doc, artist, type) =>
       like: doc.like,
       dislike: doc.dislike,
       route: `/music/video/${doc.id}`,
+      createdAt: doc.createdAt || null,
     },
     doc,
   });
