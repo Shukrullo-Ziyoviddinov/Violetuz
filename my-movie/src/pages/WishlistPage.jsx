@@ -17,6 +17,7 @@ import Movies from '../components/Movies/Movies';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import ShortsVideoThumb from '../components/ShortsVideos/ShortsVideoThumb';
+import ViewCount from '../components/ViewCount/ViewCount';
 import {
   WishlistFilterModal,
   WishlistTabIcons,
@@ -757,7 +758,17 @@ const WishlistPage = () => {
               >
                 <ShortsVideoThumb
                   videoSrc={item.video?.[contentLang] || item.video?.uz || ''}
-                />
+                >
+                  {item?.id != null ? (
+                    <ViewCount
+                      itemId={item.id}
+                      type={shortsWishlistType(item)}
+                      variant="icon"
+                      record={false}
+                      className="shorts-video-card-views"
+                    />
+                  ) : null}
+                </ShortsVideoThumb>
                 <button
                   type="button"
                   className="wishlist-music-item-wishlist-btn active wishlist-shorts-save-btn"

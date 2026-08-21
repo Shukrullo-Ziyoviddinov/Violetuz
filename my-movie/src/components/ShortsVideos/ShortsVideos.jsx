@@ -7,7 +7,9 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 import { addWatch, getWatchHistory } from '../../api/shortsWatchHistory';
+import { recordViewRequest } from '../../api/viewsApi';
 import { getShortsRecommendations } from '../../algo/shortsRecommendationAlgo';
+import { useAuth } from '../../context/AuthContext';
 import VertikalDrag from '../VertikalDrag/VertikalDrag';
 import ShortsComments from './ShortsComments';
 import ShortsShare from './ShortsShare';
@@ -24,6 +26,7 @@ import {
 } from '../../store/slices/wishlistUtils';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import ShortsVideoThumb from './ShortsVideoThumb';
+import ViewCount from '../ViewCount/ViewCount';
 import './ShortsVideos.css';
 
 const MOBILE_BREAKPOINT = 768;
@@ -178,6 +181,7 @@ const ShortsVideos = ({
   repostShortsEntries = null,
 }) => {
   const { contentLang } = useContentLanguage();
+  const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { allShortsVideos, allMovies, shortsLoading, moviesLoading } = useMoviesApi();
   const {
@@ -332,6 +336,22 @@ const ShortsVideos = ({
     const t = setTimeout(() => addWatch(short), 2000);
     return () => clearTimeout(t);
   }, [modalOpen, activeIndex, shortsList]);
+
+  // Aktiv short modalda — ko‘rish hisobi (bir user = bir marta)
+  useEffect(() => {
+    if (!modalOpen || !isLoggedIn) return undefined;
+    const short = shortsList[activeIndex];
+    if (short?.id == null) return undefined;
+    const type =
+      short?.type === 'musicshorts' || isMusicShorts ? 'musicshorts' : 'movieShorts';
+    let cancelled = false;
+    recordViewRequest({ id: short.id, type }).catch(() => {
+      if (cancelled) return;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [modalOpen, activeIndex, shortsList, isLoggedIn, isMusicShorts]);
 
   const getVideo = useCallback((item) => item.video?.[contentLang] || item.video?.uz || '', [contentLang]);
 
@@ -1406,7 +1426,21 @@ const ShortsVideos = ({
                 <ShortsVideoThumb
                   videoSrc={getVideo(item)}
                   onClick={() => openModal(index)}
-                />
+                >
+                  {item?.id != null ? (
+                    <ViewCount
+                      itemId={item.id}
+                      type={
+                        item?.type === 'musicshorts' || isMusicShorts
+                          ? 'musicshorts'
+                          : 'movieShorts'
+                      }
+                      variant="icon"
+                      record={false}
+                      className="shorts-video-card-views"
+                    />
+                  ) : null}
+                </ShortsVideoThumb>
               </div>
             ))}
           </div>

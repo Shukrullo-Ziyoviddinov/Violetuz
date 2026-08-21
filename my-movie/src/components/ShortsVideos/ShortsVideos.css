@@ -50,6 +50,36 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.shorts-video-card-views {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+.shorts-video-card-views svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.shorts-video-card-views .movie-detail-action-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  min-width: 0;
+}
+
 .shorts-video-thumb {
   position: relative;
   aspect-ratio: 9 / 13;

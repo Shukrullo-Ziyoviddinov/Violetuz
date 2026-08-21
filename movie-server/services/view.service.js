@@ -5,6 +5,8 @@ const Music = require('../models/Music.model');
 const Clip = require('../models/Clip.model');
 const Concert = require('../models/Concert.model');
 const Triller = require('../models/Triller.model');
+const ShortVideo = require('../models/ShortVideo.model');
+const MusicShort = require('../models/MusicShort.model');
 const { badRequest, notFound } = require('../utils/errors');
 
 const TYPE_ALIASES = Object.freeze({
@@ -15,9 +17,12 @@ const TYPE_ALIASES = Object.freeze({
   konsert: 'konsert',
   concert: 'konsert',
   triller: 'triller',
-  /** Kino ichidagi trailer (trailersVideo) — Triller sahifasidan alohida */
   trailer: 'trailer',
   movietrailer: 'trailer',
+  movieshorts: 'movieShorts',
+  movieshort: 'movieShorts',
+  musicshorts: 'musicshorts',
+  musicshort: 'musicshorts',
 });
 
 const normalizeType = (raw) => {
@@ -85,6 +90,16 @@ const assertItemExists = async (type, itemId) => {
     case 'triller':
       doc = useNumeric
         ? await Triller.findOne({ id: numericId }).select({ id: 1 }).lean()
+        : null;
+      break;
+    case 'movieShorts':
+      doc = useNumeric
+        ? await ShortVideo.findOne({ id: numericId }).select({ id: 1 }).lean()
+        : null;
+      break;
+    case 'musicshorts':
+      doc = useNumeric
+        ? await MusicShort.findOne({ id: numericId }).select({ id: 1 }).lean()
         : null;
       break;
     case 'trailer': {

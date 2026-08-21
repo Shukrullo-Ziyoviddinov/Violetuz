@@ -11,6 +11,8 @@ const VIEW_TYPES = Object.freeze([
   'konsert',
   'triller',
   'trailer',
+  'movieShorts',
+  'musicshorts',
 ]);
 
 const contentViewSchema = new mongoose.Schema(

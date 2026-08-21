@@ -10,6 +10,7 @@ import { getShortsForHomeBlock } from '../../algo/shortsRecommendationAlgo';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import ShortsVideoThumb from '../ShortsVideos/ShortsVideoThumb';
+import ViewCount from '../ViewCount/ViewCount';
 import '../ShortsVideos/ShortsVideos.css';
 import './HomeShorts.css';
 
@@ -167,7 +168,21 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
                             }
                           : undefined
                       }
-                    />
+                    >
+                      {item?.id != null ? (
+                        <ViewCount
+                          itemId={item.id}
+                          type={
+                            item?.type === 'musicshorts' || isMusic
+                              ? 'musicshorts'
+                              : 'movieShorts'
+                          }
+                          variant="icon"
+                          record={false}
+                          className="shorts-video-card-views"
+                        />
+                      ) : null}
+                    </ShortsVideoThumb>
                   </Link>
                 );
               })}
