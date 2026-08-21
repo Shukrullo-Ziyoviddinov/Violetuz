@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { getDominantColor } from '../utils/dominantColor';
 import VideoDuration from '../Music/VideoDuration/VideoDuration';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import ViewCount from '../components/ViewCount/ViewCount';
+import LikeButton from '../Music/LikeButton/LikeButton';
+import { formatCount } from '../utils/utils';
 import { useImageReady } from '../utils/useImageReady';
 import './VideoPage.css';
 
@@ -15,6 +17,16 @@ const VideoDetailTrendCard = ({ item, isActive, onClick, getArtistName }) => {
     String(item?.type || '').toLowerCase() === 'concert'
       ? 'konsert'
       : 'klip';
+
+  const likeMeta = useMemo(() => {
+    if (item?.id == null) return undefined;
+    return {
+      category: viewType,
+      title: item.title || '',
+      image: item.img || '',
+      route: `/music/video/${item.id}`,
+    };
+  }, [item?.id, item?.title, item?.img, viewType]);
 
   useEffect(() => {
     if (!item?.img || showImgSkeleton) {
@@ -101,9 +113,23 @@ const VideoDetailTrendCard = ({ item, isActive, onClick, getArtistName }) => {
                 className="view-count-text video-detail-trend-card-view-count"
               />
             ) : null}
-            {item.year && (
-              <span className="video-detail-trend-card-year">{item.year}</span>
-            )}
+            {item.id != null ? (
+              <div
+                className="video-detail-trend-card-likes"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                <LikeButton
+                  contentId={String(item.id)}
+                  persistKey={`video_${item.id}`}
+                  initialLikeCount={item.like}
+                  initialDislikeCount={item.dislike}
+                  countFormatter={formatCount}
+                  stopPropagation
+                  likeMeta={likeMeta}
+                />
+              </div>
+            ) : null}
           </>
         )}
       </div>

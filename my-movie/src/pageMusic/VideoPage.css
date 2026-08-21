@@ -639,9 +639,69 @@ body.video-detail-page-active {
   text-overflow: ellipsis;
 }
 
-.video-detail-trend-card-year {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.55);
+.video-detail-trend-card-likes {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.video-detail-trend-card-likes .like-button {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.video-detail-trend-card-likes .like-button-btn {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.video-detail-trend-card-likes .like-button-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: none;
+}
+
+.video-detail-trend-card-likes .like-button-like.active,
+.video-detail-trend-card-likes .like-button-like.active .like-button-icon-wrap,
+.video-detail-trend-card-likes .like-button-like.active .like-button-count {
+  color: #c084fc;
+}
+
+.video-detail-trend-card-likes .like-button-dislike.active,
+.video-detail-trend-card-likes .like-button-dislike.active .like-button-icon-wrap,
+.video-detail-trend-card-likes .like-button-dislike.active .like-button-count {
+  color: rgba(255, 100, 100, 0.95);
+}
+
+.video-detail-trend-card-likes .like-button-icon-wrap {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-detail-trend-card-likes .like-button-icon-wrap svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.video-detail-trend-card-likes .like-button-count {
+  font-size: 0.85rem;
+  line-height: 1;
 }
 
 .video-detail-error {
