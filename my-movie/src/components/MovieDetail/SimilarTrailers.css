@@ -162,7 +162,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   justify-content: space-between;
   min-width: 0;
 }
@@ -190,7 +189,7 @@
 
 .similar-trailer-view-count {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.55);
   line-height: 1.2;
@@ -323,10 +322,6 @@ button.similar-trailer-dislike svg {
     width: 170px;
     min-width: 170px;
     height: 100px;
-  }
-
-  .similar-trailer-info {
-    gap: 0.5rem;
   }
 
   .similar-trailer-title {
