@@ -3,6 +3,7 @@ import { getDominantColor } from '../utils/dominantColor';
 import VideoDuration from '../Music/VideoDuration/VideoDuration';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import ViewCount from '../components/ViewCount/ViewCount';
+import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import LikeButton from '../Music/LikeButton/LikeButton';
 import { formatCount } from '../utils/utils';
 import { useImageReady } from '../utils/useImageReady';
@@ -105,13 +106,19 @@ const VideoDetailTrendCard = ({ item, isActive, onClick, getArtistName }) => {
             <span className="video-detail-trend-card-title">{item.title}</span>
             <span className="video-detail-trend-card-artist">{getArtistName(item.artistId)}</span>
             {item.id != null ? (
-              <ViewCount
-                itemId={item.id}
-                type={viewType}
-                variant="text"
-                record={false}
-                className="view-count-text video-detail-trend-card-view-count"
-              />
+              <div className="video-detail-trend-card-meta-row">
+                <ViewCount
+                  itemId={item.id}
+                  type={viewType}
+                  variant="text"
+                  record={false}
+                  className="view-count-text video-detail-trend-card-view-count"
+                />
+                <UploadedAtTime
+                  at={item.createdAt || item.uploadedAt}
+                  className="video-detail-trend-card-uploaded-at"
+                />
+              </div>
             ) : null}
             {item.id != null ? (
               <div

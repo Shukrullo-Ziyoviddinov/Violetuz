@@ -4,6 +4,8 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { useImageReady } from '../../utils/useImageReady';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import ViewCount from '../ViewCount/ViewCount';
+import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import './TrillerCard.css';
 
 const TrillerCard = ({ triller, className = '', onSelect }) => {
@@ -55,6 +57,21 @@ const TrillerCard = ({ triller, className = '', onSelect }) => {
         <SkeletonLoader variant="triller-card-title" />
       ) : title ? (
         <h3 className="triller-card-title">{title}</h3>
+      ) : null}
+      {!showImgSkeleton && triller.id != null ? (
+        <div className="triller-card-meta-row">
+          <ViewCount
+            itemId={triller.id}
+            type="triller"
+            variant="text"
+            record={false}
+            className="view-count-text triller-card-view-count"
+          />
+          <UploadedAtTime
+            at={triller.createdAt || triller.uploadedAt}
+            className="triller-card-uploaded-at"
+          />
+        </div>
       ) : null}
     </button>
   );

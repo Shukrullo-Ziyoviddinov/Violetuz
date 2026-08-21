@@ -44,6 +44,54 @@
   text-overflow: ellipsis;
 }
 
+.triller-card-meta-row {
+  display: block;
+  margin: 0.2rem 0 0;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff8c;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.triller-card-meta-row .triller-card-view-count,
+.triller-card-meta-row .view-count-text {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.triller-card-meta-row .uploaded-at-time,
+.triller-card-meta-row .triller-card-uploaded-at {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+  flex-shrink: unset;
+  gap: 0;
+}
+
+.triller-card-meta-row .uploaded-at-time-dot {
+  display: inline;
+  margin: 0 0.25rem;
+}
+
+.triller-card-meta-row .uploaded-at-time-text {
+  display: inline;
+}
+
 .triller-card--skeleton,
 .triller-card--loading {
   pointer-events: none;
@@ -65,5 +113,11 @@
   .triller-card-title {
     font-size: 16px;
     margin-top: 0.45rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .triller-card-meta-row {
+    font-size: 13px;
   }
 }
