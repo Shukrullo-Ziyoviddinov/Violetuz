@@ -7,11 +7,14 @@ import './ViewCount.css';
 
 /**
  * Umumiy ko‘rishlar komponenti (movie / music / klip / konsert / triller / trailer).
- * Login user detailga kirganda serverga yozadi; bir user + id = bir marta.
  *
  * variant:
  * - "icon"  — ko‘z + son (movie detail)
- * - "text"  — "1K marta ko'rishlar" (video detail)
+ * - "text"  — "1K marta ko'rishlar" (video detail / trailer)
+ *
+ * record:
+ * - true  (default) — login user uchun ko‘rishni yozadi (+1, bir marta)
+ * - false — faqat sonni ko‘rsatadi, hisoblamaydi
  */
 const ViewCount = ({
   itemId,
@@ -19,6 +22,7 @@ const ViewCount = ({
   variant = 'icon',
   className,
   countFormatter = formatActionCount,
+  record = true,
 }) => {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
@@ -31,7 +35,8 @@ const ViewCount = ({
 
     const run = async () => {
       try {
-        const data = isLoggedIn
+        const shouldRecord = record && isLoggedIn;
+        const data = shouldRecord
           ? await recordViewRequest({ id: itemId, type })
           : await fetchViewCount({ id: itemId, type });
         if (!cancelled) {
@@ -52,7 +57,7 @@ const ViewCount = ({
     return () => {
       cancelled = true;
     };
-  }, [itemId, type, isLoggedIn]);
+  }, [itemId, type, isLoggedIn, record]);
 
   if (itemId == null || itemId === '' || !type) return null;
 

@@ -5,6 +5,7 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { formatActionCount } from '../../utils/utils';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import ViewCount from '../ViewCount/ViewCount';
 import VerticalScroll from './VerticalScroll';
 import './SimilarTrailers.css';
 
@@ -212,6 +213,13 @@ const SimilarTrailerItem = ({
             <div className="similar-trailer-text">
               {trailer.text?.[contentLang] || trailer.text?.uz || trailer.text?.ru || ''}
             </div>
+            <ViewCount
+              itemId={tKey}
+              type="trailer"
+              variant="text"
+              record={false}
+              className="view-count-text similar-trailer-view-count"
+            />
             <div className="similar-trailer-actions">
               <LikeButton
                 key={tKey}

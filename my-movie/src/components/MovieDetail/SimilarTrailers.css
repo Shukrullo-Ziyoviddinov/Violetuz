@@ -188,6 +188,17 @@
   text-overflow: ellipsis;
 }
 
+.similar-trailer-view-count {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Actions - Like and Dislike */
 .similar-trailer-actions {
   display: flex;
