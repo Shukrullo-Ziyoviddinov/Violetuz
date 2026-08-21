@@ -119,13 +119,25 @@ const FeedVideoCard = ({ item }) => {
         <button
           type="button"
           className={`feed-video-card-fav ${saved ? 'active' : ''}`}
-          aria-label="Wishlist"
+          aria-label="Saqlash"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist(item.videoId, wishlistType);
           }}
         >
-          <i className={`${saved ? 'fa-solid' : 'fa-regular'} fa-heart`} aria-hidden="true" />
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill={saved ? 'currentColor' : 'none'}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          </svg>
         </button>
       </div>
       {!isShorts ? (

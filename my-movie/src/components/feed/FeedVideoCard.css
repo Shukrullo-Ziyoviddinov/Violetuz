@@ -158,8 +158,8 @@
 }
 
 .feed-video-card-fav {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.08);
@@ -171,8 +171,9 @@
   flex-shrink: 0;
 }
 
-.feed-video-card-fav i {
-  font-size: 0.72rem;
+.feed-video-card-fav svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .feed-video-card-fav.active {
@@ -181,29 +182,29 @@
 }
 
 .feed-video-like-button .like-button-btn {
-  height: 26px;
-  padding: 0 0.45rem;
-  font-size: 0.72rem;
+  height: 32px;
+  padding: 0 0.6rem;
+  font-size: 0.85rem;
   box-sizing: border-box;
 }
 
 .feed-video-like-button .like-button-icon-wrap svg {
-  width: 0.72rem;
-  height: 0.72rem;
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .feed-video-comment-button {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  height: 26px;
-  padding: 0 0.45rem;
+  gap: 0.4rem;
+  height: 32px;
+  padding: 0 0.6rem;
   border: none;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.75);
   cursor: pointer;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 500;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -221,8 +222,8 @@
 }
 
 .feed-video-comment-button svg {
-  width: 0.72rem;
-  height: 0.72rem;
+  width: 0.95rem;
+  height: 0.95rem;
   flex-shrink: 0;
 }
 
@@ -240,9 +241,9 @@
 
 .feed-video-share-button.share-button {
   width: auto;
-  height: 26px;
+  height: 32px;
   min-width: 0;
-  padding: 0 0.45rem;
+  padding: 0 0.6rem;
   border-radius: 999px;
   border: none;
   background: rgba(255, 255, 255, 0.08);
@@ -264,6 +265,6 @@
 }
 
 .feed-video-share-button.share-button svg {
-  width: 0.72rem;
-  height: 0.72rem;
+  width: 0.95rem;
+  height: 0.95rem;
 }
