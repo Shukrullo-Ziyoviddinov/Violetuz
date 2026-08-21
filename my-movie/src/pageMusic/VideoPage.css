@@ -628,6 +628,17 @@ body.video-detail-page-active {
   text-overflow: ellipsis;
 }
 
+.video-detail-trend-card-view-count {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .video-detail-trend-card-year {
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.55);

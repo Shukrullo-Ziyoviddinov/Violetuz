@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getDominantColor } from '../utils/dominantColor';
 import VideoDuration from '../Music/VideoDuration/VideoDuration';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import ViewCount from '../components/ViewCount/ViewCount';
 import { useImageReady } from '../utils/useImageReady';
 import './VideoPage.css';
 
@@ -9,6 +10,11 @@ const VideoDetailTrendCard = ({ item, isActive, onClick, getArtistName }) => {
   const [dominantColor, setDominantColor] = useState(null);
   const imgSrc = item?.img || '/img/movie1.jpg';
   const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError } = useImageReady(imgSrc);
+  const viewType =
+    String(item?.type || '').toLowerCase() === 'konsert' ||
+    String(item?.type || '').toLowerCase() === 'concert'
+      ? 'konsert'
+      : 'klip';
 
   useEffect(() => {
     if (!item?.img || showImgSkeleton) {
@@ -86,6 +92,15 @@ const VideoDetailTrendCard = ({ item, isActive, onClick, getArtistName }) => {
           <>
             <span className="video-detail-trend-card-title">{item.title}</span>
             <span className="video-detail-trend-card-artist">{getArtistName(item.artistId)}</span>
+            {item.id != null ? (
+              <ViewCount
+                itemId={item.id}
+                type={viewType}
+                variant="text"
+                record={false}
+                className="view-count-text video-detail-trend-card-view-count"
+              />
+            ) : null}
             {item.year && (
               <span className="video-detail-trend-card-year">{item.year}</span>
             )}
