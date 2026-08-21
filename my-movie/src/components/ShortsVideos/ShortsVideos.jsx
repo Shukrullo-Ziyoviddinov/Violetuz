@@ -27,6 +27,7 @@ import {
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import ShortsVideoThumb from './ShortsVideoThumb';
 import ViewCount from '../ViewCount/ViewCount';
+import ShortsDownloadButton from './ShortsDownloadButton';
 import './ShortsVideos.css';
 
 const MOBILE_BREAKPOINT = 768;
@@ -927,6 +928,12 @@ const ShortsVideos = ({
             isInWishlist={isInWishlist}
             onClick={handleShortsSaveClick}
           />
+          <ShortsDownloadButton
+            videoUrl={getVideo(item)}
+            shortsId={item?.id}
+            shortType={itemMusic ? 'musicshorts' : 'movieShorts'}
+            fileName={`shorts-${item?.id || 'video'}.mp4`}
+          />
         </div>
         {renderMusicCornerButton(item, itemMusic, 'shorts-modal-music-corner-mobile')}
           </>
@@ -1222,6 +1229,12 @@ const ShortsVideos = ({
                     item={shortsList[activeIndex]}
                     isInWishlist={isInWishlist}
                     onClick={handleShortsSaveClick}
+                  />
+                  <ShortsDownloadButton
+                    videoUrl={getVideo(shortsList[activeIndex])}
+                    shortsId={shortsList[activeIndex]?.id}
+                    shortType={slideMusic ? 'musicshorts' : 'movieShorts'}
+                    fileName={`shorts-${shortsList[activeIndex]?.id || 'video'}.mp4`}
                   />
                 </div>
                 {renderMusicCornerButton(shortsList[activeIndex], slideMusic, 'shorts-modal-music-corner-desktop')}
