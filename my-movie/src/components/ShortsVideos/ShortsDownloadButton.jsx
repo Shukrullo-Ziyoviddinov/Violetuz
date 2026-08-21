@@ -10,12 +10,15 @@ const PHASE = {
   IDLE: 'idle',
   LOADING: 'loading',
   DONE: 'done',
+  REVERTING: 'reverting',
 };
 
 const RING_SIZE = 28;
 const RING_STROKE = 2;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRC = 2 * Math.PI * RING_RADIUS;
+const DONE_HOLD_MS = 900;
+const REVERT_MS = 650;
 
 /**
  * Shorts sidebar — R2 dan to‘g‘ridan-to‘g‘ri yuklash.
@@ -33,6 +36,7 @@ const ShortsDownloadButton = ({
   const [downloadCount, setDownloadCount] = useState(0);
   const abortRef = useRef(null);
   const doneTimerRef = useRef(null);
+  const revertTimerRef = useRef(null);
 
   useEffect(() => {
     if (shortsId == null || shortsId === '') {
@@ -63,12 +67,17 @@ const ShortsDownloadButton = ({
       window.clearTimeout(doneTimerRef.current);
       doneTimerRef.current = null;
     }
+    if (revertTimerRef.current) {
+      window.clearTimeout(revertTimerRef.current);
+      revertTimerRef.current = null;
+    }
   }, [shortsId, videoUrl]);
 
   useEffect(
     () => () => {
       if (abortRef.current) abortRef.current.abort();
       if (doneTimerRef.current) window.clearTimeout(doneTimerRef.current);
+      if (revertTimerRef.current) window.clearTimeout(revertTimerRef.current);
     },
     []
   );
@@ -102,17 +111,21 @@ const ShortsDownloadButton = ({
       setDownloadCount((c) => c + 1);
     }
     doneTimerRef.current = window.setTimeout(() => {
-      setPhase(PHASE.IDLE);
-      setProgress(0);
+      setPhase(PHASE.REVERTING);
       doneTimerRef.current = null;
-    }, 1400);
+      revertTimerRef.current = window.setTimeout(() => {
+        setPhase(PHASE.IDLE);
+        setProgress(0);
+        revertTimerRef.current = null;
+      }, REVERT_MS);
+    }, DONE_HOLD_MS);
   }, [shortsId, shortType]);
 
   const handleDownload = useCallback(
     async (e) => {
       e?.stopPropagation?.();
       e?.preventDefault?.();
-      if (phase === PHASE.LOADING || phase === PHASE.DONE) return;
+      if (phase !== PHASE.IDLE) return;
       if (!videoUrl) return;
 
       const controller = new AbortController();
@@ -191,20 +204,26 @@ const ShortsDownloadButton = ({
 
   const dashOffset = RING_CIRC * (1 - Math.min(100, Math.max(0, progress)) / 100);
   const showCount = downloadCount > 0;
+  const showRing =
+    phase === PHASE.LOADING || phase === PHASE.DONE || phase === PHASE.REVERTING;
+  const showCheck = phase === PHASE.DONE || phase === PHASE.REVERTING;
+  const showDownloadIcon = phase === PHASE.IDLE || phase === PHASE.REVERTING;
 
   return (
     <button
       type="button"
       className={`shorts-modal-action-btn shorts-download-btn${
         phase === PHASE.LOADING ? ' is-loading' : ''
-      }${phase === PHASE.DONE ? ' is-done' : ''}`}
+      }${phase === PHASE.DONE ? ' is-done' : ''}${
+        phase === PHASE.REVERTING ? ' is-reverting' : ''
+      }`}
       onClick={handleDownload}
-      disabled={phase === PHASE.LOADING}
+      disabled={phase !== PHASE.IDLE}
       aria-label="Yuklab olish"
       title="Yuklab olish"
     >
       <span className="shorts-download-icon-wrap" aria-hidden="true">
-        {(phase === PHASE.LOADING || phase === PHASE.DONE) && (
+        {showRing && (
           <svg
             className="shorts-download-ring"
             width={RING_SIZE}
@@ -227,7 +246,9 @@ const ShortsDownloadButton = ({
               fill="none"
               strokeWidth={RING_STROKE}
               strokeDasharray={RING_CIRC}
-              strokeDashoffset={phase === PHASE.DONE ? 0 : dashOffset}
+              strokeDashoffset={
+                phase === PHASE.DONE || phase === PHASE.REVERTING ? 0 : dashOffset
+              }
               strokeLinecap="round"
               transform={`rotate(-90 ${RING_SIZE / 2} ${RING_SIZE / 2})`}
             />
@@ -237,32 +258,41 @@ const ShortsDownloadButton = ({
         <span className="shorts-download-face">
           {phase === PHASE.LOADING ? (
             <span className="shorts-download-pct">{progress}%</span>
-          ) : phase === PHASE.DONE ? (
-            <svg
-              className="shorts-download-check"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
           ) : (
-            <svg
-              className="shorts-download-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
+            <>
+              {showCheck ? (
+                <svg
+                  className={`shorts-download-check${
+                    phase === PHASE.REVERTING ? ' is-out' : ''
+                  }`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : null}
+              {showDownloadIcon ? (
+                <svg
+                  className={`shorts-download-icon${
+                    phase === PHASE.REVERTING ? ' is-in' : ''
+                  }`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              ) : null}
+            </>
           )}
         </span>
       </span>

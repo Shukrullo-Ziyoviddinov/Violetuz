@@ -27,9 +27,9 @@
 
 .shorts-download-ring {
   position: absolute;
-  inset: -5px;
-  width: calc(100% + 10px);
-  height: calc(100% + 10px);
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
   pointer-events: none;
   overflow: visible;
 }
@@ -66,6 +66,13 @@
   flex-shrink: 0;
 }
 
+.shorts-download-face .shorts-download-check,
+.shorts-download-face .shorts-download-icon.is-in {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
 .shorts-download-pct {
   font-size: 0.55rem;
   font-weight: 700;
@@ -80,6 +87,18 @@
   animation: shorts-download-check-in 0.35s cubic-bezier(0.34, 1.4, 0.64, 1) both;
 }
 
+.shorts-download-check.is-out {
+  animation: shorts-download-check-out 0.65s ease both;
+}
+
+.shorts-download-icon.is-in {
+  animation: shorts-download-icon-in 0.65s ease both;
+}
+
+.shorts-download-btn.is-reverting .shorts-download-ring {
+  animation: shorts-download-ring-out 0.65s ease both;
+}
+
 @keyframes shorts-download-check-in {
   0% {
     opacity: 0;
@@ -88,6 +107,37 @@
   100% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes shorts-download-check-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+}
+
+@keyframes shorts-download-icon-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shorts-download-ring-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
@@ -118,9 +168,9 @@
 }
 
 .shorts-modal-actions-sidebar.shorts-modal-actions-mobile .shorts-download-btn .shorts-download-ring {
-  inset: -5px;
-  width: calc(100% + 10px);
-  height: calc(100% + 10px);
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
 }
 
 .shorts-modal-actions-sidebar.shorts-modal-actions-mobile .shorts-download-btn svg.shorts-download-icon,
