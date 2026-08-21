@@ -62,7 +62,7 @@ const fetchMoviesForActor = (actorId) =>
   latestByAutoId(
     Movie,
     { actors: { $in: actorIdMatchers(actorId) } },
-    'id title homeImg like dislike specs createdAt'
+    'id title homeImg like dislike specs filterCountry createdAt'
   );
 
 const fetchMovieShortsForActor = async (actorId) => {

@@ -33,14 +33,27 @@ const toFeedItem = ({
   ...extra,
 });
 
-const mapMovie = (doc, actor) => {
-  const year = doc.specs?.year;
-  const countries = Array.isArray(doc.specs?.countries)
-    ? doc.specs.countries.filter(Boolean).join(', ')
-    : '';
+const buildMovieMetaText = (doc) => {
+  const year = doc?.specs?.year ?? doc?.year ?? null;
+  const countriesRaw = doc?.specs?.countries;
+  let countries = '';
+  if (Array.isArray(countriesRaw)) {
+    countries = countriesRaw.filter(Boolean).join(', ');
+  } else if (typeof countriesRaw === 'string') {
+    countries = countriesRaw.trim();
+  }
+  if (!countries && doc?.filterCountry) {
+    countries = String(doc.filterCountry).trim();
+  }
+
   const metaParts = [];
   if (year != null && year !== '') metaParts.push(`${year}-yil`);
   if (countries) metaParts.push(countries);
+  return metaParts.join(' ');
+};
+
+const mapMovie = (doc, actor) => {
+  const metaText = buildMovieMetaText(doc);
 
   return toFeedItem({
     type: 'movie',
@@ -56,7 +69,12 @@ const mapMovie = (doc, actor) => {
       like: doc.like,
       dislike: doc.dislike,
       createdAt: doc.createdAt || null,
-      metaText: metaParts.join(' ') || '',
+      year: doc?.specs?.year ?? doc?.year ?? null,
+      countries: Array.isArray(doc?.specs?.countries)
+        ? doc.specs.countries.filter(Boolean)
+        : [],
+      filterCountry: doc?.filterCountry || '',
+      metaText,
     },
     doc,
   });

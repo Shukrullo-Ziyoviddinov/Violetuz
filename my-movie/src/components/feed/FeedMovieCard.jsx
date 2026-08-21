@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../ShareButton/ShareButton';
@@ -6,16 +6,47 @@ import MovieComments from '../MovieDetail/MovieComments';
 import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import { useWishlist } from '../../context/WishlistContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import { formatActionCount } from '../../utils/utils';
 import './FeedMovieCard.css';
+
+const buildMetaTextFromMovie = (movie) => {
+  if (!movie) return '';
+  const year = movie.specs?.year;
+  const countries = Array.isArray(movie.specs?.countries)
+    ? movie.specs.countries.filter(Boolean).join(', ')
+    : '';
+  const countryFallback = countries || movie.filterCountry || '';
+  const metaParts = [];
+  if (year != null && year !== '') metaParts.push(`${year}-yil`);
+  if (countryFallback) metaParts.push(countryFallback);
+  return metaParts.join(' ');
+};
 
 const FeedMovieCard = ({ item }) => {
   const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { allMovies } = useMoviesApi();
   const commentsRef = useRef(null);
   const [commentsCount, setCommentsCount] = useState(0);
   const saved = isInWishlist(item.movieId, 'movie');
   const movieRoute = `/movie/${item.movieId}`;
+
+  const metaText = useMemo(() => {
+    if (item.metaText) return item.metaText;
+    if (item.year != null || item.filterCountry || (item.countries && item.countries.length)) {
+      const parts = [];
+      if (item.year != null && item.year !== '') parts.push(`${item.year}-yil`);
+      const countries = Array.isArray(item.countries)
+        ? item.countries.filter(Boolean).join(', ')
+        : '';
+      const country = countries || item.filterCountry || '';
+      if (country) parts.push(country);
+      return parts.join(' ');
+    }
+    const fromCatalog = allMovies?.find((m) => Number(m.id) === Number(item.movieId));
+    return buildMetaTextFromMovie(fromCatalog);
+  }, [item, allMovies]);
 
   return (
     <div className="feed-movie-card" onClick={() => navigate(movieRoute)} role="button" tabIndex={0}>
@@ -31,7 +62,7 @@ const FeedMovieCard = ({ item }) => {
       </div>
       <img src={item.cover} alt={item.title} className="feed-movie-card-cover" />
       {item.title ? <h3 className="feed-movie-card-title">{item.title}</h3> : null}
-      {item.metaText ? <p className="feed-movie-card-movie-meta">{item.metaText}</p> : null}
+      {metaText ? <p className="feed-movie-card-movie-meta">{metaText}</p> : null}
       {item.movieId != null ? (
         <div className="feed-movie-card-meta-row">
           <ViewCount
