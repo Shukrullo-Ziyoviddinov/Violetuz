@@ -663,7 +663,7 @@ body.video-detail-page-active {
   font-size: 0.9rem;
   font-weight: 500;
   gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.1rem;
   transition: all 0.3s ease;
 }
 
