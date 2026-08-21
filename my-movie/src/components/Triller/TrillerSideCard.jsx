@@ -5,6 +5,7 @@ import { formatActionCount } from '../../utils/utils';
 import { useImageReady } from '../../utils/useImageReady';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import ViewCount from '../ViewCount/ViewCount';
 import { useVideoDurationLabel } from './useVideoDurationLabel';
 import TrillerSideCardMoreModal from './TrillerSideCardMoreModal';
 import './TrillerSideCard.css';
@@ -197,6 +198,15 @@ const TrillerSideCard = ({ triller, onSelect, loading = false }) => {
                     </span>
                   ) : null}
                 </div>
+              ) : null}
+              {triller.id != null ? (
+                <ViewCount
+                  itemId={triller.id}
+                  type="triller"
+                  variant="text"
+                  record={false}
+                  className="view-count-text triller-view-count triller-side-card-view-count"
+                />
               ) : null}
               <div
                 className="triller-meta-likes triller-side-card-likes"
