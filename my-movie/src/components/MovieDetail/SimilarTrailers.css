@@ -166,6 +166,13 @@
   min-width: 0;
 }
 
+/* Faqat loader: title/text yopishib qolmasin; yuklangandan keyin gap yo‘q */
+.similar-trailer-item--skeleton .similar-trailer-info,
+.similar-trailer-item--loading .similar-trailer-info {
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
 .similar-trailer-title {
   color: #ffffff;
   font-size: 14px;
