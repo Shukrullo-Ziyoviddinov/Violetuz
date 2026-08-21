@@ -33,8 +33,16 @@ const toFeedItem = ({
   ...extra,
 });
 
-const mapMovie = (doc, actor) =>
-  toFeedItem({
+const mapMovie = (doc, actor) => {
+  const year = doc.specs?.year;
+  const countries = Array.isArray(doc.specs?.countries)
+    ? doc.specs.countries.filter(Boolean).join(', ')
+    : '';
+  const metaParts = [];
+  if (year != null && year !== '') metaParts.push(`${year}-yil`);
+  if (countries) metaParts.push(countries);
+
+  return toFeedItem({
     type: 'movie',
     catalogId: doc.id,
     ownerType: 'actor',
@@ -48,9 +56,11 @@ const mapMovie = (doc, actor) =>
       like: doc.like,
       dislike: doc.dislike,
       createdAt: doc.createdAt || null,
+      metaText: metaParts.join(' ') || '',
     },
     doc,
   });
+};
 
 const mapMusic = (doc, artist) =>
   toFeedItem({

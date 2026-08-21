@@ -30,6 +30,8 @@ const FeedMovieCard = ({ item }) => {
         </div>
       </div>
       <img src={item.cover} alt={item.title} className="feed-movie-card-cover" />
+      {item.title ? <h3 className="feed-movie-card-title">{item.title}</h3> : null}
+      {item.metaText ? <p className="feed-movie-card-movie-meta">{item.metaText}</p> : null}
       {item.movieId != null ? (
         <div className="feed-movie-card-meta-row">
           <ViewCount
