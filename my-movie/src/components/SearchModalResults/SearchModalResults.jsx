@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -6,7 +6,13 @@ import { useActorsApi } from '../../context/ActorsApiContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
+import FilterSearchRezult from '../FilterSearchRezult/FilterSearchRezult';
 import { searchContentByQuery } from '../../utils/searchMovies';
+import {
+  SEARCH_FILTER_ALL,
+  getAvailableSearchFilters,
+  isSearchSectionVisible,
+} from '../../utils/searchFilterTypes';
 import './SearchModalResults.css';
 import '../../Music/SearchMusicResults/SearchMusicResults.css';
 
@@ -17,21 +23,43 @@ const SearchModalResults = ({ query, onMovieClick }) => {
   const { allActors } = useActorsApi();
   const { allMovies } = useMoviesApi();
   const { allMusic, allAlbums, allClips, allConcerts, allArtists, getArtistById } = useMusicApi();
+  const [activeFilter, setActiveFilter] = useState(SEARCH_FILTER_ALL);
 
-  const { actors, musicArtists, movies, music, albums, clips, concerts } = searchContentByQuery(
-    query,
-    contentLang,
-    40,
-    {
-      actors: allActors,
-      movies: allMovies,
-      music: allMusic,
-      albums: allAlbums,
-      clips: allClips,
-      concerts: allConcerts,
-      musicArtists: allArtists,
-    }
+  const results = searchContentByQuery(query, contentLang, 40, {
+    actors: allActors,
+    movies: allMovies,
+    music: allMusic,
+    albums: allAlbums,
+    clips: allClips,
+    concerts: allConcerts,
+    musicArtists: allArtists,
+  });
+
+  const { actors, musicArtists, movies, music, albums, clips, concerts } = results;
+
+  const availableFilters = useMemo(
+    () =>
+      getAvailableSearchFilters(results).map((filter) => ({
+        id: filter.id,
+        label: t(filter.labelKey, filter.labelDefault),
+      })),
+    [results, t]
   );
+
+  useEffect(() => {
+    setActiveFilter(SEARCH_FILTER_ALL);
+  }, [query]);
+
+  useEffect(() => {
+    if (
+      activeFilter !== SEARCH_FILTER_ALL &&
+      !availableFilters.some((filter) => filter.id === activeFilter)
+    ) {
+      setActiveFilter(SEARCH_FILTER_ALL);
+    }
+  }, [activeFilter, availableFilters]);
+
+  const show = (sectionId) => isSearchSectionVisible(activeFilter, sectionId);
 
   const getMovieTitle = (m) => {
     if (m?.title && typeof m.title === 'object') {
@@ -109,7 +137,15 @@ const SearchModalResults = ({ query, onMovieClick }) => {
 
   return (
     <div className="search-modal-results">
-      {actors.length > 0 && (
+      {hasAny && (
+        <FilterSearchRezult
+          filters={availableFilters}
+          activeFilter={activeFilter}
+          onSelect={setActiveFilter}
+        />
+      )}
+
+      {show('actor') && actors.length > 0 && (
         <div className="search-modal-results-actors-block">
           <h3 className="search-modal-results-section-title">
             {t('searchModal.actorsSection', 'Aktyor')}
@@ -142,9 +178,9 @@ const SearchModalResults = ({ query, onMovieClick }) => {
         </div>
       )}
 
-      {movies.length > 0 && (
+      {show('movie') && movies.length > 0 && (
         <div
-          className={`search-modal-results-movies-block${actors.length > 0 ? ' search-modal-results-movies-block--after-actors' : ''}`}
+          className={`search-modal-results-movies-block${show('actor') && actors.length > 0 ? ' search-modal-results-movies-block--after-actors' : ''}`}
         >
           <h3 className="search-modal-results-section-title">
             {t('searchModal.moviesSection', 'Kinolar')}
@@ -181,7 +217,7 @@ const SearchModalResults = ({ query, onMovieClick }) => {
 
       <div className="search-music-results">
         {musicSections.map(({ key, items, label }) => {
-          if (items.length === 0) return null;
+          if (!show(key) || items.length === 0) return null;
           const isVideo = key === 'klip' || key === 'konsert';
           return (
             <div key={key} className="search-music-results-section">
