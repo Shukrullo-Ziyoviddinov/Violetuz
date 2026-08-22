@@ -1,0 +1,24 @@
+.search-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 2.5rem 0;
+}
+
+.search-loader-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.88);
+  border-right-color: rgba(255, 255, 255, 0.45);
+  animation: search-loader-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes search-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

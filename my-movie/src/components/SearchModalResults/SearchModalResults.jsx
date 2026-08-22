@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
-import { useActorsApi } from '../../context/ActorsApiContext';
-import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import FilterSearchRezult from '../FilterSearchRezult/FilterSearchRezult';
-import { searchContentByQuery } from '../../utils/searchMovies';
+import SearchLoader from '../SearchLoader/SearchLoader';
+import { fetchSearchResults } from '../../api/searchApi';
 import {
   SEARCH_FILTER_ALL,
   getAvailableSearchFilters,
@@ -16,23 +16,37 @@ import {
 import './SearchModalResults.css';
 import '../../Music/SearchMusicResults/SearchMusicResults.css';
 
+const EMPTY_RESULTS = {
+  actors: [],
+  musicArtists: [],
+  movies: [],
+  music: [],
+  albums: [],
+  clips: [],
+  concerts: [],
+};
+
 const SearchModalResults = ({ query, onMovieClick }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
-  const { allActors } = useActorsApi();
-  const { allMovies } = useMoviesApi();
-  const { allMusic, allAlbums, allClips, allConcerts, allArtists, getArtistById } = useMusicApi();
+  const { getArtistById } = useMusicApi();
   const [activeFilter, setActiveFilter] = useState(SEARCH_FILTER_ALL);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  const results = searchContentByQuery(query, contentLang, 40, {
-    actors: allActors,
-    movies: allMovies,
-    music: allMusic,
-    albums: allAlbums,
-    clips: allClips,
-    concerts: allConcerts,
-    musicArtists: allArtists,
+  const trimmedQuery = query?.trim() || '';
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(trimmedQuery), 300);
+    return () => clearTimeout(timer);
+  }, [trimmedQuery]);
+
+  const { data: results = EMPTY_RESULTS, isFetching, isError } = useQuery({
+    queryKey: ['search', debouncedQuery, contentLang],
+    queryFn: () => fetchSearchResults(debouncedQuery, contentLang),
+    enabled: debouncedQuery.length > 0,
+    staleTime: 30_000,
+    placeholderData: (previous) => previous,
   });
 
   const { actors, musicArtists, movies, music, albums, clips, concerts } = results;
@@ -48,7 +62,7 @@ const SearchModalResults = ({ query, onMovieClick }) => {
 
   useEffect(() => {
     setActiveFilter(SEARCH_FILTER_ALL);
-  }, [query]);
+  }, [trimmedQuery]);
 
   useEffect(() => {
     if (
@@ -60,6 +74,7 @@ const SearchModalResults = ({ query, onMovieClick }) => {
   }, [activeFilter, availableFilters]);
 
   const show = (sectionId) => isSearchSectionVisible(activeFilter, sectionId);
+  const isSearching = trimmedQuery.length > 0 && (trimmedQuery !== debouncedQuery || isFetching);
 
   const getMovieTitle = (m) => {
     if (m?.title && typeof m.title === 'object') {
@@ -120,7 +135,11 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     return '';
   };
 
-  if (!query?.trim()) return null;
+  if (!trimmedQuery) return null;
+
+  if (isSearching) {
+    return <SearchLoader />;
+  }
 
   const musicSections = [
     { key: 'music', items: music, label: t('music.searchTypeMusic', 'Musiqa') },
@@ -134,6 +153,14 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     actors.length > 0 ||
     movies.length > 0 ||
     musicSections.some((s) => s.items.length > 0);
+
+  if (isError) {
+    return (
+      <p className="search-modal-results-empty">
+        {t('searchModal.error', 'Qidiruvda xatolik yuz berdi')}
+      </p>
+    );
+  }
 
   return (
     <div className="search-modal-results">

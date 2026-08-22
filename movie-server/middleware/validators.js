@@ -621,6 +621,27 @@ const validateMusicBannerIdParam = (req, _res, next) => {
   next();
 };
 
+const validateSearchQuery = (req, _res, next) => {
+  const q = req.query.q ?? req.query.query ?? '';
+  const trimmed = String(q).trim();
+
+  if (!trimmed) {
+    return next(badRequest('q query is required.'));
+  }
+
+  req.query.q = trimmed;
+
+  if (req.query.lang != null) {
+    const lang = String(req.query.lang).trim();
+    if (lang && !['uz', 'ru'].includes(lang)) {
+      return next(badRequest('lang must be uz or ru.'));
+    }
+    req.query.lang = lang || 'uz';
+  }
+
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -661,4 +682,5 @@ module.exports = {
   validateMusicShortIdParam,
   validateMusicShortListQuery,
   validateMusicBannerIdParam,
+  validateSearchQuery,
 };

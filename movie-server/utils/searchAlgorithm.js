@@ -1,9 +1,9 @@
 /**
- * Umumiy qidiruv: kinolar, aktyorlar, musiqa, albomlar, kliplar, konsertlar, artistlar.
+ * Umumiy qidiruv algoritmi: kinolar, aktyorlar, musiqa, albomlar, kliplar, konsertlar, artistlar.
  * So'zma-so'z va imlo xatolariga chidamli (fuzzy).
  */
 
-import { ensureArray } from './musicDataUtils';
+const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
 
 const normalize = (s) => (s || '').toLowerCase().trim();
 
@@ -83,7 +83,6 @@ const getMusicArtistName = (item, artistsList = []) => {
   return artist?.name || item.artistId || '';
 };
 
-/** Ism + bio */
 const actorMatchScore = (actor, q, queryWords) => {
   const nameUz = normalize(getActorName(actor, 'uz'));
   const nameRu = normalize(getActorName(actor, 'ru'));
@@ -139,9 +138,8 @@ const musicMetaMatchesQuery = (item, queryWords) => {
 const searchMoviesOrdered = (q, queryWords, moviesList = []) => {
   const byTitle = [];
   const byMeta = [];
-  const movies = Array.isArray(moviesList) ? moviesList : [];
 
-  for (const m of movies) {
+  for (const m of moviesList) {
     const score = titleMatchScore(m, q, queryWords);
     if (score > 0) byTitle.push({ movie: m, score });
     else if (movieMetaMatchesQuery(m, queryWords)) byMeta.push(m);
@@ -189,10 +187,7 @@ const searchMusicArtistsOrdered = (q, queryWords, artistsList = []) => {
   return scored.map((x) => x.artist);
 };
 
-/**
- * Aktyorlar, musiqa artistlari, kinolar, musiqa/albom/klip/konsert – bitta qidiruv.
- */
-export const searchContentByQuery = (
+const searchContentByQuery = (
   query,
   contentLang = 'uz',
   limit = 40,
@@ -257,10 +252,6 @@ export const searchContentByQuery = (
   return { actors, musicArtists, movies, music, albums, clips, concerts };
 };
 
-/** Faqat kinolar ro'yxati */
-export const searchMoviesByQuery = (query, contentLang = 'uz', limit = 20, moviesList = []) => {
-  const q = normalize(query);
-  if (!q) return [];
-  const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
-  return searchMoviesOrdered(q, queryWords, moviesList).slice(0, limit);
+module.exports = {
+  searchContentByQuery,
 };

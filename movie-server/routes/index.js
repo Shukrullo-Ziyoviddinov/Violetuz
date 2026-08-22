@@ -36,6 +36,7 @@ const shortShareRoutes = require('./shortShare.routes');
 const viewRoutes = require('./view.routes');
 const feedRoutes = require('./feed.routes');
 const shortDownloadRoutes = require('./shortDownload.routes');
+const searchRoutes = require('./search.routes');
 
 const router = Router();
 
@@ -76,5 +77,6 @@ router.use('/artists', artistRoutes);
 router.use('/music-shorts', musicShortRoutes);
 router.use('/music-banners', musicBannerRoutes);
 router.use('/trillers', trillerRoutes);
+router.use('/search', searchRoutes);
 
 module.exports = router;
