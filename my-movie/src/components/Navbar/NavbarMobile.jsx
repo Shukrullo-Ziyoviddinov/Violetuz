@@ -5,8 +5,6 @@ import SearchModalGenre from '../SearchModalGenre/SearchModalGenre';
 import SearchModalAnons from '../SearchModalAnons/SearchModalAnons';
 import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import SearchModalResults from '../SearchModalResults/SearchModalResults';
-import SearchMusicResults from '../../Music/SearchMusicResults/SearchMusicResults';
-import SearchMusicIstoriy from '../../Music/SearchMusicResults/SearchMusicIstoriy';
 import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCategory';
 import ShortsPickerModal from './ShortsPickerModal';
 import { requestOpenAuthModal } from '../../authModalBridge';
@@ -29,7 +27,6 @@ const NavbarMobile = () => {
   const isSearchActive = pathname.startsWith('/search');
   const isMusicActive = pathname === '/music';
   const isMoviesActive = pathname === '/' || pathname.startsWith('/movie/');
-  const isMusicSection = pathname.startsWith('/music');
   const isShortsActive = pathname === '/shorts' || pathname === '/music/shorts';
   const isProfileActive = pathname === '/profile';
 
@@ -148,24 +145,13 @@ const NavbarMobile = () => {
               </form>
             </div>
             {hasSearchQuery ? (
-              isMusicSection ? (
-                <SearchMusicResults
-                  query={searchQuery.trim()}
-                  onItemClick={() => setShowSearch(false)}
-                />
-              ) : (
-                <SearchModalResults
-                  query={searchQuery.trim()}
-                  onMovieClick={() => setShowSearch(false)}
-                />
-              )
-            ) : isMusicSection ? (
-              <div className="navbar-search-modal-music-empty">
-                <SearchModalCategory onCategoryClick={() => setShowSearch(false)} />
-                <SearchMusicIstoriy onItemClick={() => setShowSearch(false)} />
-              </div>
+              <SearchModalResults
+                query={searchQuery.trim()}
+                onMovieClick={() => setShowSearch(false)}
+              />
             ) : (
               <>
+                <SearchModalCategory onCategoryClick={() => setShowSearch(false)} />
                 <SearchModalGenre onGenreClick={() => setShowSearch(false)} />
                 <SearchModalAnons onAnonsClick={() => setShowSearch(false)} />
                 <SearchModalTavsiya onMovieClick={() => setShowSearch(false)} />
