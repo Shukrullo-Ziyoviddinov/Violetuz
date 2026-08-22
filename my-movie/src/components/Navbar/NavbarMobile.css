@@ -125,19 +125,18 @@
   }
 
   .navbar-mobile-search-box {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    background: rgba(10, 10, 10, 0.98);
-    border-radius: 0;
-    padding: 1rem;
-    padding-top: calc(38px + 0.25rem);
+    align-items: stretch;
+    background: #0a0a0afa;
     border: none;
+    border-radius: 0;
     box-shadow: none;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    height: 100%;
+    max-width: none;
     overflow-y: auto;
+    padding: calc(15px + 0.25rem) 0.7rem 0.7rem;
+    width: 100%;
   }
 
   .navbar-mobile-search-form-row {
