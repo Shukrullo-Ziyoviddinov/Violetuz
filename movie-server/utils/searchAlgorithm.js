@@ -1,11 +1,35 @@
 /**
- * Umumiy qidiruv algoritmi: kinolar, aktyorlar, musiqa, albomlar, kliplar, konsertlar, artistlar.
- * So'zma-so'z va imlo xatolariga chidamli (fuzzy).
+ * Professional qidiruv algoritmi.
+ * - Aniq va qismiy ibora mosligi ("meniki emassan", "ana endi")
+ * - Imlo xatolariga chidamli (shukurulo → Shukrullo)
+ * - Noto'g'ri qismiy moslikni bloklaydi (sevara → era)
+ * - Kategoriya qidiruvi (hind kinolar, korea kino)
  */
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
+const { parseMovieSearchFacets, movieFacetMatchScore } = require('./searchFacets');
 
-const normalize = (s) => (s || '').toLowerCase().trim();
+const MIN_SCORE = 55;
+const MIN_QUERY_LENGTH = 2;
+
+/** Sinonim guruhlari — kategoriya qidiruvi uchun */
+const SYNONYM_GROUPS = [
+  ['kino', 'kinolar', 'film', 'filmlar', 'movie', 'movies', 'serial', 'seriallar'],
+  ['hind', 'hindi', 'hindiston', 'india', 'indian'],
+  ['korea', 'koreya', 'korean', 'janubiy', 'shimoliy'],
+  ['tarjima', 'tarjimada', 'tilida', 'uzbek', 'o\'zbek', 'ozbek'],
+  ['qasoskor', 'qasoskorlar', 'vengence', 'revenge'],
+];
+
+const normalizeText = (s) =>
+  String(s || '')
+    .toLowerCase()
+    .replace(/[''`ʻʼ]/g, '')
+    .replace(/o'/g, 'o')
+    .replace(/g'/g, 'g')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
 const getTitleForLang = (item, lang) => {
   if (!item?.title) return '';
@@ -18,6 +42,8 @@ const getTitleForLang = (item, lang) => {
 const levenshtein = (a, b) => {
   const m = a.length;
   const n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
   const dp = Array(m + 1)
     .fill(null)
     .map(() => Array(n + 1).fill(0));
@@ -32,41 +58,135 @@ const levenshtein = (a, b) => {
   return dp[m][n];
 };
 
-const fuzzyMatch = (queryWord, titleWord) => {
-  if (!queryWord || queryWord.length < 2) return false;
-  if (titleWord.includes(queryWord) || queryWord.includes(titleWord)) return true;
-  if (queryWord.length >= 3 && titleWord.length >= 3) {
-    const d = levenshtein(queryWord, titleWord);
-    const maxDist = queryWord.length <= 4 ? 1 : Math.min(2, Math.floor(queryWord.length / 2));
-    return d <= maxDist;
+const wordSimilarity = (a, b) => {
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+  const maxLen = Math.max(a.length, b.length);
+  return 1 - levenshtein(a, b) / maxLen;
+};
+
+const expandSynonyms = (word) => {
+  const w = normalizeText(word);
+  for (const group of SYNONYM_GROUPS) {
+    if (group.some((g) => normalizeText(g) === w || w.includes(normalizeText(g)))) {
+      return group.map(normalizeText);
+    }
   }
+  return [w];
+};
+
+const isSubsequence = (needle, haystack) => {
+  if (!needle || !haystack) return false;
+  let i = 0;
+  for (let j = 0; j < haystack.length; j++) {
+    if (haystack[j] === needle[i]) i += 1;
+    if (i === needle.length) return true;
+  }
+  return i === needle.length;
+};
+
+/** Ikki so'z o'rtasida imlo xatosi bilan moslik */
+const wordsMatch = (queryWord, targetWord) => {
+  const qw = normalizeText(queryWord);
+  const tw = normalizeText(targetWord);
+  if (!qw || !tw) return false;
+  if (qw === tw) return true;
+
+  // Matn ichida to'liq so'z/ibora (ketaver, qasoskorlar)
+  if (qw.length >= 3 && tw.includes(qw)) return true;
+  // Faqat deyarli teng uzunlikdagi so'zlar (sevara → vera bloklanadi)
+  if (tw.length >= 5 && qw.length >= tw.length && qw.includes(tw) && tw.length >= qw.length * 0.75) {
+    return true;
+  }
+
+  const sim = wordSimilarity(qw, tw);
+  const maxLen = Math.max(qw.length, tw.length);
+
+  if (maxLen >= 8 && sim >= 0.68) return true;
+  if (maxLen >= 6 && sim >= 0.72) return true;
+  if (maxLen >= 4 && sim >= 0.75) return true;
+  if (maxLen === 3 && sim >= 0.66) return true;
+
+  // og'ir imlo: moronnaxr → movarounnaxr
+  if (qw.length >= 6 && tw.length >= qw.length && isSubsequence(qw, tw)) return true;
+
   return false;
 };
 
-const titleMatchesAllWords = (textA, textB, queryWords) => {
-  const wordsA = normalize(textA).split(/\s+/).filter(Boolean);
-  const wordsB = normalize(textB).split(/\s+/).filter(Boolean);
-  const pool = [...wordsA, ...wordsB];
-  return queryWords.every(
-    (qw) => pool.some((tw) => tw.includes(qw) || qw.includes(tw) || fuzzyMatch(qw, tw))
-  );
+/** So'z matn yoki sinonimlar bo'yicha mos kelishini tekshiradi */
+const wordMatchesInBlob = (queryWord, blob) => {
+  const text = normalizeText(blob);
+  const qw = normalizeText(queryWord);
+  if (!text || !qw) return false;
+
+  if (text.includes(qw)) return true;
+
+  const variants = expandSynonyms(qw);
+  if (variants.some((v) => v.length >= 3 && text.includes(v))) return true;
+
+  const words = text.split(/\s+/).filter(Boolean);
+  return words.some((tw) => variants.some((v) => wordsMatch(v, tw) || wordsMatch(qw, tw)));
 };
 
-const titleMatchScore = (item, q, queryWords) => {
-  const uz = normalize(getTitleForLang(item, 'uz'));
-  const ru = normalize(getTitleForLang(item, 'ru'));
-  if (uz.includes(q) || ru.includes(q)) return 2;
-  if (titleMatchesAllWords(uz, ru, queryWords)) return 1;
+/** Barcha qidiruv so'zlari matnda mos kelishini tekshiradi */
+const allWordsMatchInBlob = (queryWords, blob) =>
+  queryWords.every((w) => wordMatchesInBlob(w, blob));
+
+/**
+ * Matn bo'yicha umumiy ball.
+ * 100 — to'liq ibora, 90 — bitta so'z aniq, 80 — ko'p so'z, 70 — fuzzy
+ */
+const blobMatchScore = (q, queryWords, blob) => {
+  const text = normalizeText(blob);
+  if (!text) return 0;
+
+  if (q.length >= MIN_QUERY_LENGTH && text.includes(q)) return 100;
+
+  if (queryWords.length > 1) {
+    if (allWordsMatchInBlob(queryWords, text)) return 82;
+    return 0;
+  }
+
+  if (queryWords.length === 1) {
+    const qw = queryWords[0];
+    if (qw.length >= 3 && text.includes(qw)) return 92;
+
+    const words = text.split(/\s+/).filter(Boolean);
+    if (words.some((tw) => wordsMatch(qw, tw))) return 78;
+
+    if (qw.length >= 4) {
+      const bestSim = Math.max(...words.map((tw) => wordSimilarity(qw, tw)), 0);
+      if (bestSim >= 0.72) return 70;
+    }
+  }
+
   return 0;
 };
 
-const movieMetaMatchesQuery = (movie, queryWords) => {
-  const genreUz = (movie.filterGenre || movie.genre?.uz || []).join(' ').toLowerCase();
-  const genreRu = (movie.genre?.ru || []).join(' ').toLowerCase();
-  const country = String(movie.filterCountry || '').toLowerCase();
-  const typeCat = (movie.typeCategory || []).join(' ').toLowerCase();
-  const blob = `${genreUz} ${genreRu} ${country} ${typeCat}`;
-  return queryWords.some((w) => blob.includes(w));
+/** Ism qidiruvi — artist/aktyor uchun qattiqroq + imlo tolerant */
+const nameMatchScore = (q, queryWords, nameBlob) => {
+  const text = normalizeText(nameBlob);
+  if (!text) return 0;
+
+  if (q.length >= MIN_QUERY_LENGTH && text.includes(q)) return 100;
+
+  if (queryWords.length === 1) {
+    const qw = queryWords[0];
+    const nameWords = text.split(/\s+/).filter(Boolean);
+
+    if (nameWords.some((nw) => wordsMatch(qw, nw))) return 95;
+
+    const compact = text.replace(/\s/g, '');
+    const compactQ = qw.replace(/\s/g, '');
+    if (compactQ.length >= 4 && wordSimilarity(compactQ, compact) >= 0.68) return 88;
+    if (compactQ.length >= 6 && isSubsequence(compactQ, compact)) return 85;
+
+    if (nameWords.some((nw) => wordSimilarity(qw, nw) >= 0.72)) return 80;
+  }
+
+  if (queryWords.length > 1 && allWordsMatchInBlob(queryWords, text)) return 90;
+
+  return 0;
 };
 
 const getActorName = (actor, lang) => {
@@ -83,108 +203,108 @@ const getMusicArtistName = (item, artistsList = []) => {
   return artist?.name || item.artistId || '';
 };
 
-const actorMatchScore = (actor, q, queryWords) => {
-  const nameUz = normalize(getActorName(actor, 'uz'));
-  const nameRu = normalize(getActorName(actor, 'ru'));
-  const bioUz = normalize(actor?.bio?.text?.uz || '').slice(0, 1000);
-  const bioRu = normalize(actor?.bio?.text?.ru || '').slice(0, 1000);
+const movieMatchScore = (movie, q, queryWords) => {
+  const titleUz = getTitleForLang(movie, 'uz');
+  const titleRu = getTitleForLang(movie, 'ru');
+  const facets = parseMovieSearchFacets(q);
 
-  if (nameUz.includes(q) || nameRu.includes(q)) return 2;
-  if (q.length >= 2 && (bioUz.includes(q) || bioRu.includes(q))) return 2;
-  if (titleMatchesAllWords(nameUz, nameRu || nameUz, queryWords)) return 1;
-  if (titleMatchesAllWords(bioUz, bioRu, queryWords)) return 1;
-  return 0;
+  const titleSearchWords =
+    facets.titleTokens.length > 0 ? facets.titleTokens : facets.isFacetSearch ? [] : queryWords;
+
+  let score = 0;
+  if (titleSearchWords.length > 0) {
+    const titleQ = titleSearchWords.join(' ');
+    score = Math.max(
+      blobMatchScore(titleQ, titleSearchWords, titleUz),
+      blobMatchScore(titleQ, titleSearchWords, titleRu),
+      blobMatchScore(q, queryWords, titleUz),
+      blobMatchScore(q, queryWords, titleRu)
+    );
+  } else if (!facets.isFacetSearch) {
+    score = Math.max(blobMatchScore(q, queryWords, titleUz), blobMatchScore(q, queryWords, titleRu));
+  }
+
+  const facetScore = movieFacetMatchScore(movie, facets, queryWords);
+  score = Math.max(score, facetScore);
+
+  return score >= MIN_SCORE ? score : 0;
+};
+
+const actorMatchScore = (actor, q, queryWords) => {
+  const nameUz = getActorName(actor, 'uz');
+  const nameRu = getActorName(actor, 'ru');
+  let score = Math.max(
+    nameMatchScore(q, queryWords, nameUz),
+    nameMatchScore(q, queryWords, nameRu)
+  );
+
+  if (score >= MIN_SCORE) return score;
+
+  if (queryWords.length > 1) {
+    const bioUz = actor?.bio?.text?.uz || '';
+    const bioRu = actor?.bio?.text?.ru || '';
+    score = Math.max(
+      blobMatchScore(q, queryWords, bioUz),
+      blobMatchScore(q, queryWords, bioRu)
+    );
+  }
+
+  return score >= MIN_SCORE ? score : 0;
 };
 
 const musicArtistMatchScore = (artist, q, queryWords) => {
-  const name = normalize(String(artist?.name || ''));
-  if (name.includes(q)) return 2;
-  if (titleMatchesAllWords(name, name, queryWords)) return 1;
-  return 0;
+  const score = nameMatchScore(q, queryWords, artist?.name || '');
+  return score >= MIN_SCORE ? score : 0;
 };
 
 const musicItemMatchScore = (item, q, queryWords, artistsList) => {
-  const titleUz = normalize(getTitleForLang(item, 'uz'));
-  const titleRu = normalize(getTitleForLang(item, 'ru'));
-  const artistName = normalize(getMusicArtistName(item, artistsList));
-  const blobUz = `${titleUz} ${artistName}`;
-  const blobRu = `${titleRu} ${artistName}`;
-  if (blobUz.includes(q) || blobRu.includes(q)) return 2;
-  if (titleMatchesAllWords(blobUz, blobRu, queryWords)) return 1;
-  return 0;
+  const title = `${getTitleForLang(item, 'uz')} ${getTitleForLang(item, 'ru')}`;
+  const artist = getMusicArtistName(item, artistsList);
+
+  const titleScore = blobMatchScore(q, queryWords, title);
+  const artistScore = nameMatchScore(q, queryWords, artist);
+
+  let score = titleScore;
+
+  // Bitta so'z — artist nomi bo'yicha (shukurulo → Shukrullo qo'shiqlari)
+  if (queryWords.length === 1 && artistScore >= MIN_SCORE) {
+    score = Math.max(score, artistScore);
+  }
+
+  // Ko'p so'z — faqat sarlavha/ibora (noto'g'ri artist match yo'q)
+  if (queryWords.length > 1) {
+    score = titleScore;
+  }
+
+  return score >= MIN_SCORE ? score : 0;
 };
 
 const albumMatchScore = (album, q, queryWords, artistsList) => {
-  const title = normalize(String(album.title || ''));
-  const artist = normalize(getMusicArtistName(album, artistsList));
+  const title = String(album.title || '');
+  const artist = getMusicArtistName(album, artistsList);
   const songsBlob = ensureArray(album.songs)
-    .map((s) => `${normalize(String(s.title || ''))} ${normalize(String(s.artist || ''))}`)
+    .map((s) => `${String(s.title || '')} ${String(s.artist || '')}`)
     .join(' ');
+
   const blob = `${title} ${artist} ${songsBlob}`;
-  if (blob.includes(q)) return 2;
-  if (titleMatchesAllWords(blob, blob, queryWords)) return 1;
-  return 0;
-};
+  let score = blobMatchScore(q, queryWords, blob);
 
-const musicMetaMatchesQuery = (item, queryWords) => {
-  const genre = normalize(String(item.genre || ''));
-  const country = normalize(String(item.country || ''));
-  const language = normalize(String(item.language || ''));
-  const type = normalize(String(item.type || ''));
-  const blob = `${genre} ${country} ${language} ${type}`;
-  return queryWords.some((w) => blob.includes(w));
-};
-
-const searchMoviesOrdered = (q, queryWords, moviesList = []) => {
-  const byTitle = [];
-  const byMeta = [];
-
-  for (const m of moviesList) {
-    const score = titleMatchScore(m, q, queryWords);
-    if (score > 0) byTitle.push({ movie: m, score });
-    else if (movieMetaMatchesQuery(m, queryWords)) byMeta.push(m);
+  if (queryWords.length === 1) {
+    const artistScore = nameMatchScore(q, queryWords, artist);
+    if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
   }
 
-  byTitle.sort((a, b) => b.score - a.score);
-  const titleMovies = byTitle.map((x) => x.movie);
-  const titleIds = new Set(titleMovies.map((m) => m.id));
-  const metaOnly = byMeta.filter((m) => !titleIds.has(m.id));
-  return [...titleMovies, ...metaOnly];
+  return score >= MIN_SCORE ? score : 0;
 };
 
-const searchScoredList = (items, q, queryWords, matchFn, metaFn, extraArg) => {
-  const byTitle = [];
-  const byMeta = [];
+const scoreAndSort = (items, scoreFn, ...args) => {
+  const scored = [];
   for (const item of items) {
-    const score = matchFn(item, q, queryWords, extraArg);
-    if (score > 0) byTitle.push({ item, score });
-    else if (metaFn(item, queryWords)) byMeta.push(item);
+    const score = scoreFn(item, ...args);
+    if (score >= MIN_SCORE) scored.push({ item, score });
   }
-  byTitle.sort((a, b) => b.score - a.score);
-  const titleItems = byTitle.map((x) => x.item);
-  const titleIds = new Set(titleItems.map((m) => m.id));
-  const metaOnly = byMeta.filter((m) => !titleIds.has(m.id));
-  return [...titleItems, ...metaOnly];
-};
-
-const searchActorsOrdered = (q, queryWords, actorsList = []) => {
-  const scored = [];
-  for (const a of actorsList) {
-    const score = actorMatchScore(a, q, queryWords);
-    if (score > 0) scored.push({ actor: a, score });
-  }
-  scored.sort((x, y) => y.score - x.score);
-  return scored.map((x) => x.actor);
-};
-
-const searchMusicArtistsOrdered = (q, queryWords, artistsList = []) => {
-  const scored = [];
-  for (const a of artistsList) {
-    const score = musicArtistMatchScore(a, q, queryWords);
-    if (score > 0) scored.push({ artist: a, score });
-  }
-  scored.sort((x, y) => y.score - x.score);
-  return scored.map((x) => x.artist);
+  scored.sort((a, b) => b.score - a.score);
+  return scored.map((x) => x.item);
 };
 
 const searchContentByQuery = (
@@ -201,52 +321,39 @@ const searchContentByQuery = (
     musicArtists: musicArtistsList = [],
   } = {}
 ) => {
-  const q = normalize(query);
-  if (!q) {
+  const q = normalizeText(query);
+  if (!q || q.length < MIN_QUERY_LENGTH) {
     return { actors: [], musicArtists: [], movies: [], music: [], albums: [], clips: [], concerts: [] };
   }
 
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
   const perCategory = 10;
 
-  const actors = searchActorsOrdered(q, queryWords, actorsList).slice(0, 8);
-  const musicArtists = searchMusicArtistsOrdered(q, queryWords, musicArtistsList).slice(0, 8);
-  const movies = searchMoviesOrdered(q, queryWords, moviesList).slice(0, 20);
+  const actors = scoreAndSort(actorsList, (a) => actorMatchScore(a, q, queryWords)).slice(0, 8);
+  const musicArtists = scoreAndSort(musicArtistsList, (a) => musicArtistMatchScore(a, q, queryWords)).slice(
+    0,
+    8
+  );
+  const movies = scoreAndSort(moviesList, (m) => movieMatchScore(m, q, queryWords)).slice(0, 20);
 
-  const music = searchScoredList(
+  const music = scoreAndSort(
     ensureArray(musicList),
-    q,
-    queryWords,
-    musicItemMatchScore,
-    musicMetaMatchesQuery,
-    musicArtistsList
+    (item) => musicItemMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
-  const albums = searchScoredList(
+  const albums = scoreAndSort(
     ensureArray(albumsList),
-    q,
-    queryWords,
-    albumMatchScore,
-    musicMetaMatchesQuery,
-    musicArtistsList
+    (item) => albumMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
-  const clips = searchScoredList(
+  const clips = scoreAndSort(
     ensureArray(clipsList),
-    q,
-    queryWords,
-    musicItemMatchScore,
-    musicMetaMatchesQuery,
-    musicArtistsList
+    (item) => musicItemMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
-  const concerts = searchScoredList(
+  const concerts = scoreAndSort(
     ensureArray(concertsList),
-    q,
-    queryWords,
-    musicItemMatchScore,
-    musicMetaMatchesQuery,
-    musicArtistsList
+    (item) => musicItemMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
   return { actors, musicArtists, movies, music, albums, clips, concerts };
