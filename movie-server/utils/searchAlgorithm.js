@@ -9,6 +9,9 @@
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
 const { parseMovieSearchFacets, movieFacetMatchScore } = require('./searchFacets');
 const { parseMusicSearchFacets, musicFacetMatchScore } = require('./searchMusicFacets');
+const { parseClipSearchFacets, clipFacetMatchScore } = require('./searchClipFacets');
+const { parseConcertSearchFacets, concertFacetMatchScore } = require('./searchConcertFacets');
+const { parseAlbumSearchFacets, albumFacetMatchScore } = require('./searchAlbumFacets');
 const { parseContentType, resolveContentTypeResults } = require('./searchContentType');
 
 const MIN_SCORE = 55;
@@ -295,21 +298,72 @@ const musicItemMatchScore = (item, q, queryWords, artistsList) => {
   return score >= MIN_SCORE ? score : 0;
 };
 
-/** Klip/konsert — hozircha faqat title/artist (facet keyin) */
-const clipConcertMatchScore = (item, q, queryWords, artistsList) => {
+/** Klip — title/artist + genre/country facet */
+const clipMatchScore = (item, q, queryWords, artistsList) => {
   const title = `${getTitleForLang(item, 'uz')} ${getTitleForLang(item, 'ru')}`;
   const artist = getMusicArtistName(item, artistsList);
+  const facets = parseClipSearchFacets(q);
 
-  let score = blobMatchScore(q, queryWords, title);
+  const titleSearchWords =
+    facets.titleTokens.length > 0 ? facets.titleTokens : facets.isFacetSearch ? [] : queryWords;
 
-  if (queryWords.length === 1) {
+  let score = 0;
+  if (titleSearchWords.length > 0) {
+    const titleQ = titleSearchWords.join(' ');
+    score = Math.max(
+      blobMatchScore(titleQ, titleSearchWords, title),
+      blobMatchScore(q, queryWords, title)
+    );
+  } else if (!facets.isFacetSearch) {
+    score = blobMatchScore(q, queryWords, title);
+  }
+
+  if (!facets.isFacetSearch && queryWords.length === 1) {
     const artistScore = nameMatchScore(q, queryWords, artist);
     if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
   }
 
-  if (queryWords.length > 1) {
+  if (!facets.isFacetSearch && queryWords.length > 1) {
+    score = Math.max(score, blobMatchScore(q, queryWords, title));
+  }
+
+  const facetScore = clipFacetMatchScore(item, facets, queryWords);
+  score = Math.max(score, facetScore);
+
+  return score >= MIN_SCORE ? score : 0;
+};
+
+/** Konsert — title/artist + genre/country facet */
+const concertMatchScore = (item, q, queryWords, artistsList) => {
+  const title = `${getTitleForLang(item, 'uz')} ${getTitleForLang(item, 'ru')}`;
+  const artist = getMusicArtistName(item, artistsList);
+  const facets = parseConcertSearchFacets(q);
+
+  const titleSearchWords =
+    facets.titleTokens.length > 0 ? facets.titleTokens : facets.isFacetSearch ? [] : queryWords;
+
+  let score = 0;
+  if (titleSearchWords.length > 0) {
+    const titleQ = titleSearchWords.join(' ');
+    score = Math.max(
+      blobMatchScore(titleQ, titleSearchWords, title),
+      blobMatchScore(q, queryWords, title)
+    );
+  } else if (!facets.isFacetSearch) {
     score = blobMatchScore(q, queryWords, title);
   }
+
+  if (!facets.isFacetSearch && queryWords.length === 1) {
+    const artistScore = nameMatchScore(q, queryWords, artist);
+    if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
+  }
+
+  if (!facets.isFacetSearch && queryWords.length > 1) {
+    score = Math.max(score, blobMatchScore(q, queryWords, title));
+  }
+
+  const facetScore = concertFacetMatchScore(item, facets, queryWords);
+  score = Math.max(score, facetScore);
 
   return score >= MIN_SCORE ? score : 0;
 };
@@ -320,14 +374,31 @@ const albumMatchScore = (album, q, queryWords, artistsList) => {
   const songsBlob = ensureArray(album.songs)
     .map((s) => `${String(s.title || '')} ${String(s.artist || '')}`)
     .join(' ');
+  const facets = parseAlbumSearchFacets(q);
+
+  const titleSearchWords =
+    facets.titleTokens.length > 0 ? facets.titleTokens : facets.isFacetSearch ? [] : queryWords;
 
   const blob = `${title} ${artist} ${songsBlob}`;
-  let score = blobMatchScore(q, queryWords, blob);
+  let score = 0;
 
-  if (queryWords.length === 1) {
+  if (titleSearchWords.length > 0) {
+    const titleQ = titleSearchWords.join(' ');
+    score = Math.max(
+      blobMatchScore(titleQ, titleSearchWords, blob),
+      blobMatchScore(q, queryWords, blob)
+    );
+  } else if (!facets.isFacetSearch) {
+    score = blobMatchScore(q, queryWords, blob);
+  }
+
+  if (!facets.isFacetSearch && queryWords.length === 1) {
     const artistScore = nameMatchScore(q, queryWords, artist);
     if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
   }
+
+  const facetScore = albumFacetMatchScore(album, facets, queryWords);
+  score = Math.max(score, facetScore);
 
   return score >= MIN_SCORE ? score : 0;
 };
@@ -399,12 +470,12 @@ const searchContentByQuery = (
 
   const clips = scoreAndSort(
     ensureArray(clipsList),
-    (item) => clipConcertMatchScore(item, q, queryWords, musicArtistsList)
+    (item) => clipMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
   const concerts = scoreAndSort(
     ensureArray(concertsList),
-    (item) => clipConcertMatchScore(item, q, queryWords, musicArtistsList)
+    (item) => concertMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
   return { actors, musicArtists, movies, music, albums, clips, concerts };

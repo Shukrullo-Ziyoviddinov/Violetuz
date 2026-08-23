@@ -2,6 +2,9 @@
  * Kino qidiruv facetlari: filterCountry va filterGenre.
  * Umumiy engine → searchFacetEngine.js
  * Musiqa → searchMusicFacets.js
+ * Klip → searchClipFacets.js
+ * Konsert → searchConcertFacets.js
+ * Albom → searchAlbumFacets.js
  */
 
 const {
