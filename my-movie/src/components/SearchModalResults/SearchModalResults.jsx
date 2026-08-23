@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -7,7 +7,7 @@ import { useMusicApi } from '../../context/MusicApiContext';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import FilterSearchRezult from '../FilterSearchRezult/FilterSearchRezult';
 import SearchLoader from '../SearchLoader/SearchLoader';
-import { fetchSearchResults } from '../../api/searchApi';
+import { fetchSearchResults, cloneEmptyMetaSections } from '../../api/searchApi';
 import {
   SEARCH_FILTER_ALL,
   getAvailableSearchFilters,
@@ -16,14 +16,28 @@ import {
 import './SearchModalResults.css';
 import '../../Music/SearchMusicResults/SearchMusicResults.css';
 
-const EMPTY_RESULTS = {
-  actors: [],
-  musicArtists: [],
-  movies: [],
-  music: [],
-  albums: [],
-  clips: [],
-  concerts: [],
+const SECTION_KEYS = [
+  'actors',
+  'musicArtists',
+  'movies',
+  'music',
+  'albums',
+  'clips',
+  'concerts',
+];
+
+const mergeUniqueById = (prev = [], next = []) => {
+  if (!next.length) return prev;
+  const seen = new Set(prev.map((item) => String(item.id)));
+  const merged = [...prev];
+  for (const item of next) {
+    const key = String(item?.id);
+    if (!seen.has(key)) {
+      seen.add(key);
+      merged.push(item);
+    }
+  }
+  return merged;
 };
 
 const SearchModalResults = ({ query, onMovieClick }) => {
@@ -33,6 +47,20 @@ const SearchModalResults = ({ query, onMovieClick }) => {
   const { getArtistById } = useMusicApi();
   const [activeFilter, setActiveFilter] = useState(SEARCH_FILTER_ALL);
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [accumulated, setAccumulated] = useState({
+    actors: [],
+    musicArtists: [],
+    movies: [],
+    music: [],
+    albums: [],
+    clips: [],
+    concerts: [],
+  });
+  const [sectionsMeta, setSectionsMeta] = useState(() => cloneEmptyMetaSections());
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMoreLockRef = useRef(false);
+  const requestIdRef = useRef(0);
+  const sentinelRef = useRef(null);
 
   const trimmedQuery = query?.trim() || '';
 
@@ -41,28 +69,60 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     return () => clearTimeout(timer);
   }, [trimmedQuery]);
 
-  const { data: results = EMPTY_RESULTS, isFetching, isError } = useQuery({
+  useEffect(() => {
+    requestIdRef.current = debouncedQuery;
+    setAccumulated({
+      actors: [],
+      musicArtists: [],
+      movies: [],
+      music: [],
+      albums: [],
+      clips: [],
+      concerts: [],
+    });
+    setSectionsMeta(cloneEmptyMetaSections());
+    setActiveFilter(SEARCH_FILTER_ALL);
+    loadMoreLockRef.current = false;
+    setIsLoadingMore(false);
+  }, [debouncedQuery]);
+
+  const {
+    data: firstPage,
+    isFetching,
+    isError,
+    isSuccess,
+  } = useQuery({
     queryKey: ['search', debouncedQuery, contentLang],
     queryFn: () => fetchSearchResults(debouncedQuery, contentLang),
     enabled: debouncedQuery.length > 0,
     staleTime: 30_000,
-    placeholderData: (previous) => previous,
   });
 
-  const { actors, musicArtists, movies, music, albums, clips, concerts } = results;
+  useEffect(() => {
+    if (!isSuccess || !firstPage) return;
+    if (requestIdRef.current !== debouncedQuery) return;
+    setAccumulated({
+      actors: firstPage.actors || [],
+      musicArtists: firstPage.musicArtists || [],
+      movies: firstPage.movies || [],
+      music: firstPage.music || [],
+      albums: firstPage.albums || [],
+      clips: firstPage.clips || [],
+      concerts: firstPage.concerts || [],
+    });
+    setSectionsMeta(firstPage.meta?.sections || cloneEmptyMetaSections());
+  }, [isSuccess, firstPage, debouncedQuery]);
+
+  const { actors, musicArtists, movies, music, albums, clips, concerts } = accumulated;
 
   const availableFilters = useMemo(
     () =>
-      getAvailableSearchFilters(results).map((filter) => ({
+      getAvailableSearchFilters(accumulated).map((filter) => ({
         id: filter.id,
         label: t(filter.labelKey, filter.labelDefault),
       })),
-    [results, t]
+    [accumulated, t]
   );
-
-  useEffect(() => {
-    setActiveFilter(SEARCH_FILTER_ALL);
-  }, [trimmedQuery]);
 
   useEffect(() => {
     if (
@@ -74,7 +134,106 @@ const SearchModalResults = ({ query, onMovieClick }) => {
   }, [activeFilter, availableFilters]);
 
   const show = (sectionId) => isSearchSectionVisible(activeFilter, sectionId);
-  const isSearching = trimmedQuery.length > 0 && (trimmedQuery !== debouncedQuery || isFetching);
+  const isInitialLoading =
+    trimmedQuery.length > 0 &&
+    (trimmedQuery !== debouncedQuery || (isFetching && !firstPage));
+
+  const getSectionsToLoadMore = useCallback(() => {
+    const map = {
+      actor: 'actors',
+      movie: 'movies',
+      music: 'music',
+      artist: 'musicArtists',
+      album: 'albums',
+      klip: 'clips',
+      konsert: 'concerts',
+    };
+
+    return SECTION_KEYS.filter((key) => {
+      const meta = sectionsMeta?.[key];
+      if (!meta?.hasMore || !meta.nextCursor) return false;
+      if (activeFilter === SEARCH_FILTER_ALL) return true;
+      const filterKey = Object.entries(map).find(([, section]) => section === key)?.[0];
+      return filterKey ? isSearchSectionVisible(activeFilter, filterKey) : false;
+    });
+  }, [sectionsMeta, activeFilter]);
+
+  const loadMore = useCallback(async () => {
+    if (!debouncedQuery || loadMoreLockRef.current) return;
+    const sections = getSectionsToLoadMore();
+    if (!sections.length) return;
+
+    const requestQuery = debouncedQuery;
+    const requestLang = contentLang;
+    const cursors = Object.fromEntries(
+      sections.map((section) => [section, sectionsMeta[section]?.nextCursor])
+    );
+
+    loadMoreLockRef.current = true;
+    setIsLoadingMore(true);
+    try {
+      const pages = await Promise.all(
+        sections.map((section) =>
+          fetchSearchResults(requestQuery, requestLang, {
+            section,
+            cursor: cursors[section],
+          })
+        )
+      );
+
+      // So'rov o'zgargan bo'lsa — eski javobni qo'shma
+      if (requestIdRef.current !== requestQuery) return;
+
+      setAccumulated((prev) => {
+        const next = { ...prev };
+        pages.forEach((page, index) => {
+          const section = sections[index];
+          next[section] = mergeUniqueById(prev[section], page[section] || []);
+        });
+        return next;
+      });
+
+      setSectionsMeta((prev) => {
+        const next = { ...prev };
+        pages.forEach((page, index) => {
+          const section = sections[index];
+          next[section] = page.meta?.sections?.[section] || {
+            hasMore: false,
+            nextCursor: null,
+            total: next[section]?.total || 0,
+          };
+        });
+        return next;
+      });
+    } catch {
+      // keep existing results
+    } finally {
+      setIsLoadingMore(false);
+      loadMoreLockRef.current = false;
+    }
+  }, [debouncedQuery, contentLang, getSectionsToLoadMore, sectionsMeta]);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || isInitialLoading) return undefined;
+
+    const scrollRoot =
+      node.closest('.navbar-search-modal-inner') ||
+      node.closest('.navbar-mobile-search-box') ||
+      null;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadMore();
+        }
+      },
+      { root: scrollRoot, rootMargin: '160px', threshold: 0 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [loadMore, isInitialLoading, debouncedQuery, sectionsMeta]);
 
   const getMovieTitle = (m) => {
     if (m?.title && typeof m.title === 'object') {
@@ -137,7 +296,7 @@ const SearchModalResults = ({ query, onMovieClick }) => {
 
   if (!trimmedQuery) return null;
 
-  if (isSearching) {
+  if (isInitialLoading) {
     return <SearchLoader />;
   }
 
@@ -154,7 +313,9 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     movies.length > 0 ||
     musicSections.some((s) => s.items.length > 0);
 
-  if (isError) {
+  const hasMoreAny = getSectionsToLoadMore().length > 0;
+
+  if (isError && !hasAny) {
     return (
       <p className="search-modal-results-empty">
         {t('searchModal.error', 'Qidiruvda xatolik yuz berdi')}
@@ -326,6 +487,16 @@ const SearchModalResults = ({ query, onMovieClick }) => {
 
       {!hasAny && (
         <p className="search-modal-results-empty">{t('searchModal.noResults', 'Natija topilmadi')}</p>
+      )}
+
+      {(hasMoreAny || isLoadingMore) && (
+        <div
+          ref={sentinelRef}
+          className="search-modal-results-load-more"
+          aria-hidden={!isLoadingMore}
+        >
+          {isLoadingMore && <SearchLoader />}
+        </div>
       )}
     </div>
   );

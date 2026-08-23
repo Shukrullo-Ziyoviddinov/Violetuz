@@ -639,6 +639,39 @@ const validateSearchQuery = (req, _res, next) => {
     req.query.lang = lang || 'uz';
   }
 
+  if (req.query.section != null) {
+    const section = String(req.query.section).trim();
+    const allowed = [
+      'actors',
+      'musicArtists',
+      'movies',
+      'music',
+      'albums',
+      'clips',
+      'concerts',
+    ];
+    if (section && !allowed.includes(section)) {
+      return next(badRequest(`section must be one of: ${allowed.join(', ')}`));
+    }
+    req.query.section = section || null;
+  }
+
+  if (req.query.cursor != null) {
+    const cursor = Number(req.query.cursor);
+    if (!Number.isFinite(cursor) || cursor < 0) {
+      return next(badRequest('cursor must be a non-negative number.'));
+    }
+    req.query.cursor = cursor;
+  }
+
+  if (req.query.limit != null) {
+    const limit = Number(req.query.limit);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 40) {
+      return next(badRequest('limit must be an integer between 1 and 40.'));
+    }
+    req.query.limit = limit;
+  }
+
   next();
 };
 
