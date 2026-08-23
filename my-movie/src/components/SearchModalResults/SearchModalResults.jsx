@@ -13,6 +13,9 @@ import {
   getAvailableSearchFilters,
   isSearchSectionVisible,
 } from '../../utils/searchFilterTypes';
+import SearchMusicResultsItem from '../../Music/SearchMusicResults/SearchMusicResultsItem';
+import SearchModalResultsMovieItem from './SearchModalResultsMovieItem';
+import SearchModalResultsActorItem from './SearchModalResultsActorItem';
 import './SearchModalResults.css';
 import '../../Music/SearchMusicResults/SearchMusicResults.css';
 
@@ -249,6 +252,17 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     return m?.homeImg || '';
   };
 
+  const getMovieMeta = (m) => {
+    const year = m?.specs?.year;
+    const countries = Array.isArray(m?.specs?.countries)
+      ? m.specs.countries.filter(Boolean).join(', ')
+      : '';
+    const parts = [];
+    if (year != null && year !== '') parts.push(`${year}-yil`);
+    if (countries) parts.push(countries);
+    return parts.join(' ');
+  };
+
   const getMusicTitle = (item) => {
     if (item?.name && !item?.title) return item.name;
     if (!item?.title) return '';
@@ -341,25 +355,12 @@ const SearchModalResults = ({ query, onMovieClick }) => {
           <ScrollTouch className="search-modal-results-actors-scroll">
             <div className="search-modal-results-actors-row">
               {actors.map((actor) => (
-                <div
+                <SearchModalResultsActorItem
                   key={`actor-${actor.id}`}
-                  className="search-modal-results-actor-card"
+                  imgSrc={actor.image}
+                  name={getActorName(actor)}
                   onClick={() => handleActorClick(actor)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && handleActorClick(actor)}
-                >
-                  <div className="search-modal-results-actor-avatar-wrap">
-                    <img
-                      src={actor.image}
-                      alt={getActorName(actor)}
-                      className="search-modal-results-actor-avatar"
-                    />
-                  </div>
-                  {getActorName(actor) && (
-                    <p className="search-modal-results-actor-name">{getActorName(actor)}</p>
-                  )}
-                </div>
+                />
               ))}
             </div>
           </ScrollTouch>
@@ -375,29 +376,16 @@ const SearchModalResults = ({ query, onMovieClick }) => {
           </h3>
           <div className="search-modal-results-grid">
             {movies.map((movie) => (
-              <div
+              <SearchModalResultsMovieItem
                 key={`movie-${movie.id}`}
-                className="search-modal-results-item"
+                imgSrc={getMovieImg(movie)}
+                title={getMovieTitle(movie)}
+                metaText={getMovieMeta(movie)}
+                isSoon={movie.category === 'anonslar'}
+                ageRestriction={movie.ageRestriction}
+                soonLabel={t('searchModal.tezOrada', 'Tez orada')}
                 onClick={() => handleMovieClick(movie)}
-              >
-                <div className="search-modal-results-item-image-wrapper">
-                  <img
-                    src={getMovieImg(movie)}
-                    alt={getMovieTitle(movie)}
-                    className="search-modal-results-item-image"
-                  />
-                  {movie.category === 'anonslar' && (
-                    <span className="search-modal-results-badge search-modal-results-badge-soon">
-                      {t('searchModal.tezOrada', 'Tez orada')}
-                    </span>
-                  )}
-                  {movie.ageRestriction != null && (
-                    <span className="search-modal-results-badge search-modal-results-badge-age">
-                      {movie.ageRestriction}+
-                    </span>
-                  )}
-                </div>
-              </div>
+              />
             ))}
           </div>
         </div>
@@ -414,22 +402,13 @@ const SearchModalResults = ({ query, onMovieClick }) => {
                 <ScrollTouch className="search-music-results-scroll">
                   <div className="search-music-results-horizontal">
                     {items.map((item) => (
-                      <div
+                      <SearchMusicResultsItem
                         key={`artist-${item.id}`}
-                        className="search-music-results-item search-music-results-item--artist"
+                        variant="artist"
+                        imgSrc={(item.imgArtist || item.img) || '/img/movie1.jpg'}
+                        title={getMusicTitle(item)}
                         onClick={() => handleMusicClick(item, 'artist')}
-                      >
-                        <div className="search-music-results-item-image-wrapper">
-                          <img
-                            src={(item.imgArtist || item.img) || '/img/movie1.jpg'}
-                            alt={getMusicTitle(item)}
-                            className="search-music-results-item-image"
-                          />
-                        </div>
-                        <div className="search-music-results-item-info">
-                          <span className="search-music-results-item-title">{getMusicTitle(item)}</span>
-                        </div>
-                      </div>
+                      />
                     ))}
                   </div>
                 </ScrollTouch>
@@ -437,46 +416,28 @@ const SearchModalResults = ({ query, onMovieClick }) => {
                 <ScrollTouch className="search-music-results-scroll">
                   <div className="search-music-results-horizontal">
                     {items.map((item) => (
-                      <div
+                      <SearchMusicResultsItem
                         key={`${key}-${item.id}`}
-                        className="search-music-results-item search-music-results-item--video"
+                        variant="video"
+                        imgSrc={item.imgArtist || item.img || '/img/movie1.jpg'}
+                        title={getMusicTitle(item)}
+                        artist={getMusicArtistName(item)}
                         onClick={() => handleMusicClick(item, key)}
-                      >
-                        <div className="search-music-results-item-image-wrapper">
-                          <img
-                            src={item.imgArtist || item.img || '/img/movie1.jpg'}
-                            alt={getMusicTitle(item)}
-                            className="search-music-results-item-image"
-                          />
-                          <div className="search-music-results-item-info">
-                            <span className="search-music-results-item-title">{getMusicTitle(item)}</span>
-                            <span className="search-music-results-item-artist">{getMusicArtistName(item)}</span>
-                          </div>
-                        </div>
-                      </div>
+                      />
                     ))}
                   </div>
                 </ScrollTouch>
               ) : (
                 <div className="search-music-results-grid">
                   {items.map((item) => (
-                    <div
+                    <SearchMusicResultsItem
                       key={`${key}-${item.id}`}
-                      className="search-music-results-item"
+                      variant="grid"
+                      imgSrc={item.img || '/img/movie1.jpg'}
+                      title={getMusicTitle(item)}
+                      artist={getMusicArtistName(item)}
                       onClick={() => handleMusicClick(item, key)}
-                    >
-                      <div className="search-music-results-item-image-wrapper">
-                        <img
-                          src={item.img || '/img/movie1.jpg'}
-                          alt={getMusicTitle(item)}
-                          className="search-music-results-item-image"
-                        />
-                        <div className="search-music-results-item-info">
-                          <span className="search-music-results-item-title">{getMusicTitle(item)}</span>
-                          <span className="search-music-results-item-artist">{getMusicArtistName(item)}</span>
-                        </div>
-                      </div>
-                    </div>
+                    />
                   ))}
                 </div>
               )}
@@ -490,13 +451,22 @@ const SearchModalResults = ({ query, onMovieClick }) => {
       )}
 
       {(hasMoreAny || isLoadingMore) && (
-        <div
-          ref={sentinelRef}
-          className="search-modal-results-load-more"
-          aria-hidden={!isLoadingMore}
-        >
-          {isLoadingMore && <SearchLoader />}
-        </div>
+        <>
+          <div
+            ref={sentinelRef}
+            className="search-modal-results-sentinel"
+            aria-hidden="true"
+          />
+          <div
+            className={`search-modal-results-load-more${
+              isLoadingMore ? ' search-modal-results-load-more--visible' : ''
+            }`}
+            aria-hidden={!isLoadingMore}
+            aria-busy={isLoadingMore || undefined}
+          >
+            {isLoadingMore ? <SearchLoader /> : null}
+          </div>
+        </>
       )}
     </div>
   );

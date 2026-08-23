@@ -135,6 +135,7 @@
     height: 100%;
     max-width: none;
     overflow-y: auto;
+    overscroll-behavior-y: contain;
     padding: calc(15px + 0.25rem) 0.7rem 0.7rem;
     width: 100%;
   }

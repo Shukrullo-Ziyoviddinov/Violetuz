@@ -34,6 +34,65 @@
   transform: scale(1.02);
 }
 
+.search-music-results-item--loading {
+  pointer-events: none;
+  cursor: default;
+}
+
+.search-music-results-item--loading:hover {
+  transform: none;
+}
+
+.search-music-results-item-image--loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.search-music-results-item-image-wrapper .search-music-results-item-image-skeleton,
+.search-music-results-item-image-wrapper .skeleton-loader--search-music-results-image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.search-music-results-item-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%);
+  border-radius: 0 0 8px 8px;
+}
+
+.search-music-results-item--video .search-music-results-item-info {
+  padding: 0.4rem 0.5rem;
+}
+
+.search-music-results-item-title--loading,
+.search-music-results-item-artist--loading {
+  display: block;
+  overflow: hidden;
+  color: transparent;
+  -webkit-line-clamp: unset;
+}
+
+.search-music-results-item-title-skeleton,
+.search-music-results-item-artist-skeleton,
+.search-music-results-item-info .skeleton-loader--search-music-results-title,
+.search-music-results-item-info .skeleton-loader--search-music-results-artist {
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
 .search-music-results-item-image-wrapper {
   position: relative;
   width: 100%;
@@ -57,24 +116,6 @@
   height: 100%;
   object-fit: cover;
 }
-
-.search-music-results-item-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%);
-  border-radius: 0 0 8px 8px;
-}
-
-.search-music-results-item--video .search-music-results-item-info {
-  padding: 0.4rem 0.5rem;
-}
-
 
 .search-music-results-scroll {
   overflow-x: auto;
@@ -145,6 +186,16 @@
   border-radius: 50%;
 }
 
+.search-music-results-item--artist .search-music-results-item-image-skeleton,
+.search-music-results-item--artist .skeleton-loader--search-music-results-image {
+  position: absolute;
+  inset: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
 .search-music-results-item--artist .search-music-results-item-image {
   border-radius: 50%;
 }
@@ -154,6 +205,9 @@
   bottom: auto;
   left: auto;
   right: auto;
+  z-index: 2;
+  width: 104px;
+  max-width: 104px;
   padding: 0.5rem 0.25rem 0;
   background: none;
   border-radius: 0;
@@ -166,6 +220,23 @@
 .search-music-results-item--artist .search-music-results-item-title {
   display: block;
   -webkit-line-clamp: 2;
+  width: 100%;
+  text-align: center;
+}
+
+.search-music-results-item--artist .search-music-results-item-title--loading {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.search-music-results-item--artist .search-music-results-item-title-skeleton,
+.search-music-results-item--artist .skeleton-loader--search-music-results-title {
+  width: 72px;
+  max-width: 72px;
+  height: calc(0.75rem * 1.2 * 2);
+  margin: 0 auto;
+  border-radius: 4px;
 }
 
 @media (max-width: 500px) {
