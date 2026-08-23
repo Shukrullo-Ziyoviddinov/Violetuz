@@ -8,6 +8,7 @@
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
 const { parseMovieSearchFacets, movieFacetMatchScore } = require('./searchFacets');
+const { parseContentType, resolveContentTypeResults } = require('./searchContentType');
 
 const MIN_SCORE = 55;
 const MIN_QUERY_LENGTH = 2;
@@ -324,6 +325,22 @@ const searchContentByQuery = (
   const q = normalizeText(query);
   if (!q || q.length < MIN_QUERY_LENGTH) {
     return { actors: [], musicArtists: [], movies: [], music: [], albums: [], clips: [], concerts: [] };
+  }
+
+  // "kinolar" / "filmlar" — kontent turi (keyin tavsiya algoritmi shu yerda ulanadi)
+  const contentType = parseContentType(q);
+  if (contentType.isPureTypeSearch) {
+    return resolveContentTypeResults(
+      contentType,
+      {
+        movies: moviesList,
+        music: musicList,
+        clips: clipsList,
+        concerts: concertsList,
+        albums: albumsList,
+      },
+      { limit: null }
+    );
   }
 
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
