@@ -76,36 +76,44 @@ const stripNoise = (text, noiseWords = []) => {
 };
 
 const extractFacetMatches = (rawQuery, facetList, noiseWords = []) => {
-  let working = normalizeText(rawQuery);
+  const original = normalizeText(rawQuery);
+  let working = original;
   const matchedValues = new Set();
+  const usedAliases = new Set();
 
+  // Har bir facetni asl query bo'yicha tekshiramiz —
+  // bir xil alias (masalan g'amgin) bir nechta mavjud janrga tegishi mumkin.
   for (const facet of facetList) {
-    let facetHit = false;
+    let matchedAlias = null;
     for (const alias of facet.aliases) {
       const normalizedAlias = normalizeText(alias);
       if (normalizedAlias.length < 3) continue;
-      if (fuzzyIncludes(working, normalizedAlias)) {
-        facet.values.forEach((v) => matchedValues.add(v));
-        working = working.replace(new RegExp(escapeRegExp(normalizedAlias), 'g'), ' ');
-        facetHit = true;
+      if (fuzzyIncludes(original, normalizedAlias)) {
+        matchedAlias = normalizedAlias;
         break;
       }
     }
-    if (!facetHit) {
+    if (!matchedAlias) {
       for (const alias of facet.aliases) {
         const normalizedAlias = normalizeText(alias);
         if (
           normalizedAlias.length >= 3 &&
-          wordSimilarity(working.replace(/\s/g, ''), normalizedAlias) >= 0.72
+          wordSimilarity(original.replace(/\s/g, ''), normalizedAlias) >= 0.72
         ) {
-          facet.values.forEach((v) => matchedValues.add(v));
-          facetHit = true;
+          matchedAlias = normalizedAlias;
           break;
         }
       }
     }
+    if (!matchedAlias) continue;
+    facet.values.forEach((v) => matchedValues.add(v));
+    usedAliases.add(matchedAlias);
   }
 
+  for (const alias of usedAliases) {
+    working = working.replace(new RegExp(escapeRegExp(alias), 'g'), ' ');
+  }
+  working = working.replace(/\s+/g, ' ').trim();
   working = stripNoise(working, noiseWords);
   return { values: [...matchedValues], remainder: working };
 };
