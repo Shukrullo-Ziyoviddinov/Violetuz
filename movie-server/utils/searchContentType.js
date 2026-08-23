@@ -145,45 +145,52 @@ const stripWords = (text, aliases) => {
   return result.replace(/\s+/g, ' ').trim();
 };
 
-const matchPureType = (q, typeAliases, intentWords, type) => {
+const matchTypePresence = (q, typeAliases, intentWords, type) => {
   const afterType = stripWords(q, typeAliases);
   const hasType = afterType.length < q.length;
   if (!hasType) return null;
 
   const remainder = stripWords(afterType, intentWords);
-  if (!remainder) {
-    return { type, isPureTypeSearch: true };
-  }
-  return null;
+  return {
+    type,
+    isPureTypeSearch: !remainder,
+    hasTypeFilter: true,
+    remainder,
+    // Uzunroq alias (masalan "musiqa albomlar") qisqaroqdan ("musiqa") ustun
+    removedLen: q.length - afterType.length,
+  };
 };
 
 /**
- * So'rov faqat kontent turi ekanini aniqlaydi.
- * "kinolar" → movie, "musiqa" → music, "kliplar" → clip,
- * "konsertlar" → concert, "albomlar" → album
+ * Kontent turi + ixtiyoriy qoldiq (janr/davlat/nom).
+ * "musiqalar" → pure music
+ * "k pop musiqalar" → music + hasTypeFilter (faqat musiqa natija)
+ * "k pop" → type yo'q (barcha media turlari)
  */
 const parseContentType = (rawQuery) => {
   const q = normalizeText(rawQuery);
-  if (!q) {
-    return { type: null, isPureTypeSearch: false };
-  }
+  const empty = { type: null, isPureTypeSearch: false, hasTypeFilter: false, remainder: q };
 
-  const movie = matchPureType(q, MOVIE_TYPE_ALIASES, MOVIE_INTENT_WORDS, 'movie');
-  if (movie) return movie;
+  if (!q) return empty;
 
-  const music = matchPureType(q, MUSIC_TYPE_ALIASES, MUSIC_INTENT_WORDS, 'music');
-  if (music) return music;
+  const candidates = [
+    matchTypePresence(q, ALBUM_TYPE_ALIASES, ALBUM_INTENT_WORDS, 'album'),
+    matchTypePresence(q, CONCERT_TYPE_ALIASES, CONCERT_INTENT_WORDS, 'concert'),
+    matchTypePresence(q, CLIP_TYPE_ALIASES, CLIP_INTENT_WORDS, 'clip'),
+    matchTypePresence(q, MUSIC_TYPE_ALIASES, MUSIC_INTENT_WORDS, 'music'),
+    matchTypePresence(q, MOVIE_TYPE_ALIASES, MOVIE_INTENT_WORDS, 'movie'),
+  ].filter(Boolean);
 
-  const clip = matchPureType(q, CLIP_TYPE_ALIASES, CLIP_INTENT_WORDS, 'clip');
-  if (clip) return clip;
+  if (!candidates.length) return empty;
 
-  const concert = matchPureType(q, CONCERT_TYPE_ALIASES, CONCERT_INTENT_WORDS, 'concert');
-  if (concert) return concert;
-
-  const album = matchPureType(q, ALBUM_TYPE_ALIASES, ALBUM_INTENT_WORDS, 'album');
-  if (album) return album;
-
-  return { type: null, isPureTypeSearch: false };
+  candidates.sort((a, b) => b.removedLen - a.removedLen);
+  const best = candidates[0];
+  return {
+    type: best.type,
+    isPureTypeSearch: best.isPureTypeSearch,
+    hasTypeFilter: true,
+    remainder: best.remainder || '',
+  };
 };
 
 const applyLimit = (list, limit) => {

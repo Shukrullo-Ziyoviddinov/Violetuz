@@ -432,7 +432,7 @@ const searchContentByQuery = (
     return { actors: [], musicArtists: [], movies: [], music: [], albums: [], clips: [], concerts: [] };
   }
 
-  // "kinolar" / "filmlar" — kontent turi (keyin tavsiya algoritmi shu yerda ulanadi)
+  // "kinolar" / "musiqalar" — toza tur (tavsiya / to'liq katalog)
   const contentType = parseContentType(q);
   if (contentType.isPureTypeSearch) {
     return resolveContentTypeResults(
@@ -450,6 +450,61 @@ const searchContentByQuery = (
 
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
   const perCategory = 10;
+  const empty = {
+    actors: [],
+    musicArtists: [],
+    movies: [],
+    music: [],
+    albums: [],
+    clips: [],
+    concerts: [],
+  };
+
+  // "k pop musiqalar" / "k pop kliplar" — aniq tur: faqat shu bucket
+  if (contentType.hasTypeFilter && contentType.type) {
+    if (contentType.type === 'movie') {
+      return {
+        ...empty,
+        movies: scoreAndSort(moviesList, (m) => movieMatchScore(m, q, queryWords)).slice(0, 20),
+      };
+    }
+    if (contentType.type === 'music') {
+      return {
+        ...empty,
+        music: scoreAndSort(
+          ensureArray(musicList),
+          (item) => musicItemMatchScore(item, q, queryWords, musicArtistsList)
+        ).slice(0, perCategory),
+      };
+    }
+    if (contentType.type === 'clip') {
+      return {
+        ...empty,
+        clips: scoreAndSort(
+          ensureArray(clipsList),
+          (item) => clipMatchScore(item, q, queryWords, musicArtistsList)
+        ).slice(0, perCategory),
+      };
+    }
+    if (contentType.type === 'concert') {
+      return {
+        ...empty,
+        concerts: scoreAndSort(
+          ensureArray(concertsList),
+          (item) => concertMatchScore(item, q, queryWords, musicArtistsList)
+        ).slice(0, perCategory),
+      };
+    }
+    if (contentType.type === 'album') {
+      return {
+        ...empty,
+        albums: scoreAndSort(
+          ensureArray(albumsList),
+          (item) => albumMatchScore(item, q, queryWords, musicArtistsList)
+        ).slice(0, perCategory),
+      };
+    }
+  }
 
   const actors = scoreAndSort(actorsList, (a) => actorMatchScore(a, q, queryWords)).slice(0, 8);
   const musicArtists = scoreAndSort(musicArtistsList, (a) => musicArtistMatchScore(a, q, queryWords)).slice(

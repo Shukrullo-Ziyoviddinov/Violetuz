@@ -67,6 +67,33 @@ const facetValueMatches = (queryToken, dbValue) => {
 
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+const getQueryWords = (text) => normalizeText(text).split(/\s+/).filter(Boolean);
+
+/**
+ * Facet alias faqat to'liq so'z yoki aniq ibora sifatida mos keladi.
+ * "musiqalar" ichidagi "qalar" → "qatar" noto'g'ri match bo'lmasligi uchun.
+ */
+const aliasMatchesInQuery = (rawQuery, alias) => {
+  const query = normalizeText(rawQuery);
+  const normalizedAlias = normalizeText(alias);
+  if (!query || !normalizedAlias || normalizedAlias.length < 3) return false;
+
+  if (normalizedAlias.includes(' ')) {
+    if (query.includes(normalizedAlias)) return true;
+    const queryCompact = query.replace(/\s/g, '');
+    const aliasCompact = normalizedAlias.replace(/\s/g, '');
+    if (aliasCompact.length >= 3 && queryCompact.includes(aliasCompact)) return true;
+    return aliasCompact.length >= 4 && wordSimilarity(queryCompact, aliasCompact) >= 0.72;
+  }
+
+  const words = getQueryWords(query);
+  if (words.includes(normalizedAlias)) return true;
+  return words.some((word) => {
+    if (word.length < 3 || normalizedAlias.length < 3) return false;
+    return wordSimilarity(word, normalizedAlias) >= 0.72;
+  });
+};
+
 const stripNoise = (text, noiseWords = []) => {
   let result = text;
   for (const noise of [...noiseWords].sort((a, b) => b.length - a.length)) {
@@ -76,7 +103,7 @@ const stripNoise = (text, noiseWords = []) => {
 };
 
 const extractFacetMatches = (rawQuery, facetList, noiseWords = []) => {
-  const original = normalizeText(rawQuery);
+  const original = stripNoise(normalizeText(rawQuery), noiseWords);
   let working = original;
   const matchedValues = new Set();
   const usedAliases = new Set();
@@ -88,21 +115,9 @@ const extractFacetMatches = (rawQuery, facetList, noiseWords = []) => {
     for (const alias of facet.aliases) {
       const normalizedAlias = normalizeText(alias);
       if (normalizedAlias.length < 3) continue;
-      if (fuzzyIncludes(original, normalizedAlias)) {
+      if (aliasMatchesInQuery(original, normalizedAlias)) {
         matchedAlias = normalizedAlias;
         break;
-      }
-    }
-    if (!matchedAlias) {
-      for (const alias of facet.aliases) {
-        const normalizedAlias = normalizeText(alias);
-        if (
-          normalizedAlias.length >= 3 &&
-          wordSimilarity(original.replace(/\s/g, ''), normalizedAlias) >= 0.72
-        ) {
-          matchedAlias = normalizedAlias;
-          break;
-        }
       }
     }
     if (!matchedAlias) continue;
@@ -139,7 +154,7 @@ const parseCountryGenreFacets = (rawQuery, countryFacets, genreFacets, noiseWord
 
 const hasFacetIntent = (queryWords, facetList) =>
   queryWords.some((qw) =>
-    facetList.some((f) => f.aliases.some((a) => fuzzyIncludes(normalizeText(qw), normalizeText(a))))
+    facetList.some((f) => f.aliases.some((a) => aliasMatchesInQuery(qw, a)))
   );
 
 const matchSingleField = (dbValue, targets, queryWords, facetList) => {
@@ -151,7 +166,7 @@ const matchSingleField = (dbValue, targets, queryWords, facetList) => {
   return queryWords.some((qw) => {
     if (normalizeText(qw).length < 3) return false;
     for (const facet of facetList) {
-      if (!facet.aliases.some((a) => fuzzyIncludes(normalizeText(qw), normalizeText(a)))) continue;
+      if (!facet.aliases.some((a) => aliasMatchesInQuery(qw, a))) continue;
       if (facet.values.some((v) => facetValueMatches(v, dbVal))) return true;
     }
     return facetValueMatches(qw, dbVal);
@@ -167,7 +182,7 @@ const matchMultiField = (dbValues, targets, queryWords, facetList) => {
   return queryWords.some((qw) => {
     if (normalizeText(qw).length < 3) return false;
     for (const facet of facetList) {
-      if (!facet.aliases.some((a) => fuzzyIncludes(normalizeText(qw), normalizeText(a)))) continue;
+      if (!facet.aliases.some((a) => aliasMatchesInQuery(qw, a))) continue;
       if (facet.values.some((v) => list.some((g) => facetValueMatches(v, g)))) return true;
     }
     return list.some((g) => facetValueMatches(qw, g));
