@@ -178,13 +178,12 @@
 .search-modal-results-item-title {
   margin: 0;
   color: #fff;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .search-modal-results-item-meta {
@@ -202,7 +201,6 @@
   display: block;
   overflow: hidden;
   color: transparent;
-  -webkit-line-clamp: unset;
 }
 
 .search-modal-results-item-title-skeleton,
@@ -274,13 +272,7 @@
   overflow-anchor: none;
   pointer-events: none;
   opacity: 0;
-  background: linear-gradient(
-    to top,
-    rgba(20, 20, 20, 0.98) 0%,
-    rgba(20, 20, 20, 0.96) 55%,
-    rgba(20, 20, 20, 0.72) 85%,
-    transparent 100%
-  );
+  background: none;
 }
 
 .search-modal-results-load-more--visible {

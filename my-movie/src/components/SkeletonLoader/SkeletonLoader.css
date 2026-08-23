@@ -535,7 +535,7 @@
 .skeleton-loader--search-modal-results-title {
   width: 85%;
   max-width: 100%;
-  height: calc(0.75rem * 1.2 * 2);
+  height: calc(0.75rem * 1.2);
   border-radius: 4px;
 }
 
