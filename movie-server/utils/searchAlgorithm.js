@@ -8,6 +8,7 @@
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
 const { parseMovieSearchFacets, movieFacetMatchScore } = require('./searchFacets');
+const { parseMusicSearchFacets, musicFacetMatchScore } = require('./searchMusicFacets');
 const { parseContentType, resolveContentTypeResults } = require('./searchContentType');
 
 const MIN_SCORE = 55;
@@ -261,20 +262,53 @@ const musicArtistMatchScore = (artist, q, queryWords) => {
 const musicItemMatchScore = (item, q, queryWords, artistsList) => {
   const title = `${getTitleForLang(item, 'uz')} ${getTitleForLang(item, 'ru')}`;
   const artist = getMusicArtistName(item, artistsList);
+  const facets = parseMusicSearchFacets(q);
 
-  const titleScore = blobMatchScore(q, queryWords, title);
-  const artistScore = nameMatchScore(q, queryWords, artist);
+  const titleSearchWords =
+    facets.titleTokens.length > 0 ? facets.titleTokens : facets.isFacetSearch ? [] : queryWords;
 
-  let score = titleScore;
-
-  // Bitta so'z — artist nomi bo'yicha (shukurulo → Shukrullo qo'shiqlari)
-  if (queryWords.length === 1 && artistScore >= MIN_SCORE) {
-    score = Math.max(score, artistScore);
+  let score = 0;
+  if (titleSearchWords.length > 0) {
+    const titleQ = titleSearchWords.join(' ');
+    score = Math.max(
+      blobMatchScore(titleQ, titleSearchWords, title),
+      blobMatchScore(q, queryWords, title)
+    );
+  } else if (!facets.isFacetSearch) {
+    score = blobMatchScore(q, queryWords, title);
   }
 
-  // Ko'p so'z — faqat sarlavha/ibora (noto'g'ri artist match yo'q)
+  // Bitta so'z — artist nomi (facet bo'lmasa)
+  if (!facets.isFacetSearch && queryWords.length === 1) {
+    const artistScore = nameMatchScore(q, queryWords, artist);
+    if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
+  }
+
+  // Ko'p so'z + facet yo'q — faqat title/ibora
+  if (!facets.isFacetSearch && queryWords.length > 1) {
+    score = Math.max(score, blobMatchScore(q, queryWords, title));
+  }
+
+  const facetScore = musicFacetMatchScore(item, facets, queryWords);
+  score = Math.max(score, facetScore);
+
+  return score >= MIN_SCORE ? score : 0;
+};
+
+/** Klip/konsert — hozircha faqat title/artist (facet keyin) */
+const clipConcertMatchScore = (item, q, queryWords, artistsList) => {
+  const title = `${getTitleForLang(item, 'uz')} ${getTitleForLang(item, 'ru')}`;
+  const artist = getMusicArtistName(item, artistsList);
+
+  let score = blobMatchScore(q, queryWords, title);
+
+  if (queryWords.length === 1) {
+    const artistScore = nameMatchScore(q, queryWords, artist);
+    if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
+  }
+
   if (queryWords.length > 1) {
-    score = titleScore;
+    score = blobMatchScore(q, queryWords, title);
   }
 
   return score >= MIN_SCORE ? score : 0;
@@ -365,12 +399,12 @@ const searchContentByQuery = (
 
   const clips = scoreAndSort(
     ensureArray(clipsList),
-    (item) => musicItemMatchScore(item, q, queryWords, musicArtistsList)
+    (item) => clipConcertMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
   const concerts = scoreAndSort(
     ensureArray(concertsList),
-    (item) => musicItemMatchScore(item, q, queryWords, musicArtistsList)
+    (item) => clipConcertMatchScore(item, q, queryWords, musicArtistsList)
   ).slice(0, perCategory);
 
   return { actors, musicArtists, movies, music, albums, clips, concerts };
