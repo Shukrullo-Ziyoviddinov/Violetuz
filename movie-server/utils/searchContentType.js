@@ -18,6 +18,16 @@ const MOVIE_TYPE_ALIASES = [
   'serial',
   'seriallar',
   'seriallari',
+  // RU
+  'кино',
+  'фильмы',
+  'фильм',
+  'фильмов',
+  'фильма',
+  'сериалы',
+  'сериал',
+  'сериалов',
+  'сериала',
 ];
 
 const MUSIC_TYPE_ALIASES = [
@@ -37,6 +47,17 @@ const MUSIC_TYPE_ALIASES = [
   'track',
   'tracks',
   'audio',
+  // RU
+  'музыка',
+  'музыки',
+  'музыку',
+  'песня',
+  'песни',
+  'песен',
+  'трек',
+  'треки',
+  'треков',
+  'аудио',
 ];
 
 const CLIP_TYPE_ALIASES = [
@@ -54,6 +75,16 @@ const CLIP_TYPE_ALIASES = [
   'video kliplar',
   'video clip',
   'video cliplar',
+  // RU
+  'клип',
+  'клипы',
+  'клипов',
+  'клипа',
+  'видеоклип',
+  'видеоклипы',
+  'музыкальный клип',
+  'музыкальные клипы',
+  'видеоклипа',
 ];
 
 const CONCERT_TYPE_ALIASES = [
@@ -70,6 +101,19 @@ const CONCERT_TYPE_ALIASES = [
   'jonli konsert',
   'video konsert',
   'video konsertlar',
+  // RU
+  'концерт',
+  'концерты',
+  'концертов',
+  'концерта',
+  'лайв',
+  'живой',
+  'живая',
+  'живое',
+  'живой концерт',
+  'видео концерт',
+  'видеоконцерт',
+  'видеоконцерты',
 ];
 
 const ALBUM_TYPE_ALIASES = [
@@ -89,6 +133,15 @@ const ALBUM_TYPE_ALIASES = [
   'music albums',
   'music albom',
   'music albomlar',
+  // RU
+  'альбом',
+  'альбомы',
+  'альбомов',
+  'альбома',
+  'музыкальный альбом',
+  'музыкальные альбомы',
+  'муз альбом',
+  'муз альбомы',
 ];
 
 /**
@@ -120,6 +173,26 @@ const SHARED_INTENT_WORDS = [
   'oxirgi',
   'soʻnggi',
   'songgi',
+  // RU
+  'новые',
+  'новый',
+  'новая',
+  'новое',
+  'новинки',
+  'сборник',
+  'сборники',
+  'коллекция',
+  'коллекции',
+  'список',
+  'каталог',
+  'все',
+  'всех',
+  'самые',
+  'самый',
+  'последние',
+  'последний',
+  'последняя',
+  'недавние',
 ];
 
 const MOVIE_INTENT_WORDS = SHARED_INTENT_WORDS;
