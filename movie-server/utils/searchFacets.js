@@ -16,6 +16,7 @@ const {
   countryGenreFacetScore,
 } = require('./searchFacetEngine');
 const { attachYearFacet, COLLECTION_NOISE_WORDS } = require('./searchYearFacets');
+const { ACTOR_FILM_NOISE_WORDS } = require('./searchActorFilmFacets');
 
 const NOISE_WORDS = [
   'kino',
@@ -34,6 +35,7 @@ const NOISE_WORDS = [
   'tarjimada',
   'tilida',
   ...COLLECTION_NOISE_WORDS,
+  ...ACTOR_FILM_NOISE_WORDS,
 ];
 
 /** DB filterCountry qiymatlari + foydalanuvchi sinonimlari */

@@ -322,19 +322,36 @@ const itemMatchesYearFacet = (item, facets, getYear = getItemYear) => {
 /**
  * Umumiy year rank: exact filter / recency DESC.
  * Kino, musiqa, klip, konsert, albom — bir xil algoritm.
+ * actorIds berilsa — faqat shu aktyorlarga biriktirilgan kinolar.
  */
-const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear) => {
+const movieHasAnyActor = (movie, actorIds) => {
+  if (!actorIds?.length) return true;
+  const list = ensureArray(movie?.actors).map((id) => String(id));
+  if (!list.length) return false;
+  return actorIds.some((id) => list.includes(String(id)));
+};
+
+const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear, options = {}) => {
+  const { actorIds = null } = options;
   const yearOnly =
     Boolean(facets?.isYearSearch) &&
     (facets.countryTargets || []).length === 0 &&
     (facets.genreTargets || []).length === 0 &&
     (facets.titleTokens || []).length === 0;
 
+  // Aktyor orqali katalog (title qoldiq yo'q) — yearOnly kabi engil score
+  const actorCatalogOnly =
+    Boolean(actorIds?.length) &&
+    (facets.countryTargets || []).length === 0 &&
+    (facets.genreTargets || []).length === 0 &&
+    (facets.titleTokens || []).length === 0;
+
   const scored = [];
   for (const item of ensureArray(items)) {
+    if (actorIds?.length && !movieHasAnyActor(item, actorIds)) continue;
     if (!itemMatchesYearFacet(item, facets, getYear)) continue;
 
-    const score = yearOnly ? MIN_SCORE : scoreFn(item);
+    const score = yearOnly || actorCatalogOnly ? MIN_SCORE : scoreFn(item);
     if (score < MIN_SCORE) continue;
     scored.push({ item, score, year: getYear(item) });
   }
@@ -350,9 +367,31 @@ const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear) =>
   return scored.map((x) => x.item);
 };
 
-const rankMoviesByFacets = (moviesList, q, queryWords, facets) =>
-  rankItemsByYearFacets(moviesList, facets, (movie) =>
-    movieMatchScore(movie, q, queryWords, facets)
+/** Faqat ism — bio orqali noto'g'ri match bo'lmasin */
+const actorNameOnlyScore = (actor, nameQ, nameWords) => {
+  const nameUz = getActorName(actor, 'uz');
+  const nameRu = getActorName(actor, 'ru');
+  const score = Math.max(
+    nameMatchScore(nameQ, nameWords, nameUz),
+    nameMatchScore(nameQ, nameWords, nameRu)
+  );
+  return score >= MIN_SCORE ? score : 0;
+};
+
+const resolveActorFilmHits = (actorsList, nameTokens) => {
+  const tokens = ensureArray(nameTokens).filter(Boolean);
+  if (!tokens.length || !actorsList?.length) return [];
+  const nameQ = tokens.join(' ');
+  return scoreAndSort(actorsList, (actor) => actorNameOnlyScore(actor, nameQ, tokens));
+};
+
+const rankMoviesByFacets = (moviesList, q, queryWords, facets, actorIds = null) =>
+  rankItemsByYearFacets(
+    moviesList,
+    facets,
+    (movie) => movieMatchScore(movie, q, queryWords, facets),
+    getItemYear,
+    { actorIds }
   );
 
 const rankMediaByFacets = (list, q, queryWords, artistsList, facets, facetScoreFn) =>
@@ -364,6 +403,38 @@ const rankAlbumsByFacets = (list, q, queryWords, artistsList, facets) =>
   rankItemsByYearFacets(list, facets, (album) =>
     albumMatchScore(album, q, queryWords, artistsList, facets)
   );
+
+/**
+ * Kino type: qolgan token aktyor ismi bo'lsa — profil + biriktirilgan kinolar.
+ * Topilmasa — oddiy title/facet qidiruv.
+ */
+const rankMovieTypeResults = (moviesList, actorsList, q, queryWords, movieFacets) => {
+  const nameTokens = movieFacets.titleTokens || [];
+  const actorHits = resolveActorFilmHits(actorsList, nameTokens);
+
+  if (actorHits.length) {
+    const facetsForMovies = {
+      ...movieFacets,
+      titleTokens: [],
+      isFacetSearch: true,
+    };
+    return {
+      actors: actorHits,
+      movies: rankMoviesByFacets(
+        moviesList,
+        q,
+        queryWords,
+        facetsForMovies,
+        actorHits.map((a) => a.id)
+      ),
+    };
+  }
+
+  return {
+    actors: [],
+    movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
+  };
+};
 
 const emptyResults = () => ({
   actors: [],
@@ -510,9 +581,17 @@ const rankAllResults = (
 
   if (contentType.hasTypeFilter && contentType.type) {
     if (contentType.type === 'movie') {
+      const movieType = rankMovieTypeResults(
+        moviesList,
+        actorsList,
+        q,
+        queryWords,
+        movieFacets
+      );
       return {
         ...empty,
-        movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
+        actors: movieType.actors,
+        movies: movieType.movies,
       };
     }
     if (contentType.type === 'music') {

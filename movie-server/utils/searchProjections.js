@@ -13,6 +13,7 @@ const MOVIE_SEARCH_PROJECTION = {
   filterCountry: 1,
   filterGenre: 1,
   categoryName: 1,
+  actors: 1,
   'specs.year': 1,
   'specs.countries': 1,
 };

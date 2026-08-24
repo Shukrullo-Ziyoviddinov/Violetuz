@@ -17,6 +17,7 @@ const {
   DEFAULT_LIMITS,
   SEARCH_SECTIONS,
 } = require('../utils/searchAlgorithm');
+const { parseMovieSearchFacets } = require('../utils/searchFacets');
 const {
   MOVIE_SEARCH_PROJECTION,
   ACTOR_SEARCH_PROJECTION,
@@ -53,7 +54,12 @@ const resolveNeededScopes = (query, section = null) => {
       if (contentType.type === 'concert') return { concerts: true };
       if (contentType.type === 'album') return { albums: true };
     }
-    if (contentType.type === 'movie') return { movies: true };
+    if (contentType.type === 'movie') {
+      // "leonardo kinolari" — title token qolsa aktyor+kino kerak
+      const movieFacets = parseMovieSearchFacets(query);
+      const needActors = (movieFacets.titleTokens || []).length > 0;
+      return needActors ? { movies: true, actors: true } : { movies: true };
+    }
     if (contentType.type === 'music') return { music: true, musicArtists: true };
     if (contentType.type === 'clip') return { clips: true, musicArtists: true };
     if (contentType.type === 'concert') return { concerts: true, musicArtists: true };
