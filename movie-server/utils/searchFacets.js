@@ -33,6 +33,12 @@ const NOISE_WORDS = [
   'tarjima',
   'tarjimada',
   'tilida',
+  'toplam',
+  'toplami',
+  'toplamlar',
+  'toplamlari',
+  'collection',
+  'collections',
 ];
 
 /** DB filterCountry qiymatlari + foydalanuvchi sinonimlari */
