@@ -11,7 +11,7 @@ const { parseMusicSearchFacets, musicFacetMatchScore } = require('./searchMusicF
 const { parseClipSearchFacets, clipFacetMatchScore } = require('./searchClipFacets');
 const { parseConcertSearchFacets, concertFacetMatchScore } = require('./searchConcertFacets');
 const { parseAlbumSearchFacets, albumFacetMatchScore } = require('./searchAlbumFacets');
-const { parseContentType, resolveContentTypeResults } = require('./searchContentType');
+const { parseContentType, getContentTypes, resolveContentTypeResults } = require('./searchContentType');
 
 const MIN_SCORE = 55;
 const MIN_QUERY_LENGTH = 2;
@@ -322,7 +322,7 @@ const itemMatchesYearFacet = (item, facets, getYear = getItemYear) => {
 /**
  * Umumiy year rank: exact filter / recency DESC.
  * Kino, musiqa, klip, konsert, albom — bir xil algoritm.
- * actorIds berilsa — faqat shu aktyorlarga biriktirilgan kinolar.
+ * actorIds / artistIds — biriktirilgan katalog filtri.
  */
 const movieHasAnyActor = (movie, actorIds) => {
   if (!actorIds?.length) return true;
@@ -331,8 +331,15 @@ const movieHasAnyActor = (movie, actorIds) => {
   return actorIds.some((id) => list.includes(String(id)));
 };
 
+const mediaHasAnyArtist = (item, artistIds) => {
+  if (!artistIds?.length) return true;
+  const id = item?.artistId;
+  if (id == null || id === '') return false;
+  return artistIds.some((aid) => String(aid) === String(id));
+};
+
 const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear, options = {}) => {
-  const { actorIds = null, lightFacetScoreFn = null } = options;
+  const { actorIds = null, artistIds = null, lightFacetScoreFn = null } = options;
   const noTitle = (facets.titleTokens || []).length === 0;
   const noCountry = (facets.countryTargets || []).length === 0;
   const noGenre = (facets.genreTargets || []).length === 0;
@@ -340,20 +347,22 @@ const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear, op
   const yearOnly =
     Boolean(facets?.isYearSearch) && noCountry && noGenre && noTitle;
 
-  // Aktyor + (ixtiyoriy year/genre/country), title yo'q — engil yo'l
-  const actorLinkedMode = Boolean(actorIds?.length) && noTitle;
-  const actorCatalogOnly = actorLinkedMode && noCountry && noGenre;
+  // Actor/artist + (ixtiyoriy year/genre/country), title yo'q — engil yo'l
+  const linkedMode =
+    (Boolean(actorIds?.length) || Boolean(artistIds?.length)) && noTitle;
+  const linkedCatalogOnly = linkedMode && noCountry && noGenre;
 
   const scored = [];
   for (const item of ensureArray(items)) {
     if (actorIds?.length && !movieHasAnyActor(item, actorIds)) continue;
+    if (artistIds?.length && !mediaHasAnyArtist(item, artistIds)) continue;
     if (!itemMatchesYearFacet(item, facets, getYear)) continue;
 
     let score;
-    if (yearOnly || actorCatalogOnly) {
+    if (yearOnly || linkedCatalogOnly) {
       score = MIN_SCORE;
-    } else if (actorLinkedMode && lightFacetScoreFn) {
-      // Actor+genre/country — title blob yo'q, faqat facet
+    } else if (linkedMode && lightFacetScoreFn) {
+      // Linked + genre/country — title blob yo'q, faqat facet
       score = lightFacetScoreFn(item);
     } else {
       score = scoreFn(item);
@@ -403,15 +412,173 @@ const rankMoviesByFacets = (moviesList, q, queryWords, facets, actorIds = null) 
     }
   );
 
-const rankMediaByFacets = (list, q, queryWords, artistsList, facets, facetScoreFn) =>
-  rankItemsByYearFacets(list, facets, (item) =>
-    mediaItemMatchScore(item, q, queryWords, artistsList, facets, facetScoreFn)
+const rankMediaByFacets = (list, q, queryWords, artistsList, facets, facetScoreFn, artistIds = null) =>
+  rankItemsByYearFacets(
+    list,
+    facets,
+    (item) => mediaItemMatchScore(item, q, queryWords, artistsList, facets, facetScoreFn),
+    getItemYear,
+    {
+      artistIds,
+      lightFacetScoreFn: (item) => facetScoreFn(item, facets, queryWords),
+    }
   );
 
-const rankAlbumsByFacets = (list, q, queryWords, artistsList, facets) =>
-  rankItemsByYearFacets(list, facets, (album) =>
-    albumMatchScore(album, q, queryWords, artistsList, facets)
+const rankAlbumsByFacets = (list, q, queryWords, artistsList, facets, artistIds = null) =>
+  rankItemsByYearFacets(
+    list,
+    facets,
+    (album) => albumMatchScore(album, q, queryWords, artistsList, facets),
+    getItemYear,
+    {
+      artistIds,
+      lightFacetScoreFn: (album) => albumFacetMatchScore(album, facets, queryWords),
+    }
   );
+
+/**
+ * Title tokendan faqat artist ismiga o'xshaganlarini oladi.
+ * Qolgan filler ("tuplami") ism matchini buzmasin.
+ */
+const pickArtistNameTokens = (nameTokens, artistsList) => {
+  const tokens = ensureArray(nameTokens).filter(Boolean);
+  if (!tokens.length || !artistsList?.length) return tokens;
+  const blobs = artistsList.map((a) => normalizeText(a?.name || '')).filter(Boolean);
+  const nameLike = tokens.filter((t) => blobs.some((blob) => wordMatchesInBlob(t, blob)));
+  return nameLike.length ? nameLike : tokens;
+};
+
+/** Faqat artist ismi */
+const resolveArtistMediaHits = (artistsList, nameTokens) => {
+  const tokens = pickArtistNameTokens(nameTokens, artistsList);
+  if (!tokens.length || !artistsList?.length) return [];
+  const nameQ = tokens.join(' ');
+  return scoreAndSort(artistsList, (artist) => musicArtistMatchScore(artist, nameQ, tokens));
+};
+
+/**
+ * Media type(lar): qolgan token artist ismi bo'lsa — profil + biriktirilgan media.
+ * types: ['music','clip',...] — bir so'rovda bir nechta bo'lim.
+ */
+const rankArtistMediaTypeResults = ({
+  types,
+  musicList,
+  clipsList,
+  concertsList,
+  albumsList,
+  artistsList,
+  q,
+  queryWords,
+  musicFacets,
+  clipFacets,
+  concertFacets,
+  albumFacets,
+}) => {
+  const facetsByType = {
+    music: musicFacets,
+    clip: clipFacets,
+    concert: concertFacets,
+    album: albumFacets,
+  };
+
+  const mediaTypes = ensureArray(types).filter((t) => facetsByType[t]);
+  const nameTokens =
+    mediaTypes.map((t) => facetsByType[t]?.titleTokens || []).find((toks) => toks.length) || [];
+
+  const artistHits = resolveArtistMediaHits(artistsList, nameTokens);
+  const emptyMedia = { music: [], clips: [], concerts: [], albums: [] };
+
+  if (artistHits.length) {
+    const artistIds = artistHits.map((a) => a.id);
+    const out = { musicArtists: artistHits, ...emptyMedia };
+
+    for (const t of mediaTypes) {
+      const facetsForMedia = {
+        ...facetsByType[t],
+        titleTokens: [],
+        isFacetSearch: true,
+      };
+      if (t === 'music') {
+        out.music = rankMediaByFacets(
+          musicList,
+          q,
+          queryWords,
+          artistsList,
+          facetsForMedia,
+          musicFacetMatchScore,
+          artistIds
+        );
+      } else if (t === 'clip') {
+        out.clips = rankMediaByFacets(
+          clipsList,
+          q,
+          queryWords,
+          artistsList,
+          facetsForMedia,
+          clipFacetMatchScore,
+          artistIds
+        );
+      } else if (t === 'concert') {
+        out.concerts = rankMediaByFacets(
+          concertsList,
+          q,
+          queryWords,
+          artistsList,
+          facetsForMedia,
+          concertFacetMatchScore,
+          artistIds
+        );
+      } else if (t === 'album') {
+        out.albums = rankAlbumsByFacets(
+          albumsList,
+          q,
+          queryWords,
+          artistsList,
+          facetsForMedia,
+          artistIds
+        );
+      }
+    }
+    return out;
+  }
+
+  // Artist topilmasa — oddiy title/facet (faqat so'ralgan turlar)
+  const out = { musicArtists: [], ...emptyMedia };
+  for (const t of mediaTypes) {
+    const facets = facetsByType[t];
+    if (t === 'music') {
+      out.music = rankMediaByFacets(
+        musicList,
+        q,
+        queryWords,
+        artistsList,
+        facets,
+        musicFacetMatchScore
+      );
+    } else if (t === 'clip') {
+      out.clips = rankMediaByFacets(
+        clipsList,
+        q,
+        queryWords,
+        artistsList,
+        facets,
+        clipFacetMatchScore
+      );
+    } else if (t === 'concert') {
+      out.concerts = rankMediaByFacets(
+        concertsList,
+        q,
+        queryWords,
+        artistsList,
+        facets,
+        concertFacetMatchScore
+      );
+    } else if (t === 'album') {
+      out.albums = rankAlbumsByFacets(albumsList, q, queryWords, artistsList, facets);
+    }
+  }
+  return out;
+};
 
 /**
  * Kino type: qolgan token aktyor ismi bo'lsa — profil + biriktirilgan kinolar.
@@ -496,74 +663,99 @@ const rankAllResults = (
 
   const contentType = parseContentType(q);
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
+  const contentTypes = getContentTypes(contentType);
 
   // Pure type + year: faqat kerakli facet parse (og'irlik past)
   if (contentType.isPureTypeSearch) {
-    if (contentType.type === 'movie') {
-      const movieFacets = parseMovieSearchFacets(q);
-      if (movieFacets.isYearSearch) {
-        return {
-          ...emptyResults(),
-          movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
-        };
-      }
-    }
-    if (contentType.type === 'music') {
-      const musicFacets = parseMusicSearchFacets(q);
-      if (musicFacets.isYearSearch) {
-        return {
-          ...emptyResults(),
-          music: rankMediaByFacets(
+    const pureYearOut = { ...emptyResults() };
+    let handledYear = false;
+
+    for (const t of contentTypes) {
+      if (t === 'movie') {
+        const movieFacets = parseMovieSearchFacets(q);
+        if (movieFacets.isYearSearch) {
+          pureYearOut.movies = rankMoviesByFacets(moviesList, q, queryWords, movieFacets);
+          handledYear = true;
+        }
+      } else if (t === 'music') {
+        const musicFacets = parseMusicSearchFacets(q);
+        if (musicFacets.isYearSearch) {
+          pureYearOut.music = rankMediaByFacets(
             musicList,
             q,
             queryWords,
             musicArtistsList,
             musicFacets,
             musicFacetMatchScore
-          ),
-        };
-      }
-    }
-    if (contentType.type === 'clip') {
-      const clipFacets = parseClipSearchFacets(q);
-      if (clipFacets.isYearSearch) {
-        return {
-          ...emptyResults(),
-          clips: rankMediaByFacets(
+          );
+          handledYear = true;
+        }
+      } else if (t === 'clip') {
+        const clipFacets = parseClipSearchFacets(q);
+        if (clipFacets.isYearSearch) {
+          pureYearOut.clips = rankMediaByFacets(
             clipsList,
             q,
             queryWords,
             musicArtistsList,
             clipFacets,
             clipFacetMatchScore
-          ),
-        };
-      }
-    }
-    if (contentType.type === 'concert') {
-      const concertFacets = parseConcertSearchFacets(q);
-      if (concertFacets.isYearSearch) {
-        return {
-          ...emptyResults(),
-          concerts: rankMediaByFacets(
+          );
+          handledYear = true;
+        }
+      } else if (t === 'concert') {
+        const concertFacets = parseConcertSearchFacets(q);
+        if (concertFacets.isYearSearch) {
+          pureYearOut.concerts = rankMediaByFacets(
             concertsList,
             q,
             queryWords,
             musicArtistsList,
             concertFacets,
             concertFacetMatchScore
-          ),
-        };
+          );
+          handledYear = true;
+        }
+      } else if (t === 'album') {
+        const albumFacets = parseAlbumSearchFacets(q);
+        if (albumFacets.isYearSearch) {
+          pureYearOut.albums = rankAlbumsByFacets(
+            albumsList,
+            q,
+            queryWords,
+            musicArtistsList,
+            albumFacets
+          );
+          handledYear = true;
+        }
       }
     }
-    if (contentType.type === 'album') {
-      const albumFacets = parseAlbumSearchFacets(q);
-      if (albumFacets.isYearSearch) {
-        return {
-          ...emptyResults(),
-          albums: rankAlbumsByFacets(albumsList, q, queryWords, musicArtistsList, albumFacets),
-        };
+
+    if (handledYear) return pureYearOut;
+
+    // Multi pure catalog (musiqalar kliplar) — har bir so'ralgan tur
+    if (contentTypes.length > 1) {
+      const multi = emptyResults();
+      for (const t of contentTypes) {
+        const one = resolveContentTypeResults(
+          { ...contentType, type: t, isPureTypeSearch: true },
+          {
+            movies: moviesList,
+            music: musicList,
+            clips: clipsList,
+            concerts: concertsList,
+            albums: albumsList,
+          },
+          { limit: null }
+        );
+        if (!one) continue;
+        if (t === 'movie') multi.movies = one.movies;
+        if (t === 'music') multi.music = one.music;
+        if (t === 'clip') multi.clips = one.clips;
+        if (t === 'concert') multi.concerts = one.concerts;
+        if (t === 'album') multi.albums = one.albums;
       }
+      return multi;
     }
 
     const pure = resolveContentTypeResults(
@@ -580,16 +772,28 @@ const rankAllResults = (
     return pure || emptyResults();
   }
 
-  const movieFacets = parseMovieSearchFacets(q);
-  const musicFacets = parseMusicSearchFacets(q);
-  const clipFacets = parseClipSearchFacets(q);
-  const concertFacets = parseConcertSearchFacets(q);
-  const albumFacets = parseAlbumSearchFacets(q);
-
   const empty = emptyResults();
+  const hasTypeFilter = Boolean(contentType.hasTypeFilter && contentTypes.length);
+  const hasMovie = hasTypeFilter && contentTypes.includes('movie');
+  const mediaTypes = hasTypeFilter
+    ? contentTypes.filter((t) => ['music', 'clip', 'concert', 'album'].includes(t))
+    : [];
+  const parseAllFacets = !hasTypeFilter;
 
-  if (contentType.hasTypeFilter && contentType.type) {
-    if (contentType.type === 'movie') {
+  // Tur filtri: faqat shu domain facet — umumiy qidiruvda hammasi
+  const movieFacets =
+    parseAllFacets || hasMovie ? parseMovieSearchFacets(q) : null;
+  const musicFacets =
+    parseAllFacets || mediaTypes.includes('music') ? parseMusicSearchFacets(q) : null;
+  const clipFacets =
+    parseAllFacets || mediaTypes.includes('clip') ? parseClipSearchFacets(q) : null;
+  const concertFacets =
+    parseAllFacets || mediaTypes.includes('concert') ? parseConcertSearchFacets(q) : null;
+  const albumFacets =
+    parseAllFacets || mediaTypes.includes('album') ? parseAlbumSearchFacets(q) : null;
+
+  if (hasTypeFilter) {
+    if (hasMovie && !mediaTypes.length) {
       const movieType = rankMovieTypeResults(
         moviesList,
         actorsList,
@@ -603,50 +807,43 @@ const rankAllResults = (
         movies: movieType.movies,
       };
     }
-    if (contentType.type === 'music') {
-      return {
+
+    if (mediaTypes.length) {
+      const mediaType = rankArtistMediaTypeResults({
+        types: mediaTypes,
+        musicList,
+        clipsList,
+        concertsList,
+        albumsList,
+        artistsList: musicArtistsList,
+        q,
+        queryWords,
+        musicFacets,
+        clipFacets,
+        concertFacets,
+        albumFacets,
+      });
+      const out = {
         ...empty,
-        music: rankMediaByFacets(
-          musicList,
+        musicArtists: mediaType.musicArtists,
+        music: mediaType.music,
+        clips: mediaType.clips,
+        concerts: mediaType.concerts,
+        albums: mediaType.albums,
+      };
+      // Juda kam: kino + musiqa birga — movie ham
+      if (hasMovie) {
+        const movieType = rankMovieTypeResults(
+          moviesList,
+          actorsList,
           q,
           queryWords,
-          musicArtistsList,
-          musicFacets,
-          musicFacetMatchScore
-        ),
-      };
-    }
-    if (contentType.type === 'clip') {
-      return {
-        ...empty,
-        clips: rankMediaByFacets(
-          clipsList,
-          q,
-          queryWords,
-          musicArtistsList,
-          clipFacets,
-          clipFacetMatchScore
-        ),
-      };
-    }
-    if (contentType.type === 'concert') {
-      return {
-        ...empty,
-        concerts: rankMediaByFacets(
-          concertsList,
-          q,
-          queryWords,
-          musicArtistsList,
-          concertFacets,
-          concertFacetMatchScore
-        ),
-      };
-    }
-    if (contentType.type === 'album') {
-      return {
-        ...empty,
-        albums: rankAlbumsByFacets(albumsList, q, queryWords, musicArtistsList, albumFacets),
-      };
+          movieFacets
+        );
+        out.actors = movieType.actors;
+        out.movies = movieType.movies;
+      }
+      return out;
     }
   }
 

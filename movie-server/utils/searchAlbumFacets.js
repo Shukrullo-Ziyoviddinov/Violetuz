@@ -10,6 +10,8 @@ const {
 } = require('./searchFacetEngine');
 const { attachYearFacet, COLLECTION_NOISE_WORDS } = require('./searchYearFacets');
 const { MEDIA_COUNTRY_FACETS, MEDIA_GENRE_FACETS } = require('./searchMediaFacetData');
+const { ARTIST_MEDIA_NOISE_WORDS } = require('./searchArtistMediaFacets');
+const { MEDIA_CROSS_TYPE_NOISE_WORDS } = require('./searchContentType');
 
 const ALBUM_COUNTRY_FACETS = MEDIA_COUNTRY_FACETS;
 const ALBUM_GENRE_FACETS = MEDIA_GENRE_FACETS;
@@ -35,6 +37,8 @@ const NOISE_WORDS = [
   'musiqalar',
   'music',
   ...COLLECTION_NOISE_WORDS,
+  ...ARTIST_MEDIA_NOISE_WORDS,
+  ...MEDIA_CROSS_TYPE_NOISE_WORDS,
 ];
 
 const parseAlbumSearchFacets = (rawQuery) =>

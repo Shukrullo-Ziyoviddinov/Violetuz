@@ -89,6 +89,10 @@ const COLLECTION_NOISE_WORDS = [
   'toplamlar',
   'toplamlari',
   'toplama',
+  'tuplam',
+  'tuplami',
+  'tuplamlar',
+  'tuplamlari',
   'collection',
   'collections',
 ];

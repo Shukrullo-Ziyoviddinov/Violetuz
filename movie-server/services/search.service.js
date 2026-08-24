@@ -17,6 +17,7 @@ const {
   DEFAULT_LIMITS,
   SEARCH_SECTIONS,
 } = require('../utils/searchAlgorithm');
+const { getContentTypes } = require('../utils/searchContentType');
 const { parseMovieSearchFacets } = require('../utils/searchFacets');
 const {
   MOVIE_SEARCH_PROJECTION,
@@ -44,26 +45,46 @@ const resolveNeededScopes = (query, section = null) => {
   }
 
   const contentType = parseContentType(query);
+  const types = getContentTypes(contentType);
 
-  if (contentType.hasTypeFilter && contentType.type) {
-    // Toza tur ("musiqalar") — artist skorlash kerak emas
+  if (contentType.hasTypeFilter && types.length) {
+    const scopes = {};
+
     if (contentType.isPureTypeSearch) {
-      if (contentType.type === 'movie') return { movies: true };
-      if (contentType.type === 'music') return { music: true };
-      if (contentType.type === 'clip') return { clips: true };
-      if (contentType.type === 'concert') return { concerts: true };
-      if (contentType.type === 'album') return { albums: true };
+      for (const t of types) {
+        if (t === 'movie') scopes.movies = true;
+        if (t === 'music') scopes.music = true;
+        if (t === 'clip') scopes.clips = true;
+        if (t === 'concert') scopes.concerts = true;
+        if (t === 'album') scopes.albums = true;
+      }
+      return scopes;
     }
-    if (contentType.type === 'movie') {
-      // "leonardo kinolari" — title token qolsa aktyor+kino kerak
-      const movieFacets = parseMovieSearchFacets(query);
-      const needActors = (movieFacets.titleTokens || []).length > 0;
-      return needActors ? { movies: true, actors: true } : { movies: true };
+
+    for (const t of types) {
+      if (t === 'movie') {
+        const movieFacets = parseMovieSearchFacets(query);
+        scopes.movies = true;
+        if ((movieFacets.titleTokens || []).length > 0) scopes.actors = true;
+      }
+      if (t === 'music') {
+        scopes.music = true;
+        scopes.musicArtists = true;
+      }
+      if (t === 'clip') {
+        scopes.clips = true;
+        scopes.musicArtists = true;
+      }
+      if (t === 'concert') {
+        scopes.concerts = true;
+        scopes.musicArtists = true;
+      }
+      if (t === 'album') {
+        scopes.albums = true;
+        scopes.musicArtists = true;
+      }
     }
-    if (contentType.type === 'music') return { music: true, musicArtists: true };
-    if (contentType.type === 'clip') return { clips: true, musicArtists: true };
-    if (contentType.type === 'concert') return { concerts: true, musicArtists: true };
-    if (contentType.type === 'album') return { albums: true, musicArtists: true };
+    return scopes;
   }
 
   // Umumiy qidiruv — barcha scope

@@ -44,6 +44,7 @@ const CLIP_TYPE_ALIASES = [
   'klips',
   'kliplar',
   'kliplari',
+  'kipi',
   'clip',
   'clips',
   'music video',
@@ -102,6 +103,10 @@ const SHARED_INTENT_WORDS = [
   'toplami',
   'toplamlar',
   'toplamlari',
+  'tuplam',
+  'tuplami',
+  'tuplamlar',
+  'tuplamlari',
   'collection',
   'collections',
   'royhat',
@@ -145,53 +150,77 @@ const stripWords = (text, aliases) => {
   return result.replace(/\s+/g, ' ').trim();
 };
 
-const matchTypePresence = (q, typeAliases, intentWords, type) => {
-  const afterType = stripWords(q, typeAliases);
-  const hasType = afterType.length < q.length;
-  if (!hasType) return null;
-
-  const remainder = stripWords(afterType, intentWords);
-  return {
-    type,
-    isPureTypeSearch: !remainder,
-    hasTypeFilter: true,
-    remainder,
-    // Uzunroq alias (masalan "musiqa albomlar") qisqaroqdan ("musiqa") ustun
-    removedLen: q.length - afterType.length,
-  };
-};
+/**
+ * Prioritet: albom > konsert > klip > musiqa > kino.
+ * Yuqori tur olib tashlangach pastki turlar qolgan matndan aniqlanadi —
+ * "musiqa albomlar" faqat album (musiqa alohida emas).
+ * "musiqalari kliplari konsertlari" → types: [concert, clip, music].
+ */
+const TYPE_PARSE_ORDER = [
+  { type: 'album', aliases: ALBUM_TYPE_ALIASES },
+  { type: 'concert', aliases: CONCERT_TYPE_ALIASES },
+  { type: 'clip', aliases: CLIP_TYPE_ALIASES },
+  { type: 'music', aliases: MUSIC_TYPE_ALIASES },
+  { type: 'movie', aliases: MOVIE_TYPE_ALIASES },
+];
 
 /**
- * Kontent turi + ixtiyoriy qoldiq (janr/davlat/nom).
+ * Kontent turi(lar) + ixtiyoriy qoldiq (janr/davlat/nom/artist).
  * "musiqalar" → pure music
- * "k pop musiqalar" → music + hasTypeFilter (faqat musiqa natija)
+ * "k pop musiqalar" → music + hasTypeFilter
+ * "jah khalib musiqalari kliplari" → types [clip, music] + remainder artist
  * "k pop" → type yo'q (barcha media turlari)
  */
 const parseContentType = (rawQuery) => {
   const q = normalizeText(rawQuery);
-  const empty = { type: null, isPureTypeSearch: false, hasTypeFilter: false, remainder: q };
+  const empty = {
+    type: null,
+    types: [],
+    isPureTypeSearch: false,
+    hasTypeFilter: false,
+    remainder: q,
+  };
 
   if (!q) return empty;
 
-  const candidates = [
-    matchTypePresence(q, ALBUM_TYPE_ALIASES, ALBUM_INTENT_WORDS, 'album'),
-    matchTypePresence(q, CONCERT_TYPE_ALIASES, CONCERT_INTENT_WORDS, 'concert'),
-    matchTypePresence(q, CLIP_TYPE_ALIASES, CLIP_INTENT_WORDS, 'clip'),
-    matchTypePresence(q, MUSIC_TYPE_ALIASES, MUSIC_INTENT_WORDS, 'music'),
-    matchTypePresence(q, MOVIE_TYPE_ALIASES, MOVIE_INTENT_WORDS, 'movie'),
-  ].filter(Boolean);
+  const types = [];
+  let remaining = q;
 
-  if (!candidates.length) return empty;
+  for (const def of TYPE_PARSE_ORDER) {
+    const afterType = stripWords(remaining, def.aliases);
+    if (afterType.length < remaining.length) {
+      types.push(def.type);
+      remaining = afterType;
+    }
+  }
 
-  candidates.sort((a, b) => b.removedLen - a.removedLen);
-  const best = candidates[0];
+  if (!types.length) return empty;
+
+  const remainder = stripWords(remaining, SHARED_INTENT_WORDS);
   return {
-    type: best.type,
-    isPureTypeSearch: best.isPureTypeSearch,
+    type: types[0],
+    types,
+    isPureTypeSearch: !remainder,
     hasTypeFilter: true,
-    remainder: best.remainder || '',
+    remainder: remainder || '',
   };
 };
+
+/** `.type` yoki `.types` — bitta ro'yxat */
+const getContentTypes = (contentType) => {
+  if (Array.isArray(contentType?.types) && contentType.types.length) return contentType.types;
+  if (contentType?.type) return [contentType.type];
+  return [];
+};
+
+/** Facet NOISE uchun — barcha media tur aliaslari (multi-type so'rovda chalkashmasin) */
+const MEDIA_CROSS_TYPE_NOISE_WORDS = [
+  ...new Set(
+    [...MUSIC_TYPE_ALIASES, ...CLIP_TYPE_ALIASES, ...CONCERT_TYPE_ALIASES, ...ALBUM_TYPE_ALIASES]
+      .map((a) => normalizeText(a))
+      .filter((a) => a.length >= 2)
+  ),
+];
 
 const applyLimit = (list, limit) => {
   if (limit != null && limit > 0) return list.slice(0, limit);
@@ -286,6 +315,7 @@ const resolveContentTypeResults = (contentType, data = {}, options = {}) => {
 
 module.exports = {
   parseContentType,
+  getContentTypes,
   resolveMoviesByType,
   resolveMusicByType,
   resolveClipsByType,
@@ -297,6 +327,7 @@ module.exports = {
   CLIP_TYPE_ALIASES,
   CONCERT_TYPE_ALIASES,
   ALBUM_TYPE_ALIASES,
+  MEDIA_CROSS_TYPE_NOISE_WORDS,
   MOVIE_INTENT_WORDS,
   MUSIC_INTENT_WORDS,
   CLIP_INTENT_WORDS,
