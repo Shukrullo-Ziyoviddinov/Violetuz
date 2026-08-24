@@ -1,7 +1,6 @@
 /**
- * Musiqa albom qidiruv facetlari: genre va country.
- * Umumiy engine → searchFacetEngine.js
- * Umumiy values/aliases → searchMediaFacetData.js
+ * Musiqa albom qidiruv facetlari: genre, country va year.
+ * Year → searchYearFacets.js (umumiy)
  */
 
 const {
@@ -9,13 +8,10 @@ const {
   matchSingleField,
   countryGenreFacetScore,
 } = require('./searchFacetEngine');
-
+const { attachYearFacet, COLLECTION_NOISE_WORDS } = require('./searchYearFacets');
 const { MEDIA_COUNTRY_FACETS, MEDIA_GENRE_FACETS } = require('./searchMediaFacetData');
 
-/** DB album.country — musiqa bilan bir xil qiymatlar */
 const ALBUM_COUNTRY_FACETS = MEDIA_COUNTRY_FACETS;
-
-/** DB album.genre — musiqa bilan bir xil qiymatlar */
 const ALBUM_GENRE_FACETS = MEDIA_GENRE_FACETS;
 
 const NOISE_WORDS = [
@@ -38,12 +34,13 @@ const NOISE_WORDS = [
   'musiqa',
   'musiqalar',
   'music',
-  'collection',
-  'toplama',
+  ...COLLECTION_NOISE_WORDS,
 ];
 
 const parseAlbumSearchFacets = (rawQuery) =>
-  parseCountryGenreFacets(rawQuery, ALBUM_COUNTRY_FACETS, ALBUM_GENRE_FACETS, NOISE_WORDS);
+  attachYearFacet(rawQuery, (cleaned) =>
+    parseCountryGenreFacets(cleaned, ALBUM_COUNTRY_FACETS, ALBUM_GENRE_FACETS, NOISE_WORDS)
+  );
 
 const matchAlbumCountry = (country, countryTargets, queryWords = []) =>
   matchSingleField(country, countryTargets, queryWords, ALBUM_COUNTRY_FACETS);

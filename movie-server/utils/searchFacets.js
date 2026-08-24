@@ -15,7 +15,7 @@ const {
   matchMultiField,
   countryGenreFacetScore,
 } = require('./searchFacetEngine');
-const { parseYearFacet, stripYearTokens } = require('./searchYearFacets');
+const { attachYearFacet, COLLECTION_NOISE_WORDS } = require('./searchYearFacets');
 
 const NOISE_WORDS = [
   'kino',
@@ -33,12 +33,7 @@ const NOISE_WORDS = [
   'tarjima',
   'tarjimada',
   'tilida',
-  'toplam',
-  'toplami',
-  'toplamlar',
-  'toplamlari',
-  'collection',
-  'collections',
+  ...COLLECTION_NOISE_WORDS,
 ];
 
 /** DB filterCountry qiymatlari + foydalanuvchi sinonimlari */
@@ -128,24 +123,10 @@ const GENRE_FACETS = [
  * Country + genre + year.
  * Year avval parse → tokenlar olib tashlanadi → country/genre/title toza qoladi.
  */
-const parseMovieSearchFacets = (rawQuery) => {
-  const yearFacet = parseYearFacet(rawQuery);
-  const queryWithoutYear = stripYearTokens(rawQuery, yearFacet);
-  const base = parseCountryGenreFacets(
-    queryWithoutYear,
-    COUNTRY_FACETS,
-    GENRE_FACETS,
-    NOISE_WORDS
+const parseMovieSearchFacets = (rawQuery) =>
+  attachYearFacet(rawQuery, (cleaned) =>
+    parseCountryGenreFacets(cleaned, COUNTRY_FACETS, GENRE_FACETS, NOISE_WORDS)
   );
-
-  return {
-    ...base,
-    yearMode: yearFacet.mode,
-    year: yearFacet.year,
-    isYearSearch: yearFacet.isYearSearch,
-    isFacetSearch: base.isFacetSearch || yearFacet.isYearSearch,
-  };
-};
 
 const matchFilterCountry = (filterCountry, countryTargets, queryWords = []) =>
   matchSingleField(filterCountry, countryTargets, queryWords, COUNTRY_FACETS);

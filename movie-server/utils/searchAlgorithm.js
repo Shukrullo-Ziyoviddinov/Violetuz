@@ -305,27 +305,25 @@ const scoreAndSort = (items, scoreFn) => {
   return scored.map((x) => x.item);
 };
 
-/** specs.year — projectiondagi engil maydon */
-const getMovieYear = (movie) => {
-  const n = Number(movie?.specs?.year);
+/** Item year — media: item.year, kino: specs.year */
+const getItemYear = (item) => {
+  const n = Number(item?.year ?? item?.specs?.year);
   return Number.isFinite(n) ? n : 0;
 };
 
-const movieMatchesYearFacet = (movie, facets) => {
+const itemMatchesYearFacet = (item, facets, getYear = getItemYear) => {
   if (!facets?.isYearSearch) return true;
   if (facets.yearMode === 'exact') {
-    return getMovieYear(movie) === facets.year;
+    return getYear(item) === facets.year;
   }
-  // recency — filter yo'q, sort keyin year DESC
   return true;
 };
 
 /**
- * Kino rank: country/genre/title score + year exact/recency.
- * exact → specs.year === year
- * recency → year DESC (yangi yuqori)
+ * Umumiy year rank: exact filter / recency DESC.
+ * Kino, musiqa, klip, konsert, albom — bir xil algoritm.
  */
-const rankMoviesByFacets = (moviesList, q, queryWords, facets) => {
+const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear) => {
   const yearOnly =
     Boolean(facets?.isYearSearch) &&
     (facets.countryTargets || []).length === 0 &&
@@ -333,18 +331,12 @@ const rankMoviesByFacets = (moviesList, q, queryWords, facets) => {
     (facets.titleTokens || []).length === 0;
 
   const scored = [];
-  for (const movie of ensureArray(moviesList)) {
-    if (!movieMatchesYearFacet(movie, facets)) continue;
+  for (const item of ensureArray(items)) {
+    if (!itemMatchesYearFacet(item, facets, getYear)) continue;
 
-    let score;
-    if (yearOnly) {
-      // "yangi kinolar" / "2024 kinolari" — katalog + year
-      score = MIN_SCORE;
-    } else {
-      score = movieMatchScore(movie, q, queryWords, facets);
-    }
+    const score = yearOnly ? MIN_SCORE : scoreFn(item);
     if (score < MIN_SCORE) continue;
-    scored.push({ item: movie, score, year: getMovieYear(movie) });
+    scored.push({ item, score, year: getYear(item) });
   }
 
   if (facets?.yearMode === 'recency') {
@@ -357,6 +349,21 @@ const rankMoviesByFacets = (moviesList, q, queryWords, facets) => {
 
   return scored.map((x) => x.item);
 };
+
+const rankMoviesByFacets = (moviesList, q, queryWords, facets) =>
+  rankItemsByYearFacets(moviesList, facets, (movie) =>
+    movieMatchScore(movie, q, queryWords, facets)
+  );
+
+const rankMediaByFacets = (list, q, queryWords, artistsList, facets, facetScoreFn) =>
+  rankItemsByYearFacets(list, facets, (item) =>
+    mediaItemMatchScore(item, q, queryWords, artistsList, facets, facetScoreFn)
+  );
+
+const rankAlbumsByFacets = (list, q, queryWords, artistsList, facets) =>
+  rankItemsByYearFacets(list, facets, (album) =>
+    albumMatchScore(album, q, queryWords, artistsList, facets)
+  );
 
 const emptyResults = () => ({
   actors: [],
@@ -409,15 +416,74 @@ const rankAllResults = (
 
   const contentType = parseContentType(q);
   const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
-  const movieFacets = parseMovieSearchFacets(q);
 
-  // Pure "yangi kinolar" / "2024 kinolari" — katalog emas, year rank/sort
+  // Pure type + year: faqat kerakli facet parse (og'irlik past)
   if (contentType.isPureTypeSearch) {
-    if (contentType.type === 'movie' && movieFacets.isYearSearch) {
-      return {
-        ...emptyResults(),
-        movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
-      };
+    if (contentType.type === 'movie') {
+      const movieFacets = parseMovieSearchFacets(q);
+      if (movieFacets.isYearSearch) {
+        return {
+          ...emptyResults(),
+          movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
+        };
+      }
+    }
+    if (contentType.type === 'music') {
+      const musicFacets = parseMusicSearchFacets(q);
+      if (musicFacets.isYearSearch) {
+        return {
+          ...emptyResults(),
+          music: rankMediaByFacets(
+            musicList,
+            q,
+            queryWords,
+            musicArtistsList,
+            musicFacets,
+            musicFacetMatchScore
+          ),
+        };
+      }
+    }
+    if (contentType.type === 'clip') {
+      const clipFacets = parseClipSearchFacets(q);
+      if (clipFacets.isYearSearch) {
+        return {
+          ...emptyResults(),
+          clips: rankMediaByFacets(
+            clipsList,
+            q,
+            queryWords,
+            musicArtistsList,
+            clipFacets,
+            clipFacetMatchScore
+          ),
+        };
+      }
+    }
+    if (contentType.type === 'concert') {
+      const concertFacets = parseConcertSearchFacets(q);
+      if (concertFacets.isYearSearch) {
+        return {
+          ...emptyResults(),
+          concerts: rankMediaByFacets(
+            concertsList,
+            q,
+            queryWords,
+            musicArtistsList,
+            concertFacets,
+            concertFacetMatchScore
+          ),
+        };
+      }
+    }
+    if (contentType.type === 'album') {
+      const albumFacets = parseAlbumSearchFacets(q);
+      if (albumFacets.isYearSearch) {
+        return {
+          ...emptyResults(),
+          albums: rankAlbumsByFacets(albumsList, q, queryWords, musicArtistsList, albumFacets),
+        };
+      }
     }
 
     const pure = resolveContentTypeResults(
@@ -434,6 +500,7 @@ const rankAllResults = (
     return pure || emptyResults();
   }
 
+  const movieFacets = parseMovieSearchFacets(q);
   const musicFacets = parseMusicSearchFacets(q);
   const clipFacets = parseClipSearchFacets(q);
   const concertFacets = parseConcertSearchFacets(q);
@@ -451,40 +518,46 @@ const rankAllResults = (
     if (contentType.type === 'music') {
       return {
         ...empty,
-        music: scoreAndSort(ensureArray(musicList), (item) =>
-          mediaItemMatchScore(item, q, queryWords, musicArtistsList, musicFacets, musicFacetMatchScore)
+        music: rankMediaByFacets(
+          musicList,
+          q,
+          queryWords,
+          musicArtistsList,
+          musicFacets,
+          musicFacetMatchScore
         ),
       };
     }
     if (contentType.type === 'clip') {
       return {
         ...empty,
-        clips: scoreAndSort(ensureArray(clipsList), (item) =>
-          mediaItemMatchScore(item, q, queryWords, musicArtistsList, clipFacets, clipFacetMatchScore)
+        clips: rankMediaByFacets(
+          clipsList,
+          q,
+          queryWords,
+          musicArtistsList,
+          clipFacets,
+          clipFacetMatchScore
         ),
       };
     }
     if (contentType.type === 'concert') {
       return {
         ...empty,
-        concerts: scoreAndSort(ensureArray(concertsList), (item) =>
-          mediaItemMatchScore(
-            item,
-            q,
-            queryWords,
-            musicArtistsList,
-            concertFacets,
-            concertFacetMatchScore
-          )
+        concerts: rankMediaByFacets(
+          concertsList,
+          q,
+          queryWords,
+          musicArtistsList,
+          concertFacets,
+          concertFacetMatchScore
         ),
       };
     }
     if (contentType.type === 'album') {
       return {
         ...empty,
-        albums: scoreAndSort(ensureArray(albumsList), (item) =>
-          albumMatchScore(item, q, queryWords, musicArtistsList, albumFacets)
-        ),
+        albums: rankAlbumsByFacets(albumsList, q, queryWords, musicArtistsList, albumFacets),
       };
     }
   }
@@ -493,17 +566,30 @@ const rankAllResults = (
     actors: scoreAndSort(actorsList, (a) => actorMatchScore(a, q, queryWords)),
     musicArtists: scoreAndSort(musicArtistsList, (a) => musicArtistMatchScore(a, q, queryWords)),
     movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
-    music: scoreAndSort(ensureArray(musicList), (item) =>
-      mediaItemMatchScore(item, q, queryWords, musicArtistsList, musicFacets, musicFacetMatchScore)
+    music: rankMediaByFacets(
+      musicList,
+      q,
+      queryWords,
+      musicArtistsList,
+      musicFacets,
+      musicFacetMatchScore
     ),
-    albums: scoreAndSort(ensureArray(albumsList), (item) =>
-      albumMatchScore(item, q, queryWords, musicArtistsList, albumFacets)
+    albums: rankAlbumsByFacets(albumsList, q, queryWords, musicArtistsList, albumFacets),
+    clips: rankMediaByFacets(
+      clipsList,
+      q,
+      queryWords,
+      musicArtistsList,
+      clipFacets,
+      clipFacetMatchScore
     ),
-    clips: scoreAndSort(ensureArray(clipsList), (item) =>
-      mediaItemMatchScore(item, q, queryWords, musicArtistsList, clipFacets, clipFacetMatchScore)
-    ),
-    concerts: scoreAndSort(ensureArray(concertsList), (item) =>
-      mediaItemMatchScore(item, q, queryWords, musicArtistsList, concertFacets, concertFacetMatchScore)
+    concerts: rankMediaByFacets(
+      concertsList,
+      q,
+      queryWords,
+      musicArtistsList,
+      concertFacets,
+      concertFacetMatchScore
     ),
   };
 };

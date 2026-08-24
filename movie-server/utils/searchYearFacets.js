@@ -1,7 +1,7 @@
 /**
- * Kino yil facet — so'rovdan year intent.
- * Exact: "2024 kinolari" → { mode: 'exact', year: 2024 }
- * Recency: "yangi kinolar" → { mode: 'recency' }
+ * Umumiy yil facet — kino / musiqa / klip / konsert / albom.
+ * Exact: "2024 musiqalar" → { mode: 'exact', year: 2024 }
+ * Recency: "yangi kliplar" → { mode: 'recency' }
  *
  * Yillar ro'yxatlab yozilmaydi. Hardcode year yo'q.
  * Faqat engil string parse (1 marta / so'rov).
@@ -17,7 +17,6 @@ const escapeRegExp = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /**
  * Recency aliaslari — "yangi" / "oxirgi" / "latest".
  * "new" qo'shilmagan: "new york" kabi title bilan chalkashmasin.
- * Joriy yil Date bilan bu faylda hisoblanmaydi (sort keyin rank bosqichida).
  */
 const RECENCY_ALIASES = [
   'yangi',
@@ -35,7 +34,7 @@ const RECENCY_ALIASES = [
   "so'nggi",
 ];
 
-/** Year yonidagi shovqin so'zlar ("2025 yilda chiqqan", "2025 yil dagi", "2025 da chiqqan"...) */
+/** Year yonidagi shovqin so'zlar */
 const YEAR_NOISE_WORDS = [
   'yil',
   'yili',
@@ -53,6 +52,20 @@ const YEAR_NOISE_WORDS = [
   'years',
 ];
 
+/**
+ * "to'plam" / collection — type intent, title emas.
+ * Domain NOISE_WORDS ga qo'shish uchun umumiy.
+ */
+const COLLECTION_NOISE_WORDS = [
+  'toplam',
+  'toplami',
+  'toplamlar',
+  'toplamlari',
+  'toplama',
+  'collection',
+  'collections',
+];
+
 const emptyYearFacet = () => ({
   mode: null,
   year: null,
@@ -67,7 +80,6 @@ const parseYearFacet = (rawQuery) => {
   const q = normalizeText(rawQuery);
   if (!q) return emptyYearFacet();
 
-  // 1) Exact year — raqam bo'lsa ustun (masalan "yangi 2024" → exact 2024)
   const yearMatch = q.match(YEAR_RE);
   if (yearMatch) {
     const year = Number(yearMatch[1]);
@@ -80,10 +92,8 @@ const parseYearFacet = (rawQuery) => {
     }
   }
 
-  // 2) Recency — "yangi", "oxirgi", "latest"...
   const words = q.split(/\s+/).filter(Boolean);
-  const hasRecency = words.some((w) => RECENCY_ALIASES.includes(w));
-  if (hasRecency) {
+  if (words.some((w) => RECENCY_ALIASES.includes(w))) {
     return {
       mode: 'recency',
       year: null,
@@ -96,7 +106,6 @@ const parseYearFacet = (rawQuery) => {
 
 /**
  * Year / recency / "yil" tokenlarini querydan olib tashlaydi.
- * Country/genre/title parse oldidan chaqiriladi — chalkashmasin.
  */
 const stripYearTokens = (rawQuery, yearFacet = null) => {
   let q = normalizeText(rawQuery);
@@ -121,11 +130,32 @@ const stripYearTokens = (rawQuery, yearFacet = null) => {
   return q.replace(/\s+/g, ' ').trim();
 };
 
+/**
+ * Country/genre parse oldidan year ulash — barcha media domainlari uchun bir xil.
+ * @param {string} rawQuery
+ * @param {(cleanedQuery: string) => object} parseBaseFacets
+ */
+const attachYearFacet = (rawQuery, parseBaseFacets) => {
+  const yearFacet = parseYearFacet(rawQuery);
+  const queryWithoutYear = stripYearTokens(rawQuery, yearFacet);
+  const base = parseBaseFacets(queryWithoutYear) || {};
+
+  return {
+    ...base,
+    yearMode: yearFacet.mode,
+    year: yearFacet.year,
+    isYearSearch: yearFacet.isYearSearch,
+    isFacetSearch: Boolean(base.isFacetSearch) || yearFacet.isYearSearch,
+  };
+};
+
 module.exports = {
   parseYearFacet,
   stripYearTokens,
+  attachYearFacet,
   emptyYearFacet,
   YEAR_RE,
   RECENCY_ALIASES,
   YEAR_NOISE_WORDS,
+  COLLECTION_NOISE_WORDS,
 };

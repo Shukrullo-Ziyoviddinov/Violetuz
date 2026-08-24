@@ -1,7 +1,6 @@
 /**
- * Klip qidiruv facetlari: genre va country.
- * Umumiy engine → searchFacetEngine.js
- * Umumiy values/aliases → searchMediaFacetData.js
+ * Klip qidiruv facetlari: genre, country va year.
+ * Year → searchYearFacets.js (umumiy)
  */
 
 const {
@@ -9,13 +8,10 @@ const {
   matchSingleField,
   countryGenreFacetScore,
 } = require('./searchFacetEngine');
-
+const { attachYearFacet, COLLECTION_NOISE_WORDS } = require('./searchYearFacets');
 const { MEDIA_COUNTRY_FACETS, MEDIA_GENRE_FACETS } = require('./searchMediaFacetData');
 
-/** DB clip.country — musiqa bilan bir xil qiymatlar */
 const CLIP_COUNTRY_FACETS = MEDIA_COUNTRY_FACETS;
-
-/** DB clip.genre — musiqa bilan bir xil qiymatlar */
 const CLIP_GENRE_FACETS = MEDIA_GENRE_FACETS;
 
 const NOISE_WORDS = [
@@ -38,10 +34,13 @@ const NOISE_WORDS = [
   'music',
   'mv',
   'music video',
+  ...COLLECTION_NOISE_WORDS,
 ];
 
 const parseClipSearchFacets = (rawQuery) =>
-  parseCountryGenreFacets(rawQuery, CLIP_COUNTRY_FACETS, CLIP_GENRE_FACETS, NOISE_WORDS);
+  attachYearFacet(rawQuery, (cleaned) =>
+    parseCountryGenreFacets(cleaned, CLIP_COUNTRY_FACETS, CLIP_GENRE_FACETS, NOISE_WORDS)
+  );
 
 const matchClipCountry = (country, countryTargets, queryWords = []) =>
   matchSingleField(country, countryTargets, queryWords, CLIP_COUNTRY_FACETS);
