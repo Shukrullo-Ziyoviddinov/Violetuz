@@ -90,13 +90,15 @@ const GENRE_FACETS = [
     ],
   },
   { values: ['Triller'], aliases: ['triller', 'thriller'] },
-  { values: ['Sarguzasht'], aliases: ['sarguzasht', 'sargizasht', 'adventure'] },
+  { values: ['Sarguzasht'], aliases: ['sarguzasht', 'sarguzashat', 'sargizasht', 'adventure'] },
   {
     values: ["Qo'rqinchli"],
     aliases: [
       'qorqinchli',
       'qorqinch',
       'horror',
+      'horrr',
+      'horr',
       'daxshat',
       'dahshat',
       'daxshatli',

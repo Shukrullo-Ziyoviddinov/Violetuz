@@ -106,7 +106,7 @@ const extractFacetMatches = (rawQuery, facetList, noiseWords = []) => {
   const original = stripNoise(normalizeText(rawQuery), noiseWords);
   let working = original;
   const matchedValues = new Set();
-  const usedAliases = new Set();
+  const usedTokens = new Set();
 
   // Har bir facetni asl query bo'yicha tekshiramiz —
   // bir xil alias (masalan g'amgin) bir nechta mavjud janrga tegishi mumkin.
@@ -122,11 +122,23 @@ const extractFacetMatches = (rawQuery, facetList, noiseWords = []) => {
     }
     if (!matchedAlias) continue;
     facet.values.forEach((v) => matchedValues.add(v));
-    usedAliases.add(matchedAlias);
+    usedTokens.add(matchedAlias);
+
+    // Fuzzy typo ("horrr"≈"horror") — querydagi haqiqiy so'zni ham olib tashla
+    if (!matchedAlias.includes(' ')) {
+      for (const word of getQueryWords(original)) {
+        if (word === matchedAlias) {
+          usedTokens.add(word);
+          continue;
+        }
+        if (word.length < 3 || matchedAlias.length < 3) continue;
+        if (wordSimilarity(word, matchedAlias) >= 0.72) usedTokens.add(word);
+      }
+    }
   }
 
-  for (const alias of usedAliases) {
-    working = working.replace(new RegExp(escapeRegExp(alias), 'g'), ' ');
+  for (const token of usedTokens) {
+    working = working.replace(new RegExp(escapeRegExp(token), 'g'), ' ');
   }
   working = working.replace(/\s+/g, ' ').trim();
   working = stripNoise(working, noiseWords);

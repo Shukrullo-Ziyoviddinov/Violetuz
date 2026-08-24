@@ -29,6 +29,7 @@ const ACTOR_FILM_NOISE_WORDS = [
   'rulidagi',
   'rulida',
   'ruldagi',
+  'rulga',
   'ruli',
   'bosh',
   'boshi',

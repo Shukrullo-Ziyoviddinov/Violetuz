@@ -332,26 +332,32 @@ const movieHasAnyActor = (movie, actorIds) => {
 };
 
 const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear, options = {}) => {
-  const { actorIds = null } = options;
-  const yearOnly =
-    Boolean(facets?.isYearSearch) &&
-    (facets.countryTargets || []).length === 0 &&
-    (facets.genreTargets || []).length === 0 &&
-    (facets.titleTokens || []).length === 0;
+  const { actorIds = null, lightFacetScoreFn = null } = options;
+  const noTitle = (facets.titleTokens || []).length === 0;
+  const noCountry = (facets.countryTargets || []).length === 0;
+  const noGenre = (facets.genreTargets || []).length === 0;
 
-  // Aktyor orqali katalog (title qoldiq yo'q) — yearOnly kabi engil score
-  const actorCatalogOnly =
-    Boolean(actorIds?.length) &&
-    (facets.countryTargets || []).length === 0 &&
-    (facets.genreTargets || []).length === 0 &&
-    (facets.titleTokens || []).length === 0;
+  const yearOnly =
+    Boolean(facets?.isYearSearch) && noCountry && noGenre && noTitle;
+
+  // Aktyor + (ixtiyoriy year/genre/country), title yo'q — engil yo'l
+  const actorLinkedMode = Boolean(actorIds?.length) && noTitle;
+  const actorCatalogOnly = actorLinkedMode && noCountry && noGenre;
 
   const scored = [];
   for (const item of ensureArray(items)) {
     if (actorIds?.length && !movieHasAnyActor(item, actorIds)) continue;
     if (!itemMatchesYearFacet(item, facets, getYear)) continue;
 
-    const score = yearOnly || actorCatalogOnly ? MIN_SCORE : scoreFn(item);
+    let score;
+    if (yearOnly || actorCatalogOnly) {
+      score = MIN_SCORE;
+    } else if (actorLinkedMode && lightFacetScoreFn) {
+      // Actor+genre/country — title blob yo'q, faqat facet
+      score = lightFacetScoreFn(item);
+    } else {
+      score = scoreFn(item);
+    }
     if (score < MIN_SCORE) continue;
     scored.push({ item, score, year: getYear(item) });
   }
@@ -391,7 +397,10 @@ const rankMoviesByFacets = (moviesList, q, queryWords, facets, actorIds = null) 
     facets,
     (movie) => movieMatchScore(movie, q, queryWords, facets),
     getItemYear,
-    { actorIds }
+    {
+      actorIds,
+      lightFacetScoreFn: (movie) => movieFacetMatchScore(movie, facets, queryWords),
+    }
   );
 
 const rankMediaByFacets = (list, q, queryWords, artistsList, facets, facetScoreFn) =>
