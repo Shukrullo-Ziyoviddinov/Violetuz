@@ -35,13 +35,20 @@ const RECENCY_ALIASES = [
   "so'nggi",
 ];
 
-/** Year yonidagi shovqin so'zlar */
+/** Year yonidagi shovqin so'zlar ("2025 yilda chiqqan", "2025 yil dagi", "2025 da chiqqan"...) */
 const YEAR_NOISE_WORDS = [
   'yil',
   'yili',
+  'yilda',
   'yildagi',
   'yildan',
   'yilgi',
+  'dagi',
+  'da',
+  'chiqqan',
+  'chiqgan',
+  'chiqarilgan',
+  'released',
   'year',
   'years',
 ];
