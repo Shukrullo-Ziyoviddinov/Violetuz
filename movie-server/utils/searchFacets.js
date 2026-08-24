@@ -1,6 +1,7 @@
 /**
- * Kino qidiruv facetlari: filterCountry va filterGenre.
+ * Kino qidiruv facetlari: filterCountry, filterGenre va year.
  * Umumiy engine → searchFacetEngine.js
+ * Year → searchYearFacets.js
  * Musiqa → searchMusicFacets.js
  * Klip → searchClipFacets.js
  * Konsert → searchConcertFacets.js
@@ -14,6 +15,7 @@ const {
   matchMultiField,
   countryGenreFacetScore,
 } = require('./searchFacetEngine');
+const { parseYearFacet, stripYearTokens } = require('./searchYearFacets');
 
 const NOISE_WORDS = [
   'kino',
@@ -116,8 +118,28 @@ const GENRE_FACETS = [
   { values: ['Vestern'], aliases: ['vestern', 'western'] },
 ];
 
-const parseMovieSearchFacets = (rawQuery) =>
-  parseCountryGenreFacets(rawQuery, COUNTRY_FACETS, GENRE_FACETS, NOISE_WORDS);
+/**
+ * Country + genre + year.
+ * Year avval parse → tokenlar olib tashlanadi → country/genre/title toza qoladi.
+ */
+const parseMovieSearchFacets = (rawQuery) => {
+  const yearFacet = parseYearFacet(rawQuery);
+  const queryWithoutYear = stripYearTokens(rawQuery, yearFacet);
+  const base = parseCountryGenreFacets(
+    queryWithoutYear,
+    COUNTRY_FACETS,
+    GENRE_FACETS,
+    NOISE_WORDS
+  );
+
+  return {
+    ...base,
+    yearMode: yearFacet.mode,
+    year: yearFacet.year,
+    isYearSearch: yearFacet.isYearSearch,
+    isFacetSearch: base.isFacetSearch || yearFacet.isYearSearch,
+  };
+};
 
 const matchFilterCountry = (filterCountry, countryTargets, queryWords = []) =>
   matchSingleField(filterCountry, countryTargets, queryWords, COUNTRY_FACETS);

@@ -1,5 +1,6 @@
 /**
  * Qidiruv uchun Mongo projection — og'ir maydonlar (description, seasons, trailers) chiqarilmaydi.
+ * Year facet faqat specs.year ishlatadi (description.year yuklanmaydi).
  */
 
 const MOVIE_SEARCH_PROJECTION = {

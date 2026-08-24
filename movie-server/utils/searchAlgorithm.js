@@ -305,6 +305,59 @@ const scoreAndSort = (items, scoreFn) => {
   return scored.map((x) => x.item);
 };
 
+/** specs.year — projectiondagi engil maydon */
+const getMovieYear = (movie) => {
+  const n = Number(movie?.specs?.year);
+  return Number.isFinite(n) ? n : 0;
+};
+
+const movieMatchesYearFacet = (movie, facets) => {
+  if (!facets?.isYearSearch) return true;
+  if (facets.yearMode === 'exact') {
+    return getMovieYear(movie) === facets.year;
+  }
+  // recency — filter yo'q, sort keyin year DESC
+  return true;
+};
+
+/**
+ * Kino rank: country/genre/title score + year exact/recency.
+ * exact → specs.year === year
+ * recency → year DESC (yangi yuqori)
+ */
+const rankMoviesByFacets = (moviesList, q, queryWords, facets) => {
+  const yearOnly =
+    Boolean(facets?.isYearSearch) &&
+    (facets.countryTargets || []).length === 0 &&
+    (facets.genreTargets || []).length === 0 &&
+    (facets.titleTokens || []).length === 0;
+
+  const scored = [];
+  for (const movie of ensureArray(moviesList)) {
+    if (!movieMatchesYearFacet(movie, facets)) continue;
+
+    let score;
+    if (yearOnly) {
+      // "yangi kinolar" / "2024 kinolari" — katalog + year
+      score = MIN_SCORE;
+    } else {
+      score = movieMatchScore(movie, q, queryWords, facets);
+    }
+    if (score < MIN_SCORE) continue;
+    scored.push({ item: movie, score, year: getMovieYear(movie) });
+  }
+
+  if (facets?.yearMode === 'recency') {
+    scored.sort((a, b) => b.year - a.year || b.score - a.score);
+  } else if (facets?.yearMode === 'exact') {
+    scored.sort((a, b) => b.score - a.score || b.year - a.year);
+  } else {
+    scored.sort((a, b) => b.score - a.score);
+  }
+
+  return scored.map((x) => x.item);
+};
+
 const emptyResults = () => ({
   actors: [],
   musicArtists: [],
@@ -355,8 +408,18 @@ const rankAllResults = (
   if (!q || q.length < MIN_QUERY_LENGTH) return emptyResults();
 
   const contentType = parseContentType(q);
+  const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
+  const movieFacets = parseMovieSearchFacets(q);
 
+  // Pure "yangi kinolar" / "2024 kinolari" — katalog emas, year rank/sort
   if (contentType.isPureTypeSearch) {
+    if (contentType.type === 'movie' && movieFacets.isYearSearch) {
+      return {
+        ...emptyResults(),
+        movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
+      };
+    }
+
     const pure = resolveContentTypeResults(
       contentType,
       {
@@ -371,8 +434,6 @@ const rankAllResults = (
     return pure || emptyResults();
   }
 
-  const queryWords = q.split(/\s+/).filter((w) => w.length >= 1);
-  const movieFacets = parseMovieSearchFacets(q);
   const musicFacets = parseMusicSearchFacets(q);
   const clipFacets = parseClipSearchFacets(q);
   const concertFacets = parseConcertSearchFacets(q);
@@ -384,7 +445,7 @@ const rankAllResults = (
     if (contentType.type === 'movie') {
       return {
         ...empty,
-        movies: scoreAndSort(moviesList, (m) => movieMatchScore(m, q, queryWords, movieFacets)),
+        movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
       };
     }
     if (contentType.type === 'music') {
@@ -431,7 +492,7 @@ const rankAllResults = (
   return {
     actors: scoreAndSort(actorsList, (a) => actorMatchScore(a, q, queryWords)),
     musicArtists: scoreAndSort(musicArtistsList, (a) => musicArtistMatchScore(a, q, queryWords)),
-    movies: scoreAndSort(moviesList, (m) => movieMatchScore(m, q, queryWords, movieFacets)),
+    movies: rankMoviesByFacets(moviesList, q, queryWords, movieFacets),
     music: scoreAndSort(ensureArray(musicList), (item) =>
       mediaItemMatchScore(item, q, queryWords, musicArtistsList, musicFacets, musicFacetMatchScore)
     ),

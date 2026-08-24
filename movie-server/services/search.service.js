@@ -123,6 +123,11 @@ const loadCollections = async (scopes = {}) => {
   return collections;
 };
 
+/**
+ * Rank bir marta → cache → keyin faqat cursor slice.
+ * Scroll (section+cursor) qayta Mongo load / rank qilmaydi (cache hit).
+ * Year facet (`yangi` / `2024`) ham shu yo'lda — og'irlik qo'shilmaydi.
+ */
 const getRankedCached = async (query, lang) => {
   const q = normalizeText(query);
   const cacheKey = searchCache.makeKey(['search', 'rank', lang, q]);
