@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
-import SearchModalGenre from '../SearchModalGenre/SearchModalGenre';
-import SearchModalAnons from '../SearchModalAnons/SearchModalAnons';
-import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import SearchModalResults from '../SearchModalResults/SearchModalResults';
-import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCategory';
+import SearchModalBrowseShell from '../SearchModalBrowseShell/SearchModalBrowseShell';
 import ShortsPickerModal from './ShortsPickerModal';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { OPEN_SEARCH_EVENT } from '../../searchModalBridge';
@@ -150,12 +147,10 @@ const NavbarMobile = () => {
                 onMovieClick={() => setShowSearch(false)}
               />
             ) : (
-              <>
-                <SearchModalCategory onCategoryClick={() => setShowSearch(false)} />
-                <SearchModalGenre onGenreClick={() => setShowSearch(false)} />
-                <SearchModalAnons onAnonsClick={() => setShowSearch(false)} />
-                <SearchModalTavsiya onMovieClick={() => setShowSearch(false)} />
-              </>
+              <SearchModalBrowseShell
+                key="search-browse-mobile"
+                onNavigateAway={() => setShowSearch(false)}
+              />
             )}
           </div>
         </div>

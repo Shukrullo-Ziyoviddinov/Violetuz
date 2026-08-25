@@ -2,11 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LanguageModal from './LanguageModal';
-import SearchModalGenre from '../SearchModalGenre/SearchModalGenre';
-import SearchModalAnons from '../SearchModalAnons/SearchModalAnons';
-import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import SearchModalResults from '../SearchModalResults/SearchModalResults';
-import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCategory';
+import SearchModalBrowseShell from '../SearchModalBrowseShell/SearchModalBrowseShell';
 import { requestOpenProfileInfoMenu } from '../../profileInfoMenuBridge';
 import { requestOpenMessagesModal } from '../../messagesModalBridge';
 import { requestOpenAuthModal } from '../../authModalBridge';
@@ -376,12 +373,10 @@ const Navbar = () => {
                 onMovieClick={() => setShowSearchModal(false)}
               />
             ) : (
-              <>
-                <SearchModalCategory onCategoryClick={() => setShowSearchModal(false)} />
-                <SearchModalGenre onGenreClick={() => setShowSearchModal(false)} />
-                <SearchModalAnons onAnonsClick={() => setShowSearchModal(false)} />
-                <SearchModalTavsiya onMovieClick={() => setShowSearchModal(false)} />
-              </>
+              <SearchModalBrowseShell
+                key="search-browse-desktop"
+                onNavigateAway={() => setShowSearchModal(false)}
+              />
             )}
           </div>
         </div>

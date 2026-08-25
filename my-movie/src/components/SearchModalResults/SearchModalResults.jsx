@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import FilterSearchRezult from '../FilterSearchRezult/FilterSearchRezult';
 import SearchLoader from '../SearchLoader/SearchLoader';
 import { fetchSearchResults, cloneEmptyMetaSections } from '../../api/searchApi';
+import { recordSearchPoiscHistoryClick } from '../../api/searchPoiscHistoryApi';
+import { useAuth } from '../../context/AuthContext';
 import {
   SEARCH_FILTER_ALL,
   getAvailableSearchFilters,
@@ -48,6 +50,8 @@ const SearchModalResults = ({ query, onMovieClick }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { getArtistById } = useMusicApi();
+  const { isLoggedIn } = useAuth();
+  const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState(SEARCH_FILTER_ALL);
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [accumulated, setAccumulated] = useState({
@@ -285,10 +289,30 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     navigate(path);
   };
 
-  const handleMovieClick = (movie) => closeAndNavigate(`/movie/${movie.id}`);
+  /** Faqat login + B1 turlari. Query yuborilmaydi. Navigatsiyani to‘xtatmaydi. */
+  const recordHistoryClick = useCallback(
+    (id, type) => {
+      if (!isLoggedIn || id == null || id === '') return;
+      void recordSearchPoiscHistoryClick({ id, type })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['searchPoiscHistory'] });
+        })
+        .catch(() => {});
+    },
+    [isLoggedIn, queryClient]
+  );
+
+  const handleMovieClick = (movie) => {
+    recordHistoryClick(movie?.id, 'movie');
+    closeAndNavigate(`/movie/${movie.id}`);
+  };
+
   const handleActorClick = (actor) => closeAndNavigate(`/actor/${actor.id}`);
 
   const handleMusicClick = (item, type) => {
+    if (type === 'music' || type === 'klip' || type === 'konsert') {
+      recordHistoryClick(item?.id, type);
+    }
     if (type === 'artist') {
       closeAndNavigate(`/music/artist/${item.id}`);
     } else if (type === 'album') {
