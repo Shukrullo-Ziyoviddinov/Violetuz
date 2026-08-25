@@ -860,7 +860,6 @@ const MEDIA_COUNTRY_FACETS = [
 
 /** DB music.genre qiymatlari + foydalanuvchi sinonimlari */
 
-
 const MEDIA_GENRE_FACETS = [
   {
     values: ['electronic', 'Electronic'],

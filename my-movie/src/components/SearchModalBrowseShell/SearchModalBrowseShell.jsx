@@ -11,9 +11,9 @@ const SLIDE_MS = 380;
 
 /**
  * Bo‘sh qidiruv: Siz uchun tavsiya | Qidiruv tarixlari + slide.
+ * Tarix → panel o‘ngga; tavsiya → panel chapga.
+ * Active pill ham panel bilan bir xil easing/vaqtda suriladi.
  * Default tab: tavsiya. Tarix tab ochilganda list yuklanadi (enabled).
- * Desktop: tablar modal yuqorisida (form yashirin).
- * Mobile: input qatori ostida.
  */
 const SearchModalBrowseShell = ({ onNavigateAway }) => {
   const { t } = useTranslation();
@@ -66,14 +66,18 @@ const SearchModalBrowseShell = ({ onNavigateAway }) => {
 
   const selectTavsiya = () => selectTab('tavsiya');
   const selectHistory = () => selectTab('history');
+  const isHistory = activeTab === 'history';
 
   return (
     <div className="search-modal-browse">
       <div
-        className="search-modal-browse-tabs"
+        className={`search-modal-browse-tabs${
+          isHistory ? ' search-modal-browse-tabs--history' : ''
+        }`}
         role="tablist"
         aria-label={t('searchModal.browseTabs', 'Qidiruv bo‘limlari')}
       >
+        <span className="search-modal-browse-tabs-indicator" aria-hidden="true" />
         <button
           type="button"
           role="tab"
@@ -103,24 +107,12 @@ const SearchModalBrowseShell = ({ onNavigateAway }) => {
       </div>
 
       <div className="search-modal-browse-viewport">
+        {/* Tartib: history | tavsiya — tarixga o‘tganda track o‘ngga (0 ← -50%) */}
         <div
           className={`search-modal-browse-track${
-            activeTab === 'history' ? ' search-modal-browse-track--history' : ''
+            isHistory ? '' : ' search-modal-browse-track--tavsiya'
           }`}
         >
-          <div
-            id="search-browse-panel-tavsiya"
-            className={panelClass('tavsiya')}
-            role="tabpanel"
-            aria-labelledby="search-browse-tab-tavsiya"
-            aria-hidden={activeTab !== 'tavsiya'}
-          >
-            <SearchModalCategory onCategoryClick={close} />
-            <SearchModalGenre onGenreClick={close} />
-            <SearchModalAnons onAnonsClick={close} />
-            <SearchModalTavsiya onMovieClick={close} />
-          </div>
-
           <div
             id="search-browse-panel-history"
             className={panelClass('history')}
@@ -132,6 +124,19 @@ const SearchModalBrowseShell = ({ onNavigateAway }) => {
               enabled={activeTab === 'history'}
               onItemClick={close}
             />
+          </div>
+
+          <div
+            id="search-browse-panel-tavsiya"
+            className={panelClass('tavsiya')}
+            role="tabpanel"
+            aria-labelledby="search-browse-tab-tavsiya"
+            aria-hidden={activeTab !== 'tavsiya'}
+          >
+            <SearchModalCategory onCategoryClick={close} />
+            <SearchModalGenre onGenreClick={close} />
+            <SearchModalAnons onAnonsClick={close} />
+            <SearchModalTavsiya onMovieClick={close} />
           </div>
         </div>
       </div>

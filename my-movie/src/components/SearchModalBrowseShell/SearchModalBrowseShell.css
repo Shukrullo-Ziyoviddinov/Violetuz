@@ -5,9 +5,11 @@
 }
 
 .search-modal-browse-tabs {
+  --browse-tabs-gap: 0.35rem;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--browse-tabs-gap);
   flex-shrink: 0;
   width: 100%;
   padding: 0.15rem 0 0.75rem;
@@ -15,7 +17,28 @@
   margin-bottom: 0.35rem;
 }
 
+.search-modal-browse-tabs-indicator {
+  position: absolute;
+  top: 0.15rem;
+  left: 0;
+  width: calc((100% - var(--browse-tabs-gap)) / 2);
+  height: calc(100% - 0.9rem);
+  border-radius: 8px;
+  background: #ffffff14;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateX(0);
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.search-modal-browse-tabs--history .search-modal-browse-tabs-indicator {
+  transform: translateX(calc(100% + var(--browse-tabs-gap)));
+}
+
 .search-modal-browse-tab {
+  position: relative;
+  z-index: 1;
   flex: 1;
   appearance: none;
   border: none;
@@ -27,7 +50,7 @@
   padding: 0.55rem 0.4rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: color 0.25s ease, background 0.25s ease;
+  transition: color 0.25s ease;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -35,19 +58,11 @@
 
 .search-modal-browse-tab:hover {
   color: rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .search-modal-browse-tab--active {
   color: rgba(255, 255, 255, 0.95);
-  background: rgba(155, 79, 231, 0.22);
-  box-shadow: inset 0 -2px 0 rgba(155, 79, 231, 0.85);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .search-modal-browse-track {
-    transition: none;
-  }
+  background: transparent;
 }
 
 .search-modal-browse-viewport {
@@ -63,7 +78,8 @@
   will-change: transform;
 }
 
-.search-modal-browse-track--history {
+/* Default: tavsiya (o‘ng panel). Tarixga → translateX(0) = o‘ngga suriladi */
+.search-modal-browse-track--tavsiya {
   transform: translateX(-50%);
 }
 
@@ -71,13 +87,15 @@
   width: 50%;
   flex-shrink: 0;
   box-sizing: border-box;
-  padding-right: 0.15rem;
   min-width: 0;
 }
 
 .search-modal-browse-panel--history {
+  padding-right: 0.15rem;
+}
+
+.search-modal-browse-panel--tavsiya {
   padding-left: 0.15rem;
-  padding-right: 0;
 }
 
 .search-modal-browse-panel--collapsed {
@@ -90,6 +108,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .search-modal-browse-track,
+  .search-modal-browse-tabs-indicator {
+    transition: none;
+  }
+
   .search-modal-browse-panel--collapsed {
     transition: none;
   }
@@ -100,6 +123,11 @@
   .search-modal-browse-tabs {
     padding-top: 0;
     order: 0;
+  }
+
+  .search-modal-browse-tabs-indicator {
+    top: 0;
+    height: calc(100% - 0.75rem);
   }
 
   .search-modal-browse-tab {
@@ -113,6 +141,10 @@
   .search-modal-browse-tabs {
     margin-top: 0.35rem;
     padding-bottom: 0.65rem;
+  }
+
+  .search-modal-browse-tabs-indicator {
+    height: calc(100% - 0.8rem);
   }
 
   .search-modal-browse-tab {
