@@ -163,7 +163,7 @@
 
 @media (max-width: 768px) {
   .search-modal-tavsiya {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     width: 100%;
   }
 }

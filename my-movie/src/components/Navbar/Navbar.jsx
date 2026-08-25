@@ -268,17 +268,13 @@ const Navbar = () => {
                 value={searchQuery}
                 readOnly={!isComposing}
                 onChange={(e) => handleQueryChange(e.target.value)}
+                onMouseDown={(e) => {
+                  // Browse/yopiq: focus ochilmasin (aks holda darhol compose bo‘ladi)
+                  if (!isComposing) e.preventDefault();
+                }}
                 onClick={handleNavbarSearchActivate}
                 onFocus={(e) => {
-                  if (!showSearchModal) {
-                    e.target.blur();
-                    openSearchBrowse();
-                    return;
-                  }
-                  if (searchMode === SEARCH_MODE_BROWSE) {
-                    e.target.blur();
-                    setSearchMode(SEARCH_MODE_COMPOSE);
-                  }
+                  if (!isComposing) e.target.blur();
                 }}
                 className="navbar-search-input"
               />
@@ -455,7 +451,7 @@ const Navbar = () => {
                 onClick={handleSearchBack}
                 aria-label={t('searchModal.back', 'Orqaga')}
               >
-                <i className="fa-solid fa-arrow-left" aria-hidden="true" />
+                <i className="fa-solid fa-angle-left" aria-hidden="true" />
               </button>
               <form onSubmit={handleSearch} className="navbar-search-modal-form navbar-search-modal-form-mobile">
                 <div className="navbar-search-input-wrap">

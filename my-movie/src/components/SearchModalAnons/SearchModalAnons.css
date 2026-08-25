@@ -175,7 +175,7 @@
 
 @media (max-width: 768px) {
   .search-modal-anons {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     width: 100%;
   }
 

@@ -324,11 +324,6 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s;
-}
-
-.navbar-search-modal-back:hover {
-  color: #9b4fe7;
 }
 
 /* Desktop: modal ichida input ko'rinadi, qidiruv natijalari modaldagi */

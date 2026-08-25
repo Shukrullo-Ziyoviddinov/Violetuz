@@ -1,5 +1,4 @@
 .search-modal-genre {
-  margin-top: 1rem;
   width: 100%;
 }
 
@@ -117,10 +116,6 @@
 }
 
 @media (max-width: 768px) {
-  .search-modal-genre {
-    margin-top: 1rem;
-  }
-
   .search-modal-genre-item {
     width: 160px;
   }
