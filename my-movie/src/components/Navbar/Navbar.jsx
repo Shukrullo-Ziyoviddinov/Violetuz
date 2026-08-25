@@ -2,12 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LanguageModal from './LanguageModal';
-import SearchModalResults from '../SearchModalResults/SearchModalResults';
-import SearchModalBrowseShell from '../SearchModalBrowseShell/SearchModalBrowseShell';
+import SearchModalBody from '../SearchModalBody/SearchModalBody';
 import { requestOpenProfileInfoMenu } from '../../profileInfoMenuBridge';
 import { requestOpenMessagesModal } from '../../messagesModalBridge';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { requestOpenSearchModal } from '../../searchModalBridge';
+import {
+  SEARCH_MODE_BROWSE,
+  SEARCH_MODE_COMPOSE,
+} from '../../searchModalModes';
 import { useAuth } from '../../context/AuthContext';
 import UserAvatar from '../UserAvatar/UserAvatar';
 import ShortsPickerModal from './ShortsPickerModal';
@@ -35,10 +38,14 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [searchMode, setSearchMode] = useState(SEARCH_MODE_BROWSE);
   const [showShortsPicker, setShowShortsPicker] = useState(false);
   const languageWrapperRef = useRef(null);
   const searchInputRef = useRef(null);
+  const desktopSearchInputRef = useRef(null);
+  const modalInputRef = useRef(null);
   const modalRef = useRef(null);
+  const handleSearchBackRef = useRef(() => {});
 
   const updateModalPosition = () => {
     if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_NAV_MAX) return;
@@ -100,10 +107,13 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        setShowSearchModal(false);
+      if (e.key !== 'Escape') return;
+      if (showShortsPicker) {
         setShowShortsPicker(false);
+        return;
       }
+      if (!showSearchModal) return;
+      handleSearchBackRef.current();
     };
     if (showSearchModal || showShortsPicker) {
       document.addEventListener('keydown', handleEscape);
@@ -119,6 +129,28 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [showSearchModal]);
 
+  useEffect(() => {
+    if (!showSearchModal || searchMode !== SEARCH_MODE_COMPOSE) return undefined;
+    const id = window.requestAnimationFrame(() => {
+      const isMobile =
+        typeof window !== 'undefined' && window.innerWidth <= MOBILE_NAV_MAX;
+      const el = isMobile ? modalInputRef.current : desktopSearchInputRef.current;
+      if (el && document.activeElement !== el) {
+        el.focus();
+      }
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [showSearchModal, searchMode]);
+
+  useEffect(() => {
+    if (!showSearchModal) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [showSearchModal]);
+
   const handleLanguageChange = (langCode) => {
     if (langCode === 'uz' || langCode === 'ru') {
       i18n.changeLanguage(langCode);
@@ -131,12 +163,71 @@ const Navbar = () => {
     // Enter bosilganda sahifaga o'tmaslik, natijalar modaldagi qoladi
   };
 
-  const openSearchModal = () => {
+  const closeSearchModal = () => {
+    setShowSearchModal(false);
+    setSearchMode(SEARCH_MODE_BROWSE);
+    setSearchQuery('');
+    modalInputRef.current?.blur();
+    desktopSearchInputRef.current?.blur();
+  };
+
+  const openSearchBrowse = () => {
     if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_NAV_MAX) {
       requestOpenSearchModal();
       return;
     }
     setShowSearchModal(true);
+    setSearchMode(SEARCH_MODE_BROWSE);
+  };
+
+  /** Faqat desktop — mobile compose NavbarMobile’da */
+  const enterSearchCompose = () => {
+    setShowSearchModal(true);
+    setSearchMode(SEARCH_MODE_COMPOSE);
+  };
+
+  /** Ortga: compose/yozish → browse; browse → modal yopiladi */
+  const handleSearchBack = () => {
+    if (searchMode === SEARCH_MODE_COMPOSE || searchQuery.trim()) {
+      setSearchQuery('');
+      setSearchMode(SEARCH_MODE_BROWSE);
+      modalInputRef.current?.blur();
+      desktopSearchInputRef.current?.blur();
+      return;
+    }
+    closeSearchModal();
+  };
+
+  handleSearchBackRef.current = handleSearchBack;
+
+  const handleNavbarSearchActivate = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_NAV_MAX) {
+      requestOpenSearchModal();
+      return;
+    }
+    if (!showSearchModal) {
+      openSearchBrowse();
+      return;
+    }
+    if (searchMode === SEARCH_MODE_BROWSE) {
+      enterSearchCompose();
+    }
+  };
+
+  const isComposing = searchMode === SEARCH_MODE_COMPOSE;
+  const hasSearchQuery = searchQuery.trim().length > 0;
+
+  const handleQueryChange = (value) => {
+    setSearchQuery(value);
+    if (value.trim() && searchMode !== SEARCH_MODE_COMPOSE) {
+      setSearchMode(SEARCH_MODE_COMPOSE);
+    }
+  };
+
+  /** Natijani tozalash — compose/tarixda qoladi (browse’ga tushmaydi) */
+  const clearSearchQuery = () => {
+    setSearchQuery('');
+    setSearchMode(SEARCH_MODE_COMPOSE);
   };
 
   return (
@@ -159,7 +250,7 @@ const Navbar = () => {
           <button
             type="button"
             className="navbar-mobile-search-trigger"
-            onClick={openSearchModal}
+            onClick={openSearchBrowse}
             aria-label={t('navbar.search')}
           >
             <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
@@ -171,20 +262,40 @@ const Navbar = () => {
             <div className="navbar-search-wrap" ref={searchInputRef}>
               <>
               <input
+                ref={desktopSearchInputRef}
                 type="text"
                 placeholder={t('navbar.search')}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={openSearchModal}
+                readOnly={!isComposing}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                onClick={handleNavbarSearchActivate}
+                onFocus={(e) => {
+                  if (!showSearchModal) {
+                    e.target.blur();
+                    openSearchBrowse();
+                    return;
+                  }
+                  if (searchMode === SEARCH_MODE_BROWSE) {
+                    e.target.blur();
+                    setSearchMode(SEARCH_MODE_COMPOSE);
+                  }
+                }}
                 className="navbar-search-input"
               />
               <button
                 type="button"
                 className="navbar-search-icon"
-                onClick={(e) => { e.stopPropagation(); setSearchQuery(''); }}
-                aria-label={searchQuery.trim() ? 'Tozalash' : t('navbar.search')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (hasSearchQuery) {
+                    clearSearchQuery();
+                    return;
+                  }
+                  handleNavbarSearchActivate();
+                }}
+                aria-label={hasSearchQuery ? t('searchModal.clear', 'Tozalash') : t('navbar.search')}
               >
-                {searchQuery.trim() ? (
+                {hasSearchQuery ? (
                   <i className="fa-solid fa-xmark" aria-hidden="true" />
                 ) : (
                   <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
@@ -272,7 +383,7 @@ const Navbar = () => {
             <button
               type="button"
               className="navbar-mobile-action-btn navbar-mobile-search-btn"
-              onClick={openSearchModal}
+              onClick={openSearchBrowse}
               aria-label={t('navbar.search')}
             >
               <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
@@ -321,44 +432,68 @@ const Navbar = () => {
     {showSearchModal && (
       <div
           className="navbar-search-modal-overlay"
+          role="presentation"
           onClick={(e) => {
-            if (!e.target.closest('.navbar-search-modal')) setShowSearchModal(false);
+            if (!e.target.closest('.navbar-search-modal')) closeSearchModal();
           }}
         >
         <div
           ref={modalRef}
           className="navbar-search-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('navbar.search')}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="navbar-search-modal-inner">
             <div
-              className={`navbar-search-modal-form-row ${searchQuery.trim() ? 'navbar-search-modal-form-row--has-query' : ''}`}
+              className={`navbar-search-modal-form-row ${hasSearchQuery ? 'navbar-search-modal-form-row--has-query' : ''}`}
             >
               <button
                 type="button"
                 className="navbar-search-modal-back"
-                onClick={() => setShowSearchModal(false)}
-                aria-label="Close"
+                onClick={handleSearchBack}
+                aria-label={t('searchModal.back', 'Orqaga')}
               >
                 <i className="fa-solid fa-arrow-left" aria-hidden="true" />
               </button>
               <form onSubmit={handleSearch} className="navbar-search-modal-form navbar-search-modal-form-mobile">
                 <div className="navbar-search-input-wrap">
                   <input
+                    ref={modalInputRef}
                     type="text"
+                    inputMode="search"
+                    enterKeyHint="search"
+                    autoComplete="off"
                     placeholder={t('navbar.search')}
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    readOnly={!isComposing}
+                    onChange={(e) => handleQueryChange(e.target.value)}
+                    onClick={() => {
+                      if (searchMode === SEARCH_MODE_BROWSE) {
+                        setSearchMode(SEARCH_MODE_COMPOSE);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchMode === SEARCH_MODE_BROWSE) {
+                        setSearchMode(SEARCH_MODE_COMPOSE);
+                      }
+                    }}
                     className="navbar-search-input"
-                    autoFocus
                   />
                   <button
                     type="button"
                     className="navbar-search-icon-btn"
-                    onClick={(e) => { e.stopPropagation(); setSearchQuery(''); }}
-                    aria-label={searchQuery.trim() ? 'Tozalash' : t('navbar.search')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (hasSearchQuery) clearSearchQuery();
+                      else if (searchMode === SEARCH_MODE_BROWSE) {
+                        setSearchMode(SEARCH_MODE_COMPOSE);
+                      }
+                    }}
+                    aria-label={hasSearchQuery ? t('searchModal.clear', 'Tozalash') : t('navbar.search')}
                   >
-                    {searchQuery.trim() ? (
+                    {hasSearchQuery ? (
                       <i className="fa-solid fa-xmark" aria-hidden="true" />
                     ) : (
                       <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
@@ -367,17 +502,11 @@ const Navbar = () => {
                 </div>
               </form>
             </div>
-            {searchQuery.trim() ? (
-              <SearchModalResults
-                query={searchQuery.trim()}
-                onMovieClick={() => setShowSearchModal(false)}
-              />
-            ) : (
-              <SearchModalBrowseShell
-                key="search-browse-desktop"
-                onNavigateAway={() => setShowSearchModal(false)}
-              />
-            )}
+            <SearchModalBody
+              query={searchQuery}
+              searchMode={searchMode}
+              onNavigateAway={closeSearchModal}
+            />
           </div>
         </div>
       </div>

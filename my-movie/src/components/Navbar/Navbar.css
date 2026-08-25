@@ -292,9 +292,20 @@
 }
 
 @media (min-width: 769px) {
+  /* Desktop: yozish navbar inputda; modalda faqat ortga (parity) */
   .navbar-search-modal-form-row,
   .navbar-search-modal-form-row--has-query {
+    display: flex !important;
+    width: 100%;
+    margin-bottom: 0.35rem;
+  }
+
+  .navbar-search-modal-form-mobile {
     display: none !important;
+  }
+
+  .navbar-search-modal-back {
+    display: flex;
   }
 }
 

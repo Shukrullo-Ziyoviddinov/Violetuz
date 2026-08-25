@@ -4,20 +4,20 @@ import SearchModalGenre from '../SearchModalGenre/SearchModalGenre';
 import SearchModalAnons from '../SearchModalAnons/SearchModalAnons';
 import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import SearchModalCategory from '../../Music/SearchMusicResults/SearchModalCategory';
-import SearchModalHistory from '../SearchModalHistory/SearchModalHistory';
 import './SearchModalBrowseShell.css';
 
 const SLIDE_MS = 380;
 
 /**
- * Bo‘sh qidiruv: Siz uchun tavsiya | Qidiruv tarixlari + slide.
- * Tarix → panel o‘ngga; tavsiya → panel chapga.
- * Active pill ham panel bilan bir xil easing/vaqtda suriladi.
- * Default tab: tavsiya. Tarix tab ochilganda list yuklanadi (enabled).
+ * Browse: Kino | Music + slide carousel.
+ * Kino: Genre + Anons + Tavsiya (Category yo‘q).
+ * Music: SearchModalCategory (+ keyin music tavsiya).
+ * History bu shellda emas — compose rejimida SearchModalIdleBody orqali.
+ * Default tab: kino. Music → panel o‘ngga; Kino → chapga.
  */
 const SearchModalBrowseShell = ({ onNavigateAway }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('tavsiya');
+  const [activeTab, setActiveTab] = useState('kino');
   const [slideDone, setSlideDone] = useState(true);
   const slideTimerRef = useRef(null);
 
@@ -64,15 +64,15 @@ const SearchModalBrowseShell = ({ onNavigateAway }) => {
       .filter(Boolean)
       .join(' ');
 
-  const selectTavsiya = () => selectTab('tavsiya');
-  const selectHistory = () => selectTab('history');
-  const isHistory = activeTab === 'history';
+  const selectKino = () => selectTab('kino');
+  const selectMusic = () => selectTab('music');
+  const isMusic = activeTab === 'music';
 
   return (
     <div className="search-modal-browse">
       <div
         className={`search-modal-browse-tabs${
-          isHistory ? ' search-modal-browse-tabs--history' : ''
+          isMusic ? ' search-modal-browse-tabs--music' : ''
         }`}
         role="tablist"
         aria-label={t('searchModal.browseTabs', 'Qidiruv bo‘limlari')}
@@ -81,59 +81,55 @@ const SearchModalBrowseShell = ({ onNavigateAway }) => {
         <button
           type="button"
           role="tab"
-          id="search-browse-tab-tavsiya"
-          aria-controls="search-browse-panel-tavsiya"
-          aria-selected={activeTab === 'tavsiya'}
+          id="search-browse-tab-kino"
+          aria-controls="search-browse-panel-kino"
+          aria-selected={activeTab === 'kino'}
           className={`search-modal-browse-tab${
-            activeTab === 'tavsiya' ? ' search-modal-browse-tab--active' : ''
+            activeTab === 'kino' ? ' search-modal-browse-tab--active' : ''
           }`}
-          onClick={selectTavsiya}
+          onClick={selectKino}
         >
-          {t('searchModal.forYouTab', 'Siz uchun tavsiya')}
+          {t('searchModal.kinoTab', 'Kino')}
         </button>
         <button
           type="button"
           role="tab"
-          id="search-browse-tab-history"
-          aria-controls="search-browse-panel-history"
-          aria-selected={activeTab === 'history'}
+          id="search-browse-tab-music"
+          aria-controls="search-browse-panel-music"
+          aria-selected={activeTab === 'music'}
           className={`search-modal-browse-tab${
-            activeTab === 'history' ? ' search-modal-browse-tab--active' : ''
+            activeTab === 'music' ? ' search-modal-browse-tab--active' : ''
           }`}
-          onClick={selectHistory}
+          onClick={selectMusic}
         >
-          {t('searchModal.historyTab', 'Qidiruv tarixlari')}
+          {t('searchModal.musicTab', 'Musiqa')}
         </button>
       </div>
 
       <div className="search-modal-browse-viewport">
-        {/* Tartib: history | tavsiya — tarixga o‘tganda track o‘ngga (0 ← -50%) */}
+        {/* Tartib: music | kino — Musicga o‘tganda track o‘ngga (0 ← -50%) */}
         <div
           className={`search-modal-browse-track${
-            isHistory ? '' : ' search-modal-browse-track--tavsiya'
+            isMusic ? '' : ' search-modal-browse-track--kino'
           }`}
         >
           <div
-            id="search-browse-panel-history"
-            className={panelClass('history')}
+            id="search-browse-panel-music"
+            className={panelClass('music')}
             role="tabpanel"
-            aria-labelledby="search-browse-tab-history"
-            aria-hidden={activeTab !== 'history'}
+            aria-labelledby="search-browse-tab-music"
+            aria-hidden={activeTab !== 'music'}
           >
-            <SearchModalHistory
-              enabled={activeTab === 'history'}
-              onItemClick={close}
-            />
+            <SearchModalCategory onCategoryClick={close} />
           </div>
 
           <div
-            id="search-browse-panel-tavsiya"
-            className={panelClass('tavsiya')}
+            id="search-browse-panel-kino"
+            className={panelClass('kino')}
             role="tabpanel"
-            aria-labelledby="search-browse-tab-tavsiya"
-            aria-hidden={activeTab !== 'tavsiya'}
+            aria-labelledby="search-browse-tab-kino"
+            aria-hidden={activeTab !== 'kino'}
           >
-            <SearchModalCategory onCategoryClick={close} />
             <SearchModalGenre onGenreClick={close} />
             <SearchModalAnons onAnonsClick={close} />
             <SearchModalTavsiya onMovieClick={close} />

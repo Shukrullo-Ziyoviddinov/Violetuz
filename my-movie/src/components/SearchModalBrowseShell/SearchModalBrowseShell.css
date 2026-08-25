@@ -31,7 +31,7 @@
   will-change: transform;
 }
 
-.search-modal-browse-tabs--history .search-modal-browse-tabs-indicator {
+.search-modal-browse-tabs--music .search-modal-browse-tabs-indicator {
   transform: translateX(calc(100% + var(--browse-tabs-gap)));
 }
 
@@ -77,8 +77,8 @@
   will-change: transform;
 }
 
-/* Default: tavsiya (o‘ng panel). Tarixga → translateX(0) = o‘ngga suriladi */
-.search-modal-browse-track--tavsiya {
+/* Default: kino (o‘ng panel). Musicga → translateX(0) = o‘ngga suriladi */
+.search-modal-browse-track--kino {
   transform: translateX(-50%);
 }
 
@@ -89,11 +89,11 @@
   min-width: 0;
 }
 
-.search-modal-browse-panel--history {
+.search-modal-browse-panel--music {
   padding-right: 0.15rem;
 }
 
-.search-modal-browse-panel--tavsiya {
+.search-modal-browse-panel--kino {
   padding-left: 0.15rem;
 }
 
