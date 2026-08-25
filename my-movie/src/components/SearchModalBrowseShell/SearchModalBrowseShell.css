@@ -2,8 +2,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 0;
-  flex: 1;
 }
 
 .search-modal-browse-tabs {
@@ -55,8 +53,6 @@
 .search-modal-browse-viewport {
   width: 100%;
   overflow: hidden;
-  min-height: 0;
-  flex: 1;
 }
 
 .search-modal-browse-track {
