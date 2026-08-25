@@ -11,6 +11,7 @@ import {
   SEARCH_MODE_BROWSE,
   SEARCH_MODE_COMPOSE,
 } from '../../searchModalModes';
+import { useSearchHardwareBack } from '../../useSearchHardwareBack';
 import { useAuth } from '../../context/AuthContext';
 import UserAvatar from '../UserAvatar/UserAvatar';
 import ShortsPickerModal from './ShortsPickerModal';
@@ -46,6 +47,32 @@ const Navbar = () => {
   const modalInputRef = useRef(null);
   const modalRef = useRef(null);
   const handleSearchBackRef = useRef(() => {});
+
+  const hasSearchQuery = searchQuery.trim().length > 0;
+
+  const returnSearchToBrowse = () => {
+    setSearchQuery('');
+    setSearchMode(SEARCH_MODE_BROWSE);
+    modalInputRef.current?.blur();
+    desktopSearchInputRef.current?.blur();
+  };
+
+  const finishCloseSearch = () => {
+    setShowSearchModal(false);
+    setSearchMode(SEARCH_MODE_BROWSE);
+    setSearchQuery('');
+    modalInputRef.current?.blur();
+    desktopSearchInputRef.current?.blur();
+  };
+
+  const { markSearchHistoryOpen, releaseSearchHistory, abandonSearchHistory } =
+    useSearchHardwareBack({
+      showSearch: showSearchModal,
+      searchMode,
+      hasQuery: hasSearchQuery,
+      onReturnToBrowse: returnSearchToBrowse,
+      onCloseFromHardware: finishCloseSearch,
+    });
 
   const updateModalPosition = () => {
     if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_NAV_MAX) return;
@@ -164,11 +191,13 @@ const Navbar = () => {
   };
 
   const closeSearchModal = () => {
-    setShowSearchModal(false);
-    setSearchMode(SEARCH_MODE_BROWSE);
-    setSearchQuery('');
-    modalInputRef.current?.blur();
-    desktopSearchInputRef.current?.blur();
+    finishCloseSearch();
+    releaseSearchHistory();
+  };
+
+  const leaveSearchForNavigation = () => {
+    abandonSearchHistory();
+    finishCloseSearch();
   };
 
   const openSearchBrowse = () => {
@@ -178,21 +207,20 @@ const Navbar = () => {
     }
     setShowSearchModal(true);
     setSearchMode(SEARCH_MODE_BROWSE);
+    markSearchHistoryOpen();
   };
 
   /** Faqat desktop — mobile compose NavbarMobile’da */
   const enterSearchCompose = () => {
     setShowSearchModal(true);
     setSearchMode(SEARCH_MODE_COMPOSE);
+    markSearchHistoryOpen();
   };
 
   /** Ortga: compose/yozish → browse; browse → modal yopiladi */
   const handleSearchBack = () => {
     if (searchMode === SEARCH_MODE_COMPOSE || searchQuery.trim()) {
-      setSearchQuery('');
-      setSearchMode(SEARCH_MODE_BROWSE);
-      modalInputRef.current?.blur();
-      desktopSearchInputRef.current?.blur();
+      returnSearchToBrowse();
       return;
     }
     closeSearchModal();
@@ -215,7 +243,6 @@ const Navbar = () => {
   };
 
   const isComposing = searchMode === SEARCH_MODE_COMPOSE;
-  const hasSearchQuery = searchQuery.trim().length > 0;
 
   const handleQueryChange = (value) => {
     setSearchQuery(value);
@@ -501,7 +528,7 @@ const Navbar = () => {
             <SearchModalBody
               query={searchQuery}
               searchMode={searchMode}
-              onNavigateAway={closeSearchModal}
+              onNavigateAway={leaveSearchForNavigation}
             />
           </div>
         </div>

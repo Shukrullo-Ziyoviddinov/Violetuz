@@ -9,6 +9,7 @@ import {
   SEARCH_MODE_BROWSE,
   SEARCH_MODE_COMPOSE,
 } from '../../searchModalModes';
+import { useSearchHardwareBack } from '../../useSearchHardwareBack';
 import { useAuth } from '../../context/AuthContext';
 import UserAvatar from '../UserAvatar/UserAvatar';
 import './NavbarMobile.css';
@@ -36,6 +37,28 @@ const NavbarMobile = () => {
   const hasSearchQuery = searchQuery.trim().length > 0;
   const isComposing = searchMode === SEARCH_MODE_COMPOSE;
 
+  const returnSearchToBrowse = () => {
+    setSearchQuery('');
+    setSearchMode(SEARCH_MODE_BROWSE);
+    inputRef.current?.blur();
+  };
+
+  const finishCloseSearch = () => {
+    setShowSearch(false);
+    setSearchMode(SEARCH_MODE_BROWSE);
+    setSearchQuery('');
+    inputRef.current?.blur();
+  };
+
+  const { markSearchHistoryOpen, releaseSearchHistory, abandonSearchHistory } =
+    useSearchHardwareBack({
+      showSearch,
+      searchMode,
+      hasQuery: hasSearchQuery,
+      onReturnToBrowse: returnSearchToBrowse,
+      onCloseFromHardware: finishCloseSearch,
+    });
+
   const handleQueryChange = (value) => {
     setSearchQuery(value);
     if (value.trim() && searchMode !== SEARCH_MODE_COMPOSE) {
@@ -50,24 +73,27 @@ const NavbarMobile = () => {
   };
 
   const closeSearchModal = () => {
-    setShowSearch(false);
-    setSearchMode(SEARCH_MODE_BROWSE);
-    setSearchQuery('');
-    inputRef.current?.blur();
+    finishCloseSearch();
+    releaseSearchHistory();
+  };
+
+  /** Natija/tarix item → sahifa: history.back qilinmaydi */
+  const leaveSearchForNavigation = () => {
+    abandonSearchHistory();
+    finishCloseSearch();
   };
 
   const openSearchBrowse = () => {
     setShowSearch(true);
     setSearchMode(SEARCH_MODE_BROWSE);
     inputRef.current?.blur();
+    markSearchHistoryOpen();
   };
 
   /** Ortga: compose/yozish → browse; browse → modal yopiladi */
   const handleSearchBack = () => {
     if (searchMode === SEARCH_MODE_COMPOSE || hasSearchQuery) {
-      setSearchQuery('');
-      setSearchMode(SEARCH_MODE_BROWSE);
-      inputRef.current?.blur();
+      returnSearchToBrowse();
       return;
     }
     closeSearchModal();
@@ -212,7 +238,7 @@ const NavbarMobile = () => {
                 onClick={handleSearchBack}
                 aria-label={t('searchModal.back', 'Orqaga')}
               >
-                <i className="fa-solid fa-arrow-left" aria-hidden="true" />
+                <i className="fa-solid fa-angle-left" aria-hidden="true" />
               </button>
               <form onSubmit={handleSearchSubmit} className="navbar-mobile-search-form">
               <div className="navbar-mobile-search-input-wrap">
@@ -255,7 +281,7 @@ const NavbarMobile = () => {
             <SearchModalBody
               query={searchQuery}
               searchMode={searchMode}
-              onNavigateAway={closeSearchModal}
+              onNavigateAway={leaveSearchForNavigation}
             />
           </div>
         </div>

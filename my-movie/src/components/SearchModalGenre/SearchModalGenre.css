@@ -7,8 +7,8 @@
   font-weight: 600;
   line-height: 1.2;
   color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 0.75rem 0;
-  min-height: calc(1rem * 1.2);
+  margin: 0 0 0.4rem;
+  min-height: 1.2rem;
 }
 
 /* Title skeleton — .search-modal-genre-title o‘lchami bilan mos */

@@ -169,11 +169,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s;
-  }
-
-  .navbar-mobile-search-back:hover {
-    color: #9b4fe7;
   }
 
   .navbar-mobile-search-back i,
