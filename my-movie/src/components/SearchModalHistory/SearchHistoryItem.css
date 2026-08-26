@@ -59,14 +59,32 @@
   pointer-events: none;
 }
 
-/* Movie / music — poster: baland, yonlari bo‘sh qolishi mumkin */
+/* Movie — poster media: blokni to‘liq to‘ldiradi, bo‘sh joy yo‘q */
+.search-history-item--movie .search-history-item-media {
+  width: 2.6rem;
+  height: 3.7rem;
+  border-radius: 5px;
+}
+
+.search-history-item--movie .search-history-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Music / klip / konsert — keyingi qadam (hozir umumiy) */
 .search-history-item--poster .search-history-item-img {
   width: auto;
   height: 100%;
   object-fit: cover;
 }
 
-/* Klip / konsert — keng: blokni to‘ldiradi */
+.search-history-item--movie.search-history-item--poster .search-history-item-img {
+  width: 100%;
+  height: 100%;
+}
+
 .search-history-item--wide .search-history-item-img {
   width: 100%;
   height: 100%;
@@ -125,6 +143,11 @@
   .search-history-item-media {
     width: 2.85rem;
     height: 2.85rem;
+  }
+
+  .search-history-item--movie .search-history-item-media {
+    width: 2.35rem;
+    height: 3.35rem;
   }
 
   .search-history-item-title {

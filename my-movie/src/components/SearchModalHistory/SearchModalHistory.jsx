@@ -1,13 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import {
-  fetchSearchPoiscHistory,
-  clearSearchPoiscHistory,
-} from '../../api/searchPoiscHistoryApi';
+import { fetchSearchPoiscHistory } from '../../api/searchPoiscHistoryApi';
 import { normalizeImagePath } from '../../utils/utils';
 import SearchHistoryItem, {
   getHistoryItemTitle,
@@ -33,16 +30,14 @@ const getHistoryPath = (item) => {
 };
 
 /**
- * Qidiruv tarixi paneli — list + empty + tozalash.
+ * Qidiruv tarixi paneli — list + empty.
  * enabled=false bo‘lsa so‘rov yuborilmaydi (tab yopiq).
  */
 const SearchModalHistory = ({ onItemClick, enabled = true }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { contentLang } = useContentLanguage();
   const { isLoggedIn, authReady } = useAuth();
-  const [clearing, setClearing] = useState(false);
 
   const canFetch = Boolean(enabled && authReady && isLoggedIn);
 
@@ -80,24 +75,6 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
     },
     [navigate, onItemClick]
   );
-
-  const handleClear = useCallback(async () => {
-    if (clearing || !items.length) return;
-    const ok = window.confirm(
-      t('searchModal.historyClearConfirm', 'Barcha qidiruv tarixini o‘chirasizmi?')
-    );
-    if (!ok) return;
-    setClearing(true);
-    try {
-      await clearSearchPoiscHistory();
-      await queryClient.invalidateQueries({ queryKey: ['searchPoiscHistory'] });
-    } catch {
-      /* silent */
-    } finally {
-      setClearing(false);
-    }
-  }, [clearing, items.length, queryClient, t]);
-
   if (!authReady) {
     return (
       <div className="search-modal-history" aria-busy="true">
@@ -175,18 +152,8 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
   return (
     <div
       className="search-modal-history"
-      aria-busy={isFetching || clearing || undefined}
+      aria-busy={isFetching || undefined}
     >
-      <div className="search-modal-history-toolbar">
-        <button
-          type="button"
-          className="search-modal-history-clear"
-          onClick={handleClear}
-          disabled={clearing}
-        >
-          {t('searchModal.historyClear')}
-        </button>
-      </div>
       <div className="search-modal-history-list">
         {items.map((item) => {
           const type = item.type || 'movie';

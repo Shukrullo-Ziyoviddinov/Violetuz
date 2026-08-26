@@ -66,12 +66,13 @@ const SearchHistoryItem = ({
     () =>
       [
         'search-history-item',
+        `search-history-item--${type}`,
         `search-history-item--${fit}`,
         showSkeleton && 'search-history-item--loading',
       ]
         .filter(Boolean)
         .join(' '),
-    [fit, showSkeleton]
+    [type, fit, showSkeleton]
   );
 
   return (

@@ -29,35 +29,6 @@
   flex-shrink: 0;
 }
 
-.search-modal-history-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 0.15rem 0.35rem;
-}
-
-.search-modal-history-clear {
-  appearance: none;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.35rem 0.4rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-
-.search-modal-history-clear:hover:not(:disabled) {
-  color: rgba(255, 120, 120, 0.95);
-  background: rgba(255, 80, 80, 0.1);
-}
-
-.search-modal-history-clear:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
 .search-modal-history-list {
   display: flex;
   flex-direction: column;
