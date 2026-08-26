@@ -7,6 +7,7 @@ import { normalizeImagePath } from '../../utils/utils';
 import { matchId } from '../../utils/musicDataUtils';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady, useImagesReadyMap } from '../../utils/useImageReady';
+import { formatMovieRating } from '../Rating/CalculateRating';
 import './VideoBanner.css';
 
 const RATING_IMGS = {
@@ -74,16 +75,37 @@ const VideoBannerCard = ({
     if (!ratings) return [];
     const list = [];
     if (ratings.ratingNetflix != null) {
-      list.push({ key: 'netflix', src: normalizeImagePath(RATING_IMGS.netflix), value: ratings.ratingNetflix, alt: 'Netflix' });
+      list.push({
+        key: 'netflix',
+        src: normalizeImagePath(RATING_IMGS.netflix),
+        value: formatMovieRating(ratings.ratingNetflix),
+        alt: 'Netflix',
+      });
     }
     if (ratings.ratingImdb != null) {
-      list.push({ key: 'imdb', src: normalizeImagePath(RATING_IMGS.imdb), value: ratings.ratingImdb, alt: 'IMDb' });
+      list.push({
+        key: 'imdb',
+        src: normalizeImagePath(RATING_IMGS.imdb),
+        value: formatMovieRating(ratings.ratingImdb),
+        alt: 'IMDb',
+      });
     }
     if (ratings.ratingKinopoisk != null) {
-      list.push({ key: 'kinopoisk', src: normalizeImagePath(RATING_IMGS.kinopoisk), value: ratings.ratingKinopoisk, alt: 'Kinopoisk' });
+      list.push({
+        key: 'kinopoisk',
+        src: normalizeImagePath(RATING_IMGS.kinopoisk),
+        value: formatMovieRating(ratings.ratingKinopoisk),
+        alt: 'Kinopoisk',
+      });
     }
     if (ratings.rating != null) {
-      list.push({ key: 'vl', src: normalizeImagePath(RATING_IMGS.vl), value: ratings.rating, alt: 'Vl', vl: true });
+      list.push({
+        key: 'vl',
+        src: normalizeImagePath(RATING_IMGS.vl),
+        value: formatMovieRating(ratings.rating),
+        alt: 'Vl',
+        vl: true,
+      });
     }
     return list;
   }, [ratings]);
