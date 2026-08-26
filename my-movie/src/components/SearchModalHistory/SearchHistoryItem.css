@@ -111,7 +111,7 @@
   object-position: center;
 }
 
-/* Actor / artist — dumaloq avatar */
+/* Actor / artist — dumaloq avatar + skeleton */
 .search-history-item--actor .search-history-item-media,
 .search-history-item--artist .search-history-item-media {
   width: 2.85rem;
@@ -129,8 +129,15 @@
 }
 
 .search-history-item--actor .search-history-item-media-skeleton,
-.search-history-item--artist .search-history-item-media-skeleton {
+.search-history-item--artist .search-history-item-media-skeleton,
+.search-history-item--actor .skeleton-loader--search-history-item-image,
+.search-history-item--artist .skeleton-loader--search-history-item-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
+  z-index: 1;
 }
 
 .search-history-item--actor .skeleton-loader--search-history-item-title,
@@ -210,7 +217,6 @@
 .search-history-item-title {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
   min-width: 0;
   font-size: 0.9rem;
   font-weight: 560;

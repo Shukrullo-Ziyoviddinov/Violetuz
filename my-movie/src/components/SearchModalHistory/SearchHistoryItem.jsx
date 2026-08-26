@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import './SearchHistoryItem.css';
@@ -14,6 +14,9 @@ export const HISTORY_MEDIA_FIT = Object.freeze({
 });
 
 const PERSON_TYPES = new Set(['actor', 'artist']);
+
+/** Kesh hit bo‘lsa ham actor/artist skeleton ko‘rinsin */
+const PERSON_SKELETON_MIN_MS = 240;
 
 /**
  * Snapshot / item dan title.
@@ -69,7 +72,7 @@ export const getHistoryItemImgSrc = (snapshot, type, contentLang = 'uz') => {
 
 /**
  * Qidiruv tarixi kartochkasi.
- * Actor/artist: dumaloq avatar, name oldida galochka, meta yonida.
+ * Actor/artist: dumaloq avatar, name o‘ngida galochka, meta yonida.
  */
 const SearchHistoryItem = ({
   type = 'movie',
@@ -89,7 +92,24 @@ const SearchHistoryItem = ({
   const { showSkeleton: imageSkeleton, imgRef, onLoad, onError, failed } =
     useImageReady(src);
 
-  const showSkeleton = Boolean(forceLoading || placeholder || imageSkeleton);
+  /** Actor/artist: keshdan kelganda ham skeleton bir zum ko‘rinsin */
+  const [personHold, setPersonHold] = useState(
+    () => isPerson && !forceLoading && !placeholder
+  );
+
+  useEffect(() => {
+    if (!isPerson || forceLoading || placeholder) {
+      setPersonHold(false);
+      return undefined;
+    }
+    setPersonHold(true);
+    const id = window.setTimeout(() => setPersonHold(false), PERSON_SKELETON_MIN_MS);
+    return () => window.clearTimeout(id);
+  }, [isPerson, src, forceLoading, placeholder, type]);
+
+  const showSkeleton = Boolean(
+    forceLoading || placeholder || imageSkeleton || (isPerson && personHold)
+  );
 
   const itemClass = useMemo(
     () =>
