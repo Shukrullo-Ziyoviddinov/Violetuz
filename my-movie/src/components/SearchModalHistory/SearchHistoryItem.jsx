@@ -162,6 +162,7 @@ const SearchHistoryItem = ({
           <>
             {title ? (
               <span className="search-history-item-title">
+                <span className="search-history-item-title-text">{title}</span>
                 {isPerson && verifiedSrc ? (
                   <img
                     src={verifiedSrc}
@@ -170,7 +171,6 @@ const SearchHistoryItem = ({
                     aria-hidden="true"
                   />
                 ) : null}
-                <span className="search-history-item-title-text">{title}</span>
               </span>
             ) : null}
             {typeLabel ? <span className="search-history-item-type">{typeLabel}</span> : null}
