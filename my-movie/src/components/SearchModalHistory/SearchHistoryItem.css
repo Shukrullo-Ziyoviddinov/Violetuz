@@ -73,6 +73,20 @@
   object-position: center;
 }
 
+/* Music — movie kabi poster, balandlik pastroq */
+.search-history-item--music .search-history-item-media {
+  width: 38px;
+  height: 48px;
+  border-radius: 5px;
+}
+
+.search-history-item--music .search-history-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 /* Klip / konsert — keng media, balandlik pastroq */
 .search-history-item--klip .search-history-item-media,
 .search-history-item--konsert .search-history-item-media {
@@ -89,7 +103,7 @@
   object-position: center;
 }
 
-/* Music — keyingi qadam (hozir umumiy poster) */
+/* Music — keyingi qadam emas; tip stil yuqorida */
 .search-history-item--poster .search-history-item-img {
   width: auto;
   height: 100%;
@@ -97,6 +111,7 @@
 }
 
 .search-history-item--movie.search-history-item--poster .search-history-item-img,
+.search-history-item--music.search-history-item--poster .search-history-item-img,
 .search-history-item--klip.search-history-item--wide .search-history-item-img,
 .search-history-item--konsert.search-history-item--wide .search-history-item-img {
   width: 100%;
@@ -183,6 +198,11 @@
   .search-history-item--movie .search-history-item-media {
     width: 2.35rem;
     height: 3.35rem;
+  }
+
+  .search-history-item--music .search-history-item-media {
+    width: 34px;
+    height: 44px;
   }
 
   .search-history-item--klip .search-history-item-media,
