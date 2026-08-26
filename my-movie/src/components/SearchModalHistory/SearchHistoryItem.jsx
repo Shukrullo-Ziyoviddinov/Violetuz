@@ -134,6 +134,12 @@ const SearchHistoryItem = ({
           </>
         )}
       </div>
+
+      <span className="search-history-item-clock" aria-hidden="true">
+        {showSkeleton ? null : (
+          <i className="fa-regular fa-clock" />
+        )}
+      </span>
     </div>
   );
 };
