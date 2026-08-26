@@ -73,14 +73,32 @@
   object-position: center;
 }
 
-/* Music / klip / konsert — keyingi qadam (hozir umumiy) */
+/* Klip / konsert — keng media, balandlik pastroq */
+.search-history-item--klip .search-history-item-media,
+.search-history-item--konsert .search-history-item-media {
+  width: 4.4rem;
+  height: 2.55rem;
+  border-radius: 5px;
+}
+
+.search-history-item--klip .search-history-item-img,
+.search-history-item--konsert .search-history-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Music — keyingi qadam (hozir umumiy poster) */
 .search-history-item--poster .search-history-item-img {
   width: auto;
   height: 100%;
   object-fit: cover;
 }
 
-.search-history-item--movie.search-history-item--poster .search-history-item-img {
+.search-history-item--movie.search-history-item--poster .search-history-item-img,
+.search-history-item--klip.search-history-item--wide .search-history-item-img,
+.search-history-item--konsert.search-history-item--wide .search-history-item-img {
   width: 100%;
   height: 100%;
 }
@@ -165,6 +183,12 @@
   .search-history-item--movie .search-history-item-media {
     width: 2.35rem;
     height: 3.35rem;
+  }
+
+  .search-history-item--klip .search-history-item-media,
+  .search-history-item--konsert .search-history-item-media {
+    width: 4rem;
+    height: 2.3rem;
   }
 
   .search-history-item-title {
