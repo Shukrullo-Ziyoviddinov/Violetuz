@@ -48,8 +48,9 @@ export const getHistoryItemImgSrc = (snapshot, type, contentLang = 'uz') => {
 };
 
 /**
- * Qidiruv tarixi kartochkasi — chapda kichik img-blok, o‘ngda name + type.
- * Img-blok o‘lchami barcha turlar uchun bir xil; ichida tipga qarab fit.
+ * Qidiruv tarixi kartochkasi — chapda media, o‘ngda name + type + soat.
+ * Loader: media + title + type birga; rasm tayyor bo‘lguncha hammasi skeleton.
+ * Har tip (movie / music / klip / konsert) o‘z media va text skeleton o‘lchamiga ega.
  */
 const SearchHistoryItem = ({
   type = 'movie',
@@ -136,7 +137,12 @@ const SearchHistoryItem = ({
       </div>
 
       <span className="search-history-item-clock" aria-hidden="true">
-        {showSkeleton ? null : (
+        {showSkeleton ? (
+          <SkeletonLoader
+            variant="block"
+            className="search-history-item-clock--loading"
+          />
+        ) : (
           <i className="fa-solid fa-clock-rotate-left" />
         )}
       </span>

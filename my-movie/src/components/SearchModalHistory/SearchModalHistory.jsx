@@ -79,8 +79,8 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
     return (
       <div className="search-modal-history" aria-busy="true">
         <div className="search-modal-history-list">
-          {[0, 1, 2].map((i) => (
-            <SearchHistoryItem key={`sk-${i}`} type="movie" />
+          {['movie', 'music', 'klip'].map((type) => (
+            <SearchHistoryItem key={`sk-auth-${type}`} type={type} />
           ))}
         </div>
       </div>
@@ -101,8 +101,8 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
     return (
       <div className="search-modal-history" aria-busy="true">
         <div className="search-modal-history-list">
-          {[0, 1, 2, 3].map((i) => (
-            <SearchHistoryItem key={`sk-${i}`} type="movie" />
+          {['movie', 'music', 'klip', 'konsert'].map((type) => (
+            <SearchHistoryItem key={`sk-wait-${type}`} type={type} />
           ))}
         </div>
       </div>
