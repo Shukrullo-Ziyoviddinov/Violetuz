@@ -49,7 +49,8 @@ export const fetchSearchPoiscHistory = async ({ limit } = {}) => {
 
 /**
  * Search natijasidan click — faqat { id, type }.
- * type: movie | music | klip | konsert (clip/concert ham qabul qilinadi).
+ * type: movie | music | klip | konsert | actor | artist
+ * (clip/concert ham qabul qilinadi).
  */
 export const recordSearchPoiscHistoryClick = async ({ id, type }) => {
   const res = await historyFetch('/search-poisc-history/items', {

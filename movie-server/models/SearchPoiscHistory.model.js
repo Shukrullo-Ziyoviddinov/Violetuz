@@ -3,9 +3,16 @@ const mongoose = require('mongoose');
 /**
  * Search natijasidan click tarixi (alohida collection).
  * Faqat login user. Query matni saqlanmaydi — faqat bosilgan item.
- * Kelishuv: A1 (login) + B1 (movie | music | klip | konsert).
+ * Kelishuv: A1 (login) + B1 (movie | music | klip | konsert | actor | artist).
  */
-const SEARCH_POISC_HISTORY_TYPES = Object.freeze(['movie', 'music', 'klip', 'konsert']);
+const SEARCH_POISC_HISTORY_TYPES = Object.freeze([
+  'movie',
+  'music',
+  'klip',
+  'konsert',
+  'actor',
+  'artist',
+]);
 
 const searchPoiscHistorySchema = new mongoose.Schema(
   {

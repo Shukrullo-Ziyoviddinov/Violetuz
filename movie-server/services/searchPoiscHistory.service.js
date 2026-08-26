@@ -8,6 +8,8 @@ const Movie = require('../models/Movie.model');
 const Music = require('../models/Music.model');
 const Clip = require('../models/Clip.model');
 const Concert = require('../models/Concert.model');
+const Actor = require('../models/Actor.model');
+const Artist = require('../models/Artist.model');
 const { badRequest, notFound } = require('../utils/errors');
 
 const stripMongoMeta = (doc) => {
@@ -49,7 +51,7 @@ const toClientItem = (row) => ({
 });
 
 /**
- * Katalogdan snapshot — faqat B1 turlari.
+ * Katalogdan snapshot — movie/music/klip/konsert/actor/artist.
  * Query matni hech qachon saqlanmaydi.
  */
 const resolveCatalogSnapshot = async (type, itemId) => {
@@ -71,6 +73,12 @@ const resolveCatalogSnapshot = async (type, itemId) => {
       break;
     case 'konsert':
       doc = useNumeric ? await Concert.findOne({ id: numericId }).lean() : null;
+      break;
+    case 'actor':
+      doc = useNumeric ? await Actor.findOne({ id: numericId }).lean() : null;
+      break;
+    case 'artist':
+      doc = await Artist.findOne({ id: idStr }).lean();
       break;
     default:
       break;

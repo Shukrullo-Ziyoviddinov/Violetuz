@@ -307,10 +307,18 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     closeAndNavigate(`/movie/${movie.id}`);
   };
 
-  const handleActorClick = (actor) => closeAndNavigate(`/actor/${actor.id}`);
+  const handleActorClick = (actor) => {
+    recordHistoryClick(actor?.id, 'actor');
+    closeAndNavigate(`/actor/${actor.id}`);
+  };
 
   const handleMusicClick = (item, type) => {
-    if (type === 'music' || type === 'klip' || type === 'konsert') {
+    if (
+      type === 'music' ||
+      type === 'klip' ||
+      type === 'konsert' ||
+      type === 'artist'
+    ) {
       recordHistoryClick(item?.id, type);
     }
     if (type === 'artist') {

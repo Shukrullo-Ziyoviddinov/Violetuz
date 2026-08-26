@@ -66,6 +66,23 @@
   pointer-events: none;
 }
 
+/* List kutish — bir xil o‘lcham (tipga bog‘liq emas) */
+.search-history-item--placeholder .search-history-item-media {
+  width: 2.6rem;
+  height: 3.2rem;
+  border-radius: 5px;
+}
+
+.search-history-item--placeholder .skeleton-loader--search-history-item-title {
+  width: 70%;
+  height: 0.9rem;
+}
+
+.search-history-item--placeholder .skeleton-loader--search-history-item-type {
+  width: 34%;
+  height: 0.7rem;
+}
+
 /* Movie — poster media: blokni to‘liq to‘ldiradi, bo‘sh joy yo‘q */
 .search-history-item--movie .search-history-item-media {
   width: 2.6rem;
@@ -92,6 +109,40 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+/* Actor / artist — dumaloq avatar */
+.search-history-item--actor .search-history-item-media,
+.search-history-item--artist .search-history-item-media {
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 50%;
+}
+
+.search-history-item--actor .search-history-item-img,
+.search-history-item--artist .search-history-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+}
+
+.search-history-item--actor .search-history-item-media-skeleton,
+.search-history-item--artist .search-history-item-media-skeleton {
+  border-radius: 50%;
+}
+
+.search-history-item--actor .skeleton-loader--search-history-item-title,
+.search-history-item--artist .skeleton-loader--search-history-item-title {
+  width: 58%;
+  height: 0.9rem;
+}
+
+.search-history-item--actor .skeleton-loader--search-history-item-type,
+.search-history-item--artist .skeleton-loader--search-history-item-type {
+  width: 30%;
+  height: 0.68rem;
 }
 
 /* Klip / konsert — keng media, balandlik pastroq */
@@ -157,10 +208,25 @@
 }
 
 .search-history-item-title {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
   font-size: 0.9rem;
   font-weight: 560;
   line-height: 1.25;
   color: rgba(255, 255, 255, 0.92);
+}
+
+.search-history-item-verified {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.search-history-item-title-text {
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -241,6 +307,11 @@
     height: 2.85rem;
   }
 
+  .search-history-item--placeholder .search-history-item-media {
+    width: 2.35rem;
+    height: 2.9rem;
+  }
+
   .search-history-item--movie .search-history-item-media {
     width: 2.35rem;
     height: 3.35rem;
@@ -257,7 +328,18 @@
     height: 2.3rem;
   }
 
+  .search-history-item--actor .search-history-item-media,
+  .search-history-item--artist .search-history-item-media {
+    width: 2.55rem;
+    height: 2.55rem;
+  }
+
   .search-history-item-title {
     font-size: 0.85rem;
+  }
+
+  .search-history-item-verified {
+    width: 0.88rem;
+    height: 0.88rem;
   }
 }

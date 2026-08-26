@@ -17,6 +17,8 @@ const HISTORY_TYPE_I18N = {
   music: ['searchModal.historyTypeMusic', 'Musiqa'],
   klip: ['searchModal.historyTypeClip', 'Klip'],
   konsert: ['searchModal.historyTypeConcert', 'Konsert'],
+  actor: ['searchModal.historyTypeActor', 'Aktyor'],
+  artist: ['searchModal.historyTypeArtist', 'Artist'],
 };
 
 const getHistoryPath = (item) => {
@@ -26,6 +28,8 @@ const getHistoryPath = (item) => {
   if (type === 'movie') return `/movie/${id}`;
   if (type === 'music') return `/music/${id}`;
   if (type === 'klip' || type === 'konsert') return `/music/video/${id}`;
+  if (type === 'actor') return `/actor/${id}`;
+  if (type === 'artist') return `/music/artist/${id}`;
   return null;
 };
 
@@ -55,7 +59,7 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
   });
 
   const items = Array.isArray(data?.items) ? data.items : [];
-  const waiting = !authReady || (canFetch && isLoading && items.length === 0);
+  const listPending = !authReady || (canFetch && isLoading && items.length === 0);
 
   const typeLabel = useCallback(
     (type) => {
@@ -75,12 +79,17 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
     },
     [navigate, onItemClick]
   );
-  if (!authReady) {
+
+  if (!authReady || (isLoggedIn && listPending)) {
     return (
       <div className="search-modal-history" aria-busy="true">
         <div className="search-modal-history-list">
-          {['movie', 'music', 'klip'].map((type) => (
-            <SearchHistoryItem key={`sk-auth-${type}`} type={type} />
+          {[0, 1, 2, 3].map((i) => (
+            <SearchHistoryItem
+              key={`sk-list-${i}`}
+              placeholder
+              forceLoading
+            />
           ))}
         </div>
       </div>
@@ -93,18 +102,6 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
         <p className="search-modal-history-empty">
           {t('searchModal.historyLoginRequired')}
         </p>
-      </div>
-    );
-  }
-
-  if (waiting) {
-    return (
-      <div className="search-modal-history" aria-busy="true">
-        <div className="search-modal-history-list">
-          {['movie', 'music', 'klip', 'konsert'].map((type) => (
-            <SearchHistoryItem key={`sk-wait-${type}`} type={type} />
-          ))}
-        </div>
       </div>
     );
   }
@@ -160,9 +157,9 @@ const SearchModalHistory = ({ onItemClick, enabled = true }) => {
           const snapshot = item.snapshot || null;
           return (
             <SearchHistoryItem
-              key={`${type}-${item.id}-${item.clickedAt || ''}`}
+              key={`${type}-${item.id}`}
               type={type}
-              title={getHistoryItemTitle(snapshot, contentLang)}
+              title={getHistoryItemTitle(snapshot, contentLang, type)}
               typeLabel={typeLabel(type)}
               imgSrc={normalizeImagePath(
                 getHistoryItemImgSrc(snapshot, type, contentLang) || ''

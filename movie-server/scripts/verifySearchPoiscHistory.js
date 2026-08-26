@@ -33,14 +33,15 @@ ok(
     SearchPoiscHistory.schema?.options?.collection === 'searchPoiscHistory'
 );
 ok(
-  'types B1 only',
-  SEARCH_POISC_HISTORY_TYPES.length === 4 &&
+  'types include actor/artist',
+  SEARCH_POISC_HISTORY_TYPES.length === 6 &&
     SEARCH_POISC_HISTORY_TYPES.includes('movie') &&
     SEARCH_POISC_HISTORY_TYPES.includes('music') &&
     SEARCH_POISC_HISTORY_TYPES.includes('klip') &&
     SEARCH_POISC_HISTORY_TYPES.includes('konsert') &&
-    !SEARCH_POISC_HISTORY_TYPES.includes('album') &&
-    !SEARCH_POISC_HISTORY_TYPES.includes('actor')
+    SEARCH_POISC_HISTORY_TYPES.includes('actor') &&
+    SEARCH_POISC_HISTORY_TYPES.includes('artist') &&
+    !SEARCH_POISC_HISTORY_TYPES.includes('album')
 );
 ok('max history', MAX_HISTORY_PER_USER === 50);
 
