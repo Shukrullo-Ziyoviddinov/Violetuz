@@ -21,11 +21,16 @@ const NavbarMobile = () => {
   const { isLoggedIn, profile } = useAuth();
   const pathname = location.pathname;
   const [showSearch, setShowSearch] = useState(false);
+  /** Yopilish slide — DOM unmount kechiktiriladi */
+  const [searchExiting, setSearchExiting] = useState(false);
+  /** Ochilish slide — mount dan keyin --in class */
+  const [searchEntered, setSearchEntered] = useState(false);
   const [searchMode, setSearchMode] = useState(SEARCH_MODE_BROWSE);
   const [showShortsPicker, setShowShortsPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const inputRef = useRef(null);
   const handleSearchBackRef = useRef(() => {});
+  const searchClosingRef = useRef(false);
 
   const isHomeActive = pathname === '/feed';
   const isSearchActive = pathname.startsWith('/search');
@@ -36,6 +41,8 @@ const NavbarMobile = () => {
 
   const hasSearchQuery = searchQuery.trim().length > 0;
   const isComposing = searchMode === SEARCH_MODE_COMPOSE;
+  const searchInDom = showSearch || searchExiting;
+  const searchSlideIn = searchEntered && !searchExiting;
 
   const returnSearchToBrowse = () => {
     setSearchQuery('');
@@ -43,10 +50,23 @@ const NavbarMobile = () => {
     inputRef.current?.blur();
   };
 
-  const finishCloseSearch = () => {
+  /** Holat tozalash + unmount (animatsiya tugagach yoki navigatsiya) */
+  const unmountSearchModal = () => {
+    searchClosingRef.current = false;
     setShowSearch(false);
+    setSearchExiting(false);
+    setSearchEntered(false);
     setSearchMode(SEARCH_MODE_BROWSE);
     setSearchQuery('');
+    inputRef.current?.blur();
+  };
+
+  /** Yopilish slide boshlash (hardware / UI ortga) */
+  const beginCloseSearch = () => {
+    if (searchClosingRef.current || searchExiting) return;
+    searchClosingRef.current = true;
+    setSearchExiting(true);
+    setShowSearch(false);
     inputRef.current?.blur();
   };
 
@@ -56,7 +76,7 @@ const NavbarMobile = () => {
       searchMode,
       hasQuery: hasSearchQuery,
       onReturnToBrowse: returnSearchToBrowse,
-      onCloseFromHardware: finishCloseSearch,
+      onCloseFromHardware: beginCloseSearch,
     });
 
   const handleQueryChange = (value) => {
@@ -73,21 +93,33 @@ const NavbarMobile = () => {
   };
 
   const closeSearchModal = () => {
-    finishCloseSearch();
+    if (searchClosingRef.current || searchExiting) return;
+    beginCloseSearch();
     releaseSearchHistory();
   };
 
-  /** Natija/tarix item → sahifa: history.back qilinmaydi */
+  /** Natija/tarix item → sahifa: animatsiyasiz yopiladi */
   const leaveSearchForNavigation = () => {
     abandonSearchHistory();
-    finishCloseSearch();
+    unmountSearchModal();
   };
 
   const openSearchBrowse = () => {
+    if (showSearch || searchExiting) return;
+    searchClosingRef.current = false;
+    setSearchExiting(false);
+    setSearchEntered(false);
     setShowSearch(true);
     setSearchMode(SEARCH_MODE_BROWSE);
     inputRef.current?.blur();
     markSearchHistoryOpen();
+  };
+
+  const handleSearchBoxTransitionEnd = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.propertyName !== 'transform') return;
+    if (!searchExiting) return;
+    unmountSearchModal();
   };
 
   /** Ortga: compose/yozish → browse; browse → modal yopiladi */
@@ -111,6 +143,33 @@ const NavbarMobile = () => {
     return () => window.removeEventListener(OPEN_SEARCH_EVENT, open);
   }, []);
 
+  /** Mount → keyingi frame’da slide-in */
+  useEffect(() => {
+    if (!showSearch || searchExiting) return undefined;
+    let innerId = 0;
+    const outerId = window.requestAnimationFrame(() => {
+      innerId = window.requestAnimationFrame(() => {
+        setSearchEntered(true);
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(outerId);
+      window.cancelAnimationFrame(innerId);
+    };
+  }, [showSearch, searchExiting]);
+
+  /** transitionend bo‘lmasa ham (reduced-motion) unmount */
+  useEffect(() => {
+    if (!searchExiting) return undefined;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const id = window.setTimeout(() => {
+      unmountSearchModal();
+    }, reduced ? 0 : 380);
+    return () => window.clearTimeout(id);
+  }, [searchExiting]);
+
   useEffect(() => {
     if (!showSearch || searchMode !== SEARCH_MODE_COMPOSE) return undefined;
     const id = window.requestAnimationFrame(() => {
@@ -123,13 +182,13 @@ const NavbarMobile = () => {
   }, [showSearch, searchMode]);
 
   useEffect(() => {
-    if (!showSearch) return undefined;
+    if (!searchInDom) return undefined;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [showSearch]);
+  }, [searchInDom]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -138,14 +197,14 @@ const NavbarMobile = () => {
         setShowShortsPicker(false);
         return;
       }
-      if (!showSearch) return;
+      if (!showSearch && !searchExiting) return;
       handleSearchBackRef.current();
     };
-    if (showSearch || showShortsPicker) {
+    if (searchInDom || showShortsPicker) {
       document.addEventListener('keydown', handleEscape);
     }
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [showSearch, showShortsPicker]);
+  }, [searchInDom, showSearch, searchExiting, showShortsPicker]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -216,7 +275,7 @@ const NavbarMobile = () => {
         </button>
       </nav>
 
-      {showSearch && (
+      {searchInDom && (
         <div
           className="navbar-mobile-search-overlay"
           role="presentation"
@@ -225,11 +284,14 @@ const NavbarMobile = () => {
           }}
         >
           <div
-            className="navbar-mobile-search-box"
+            className={`navbar-mobile-search-box${
+              searchSlideIn ? ' navbar-mobile-search-box--in' : ''
+            }`}
             role="dialog"
             aria-modal="true"
             aria-label={t('navbar.search')}
             onClick={(e) => e.stopPropagation()}
+            onTransitionEnd={handleSearchBoxTransitionEnd}
           >
             <div className="navbar-mobile-search-form-row">
               <button
