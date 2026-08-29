@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -6,6 +6,7 @@ import { fetchCommentHistoryEntries, getShortsRouteFromHistory } from './comment
 import { COMMENTS_CHANGED_EVENT } from '../../api/commentsApi';
 import { SHORTS_COMMENTS_CHANGED_EVENT } from '../../api/shortsCommentsApi';
 import { useAuth } from '../../context/AuthContext';
+import { useModalHardwareBack } from '../../useModalHardwareBack';
 import ComentariaHistoryFilter from './ComentariaHistoryFilter';
 import ComentariaMovieCard from './ComentariaMovieCard';
 import ComentariaVideoCard from './ComentariaVideoCard';
@@ -19,6 +20,9 @@ import { formatActionCount } from '../../utils/utils';
 import '../MovieDetail/MovieDetail.css';
 import '../ShortsVideos/ShortsVideos.css';
 import './ComentariaHistoryModal.css';
+
+const isMobileSlideViewport = () =>
+  typeof window !== 'undefined' && window.innerWidth <= 768;
 
 const formatCommentDate = (iso) => {
   if (!iso) return '';
@@ -100,8 +104,52 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
   const [tick, setTick] = useState(0);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const closingRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  const slideIn = entered && !exiting;
+  const logicalOpen = Boolean(open) && !exiting;
+  const visible = Boolean(open) || exiting;
 
   const refresh = useCallback(() => setTick((x) => x + 1), []);
+
+  const finishClose = () => {
+    closingRef.current = false;
+    onCloseRef.current?.();
+    setExiting(false);
+    setEntered(false);
+  };
+
+  const beginCloseFromHardware = () => {
+    if (closingRef.current || exiting) return;
+    if (!isMobileSlideViewport()) {
+      onCloseRef.current?.();
+      return;
+    }
+    closingRef.current = true;
+    setExiting(true);
+  };
+
+  const { releaseHistory, abandonHistory } = useModalHardwareBack({
+    historyKey: 'violetComentariaHistory',
+    isOpen: logicalOpen,
+    onCloseFromHardware: beginCloseFromHardware,
+  });
+
+  const requestClose = () => {
+    if (closingRef.current || exiting) return;
+    if (!isMobileSlideViewport()) {
+      releaseHistory();
+      onCloseRef.current?.();
+      return;
+    }
+    closingRef.current = true;
+    setExiting(true);
+    releaseHistory();
+  };
 
   useEffect(() => {
     if (open) refresh();
@@ -121,7 +169,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
   }, [open, refresh]);
 
   useEffect(() => {
-    if (open) {
+    if (visible) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -129,7 +177,37 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
     return () => {
       document.body.style.overflow = '';
     };
+  }, [visible]);
+
+  /** Ochilganda slide-in */
+  useEffect(() => {
+    if (!open) return undefined;
+    closingRef.current = false;
+    setExiting(false);
+    setEntered(false);
+    let innerId = 0;
+    const outerId = window.requestAnimationFrame(() => {
+      innerId = window.requestAnimationFrame(() => {
+        setEntered(true);
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(outerId);
+      window.cancelAnimationFrame(innerId);
+    };
   }, [open]);
+
+  /** transitionend bo‘lmasa ham unmount */
+  useEffect(() => {
+    if (!exiting) return undefined;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const id = window.setTimeout(() => {
+      finishClose();
+    }, reduced ? 0 : 380);
+    return () => window.clearTimeout(id);
+  }, [exiting]);
 
   useEffect(() => {
     if (!open || !authReady) return undefined;
@@ -164,13 +242,24 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
 
   const groupedRows = useMemo(() => groupCommentHistoryRows(filtered), [filtered]);
 
+  const handleModalTransitionEnd = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.propertyName !== 'transform') return;
+    if (!exiting) return;
+    finishClose();
+  };
+
   const go = (route) => {
     if (!route) return;
-    onClose();
+    abandonHistory();
+    onCloseRef.current?.();
+    setExiting(false);
+    setEntered(false);
+    closingRef.current = false;
     navigate(route);
   };
 
-  if (!open) return null;
+  if (!visible) return null;
 
   const emptyUz = 'Hozircha sharhlar yo‘q';
   const emptyRu = 'Пока нет комментариев';
@@ -183,10 +272,28 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
 
   return createPortal(
     <>
-      <div className="comentaria-history-modal-overlay" onClick={onClose} role="presentation" />
-      <div className="comentaria-history-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="comentaria-history-modal-title">
+      <div
+        className="comentaria-history-modal-overlay"
+        onClick={requestClose}
+        role="presentation"
+      />
+      <div
+        className={`comentaria-history-modal${
+          slideIn ? ' comentaria-history-modal--in' : ''
+        }`}
+        onClick={(e) => e.stopPropagation()}
+        onTransitionEnd={handleModalTransitionEnd}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="comentaria-history-modal-title"
+      >
         <div className="comentaria-history-modal-header">
-          <button type="button" className="comentaria-history-modal-back" onClick={onClose} aria-label={lang === 'ru' ? 'Закрыть' : 'Yopish'}>
+          <button
+            type="button"
+            className="comentaria-history-modal-back"
+            onClick={requestClose}
+            aria-label={lang === 'ru' ? 'Закрыть' : 'Yopish'}
+          >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
