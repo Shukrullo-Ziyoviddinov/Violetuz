@@ -121,7 +121,7 @@
   background: var(--vs-red);
   box-shadow: 0 0 10px var(--vs-red-glow);
   transform-origin: center;
-  transition: height 0.12s ease-out;
+  transition: height 0.06s linear;
 }
 
 .voice-search-wave--live .voice-search-wave-bar {

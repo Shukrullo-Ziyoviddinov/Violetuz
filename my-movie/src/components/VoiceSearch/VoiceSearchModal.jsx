@@ -4,6 +4,7 @@ import useSpeechRecognition, {
   cleanSpeechTranscript,
   resolveSpeechLang,
 } from './useSpeechRecognition';
+import useVoiceMeter from './useVoiceMeter';
 import './VoiceSearchModal.css';
 
 const PHASE_IDLE = 'idle';
@@ -49,8 +50,8 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     listening,
     displayText,
     finalText,
-    speaking,
-    voiceLevel,
+    speaking: sttSpeaking,
+    voiceLevel: sttLevel,
     error,
     start,
     stop,
@@ -62,7 +63,11 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     enabled: isOpen,
   });
 
-  /** Ovoz kelayotganda (STT interim) visual jonlanadi */
+  const { level: micLevel, speaking: micSpeaking } = useVoiceMeter(listening);
+
+  /** Real-time mic darajasi asosiy; STT — zaxira */
+  const speaking = micSpeaking || sttSpeaking;
+  const voiceLevel = Math.max(micLevel, sttLevel);
   const visualsLive = listening && speaking;
 
   const clearTimers = () => {
