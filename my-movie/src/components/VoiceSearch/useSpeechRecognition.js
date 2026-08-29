@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Web Speech API — ovoz → matn.
- * Bitta sessiya (restart yo‘q) — takrorlanish bo‘lmasin.
+ * Faqat oxirgi natija ishlatiladi (takrorlanish oldini oladi).
  */
 
 export const getSpeechRecognitionCtor = () => {
@@ -26,24 +26,13 @@ export const cleanSpeechTranscript = (raw = '') =>
     .trim();
 
 /**
- * Brauzer natijasidan to‘liq matn (takrorlanmas).
- * Oxirgi interim odatda butun gapni o‘z ichiga oladi.
+ * Brauzer har yangilanganda butun gapni oxirgi result da saqlaydi.
+ * Barcha final larni qo‘shish → "2024 2024 yil..." takrorlanishi.
  */
-export const extractTranscript = (results) => {
+export const extractLatestTranscript = (results) => {
   if (!results?.length) return '';
-
   const last = results[results.length - 1];
-  if (!last.isFinal) {
-    return cleanSpeechTranscript(last[0]?.transcript || '');
-  }
-
-  let combined = '';
-  for (let i = 0; i < results.length; i += 1) {
-    if (results[i].isFinal) {
-      combined += results[i][0]?.transcript || '';
-    }
-  }
-  return cleanSpeechTranscript(combined);
+  return cleanSpeechTranscript(last[0]?.transcript || '');
 };
 
 export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } = {}) {
@@ -141,7 +130,7 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     recognitionRef.current = recognition;
 
     recognition.onresult = (event) => {
-      const text = extractTranscript(event.results);
+      const text = extractLatestTranscript(event.results);
       if (!text) return;
       transcriptRef.current = text;
       setTranscript(text);
