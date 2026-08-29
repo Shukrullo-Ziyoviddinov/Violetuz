@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchModalBody from '../SearchModalBody/SearchModalBody';
 import ShortsPickerModal from './ShortsPickerModal';
+import VoiceSearchModal from '../VoiceSearch/VoiceSearchModal';
+import { isSpeechRecognitionSupported } from '../VoiceSearch/useSpeechRecognition';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { OPEN_SEARCH_EVENT } from '../../searchModalBridge';
 import {
@@ -27,10 +29,12 @@ const NavbarMobile = () => {
   const [searchEntered, setSearchEntered] = useState(false);
   const [searchMode, setSearchMode] = useState(SEARCH_MODE_BROWSE);
   const [showShortsPicker, setShowShortsPicker] = useState(false);
+  const [showVoiceSearch, setShowVoiceSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const inputRef = useRef(null);
   const handleSearchBackRef = useRef(() => {});
   const searchClosingRef = useRef(false);
+  const voiceSearchSupported = isSpeechRecognitionSupported();
 
   const isHomeActive = pathname === '/feed';
   const isSearchActive = pathname.startsWith('/search');
@@ -58,6 +62,7 @@ const NavbarMobile = () => {
     setSearchEntered(false);
     setSearchMode(SEARCH_MODE_BROWSE);
     setSearchQuery('');
+    setShowVoiceSearch(false);
     inputRef.current?.blur();
   };
 
@@ -67,6 +72,7 @@ const NavbarMobile = () => {
     searchClosingRef.current = true;
     setSearchExiting(true);
     setShowSearch(false);
+    setShowVoiceSearch(false);
     inputRef.current?.blur();
   };
 
@@ -193,6 +199,7 @@ const NavbarMobile = () => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key !== 'Escape') return;
+      if (showVoiceSearch) return;
       if (showShortsPicker) {
         setShowShortsPicker(false);
         return;
@@ -204,10 +211,16 @@ const NavbarMobile = () => {
       document.addEventListener('keydown', handleEscape);
     }
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [searchInDom, showSearch, searchExiting, showShortsPicker]);
+  }, [searchInDom, showSearch, searchExiting, showShortsPicker, showVoiceSearch]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+  };
+
+  const handleVoiceSearchResult = (text) => {
+    const value = typeof text === 'string' ? text.trim() : '';
+    if (!value) return;
+    handleQueryChange(value);
   };
 
   return (
@@ -339,6 +352,19 @@ const NavbarMobile = () => {
                 </button>
               </div>
               </form>
+              {voiceSearchSupported ? (
+                <button
+                  type="button"
+                  className="navbar-mobile-search-mic"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowVoiceSearch(true);
+                  }}
+                  aria-label={t('voiceSearch.mic', 'Mikrofon')}
+                >
+                  <i className="fa-solid fa-microphone" aria-hidden="true" />
+                </button>
+              ) : null}
             </div>
             <SearchModalBody
               query={searchQuery}
@@ -348,6 +374,12 @@ const NavbarMobile = () => {
           </div>
         </div>
       )}
+
+      <VoiceSearchModal
+        isOpen={showVoiceSearch}
+        onClose={() => setShowVoiceSearch(false)}
+        onResult={handleVoiceSearchResult}
+      />
 
       <ShortsPickerModal
         isOpen={showShortsPicker}

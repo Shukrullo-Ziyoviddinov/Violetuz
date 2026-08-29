@@ -177,6 +177,34 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
+  .navbar-mobile-search-mic {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .navbar-mobile-search-mic i {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .navbar-mobile-search-mic:hover,
+  .navbar-mobile-search-mic:focus-visible {
+    color: #fff;
+    background: rgba(255, 45, 74, 0.28);
+    outline: none;
+  }
+
   .navbar-mobile-search-back {
     background: none;
     border: none;
