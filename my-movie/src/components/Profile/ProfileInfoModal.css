@@ -148,8 +148,9 @@
 }
 
 @media (max-width: 768px) {
+  /* Modal o‘zi to‘liq fon — overlay shaffof, slide paytida profil ko‘rinsin */
   .profile-info-overlay {
-    background: #0a0a0a;
+    background: transparent;
     backdrop-filter: none;
     overflow: hidden;
   }
@@ -167,6 +168,7 @@
     border: none;
     box-shadow: none;
     padding-bottom: env(safe-area-inset-bottom, 0);
+    background: #0a0a0a;
     transform: translate3d(100%, 0, 0);
     /* Yopilish — search modal bilan bir xil */
     transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
