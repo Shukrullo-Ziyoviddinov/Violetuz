@@ -14,12 +14,25 @@
   box-sizing: border-box;
   transform: translate3d(100%, 0, 0);
   transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform;
+  will-change: transform, opacity;
+  opacity: 1;
 }
 
 .voice-search-modal--in {
   transform: translate3d(0, 0, 0);
+  /* Ochilish — biroz sekinroq */
   transition: transform 0.42s cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+
+/* Matn inputga ketgandan keyin — markazdan kichrayib yo‘qoladi */
+.voice-search-modal--exit-handoff {
+  transform: translate3d(0, 0, 0) scale(0.86);
+  opacity: 0;
+  transform-origin: center center;
+  pointer-events: none;
+  transition:
+    transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.34s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .voice-search-modal-top {
@@ -336,7 +349,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .voice-search-modal,
-  .voice-search-modal--in {
+  .voice-search-modal--in,
+  .voice-search-modal--exit-handoff {
     transition: none;
   }
 

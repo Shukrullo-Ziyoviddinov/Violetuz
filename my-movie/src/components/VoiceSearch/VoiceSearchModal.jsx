@@ -37,6 +37,8 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const [shownText, setShownText] = useState('');
   const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
+  /** Yopilish: slide (X/ortga) | handoff (matn inputga ketgandan keyin) */
+  const [exitMode, setExitMode] = useState('slide');
   const handedOffRef = useRef(false);
   const processingStartedRef = useRef(false);
   const commitOnceRef = useRef(false);
@@ -57,12 +59,14 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     closingRef.current = false;
     setExiting(false);
     setEntered(false);
+    setExitMode('slide');
     onCloseRef.current?.();
   };
 
-  const beginAnimatedClose = () => {
+  const beginAnimatedClose = (mode = 'slide') => {
     if (closingRef.current || exiting) return;
     closingRef.current = true;
+    setExitMode(mode);
     setExiting(true);
   };
 
@@ -154,6 +158,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     closingRef.current = false;
     setExiting(false);
     setEntered(false);
+    setExitMode('slide');
     handedOffRef.current = false;
     processingStartedRef.current = false;
     commitOnceRef.current = false;
@@ -178,16 +183,21 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     const reduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const delayMs = reduced ? 0 : exitMode === 'handoff' ? 400 : 380;
     const id = window.setTimeout(() => {
       finishAnimatedClose();
-    }, reduced ? 0 : 380);
+    }, delayMs);
     return () => window.clearTimeout(id);
-  }, [exiting]);
+  }, [exiting, exitMode]);
 
   const handleModalTransitionEnd = (e) => {
     if (e.target !== e.currentTarget) return;
-    if (e.propertyName !== 'transform') return;
     if (!exiting) return;
+    if (exitMode === 'handoff') {
+      if (e.propertyName !== 'opacity' && e.propertyName !== 'transform') return;
+    } else if (e.propertyName !== 'transform') {
+      return;
+    }
     finishAnimatedClose();
   };
 
@@ -226,7 +236,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       if (handedOffRef.current) return;
       handedOffRef.current = true;
       onResultRef.current?.(text);
-      beginAnimatedClose();
+      beginAnimatedClose('handoff');
     }, PROCESSING_MS + HANDOFF_MS);
   }, [isOpen, phase, shownText]);
 
@@ -284,9 +294,17 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const sideClass = visualsLive ? ' voice-search-side-wave--live' : '';
   const rippleClass = visualsLive ? ' voice-search-ripple-wrap--live' : '';
 
+  const modalClass = [
+    'voice-search-modal',
+    slideIn && 'voice-search-modal--in',
+    exiting && exitMode === 'handoff' && 'voice-search-modal--exit-handoff',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div
-      className={`voice-search-modal${slideIn ? ' voice-search-modal--in' : ''}`}
+      className={modalClass}
       role="dialog"
       aria-modal="true"
       aria-label={t('voiceSearch.title', 'Ovozli qidiruv')}
