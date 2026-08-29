@@ -12,9 +12,7 @@ export const getSpeechRecognitionCtor = () => {
 
 export const isSpeechRecognitionSupported = () => Boolean(getSpeechRecognitionCtor());
 
-/**
- * STT tili. uz-UZ ko‘p brauzerda zaif — ru-RU/tr-TR zaxira.
- */
+/** App tili → BCP-47 */
 export const resolveSpeechLang = (appLang = 'uz') => {
   const code = String(appLang || 'uz').toLowerCase().slice(0, 2);
   if (code === 'ru') return 'ru-RU';
@@ -32,6 +30,10 @@ export const cleanSpeechTranscript = (raw = '') =>
     .replace(/[.!?,;:]+$/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+
+/** Final + interim → to‘liq gap */
+export const mergeSpeechParts = (finalPart = '', interimPart = '') =>
+  cleanSpeechTranscript([finalPart, interimPart].filter(Boolean).join(' '));
 
 /**
  * @param {{ lang?: string, enabled?: boolean }} options
@@ -148,6 +150,7 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
           if (result.isFinal) finals += `${text} `;
           else interim += text;
         }
+
         const finalClean = cleanSpeechTranscript(finals);
         const interimClean = cleanSpeechTranscript(interim);
 
@@ -163,8 +166,8 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
           setInterimText('');
         }
 
-        const activeLen = (finalClean || interimClean || '').length;
-        if (activeLen) pulseVoiceActivity(activeLen);
+        const fullLen = mergeSpeechParts(finalRef.current, interimRef.current).length;
+        if (fullLen) pulseVoiceActivity(fullLen);
       };
 
       recognition.onerror = (event) => {
@@ -173,10 +176,7 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
           setListening(false);
           return;
         }
-        if (code === 'no-speech') {
-          // continuous: jimlik — listeningda qolamiz, onend restart qilishi mumkin
-          return;
-        }
+        if (code === 'no-speech') return;
         if (
           (code === 'language-not-supported' || code === 'network') &&
           langIndexRef.current < langs.length - 1
@@ -199,8 +199,16 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
       recognition.onend = () => {
         if (recognitionRef.current !== recognition) return;
 
+        // Oxirgi interim ni final ga qo‘shish
+        if (interimRef.current) {
+          const merged = mergeSpeechParts(finalRef.current, interimRef.current);
+          finalRef.current = merged;
+          setFinalText(merged);
+          interimRef.current = '';
+          setInterimText('');
+        }
+
         if (!stoppedByUserRef.current) {
-          // Brauzer to‘xtatdi — qayta start (continuous sessiyani ushlab turish)
           try {
             recognition.start();
             setListening(true);
@@ -208,14 +216,6 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
           } catch {
             /* fall through */
           }
-        }
-
-        if (!finalRef.current && interimRef.current) {
-          const fallback = cleanSpeechTranscript(interimRef.current);
-          finalRef.current = fallback;
-          setFinalText(fallback);
-          setInterimText('');
-          interimRef.current = '';
         }
 
         recognitionRef.current = null;
@@ -256,11 +256,11 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     []
   );
 
-  const displayText = finalText || interimText;
+  const displayText = mergeSpeechParts(finalText, interimText);
 
   const getCurrentText = useCallback(
-    () => cleanSpeechTranscript(finalRef.current || interimRef.current || finalText || interimText),
-    [finalText, interimText]
+    () => mergeSpeechParts(finalRef.current, interimRef.current),
+    []
   );
 
   return {

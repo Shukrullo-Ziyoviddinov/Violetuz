@@ -13,6 +13,8 @@ const PHASE_HANDOFF = 'handoff';
 
 const PROCESSING_MS = 900;
 const HANDOFF_MS = 450;
+/** Mic o‘chgach onend finalizatsiyasi uchun */
+const STOP_SETTLE_MS = 180;
 
 const CENTER_BARS = [28, 46, 72, 54, 88, 62, 96, 70, 84, 58, 76, 48, 36];
 const SIDE_BARS = [10, 18, 28, 22, 34, 16, 26, 14];
@@ -36,6 +38,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const handedOffRef = useRef(false);
   const processingStartedRef = useRef(false);
   const commitOnceRef = useRef(false);
+  const stopCommitPendingRef = useRef(false);
   const timersRef = useRef([]);
   const cancelRef = useRef(() => {});
   const onResultRef = useRef(onResult);
@@ -90,6 +93,22 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     return true;
   };
 
+  /** Faqat mic o‘chganda commit — gapirayotganda emas */
+  const tryCommitAfterStop = () => {
+    if (stopCommitPendingRef.current) return;
+    stopCommitPendingRef.current = true;
+    schedule(() => {
+      stopCommitPendingRef.current = false;
+      if (commitOnceRef.current || handedOffRef.current) return;
+      const text = getCurrentText();
+      if (text) {
+        commitTranscript(text);
+        return;
+      }
+      setPhase(PHASE_IDLE);
+    }, STOP_SETTLE_MS);
+  };
+
   const handleCancel = () => {
     clearTimers();
     handedOffRef.current = true;
@@ -106,6 +125,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       handedOffRef.current = false;
       processingStartedRef.current = false;
       commitOnceRef.current = false;
+      stopCommitPendingRef.current = false;
       setPhase(PHASE_IDLE);
       setShownText('');
       return undefined;
@@ -129,22 +149,13 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
 
   useEffect(() => {
     if (!isOpen || handedOffRef.current || commitOnceRef.current) return;
-    if (phase !== PHASE_LISTENING && phase !== PHASE_IDLE) return;
+    if (phase !== PHASE_LISTENING) return;
 
-    if (finalText) {
-      commitTranscript(finalText);
-      return;
+    // Birinchi final qism kelganda commit QILMAYMIZ — faqat to‘xtaganda
+    if (!listening) {
+      tryCommitAfterStop();
     }
-
-    if (!listening && displayText && phase === PHASE_LISTENING) {
-      commitTranscript(displayText);
-      return;
-    }
-
-    if (!listening && phase === PHASE_LISTENING && !displayText && !finalText) {
-      setPhase(PHASE_IDLE);
-    }
-  }, [isOpen, phase, listening, finalText, displayText]);
+  }, [isOpen, phase, listening]);
 
   useEffect(() => {
     if (!isOpen || phase !== PHASE_PROCESSING || handedOffRef.current) return;
@@ -153,6 +164,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     const text = cleanSpeechTranscript(shownText);
     if (!text) {
       commitOnceRef.current = false;
+      stopCommitPendingRef.current = false;
       setPhase(PHASE_IDLE);
       return;
     }
@@ -189,11 +201,8 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     if (phase === PHASE_PROCESSING || phase === PHASE_HANDOFF) return;
 
     if (listening) {
-      const pending = getCurrentText();
       stop();
-      if (pending) {
-        commitTranscript(pending);
-      }
+      tryCommitAfterStop();
       return;
     }
 
