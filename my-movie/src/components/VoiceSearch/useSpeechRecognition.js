@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 /**
  * Web Speech API — ovoz → matn.
  * Search algoritmiga tegmaydi; faqat transcript boshqaradi.
+ * start() faqat mikrafon bosilganda chaqiriladi (auto-start yo‘q).
  */
 
 export const getSpeechRecognitionCtor = () => {
@@ -28,9 +29,9 @@ export const cleanSpeechTranscript = (raw = '') =>
 
 /**
  * Voice search STT tizimi (alohida).
- * @param {{ lang?: string, active?: boolean }} options
+ * @param {{ lang?: string, enabled?: boolean }} options
  */
-export default function useSpeechRecognition({ lang = 'uz-UZ', active = false } = {}) {
+export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } = {}) {
   const [listening, setListening] = useState(false);
   const [interimText, setInterimText] = useState('');
   const [finalText, setFinalText] = useState('');
@@ -141,16 +142,10 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', active = false } 
     }
   }, [abort]);
 
+  /** Modal yopilganda / phase o‘zgaganda to‘xtatish — auto-start yo‘q */
   useEffect(() => {
-    if (!active) {
-      abort();
-      return undefined;
-    }
-    start();
-    return () => {
-      abort();
-    };
-  }, [active, start, abort]);
+    if (!enabled) abort();
+  }, [enabled, abort]);
 
   const displayText = finalText || interimText;
 

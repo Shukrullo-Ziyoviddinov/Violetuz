@@ -4,8 +4,10 @@ import useSpeechRecognition, {
   cleanSpeechTranscript,
   resolveSpeechLang,
 } from './useSpeechRecognition';
+import useVoiceMeter from './useVoiceMeter';
 import './VoiceSearchModal.css';
 
+const PHASE_IDLE = 'idle';
 const PHASE_LISTENING = 'listening';
 const PHASE_PROCESSING = 'processing';
 const PHASE_HANDOFF = 'handoff';
@@ -17,13 +19,19 @@ const CENTER_BARS = [28, 46, 72, 54, 88, 62, 96, 70, 84, 58, 76, 48, 36];
 const SIDE_BARS = [10, 18, 28, 22, 34, 16, 26, 14];
 const MINI_BARS = [8, 14, 10, 16, 12, 18, 9];
 
+const barHeight = (base, level, live) => {
+  if (!live) return Math.max(6, Math.round(base * 0.28));
+  const scaled = base * (0.22 + level * 0.95);
+  return Math.max(6, Math.round(scaled));
+};
+
 /**
  * Voice search modal (UI).
  * STT → onResult(text); search algoritmiga tegmaydi.
  */
 const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const { t, i18n } = useTranslation();
-  const [phase, setPhase] = useState(PHASE_LISTENING);
+  const [phase, setPhase] = useState(PHASE_IDLE);
   const [shownText, setShownText] = useState('');
   const handedOffRef = useRef(false);
   const processingStartedRef = useRef(false);
@@ -35,6 +43,8 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   onCloseRef.current = onClose;
 
   const speechLang = resolveSpeechLang(i18n.language);
+  const canListen = isOpen && (phase === PHASE_IDLE || phase === PHASE_LISTENING);
+
   const {
     listening,
     displayText,
@@ -45,8 +55,11 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     abort,
   } = useSpeechRecognition({
     lang: speechLang,
-    active: isOpen && phase === PHASE_LISTENING,
+    enabled: canListen,
   });
+
+  const { level, speaking } = useVoiceMeter(listening);
+  const visualsLive = listening && (speaking || Boolean(displayText));
 
   const clearTimers = () => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -72,16 +85,26 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       clearTimers();
       handedOffRef.current = false;
       processingStartedRef.current = false;
-      setPhase(PHASE_LISTENING);
+      setPhase(PHASE_IDLE);
       setShownText('');
       return undefined;
     }
     handedOffRef.current = false;
     processingStartedRef.current = false;
-    setPhase(PHASE_LISTENING);
+    setPhase(PHASE_IDLE);
     setShownText('');
     return () => clearTimers();
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (listening && phase === PHASE_IDLE) {
+      setPhase(PHASE_LISTENING);
+    }
+    if (!listening && phase === PHASE_LISTENING && !finalText && !displayText) {
+      setPhase(PHASE_IDLE);
+    }
+  }, [isOpen, listening, phase, finalText, displayText]);
 
   /** Final matn keldi yoki listening tugadi + matn bor → processing */
   useEffect(() => {
@@ -96,14 +119,14 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     setPhase(PHASE_PROCESSING);
   }, [isOpen, phase, listening, finalText, displayText, stop]);
 
-  /** Processing → handoff → onResult + close (timerlar cancel/isOpen da tozalanadi) */
+  /** Processing → handoff → onResult + close */
   useEffect(() => {
     if (!isOpen || phase !== PHASE_PROCESSING || handedOffRef.current) return;
     if (processingStartedRef.current) return;
 
     const text = cleanSpeechTranscript(shownText);
     if (!text) {
-      setPhase(PHASE_LISTENING);
+      setPhase(PHASE_IDLE);
       return;
     }
 
@@ -136,22 +159,34 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   }, [isOpen]);
 
   const handleMicClick = () => {
-    if (phase !== PHASE_LISTENING) return;
+    if (phase === PHASE_PROCESSING || phase === PHASE_HANDOFF) return;
     if (listening) {
       stop();
+      setPhase(PHASE_IDLE);
       return;
     }
+    setPhase(PHASE_LISTENING);
     start();
   };
 
   if (!isOpen) return null;
 
-  const livePreview = phase === PHASE_LISTENING ? displayText : shownText;
+  const livePreview =
+    phase === PHASE_LISTENING || phase === PHASE_IDLE ? displayText : shownText;
   const showLoader = phase === PHASE_PROCESSING || phase === PHASE_HANDOFF;
-  const statusLabel =
-    phase === PHASE_LISTENING
-      ? t('voiceSearch.recording', 'Ovoz yozilmoqda...')
-      : livePreview || t('voiceSearch.processing', 'Aniqlanmoqda...');
+
+  let statusLabel = t('voiceSearch.tapMic', 'Mikrofonni bosing');
+  if (phase === PHASE_LISTENING || listening) {
+    statusLabel = t('voiceSearch.recording', 'Ovoz yozilmoqda...');
+  }
+  if (showLoader) {
+    statusLabel = livePreview || t('voiceSearch.processing', 'Aniqlanmoqda...');
+  }
+
+  const waveClass = visualsLive ? ' voice-search-wave--live' : '';
+  const miniClass = visualsLive ? ' voice-search-mini-wave--live' : '';
+  const sideClass = visualsLive ? ' voice-search-side-wave--live' : '';
+  const rippleClass = visualsLive ? ' voice-search-ripple-wrap--live' : '';
 
   return (
     <div
@@ -177,22 +212,18 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       </div>
 
       <div className="voice-search-modal-center">
-        <div className="voice-search-ripple-wrap" aria-hidden="true">
+        <div className={`voice-search-ripple-wrap${rippleClass}`} aria-hidden="true">
           <span className="voice-search-ripple voice-search-ripple--1" />
           <span className="voice-search-ripple voice-search-ripple--2" />
           <span className="voice-search-ripple voice-search-ripple--3" />
-          <div
-            className={`voice-search-wave${
-              phase === PHASE_LISTENING && listening ? ' voice-search-wave--live' : ''
-            }`}
-          >
+          <div className={`voice-search-wave${waveClass}`}>
             {CENTER_BARS.map((h, i) => (
               <span
                 key={`c-${i}`}
                 className="voice-search-wave-bar"
                 style={{
-                  '--bar-h': `${h}px`,
-                  '--bar-delay': `${i * 0.05}s`,
+                  height: `${barHeight(h, level, visualsLive)}px`,
+                  '--bar-delay': `${i * 0.04}s`,
                 }}
               />
             ))}
@@ -218,14 +249,14 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
                 {livePreview}
               </p>
             ) : null}
-            <div className="voice-search-mini-wave" aria-hidden="true">
+            <div className={`voice-search-mini-wave${miniClass}`} aria-hidden="true">
               {MINI_BARS.map((h, i) => (
                 <span
                   key={`m-${i}`}
                   className="voice-search-mini-bar"
                   style={{
-                    '--bar-h': `${h}px`,
-                    '--bar-delay': `${i * 0.07}s`,
+                    height: `${barHeight(h, level, visualsLive)}px`,
+                    '--bar-delay': `${i * 0.06}s`,
                   }}
                 />
               ))}
@@ -235,14 +266,14 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       </div>
 
       <div className="voice-search-modal-bottom">
-        <div className="voice-search-side-wave" aria-hidden="true">
+        <div className={`voice-search-side-wave${sideClass}`} aria-hidden="true">
           {SIDE_BARS.map((h, i) => (
             <span
               key={`l-${i}`}
               className="voice-search-side-bar"
               style={{
-                '--bar-h': `${h}px`,
-                '--bar-delay': `${i * 0.06}s`,
+                height: `${barHeight(h, level, visualsLive)}px`,
+                '--bar-delay': `${i * 0.05}s`,
               }}
             />
           ))}
@@ -250,29 +281,29 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
 
         <button
           type="button"
-          className={`voice-search-mic-btn${
-            listening ? ' voice-search-mic-btn--live' : ''
-          }`}
+          className={`voice-search-mic-btn${listening ? ' voice-search-mic-btn--live' : ''}`}
           onClick={handleMicClick}
           aria-label={t('voiceSearch.mic', 'Mikrofon')}
-          disabled={phase !== PHASE_LISTENING}
+          aria-pressed={listening}
+          disabled={phase === PHASE_PROCESSING || phase === PHASE_HANDOFF}
         >
-          <span className="voice-search-mic-ring voice-search-mic-ring--1" aria-hidden="true" />
-          <span className="voice-search-mic-ring voice-search-mic-ring--2" aria-hidden="true" />
-          <span className="voice-search-mic-ring voice-search-mic-ring--3" aria-hidden="true" />
-          <span className="voice-search-mic-core">
+          <span
+            className={`voice-search-mic-core${
+              listening ? '' : ' voice-search-mic-core--muted'
+            }`}
+          >
             <i className="fa-solid fa-microphone" aria-hidden="true" />
           </span>
         </button>
 
-        <div className="voice-search-side-wave" aria-hidden="true">
+        <div className={`voice-search-side-wave${sideClass}`} aria-hidden="true">
           {SIDE_BARS.map((h, i) => (
             <span
               key={`r-${i}`}
               className="voice-search-side-bar"
               style={{
-                '--bar-h': `${h}px`,
-                '--bar-delay': `${i * 0.06}s`,
+                height: `${barHeight(h, level, visualsLive)}px`,
+                '--bar-delay': `${i * 0.05}s`,
               }}
             />
           ))}

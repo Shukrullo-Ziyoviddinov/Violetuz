@@ -98,6 +98,9 @@
   width: 96%;
   height: 96%;
   opacity: 0.14;
+}
+
+.voice-search-ripple-wrap--live .voice-search-ripple--3 {
   animation: voice-search-ripple-pulse 2.4s ease-out infinite;
 }
 
@@ -113,16 +116,15 @@
 
 .voice-search-wave-bar {
   width: 5px;
-  height: calc(var(--bar-h, 40px) * 0.45);
   border-radius: 999px;
   background: var(--vs-red);
   box-shadow: 0 0 10px var(--vs-red-glow);
   transform-origin: center;
+  transition: height 0.08s linear;
 }
 
 .voice-search-wave--live .voice-search-wave-bar {
-  animation: voice-search-bar-bounce 0.85s ease-in-out infinite;
-  animation-delay: var(--bar-delay, 0s);
+  transition: height 0.05s linear;
 }
 
 .voice-search-status {
@@ -183,12 +185,10 @@
 
 .voice-search-mini-bar {
   width: 3px;
-  height: var(--bar-h, 10px);
   border-radius: 999px;
   background: var(--vs-red);
   box-shadow: 0 0 6px var(--vs-red-glow);
-  animation: voice-search-bar-bounce 0.75s ease-in-out infinite;
-  animation-delay: var(--bar-delay, 0s);
+  transition: height 0.08s linear;
 }
 
 .voice-search-modal-bottom {
@@ -209,19 +209,17 @@
 
 .voice-search-side-bar {
   width: 3px;
-  height: calc(var(--bar-h, 16px) * 0.55);
   border-radius: 999px;
   background: var(--vs-red);
   opacity: 0.85;
   box-shadow: 0 0 6px var(--vs-red-glow);
-  animation: voice-search-bar-bounce 0.9s ease-in-out infinite;
-  animation-delay: var(--bar-delay, 0s);
+  transition: height 0.08s linear;
 }
 
 .voice-search-mic-btn {
   position: relative;
-  width: 5.1rem;
-  height: 5.1rem;
+  width: 4.6rem;
+  height: 4.6rem;
   border: none;
   background: transparent;
   padding: 0;
@@ -250,60 +248,37 @@
   box-shadow:
     0 0 18px var(--vs-red-glow),
     0 0 36px rgba(255, 45, 74, 0.35);
+  overflow: hidden;
 }
 
 .voice-search-mic-core i {
   font-size: 1.65rem;
   color: #fff;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
-.voice-search-mic-ring {
+/* Mikrafon bosilmaganda — chiziq */
+.voice-search-mic-core--muted::after {
+  content: '';
   position: absolute;
-  inset: 0;
-  margin: auto;
-  border-radius: 50%;
-  border: 1.5px solid var(--vs-red-soft);
+  z-index: 2;
+  width: 2.5px;
+  height: 58%;
+  top: 21%;
+  left: 50%;
+  background: #fff;
+  border-radius: 2px;
+  transform: translateX(-50%) rotate(-42deg);
+  box-shadow: 0 0 0 1.5px var(--vs-red);
   pointer-events: none;
 }
 
-.voice-search-mic-ring--1 {
-  width: 100%;
-  height: 100%;
-  opacity: 0.55;
-}
-
-.voice-search-mic-ring--2 {
-  width: 122%;
-  height: 122%;
-  opacity: 0.32;
-}
-
-.voice-search-mic-ring--3 {
-  width: 144%;
-  height: 144%;
-  opacity: 0.18;
-}
-
-.voice-search-mic-btn--live .voice-search-mic-ring--2,
-.voice-search-mic-btn--live .voice-search-mic-ring--3 {
-  animation: voice-search-ring-pulse 1.8s ease-out infinite;
-}
-
-.voice-search-mic-btn--live .voice-search-mic-ring--3 {
-  animation-delay: 0.35s;
-}
-
-@keyframes voice-search-bar-bounce {
-  0%,
-  100% {
-    height: calc(var(--bar-h, 40px) * 0.35);
-    opacity: 0.7;
-  }
-  50% {
-    height: var(--bar-h, 40px);
-    opacity: 1;
-  }
+.voice-search-mic-btn--live .voice-search-mic-core {
+  box-shadow:
+    0 0 22px var(--vs-red-glow),
+    0 0 40px rgba(255, 45, 74, 0.4);
 }
 
 @keyframes voice-search-ripple-pulse {
@@ -321,17 +296,6 @@
   }
 }
 
-@keyframes voice-search-ring-pulse {
-  0% {
-    transform: scale(0.92);
-    opacity: 0.45;
-  }
-  100% {
-    transform: scale(1.12);
-    opacity: 0;
-  }
-}
-
 @keyframes voice-search-spin {
   to {
     transform: rotate(360deg);
@@ -343,8 +307,8 @@
   .voice-search-mini-bar,
   .voice-search-side-bar,
   .voice-search-ripple--3,
-  .voice-search-mic-ring,
   .voice-search-loader {
     animation: none !important;
+    transition: none !important;
   }
 }
