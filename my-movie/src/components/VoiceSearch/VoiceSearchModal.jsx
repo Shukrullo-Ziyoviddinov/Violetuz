@@ -4,6 +4,7 @@ import useSpeechRecognition, {
   cleanSpeechTranscript,
   resolveSpeechLang,
 } from './useSpeechRecognition';
+import { useModalHardwareBack } from '../../useModalHardwareBack';
 import './VoiceSearchModal.css';
 
 const PHASE_IDLE = 'idle';
@@ -70,6 +71,22 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     setExiting(true);
   };
 
+  const dismissWithSlide = () => {
+    if (closingRef.current || exiting) return;
+    clearTimers();
+    handedOffRef.current = true;
+    abort();
+    resetTranscript();
+    setShownText('');
+    beginAnimatedClose('slide');
+  };
+
+  const { releaseHistory } = useModalHardwareBack({
+    historyKey: 'violetVoiceSearch',
+    isOpen: isOpen && !exiting,
+    onCloseFromHardware: dismissWithSlide,
+  });
+
   const speechLang = resolveSpeechLang(i18n.language);
 
   const {
@@ -134,12 +151,9 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   };
 
   const handleCancel = () => {
-    clearTimers();
-    handedOffRef.current = true;
-    abort();
-    resetTranscript();
-    setShownText('');
-    beginAnimatedClose();
+    if (closingRef.current || exiting) return;
+    dismissWithSlide();
+    releaseHistory();
   };
   cancelRef.current = handleCancel;
 
@@ -183,7 +197,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     const reduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const delayMs = reduced ? 0 : exitMode === 'handoff' ? 400 : 380;
+    const delayMs = reduced ? 0 : exitMode === 'handoff' ? 520 : 380;
     const id = window.setTimeout(() => {
       finishAnimatedClose();
     }, delayMs);
@@ -194,7 +208,13 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     if (e.target !== e.currentTarget) return;
     if (!exiting) return;
     if (exitMode === 'handoff') {
-      if (e.propertyName !== 'opacity' && e.propertyName !== 'transform') return;
+      if (
+        e.propertyName !== 'opacity' &&
+        e.propertyName !== 'transform' &&
+        e.propertyName !== 'filter'
+      ) {
+        return;
+      }
     } else if (e.propertyName !== 'transform') {
       return;
     }
@@ -237,13 +257,15 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       handedOffRef.current = true;
       onResultRef.current?.(text);
       beginAnimatedClose('handoff');
+      releaseHistory();
     }, PROCESSING_MS + HANDOFF_MS);
   }, [isOpen, phase, shownText]);
 
   useEffect(() => {
     if (!isOpen || !error) return;
     if (error.error === 'not-supported' || error.error === 'not-allowed') {
-      beginAnimatedClose();
+      beginAnimatedClose('slide');
+      releaseHistory();
     }
   }, [isOpen, error]);
 

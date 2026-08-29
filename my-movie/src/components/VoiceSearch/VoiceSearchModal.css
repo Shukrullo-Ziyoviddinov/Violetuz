@@ -14,7 +14,7 @@
   box-sizing: border-box;
   transform: translate3d(100%, 0, 0);
   transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform, opacity;
+  will-change: transform, opacity, filter;
   opacity: 1;
 }
 
@@ -24,15 +24,17 @@
   transition: transform 0.42s cubic-bezier(0.22, 0.8, 0.2, 1);
 }
 
-/* Matn inputga ketgandan keyin — markazdan kichrayib yo‘qoladi */
+/* Matn inputga ketgandan keyin — markazdan aniq kichrayib yo‘qoladi */
 .voice-search-modal--exit-handoff {
-  transform: translate3d(0, 0, 0) scale(0.86);
+  transform: translate3d(0, 0, 0) scale(0.45);
   opacity: 0;
+  filter: blur(12px);
   transform-origin: center center;
   pointer-events: none;
   transition:
-    transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.5s cubic-bezier(0.45, 0, 0.55, 1),
+    opacity 0.46s cubic-bezier(0.4, 0, 1, 1),
+    filter 0.46s ease;
 }
 
 .voice-search-modal-top {

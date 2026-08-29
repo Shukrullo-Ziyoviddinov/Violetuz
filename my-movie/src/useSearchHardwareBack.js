@@ -14,17 +14,21 @@ export function useSearchHardwareBack({
   hasQuery,
   onReturnToBrowse,
   onCloseFromHardware,
+  /** true — boshqa modal (masalan voice) ortga ushlaydi */
+  blocked = false,
 }) {
   const ownedRef = useRef(false);
   const showRef = useRef(showSearch);
   const modeRef = useRef(searchMode);
   const queryRef = useRef(hasQuery);
+  const blockedRef = useRef(blocked);
   const onReturnRef = useRef(onReturnToBrowse);
   const onCloseRef = useRef(onCloseFromHardware);
 
   showRef.current = showSearch;
   modeRef.current = searchMode;
   queryRef.current = hasQuery;
+  blockedRef.current = blocked;
   onReturnRef.current = onReturnToBrowse;
   onCloseRef.current = onCloseFromHardware;
 
@@ -48,6 +52,8 @@ export function useSearchHardwareBack({
 
   useEffect(() => {
     const onPopState = () => {
+      if (blockedRef.current) return;
+
       if (!showRef.current) {
         ownedRef.current = false;
         return;

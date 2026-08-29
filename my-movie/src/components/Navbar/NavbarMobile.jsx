@@ -83,6 +83,7 @@ const NavbarMobile = () => {
       hasQuery: hasSearchQuery,
       onReturnToBrowse: returnSearchToBrowse,
       onCloseFromHardware: beginCloseSearch,
+      blocked: showVoiceSearch,
     });
 
   const handleQueryChange = (value) => {
