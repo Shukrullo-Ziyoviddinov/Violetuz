@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
 import MiniGlobalModal from '../MiniGlobalModal/MiniGlobalModal';
+import { useModalHardwareBack } from '../../useModalHardwareBack';
 import './ProfileInfoModal.css';
 
 const isMobileSlideViewport = () =>
@@ -31,14 +32,16 @@ const ProfileInfoModal = ({
   onCloseRef.current = onClose;
 
   const slideIn = entered && !exiting;
+  /** Animatsiya tugaguncha hook uchun «ochiq» */
+  const logicalOpen = !exiting;
 
   const finishClose = () => {
     closingRef.current = false;
     onCloseRef.current?.();
   };
 
-  /** Ortga / overlay — mobile’da slide-out, desktop’da darhol */
-  const requestClose = () => {
+  /** Hardware ortga — faqat slide/yopish (history allaqachon pop) */
+  const beginCloseFromHardware = () => {
     if (closingRef.current || exiting) return;
     if (!isMobileSlideViewport()) {
       onCloseRef.current?.();
@@ -46,6 +49,35 @@ const ProfileInfoModal = ({
     }
     closingRef.current = true;
     setExiting(true);
+  };
+
+  const { releaseHistory, abandonHistory } = useModalHardwareBack({
+    historyKey: 'violetProfileInfo',
+    isOpen: logicalOpen,
+    onCloseFromHardware: beginCloseFromHardware,
+    hasNested: showLogoutConfirm,
+    onNestedBack: () => {
+      if (!logoutBusy) setShowLogoutConfirm(false);
+    },
+  });
+
+  /** Ortga / overlay — mobile’da slide-out, desktop’da darhol */
+  const requestClose = () => {
+    if (closingRef.current || exiting) return;
+    if (!isMobileSlideViewport()) {
+      releaseHistory();
+      onCloseRef.current?.();
+      return;
+    }
+    closingRef.current = true;
+    setExiting(true);
+    releaseHistory();
+  };
+
+  /** Navigatsiya (wishlist) — history.back qilinmaydi */
+  const leaveForAction = (action) => {
+    abandonHistory();
+    action?.();
   };
 
   useEffect(() => {
@@ -97,6 +129,7 @@ const ProfileInfoModal = ({
       await logout();
       setShowLogoutConfirm(false);
       closingRef.current = false;
+      abandonHistory();
       onCloseRef.current?.();
       navigate('/', { replace: true });
     } finally {
@@ -133,7 +166,11 @@ const ProfileInfoModal = ({
         </div>
 
         <div className="profile-info-modal-body">
-          <button type="button" className="profile-wishlist-block profile-info-action" onClick={onWishlist}>
+          <button
+            type="button"
+            className="profile-wishlist-block profile-info-action"
+            onClick={() => leaveForAction(onWishlist)}
+          >
             <div className="profile-wishlist-left">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
