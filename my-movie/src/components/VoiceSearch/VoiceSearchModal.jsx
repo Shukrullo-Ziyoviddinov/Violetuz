@@ -35,16 +35,36 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const { t, i18n } = useTranslation();
   const [phase, setPhase] = useState(PHASE_IDLE);
   const [shownText, setShownText] = useState('');
+  const [entered, setEntered] = useState(false);
+  const [exiting, setExiting] = useState(false);
   const handedOffRef = useRef(false);
   const processingStartedRef = useRef(false);
   const commitOnceRef = useRef(false);
   const stopCommitPendingRef = useRef(false);
+  const closingRef = useRef(false);
   const timersRef = useRef([]);
   const cancelRef = useRef(() => {});
   const onResultRef = useRef(onResult);
   const onCloseRef = useRef(onClose);
   onResultRef.current = onResult;
   onCloseRef.current = onClose;
+
+  const visible = isOpen || exiting;
+  const slideIn = entered && !exiting;
+
+  const finishAnimatedClose = () => {
+    if (!closingRef.current) return;
+    closingRef.current = false;
+    setExiting(false);
+    setEntered(false);
+    onCloseRef.current?.();
+  };
+
+  const beginAnimatedClose = () => {
+    if (closingRef.current || exiting) return;
+    closingRef.current = true;
+    setExiting(true);
+  };
 
   const speechLang = resolveSpeechLang(i18n.language);
 
@@ -115,7 +135,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     abort();
     resetTranscript();
     setShownText('');
-    onClose?.();
+    beginAnimatedClose();
   };
   cancelRef.current = handleCancel;
 
@@ -131,14 +151,45 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       return undefined;
     }
     // Har safar ochilganda — eski ovoz matni yo‘qoladi
+    closingRef.current = false;
+    setExiting(false);
+    setEntered(false);
     handedOffRef.current = false;
     processingStartedRef.current = false;
     commitOnceRef.current = false;
     setPhase(PHASE_IDLE);
     setShownText('');
     resetTranscript();
-    return () => clearTimers();
+    let innerId = 0;
+    const outerId = window.requestAnimationFrame(() => {
+      innerId = window.requestAnimationFrame(() => {
+        setEntered(true);
+      });
+    });
+    return () => {
+      clearTimers();
+      window.cancelAnimationFrame(outerId);
+      window.cancelAnimationFrame(innerId);
+    };
   }, [isOpen, resetTranscript]);
+
+  useEffect(() => {
+    if (!exiting) return undefined;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const id = window.setTimeout(() => {
+      finishAnimatedClose();
+    }, reduced ? 0 : 380);
+    return () => window.clearTimeout(id);
+  }, [exiting]);
+
+  const handleModalTransitionEnd = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.propertyName !== 'transform') return;
+    if (!exiting) return;
+    finishAnimatedClose();
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -175,14 +226,14 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       if (handedOffRef.current) return;
       handedOffRef.current = true;
       onResultRef.current?.(text);
-      onCloseRef.current?.();
+      beginAnimatedClose();
     }, PROCESSING_MS + HANDOFF_MS);
   }, [isOpen, phase, shownText]);
 
   useEffect(() => {
     if (!isOpen || !error) return;
     if (error.error === 'not-supported' || error.error === 'not-allowed') {
-      onCloseRef.current?.();
+      beginAnimatedClose();
     }
   }, [isOpen, error]);
 
@@ -214,7 +265,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     start();
   };
 
-  if (!isOpen) return null;
+  if (!visible) return null;
 
   const livePreview =
     phase === PHASE_LISTENING || phase === PHASE_IDLE ? displayText : shownText;
@@ -235,11 +286,12 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
 
   return (
     <div
-      className="voice-search-modal"
+      className={`voice-search-modal${slideIn ? ' voice-search-modal--in' : ''}`}
       role="dialog"
       aria-modal="true"
       aria-label={t('voiceSearch.title', 'Ovozli qidiruv')}
       onClick={(e) => e.stopPropagation()}
+      onTransitionEnd={handleModalTransitionEnd}
     >
       <div className="voice-search-modal-top">
         <button
