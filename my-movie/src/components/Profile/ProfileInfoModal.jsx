@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
 import MiniGlobalModal from '../MiniGlobalModal/MiniGlobalModal';
 import './ProfileInfoModal.css';
+
+const isMobileSlideViewport = () =>
+  typeof window !== 'undefined' && window.innerWidth <= 768;
 
 const ProfileInfoModal = ({
   onClose,
@@ -21,6 +24,29 @@ const ProfileInfoModal = ({
   const { appStoreLinks } = useMoviesApi();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [logoutBusy, setLogoutBusy] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const closingRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  const slideIn = entered && !exiting;
+
+  const finishClose = () => {
+    closingRef.current = false;
+    onCloseRef.current?.();
+  };
+
+  /** Ortga / overlay — mobile’da slide-out, desktop’da darhol */
+  const requestClose = () => {
+    if (closingRef.current || exiting) return;
+    if (!isMobileSlideViewport()) {
+      onCloseRef.current?.();
+      return;
+    }
+    closingRef.current = true;
+    setExiting(true);
+  };
 
   useEffect(() => {
     if (window.innerWidth <= 768) {
@@ -31,13 +57,47 @@ const ProfileInfoModal = ({
     };
   }, []);
 
+  /** Mount → slide-in (faqat mobile CSS ishlaydi) */
+  useEffect(() => {
+    let innerId = 0;
+    const outerId = window.requestAnimationFrame(() => {
+      innerId = window.requestAnimationFrame(() => {
+        setEntered(true);
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(outerId);
+      window.cancelAnimationFrame(innerId);
+    };
+  }, []);
+
+  /** transitionend bo‘lmasa ham (reduced-motion) yopish */
+  useEffect(() => {
+    if (!exiting) return undefined;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const id = window.setTimeout(() => {
+      finishClose();
+    }, reduced ? 0 : 380);
+    return () => window.clearTimeout(id);
+  }, [exiting]);
+
+  const handleModalTransitionEnd = (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.propertyName !== 'transform') return;
+    if (!exiting) return;
+    finishClose();
+  };
+
   const handleLogoutConfirm = async () => {
     if (logoutBusy) return;
     setLogoutBusy(true);
     try {
       await logout();
       setShowLogoutConfirm(false);
-      onClose?.();
+      closingRef.current = false;
+      onCloseRef.current?.();
       navigate('/', { replace: true });
     } finally {
       setLogoutBusy(false);
@@ -46,10 +106,11 @@ const ProfileInfoModal = ({
 
   return (
     <>
-      <div className="profile-info-overlay" onClick={onClose} />
+      <div className="profile-info-overlay" onClick={requestClose} />
       <div
-        className="profile-info-modal"
+        className={`profile-info-modal${slideIn ? ' profile-info-modal--in' : ''}`}
         onClick={(e) => e.stopPropagation()}
+        onTransitionEnd={handleModalTransitionEnd}
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-info-modal-title"
@@ -58,7 +119,7 @@ const ProfileInfoModal = ({
           <button
             type="button"
             className="profile-info-back"
-            onClick={onClose}
+            onClick={requestClose}
             aria-label={t('profile.settingsBack')}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
