@@ -116,15 +116,16 @@
 
 .voice-search-wave-bar {
   width: 5px;
+  height: calc(var(--bar-h, 40px) * 0.28);
   border-radius: 999px;
   background: var(--vs-red);
   box-shadow: 0 0 10px var(--vs-red-glow);
   transform-origin: center;
-  transition: height 0.08s linear;
 }
 
 .voice-search-wave--live .voice-search-wave-bar {
-  transition: height 0.05s linear;
+  animation: voice-search-bar-bounce 0.85s ease-in-out infinite;
+  animation-delay: var(--bar-delay, 0s);
 }
 
 .voice-search-status {
@@ -185,10 +186,15 @@
 
 .voice-search-mini-bar {
   width: 3px;
+  height: calc(var(--bar-h, 10px) * 0.35);
   border-radius: 999px;
   background: var(--vs-red);
   box-shadow: 0 0 6px var(--vs-red-glow);
-  transition: height 0.08s linear;
+}
+
+.voice-search-mini-wave--live .voice-search-mini-bar {
+  animation: voice-search-bar-bounce 0.75s ease-in-out infinite;
+  animation-delay: var(--bar-delay, 0s);
 }
 
 .voice-search-modal-bottom {
@@ -209,11 +215,16 @@
 
 .voice-search-side-bar {
   width: 3px;
+  height: calc(var(--bar-h, 16px) * 0.35);
   border-radius: 999px;
   background: var(--vs-red);
   opacity: 0.85;
   box-shadow: 0 0 6px var(--vs-red-glow);
-  transition: height 0.08s linear;
+}
+
+.voice-search-side-wave--live .voice-search-side-bar {
+  animation: voice-search-bar-bounce 0.9s ease-in-out infinite;
+  animation-delay: var(--bar-delay, 0s);
 }
 
 .voice-search-mic-btn {
@@ -279,6 +290,18 @@
   box-shadow:
     0 0 22px var(--vs-red-glow),
     0 0 40px rgba(255, 45, 74, 0.4);
+}
+
+@keyframes voice-search-bar-bounce {
+  0%,
+  100% {
+    height: calc(var(--bar-h, 40px) * 0.35);
+    opacity: 0.7;
+  }
+  50% {
+    height: var(--bar-h, 40px);
+    opacity: 1;
+  }
 }
 
 @keyframes voice-search-ripple-pulse {

@@ -39,15 +39,20 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
 
   const recognitionRef = useRef(null);
   const stoppedByUserRef = useRef(false);
+  const interimRef = useRef('');
+  const finalRef = useRef('');
   const langRef = useRef(lang);
   langRef.current = lang;
 
   const resetTranscript = useCallback(() => {
+    interimRef.current = '';
+    finalRef.current = '';
     setInterimText('');
     setFinalText('');
     setError(null);
   }, []);
 
+  /** stop — final natija kelishi uchun listening ni onend da o‘chiramiz */
   const stop = useCallback(() => {
     stoppedByUserRef.current = true;
     const rec = recognitionRef.current;
@@ -58,9 +63,8 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     try {
       rec.stop();
     } catch {
-      /* ignore */
+      setListening(false);
     }
-    setListening(false);
   }, []);
 
   const abort = useCallback(() => {
@@ -86,9 +90,7 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
 
     abort();
     stoppedByUserRef.current = false;
-    setError(null);
-    setInterimText('');
-    setFinalText('');
+    resetTranscript();
 
     const recognition = new Ctor();
     recognition.lang = langRef.current || 'uz-UZ';
@@ -99,24 +101,32 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
 
     recognition.onresult = (event) => {
       let interim = '';
-      let finalChunk = '';
-      for (let i = event.resultIndex; i < event.results.length; i += 1) {
+      let finals = '';
+      for (let i = 0; i < event.results.length; i += 1) {
         const result = event.results[i];
         const text = result?.[0]?.transcript || '';
-        if (result.isFinal) finalChunk += text;
+        if (result.isFinal) finals += text;
         else interim += text;
       }
-      if (finalChunk) {
-        setFinalText(cleanSpeechTranscript(finalChunk));
+      if (finals) {
+        const cleaned = cleanSpeechTranscript(finals);
+        finalRef.current = cleaned;
+        interimRef.current = '';
+        setFinalText(cleaned);
         setInterimText('');
       } else if (interim) {
-        setInterimText(cleanSpeechTranscript(interim));
+        const cleaned = cleanSpeechTranscript(interim);
+        interimRef.current = cleaned;
+        setInterimText(cleaned);
       }
     };
 
     recognition.onerror = (event) => {
       const code = event?.error || 'unknown';
-      if (code === 'aborted' && stoppedByUserRef.current) return;
+      if (code === 'aborted') {
+        setListening(false);
+        return;
+      }
       if (code === 'no-speech') {
         setListening(false);
         return;
@@ -126,6 +136,14 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     };
 
     recognition.onend = () => {
+      // stop() dan keyin oxirgi interim ni final sifatida saqlash
+      if (!finalRef.current && interimRef.current) {
+        const fallback = cleanSpeechTranscript(interimRef.current);
+        finalRef.current = fallback;
+        setFinalText(fallback);
+        setInterimText('');
+        interimRef.current = '';
+      }
       setListening(false);
       if (recognitionRef.current === recognition) {
         recognitionRef.current = null;
@@ -140,14 +158,20 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
       setListening(false);
       recognitionRef.current = null;
     }
-  }, [abort]);
+  }, [abort, resetTranscript]);
 
-  /** Modal yopilganda / phase o‘zgaganda to‘xtatish — auto-start yo‘q */
+  /** Faqat modal yopilganda abort — phase o‘zgarishi STT ni o‘ldirmasin */
   useEffect(() => {
     if (!enabled) abort();
   }, [enabled, abort]);
 
   const displayText = finalText || interimText;
+
+  /** Joriy matn (ref) — mic o‘chirilganda darhol olish uchun */
+  const getCurrentText = useCallback(
+    () => cleanSpeechTranscript(finalRef.current || interimRef.current || finalText || interimText),
+    [finalText, interimText]
+  );
 
   return {
     supported: isSpeechRecognitionSupported(),
@@ -160,5 +184,6 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     stop,
     abort,
     resetTranscript,
+    getCurrentText,
   };
 }
