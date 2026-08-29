@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Web Speech API — ovoz → matn.
- * Search algoritmiga tegmaydi; faqat transcript boshqaradi.
- * start() faqat mikrafon bosilganda chaqiriladi (auto-start yo‘q).
+ * getUserMedia meter YO‘Q (STT bilan conflict qilmasin).
  */
 
 export const getSpeechRecognitionCtor = () => {
@@ -13,12 +12,19 @@ export const getSpeechRecognitionCtor = () => {
 
 export const isSpeechRecognitionSupported = () => Boolean(getSpeechRecognitionCtor());
 
-/** App tili → BCP-47 */
+/**
+ * STT tili. uz-UZ ko‘p brauzerda zaif — ru-RU/tr-TR zaxira.
+ */
 export const resolveSpeechLang = (appLang = 'uz') => {
   const code = String(appLang || 'uz').toLowerCase().slice(0, 2);
   if (code === 'ru') return 'ru-RU';
   if (code === 'en') return 'en-US';
   return 'uz-UZ';
+};
+
+export const speechLangFallbacks = (primary) => {
+  const list = [primary, 'ru-RU', 'tr-TR', 'en-US'];
+  return [...new Set(list.filter(Boolean))];
 };
 
 export const cleanSpeechTranscript = (raw = '') =>
@@ -28,7 +34,6 @@ export const cleanSpeechTranscript = (raw = '') =>
     .trim();
 
 /**
- * Voice search STT tizimi (alohida).
  * @param {{ lang?: string, enabled?: boolean }} options
  */
 export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } = {}) {
@@ -36,7 +41,6 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
   const [interimText, setInterimText] = useState('');
   const [finalText, setFinalText] = useState('');
   const [error, setError] = useState(null);
-  /** Visual: ovoz aniqlanganda (interim/final) — getUserMedia yo‘q */
   const [speaking, setSpeaking] = useState(false);
   const [voiceLevel, setVoiceLevel] = useState(0);
 
@@ -46,6 +50,7 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
   const finalRef = useRef('');
   const activityTimerRef = useRef(0);
   const langRef = useRef(lang);
+  const langIndexRef = useRef(0);
   langRef.current = lang;
 
   const clearVoiceActivity = useCallback(() => {
@@ -58,15 +63,15 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
   }, []);
 
   const pulseVoiceActivity = useCallback((textLen) => {
-    const intensity = Math.min(1, 0.4 + textLen * 0.05);
+    const intensity = Math.min(1, 0.45 + textLen * 0.06);
     setSpeaking(true);
     setVoiceLevel(intensity);
     if (activityTimerRef.current) window.clearTimeout(activityTimerRef.current);
     activityTimerRef.current = window.setTimeout(() => {
       setSpeaking(false);
-      setVoiceLevel(0);
+      setVoiceLevel(0.28);
       activityTimerRef.current = 0;
-    }, 420);
+    }, 500);
   }, []);
 
   const resetTranscript = useCallback(() => {
@@ -78,19 +83,19 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     clearVoiceActivity();
   }, [clearVoiceActivity]);
 
-  /** stop — final natija kelishi uchun listening ni onend da o‘chiramiz */
   const stop = useCallback(() => {
     stoppedByUserRef.current = true;
-    clearVoiceActivity();
     const rec = recognitionRef.current;
     if (!rec) {
       setListening(false);
+      clearVoiceActivity();
       return;
     }
     try {
       rec.stop();
     } catch {
       setListening(false);
+      clearVoiceActivity();
     }
   }, [clearVoiceActivity]);
 
@@ -100,6 +105,9 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     recognitionRef.current = null;
     if (rec) {
       try {
+        rec.onresult = null;
+        rec.onerror = null;
+        rec.onend = null;
         rec.abort();
       } catch {
         /* ignore */
@@ -118,80 +126,122 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
 
     abort();
     stoppedByUserRef.current = false;
+    langIndexRef.current = 0;
     resetTranscript();
 
-    const recognition = new Ctor();
-    recognition.lang = langRef.current || 'uz-UZ';
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-    recognitionRef.current = recognition;
+    const langs = speechLangFallbacks(langRef.current || 'uz-UZ');
 
-    recognition.onresult = (event) => {
-      let interim = '';
-      let finals = '';
-      for (let i = 0; i < event.results.length; i += 1) {
-        const result = event.results[i];
-        const text = result?.[0]?.transcript || '';
-        if (result.isFinal) finals += text;
-        else interim += text;
-      }
-      if (finals) {
-        const cleaned = cleanSpeechTranscript(finals);
-        finalRef.current = cleaned;
-        interimRef.current = '';
-        setFinalText(cleaned);
-        setInterimText('');
-        pulseVoiceActivity(cleaned.length);
-      } else if (interim) {
-        const cleaned = cleanSpeechTranscript(interim);
-        interimRef.current = cleaned;
-        setInterimText(cleaned);
-        pulseVoiceActivity(cleaned.length);
-      }
-    };
+    const bindAndStart = (langCode) => {
+      const recognition = new Ctor();
+      recognition.lang = langCode;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      recognitionRef.current = recognition;
 
-    recognition.onerror = (event) => {
-      const code = event?.error || 'unknown';
-      clearVoiceActivity();
-      if (code === 'aborted') {
+      recognition.onresult = (event) => {
+        let interim = '';
+        let finals = '';
+        for (let i = 0; i < event.results.length; i += 1) {
+          const result = event.results[i];
+          const text = result?.[0]?.transcript || '';
+          if (result.isFinal) finals += `${text} `;
+          else interim += text;
+        }
+        const finalClean = cleanSpeechTranscript(finals);
+        const interimClean = cleanSpeechTranscript(interim);
+
+        if (finalClean) {
+          finalRef.current = finalClean;
+          setFinalText(finalClean);
+        }
+        if (interimClean) {
+          interimRef.current = interimClean;
+          setInterimText(interimClean);
+        } else if (finalClean) {
+          interimRef.current = '';
+          setInterimText('');
+        }
+
+        const activeLen = (finalClean || interimClean || '').length;
+        if (activeLen) pulseVoiceActivity(activeLen);
+      };
+
+      recognition.onerror = (event) => {
+        const code = event?.error || 'unknown';
+        if (code === 'aborted') {
+          setListening(false);
+          return;
+        }
+        if (code === 'no-speech') {
+          // continuous: jimlik — listeningda qolamiz, onend restart qilishi mumkin
+          return;
+        }
+        if (
+          (code === 'language-not-supported' || code === 'network') &&
+          langIndexRef.current < langs.length - 1
+        ) {
+          langIndexRef.current += 1;
+          try {
+            recognition.onend = null;
+            recognition.abort();
+          } catch {
+            /* ignore */
+          }
+          bindAndStart(langs[langIndexRef.current]);
+          return;
+        }
+        setError({ error: code, message: event?.message });
         setListening(false);
-        return;
-      }
-      if (code === 'no-speech') {
-        setListening(false);
-        return;
-      }
-      setError({ error: code, message: event?.message });
-      setListening(false);
-    };
+        clearVoiceActivity();
+      };
 
-    recognition.onend = () => {
-      clearVoiceActivity();
-      if (!finalRef.current && interimRef.current) {
-        const fallback = cleanSpeechTranscript(interimRef.current);
-        finalRef.current = fallback;
-        setFinalText(fallback);
-        setInterimText('');
-        interimRef.current = '';
-      }
-      setListening(false);
-      if (recognitionRef.current === recognition) {
+      recognition.onend = () => {
+        if (recognitionRef.current !== recognition) return;
+
+        if (!stoppedByUserRef.current) {
+          // Brauzer to‘xtatdi — qayta start (continuous sessiyani ushlab turish)
+          try {
+            recognition.start();
+            setListening(true);
+            return;
+          } catch {
+            /* fall through */
+          }
+        }
+
+        if (!finalRef.current && interimRef.current) {
+          const fallback = cleanSpeechTranscript(interimRef.current);
+          finalRef.current = fallback;
+          setFinalText(fallback);
+          setInterimText('');
+          interimRef.current = '';
+        }
+
+        recognitionRef.current = null;
+        setListening(false);
+        clearVoiceActivity();
+      };
+
+      try {
+        recognition.start();
+        setListening(true);
+        setVoiceLevel(0.28);
+      } catch (err) {
+        if (langIndexRef.current < langs.length - 1) {
+          langIndexRef.current += 1;
+          bindAndStart(langs[langIndexRef.current]);
+          return;
+        }
+        setError({ error: 'start-failed', message: err?.message || String(err) });
+        setListening(false);
         recognitionRef.current = null;
       }
     };
 
-    try {
-      recognition.start();
-      setListening(true);
-    } catch (err) {
-      setError({ error: 'start-failed', message: err?.message || String(err) });
-      setListening(false);
-      recognitionRef.current = null;
-    }
+    bindAndStart(langs[0]);
   }, [abort, resetTranscript, pulseVoiceActivity, clearVoiceActivity]);
 
-  /** Modal yopilganda: abort + matnni tozalash (keyingi ochilishda eski natija qolmasin) */
   useEffect(() => {
     if (!enabled) {
       abort();

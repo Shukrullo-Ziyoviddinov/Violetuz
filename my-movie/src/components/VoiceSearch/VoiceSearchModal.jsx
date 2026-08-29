@@ -4,7 +4,6 @@ import useSpeechRecognition, {
   cleanSpeechTranscript,
   resolveSpeechLang,
 } from './useSpeechRecognition';
-import useVoiceMeter from './useVoiceMeter';
 import './VoiceSearchModal.css';
 
 const PHASE_IDLE = 'idle';
@@ -50,8 +49,8 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     listening,
     displayText,
     finalText,
-    speaking: sttSpeaking,
-    voiceLevel: sttLevel,
+    speaking,
+    voiceLevel,
     error,
     start,
     stop,
@@ -63,12 +62,12 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     enabled: isOpen,
   });
 
-  const { level: micLevel, speaking: micSpeaking } = useVoiceMeter(listening);
-
-  /** Real-time mic darajasi asosiy; STT — zaxira */
-  const speaking = micSpeaking || sttSpeaking;
-  const voiceLevel = Math.max(micLevel, sttLevel);
-  const visualsLive = listening && speaking;
+  /**
+   * Visual: mic yoqilganda darhol (STT/getUserMedia kutmaydi).
+   * Gapirilganda (matn kelganda) kuchayadi.
+   */
+  const visualsLive = listening;
+  const level = listening ? (speaking ? Math.max(0.55, voiceLevel) : 0.32) : 0;
 
   const clearTimers = () => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -224,7 +223,6 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const miniClass = visualsLive ? ' voice-search-mini-wave--live' : '';
   const sideClass = visualsLive ? ' voice-search-side-wave--live' : '';
   const rippleClass = visualsLive ? ' voice-search-ripple-wrap--live' : '';
-  const level = visualsLive ? voiceLevel : 0;
 
   return (
     <div
