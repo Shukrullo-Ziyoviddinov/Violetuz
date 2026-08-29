@@ -121,10 +121,11 @@
   background: var(--vs-red);
   box-shadow: 0 0 10px var(--vs-red-glow);
   transform-origin: center;
+  transition: height 0.12s ease-out;
 }
 
 .voice-search-wave--live .voice-search-wave-bar {
-  animation: voice-search-bar-bounce 0.85s ease-in-out infinite;
+  animation: voice-search-bar-bounce 0.7s ease-in-out infinite;
   animation-delay: var(--bar-delay, 0s);
 }
 

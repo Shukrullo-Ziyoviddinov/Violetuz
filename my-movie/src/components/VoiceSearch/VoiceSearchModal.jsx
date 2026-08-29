@@ -18,6 +18,13 @@ const CENTER_BARS = [28, 46, 72, 54, 88, 62, 96, 70, 84, 58, 76, 48, 36];
 const SIDE_BARS = [10, 18, 28, 22, 34, 16, 26, 14];
 const MINI_BARS = [8, 14, 10, 16, 12, 18, 9];
 
+const barPx = (base, live, level, index) => {
+  if (!live) return Math.max(5, Math.round(base * 0.28));
+  const wave = 0.55 + ((index % 5) / 5) * 0.45;
+  const scaled = base * (0.3 + level * 0.85) * wave;
+  return Math.max(8, Math.round(scaled));
+};
+
 /**
  * Voice search modal (UI).
  * STT → onResult(text); search algoritmiga tegmaydi.
@@ -42,18 +49,21 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     listening,
     displayText,
     finalText,
+    speaking,
+    voiceLevel,
     error,
     start,
     stop,
     abort,
+    resetTranscript,
     getCurrentText,
   } = useSpeechRecognition({
     lang: speechLang,
     enabled: isOpen,
   });
 
-  /** Visual: faqat listening + matn kelayotganda (alohida mic stream yo‘q — STT bilan conflict qilmasin) */
-  const visualsLive = listening && Boolean(displayText);
+  /** Ovoz kelayotganda (STT interim) visual jonlanadi */
+  const visualsLive = listening && speaking;
 
   const clearTimers = () => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -80,6 +90,8 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     clearTimers();
     handedOffRef.current = true;
     abort();
+    resetTranscript();
+    setShownText('');
     onClose?.();
   };
   cancelRef.current = handleCancel;
@@ -94,13 +106,15 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       setShownText('');
       return undefined;
     }
+    // Har safar ochilganda — eski ovoz matni yo‘qoladi
     handedOffRef.current = false;
     processingStartedRef.current = false;
     commitOnceRef.current = false;
     setPhase(PHASE_IDLE);
     setShownText('');
+    resetTranscript();
     return () => clearTimers();
-  }, [isOpen]);
+  }, [isOpen, resetTranscript]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -109,7 +123,6 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     }
   }, [isOpen, listening, phase]);
 
-  /** Final keldi yoki listening tugadi + matn bor → processing */
   useEffect(() => {
     if (!isOpen || handedOffRef.current || commitOnceRef.current) return;
     if (phase !== PHASE_LISTENING && phase !== PHASE_IDLE) return;
@@ -119,7 +132,6 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
       return;
     }
 
-    // Mic o‘chirildi / recognition tugadi — interim ham natija
     if (!listening && displayText && phase === PHASE_LISTENING) {
       commitTranscript(displayText);
       return;
@@ -130,7 +142,6 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     }
   }, [isOpen, phase, listening, finalText, displayText]);
 
-  /** Processing → handoff → onResult + close */
   useEffect(() => {
     if (!isOpen || phase !== PHASE_PROCESSING || handedOffRef.current) return;
     if (processingStartedRef.current) return;
@@ -174,18 +185,18 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     if (phase === PHASE_PROCESSING || phase === PHASE_HANDOFF) return;
 
     if (listening) {
-      // Avval joriy matnni olamiz, keyin stop — natija yo‘qolmasin
       const pending = getCurrentText();
       stop();
       if (pending) {
         commitTranscript(pending);
       }
-      // matn bo‘lmasa onend / effect IDLE qiladi
       return;
     }
 
     commitOnceRef.current = false;
     processingStartedRef.current = false;
+    setShownText('');
+    resetTranscript();
     setPhase(PHASE_LISTENING);
     start();
   };
@@ -208,6 +219,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const miniClass = visualsLive ? ' voice-search-mini-wave--live' : '';
   const sideClass = visualsLive ? ' voice-search-side-wave--live' : '';
   const rippleClass = visualsLive ? ' voice-search-ripple-wrap--live' : '';
+  const level = visualsLive ? voiceLevel : 0;
 
   return (
     <div
@@ -243,6 +255,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
                 key={`c-${i}`}
                 className="voice-search-wave-bar"
                 style={{
+                  height: `${barPx(h, visualsLive, level, i)}px`,
                   '--bar-h': `${h}px`,
                   '--bar-delay': `${i * 0.04}s`,
                 }}
@@ -276,6 +289,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
                   key={`m-${i}`}
                   className="voice-search-mini-bar"
                   style={{
+                    height: `${barPx(h, visualsLive, level, i)}px`,
                     '--bar-h': `${h}px`,
                     '--bar-delay': `${i * 0.06}s`,
                   }}
@@ -293,6 +307,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
               key={`l-${i}`}
               className="voice-search-side-bar"
               style={{
+                height: `${barPx(h, visualsLive, level, i)}px`,
                 '--bar-h': `${h}px`,
                 '--bar-delay': `${i * 0.05}s`,
               }}
@@ -323,6 +338,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
               key={`r-${i}`}
               className="voice-search-side-bar"
               style={{
+                height: `${barPx(h, visualsLive, level, i)}px`,
                 '--bar-h': `${h}px`,
                 '--bar-delay': `${i * 0.05}s`,
               }}

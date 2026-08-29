@@ -36,13 +36,38 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
   const [interimText, setInterimText] = useState('');
   const [finalText, setFinalText] = useState('');
   const [error, setError] = useState(null);
+  /** Visual: ovoz aniqlanganda (interim/final) — getUserMedia yo‘q */
+  const [speaking, setSpeaking] = useState(false);
+  const [voiceLevel, setVoiceLevel] = useState(0);
 
   const recognitionRef = useRef(null);
   const stoppedByUserRef = useRef(false);
   const interimRef = useRef('');
   const finalRef = useRef('');
+  const activityTimerRef = useRef(0);
   const langRef = useRef(lang);
   langRef.current = lang;
+
+  const clearVoiceActivity = useCallback(() => {
+    if (activityTimerRef.current) {
+      window.clearTimeout(activityTimerRef.current);
+      activityTimerRef.current = 0;
+    }
+    setSpeaking(false);
+    setVoiceLevel(0);
+  }, []);
+
+  const pulseVoiceActivity = useCallback((textLen) => {
+    const intensity = Math.min(1, 0.4 + textLen * 0.05);
+    setSpeaking(true);
+    setVoiceLevel(intensity);
+    if (activityTimerRef.current) window.clearTimeout(activityTimerRef.current);
+    activityTimerRef.current = window.setTimeout(() => {
+      setSpeaking(false);
+      setVoiceLevel(0);
+      activityTimerRef.current = 0;
+    }, 420);
+  }, []);
 
   const resetTranscript = useCallback(() => {
     interimRef.current = '';
@@ -50,11 +75,13 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     setInterimText('');
     setFinalText('');
     setError(null);
-  }, []);
+    clearVoiceActivity();
+  }, [clearVoiceActivity]);
 
   /** stop — final natija kelishi uchun listening ni onend da o‘chiramiz */
   const stop = useCallback(() => {
     stoppedByUserRef.current = true;
+    clearVoiceActivity();
     const rec = recognitionRef.current;
     if (!rec) {
       setListening(false);
@@ -65,7 +92,7 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     } catch {
       setListening(false);
     }
-  }, []);
+  }, [clearVoiceActivity]);
 
   const abort = useCallback(() => {
     stoppedByUserRef.current = true;
@@ -79,7 +106,8 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
       }
     }
     setListening(false);
-  }, []);
+    clearVoiceActivity();
+  }, [clearVoiceActivity]);
 
   const start = useCallback(() => {
     const Ctor = getSpeechRecognitionCtor();
@@ -114,15 +142,18 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
         interimRef.current = '';
         setFinalText(cleaned);
         setInterimText('');
+        pulseVoiceActivity(cleaned.length);
       } else if (interim) {
         const cleaned = cleanSpeechTranscript(interim);
         interimRef.current = cleaned;
         setInterimText(cleaned);
+        pulseVoiceActivity(cleaned.length);
       }
     };
 
     recognition.onerror = (event) => {
       const code = event?.error || 'unknown';
+      clearVoiceActivity();
       if (code === 'aborted') {
         setListening(false);
         return;
@@ -136,7 +167,7 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     };
 
     recognition.onend = () => {
-      // stop() dan keyin oxirgi interim ni final sifatida saqlash
+      clearVoiceActivity();
       if (!finalRef.current && interimRef.current) {
         const fallback = cleanSpeechTranscript(interimRef.current);
         finalRef.current = fallback;
@@ -158,16 +189,25 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
       setListening(false);
       recognitionRef.current = null;
     }
-  }, [abort, resetTranscript]);
+  }, [abort, resetTranscript, pulseVoiceActivity, clearVoiceActivity]);
 
-  /** Faqat modal yopilganda abort — phase o‘zgarishi STT ni o‘ldirmasin */
+  /** Modal yopilganda: abort + matnni tozalash (keyingi ochilishda eski natija qolmasin) */
   useEffect(() => {
-    if (!enabled) abort();
-  }, [enabled, abort]);
+    if (!enabled) {
+      abort();
+      resetTranscript();
+    }
+  }, [enabled, abort, resetTranscript]);
+
+  useEffect(
+    () => () => {
+      if (activityTimerRef.current) window.clearTimeout(activityTimerRef.current);
+    },
+    []
+  );
 
   const displayText = finalText || interimText;
 
-  /** Joriy matn (ref) — mic o‘chirilganda darhol olish uchun */
   const getCurrentText = useCallback(
     () => cleanSpeechTranscript(finalRef.current || interimRef.current || finalText || interimText),
     [finalText, interimText]
@@ -179,6 +219,8 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     interimText,
     finalText,
     displayText,
+    speaking,
+    voiceLevel,
     error,
     start,
     stop,
