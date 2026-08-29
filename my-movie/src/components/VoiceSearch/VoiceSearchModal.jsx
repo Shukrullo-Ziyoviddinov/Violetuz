@@ -14,7 +14,7 @@ const PHASE_HANDOFF = 'handoff';
 const PROCESSING_MS = 900;
 const HANDOFF_MS = 450;
 /** Mic o‘chgach onend finalizatsiyasi uchun */
-const STOP_SETTLE_MS = 180;
+const STOP_SETTLE_MS = 280;
 
 const CENTER_BARS = [28, 46, 72, 54, 88, 62, 96, 70, 84, 58, 76, 48, 36];
 const SIDE_BARS = [10, 18, 28, 22, 34, 16, 26, 14];

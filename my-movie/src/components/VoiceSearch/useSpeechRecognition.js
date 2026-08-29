@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Web Speech API — ovoz → matn.
- * getUserMedia meter YO‘Q (STT bilan conflict qilmasin).
+ * Bitta sessiya (restart yo‘q) — takrorlanish bo‘lmasin.
  */
 
 export const getSpeechRecognitionCtor = () => {
@@ -12,17 +12,11 @@ export const getSpeechRecognitionCtor = () => {
 
 export const isSpeechRecognitionSupported = () => Boolean(getSpeechRecognitionCtor());
 
-/** App tili → BCP-47 */
 export const resolveSpeechLang = (appLang = 'uz') => {
   const code = String(appLang || 'uz').toLowerCase().slice(0, 2);
   if (code === 'ru') return 'ru-RU';
   if (code === 'en') return 'en-US';
   return 'uz-UZ';
-};
-
-export const speechLangFallbacks = (primary) => {
-  const list = [primary, 'ru-RU', 'tr-TR', 'en-US'];
-  return [...new Set(list.filter(Boolean))];
 };
 
 export const cleanSpeechTranscript = (raw = '') =>
@@ -31,28 +25,39 @@ export const cleanSpeechTranscript = (raw = '') =>
     .replace(/\s+/g, ' ')
     .trim();
 
-/** Final + interim → to‘liq gap */
-export const mergeSpeechParts = (finalPart = '', interimPart = '') =>
-  cleanSpeechTranscript([finalPart, interimPart].filter(Boolean).join(' '));
-
 /**
- * @param {{ lang?: string, enabled?: boolean }} options
+ * Brauzer natijasidan to‘liq matn (takrorlanmas).
+ * Oxirgi interim odatda butun gapni o‘z ichiga oladi.
  */
+export const extractTranscript = (results) => {
+  if (!results?.length) return '';
+
+  const last = results[results.length - 1];
+  if (!last.isFinal) {
+    return cleanSpeechTranscript(last[0]?.transcript || '');
+  }
+
+  let combined = '';
+  for (let i = 0; i < results.length; i += 1) {
+    if (results[i].isFinal) {
+      combined += results[i][0]?.transcript || '';
+    }
+  }
+  return cleanSpeechTranscript(combined);
+};
+
 export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } = {}) {
   const [listening, setListening] = useState(false);
-  const [interimText, setInterimText] = useState('');
-  const [finalText, setFinalText] = useState('');
+  const [transcript, setTranscript] = useState('');
   const [error, setError] = useState(null);
   const [speaking, setSpeaking] = useState(false);
   const [voiceLevel, setVoiceLevel] = useState(0);
 
   const recognitionRef = useRef(null);
   const stoppedByUserRef = useRef(false);
-  const interimRef = useRef('');
-  const finalRef = useRef('');
+  const transcriptRef = useRef('');
   const activityTimerRef = useRef(0);
   const langRef = useRef(lang);
-  const langIndexRef = useRef(0);
   langRef.current = lang;
 
   const clearVoiceActivity = useCallback(() => {
@@ -77,10 +82,8 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
   }, []);
 
   const resetTranscript = useCallback(() => {
-    interimRef.current = '';
-    finalRef.current = '';
-    setInterimText('');
-    setFinalText('');
+    transcriptRef.current = '';
+    setTranscript('');
     setError(null);
     clearVoiceActivity();
   }, [clearVoiceActivity]);
@@ -128,118 +131,50 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
 
     abort();
     stoppedByUserRef.current = false;
-    langIndexRef.current = 0;
     resetTranscript();
 
-    const langs = speechLangFallbacks(langRef.current || 'uz-UZ');
+    const recognition = new Ctor();
+    recognition.lang = langRef.current || 'uz-UZ';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
 
-    const bindAndStart = (langCode) => {
-      const recognition = new Ctor();
-      recognition.lang = langCode;
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
-      recognitionRef.current = recognition;
-
-      recognition.onresult = (event) => {
-        let interim = '';
-        let finals = '';
-        for (let i = 0; i < event.results.length; i += 1) {
-          const result = event.results[i];
-          const text = result?.[0]?.transcript || '';
-          if (result.isFinal) finals += `${text} `;
-          else interim += text;
-        }
-
-        const finalClean = cleanSpeechTranscript(finals);
-        const interimClean = cleanSpeechTranscript(interim);
-
-        if (finalClean) {
-          finalRef.current = finalClean;
-          setFinalText(finalClean);
-        }
-        if (interimClean) {
-          interimRef.current = interimClean;
-          setInterimText(interimClean);
-        } else if (finalClean) {
-          interimRef.current = '';
-          setInterimText('');
-        }
-
-        const fullLen = mergeSpeechParts(finalRef.current, interimRef.current).length;
-        if (fullLen) pulseVoiceActivity(fullLen);
-      };
-
-      recognition.onerror = (event) => {
-        const code = event?.error || 'unknown';
-        if (code === 'aborted') {
-          setListening(false);
-          return;
-        }
-        if (code === 'no-speech') return;
-        if (
-          (code === 'language-not-supported' || code === 'network') &&
-          langIndexRef.current < langs.length - 1
-        ) {
-          langIndexRef.current += 1;
-          try {
-            recognition.onend = null;
-            recognition.abort();
-          } catch {
-            /* ignore */
-          }
-          bindAndStart(langs[langIndexRef.current]);
-          return;
-        }
-        setError({ error: code, message: event?.message });
-        setListening(false);
-        clearVoiceActivity();
-      };
-
-      recognition.onend = () => {
-        if (recognitionRef.current !== recognition) return;
-
-        // Oxirgi interim ni final ga qo‘shish
-        if (interimRef.current) {
-          const merged = mergeSpeechParts(finalRef.current, interimRef.current);
-          finalRef.current = merged;
-          setFinalText(merged);
-          interimRef.current = '';
-          setInterimText('');
-        }
-
-        if (!stoppedByUserRef.current) {
-          try {
-            recognition.start();
-            setListening(true);
-            return;
-          } catch {
-            /* fall through */
-          }
-        }
-
-        recognitionRef.current = null;
-        setListening(false);
-        clearVoiceActivity();
-      };
-
-      try {
-        recognition.start();
-        setListening(true);
-        setVoiceLevel(0.28);
-      } catch (err) {
-        if (langIndexRef.current < langs.length - 1) {
-          langIndexRef.current += 1;
-          bindAndStart(langs[langIndexRef.current]);
-          return;
-        }
-        setError({ error: 'start-failed', message: err?.message || String(err) });
-        setListening(false);
-        recognitionRef.current = null;
-      }
+    recognition.onresult = (event) => {
+      const text = extractTranscript(event.results);
+      if (!text) return;
+      transcriptRef.current = text;
+      setTranscript(text);
+      pulseVoiceActivity(text.length);
     };
 
-    bindAndStart(langs[0]);
+    recognition.onerror = (event) => {
+      const code = event?.error || 'unknown';
+      if (code === 'aborted' || code === 'no-speech') {
+        setListening(false);
+        return;
+      }
+      setError({ error: code, message: event?.message });
+      setListening(false);
+      clearVoiceActivity();
+    };
+
+    recognition.onend = () => {
+      if (recognitionRef.current !== recognition) return;
+      recognitionRef.current = null;
+      setListening(false);
+      clearVoiceActivity();
+    };
+
+    try {
+      recognition.start();
+      setListening(true);
+      setVoiceLevel(0.28);
+    } catch (err) {
+      setError({ error: 'start-failed', message: err?.message || String(err) });
+      setListening(false);
+      recognitionRef.current = null;
+    }
   }, [abort, resetTranscript, pulseVoiceActivity, clearVoiceActivity]);
 
   useEffect(() => {
@@ -256,19 +191,15 @@ export default function useSpeechRecognition({ lang = 'uz-UZ', enabled = true } 
     []
   );
 
-  const displayText = mergeSpeechParts(finalText, interimText);
-
-  const getCurrentText = useCallback(
-    () => mergeSpeechParts(finalRef.current, interimRef.current),
-    []
-  );
+  const getCurrentText = useCallback(() => transcriptRef.current || transcript, [transcript]);
 
   return {
     supported: isSpeechRecognitionSupported(),
     listening,
-    interimText,
-    finalText,
-    displayText,
+    transcript,
+    displayText: transcript,
+    finalText: transcript,
+    interimText: '',
     speaking,
     voiceLevel,
     error,
