@@ -1,9 +1,7 @@
 /**
  * Chromaprint fingerprint decode + compare (pure JS).
- * fpcalc JSON "fingerprint" string → similarity score 0..1.
+ * fpcalc -json -raw → JSON array of uint32 stored in MongoDB.
  */
-
-const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._';
 
 const popCount32 = (n) => {
   let v = n >>> 0;
@@ -13,31 +11,27 @@ const popCount32 = (n) => {
 };
 
 const decodeFingerprint = (encoded) => {
-  if (!encoded || typeof encoded !== 'string') return [];
+  if (!encoded) return [];
 
-  const codes = [];
-  for (let i = 0; i < encoded.length; i += 1) {
-    const code = ALPHABET.indexOf(encoded[i]);
-    if (code === -1) return [];
-    codes.push(code);
+  if (Array.isArray(encoded)) {
+    return encoded.map((n) => n >>> 0);
   }
 
-  let offset = 0;
-  let x = 0;
-  const fingerprint = [];
+  const str = String(encoded).trim();
+  if (!str) return [];
 
-  while (offset < codes.length) {
-    if (offset + 3 > codes.length) break;
-    const length = (codes[offset] << 12) | (codes[offset + 1] << 6) | codes[offset + 2];
-    offset += 3;
-    for (let i = 0; i < length && offset < codes.length; i += 1) {
-      x += codes[offset];
-      fingerprint.push(x >>> 0);
-      offset += 1;
+  // New format: JSON array from `fpcalc -json -raw`
+  if (str.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(str);
+      return Array.isArray(parsed) ? parsed.map((n) => n >>> 0) : [];
+    } catch {
+      return [];
     }
   }
 
-  return fingerprint;
+  // Legacy compressed AcoustID strings cannot be compared without libchromaprint.
+  return [];
 };
 
 /**

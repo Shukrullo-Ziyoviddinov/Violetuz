@@ -8,7 +8,7 @@ const FPCALC_BIN = process.env.FPCALC_PATH || 'fpcalc';
 const FFMPEG_BIN = process.env.FFMPEG_PATH || 'ffmpeg';
 
 const runFpcalc = async (filePath, { length } = {}) => {
-  const args = ['-json'];
+  const args = ['-json', '-raw'];
   if (length != null && Number.isFinite(length)) {
     args.push('-length', String(length));
   }
@@ -16,17 +16,17 @@ const runFpcalc = async (filePath, { length } = {}) => {
 
   const { stdout } = await execFileAsync(FPCALC_BIN, args, {
     timeout: 120_000,
-    maxBuffer: 4 * 1024 * 1024,
+    maxBuffer: 16 * 1024 * 1024,
   });
 
   const parsed = JSON.parse(stdout);
-  if (!parsed?.fingerprint) {
+  if (!Array.isArray(parsed?.fingerprint) || !parsed.fingerprint.length) {
     throw new Error('fpcalc returned empty fingerprint');
   }
 
   return {
     duration: Number(parsed.duration) || 0,
-    fingerprint: String(parsed.fingerprint),
+    fingerprint: JSON.stringify(parsed.fingerprint),
   };
 };
 

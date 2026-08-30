@@ -105,8 +105,17 @@ const upsertMusicFingerprint = async (musicId) => {
 };
 
 const generateAllFingerprints = async ({ onlyMissing = true } = {}) => {
+  const legacyOrMissing = {
+    $or: [
+      { fingerprint: '' },
+      { fingerprint: { $exists: false } },
+      // Eski compressed format (AQAD...) — raw JSON array emas
+      { fingerprint: { $not: /^\[/ } },
+    ],
+  };
+
   const query = onlyMissing
-    ? { audio: { $ne: '' }, $or: [{ fingerprint: '' }, { fingerprint: { $exists: false } }] }
+    ? { audio: { $ne: '' }, ...legacyOrMissing }
     : { audio: { $ne: '' } };
 
   const tracks = await Music.find(query).select({ id: 1, audio: 1, title: 1 }).sort({ id: 1 }).lean();
@@ -141,7 +150,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
   const queryFp = await fingerprintFromBuffer(buffer, originalName);
 
   const catalog = await Music.find({
-    fingerprint: { $exists: true, $ne: '' },
+    fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
   })
     .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
     .lean();
