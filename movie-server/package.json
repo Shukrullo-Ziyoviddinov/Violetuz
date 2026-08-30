@@ -34,6 +34,8 @@
     "migrate:media-to-r2:dry": "node scripts/migrateMediaToR2.js --dry-run",
     "prune:public-media": "node scripts/prunePublicCatalogMedia.js",
     "prune:public-media:execute": "node scripts/prunePublicCatalogMedia.js --execute",
+    "fingerprints:generate": "node scripts/generateFingerprints.js",
+    "fingerprints:generate:all": "node scripts/generateFingerprints.js --all",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -50,7 +52,8 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
-    "morgan": "^1.11.0"
+    "morgan": "^1.11.0",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

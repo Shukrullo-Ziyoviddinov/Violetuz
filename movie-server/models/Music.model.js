@@ -62,6 +62,16 @@ const musicSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    /** Chromaprint string from fpcalc (Shazam-like identify) */
+    fingerprint: {
+      type: String,
+      default: '',
+      index: true,
+    },
+    fingerprintDuration: {
+      type: Number,
+      default: null,
+    },
   },
   {
     strict: true,

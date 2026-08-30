@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import SearchModalBody from '../SearchModalBody/SearchModalBody';
 import ShortsPickerModal from './ShortsPickerModal';
 import VoiceSearchModal from '../VoiceSearch/VoiceSearchModal';
-import { isSpeechRecognitionSupported } from '../VoiceSearch/useSpeechRecognition';
+import { isVoiceSearchAvailable } from '../VoiceSearch/voiceSearchSupport';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { OPEN_SEARCH_EVENT } from '../../searchModalBridge';
 import {
@@ -34,7 +34,7 @@ const NavbarMobile = () => {
   const inputRef = useRef(null);
   const handleSearchBackRef = useRef(() => {});
   const searchClosingRef = useRef(false);
-  const voiceSearchSupported = isSpeechRecognitionSupported();
+  const voiceSearchSupported = isVoiceSearchAvailable();
 
   const isHomeActive = pathname === '/feed';
   const isSearchActive = pathname.startsWith('/search');
@@ -224,6 +224,12 @@ const NavbarMobile = () => {
     handleQueryChange(value);
   };
 
+  const handleTaronaMusicSelect = (item) => {
+    if (!item?.id) return;
+    leaveSearchForNavigation();
+    navigate(`/music/${item.id}`);
+  };
+
   return (
     <>
       <nav className="navbar-mobile">
@@ -380,6 +386,7 @@ const NavbarMobile = () => {
         isOpen={showVoiceSearch}
         onClose={() => setShowVoiceSearch(false)}
         onResult={handleVoiceSearchResult}
+        onMusicSelect={handleTaronaMusicSelect}
       />
 
       <ShortsPickerModal
