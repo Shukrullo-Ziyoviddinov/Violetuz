@@ -10,7 +10,8 @@ const { compareFingerprintStrings } = require('../../utils/chromaprintCompare');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBuffer } = require('./fpcalcRunner');
 
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.55;
+// Karnay → mikrofon yozuvi uchun pastroq (0.55 juda qattiq)
+const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.38;
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
 
 const downloadToFile = (url, destPath) =>
@@ -145,19 +146,21 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
     .lean();
 
-  const scored = catalog
+  const allScored = catalog
     .map((track) => ({
       track,
       score: compareFingerprintStrings(queryFp.fingerprint, track.fingerprint),
     }))
-    .filter((item) => item.score >= MATCH_THRESHOLD)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, MATCH_LIMIT);
+    .sort((a, b) => b.score - a.score);
+
+  const scored = allScored.filter((item) => item.score >= MATCH_THRESHOLD).slice(0, MATCH_LIMIT);
+  const bestScore = allScored[0]?.score ?? 0;
 
   const artistMap = await buildArtistNameMap(scored.map((s) => s.track.artistId));
 
   return {
     queryDuration: queryFp.duration,
+    bestScore: Math.round(bestScore * 1000) / 1000,
     matches: scored.map(({ track, score }) => ({
       id: track.id,
       title: track.title,

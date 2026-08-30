@@ -16,6 +16,8 @@ const identifyMusic = async (req, res) => {
     data: result.matches,
     meta: {
       queryDuration: result.queryDuration,
+      bestScore: result.bestScore,
+      threshold: fingerprintService.MATCH_THRESHOLD,
     },
   });
 };

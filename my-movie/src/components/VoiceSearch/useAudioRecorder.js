@@ -13,10 +13,28 @@ const pickMimeType = () => {
   return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || '';
 };
 
+/** Tarona: karnaydan eshitilgan musiqa uchun AEC/NS o‘chiriladi */
+const TARONA_AUDIO_CONSTRAINTS = {
+  echoCancellation: false,
+  noiseSuppression: false,
+  autoGainControl: false,
+  // Chrome-specific (ignored on other browsers)
+  googEchoCancellation: false,
+  googNoiseSuppression: false,
+  googAutoGainControl: false,
+  googHighpassFilter: false,
+};
+
 /**
  * Mikrofon orqali qisqa audio yozish (Tarona / Shazam).
+ * @param {boolean} [rawAudio] — true bo‘lsa echo/noise suppression o‘chiriladi (Tarona uchun).
  */
-const useAudioRecorder = ({ enabled = true, maxMs = DEFAULT_MAX_MS, onComplete } = {}) => {
+const useAudioRecorder = ({
+  enabled = true,
+  maxMs = DEFAULT_MAX_MS,
+  onComplete,
+  rawAudio = false,
+} = {}) => {
   const [recording, setRecording] = useState(false);
   const [error, setError] = useState(null);
   const streamRef = useRef(null);
@@ -65,10 +83,12 @@ const useAudioRecorder = ({ enabled = true, maxMs = DEFAULT_MAX_MS, onComplete }
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
+        audio: rawAudio
+          ? TARONA_AUDIO_CONSTRAINTS
+          : {
+              echoCancellation: true,
+              noiseSuppression: true,
+            },
       });
       streamRef.current = stream;
       chunksRef.current = [];
@@ -121,7 +141,7 @@ const useAudioRecorder = ({ enabled = true, maxMs = DEFAULT_MAX_MS, onComplete }
       abort();
       return null;
     }
-  }, [enabled, abort, cleanupStream, maxMs, stop]);
+  }, [enabled, abort, cleanupStream, maxMs, stop, rawAudio]);
 
   useEffect(() => {
     if (!enabled) abort();

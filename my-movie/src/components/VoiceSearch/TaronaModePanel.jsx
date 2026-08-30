@@ -33,6 +33,7 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
   const { recording, error, start, stop, abort } = useAudioRecorder({
     enabled: isOpen,
     maxMs: 10_000,
+    rawAudio: true,
     onComplete: runIdentify,
   });
 
@@ -90,6 +91,8 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
   }
   if (identifyError) {
     hint = t('voiceSearch.taronaError', 'Aniqlashda xatolik');
+  } else if (phase === PHASE_DONE && !matches.length) {
+    hint = t('voiceSearch.taronaNoResults', 'Mos musiqa topilmadi');
   }
 
   return (
