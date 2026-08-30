@@ -55,7 +55,7 @@ const fingerprintFromBuffer = async (buffer, originalName = 'sample.webm') => {
   try {
     await fs.writeFile(inputPath, buffer);
     await convertToWav(inputPath, wavPath);
-    return runFpcalc(wavPath, { length: 120 });
+    return await runFpcalc(wavPath, { length: 120 });
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
   }
