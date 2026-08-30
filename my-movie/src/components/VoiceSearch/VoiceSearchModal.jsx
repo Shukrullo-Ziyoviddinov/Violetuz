@@ -194,13 +194,12 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
           <i className="fa-solid fa-xmark" aria-hidden="true" />
         </button>
 
-        {(voiceSupported || taronaSupported) && (
-          <VoiceModeToggle
-            mode={mode}
-            onChange={handleModeChange}
-            voiceDisabled={!voiceSupported}
-          />
-        )}
+        <VoiceModeToggle
+          mode={mode}
+          onChange={handleModeChange}
+          voiceDisabled={!voiceSupported}
+          taronaDisabled={!taronaSupported}
+        />
       </div>
 
       {isTarona && taronaShowResults ? (

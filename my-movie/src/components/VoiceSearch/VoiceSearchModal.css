@@ -95,9 +95,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  padding: 0.2rem;
+  padding: 0.22rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.14);
+  z-index: 2;
 }
 
 .voice-search-mode-btn {
