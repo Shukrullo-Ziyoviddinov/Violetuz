@@ -6,7 +6,8 @@ import VoiceModePanel from './VoiceModePanel';
 import TaronaModePanel from './TaronaModePanel';
 import TaronaResults from './TaronaResults';
 import { VOICE_SEARCH_MODE_TARONA, VOICE_SEARCH_MODE_VOICE } from './voiceSearchModes';
-import { isSpeechRecognitionSupported, isTaronaIdentifySupported } from './voiceSearchSupport';
+import { isSpeechRecognitionSupported } from './useSpeechRecognition';
+import { isTaronaIdentifySupported } from './voiceSearchSupport';
 import './VoiceSearchModal.css';
 
 /**
