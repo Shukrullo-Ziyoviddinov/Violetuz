@@ -7,16 +7,16 @@ const http = require('http');
 const Music = require('../../models/Music.model');
 const Artist = require('../../models/Artist.model');
 const { compareFingerprintStrings, decodeFingerprint } = require('../../utils/chromaprintCompare');
-const { measureAudioLevelDb, isAudioLevelSufficient } = require('../../utils/audioLevel');
+const { measureAudioLevelDb } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBuffer } = require('./fpcalcRunner');
 
 // Shovqin ~0.62 (gap ~0.04), haqiqiy musiqa ~0.72+ yoki gap >= 0.08
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.72;
+const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.78;
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
 const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.08;
-const MIN_ABSOLUTE_SCORE = Number(process.env.FINGERPRINT_MIN_ABSOLUTE_SCORE) || 0.6;
-const UNKNOWN_VOLUME_MIN_SCORE = Number(process.env.FINGERPRINT_UNKNOWN_VOLUME_MIN_SCORE) || 0.85;
+const MIN_ABSOLUTE_SCORE = Number(process.env.FINGERPRINT_MIN_ABSOLUTE_SCORE) || 0.58;
+const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 5;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
 
@@ -163,15 +163,10 @@ const groupCatalogByFingerprint = (tracks) => {
   return groups;
 };
 
-const pickConfidentMatches = (fpScored, { meanVolumeDb } = {}) => {
+const pickConfidentMatches = (fpScored) => {
   if (!fpScored.length) {
     return { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
   }
-
-  const threshold =
-    meanVolumeDb == null
-      ? Math.max(MATCH_THRESHOLD, UNKNOWN_VOLUME_MIN_SCORE)
-      : MATCH_THRESHOLD;
 
   const bestScore = fpScored[0].score;
   const secondScore = fpScored[1]?.score ?? 0;
@@ -182,7 +177,7 @@ const pickConfidentMatches = (fpScored, { meanVolumeDb } = {}) => {
   }
 
   const confident =
-    bestScore >= threshold || (bestScore >= MIN_ABSOLUTE_SCORE && gap >= MIN_SCORE_GAP);
+    bestScore >= MATCH_THRESHOLD || (bestScore >= MIN_ABSOLUTE_SCORE && gap >= MIN_SCORE_GAP);
 
   if (!confident) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
@@ -222,7 +217,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     }
 
     const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
-    if (!isAudioLevelSufficient(meanVolumeDb)) {
+    if (meanVolumeDb != null && meanVolumeDb < SILENCE_VOLUME_DB) {
       return {
         queryDuration: queryFp.duration,
         bestScore: 0,
@@ -260,9 +255,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       }))
       .sort((a, b) => b.score - a.score);
 
-    const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(fpScored, {
-      meanVolumeDb,
-    });
+    const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(fpScored);
 
     const artistMap = await buildArtistNameMap(confident.map((s) => s.track.artistId));
 

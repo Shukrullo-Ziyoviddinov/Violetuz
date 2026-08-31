@@ -14,7 +14,7 @@ const pickMimeType = () => {
   return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || '';
 };
 
-/** Tarona: AEC o‘chiriladi, AGC yoqiladi — past mikrofon signalini kuchaytiradi */
+/** Tarona: AEC o‘chiriladi, AGC yoqiladi */
 const TARONA_AUDIO_CONSTRAINTS = {
   echoCancellation: false,
   noiseSuppression: false,
@@ -24,9 +24,41 @@ const TARONA_AUDIO_CONSTRAINTS = {
   googAutoGainControl: true,
 };
 
-/**
- * Mikrofon orqali qisqa audio yozish (Tarona / Shazam).
- */
+const attachMicMeter = (stream, onLevel) => {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return () => {};
+
+  const ctx = new AudioCtx();
+  const source = ctx.createMediaStreamSource(stream);
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 512;
+  analyser.smoothingTimeConstant = 0.35;
+  source.connect(analyser);
+
+  const data = new Uint8Array(analyser.fftSize);
+  let rafId = 0;
+
+  const tick = () => {
+    analyser.getByteTimeDomainData(data);
+    let sum = 0;
+    for (let i = 0; i < data.length; i += 1) {
+      const v = (data[i] - 128) / 128;
+      sum += v * v;
+    }
+    onLevel(Math.sqrt(sum / data.length));
+    rafId = window.requestAnimationFrame(tick);
+  };
+
+  tick();
+
+  return () => {
+    if (rafId) window.cancelAnimationFrame(rafId);
+    source.disconnect();
+    analyser.disconnect();
+    ctx.close().catch(() => {});
+  };
+};
+
 const useAudioRecorder = ({
   enabled = true,
   minMs = DEFAULT_MIN_MS,
@@ -37,13 +69,17 @@ const useAudioRecorder = ({
   const [recording, setRecording] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [canStop, setCanStop] = useState(false);
+  const [micLevel, setMicLevel] = useState(0);
+  const [peakMicLevel, setPeakMicLevel] = useState(0);
   const [error, setError] = useState(null);
   const streamRef = useRef(null);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const stopTimerRef = useRef(null);
   const tickTimerRef = useRef(null);
+  const meterCleanupRef = useRef(null);
   const startedAtRef = useRef(0);
+  const peakRef = useRef(0);
   const resolveRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
@@ -57,6 +93,10 @@ const useAudioRecorder = ({
       window.clearInterval(tickTimerRef.current);
       tickTimerRef.current = null;
     }
+    if (meterCleanupRef.current) {
+      meterCleanupRef.current();
+      meterCleanupRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -64,6 +104,7 @@ const useAudioRecorder = ({
     recorderRef.current = null;
     chunksRef.current = [];
     startedAtRef.current = 0;
+    peakRef.current = 0;
   }, []);
 
   const abort = useCallback(() => {
@@ -71,6 +112,8 @@ const useAudioRecorder = ({
     setRecording(false);
     setElapsedMs(0);
     setCanStop(false);
+    setMicLevel(0);
+    setPeakMicLevel(0);
     setError(null);
     resolveRef.current = null;
   }, [cleanupStream]);
@@ -88,6 +131,9 @@ const useAudioRecorder = ({
 
     return new Promise((resolve) => {
       resolveRef.current = resolve;
+      if (typeof recorder.requestData === 'function') {
+        recorder.requestData();
+      }
       recorder.stop();
     });
   }, [minMs]);
@@ -107,11 +153,22 @@ const useAudioRecorder = ({
       });
       streamRef.current = stream;
       chunksRef.current = [];
+      peakRef.current = 0;
+      setPeakMicLevel(0);
+
+      meterCleanupRef.current = attachMicMeter(stream, (level) => {
+        setMicLevel(level);
+        if (level > peakRef.current) {
+          peakRef.current = level;
+          setPeakMicLevel(level);
+        }
+      });
 
       const mimeType = pickMimeType();
-      const recorder = mimeType
-        ? new MediaRecorder(stream, { mimeType })
-        : new MediaRecorder(stream);
+      const recorderOptions = mimeType
+        ? { mimeType, audioBitsPerSecond: 128_000 }
+        : { audioBitsPerSecond: 128_000 };
+      const recorder = new MediaRecorder(stream, recorderOptions);
 
       recorderRef.current = recorder;
 
@@ -127,6 +184,7 @@ const useAudioRecorder = ({
         setRecording(false);
         setElapsedMs(0);
         setCanStop(false);
+        setMicLevel(0);
         const result = blob.size > 0 ? blob : null;
         const resolve = resolveRef.current;
         resolveRef.current = null;
@@ -183,6 +241,8 @@ const useAudioRecorder = ({
     elapsedMs,
     remainingSec,
     canStop,
+    micLevel,
+    peakMicLevel,
     error,
     start,
     stop,

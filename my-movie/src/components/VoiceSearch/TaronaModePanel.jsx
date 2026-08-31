@@ -32,7 +32,8 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     [identify]
   );
 
-  const { recording, error, start, stop, abort, canStop, remainingSec } = useAudioRecorder({
+  const { recording, error, start, stop, abort, canStop, remainingSec, peakMicLevel } =
+    useAudioRecorder({
     enabled: isOpen,
     minMs: 7_000,
     maxMs: 12_000,
@@ -95,6 +96,13 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     hint = t('voiceSearch.taronaKeepListening', 'Eshitilmoqda... yana {{sec}}s', {
       sec: remainingSec,
     });
+  } else if (recording && peakMicLevel < 0.02) {
+    hint = t(
+      'voiceSearch.taronaMicLow',
+      'Mikrofon past eshityapti — musiqani balandroq qiling yoki mikrofonni yaqin tuting'
+    );
+  } else if (recording && peakMicLevel >= 0.02) {
+    hint = t('voiceSearch.taronaMicOk', 'Yaxshi eshitilmoqda, kuting...');
   }
 
   return (

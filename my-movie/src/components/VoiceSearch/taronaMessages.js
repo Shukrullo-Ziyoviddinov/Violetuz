@@ -46,6 +46,9 @@ export const getTaronaHintDefaults = (key) => {
     'voiceSearch.taronaTooShort': 'Yozuv juda qisqa. Kamida 7 soniya musiqa eshiting.',
     'voiceSearch.taronaAmbiguous':
       'Aniq natija topilmadi. Musiqani aniqroq va balandroq ijro qilib qayta urinib ko‘ring.',
+    'voiceSearch.taronaMicLow':
+      'Mikrofon past eshityapti — musiqani balandroq qiling yoki mikrofonni yaqin tuting',
+    'voiceSearch.taronaMicOk': 'Yaxshi eshitilmoqda, kuting...',
     'voiceSearch.taronaNetworkError':
       'Serverga ulanib bo‘lmadi. Internetni tekshiring va qayta urinib ko‘ring.',
     'voiceSearch.taronaError': 'Aniqlashda xatolik. Qayta urinib ko‘ring.',

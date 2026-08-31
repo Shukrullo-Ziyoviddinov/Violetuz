@@ -30,12 +30,16 @@ const runFpcalc = async (filePath, { length } = {}) => {
   };
 };
 
-const convertToWav = async (inputPath, outputPath) => {
-  await execFileAsync(
-    FFMPEG_BIN,
-    ['-y', '-i', inputPath, '-ar', '44100', '-ac', '1', '-f', 'wav', outputPath],
-    { timeout: 120_000, maxBuffer: 8 * 1024 * 1024 }
-  );
+const convertToWav = async (inputPath, outputPath, { normalize = false } = {}) => {
+  const filters = normalize ? 'dynaudnorm=f=75:g=15' : null;
+  const args = ['-y', '-i', inputPath, '-ar', '44100', '-ac', '1'];
+  if (filters) args.push('-af', filters);
+  args.push('-f', 'wav', outputPath);
+
+  await execFileAsync(FFMPEG_BIN, args, {
+    timeout: 120_000,
+    maxBuffer: 8 * 1024 * 1024,
+  });
 };
 
 const fingerprintFromFile = async (filePath, options = {}) => {
@@ -54,8 +58,8 @@ const fingerprintFromBuffer = async (buffer, originalName = 'sample.webm') => {
 
   try {
     await fs.writeFile(inputPath, buffer);
-    await convertToWav(inputPath, wavPath);
-    return await runFpcalc(wavPath, { length: 120 });
+    await convertToWav(inputPath, wavPath, { normalize: true });
+    return await runFpcalc(wavPath);
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
   }

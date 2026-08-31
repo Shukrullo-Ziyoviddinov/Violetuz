@@ -38,6 +38,10 @@ const useTaronaIdentify = () => {
       setMatches(found);
       setRejectReason(found.length ? null : meta?.rejectedReason || 'no_confident_match');
       setPhase(PHASE_DONE);
+      if (!found.length && meta?.bestScore != null) {
+        // eslint-disable-next-line no-console
+        console.info('[tarona] no match', meta);
+      }
     } catch (err) {
       const msg = String(err?.message || '');
       const isNetwork =
