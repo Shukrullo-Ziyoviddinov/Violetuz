@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import { identifyMusicFromAudio } from './identifyApi';
-import { analyzeAudioBlobRms, isTaronaAudioLoudEnough } from './taronaAudioLevel';
 
 const PHASE_IDLE = 'idle';
 const PHASE_RECORDING = 'recording';
@@ -31,13 +30,6 @@ const useTaronaIdentify = () => {
     setMatches([]);
 
     try {
-      const rms = await analyzeAudioBlobRms(audioBlob);
-      if (!isTaronaAudioLoudEnough(rms)) {
-        setError({ message: 'audio-too-quiet' });
-        setPhase(PHASE_DONE);
-        return;
-      }
-
       const { matches: found, meta } = await identifyMusicFromAudio(audioBlob);
       setMatches(found);
 

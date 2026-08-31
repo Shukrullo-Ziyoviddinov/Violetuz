@@ -7,9 +7,9 @@ const path = require('path');
 const execFileAsync = promisify(execFile);
 const FFMPEG_BIN = process.env.FFMPEG_PATH || 'ffmpeg';
 
-/** mean_volume shundan past bo'lsa — jim/shovqinsiz deb hisoblanadi */
+/** mean_volume shundan past bo'lsa — jim/shovqinsiz deb hisoblanadi (sukunat ~-91 dB) */
 const MIN_MEAN_VOLUME_DB =
-  Number(process.env.FINGERPRINT_MIN_MEAN_VOLUME_DB) || -38;
+  Number(process.env.FINGERPRINT_MIN_MEAN_VOLUME_DB) || -48;
 
 const parseMeanVolume = (stderr) => {
   const match = String(stderr).match(/mean_volume:\s*([-\d.]+)\s*dB/);
