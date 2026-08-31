@@ -7,6 +7,12 @@ const execFileAsync = promisify(execFile);
 const FPCALC_BIN = process.env.FPCALC_PATH || 'fpcalc';
 const FFMPEG_BIN = process.env.FFMPEG_PATH || 'ffmpeg';
 
+const UPLOAD_FILTER_PRESETS = [
+  'dynaudnorm=f=75:g=15',
+  'highpass=f=180,lowpass=f=4200,dynaudnorm=f=75:g=15',
+  'highpass=f=280,lowpass=f=3400,volume=2.5,dynaudnorm=f=75:g=15',
+];
+
 const runFpcalc = async (filePath, { length } = {}) => {
   const args = ['-json', '-raw'];
   if (length != null && Number.isFinite(length)) {
@@ -30,10 +36,9 @@ const runFpcalc = async (filePath, { length } = {}) => {
   };
 };
 
-const convertToWav = async (inputPath, outputPath, { normalize = false } = {}) => {
-  const filters = normalize ? 'dynaudnorm=f=75:g=15' : null;
+const convertToWav = async (inputPath, outputPath, { audioFilter } = {}) => {
   const args = ['-y', '-i', inputPath, '-ar', '44100', '-ac', '1'];
-  if (filters) args.push('-af', filters);
+  if (audioFilter) args.push('-af', audioFilter);
   args.push('-f', 'wav', outputPath);
 
   await execFileAsync(FFMPEG_BIN, args, {
@@ -47,22 +52,34 @@ const fingerprintFromFile = async (filePath, options = {}) => {
 };
 
 /**
- * Browser upload (webm/ogg) → temp wav → fingerprint.
+ * Browser upload → bir nechta audio filter bilan fingerprint (telefon mikrofoni uchun).
  */
-const fingerprintFromBuffer = async (buffer, originalName = 'sample.webm') => {
+const fingerprintFromBufferMulti = async (buffer, originalName = 'sample.webm') => {
   const os = require('os');
   const path = require('path');
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'violet-fp-'));
   const inputPath = path.join(tmpDir, originalName.replace(/[^\w.-]/g, '_'));
-  const wavPath = path.join(tmpDir, 'sample.wav');
 
   try {
     await fs.writeFile(inputPath, buffer);
-    await convertToWav(inputPath, wavPath, { normalize: true });
-    return await runFpcalc(wavPath);
+
+    const results = [];
+    for (let i = 0; i < UPLOAD_FILTER_PRESETS.length; i += 1) {
+      const wavPath = path.join(tmpDir, `sample-${i}.wav`);
+      await convertToWav(inputPath, wavPath, { audioFilter: UPLOAD_FILTER_PRESETS[i] });
+      const fp = await runFpcalc(wavPath);
+      results.push(fp);
+    }
+
+    return results;
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
   }
+};
+
+const fingerprintFromBuffer = async (buffer, originalName = 'sample.webm') => {
+  const results = await fingerprintFromBufferMulti(buffer, originalName);
+  return results[0];
 };
 
 const checkFingerprintTools = async () => {
@@ -78,5 +95,6 @@ const checkFingerprintTools = async () => {
 module.exports = {
   fingerprintFromFile,
   fingerprintFromBuffer,
+  fingerprintFromBufferMulti,
   checkFingerprintTools,
 };

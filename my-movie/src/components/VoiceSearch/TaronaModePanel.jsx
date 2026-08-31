@@ -15,6 +15,7 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     matches,
     error: identifyError,
     rejectReason,
+    lastMeta,
     identify,
     reset,
     PHASE_PROCESSING,
@@ -96,13 +97,30 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     hint = t('voiceSearch.taronaKeepListening', 'Eshitilmoqda... yana {{sec}}s', {
       sec: remainingSec,
     });
-  } else if (recording && peakMicLevel < 0.02) {
+  } else if (recording && peakMicLevel < 0.05) {
     hint = t(
       'voiceSearch.taronaMicLow',
-      'Mikrofon past eshityapti — musiqani balandroq qiling yoki mikrofonni yaqin tuting'
+      'Mikrofon musiqani past eshityapti — boshqa telefonda ijro qiling'
     );
-  } else if (recording && peakMicLevel >= 0.02) {
+  } else if (recording && peakMicLevel < 0.1) {
+    hint = t(
+      'voiceSearch.taronaMicMedium',
+      'Eshitilmoqda, lekin balandroq qiling yoki mikrofonni yaqin tuting'
+    );
+  } else if (recording) {
     hint = t('voiceSearch.taronaMicOk', 'Yaxshi eshitilmoqda, kuting...');
+  } else if (
+    phase === PHASE_DONE &&
+    !matches.length &&
+    lastMeta?.bestScore != null &&
+    lastMeta.bestScore > 0
+  ) {
+    const pct = Math.round(lastMeta.bestScore * 100);
+    hint = t(
+      'voiceSearch.taronaLowMatch',
+      'Musiqa eshitildi ({{pct}}%), lekin bazada mos yo‘q. Ilovadagi trekni boshqa telefonda ijro qiling.',
+      { pct }
+    );
   }
 
   return (

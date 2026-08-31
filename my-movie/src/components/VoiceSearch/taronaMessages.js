@@ -37,7 +37,7 @@ export const getTaronaHintKey = ({ phase, matches, error, rejectReason }) => {
 export const getTaronaHintDefaults = (key) => {
   const defaults = {
     'voiceSearch.taronaHint':
-      'Ilovadagi musiqani boshqa telefonda/kompyuterda ijro qiling. Kamida 7 soniya eshiting.',
+      'Faqat ilovadagi musiqa topiladi. Boshqa telefon/kompyuterda ijro qiling (shu telefonda emas).',
     'voiceSearch.taronaListening': 'Eshitilmoqda...',
     'voiceSearch.taronaProcessing': 'Aniqlanmoqda...',
     'voiceSearch.taronaNoResults': 'Mos musiqa topilmadi',
@@ -47,8 +47,12 @@ export const getTaronaHintDefaults = (key) => {
     'voiceSearch.taronaAmbiguous':
       'Aniq natija topilmadi. Musiqani aniqroq va balandroq ijro qilib qayta urinib ko‘ring.',
     'voiceSearch.taronaMicLow':
-      'Mikrofon past eshityapti — musiqani balandroq qiling yoki mikrofonni yaqin tuting',
+      'Mikrofon musiqani past eshityapti — boshqa telefonda ijro qiling',
+    'voiceSearch.taronaMicMedium':
+      'Eshitilmoqda, lekin balandroq qiling yoki mikrofonni yaqin tuting',
     'voiceSearch.taronaMicOk': 'Yaxshi eshitilmoqda, kuting...',
+    'voiceSearch.taronaLowMatch':
+      'Musiqa eshitildi ({{pct}}%), lekin bazada mos yo‘q. Ilovadagi trekni boshqa telefonda ijro qiling.',
     'voiceSearch.taronaNetworkError':
       'Serverga ulanib bo‘lmadi. Internetni tekshiring va qayta urinib ko‘ring.',
     'voiceSearch.taronaError': 'Aniqlashda xatolik. Qayta urinib ko‘ring.',

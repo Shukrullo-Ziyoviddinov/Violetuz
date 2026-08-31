@@ -9,7 +9,7 @@ const Artist = require('../../models/Artist.model');
 const { compareFingerprintStrings, decodeFingerprint } = require('../../utils/chromaprintCompare');
 const { measureAudioLevelDb } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
-const { fingerprintFromFile, fingerprintFromBuffer } = require('./fpcalcRunner');
+const { fingerprintFromFile, fingerprintFromBufferMulti } = require('./fpcalcRunner');
 
 // Shovqin ~0.62 (gap ~0.04), haqiqiy musiqa ~0.72+ yoki gap >= 0.08
 const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.78;
@@ -202,13 +202,28 @@ const pickConfidentMatches = (fpScored) => {
   };
 };
 
+const scoreCatalog = (queryFingerprint, catalog) => {
+  const fpGroups = groupCatalogByFingerprint(catalog);
+
+  const fpScored = [...fpGroups.entries()]
+    .map(([fingerprint, tracks]) => ({
+      fingerprint,
+      tracks,
+      score: compareFingerprintStrings(queryFingerprint, fingerprint),
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  return pickConfidentMatches(fpScored);
+};
+
 const identifyFromAudioBuffer = async (buffer, originalName) => {
   try {
-    const queryFp = await fingerprintFromBuffer(buffer, originalName);
+    const queryFingerprints = await fingerprintFromBufferMulti(buffer, originalName);
+    const primary = queryFingerprints[0];
 
-    if (queryFp.duration < MIN_QUERY_DURATION_SEC) {
+    if (!primary || primary.duration < MIN_QUERY_DURATION_SEC) {
       return {
-        queryDuration: queryFp.duration,
+        queryDuration: primary?.duration || 0,
         bestScore: 0,
         meanVolumeDb: null,
         rejectedReason: 'audio_too_short',
@@ -219,22 +234,10 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
     if (meanVolumeDb != null && meanVolumeDb < SILENCE_VOLUME_DB) {
       return {
-        queryDuration: queryFp.duration,
+        queryDuration: primary.duration,
         bestScore: 0,
         meanVolumeDb,
         rejectedReason: 'audio_too_quiet',
-        matches: [],
-      };
-    }
-
-    const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
-
-    if (queryFrames < MIN_QUERY_FRAMES) {
-      return {
-        queryDuration: queryFp.duration,
-        bestScore: 0,
-        meanVolumeDb,
-        rejectedReason: 'audio_too_short',
         matches: [],
       };
     }
@@ -245,22 +248,27 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
       .lean();
 
-    const fpGroups = groupCatalogByFingerprint(catalog);
+    let bestResult = { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
+    let queryDuration = primary.duration;
 
-    const fpScored = [...fpGroups.entries()]
-      .map(([fingerprint, tracks]) => ({
-        fingerprint,
-        tracks,
-        score: compareFingerprintStrings(queryFp.fingerprint, fingerprint),
-      }))
-      .sort((a, b) => b.score - a.score);
+    for (const queryFp of queryFingerprints) {
+      const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
+      if (queryFrames < MIN_QUERY_FRAMES) continue;
 
-    const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(fpScored);
+      const result = scoreCatalog(queryFp.fingerprint, catalog);
+      if (result.bestScore > bestResult.bestScore) {
+        bestResult = result;
+        queryDuration = queryFp.duration;
+      }
+      if (result.matches.length) break;
+    }
+
+    const { matches: confident, bestScore, rejectedReason } = bestResult;
 
     const artistMap = await buildArtistNameMap(confident.map((s) => s.track.artistId));
 
     return {
-      queryDuration: queryFp.duration,
+      queryDuration,
       meanVolumeDb,
       bestScore: Math.round(bestScore * 1000) / 1000,
       rejectedReason,
