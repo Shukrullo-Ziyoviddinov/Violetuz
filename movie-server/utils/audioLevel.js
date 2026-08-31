@@ -9,7 +9,7 @@ const FFMPEG_BIN = process.env.FFMPEG_PATH || 'ffmpeg';
 
 /** mean_volume shundan past — jim (sukunat ~-91 dB) */
 const MIN_MEAN_VOLUME_DB =
-  Number(process.env.FINGERPRINT_MIN_MEAN_VOLUME_DB) || -52;
+  Number(process.env.FINGERPRINT_MIN_MEAN_VOLUME_DB) || -58;
 
 /** volumedetect ishonchsiz (qisqa clip) */
 const UNRELIABLE_VOLUME_DB = -85;

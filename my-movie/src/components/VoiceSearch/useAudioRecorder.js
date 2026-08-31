@@ -14,15 +14,14 @@ const pickMimeType = () => {
   return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || '';
 };
 
-/** Tarona: karnaydan eshitilgan musiqa uchun AEC/NS o‘chiriladi */
+/** Tarona: AEC o‘chiriladi, AGC yoqiladi — past mikrofon signalini kuchaytiradi */
 const TARONA_AUDIO_CONSTRAINTS = {
   echoCancellation: false,
   noiseSuppression: false,
-  autoGainControl: false,
+  autoGainControl: true,
   googEchoCancellation: false,
   googNoiseSuppression: false,
-  googAutoGainControl: false,
-  googHighpassFilter: false,
+  googAutoGainControl: true,
 };
 
 /**

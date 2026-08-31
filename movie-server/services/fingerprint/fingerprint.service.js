@@ -11,11 +11,12 @@ const { measureAudioLevelDb, isAudioLevelSufficient } = require('../../utils/aud
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBuffer } = require('./fpcalcRunner');
 
-// Shovqin ~0.62 (gap ~0.04), haqiqiy musiqa ~0.76+ yoki gap >= 0.09
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.76;
-const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 1;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.09;
-const MIN_ABSOLUTE_SCORE = Number(process.env.FINGERPRINT_MIN_ABSOLUTE_SCORE) || 0.62;
+// Shovqin ~0.62 (gap ~0.04), haqiqiy musiqa ~0.72+ yoki gap >= 0.08
+const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.72;
+const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.08;
+const MIN_ABSOLUTE_SCORE = Number(process.env.FINGERPRINT_MIN_ABSOLUTE_SCORE) || 0.6;
+const UNKNOWN_VOLUME_MIN_SCORE = Number(process.env.FINGERPRINT_UNKNOWN_VOLUME_MIN_SCORE) || 0.85;
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 5;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
 
@@ -151,23 +152,29 @@ const buildArtistNameMap = async (artistIds) => {
   return new Map(artists.map((a) => [a.id, a.name]));
 };
 
-const dedupeCatalogByFingerprint = (tracks) => {
-  const seen = new Set();
-  return tracks.filter((track) => {
+const groupCatalogByFingerprint = (tracks) => {
+  const groups = new Map();
+  for (const track of tracks) {
     const fp = String(track.fingerprint || '');
-    if (!fp || seen.has(fp)) return false;
-    seen.add(fp);
-    return true;
-  });
+    if (!fp) continue;
+    if (!groups.has(fp)) groups.set(fp, []);
+    groups.get(fp).push(track);
+  }
+  return groups;
 };
 
-const pickConfidentMatches = (allScored) => {
-  if (!allScored.length) {
+const pickConfidentMatches = (fpScored, { meanVolumeDb } = {}) => {
+  if (!fpScored.length) {
     return { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
   }
 
-  const bestScore = allScored[0].score;
-  const secondScore = allScored[1]?.score ?? 0;
+  const threshold =
+    meanVolumeDb == null
+      ? Math.max(MATCH_THRESHOLD, UNKNOWN_VOLUME_MIN_SCORE)
+      : MATCH_THRESHOLD;
+
+  const bestScore = fpScored[0].score;
+  const secondScore = fpScored[1]?.score ?? 0;
   const gap = bestScore - secondScore;
 
   if (bestScore < MIN_ABSOLUTE_SCORE) {
@@ -175,18 +182,29 @@ const pickConfidentMatches = (allScored) => {
   }
 
   const confident =
-    bestScore >= MATCH_THRESHOLD || (bestScore >= MIN_ABSOLUTE_SCORE && gap >= MIN_SCORE_GAP);
+    bestScore >= threshold || (bestScore >= MIN_ABSOLUTE_SCORE && gap >= MIN_SCORE_GAP);
 
   if (!confident) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
   const minAccepted = Math.max(MIN_ABSOLUTE_SCORE, bestScore - 0.02);
-  const matches = allScored
-    .filter((item) => item.score >= minAccepted)
-    .slice(0, MATCH_LIMIT);
+  const winningGroups = fpScored.filter((item) => item.score >= minAccepted);
 
-  return { matches, bestScore, rejectedReason: null };
+  const expanded = [];
+  for (const group of winningGroups) {
+    for (const track of group.tracks) {
+      expanded.push({ track, score: group.score });
+    }
+  }
+
+  expanded.sort((a, b) => b.score - a.score || a.track.id - b.track.id);
+
+  return {
+    matches: expanded.slice(0, MATCH_LIMIT),
+    bestScore,
+    rejectedReason: null,
+  };
 };
 
 const identifyFromAudioBuffer = async (buffer, originalName) => {
@@ -232,16 +250,19 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
       .lean();
 
-    const uniqueCatalog = dedupeCatalogByFingerprint(catalog);
+    const fpGroups = groupCatalogByFingerprint(catalog);
 
-    const allScored = uniqueCatalog
-      .map((track) => ({
-        track,
-        score: compareFingerprintStrings(queryFp.fingerprint, track.fingerprint),
+    const fpScored = [...fpGroups.entries()]
+      .map(([fingerprint, tracks]) => ({
+        fingerprint,
+        tracks,
+        score: compareFingerprintStrings(queryFp.fingerprint, fingerprint),
       }))
       .sort((a, b) => b.score - a.score);
 
-    const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(allScored);
+    const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(fpScored, {
+      meanVolumeDb,
+    });
 
     const artistMap = await buildArtistNameMap(confident.map((s) => s.track.artistId));
 
