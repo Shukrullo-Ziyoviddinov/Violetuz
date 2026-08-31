@@ -11,8 +11,8 @@ const { measureAudioLevelDb, isAudioLevelSufficient } = require('../../utils/aud
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBuffer } = require('./fpcalcRunner');
 
-// Sukunat ~0.75, shovqin ~0.64, haqiqiy musiqa ~0.94+ ball oladi
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.82;
+// Sukunat ~0.75 (volume check bilan blok), shovqin ~0.64, haqiqiy musiqa ~0.94+
+const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.8;
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 3;
 const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 12;
@@ -195,63 +195,75 @@ const pickConfidentMatches = (allScored) => {
 };
 
 const identifyFromAudioBuffer = async (buffer, originalName) => {
-  const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
-  if (!isAudioLevelSufficient(meanVolumeDb)) {
+  try {
+    const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
+    if (!isAudioLevelSufficient(meanVolumeDb)) {
+      return {
+        queryDuration: 0,
+        bestScore: 0,
+        meanVolumeDb,
+        rejectedReason: 'audio_too_quiet',
+        matches: [],
+      };
+    }
+
+    const queryFp = await fingerprintFromBuffer(buffer, originalName);
+    const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
+
+    if (queryFrames < MIN_QUERY_FRAMES) {
+      return {
+        queryDuration: queryFp.duration,
+        bestScore: 0,
+        meanVolumeDb,
+        rejectedReason: 'audio_too_short',
+        matches: [],
+      };
+    }
+
+    const catalog = await Music.find({
+      fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
+    })
+      .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
+      .lean();
+
+    const uniqueCatalog = dedupeCatalogByFingerprint(catalog);
+
+    const allScored = uniqueCatalog
+      .map((track) => ({
+        track,
+        score: compareFingerprintStrings(queryFp.fingerprint, track.fingerprint),
+      }))
+      .sort((a, b) => b.score - a.score);
+
+    const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(allScored);
+
+    const artistMap = await buildArtistNameMap(confident.map((s) => s.track.artistId));
+
+    return {
+      queryDuration: queryFp.duration,
+      meanVolumeDb,
+      bestScore: Math.round(bestScore * 1000) / 1000,
+      rejectedReason,
+      matches: confident.map(({ track, score }) => ({
+        id: track.id,
+        title: track.title,
+        artistId: track.artistId,
+        artistName: artistMap.get(track.artistId) || track.artistId,
+        img: track.img || '',
+        score: Math.round(score * 1000) / 1000,
+      })),
+    };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[identify] failed:', err.message);
     return {
       queryDuration: 0,
       bestScore: 0,
-      meanVolumeDb,
-      rejectedReason: 'audio_too_quiet',
+      meanVolumeDb: null,
+      rejectedReason: 'processing_failed',
       matches: [],
     };
   }
-
-  const queryFp = await fingerprintFromBuffer(buffer, originalName);
-  const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
-
-  if (queryFrames < MIN_QUERY_FRAMES) {
-    return {
-      queryDuration: queryFp.duration,
-      bestScore: 0,
-      meanVolumeDb,
-      rejectedReason: 'audio_too_short',
-      matches: [],
-    };
-  }
-
-  const catalog = await Music.find({
-    fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
-  })
-    .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
-    .lean();
-
-  const uniqueCatalog = dedupeCatalogByFingerprint(catalog);
-
-  const allScored = uniqueCatalog
-    .map((track) => ({
-      track,
-      score: compareFingerprintStrings(queryFp.fingerprint, track.fingerprint),
-    }))
-    .sort((a, b) => b.score - a.score);
-
-  const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(allScored);
-
-  const artistMap = await buildArtistNameMap(confident.map((s) => s.track.artistId));
-
-  return {
-    queryDuration: queryFp.duration,
-    meanVolumeDb,
-    bestScore: Math.round(bestScore * 1000) / 1000,
-    rejectedReason,
-    matches: confident.map(({ track, score }) => ({
-      id: track.id,
-      title: track.title,
-      artistId: track.artistId,
-      artistName: artistMap.get(track.artistId) || track.artistId,
-      img: track.img || '',
-      score: Math.round(score * 1000) / 1000,
-    })),
-  };
 };
 
 module.exports = {

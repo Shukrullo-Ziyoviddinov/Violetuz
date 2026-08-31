@@ -31,6 +31,8 @@ const measureAudioLevelDb = async (buffer, originalName = 'sample.webm') => {
       { timeout: 60_000, maxBuffer: 2 * 1024 * 1024 }
     );
     return parseMeanVolume(stderr);
+  } catch {
+    return null;
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
   }

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAudioRecorder from './useAudioRecorder';
 import useTaronaIdentify from './useTaronaIdentify';
+import { getTaronaHintDefaults, getTaronaHintKey } from './taronaMessages';
 
 const VIS_BARS = [18, 32, 48, 28, 56, 36, 44, 24];
 
@@ -13,6 +14,7 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     phase,
     matches,
     error: identifyError,
+    rejectReason,
     identify,
     reset,
     PHASE_PROCESSING,
@@ -79,31 +81,14 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     await start();
   }, [processing, recording, stop, reset, start, onResults]);
 
-  let hint = t(
-    'voiceSearch.taronaHint',
-    'Yaqin atrofda musiqa ijro eting (karnay yoki dinamik). Kuylash/xirgoyi ishlamaydi.'
-  );
-  if (recording) {
-    hint = t('voiceSearch.taronaListening', 'Eshitilmoqda...');
-  }
-  if (processing) {
-    hint = t('voiceSearch.taronaProcessing', 'Aniqlanmoqda...');
-  }
-  if (identifyError?.message === 'audio-too-quiet' || identifyError?.message === 'audio_too_quiet') {
-    hint = t(
-      'voiceSearch.taronaTooQuiet',
-      'Ovoz juda past. Musiqani balandroq ijro eting yoki mikrofonni yaqinroq tuting.'
-    );
-  } else if (identifyError?.message === 'ambiguous_match') {
-    hint = t(
-      'voiceSearch.taronaAmbiguous',
-      'Aniq natija topilmadi. Musiqani aniqroq va balandroq ijro qilib qayta urinib ko‘ring.'
-    );
-  } else if (identifyError) {
-    hint = t('voiceSearch.taronaError', 'Aniqlashda xatolik');
-  } else if (phase === PHASE_DONE && !matches.length) {
-    hint = t('voiceSearch.taronaNoResults', 'Mos musiqa topilmadi');
-  }
+  const uiPhase = recording ? 'recording' : processing ? 'processing' : phase;
+  const hintKey = getTaronaHintKey({
+    phase: uiPhase,
+    matches,
+    error: identifyError,
+    rejectReason,
+  });
+  const hint = t(hintKey, getTaronaHintDefaults(hintKey));
 
   return (
     <>
