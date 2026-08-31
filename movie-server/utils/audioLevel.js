@@ -7,18 +7,18 @@ const path = require('path');
 const execFileAsync = promisify(execFile);
 const FFMPEG_BIN = process.env.FFMPEG_PATH || 'ffmpeg';
 
-/** mean_volume shundan past bo'lsa — jim/shovqinsiz deb hisoblanadi (sukunat ~-91 dB) */
+/** mean_volume shundan past — jim (sukunat ~-91 dB) */
 const MIN_MEAN_VOLUME_DB =
-  Number(process.env.FINGERPRINT_MIN_MEAN_VOLUME_DB) || -48;
+  Number(process.env.FINGERPRINT_MIN_MEAN_VOLUME_DB) || -52;
+
+/** volumedetect ishonchsiz (qisqa clip) */
+const UNRELIABLE_VOLUME_DB = -85;
 
 const parseMeanVolume = (stderr) => {
   const match = String(stderr).match(/mean_volume:\s*([-\d.]+)\s*dB/);
   return match ? Number(match[1]) : null;
 };
 
-/**
- * Upload buffer → ffmpeg volumedetect → mean_volume dB.
- */
 const measureAudioLevelDb = async (buffer, originalName = 'sample.webm') => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'violet-vol-'));
   const inputPath = path.join(tmpDir, originalName.replace(/[^\w.-]/g, '_'));
@@ -30,7 +30,9 @@ const measureAudioLevelDb = async (buffer, originalName = 'sample.webm') => {
       ['-hide_banner', '-i', inputPath, '-af', 'volumedetect', '-f', 'null', '-'],
       { timeout: 60_000, maxBuffer: 2 * 1024 * 1024 }
     );
-    return parseMeanVolume(stderr);
+    const db = parseMeanVolume(stderr);
+    if (db == null || db <= UNRELIABLE_VOLUME_DB) return null;
+    return db;
   } catch {
     return null;
   } finally {

@@ -37,13 +37,13 @@ export const getTaronaHintKey = ({ phase, matches, error, rejectReason }) => {
 export const getTaronaHintDefaults = (key) => {
   const defaults = {
     'voiceSearch.taronaHint':
-      'Yaqin atrofda musiqa ijro eting (karnay yoki dinamik). Kuylash/xirgoyi ishlamaydi.',
+      'Ilovadagi musiqani boshqa telefonda/kompyuterda ijro qiling. Kamida 7 soniya eshiting.',
     'voiceSearch.taronaListening': 'Eshitilmoqda...',
     'voiceSearch.taronaProcessing': 'Aniqlanmoqda...',
     'voiceSearch.taronaNoResults': 'Mos musiqa topilmadi',
     'voiceSearch.taronaTooQuiet':
       'Ovoz juda past. Musiqani balandroq ijro eting yoki mikrofonni yaqinroq tuting.',
-    'voiceSearch.taronaTooShort': 'Yozuv juda qisqa. Kamida 5 soniya musiqa eshiting.',
+    'voiceSearch.taronaTooShort': 'Yozuv juda qisqa. Kamida 7 soniya musiqa eshiting.',
     'voiceSearch.taronaAmbiguous':
       'Aniq natija topilmadi. Musiqani aniqroq va balandroq ijro qilib qayta urinib ko‘ring.',
     'voiceSearch.taronaNetworkError':

@@ -32,9 +32,10 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     [identify]
   );
 
-  const { recording, error, start, stop, abort } = useAudioRecorder({
+  const { recording, error, start, stop, abort, canStop, remainingSec } = useAudioRecorder({
     enabled: isOpen,
-    maxMs: 10_000,
+    minMs: 7_000,
+    maxMs: 12_000,
     rawAudio: true,
     onComplete: runIdentify,
   });
@@ -71,6 +72,7 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     if (processing) return;
 
     if (recording) {
+      if (!canStop) return;
       await stop();
       return;
     }
@@ -79,16 +81,21 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     identifyStartedRef.current = false;
     onResults?.([], 'idle');
     await start();
-  }, [processing, recording, stop, reset, start, onResults]);
+  }, [processing, recording, canStop, stop, reset, start, onResults]);
 
   const uiPhase = recording ? 'recording' : processing ? 'processing' : phase;
-  const hintKey = getTaronaHintKey({
+  let hintKey = getTaronaHintKey({
     phase: uiPhase,
     matches,
     error: identifyError,
     rejectReason,
   });
-  const hint = t(hintKey, getTaronaHintDefaults(hintKey));
+  let hint = t(hintKey, getTaronaHintDefaults(hintKey));
+  if (recording && remainingSec > 0) {
+    hint = t('voiceSearch.taronaKeepListening', 'Eshitilmoqda... yana {{sec}}s', {
+      sec: remainingSec,
+    });
+  }
 
   return (
     <>
@@ -103,7 +110,7 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
           onClick={handleMainButtonClick}
           aria-label={t('voiceSearch.taronaListen', 'Musiqani eshitish')}
           aria-pressed={recording}
-          disabled={processing}
+          disabled={processing || (recording && !canStop)}
         >
           <span className="tarona-visualizer-glow" aria-hidden="true" />
           <span className="tarona-visualizer-core">

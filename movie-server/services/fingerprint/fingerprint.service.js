@@ -11,13 +11,13 @@ const { measureAudioLevelDb, isAudioLevelSufficient } = require('../../utils/aud
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBuffer } = require('./fpcalcRunner');
 
-// Sukunat ~0.75 (volume check bilan blok), shovqin ~0.64, haqiqiy musiqa ~0.94+
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.8;
-const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 3;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
-const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 12;
-const AMBIGUOUS_TIE_COUNT = Number(process.env.FINGERPRINT_AMBIGUOUS_TIE_COUNT) || 4;
-const AMBIGUOUS_TIE_MAX_SCORE = Number(process.env.FINGERPRINT_AMBIGUOUS_TIE_MAX_SCORE) || 0.9;
+// Shovqin ~0.62 (gap ~0.04), haqiqiy musiqa ~0.76+ yoki gap >= 0.09
+const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.76;
+const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 1;
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.09;
+const MIN_ABSOLUTE_SCORE = Number(process.env.FINGERPRINT_MIN_ABSOLUTE_SCORE) || 0.62;
+const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 5;
+const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
 
 const downloadToFile = (url, destPath) =>
   new Promise((resolve, reject) => {
@@ -161,11 +161,6 @@ const dedupeCatalogByFingerprint = (tracks) => {
   });
 };
 
-const countNearTopScores = (scored, bestScore, epsilon = 0.015) => {
-  if (!scored.length) return 0;
-  return scored.filter((item) => bestScore - item.score <= epsilon).length;
-};
-
 const pickConfidentMatches = (allScored) => {
   if (!allScored.length) {
     return { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
@@ -173,22 +168,22 @@ const pickConfidentMatches = (allScored) => {
 
   const bestScore = allScored[0].score;
   const secondScore = allScored[1]?.score ?? 0;
-  const tieCount = countNearTopScores(allScored, bestScore);
+  const gap = bestScore - secondScore;
 
-  if (bestScore < MATCH_THRESHOLD) {
+  if (bestScore < MIN_ABSOLUTE_SCORE) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
-  if (tieCount >= AMBIGUOUS_TIE_COUNT && bestScore < AMBIGUOUS_TIE_MAX_SCORE) {
-    return { matches: [], bestScore, rejectedReason: 'ambiguous_match' };
+  const confident =
+    bestScore >= MATCH_THRESHOLD || (bestScore >= MIN_ABSOLUTE_SCORE && gap >= MIN_SCORE_GAP);
+
+  if (!confident) {
+    return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
-  if (bestScore - secondScore < MIN_SCORE_GAP && bestScore < 0.95) {
-    return { matches: [], bestScore, rejectedReason: 'ambiguous_match' };
-  }
-
+  const minAccepted = Math.max(MIN_ABSOLUTE_SCORE, bestScore - 0.02);
   const matches = allScored
-    .filter((item) => item.score >= MATCH_THRESHOLD)
+    .filter((item) => item.score >= minAccepted)
     .slice(0, MATCH_LIMIT);
 
   return { matches, bestScore, rejectedReason: null };
@@ -196,10 +191,22 @@ const pickConfidentMatches = (allScored) => {
 
 const identifyFromAudioBuffer = async (buffer, originalName) => {
   try {
+    const queryFp = await fingerprintFromBuffer(buffer, originalName);
+
+    if (queryFp.duration < MIN_QUERY_DURATION_SEC) {
+      return {
+        queryDuration: queryFp.duration,
+        bestScore: 0,
+        meanVolumeDb: null,
+        rejectedReason: 'audio_too_short',
+        matches: [],
+      };
+    }
+
     const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
     if (!isAudioLevelSufficient(meanVolumeDb)) {
       return {
-        queryDuration: 0,
+        queryDuration: queryFp.duration,
         bestScore: 0,
         meanVolumeDb,
         rejectedReason: 'audio_too_quiet',
@@ -207,7 +214,6 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       };
     }
 
-    const queryFp = await fingerprintFromBuffer(buffer, originalName);
     const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
 
     if (queryFrames < MIN_QUERY_FRAMES) {

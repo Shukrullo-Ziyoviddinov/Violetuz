@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const DEFAULT_MAX_MS = 10_000;
+const DEFAULT_MAX_MS = 12_000;
+const DEFAULT_MIN_MS = 7_000;
 
 const pickMimeType = () => {
   if (typeof window === 'undefined' || !window.MediaRecorder) return '';
@@ -18,7 +19,6 @@ const TARONA_AUDIO_CONSTRAINTS = {
   echoCancellation: false,
   noiseSuppression: false,
   autoGainControl: false,
-  // Chrome-specific (ignored on other browsers)
   googEchoCancellation: false,
   googNoiseSuppression: false,
   googAutoGainControl: false,
@@ -27,20 +27,24 @@ const TARONA_AUDIO_CONSTRAINTS = {
 
 /**
  * Mikrofon orqali qisqa audio yozish (Tarona / Shazam).
- * @param {boolean} [rawAudio] — true bo‘lsa echo/noise suppression o‘chiriladi (Tarona uchun).
  */
 const useAudioRecorder = ({
   enabled = true,
+  minMs = DEFAULT_MIN_MS,
   maxMs = DEFAULT_MAX_MS,
   onComplete,
   rawAudio = false,
 } = {}) => {
   const [recording, setRecording] = useState(false);
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const [canStop, setCanStop] = useState(false);
   const [error, setError] = useState(null);
   const streamRef = useRef(null);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const stopTimerRef = useRef(null);
+  const tickTimerRef = useRef(null);
+  const startedAtRef = useRef(0);
   const resolveRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
@@ -50,17 +54,24 @@ const useAudioRecorder = ({
       window.clearTimeout(stopTimerRef.current);
       stopTimerRef.current = null;
     }
+    if (tickTimerRef.current) {
+      window.clearInterval(tickTimerRef.current);
+      tickTimerRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
     recorderRef.current = null;
     chunksRef.current = [];
+    startedAtRef.current = 0;
   }, []);
 
   const abort = useCallback(() => {
     cleanupStream();
     setRecording(false);
+    setElapsedMs(0);
+    setCanStop(false);
     setError(null);
     resolveRef.current = null;
   }, [cleanupStream]);
@@ -71,11 +82,16 @@ const useAudioRecorder = ({
       return Promise.resolve(null);
     }
 
+    const elapsed = Date.now() - (startedAtRef.current || Date.now());
+    if (elapsed < minMs) {
+      return Promise.resolve(null);
+    }
+
     return new Promise((resolve) => {
       resolveRef.current = resolve;
       recorder.stop();
     });
-  }, []);
+  }, [minMs]);
 
   const start = useCallback(async () => {
     if (!enabled) return null;
@@ -110,6 +126,8 @@ const useAudioRecorder = ({
         });
         cleanupStream();
         setRecording(false);
+        setElapsedMs(0);
+        setCanStop(false);
         const result = blob.size > 0 ? blob : null;
         const resolve = resolveRef.current;
         resolveRef.current = null;
@@ -123,8 +141,19 @@ const useAudioRecorder = ({
       };
 
       recorder.start(250);
+      startedAtRef.current = Date.now();
       setRecording(true);
+      setElapsedMs(0);
+      setCanStop(false);
       setError(null);
+
+      tickTimerRef.current = window.setInterval(() => {
+        const elapsed = Date.now() - startedAtRef.current;
+        setElapsedMs(elapsed);
+        if (elapsed >= minMs) {
+          setCanStop(true);
+        }
+      }, 200);
 
       stopTimerRef.current = window.setTimeout(() => {
         stop();
@@ -141,15 +170,20 @@ const useAudioRecorder = ({
       abort();
       return null;
     }
-  }, [enabled, abort, cleanupStream, maxMs, stop, rawAudio]);
+  }, [enabled, abort, cleanupStream, maxMs, minMs, stop, rawAudio]);
 
   useEffect(() => {
     if (!enabled) abort();
     return () => abort();
   }, [enabled, abort]);
 
+  const remainingSec = Math.max(0, Math.ceil((minMs - elapsedMs) / 1000));
+
   return {
     recording,
+    elapsedMs,
+    remainingSec,
+    canStop,
     error,
     start,
     stop,
