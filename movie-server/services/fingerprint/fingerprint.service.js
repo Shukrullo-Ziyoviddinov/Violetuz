@@ -11,11 +11,12 @@ const { measureAudioLevelDb } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBufferMulti } = require('./fpcalcRunner');
 
-// Shovqin ~0.62 (gap ~0.04), haqiqiy musiqa ~0.72+ yoki gap >= 0.08
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.78;
+// Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
+const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.68;
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.08;
-const MIN_ABSOLUTE_SCORE = Number(process.env.FINGERPRINT_MIN_ABSOLUTE_SCORE) || 0.58;
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
+const STRONG_MATCH_SCORE = Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.72;
+const NOISE_CEILING = Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.64;
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 5;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
@@ -172,18 +173,22 @@ const pickConfidentMatches = (fpScored) => {
   const secondScore = fpScored[1]?.score ?? 0;
   const gap = bestScore - secondScore;
 
-  if (bestScore < MIN_ABSOLUTE_SCORE) {
+  // Shovqin: barcha guruhlar ~0.62 atrofida
+  if (bestScore <= NOISE_CEILING) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
-  const confident =
-    bestScore >= MATCH_THRESHOLD || (bestScore >= MIN_ABSOLUTE_SCORE && gap >= MIN_SCORE_GAP);
+  // Kuchli moslik — gap shart emas
+  const strong = bestScore >= STRONG_MATCH_SCORE;
 
-  if (!confident) {
+  // O‘rtacha moslik — eng yaxshisi aniq ajralishi kerak
+  const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
+
+  if (!strong && !clearWinner) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
-  const minAccepted = Math.max(MIN_ABSOLUTE_SCORE, bestScore - 0.02);
+  const minAccepted = Math.max(NOISE_CEILING + 0.02, bestScore - 0.03);
   const winningGroups = fpScored.filter((item) => item.score >= minAccepted);
 
   const expanded = [];
@@ -232,7 +237,8 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     }
 
     const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
-    if (meanVolumeDb != null && meanVolumeDb < SILENCE_VOLUME_DB) {
+    // null = volumedetect -85 dB dan past (haqiqiy sukunat) — fingerprint noto‘g‘ri mos keladi
+    if (meanVolumeDb == null || meanVolumeDb < SILENCE_VOLUME_DB) {
       return {
         queryDuration: primary.duration,
         bestScore: 0,
