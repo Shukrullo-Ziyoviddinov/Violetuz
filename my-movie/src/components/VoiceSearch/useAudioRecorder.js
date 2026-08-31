@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const DEFAULT_MAX_MS = 12_000;
-const DEFAULT_MIN_MS = 7_000;
+const DEFAULT_MAX_MS = 40_000;
+const DEFAULT_MIN_MS = 2_000;
+const DEFAULT_SNAPSHOT_INTERVAL_MS = 3_500;
+const DEFAULT_FIRST_SNAPSHOT_MS = 4_000;
 
 const pickMimeType = () => {
   if (typeof window === 'undefined' || !window.MediaRecorder) return '';
@@ -59,11 +61,25 @@ const attachMicMeter = (stream, onLevel) => {
   };
 };
 
+/**
+ * @param {object} options
+ * @param {boolean} [options.enabled]
+ * @param {number} [options.minMs] — foydalanuvchi to‘xtata oladigan minimal vaqt
+ * @param {number} [options.maxMs] — maksimal tinglash (default 40s)
+ * @param {boolean} [options.rawAudio]
+ * @param {(blob: Blob|null) => void} [options.onComplete] — yozuv tugaganda (max yoki manual stop)
+ * @param {(blob: Blob) => void} [options.onSnapshot] — tinglash davomida davriy probe
+ * @param {number} [options.snapshotIntervalMs]
+ * @param {number} [options.firstSnapshotMs] — birinchi probe qachon
+ */
 const useAudioRecorder = ({
   enabled = true,
   minMs = DEFAULT_MIN_MS,
   maxMs = DEFAULT_MAX_MS,
   onComplete,
+  onSnapshot,
+  snapshotIntervalMs = DEFAULT_SNAPSHOT_INTERVAL_MS,
+  firstSnapshotMs = DEFAULT_FIRST_SNAPSHOT_MS,
   rawAudio = false,
 } = {}) => {
   const [recording, setRecording] = useState(false);
@@ -72,17 +88,46 @@ const useAudioRecorder = ({
   const [micLevel, setMicLevel] = useState(0);
   const [peakMicLevel, setPeakMicLevel] = useState(0);
   const [error, setError] = useState(null);
+
   const streamRef = useRef(null);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
+  const mimeTypeRef = useRef('audio/webm');
   const stopTimerRef = useRef(null);
   const tickTimerRef = useRef(null);
+  const snapshotTimerRef = useRef(null);
+  const firstSnapshotTimerRef = useRef(null);
   const meterCleanupRef = useRef(null);
   const startedAtRef = useRef(0);
   const peakRef = useRef(0);
   const resolveRef = useRef(null);
+  const skipCompleteRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
+  const onSnapshotRef = useRef(onSnapshot);
   onCompleteRef.current = onComplete;
+  onSnapshotRef.current = onSnapshot;
+
+  const buildBlob = useCallback(() => {
+    if (!chunksRef.current.length) return null;
+    const blob = new Blob(chunksRef.current, {
+      type: mimeTypeRef.current || 'audio/webm',
+    });
+    return blob.size > 0 ? blob : null;
+  }, []);
+
+  const emitSnapshot = useCallback(() => {
+    const recorder = recorderRef.current;
+    if (!recorder || recorder.state !== 'recording') return;
+    if (typeof recorder.requestData === 'function') {
+      recorder.requestData();
+    }
+    // requestData async chunk beradi — keyingi tickda o‘qiymiz
+    window.setTimeout(() => {
+      if (!recorderRef.current || recorderRef.current.state !== 'recording') return;
+      const blob = buildBlob();
+      if (blob) onSnapshotRef.current?.(blob);
+    }, 80);
+  }, [buildBlob]);
 
   const cleanupStream = useCallback(() => {
     if (stopTimerRef.current) {
@@ -92,6 +137,14 @@ const useAudioRecorder = ({
     if (tickTimerRef.current) {
       window.clearInterval(tickTimerRef.current);
       tickTimerRef.current = null;
+    }
+    if (snapshotTimerRef.current) {
+      window.clearInterval(snapshotTimerRef.current);
+      snapshotTimerRef.current = null;
+    }
+    if (firstSnapshotTimerRef.current) {
+      window.clearTimeout(firstSnapshotTimerRef.current);
+      firstSnapshotTimerRef.current = null;
     }
     if (meterCleanupRef.current) {
       meterCleanupRef.current();
@@ -108,6 +161,16 @@ const useAudioRecorder = ({
   }, []);
 
   const abort = useCallback(() => {
+    skipCompleteRef.current = true;
+    const recorder = recorderRef.current;
+    if (recorder && recorder.state !== 'inactive') {
+      try {
+        recorder.onstop = null;
+        recorder.stop();
+      } catch {
+        /* ignore */
+      }
+    }
     cleanupStream();
     setRecording(false);
     setElapsedMs(0);
@@ -116,27 +179,33 @@ const useAudioRecorder = ({
     setPeakMicLevel(0);
     setError(null);
     resolveRef.current = null;
+    skipCompleteRef.current = false;
   }, [cleanupStream]);
 
-  const stop = useCallback(() => {
-    const recorder = recorderRef.current;
-    if (!recorder || recorder.state === 'inactive') {
-      return Promise.resolve(null);
-    }
-
-    const elapsed = Date.now() - (startedAtRef.current || Date.now());
-    if (elapsed < minMs) {
-      return Promise.resolve(null);
-    }
-
-    return new Promise((resolve) => {
-      resolveRef.current = resolve;
-      if (typeof recorder.requestData === 'function') {
-        recorder.requestData();
+  const stop = useCallback(
+    ({ skipComplete = false } = {}) => {
+      const recorder = recorderRef.current;
+      if (!recorder || recorder.state === 'inactive') {
+        return Promise.resolve(null);
       }
-      recorder.stop();
-    });
-  }, [minMs]);
+
+      const elapsed = Date.now() - (startedAtRef.current || Date.now());
+      if (!skipComplete && elapsed < minMs) {
+        return Promise.resolve(null);
+      }
+
+      skipCompleteRef.current = Boolean(skipComplete);
+
+      return new Promise((resolve) => {
+        resolveRef.current = resolve;
+        if (typeof recorder.requestData === 'function') {
+          recorder.requestData();
+        }
+        recorder.stop();
+      });
+    },
+    [minMs]
+  );
 
   const start = useCallback(async () => {
     if (!enabled) return null;
@@ -154,6 +223,7 @@ const useAudioRecorder = ({
       streamRef.current = stream;
       chunksRef.current = [];
       peakRef.current = 0;
+      skipCompleteRef.current = false;
       setPeakMicLevel(0);
 
       meterCleanupRef.current = attachMicMeter(stream, (level) => {
@@ -165,6 +235,7 @@ const useAudioRecorder = ({
       });
 
       const mimeType = pickMimeType();
+      mimeTypeRef.current = mimeType || 'audio/webm';
       const recorderOptions = mimeType
         ? { mimeType, audioBitsPerSecond: 128_000 }
         : { audioBitsPerSecond: 128_000 };
@@ -177,19 +248,20 @@ const useAudioRecorder = ({
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, {
-          type: recorder.mimeType || mimeType || 'audio/webm',
-        });
+        const blob = buildBlob();
+        const skipComplete = skipCompleteRef.current;
+        skipCompleteRef.current = false;
         cleanupStream();
         setRecording(false);
         setElapsedMs(0);
         setCanStop(false);
         setMicLevel(0);
-        const result = blob.size > 0 ? blob : null;
         const resolve = resolveRef.current;
         resolveRef.current = null;
-        resolve?.(result);
-        onCompleteRef.current?.(result);
+        resolve?.(blob);
+        if (!skipComplete) {
+          onCompleteRef.current?.(blob);
+        }
       };
 
       recorder.onerror = () => {
@@ -197,12 +269,17 @@ const useAudioRecorder = ({
         abort();
       };
 
-      // iOS Safari timeslice bilan bo‘sh/buzilgan blob berishi mumkin — timeslicesiz yozamiz
+      // timeslice: davriy chunk + snapshot uchun; iOS da fallback
       try {
-        recorder.start();
+        recorder.start(1000);
       } catch {
-        recorder.start(250);
+        try {
+          recorder.start();
+        } catch {
+          recorder.start(250);
+        }
       }
+
       startedAtRef.current = Date.now();
       setRecording(true);
       setElapsedMs(0);
@@ -216,6 +293,18 @@ const useAudioRecorder = ({
           setCanStop(true);
         }
       }, 200);
+
+      if (onSnapshotRef.current) {
+        const firstDelay = Math.max(0, firstSnapshotMs);
+        firstSnapshotTimerRef.current = window.setTimeout(() => {
+          firstSnapshotTimerRef.current = null;
+          if (!recorderRef.current || recorderRef.current.state !== 'recording') return;
+          emitSnapshot();
+          snapshotTimerRef.current = window.setInterval(() => {
+            emitSnapshot();
+          }, snapshotIntervalMs);
+        }, firstDelay);
+      }
 
       stopTimerRef.current = window.setTimeout(() => {
         stop();
@@ -232,14 +321,26 @@ const useAudioRecorder = ({
       abort();
       return null;
     }
-  }, [enabled, abort, cleanupStream, maxMs, minMs, stop, rawAudio]);
+  }, [
+    enabled,
+    abort,
+    cleanupStream,
+    maxMs,
+    minMs,
+    stop,
+    rawAudio,
+    buildBlob,
+    emitSnapshot,
+    firstSnapshotMs,
+    snapshotIntervalMs,
+  ]);
 
   useEffect(() => {
     if (!enabled) abort();
     return () => abort();
   }, [enabled, abort]);
 
-  const remainingSec = Math.max(0, Math.ceil((minMs - elapsedMs) / 1000));
+  const remainingSec = Math.max(0, Math.ceil((maxMs - elapsedMs) / 1000));
 
   return {
     recording,

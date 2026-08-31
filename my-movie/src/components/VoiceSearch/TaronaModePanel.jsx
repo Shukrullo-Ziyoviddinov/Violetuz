@@ -6,9 +6,13 @@ import { getTaronaHintDefaults, getTaronaHintKey } from './taronaMessages';
 
 const VIS_BARS = [18, 32, 48, 28, 56, 36, 44, 24];
 
+const MAX_LISTEN_MS = 40_000;
+const FIRST_PROBE_MS = 4_000;
+const PROBE_EVERY_MS = 3_500;
+
 const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
   const { t } = useTranslation();
-  const identifyStartedRef = useRef(false);
+  const finalizeStartedRef = useRef(false);
 
   const {
     phase,
@@ -16,34 +20,55 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     error: identifyError,
     rejectReason,
     lastMeta,
-    identify,
+    probing,
+    matchedRef,
+    probe,
+    finalize,
     reset,
     PHASE_PROCESSING,
     PHASE_DONE,
     PHASE_ERROR,
   } = useTaronaIdentify();
 
-  const runIdentify = useCallback(
+  const handleSnapshot = useCallback(
     async (blob) => {
-      if (!blob || identifyStartedRef.current) return;
-      identifyStartedRef.current = true;
-      await identify(blob);
-      identifyStartedRef.current = false;
+      if (!blob || matchedRef.current) return;
+      const found = await probe(blob);
+      if (found) {
+        // Natija topildi — 40s kutmasdan yozuvni to‘xtatamiz
+        stopRef.current?.({ skipComplete: true });
+      }
     },
-    [identify]
+    [probe, matchedRef]
   );
 
-  const { recording, error, start, stop, abort, canStop, remainingSec, peakMicLevel } =
+  const handleComplete = useCallback(
+    async (blob) => {
+      if (matchedRef.current || finalizeStartedRef.current) return;
+      finalizeStartedRef.current = true;
+      await finalize(blob);
+      finalizeStartedRef.current = false;
+    },
+    [finalize, matchedRef]
+  );
+
+  const { recording, error, start, stop, abort, canStop, remainingSec, peakMicLevel, elapsedMs } =
     useAudioRecorder({
-    enabled: isOpen,
-    minMs: 7_000,
-    maxMs: 12_000,
-    rawAudio: true,
-    onComplete: runIdentify,
-  });
+      enabled: isOpen,
+      minMs: 2_000,
+      maxMs: MAX_LISTEN_MS,
+      rawAudio: true,
+      firstSnapshotMs: FIRST_PROBE_MS,
+      snapshotIntervalMs: PROBE_EVERY_MS,
+      onSnapshot: handleSnapshot,
+      onComplete: handleComplete,
+    });
+
+  const stopRef = useRef(stop);
+  stopRef.current = stop;
 
   const processing = phase === PHASE_PROCESSING;
-  const showVisualizer = recording || processing;
+  const showVisualizer = recording || processing || probing;
 
   useEffect(() => {
     onProcessingChange?.(processing);
@@ -59,7 +84,7 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     if (!isOpen) {
       abort();
       reset();
-      identifyStartedRef.current = false;
+      finalizeStartedRef.current = false;
     }
   }, [isOpen, abort, reset]);
 
@@ -80,12 +105,12 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     }
 
     reset();
-    identifyStartedRef.current = false;
+    finalizeStartedRef.current = false;
     onResults?.([], 'idle');
     await start();
   }, [processing, recording, canStop, stop, reset, start, onResults]);
 
-  const uiPhase = recording ? 'recording' : processing ? 'processing' : phase;
+  const uiPhase = recording || probing ? 'recording' : processing ? 'processing' : phase;
   let hintKey = getTaronaHintKey({
     phase: uiPhase,
     matches,
@@ -93,22 +118,29 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
     rejectReason,
   });
   let hint = t(hintKey, getTaronaHintDefaults(hintKey));
-  if (recording && remainingSec > 0) {
-    hint = t('voiceSearch.taronaKeepListening', 'Eshitilmoqda... yana {{sec}}s', {
-      sec: remainingSec,
-    });
-  } else if (recording && peakMicLevel < 0.05) {
-    hint = t(
-      'voiceSearch.taronaMicLow',
-      'Mikrofon musiqani past eshityapti — boshqa telefonda ijro qiling'
-    );
-  } else if (recording && peakMicLevel < 0.1) {
-    hint = t(
-      'voiceSearch.taronaMicMedium',
-      'Eshitilmoqda, lekin balandroq qiling yoki mikrofonni yaqin tuting'
-    );
-  } else if (recording) {
-    hint = t('voiceSearch.taronaMicOk', 'Yaxshi eshitilmoqda, kuting...');
+
+  if (recording || probing) {
+    if (probing) {
+      hint = t('voiceSearch.taronaSearching', 'Aniqlanmoqda... topilsa darhol chiqadi');
+    } else if (peakMicLevel < 0.05) {
+      hint = t(
+        'voiceSearch.taronaMicLow',
+        'Mikrofon musiqani past eshityapti — boshqa telefonda ijro qiling'
+      );
+    } else if (peakMicLevel < 0.1) {
+      hint = t(
+        'voiceSearch.taronaMicMedium',
+        'Eshitilmoqda, lekin balandroq qiling yoki mikrofonni yaqin tuting'
+      );
+    } else if (elapsedMs < FIRST_PROBE_MS) {
+      hint = t('voiceSearch.taronaMicOk', 'Yaxshi eshitilmoqda...');
+    } else {
+      hint = t(
+        'voiceSearch.taronaListeningLive',
+        'Eshitilmoqda... topilishi bilan natija chiqadi (max {{sec}}s)',
+        { sec: remainingSec }
+      );
+    }
   } else if (
     phase === PHASE_DONE &&
     !matches.length &&

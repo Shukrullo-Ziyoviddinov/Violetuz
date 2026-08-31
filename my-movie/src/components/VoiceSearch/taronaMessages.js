@@ -43,14 +43,17 @@ export const getTaronaHintDefaults = (key) => {
     'voiceSearch.taronaNoResults': 'Mos musiqa topilmadi',
     'voiceSearch.taronaTooQuiet':
       'Ovoz juda past. Musiqani balandroq ijro eting yoki mikrofonni yaqinroq tuting.',
-    'voiceSearch.taronaTooShort': 'Yozuv juda qisqa. Kamida 7 soniya musiqa eshiting.',
+    'voiceSearch.taronaTooShort': 'Yozuv juda qisqa. Qayta urinib ko‘ring.',
     'voiceSearch.taronaAmbiguous':
       'Aniq natija topilmadi. Musiqani aniqroq va balandroq ijro qilib qayta urinib ko‘ring.',
     'voiceSearch.taronaMicLow':
       'Mikrofon musiqani past eshityapti — boshqa telefonda ijro qiling',
     'voiceSearch.taronaMicMedium':
       'Eshitilmoqda, lekin balandroq qiling yoki mikrofonni yaqin tuting',
-    'voiceSearch.taronaMicOk': 'Yaxshi eshitilmoqda, kuting...',
+    'voiceSearch.taronaMicOk': 'Yaxshi eshitilmoqda...',
+    'voiceSearch.taronaSearching': 'Aniqlanmoqda... topilsa darhol chiqadi',
+    'voiceSearch.taronaListeningLive':
+      'Eshitilmoqda... topilishi bilan natija chiqadi (max {{sec}}s)',
     'voiceSearch.taronaLowMatch':
       'Musiqa eshitildi ({{pct}}%), lekin bazada mos yo‘q. Ilovadagi trekni boshqa telefonda ijro qiling.',
     'voiceSearch.taronaNetworkError':
