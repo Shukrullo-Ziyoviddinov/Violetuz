@@ -197,7 +197,12 @@ const useAudioRecorder = ({
         abort();
       };
 
-      recorder.start(250);
+      // iOS Safari timeslice bilan bo‘sh/buzilgan blob berishi mumkin — timeslicesiz yozamiz
+      try {
+        recorder.start();
+      } catch {
+        recorder.start(250);
+      }
       startedAtRef.current = Date.now();
       setRecording(true);
       setElapsedMs(0);

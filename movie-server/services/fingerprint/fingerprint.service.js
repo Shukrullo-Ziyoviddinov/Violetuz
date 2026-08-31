@@ -7,16 +7,18 @@ const http = require('http');
 const Music = require('../../models/Music.model');
 const Artist = require('../../models/Artist.model');
 const { compareFingerprintStrings, decodeFingerprint } = require('../../utils/chromaprintCompare');
-const { measureAudioLevelDb } = require('../../utils/audioLevel');
+const { measureAudioLevel } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBufferMulti } = require('./fpcalcRunner');
 
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.68;
+// Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
+const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.65, 0.55, 0.7);
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
-const STRONG_MATCH_SCORE = Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.72;
-const NOISE_CEILING = Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.64;
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.03;
+const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.65, 0.8);
+const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.5, 0.66);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 5;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
@@ -181,10 +183,13 @@ const pickConfidentMatches = (fpScored) => {
   // Kuchli moslik — gap shart emas
   const strong = bestScore >= STRONG_MATCH_SCORE;
 
-  // O‘rtacha moslik — eng yaxshisi aniq ajralishi kerak
+  // O‘rtacha: threshold + gap (4 ta unique fp o‘xshash ball berishi mumkin)
   const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
 
-  if (!strong && !clearWinner) {
+  // Telefon: threshold yetarli — volume jimlikni ushlaydi, gap shart emas
+  const phoneOk = bestScore >= MATCH_THRESHOLD;
+
+  if (!strong && !clearWinner && !phoneOk) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
@@ -236,9 +241,13 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       };
     }
 
-    const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
-    // null = volumedetect -85 dB dan past (haqiqiy sukunat) — fingerprint noto‘g‘ri mos keladi
-    if (meanVolumeDb == null || meanVolumeDb < SILENCE_VOLUME_DB) {
+    const volume = await measureAudioLevel(buffer, originalName);
+    const meanVolumeDb = volume.db;
+    // Faqat aniq jimlikni rad et: unknown (ffmpeg fail) — telefon yozuvini saqlab qolamiz
+    if (
+      volume.status === 'silent' ||
+      (volume.status === 'ok' && meanVolumeDb < SILENCE_VOLUME_DB)
+    ) {
       return {
         queryDuration: primary.duration,
         bestScore: 0,

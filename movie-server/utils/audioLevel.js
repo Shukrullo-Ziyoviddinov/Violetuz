@@ -11,7 +11,7 @@ const FFMPEG_BIN = process.env.FFMPEG_PATH || 'ffmpeg';
 const MIN_MEAN_VOLUME_DB =
   Number(process.env.FINGERPRINT_MIN_MEAN_VOLUME_DB) || -58;
 
-/** volumedetect ishonchsiz (qisqa clip) */
+/** volumedetect ishonchsiz (qisqa clip / haqiqiy sukunat) */
 const UNRELIABLE_VOLUME_DB = -85;
 
 const parseMeanVolume = (stderr) => {
@@ -19,7 +19,13 @@ const parseMeanVolume = (stderr) => {
   return match ? Number(match[1]) : null;
 };
 
-const measureAudioLevelDb = async (buffer, originalName = 'sample.webm') => {
+/**
+ * @returns {{ status: 'ok'|'silent'|'unknown', db: number|null }}
+ * - ok: o‘lchanishi mumkin bo‘lgan ovoz
+ * - silent: ffmpeg ishladi, lekin deyarli jim (-85 dB dan past)
+ * - unknown: ffmpeg yiqildi yoki parse bo‘lmadi (telefon uploadini rad etmaslik)
+ */
+const measureAudioLevel = async (buffer, originalName = 'sample.webm') => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'violet-vol-'));
   const inputPath = path.join(tmpDir, originalName.replace(/[^\w.-]/g, '_'));
 
@@ -31,13 +37,22 @@ const measureAudioLevelDb = async (buffer, originalName = 'sample.webm') => {
       { timeout: 60_000, maxBuffer: 2 * 1024 * 1024 }
     );
     const db = parseMeanVolume(stderr);
-    if (db == null || db <= UNRELIABLE_VOLUME_DB) return null;
-    return db;
+    if (db == null) return { status: 'unknown', db: null };
+    if (db <= UNRELIABLE_VOLUME_DB) return { status: 'silent', db };
+    return { status: 'ok', db };
   } catch {
-    return null;
+    return { status: 'unknown', db: null };
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
   }
+};
+
+/** Orqaga moslik: faqat raqam yoki null */
+const measureAudioLevelDb = async (buffer, originalName = 'sample.webm') => {
+  const result = await measureAudioLevel(buffer, originalName);
+  if (result.status === 'ok') return result.db;
+  if (result.status === 'silent') return result.db;
+  return null;
 };
 
 const isAudioLevelSufficient = (meanVolumeDb) => {
@@ -47,6 +62,7 @@ const isAudioLevelSufficient = (meanVolumeDb) => {
 
 module.exports = {
   MIN_MEAN_VOLUME_DB,
+  measureAudioLevel,
   measureAudioLevelDb,
   isAudioLevelSufficient,
 };
