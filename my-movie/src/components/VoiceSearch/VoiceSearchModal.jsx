@@ -75,7 +75,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
       return;
     }
     setTaronaMatches(matches || []);
-    setTaronaShowResults(phase === 'done' || (phase === 'error' && !matches?.length));
+    setTaronaShowResults((matches || []).length > 0);
   }, []);
 
   const handleMusicSelect = useCallback(

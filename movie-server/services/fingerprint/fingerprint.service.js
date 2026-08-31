@@ -6,13 +6,18 @@ const http = require('http');
 
 const Music = require('../../models/Music.model');
 const Artist = require('../../models/Artist.model');
-const { compareFingerprintStrings } = require('../../utils/chromaprintCompare');
+const { compareFingerprintStrings, decodeFingerprint } = require('../../utils/chromaprintCompare');
+const { measureAudioLevelDb, isAudioLevelSufficient } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFile, fingerprintFromBuffer } = require('./fpcalcRunner');
 
-// Karnay → mikrofon yozuvi uchun pastroq (0.55 juda qattiq)
-const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.38;
-const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
+// Sukunat ~0.75, shovqin ~0.64, haqiqiy musiqa ~0.94+ ball oladi
+const MATCH_THRESHOLD = Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.82;
+const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 3;
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
+const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 12;
+const AMBIGUOUS_TIE_COUNT = Number(process.env.FINGERPRINT_AMBIGUOUS_TIE_COUNT) || 4;
+const AMBIGUOUS_TIE_MAX_SCORE = Number(process.env.FINGERPRINT_AMBIGUOUS_TIE_MAX_SCORE) || 0.9;
 
 const downloadToFile = (url, destPath) =>
   new Promise((resolve, reject) => {
@@ -146,8 +151,73 @@ const buildArtistNameMap = async (artistIds) => {
   return new Map(artists.map((a) => [a.id, a.name]));
 };
 
+const dedupeCatalogByFingerprint = (tracks) => {
+  const seen = new Set();
+  return tracks.filter((track) => {
+    const fp = String(track.fingerprint || '');
+    if (!fp || seen.has(fp)) return false;
+    seen.add(fp);
+    return true;
+  });
+};
+
+const countNearTopScores = (scored, bestScore, epsilon = 0.015) => {
+  if (!scored.length) return 0;
+  return scored.filter((item) => bestScore - item.score <= epsilon).length;
+};
+
+const pickConfidentMatches = (allScored) => {
+  if (!allScored.length) {
+    return { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
+  }
+
+  const bestScore = allScored[0].score;
+  const secondScore = allScored[1]?.score ?? 0;
+  const tieCount = countNearTopScores(allScored, bestScore);
+
+  if (bestScore < MATCH_THRESHOLD) {
+    return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
+  }
+
+  if (tieCount >= AMBIGUOUS_TIE_COUNT && bestScore < AMBIGUOUS_TIE_MAX_SCORE) {
+    return { matches: [], bestScore, rejectedReason: 'ambiguous_match' };
+  }
+
+  if (bestScore - secondScore < MIN_SCORE_GAP && bestScore < 0.95) {
+    return { matches: [], bestScore, rejectedReason: 'ambiguous_match' };
+  }
+
+  const matches = allScored
+    .filter((item) => item.score >= MATCH_THRESHOLD)
+    .slice(0, MATCH_LIMIT);
+
+  return { matches, bestScore, rejectedReason: null };
+};
+
 const identifyFromAudioBuffer = async (buffer, originalName) => {
+  const meanVolumeDb = await measureAudioLevelDb(buffer, originalName);
+  if (!isAudioLevelSufficient(meanVolumeDb)) {
+    return {
+      queryDuration: 0,
+      bestScore: 0,
+      meanVolumeDb,
+      rejectedReason: 'audio_too_quiet',
+      matches: [],
+    };
+  }
+
   const queryFp = await fingerprintFromBuffer(buffer, originalName);
+  const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
+
+  if (queryFrames < MIN_QUERY_FRAMES) {
+    return {
+      queryDuration: queryFp.duration,
+      bestScore: 0,
+      meanVolumeDb,
+      rejectedReason: 'audio_too_short',
+      matches: [],
+    };
+  }
 
   const catalog = await Music.find({
     fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
@@ -155,22 +225,25 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
     .lean();
 
-  const allScored = catalog
+  const uniqueCatalog = dedupeCatalogByFingerprint(catalog);
+
+  const allScored = uniqueCatalog
     .map((track) => ({
       track,
       score: compareFingerprintStrings(queryFp.fingerprint, track.fingerprint),
     }))
     .sort((a, b) => b.score - a.score);
 
-  const scored = allScored.filter((item) => item.score >= MATCH_THRESHOLD).slice(0, MATCH_LIMIT);
-  const bestScore = allScored[0]?.score ?? 0;
+  const { matches: confident, bestScore, rejectedReason } = pickConfidentMatches(allScored);
 
-  const artistMap = await buildArtistNameMap(scored.map((s) => s.track.artistId));
+  const artistMap = await buildArtistNameMap(confident.map((s) => s.track.artistId));
 
   return {
     queryDuration: queryFp.duration,
+    meanVolumeDb,
     bestScore: Math.round(bestScore * 1000) / 1000,
-    matches: scored.map(({ track, score }) => ({
+    rejectedReason,
+    matches: confident.map(({ track, score }) => ({
       id: track.id,
       title: track.title,
       artistId: track.artistId,
@@ -183,6 +256,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
 
 module.exports = {
   MATCH_THRESHOLD,
+  MIN_SCORE_GAP,
   generateFingerprintForMusic,
   upsertMusicFingerprint,
   generateAllFingerprints,
