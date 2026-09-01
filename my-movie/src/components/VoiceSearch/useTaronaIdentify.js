@@ -7,7 +7,12 @@ const PHASE_PROCESSING = 'processing';
 const PHASE_DONE = 'done';
 const PHASE_ERROR = 'error';
 
-/** Server allaqachon filtrlagan — qo‘shimcha score cheklov yo‘q */
+/** Server bilan bir xil — shovqin false positive oldini olish */
+const MIN_CLIENT_MATCH_SCORE = 0.68;
+
+const isConfidentMatch = (matches, meta) =>
+  Boolean(matches?.length) && Number(meta?.bestScore) >= MIN_CLIENT_MATCH_SCORE;
+
 const useTaronaIdentify = () => {
   const [phase, setPhase] = useState(PHASE_IDLE);
   const [matches, setMatches] = useState([]);
@@ -29,10 +34,6 @@ const useTaronaIdentify = () => {
     setProbing(false);
   }, []);
 
-  /**
-   * Tinglash davomida: topilsa true, topilmasa false (tinglash davom etadi).
-   * Parallel probelar bloklanadi.
-   */
   const probe = useCallback(async (audioBlob) => {
     if (matchedRef.current) return true;
     if (probeInFlightRef.current) return false;
@@ -45,7 +46,7 @@ const useTaronaIdentify = () => {
       const { matches: found, meta } = await identifyMusicFromAudio(audioBlob);
       setLastMeta(meta);
 
-      if (found?.length) {
+      if (isConfidentMatch(found, meta)) {
         matchedRef.current = true;
         setMatches(found);
         setRejectReason(null);
@@ -55,7 +56,6 @@ const useTaronaIdentify = () => {
       }
       return false;
     } catch {
-      // Tarmoq xatosida tinglashni to‘xtatmaymiz — keyingi probe urinib ko‘radi
       return false;
     } finally {
       probeInFlightRef.current = false;
@@ -63,9 +63,17 @@ const useTaronaIdentify = () => {
     }
   }, []);
 
-  /** Max vaqt tugaganda yoki foydalanuvchi to‘xtatganda — oxirgi urinish */
-  const finalize = useCallback(async (audioBlob) => {
+  const finalize = useCallback(async (audioBlob, { reason: localReason } = {}) => {
     if (matchedRef.current) return;
+
+    if (localReason === 'no-audio-detected') {
+      setMatches([]);
+      setRejectReason('audio_too_quiet');
+      setLastMeta(null);
+      setError(null);
+      setPhase(PHASE_DONE);
+      return;
+    }
 
     if (!audioBlob?.size || audioBlob.size < 8000) {
       setError({ message: 'empty-audio' });
@@ -82,10 +90,16 @@ const useTaronaIdentify = () => {
 
     try {
       const { matches: found, meta } = await identifyMusicFromAudio(audioBlob);
-      setMatches(found);
       setLastMeta(meta);
-      setRejectReason(found.length ? null : meta?.rejectedReason || 'no_confident_match');
-      if (found.length) matchedRef.current = true;
+
+      if (isConfidentMatch(found, meta)) {
+        setMatches(found);
+        setRejectReason(null);
+        matchedRef.current = true;
+      } else {
+        setMatches([]);
+        setRejectReason(meta?.rejectedReason || 'no_confident_match');
+      }
       setPhase(PHASE_DONE);
     } catch (err) {
       const msg = String(err?.message || '');
@@ -101,7 +115,6 @@ const useTaronaIdentify = () => {
     }
   }, []);
 
-  /** Orqaga moslik */
   const identify = finalize;
 
   return {

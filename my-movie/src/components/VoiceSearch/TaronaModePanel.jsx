@@ -7,10 +7,11 @@ import { getTaronaHintDefaults, getTaronaHintKey } from './taronaMessages';
 const VIS_BARS = [18, 32, 48, 28, 56, 36, 44, 24];
 
 const MAX_LISTEN_MS = 40_000;
-const FIRST_PROBE_MS = 4_000;
+const FIRST_PROBE_MS = 6_000;
 const PROBE_EVERY_MS = 3_500;
-/** Musiqa bo‘lmasa probe yubormaslik */
-const MIN_PROBE_MIC_LEVEL = 0.06;
+/** Oddiy shovqin emas, haqiqiy musiqa signal (speaker) */
+const MIN_PROBE_MIC_LEVEL = 0.1;
+const MIN_FINALIZE_MIC_LEVEL = 0.09;
 
 const TaronaModePanel = ({ isOpen, onResults, onProcessingChange, hideCenterHint = false }) => {
   const { t } = useTranslation();
@@ -50,6 +51,13 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange, hideCenterHint
     async (blob) => {
       if (matchedRef.current || finalizeStartedRef.current) return;
       finalizeStartedRef.current = true;
+
+      if (peakMicRef.current < MIN_FINALIZE_MIC_LEVEL) {
+        await finalize(null, { reason: 'no-audio-detected' });
+        finalizeStartedRef.current = false;
+        return;
+      }
+
       await finalize(blob);
       finalizeStartedRef.current = false;
     },

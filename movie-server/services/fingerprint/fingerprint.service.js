@@ -22,14 +22,16 @@ const MIN_WINDOWS_FOR_CATALOG = 6;
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
 // Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.66, 0.58, 0.7);
+const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.68, 0.64, 0.72);
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.03;
-const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.65, 0.8);
-const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.55, 0.66);
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
+const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.72, 0.68, 0.82);
+const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.65, 0.6, 0.67);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
-/** Speaker musiqa odatda shundan balandroq */
-const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -52;
+/** Baland speaker — shundan past xona shovqini/mikrofon fon */
+const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -48;
+/** Xona shovqini zonasida minimal ball (false positive oldini olish) */
+const AMBIENT_MIN_SCORE = clamp(Number(process.env.FINGERPRINT_AMBIENT_MIN_SCORE) || 0.69, 0.66, 0.75);
 // Erta probe (~4s) uchun 5s emas — 3s yetarli
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 3;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
@@ -241,25 +243,31 @@ const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
 
   const volumeKnown = meanVolumeDb != null && Number.isFinite(meanVolumeDb);
   const isLoudMusic = volumeKnown && meanVolumeDb >= LOUD_MUSIC_VOLUME_DB;
-  const isQuietAmbient =
+  const isAmbientZone =
     volumeKnown &&
     meanVolumeDb > SILENCE_VOLUME_DB &&
     meanVolumeDb < LOUD_MUSIC_VOLUME_DB;
 
   const strong = bestScore >= STRONG_MATCH_SCORE;
-  const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
+  const clearWinner =
+    volumeKnown && bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
 
-  // Faqat o'lchangan baland speaker (unknown volume bu yo'ldan o'tmaydi — false positive kam)
-  const loudMusicOk =
-    isLoudMusic && bestScore >= 0.63 && gap >= 0.035;
+  const loudMusicOk = isLoudMusic && bestScore >= 0.68 && gap >= 0.04;
 
-  // Telefon mikrofoni / past ovoz
   const quietMusicOk =
-    isQuietAmbient &&
-    (bestScore >= 0.72 || (bestScore >= 0.68 && gap >= 0.05));
+    isAmbientZone &&
+    (bestScore >= 0.74 || (bestScore >= 0.7 && gap >= 0.06));
 
-  // Volume unknown: clearWinner (0.66+) yoki strong — telefon uchun asosiy yo'l
-  const accepted = strong || clearWinner || loudMusicOk || quietMusicOk;
+  const unknownVolumeOk =
+    !volumeKnown &&
+    (strong || (bestScore >= 0.72 && gap >= 0.05));
+
+  let accepted = strong || clearWinner || loudMusicOk || quietMusicOk || unknownVolumeOk;
+
+  // Xona shovqini / mikrofon fon — past ball bilan hech qachon qabul qilmaslik
+  if (accepted && isAmbientZone && bestScore < AMBIENT_MIN_SCORE) {
+    accepted = false;
+  }
 
   if (!accepted) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
@@ -348,7 +356,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
         bestResult = result;
         queryDuration = queryFp.duration;
       }
-      if (result.matches.length) break;
+      if (result.matches.length && result.bestScore >= STRONG_MATCH_SCORE) break;
     }
 
     const { matches: confident, bestScore, rejectedReason } = bestResult;
