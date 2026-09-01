@@ -14,14 +14,14 @@ const { fingerprintFromFile, fingerprintFromBufferMulti } = require('./fpcalcRun
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
 // Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.68, 0.6, 0.72);
+const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.66, 0.58, 0.7);
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
-const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.72, 0.68, 0.82);
-const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.64, 0.55, 0.66);
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.03;
+const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.65, 0.8);
+const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.55, 0.66);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
-/** Musiqa bo‘lishi uchun minimal balandlik (mikrofon shovqini ~-55, speaker musiqa ~-45 dan yuqori) */
-const MIN_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_MIN_MUSIC_VOLUME_DB) || -52;
+/** Speaker musiqa odatda shundan balandroq (-46 dan yuqori) */
+const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -46;
 // Erta probe (~4s) uchun 5s emas — 3s yetarli
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 3;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
@@ -169,7 +169,7 @@ const groupCatalogByFingerprint = (tracks) => {
   return groups;
 };
 
-const pickConfidentMatches = (fpScored) => {
+const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
   if (!fpScored.length) {
     return { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
   }
@@ -178,18 +178,31 @@ const pickConfidentMatches = (fpScored) => {
   const secondScore = fpScored[1]?.score ?? 0;
   const gap = bestScore - secondScore;
 
-  // Shovqin: barcha guruhlar ~0.62 atrofida
   if (bestScore <= NOISE_CEILING) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
-  // Kuchli moslik — gap shart emas
   const strong = bestScore >= STRONG_MATCH_SCORE;
-
-  // O‘rtacha: threshold + aniq g‘alaba (shovqin/jimlikda gap kichik)
   const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
+  const wideGap = bestScore >= 0.64 && gap >= 0.05;
 
-  if (!strong && !clearWinner) {
+  // Baland speaker musiqa — yumshoqroq (telefon mikrofoni)
+  const loudSource =
+    meanVolumeDb == null || meanVolumeDb >= LOUD_MUSIC_VOLUME_DB;
+  const loudMusicOk =
+    loudSource && bestScore >= 0.65 && (strong || gap >= 0.02);
+
+  // Past ovoz (xona shovqini) — qattiqroq
+  const quietSource =
+    meanVolumeDb != null && meanVolumeDb < LOUD_MUSIC_VOLUME_DB;
+  const quietOk =
+    quietSource &&
+    (bestScore >= 0.72 || (bestScore >= 0.68 && gap >= 0.05));
+
+  const accepted =
+    strong || clearWinner || wideGap || loudMusicOk || quietOk;
+
+  if (!accepted) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
@@ -212,7 +225,7 @@ const pickConfidentMatches = (fpScored) => {
   };
 };
 
-const scoreCatalog = (queryFingerprint, catalog) => {
+const scoreCatalog = (queryFingerprint, catalog, meanVolumeDb = null) => {
   const fpGroups = groupCatalogByFingerprint(catalog);
 
   const fpScored = [...fpGroups.entries()]
@@ -223,7 +236,7 @@ const scoreCatalog = (queryFingerprint, catalog) => {
     }))
     .sort((a, b) => b.score - a.score);
 
-  return pickConfidentMatches(fpScored);
+  return pickConfidentMatches(fpScored, meanVolumeDb);
 };
 
 const identifyFromAudioBuffer = async (buffer, originalName) => {
@@ -258,15 +271,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     }
 
     // Mikrofon shovqini / xona ovozi — musiqa emas
-    if (volume.status === 'ok' && meanVolumeDb < MIN_MUSIC_VOLUME_DB) {
-      return {
-        queryDuration: primary.duration,
-        bestScore: 0,
-        meanVolumeDb,
-        rejectedReason: 'audio_too_quiet',
-        matches: [],
-      };
-    }
+    // (volume-aware matching pickConfidentMatches ichida hal qilinadi)
 
     const catalog = await Music.find({
       fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
@@ -281,7 +286,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
       if (queryFrames < MIN_QUERY_FRAMES) continue;
 
-      const result = scoreCatalog(queryFp.fingerprint, catalog);
+      const result = scoreCatalog(queryFp.fingerprint, catalog, meanVolumeDb);
       if (result.bestScore > bestResult.bestScore) {
         bestResult = result;
         queryDuration = queryFp.duration;

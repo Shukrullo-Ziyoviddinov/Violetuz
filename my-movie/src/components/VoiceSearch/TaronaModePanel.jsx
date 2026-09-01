@@ -10,7 +10,7 @@ const MAX_LISTEN_MS = 40_000;
 const FIRST_PROBE_MS = 4_000;
 const PROBE_EVERY_MS = 3_500;
 /** Musiqa bo‘lmasa mikrofon shovqini — probe yubormaslik */
-const MIN_PROBE_MIC_LEVEL = 0.1;
+const MIN_PROBE_MIC_LEVEL = 0.06;
 
 const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
   const { t } = useTranslation();
