@@ -14,12 +14,14 @@ const { fingerprintFromFile, fingerprintFromBufferMulti } = require('./fpcalcRun
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
 // Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.65, 0.55, 0.7);
+const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.68, 0.6, 0.72);
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.03;
-const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.65, 0.8);
-const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.5, 0.66);
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
+const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.72, 0.68, 0.82);
+const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.64, 0.55, 0.66);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
+/** Musiqa bo‘lishi uchun minimal balandlik (mikrofon shovqini ~-55, speaker musiqa ~-45 dan yuqori) */
+const MIN_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_MIN_MUSIC_VOLUME_DB) || -52;
 // Erta probe (~4s) uchun 5s emas — 3s yetarli
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 3;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
@@ -184,13 +186,10 @@ const pickConfidentMatches = (fpScored) => {
   // Kuchli moslik — gap shart emas
   const strong = bestScore >= STRONG_MATCH_SCORE;
 
-  // O‘rtacha: threshold + gap (4 ta unique fp o‘xshash ball berishi mumkin)
+  // O‘rtacha: threshold + aniq g‘alaba (shovqin/jimlikda gap kichik)
   const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
 
-  // Telefon: threshold yetarli — volume jimlikni ushlaydi, gap shart emas
-  const phoneOk = bestScore >= MATCH_THRESHOLD;
-
-  if (!strong && !clearWinner && !phoneOk) {
+  if (!strong && !clearWinner) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
@@ -249,6 +248,17 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       volume.status === 'silent' ||
       (volume.status === 'ok' && meanVolumeDb < SILENCE_VOLUME_DB)
     ) {
+      return {
+        queryDuration: primary.duration,
+        bestScore: 0,
+        meanVolumeDb,
+        rejectedReason: 'audio_too_quiet',
+        matches: [],
+      };
+    }
+
+    // Mikrofon shovqini / xona ovozi — musiqa emas
+    if (volume.status === 'ok' && meanVolumeDb < MIN_MUSIC_VOLUME_DB) {
       return {
         queryDuration: primary.duration,
         bestScore: 0,

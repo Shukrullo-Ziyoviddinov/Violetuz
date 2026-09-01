@@ -9,10 +9,13 @@ const VIS_BARS = [18, 32, 48, 28, 56, 36, 44, 24];
 const MAX_LISTEN_MS = 40_000;
 const FIRST_PROBE_MS = 4_000;
 const PROBE_EVERY_MS = 3_500;
+/** Musiqa bo‘lmasa mikrofon shovqini — probe yubormaslik */
+const MIN_PROBE_MIC_LEVEL = 0.1;
 
 const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
   const { t } = useTranslation();
   const finalizeStartedRef = useRef(false);
+  const peakMicRef = useRef(0);
 
   const {
     phase,
@@ -33,9 +36,10 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
   const handleSnapshot = useCallback(
     async (blob) => {
       if (!blob || matchedRef.current) return;
+      // Faqat aniq ovoz eshitilganda serverga yuboramiz (shunchaki tinglash = false positive)
+      if (peakMicRef.current < MIN_PROBE_MIC_LEVEL) return;
       const found = await probe(blob);
       if (found) {
-        // Natija topildi — 40s kutmasdan yozuvni to‘xtatamiz
         stopRef.current?.({ skipComplete: true });
       }
     },
@@ -66,6 +70,7 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
 
   const stopRef = useRef(stop);
   stopRef.current = stop;
+  peakMicRef.current = peakMicLevel;
 
   const processing = phase === PHASE_PROCESSING;
   const showVisualizer = recording || processing || probing;

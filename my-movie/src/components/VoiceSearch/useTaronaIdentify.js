@@ -7,6 +7,9 @@ const PHASE_PROCESSING = 'processing';
 const PHASE_DONE = 'done';
 const PHASE_ERROR = 'error';
 
+/** Probe (tinglash davomida) — faqat ishonchli natija qabul qilinadi */
+export const TARONA_PROBE_MIN_SCORE = 0.72;
+
 const useTaronaIdentify = () => {
   const [phase, setPhase] = useState(PHASE_IDLE);
   const [matches, setMatches] = useState([]);
@@ -44,7 +47,7 @@ const useTaronaIdentify = () => {
       const { matches: found, meta } = await identifyMusicFromAudio(audioBlob);
       setLastMeta(meta);
 
-      if (found?.length) {
+      if (found?.length && (meta?.bestScore ?? 0) >= TARONA_PROBE_MIN_SCORE) {
         matchedRef.current = true;
         setMatches(found);
         setRejectReason(null);
