@@ -26,9 +26,11 @@ const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) ||
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
 const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.03;
 const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.65, 0.8);
-const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.55, 0.66);
+const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.62, 0.58, 0.65);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
-const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 5;
+/** 0.62–0.66 oralig'ida qabul uchun minimal gap (shovqin 0.625/gap~0.03 ni rad etadi) */
+const MARGINAL_MIN_GAP = Number(process.env.FINGERPRINT_MARGINAL_MIN_GAP) || 0.042;
+const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 4;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
 
 const downloadToFile = (url, destPath) =>
@@ -225,7 +227,7 @@ const scoreCatalog = (queryFingerprint, catalog) => {
 
 const pickConfidentMatches = (fpScored) => {
   if (!fpScored.length) {
-    return { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
+    return { matches: [], bestScore: 0, gap: 0, rejectedReason: 'no_confident_match' };
   }
 
   const bestScore = fpScored[0].score;
@@ -233,19 +235,24 @@ const pickConfidentMatches = (fpScored) => {
   const gap = bestScore - secondScore;
 
   if (bestScore <= NOISE_CEILING) {
-    return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
+    return { matches: [], bestScore, gap, rejectedReason: 'no_confident_match' };
   }
 
   const strong = bestScore >= STRONG_MATCH_SCORE;
-  const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
-  const phoneOk = bestScore >= MATCH_THRESHOLD;
+  const phoneOk = bestScore >= 0.68;
+  const standardOk = bestScore >= MATCH_THRESHOLD && gap >= 0.04;
+  const phoneMarginal =
+    bestScore >= 0.62 &&
+    bestScore < MATCH_THRESHOLD &&
+    gap >= MARGINAL_MIN_GAP;
 
-  if (!strong && !clearWinner && !phoneOk) {
-    return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
+  if (!strong && !phoneOk && !standardOk && !phoneMarginal) {
+    return { matches: [], bestScore, gap, rejectedReason: 'no_confident_match' };
   }
 
   const minAccepted = Math.max(NOISE_CEILING + 0.01, bestScore - 0.03);
-  const winningGroups = fpScored.filter((item) => item.score >= minAccepted);
+  const scoreFloor = Math.min(minAccepted, bestScore);
+  const winningGroups = fpScored.filter((item) => item.score >= scoreFloor);
 
   const expanded = [];
   for (const group of winningGroups) {
@@ -259,6 +266,7 @@ const pickConfidentMatches = (fpScored) => {
   return {
     matches: expanded.slice(0, MATCH_LIMIT),
     bestScore,
+    gap,
     rejectedReason: null,
   };
 };
@@ -315,7 +323,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
 
     const durationByAudio = buildAudioDurationMap(catalog);
 
-    let bestResult = { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
+    let bestResult = { matches: [], bestScore: 0, gap: 0, rejectedReason: 'no_confident_match' };
     let queryDuration = primary.duration;
 
     for (const queryFp of queryFingerprints) {
@@ -323,14 +331,24 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       if (queryFrames < MIN_QUERY_FRAMES) continue;
 
       const result = scoreCatalog(queryFp.fingerprint, catalog);
-      if (result.bestScore > bestResult.bestScore) {
+      if (result.matches.length) {
+        if (
+          !bestResult.matches.length ||
+          result.bestScore > bestResult.bestScore
+        ) {
+          bestResult = result;
+          queryDuration = queryFp.duration;
+        }
+      } else if (
+        !bestResult.matches.length &&
+        result.bestScore > bestResult.bestScore
+      ) {
         bestResult = result;
         queryDuration = queryFp.duration;
       }
-      if (result.matches.length) break;
     }
 
-    const { matches: confident, bestScore, rejectedReason } = bestResult;
+    const { matches: confident, bestScore, gap, rejectedReason } = bestResult;
 
     const artistMap = await buildArtistNameMap(confident.map((s) => s.track.artistId));
 
@@ -338,6 +356,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       queryDuration,
       meanVolumeDb,
       bestScore: Math.round(bestScore * 1000) / 1000,
+      scoreGap: Math.round((gap || 0) * 1000) / 1000,
       rejectedReason,
       matches: confident.map(({ track, score }) => ({
         id: track.id,

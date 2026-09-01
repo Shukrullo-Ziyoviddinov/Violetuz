@@ -17,6 +17,7 @@ const identifyMusic = async (req, res) => {
     meta: {
       queryDuration: result.queryDuration,
       bestScore: result.bestScore,
+      scoreGap: result.scoreGap,
       meanVolumeDb: result.meanVolumeDb,
       rejectedReason: result.rejectedReason,
       threshold: fingerprintService.MATCH_THRESHOLD,
