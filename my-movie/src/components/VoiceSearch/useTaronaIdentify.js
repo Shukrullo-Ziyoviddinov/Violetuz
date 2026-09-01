@@ -7,8 +7,8 @@ const PHASE_PROCESSING = 'processing';
 const PHASE_DONE = 'done';
 const PHASE_ERROR = 'error';
 
-/** Server bilan bir xil — shovqin false positive oldini olish */
-const MIN_CLIENT_MATCH_SCORE = 0.68;
+/** Server qabul qilgan match — client faqat aniq past ballni rad etadi */
+const MIN_CLIENT_MATCH_SCORE = 0.66;
 
 const isConfidentMatch = (matches, meta) =>
   Boolean(matches?.length) && Number(meta?.bestScore) >= MIN_CLIENT_MATCH_SCORE;

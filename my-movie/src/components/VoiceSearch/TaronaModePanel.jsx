@@ -7,11 +7,11 @@ import { getTaronaHintDefaults, getTaronaHintKey } from './taronaMessages';
 const VIS_BARS = [18, 32, 48, 28, 56, 36, 44, 24];
 
 const MAX_LISTEN_MS = 40_000;
-const FIRST_PROBE_MS = 6_000;
-const PROBE_EVERY_MS = 3_500;
-/** Oddiy shovqin emas, haqiqiy musiqa signal (speaker) */
-const MIN_PROBE_MIC_LEVEL = 0.1;
-const MIN_FINALIZE_MIC_LEVEL = 0.09;
+const FIRST_PROBE_MS = 4_500;
+const PROBE_EVERY_MS = 3_000;
+/** Musiqa signal — shovqindan yuqori, lekin telefon uchun yetarli past */
+const MIN_PROBE_MIC_LEVEL = 0.07;
+const MIN_FINALIZE_MIC_LEVEL = 0.06;
 
 const TaronaModePanel = ({ isOpen, onResults, onProcessingChange, hideCenterHint = false }) => {
   const { t } = useTranslation();
