@@ -22,17 +22,13 @@ const MIN_WINDOWS_FOR_CATALOG = 6;
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
 // Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.66, 0.62, 0.7);
+const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.66, 0.58, 0.7);
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
 const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.03;
-const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.66, 0.8);
-const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.64, 0.6, 0.66);
+const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.65, 0.8);
+const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.55, 0.66);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
-const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -52;
-/** 0.64–0.66 oralig'i — faqat katta gap */
-const NOISE_BAND_MIN_GAP = Number(process.env.FINGERPRINT_NOISE_BAND_MIN_GAP) || 0.065;
-// Erta probe (~4s) uchun 5s emas — 3s yetarli
-const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 3;
+const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 5;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
 
 const downloadToFile = (url, destPath) =>
@@ -211,7 +207,7 @@ const groupCatalogByAudio = (tracks) => {
   return groups;
 };
 
-const scoreCatalog = (queryFingerprint, catalog, meanVolumeDb = null) => {
+const scoreCatalog = (queryFingerprint, catalog) => {
   const audioGroups = groupCatalogByAudio(catalog);
 
   const fpScored = [...audioGroups.values()]
@@ -224,10 +220,10 @@ const scoreCatalog = (queryFingerprint, catalog, meanVolumeDb = null) => {
     })
     .sort((a, b) => b.score - a.score);
 
-  return pickConfidentMatches(fpScored, meanVolumeDb);
+  return pickConfidentMatches(fpScored);
 };
 
-const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
+const pickConfidentMatches = (fpScored) => {
   if (!fpScored.length) {
     return { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
   }
@@ -240,32 +236,11 @@ const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
-  const volumeKnown = meanVolumeDb != null && Number.isFinite(meanVolumeDb);
-
   const strong = bestScore >= STRONG_MATCH_SCORE;
+  const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
+  const phoneOk = bestScore >= MATCH_THRESHOLD;
 
-  // Telefon / speaker musiqa (asosiy yo'l) — 0.68+
-  const musicOk = bestScore >= 0.68 && gap >= 0.035;
-
-  // 0.66–0.68: faqat past telefon signali (baland shovqin emas)
-  const marginalOk =
-    volumeKnown &&
-    meanVolumeDb < LOUD_MUSIC_VOLUME_DB &&
-    bestScore >= MATCH_THRESHOLD &&
-    bestScore < 0.68 &&
-    gap >= 0.05;
-
-  // Shovqin oralig'i: 0.64–0.66 faqat juda katta gap
-  const noiseBandOk =
-    bestScore > NOISE_CEILING &&
-    bestScore < MATCH_THRESHOLD &&
-    gap >= NOISE_BAND_MIN_GAP;
-
-  const unknownVolumeOk = !volumeKnown && (strong || musicOk || marginalOk);
-
-  const accepted = strong || musicOk || marginalOk || noiseBandOk || unknownVolumeOk;
-
-  if (!accepted) {
+  if (!strong && !clearWinner && !phoneOk) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
@@ -347,23 +322,12 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
       const queryFrames = decodeFingerprint(queryFp.fingerprint).length;
       if (queryFrames < MIN_QUERY_FRAMES) continue;
 
-      const result = scoreCatalog(queryFp.fingerprint, catalog, meanVolumeDb);
-      if (result.matches.length) {
-        if (
-          !bestResult.matches.length ||
-          result.bestScore > bestResult.bestScore
-        ) {
-          bestResult = result;
-          queryDuration = queryFp.duration;
-        }
-      } else if (
-        !bestResult.matches.length &&
-        result.bestScore > bestResult.bestScore
-      ) {
+      const result = scoreCatalog(queryFp.fingerprint, catalog);
+      if (result.bestScore > bestResult.bestScore) {
         bestResult = result;
         queryDuration = queryFp.duration;
       }
-      if (result.matches.length && result.bestScore >= STRONG_MATCH_SCORE) break;
+      if (result.matches.length) break;
     }
 
     const { matches: confident, bestScore, rejectedReason } = bestResult;
