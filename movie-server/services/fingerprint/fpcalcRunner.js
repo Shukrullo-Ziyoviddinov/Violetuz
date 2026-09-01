@@ -51,7 +51,7 @@ const fingerprintFromFile = async (filePath, options = {}) => {
   return runFpcalc(filePath, options);
 };
 
-const DEFAULT_WINDOW_OFFSETS_SEC = [0, 30, 60, 90];
+const DEFAULT_WINDOW_OFFSETS_SEC = [0, 25, 50, 75, 100, 125];
 const DEFAULT_WINDOW_CLIP_SEC = 45;
 
 const sliceToWav = async (inputPath, outputPath, { offsetSec = 0, durationSec = 45 } = {}) => {

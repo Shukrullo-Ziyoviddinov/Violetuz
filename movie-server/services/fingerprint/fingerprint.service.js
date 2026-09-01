@@ -11,7 +11,7 @@ const { measureAudioLevel } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFileMultiWindow, fingerprintFromBufferMulti } = require('./fpcalcRunner');
 
-const MIN_WINDOWS_FOR_CATALOG = 3;
+const MIN_WINDOWS_FOR_CATALOG = 6;
 
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
 // Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
