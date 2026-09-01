@@ -305,7 +305,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     const catalog = await Music.find({
       fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
     })
-      .select({ id: 1, title: 1, artistId: 1, img: 1, audio: 1, fingerprint: 1, fingerprintWindows: 1 })
+      .select({ id: 1, title: 1, artistId: 1, img: 1, audio: 1, fingerprint: 1, fingerprintWindows: 1, fingerprintDuration: 1 })
       .lean();
 
     let bestResult = { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
@@ -338,6 +338,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
         artistId: track.artistId,
         artistName: artistMap.get(track.artistId) || track.artistId,
         img: track.img || '',
+        durationSec: track.fingerprintDuration ?? null,
         score: Math.round(score * 1000) / 1000,
       })),
     };

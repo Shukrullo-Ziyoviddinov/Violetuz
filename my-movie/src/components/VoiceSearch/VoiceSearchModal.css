@@ -106,29 +106,8 @@
 }
 
 .voice-search-modal-body--tarona-results .tarona-mode-bottom {
-  position: relative;
-  z-index: 2;
   flex-shrink: 0;
   padding-top: 0.75rem;
-}
-
-/* Kartochkalar scroll — pastki blok ustida tarona rangidagi soya */
-.voice-search-modal-body--tarona-results .tarona-mode-bottom::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  height: 2.75rem;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(36, 0, 70, 0) 0%,
-    rgba(58, 12, 163, 0.28) 35%,
-    rgba(36, 0, 70, 0.72) 70%,
-    #240046 100%
-  );
-  box-shadow: 0 -10px 28px rgba(36, 0, 70, 0.45);
 }
 
 /* --- Ovoz / Tarona toggle --- */
@@ -337,11 +316,13 @@
 .tarona-results-text {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.12rem;
   min-width: 0;
+  flex: 1;
 }
 
 .tarona-results-title {
+  display: block;
   font-size: 0.98rem;
   font-weight: 600;
   white-space: nowrap;
@@ -350,11 +331,20 @@
 }
 
 .tarona-results-artist {
+  display: block;
   font-size: 0.84rem;
   color: rgba(255, 255, 255, 0.78);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.tarona-results-duration {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.62);
+  white-space: nowrap;
 }
 
 @keyframes tarona-glow-pulse {
