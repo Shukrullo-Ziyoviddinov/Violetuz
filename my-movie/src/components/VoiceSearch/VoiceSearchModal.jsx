@@ -204,20 +204,27 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
       </div>
 
       {isTarona && taronaShowResults ? (
-        <TaronaResults matches={taronaMatches} onSelect={handleMusicSelect} />
-      ) : null}
-
-      <div className="voice-search-modal-body">
-        {isTarona ? (
-          <TaronaModePanel isOpen={isOpen && !exiting} onResults={handleTaronaResults} />
-        ) : (
-          <VoiceModePanel
+        <div className="voice-search-modal-body voice-search-modal-body--tarona-results">
+          <TaronaResults matches={taronaMatches} onSelect={handleMusicSelect} />
+          <TaronaModePanel
             isOpen={isOpen && !exiting}
-            onResult={handleVoiceResult}
-            onFatalError={dismissWithSlide}
+            onResults={handleTaronaResults}
+            hideCenterHint
           />
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="voice-search-modal-body">
+          {isTarona ? (
+            <TaronaModePanel isOpen={isOpen && !exiting} onResults={handleTaronaResults} />
+          ) : (
+            <VoiceModePanel
+              isOpen={isOpen && !exiting}
+              onResult={handleVoiceResult}
+              onFatalError={dismissWithSlide}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

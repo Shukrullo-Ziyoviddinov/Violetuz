@@ -12,7 +12,7 @@ const PROBE_EVERY_MS = 3_500;
 /** Musiqa bo‘lmasa mikrofon shovqini — probe yubormaslik */
 const MIN_PROBE_MIC_LEVEL = 0.06;
 
-const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
+const TaronaModePanel = ({ isOpen, onResults, onProcessingChange, hideCenterHint = false }) => {
   const { t } = useTranslation();
   const finalizeStartedRef = useRef(false);
   const peakMicRef = useRef(0);
@@ -162,9 +162,11 @@ const TaronaModePanel = ({ isOpen, onResults, onProcessingChange }) => {
 
   return (
     <>
-      <div className="tarona-mode-center">
-        <p className="tarona-mode-hint">{hint}</p>
-      </div>
+      {!hideCenterHint ? (
+        <div className="tarona-mode-center">
+          <p className="tarona-mode-hint">{hint}</p>
+        </div>
+      ) : null}
 
       <div className="tarona-mode-bottom">
         <button
