@@ -72,6 +72,17 @@ const musicSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    /** Qo‘shiq bo‘ylab bir nechta oyna (intro/chorus) — identify uchun */
+    fingerprintWindows: {
+      type: [
+        {
+          offsetSec: { type: Number, default: 0 },
+          fingerprint: { type: String, default: '' },
+          duration: { type: Number, default: null },
+        },
+      ],
+      default: [],
+    },
   },
   {
     strict: true,

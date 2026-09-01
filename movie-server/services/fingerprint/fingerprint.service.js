@@ -9,7 +9,9 @@ const Artist = require('../../models/Artist.model');
 const { compareFingerprintStrings, decodeFingerprint } = require('../../utils/chromaprintCompare');
 const { measureAudioLevel } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
-const { fingerprintFromFile, fingerprintFromBufferMulti } = require('./fpcalcRunner');
+const { fingerprintFromFileMultiWindow, fingerprintFromBufferMulti } = require('./fpcalcRunner');
+
+const MIN_WINDOWS_FOR_CATALOG = 3;
 
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
 // Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
@@ -21,7 +23,7 @@ const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCO
 const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.55, 0.66);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
 /** Speaker musiqa odatda shundan balandroq (-46 dan yuqori) */
-const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -46;
+const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -52;
 // Erta probe (~4s) uchun 5s emas — 3s yetarli
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 3;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
@@ -85,7 +87,7 @@ const generateFingerprintForMusic = async (musicDoc) => {
   if (!source) return null;
 
   try {
-    const result = await fingerprintFromFile(source.path);
+    const result = await fingerprintFromFileMultiWindow(source.path);
     return result;
   } finally {
     await cleanupSource(source);
@@ -109,11 +111,16 @@ const upsertMusicFingerprint = async (musicId) => {
       $set: {
         fingerprint: fp.fingerprint,
         fingerprintDuration: fp.duration,
+        fingerprintWindows: Array.isArray(fp.windows) ? fp.windows : [],
       },
     }
   );
 
-  return { id: musicId, duration: fp.duration };
+  return {
+    id: musicId,
+    duration: fp.duration,
+    windows: fp.windows?.length || 0,
+  };
 };
 
 const generateAllFingerprints = async ({ onlyMissing = true } = {}) => {
@@ -121,8 +128,10 @@ const generateAllFingerprints = async ({ onlyMissing = true } = {}) => {
     $or: [
       { fingerprint: '' },
       { fingerprint: { $exists: false } },
-      // Eski compressed format (AQAD...) — raw JSON array emas
       { fingerprint: { $not: /^\[/ } },
+      { fingerprintWindows: { $exists: false } },
+      { fingerprintWindows: { $size: 0 } },
+      { [`fingerprintWindows.${MIN_WINDOWS_FOR_CATALOG - 1}`]: { $exists: false } },
     ],
   };
 
@@ -158,15 +167,49 @@ const buildArtistNameMap = async (artistIds) => {
   return new Map(artists.map((a) => [a.id, a.name]));
 };
 
-const groupCatalogByFingerprint = (tracks) => {
+const collectTrackFingerprints = (track) => {
+  const fps = [];
+  const main = String(track.fingerprint || '');
+  if (main.startsWith('[')) fps.push(main);
+  for (const win of track.fingerprintWindows || []) {
+    const w = String(win?.fingerprint || '');
+    if (w.startsWith('[')) fps.push(w);
+  }
+  return [...new Set(fps)];
+};
+
+/** Bir xil audio fayl — bitta guruh (gap hisobi to‘g‘ri bo‘lishi uchun) */
+const groupCatalogByAudio = (tracks) => {
   const groups = new Map();
   for (const track of tracks) {
-    const fp = String(track.fingerprint || '');
-    if (!fp) continue;
-    if (!groups.has(fp)) groups.set(fp, []);
-    groups.get(fp).push(track);
+    const key = String(track.audio || `id:${track.id}`);
+    if (!groups.has(key)) {
+      groups.set(key, { audio: key, tracks: [], fingerprints: collectTrackFingerprints(track) });
+    } else {
+      const g = groups.get(key);
+      for (const fp of collectTrackFingerprints(track)) {
+        if (!g.fingerprints.includes(fp)) g.fingerprints.push(fp);
+      }
+    }
+    groups.get(key).tracks.push(track);
   }
   return groups;
+};
+
+const scoreCatalog = (queryFingerprint, catalog, meanVolumeDb = null) => {
+  const audioGroups = groupCatalogByAudio(catalog);
+
+  const fpScored = [...audioGroups.values()]
+    .map((group) => {
+      let best = 0;
+      for (const fp of group.fingerprints) {
+        best = Math.max(best, compareFingerprintStrings(queryFingerprint, fp));
+      }
+      return { fingerprint: group.fingerprints[0], tracks: group.tracks, score: best };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return pickConfidentMatches(fpScored, meanVolumeDb);
 };
 
 const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
@@ -190,7 +233,7 @@ const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
   const loudSource =
     meanVolumeDb == null || meanVolumeDb >= LOUD_MUSIC_VOLUME_DB;
   const loudMusicOk =
-    loudSource && bestScore >= 0.65 && (strong || gap >= 0.02);
+    loudSource && bestScore >= 0.63 && gap >= 0.035;
 
   // Past ovoz (xona shovqini) — qattiqroq
   const quietSource =
@@ -206,7 +249,7 @@ const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
   }
 
-  const minAccepted = Math.max(NOISE_CEILING + 0.02, bestScore - 0.03);
+  const minAccepted = Math.max(NOISE_CEILING + 0.01, bestScore - 0.03);
   const winningGroups = fpScored.filter((item) => item.score >= minAccepted);
 
   const expanded = [];
@@ -223,20 +266,6 @@ const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
     bestScore,
     rejectedReason: null,
   };
-};
-
-const scoreCatalog = (queryFingerprint, catalog, meanVolumeDb = null) => {
-  const fpGroups = groupCatalogByFingerprint(catalog);
-
-  const fpScored = [...fpGroups.entries()]
-    .map(([fingerprint, tracks]) => ({
-      fingerprint,
-      tracks,
-      score: compareFingerprintStrings(queryFingerprint, fingerprint),
-    }))
-    .sort((a, b) => b.score - a.score);
-
-  return pickConfidentMatches(fpScored, meanVolumeDb);
 };
 
 const identifyFromAudioBuffer = async (buffer, originalName) => {
@@ -276,7 +305,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     const catalog = await Music.find({
       fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
     })
-      .select({ id: 1, title: 1, artistId: 1, img: 1, fingerprint: 1 })
+      .select({ id: 1, title: 1, artistId: 1, img: 1, audio: 1, fingerprint: 1, fingerprintWindows: 1 })
       .lean();
 
     let bestResult = { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };

@@ -51,6 +51,73 @@ const fingerprintFromFile = async (filePath, options = {}) => {
   return runFpcalc(filePath, options);
 };
 
+const DEFAULT_WINDOW_OFFSETS_SEC = [0, 30, 60, 90];
+const DEFAULT_WINDOW_CLIP_SEC = 45;
+
+const sliceToWav = async (inputPath, outputPath, { offsetSec = 0, durationSec = 45 } = {}) => {
+  const args = [
+    '-y',
+    '-ss',
+    String(offsetSec),
+    '-i',
+    inputPath,
+    '-t',
+    String(durationSec),
+    '-ar',
+    '44100',
+    '-ac',
+    '1',
+    '-f',
+    'wav',
+    outputPath,
+  ];
+  await execFileAsync(FFMPEG_BIN, args, {
+    timeout: 120_000,
+    maxBuffer: 8 * 1024 * 1024,
+  });
+};
+
+/**
+ * Bir trekdan bir nechta vaqt oynasi fingerprint (intro + chorus).
+ */
+const fingerprintFromFileMultiWindow = async (
+  filePath,
+  {
+    offsetsSec = DEFAULT_WINDOW_OFFSETS_SEC,
+    clipSec = DEFAULT_WINDOW_CLIP_SEC,
+  } = {}
+) => {
+  const os = require('os');
+  const path = require('path');
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'violet-fpwin-'));
+
+  try {
+    const full = await runFpcalc(filePath);
+    const totalDuration = full.duration;
+    const windows = [];
+
+    for (const offsetSec of offsetsSec) {
+      if (offsetSec >= totalDuration - 8) continue;
+
+      const wavPath = path.join(tmpDir, `win-${offsetSec}.wav`);
+      await sliceToWav(filePath, wavPath, {
+        offsetSec,
+        durationSec: Math.min(clipSec, totalDuration - offsetSec),
+      });
+      const win = await runFpcalc(wavPath);
+      windows.push({
+        offsetSec,
+        fingerprint: win.fingerprint,
+        duration: win.duration,
+      });
+    }
+
+    return { ...full, windows };
+  } finally {
+    await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+  }
+};
+
 /**
  * Browser upload → bir nechta audio filter bilan fingerprint (telefon mikrofoni uchun).
  */
@@ -94,7 +161,9 @@ const checkFingerprintTools = async () => {
 
 module.exports = {
   fingerprintFromFile,
+  fingerprintFromFileMultiWindow,
   fingerprintFromBuffer,
   fingerprintFromBufferMulti,
   checkFingerprintTools,
+  DEFAULT_WINDOW_OFFSETS_SEC,
 };
