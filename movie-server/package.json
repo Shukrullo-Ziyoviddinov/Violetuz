@@ -36,6 +36,7 @@
     "prune:public-media:execute": "node scripts/prunePublicCatalogMedia.js --execute",
     "fingerprints:generate": "node scripts/generateFingerprints.js",
     "fingerprints:generate:all": "node scripts/generateFingerprints.js --all",
+    "durations:backfill": "node scripts/backfillDurationSec.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

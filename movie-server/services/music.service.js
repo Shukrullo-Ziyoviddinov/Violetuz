@@ -81,7 +81,7 @@ class MusicService {
   }
 
   async create(musicData) {
-    const { id: _oldId, fingerprint: _fp, fingerprintDuration: _fpd, ...rest } = musicData || {};
+    const { id: _oldId, fingerprint: _fp, fingerprintDuration: _fpd, durationSec: _ds, ...rest } = musicData || {};
     if (rest.categoryNameMusic) {
       rest.categoryNameMusic = String(rest.categoryNameMusic).trim();
     }

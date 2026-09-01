@@ -10,6 +10,12 @@ const { compareFingerprintStrings, decodeFingerprint } = require('../../utils/ch
 const { measureAudioLevel } = require('../../utils/audioLevel');
 const { resolveMediaUrl, resolveLocalMediaPath } = require('../../utils/resolveMediaUrl');
 const { fingerprintFromFileMultiWindow, fingerprintFromBufferMulti } = require('./fpcalcRunner');
+const {
+  normalizeDurationSec,
+  buildAudioDurationMap,
+  resolveDurationSec,
+  propagateDurationByAudio,
+} = require('./musicDuration');
 
 const MIN_WINDOWS_FOR_CATALOG = 6;
 
@@ -105,20 +111,28 @@ const upsertMusicFingerprint = async (musicId) => {
     throw new Error(`Could not fingerprint music id=${musicId}`);
   }
 
+  const durationSec = normalizeDurationSec(fp.duration);
+  if (durationSec == null) {
+    throw new Error(`Could not resolve duration for music id=${musicId}`);
+  }
+
   await Music.updateOne(
     { id: musicId },
     {
       $set: {
         fingerprint: fp.fingerprint,
-        fingerprintDuration: fp.duration,
+        fingerprintDuration: durationSec,
+        durationSec,
         fingerprintWindows: Array.isArray(fp.windows) ? fp.windows : [],
       },
     }
   );
 
+  await propagateDurationByAudio(Music, music.audio, durationSec);
+
   return {
     id: musicId,
-    duration: fp.duration,
+    duration: durationSec,
     windows: fp.windows?.length || 0,
   };
 };
@@ -132,6 +146,10 @@ const generateAllFingerprints = async ({ onlyMissing = true } = {}) => {
       { fingerprintWindows: { $exists: false } },
       { fingerprintWindows: { $size: 0 } },
       { [`fingerprintWindows.${MIN_WINDOWS_FOR_CATALOG - 1}`]: { $exists: false } },
+      { fingerprintDuration: { $in: [null, 0] } },
+      { fingerprintDuration: { $exists: false } },
+      { durationSec: { $in: [null, 0] } },
+      { durationSec: { $exists: false } },
     ],
   };
 
@@ -305,8 +323,20 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
     const catalog = await Music.find({
       fingerprint: { $exists: true, $ne: '', $regex: /^\[/ },
     })
-      .select({ id: 1, title: 1, artistId: 1, img: 1, audio: 1, fingerprint: 1, fingerprintWindows: 1, fingerprintDuration: 1 })
+      .select({
+        id: 1,
+        title: 1,
+        artistId: 1,
+        img: 1,
+        audio: 1,
+        durationSec: 1,
+        fingerprint: 1,
+        fingerprintWindows: 1,
+        fingerprintDuration: 1,
+      })
       .lean();
+
+    const durationByAudio = buildAudioDurationMap(catalog);
 
     let bestResult = { matches: [], bestScore: 0, rejectedReason: 'no_confident_match' };
     let queryDuration = primary.duration;
@@ -338,7 +368,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
         artistId: track.artistId,
         artistName: artistMap.get(track.artistId) || track.artistId,
         img: track.img || '',
-        durationSec: track.fingerprintDuration ?? null,
+        durationSec: resolveDurationSec(track, durationByAudio),
         score: Math.round(score * 1000) / 1000,
       })),
     };

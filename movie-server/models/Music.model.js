@@ -58,6 +58,11 @@ const musicSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    /** Qo‘shiq davomiyligi (soniya) — fingerprint sync da avtomatik */
+    durationSec: {
+      type: Number,
+      default: null,
+    },
     lyricsText: {
       type: String,
       default: '',
@@ -98,6 +103,7 @@ musicSchema.statics.getNextId = async function getNextId() {
 
 musicSchema.index({ categoryNameMusic: 1, id: 1 });
 musicSchema.index({ artistId: 1, id: 1 });
+musicSchema.index({ audio: 1 });
 
 musicSchema.pre('validate', async function assignAutoId() {
   if (!this.isNew || this.id != null) {
