@@ -64,17 +64,8 @@ const useTaronaIdentify = () => {
   }, []);
 
   /** Max vaqt tugaganda yoki foydalanuvchi to‘xtatganda — oxirgi urinish */
-  const finalize = useCallback(async (audioBlob, { reason: localReason } = {}) => {
+  const finalize = useCallback(async (audioBlob) => {
     if (matchedRef.current) return;
-
-    if (localReason === 'no-audio-detected') {
-      setMatches([]);
-      setRejectReason('audio_too_quiet');
-      setLastMeta(null);
-      setError(null);
-      setPhase(PHASE_DONE);
-      return;
-    }
 
     if (!audioBlob?.size || audioBlob.size < 8000) {
       setError({ message: 'empty-audio' });

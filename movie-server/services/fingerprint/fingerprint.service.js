@@ -22,20 +22,14 @@ const MIN_WINDOWS_FOR_CATALOG = 6;
 // Shovqin ~0.62, telefon mikrofoni ~0.65–0.85, toza audio ~0.95+
 // Render'da eski FINGERPRINT_MATCH_THRESHOLD=0.82 bo'lsa telefon o'tmaydi — clamp.
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.68, 0.62, 0.72);
+const MATCH_THRESHOLD = clamp(Number(process.env.FINGERPRINT_MATCH_THRESHOLD) || 0.66, 0.58, 0.7);
 const MATCH_LIMIT = Number(process.env.FINGERPRINT_MATCH_LIMIT) || 8;
-const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.04;
-const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.72, 0.68, 0.82);
-const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.64, 0.58, 0.66);
+const MIN_SCORE_GAP = Number(process.env.FINGERPRINT_MIN_SCORE_GAP) || 0.03;
+const STRONG_MATCH_SCORE = clamp(Number(process.env.FINGERPRINT_STRONG_MATCH_SCORE) || 0.7, 0.65, 0.8);
+const NOISE_CEILING = clamp(Number(process.env.FINGERPRINT_NOISE_CEILING) || 0.63, 0.55, 0.66);
 const SILENCE_VOLUME_DB = Number(process.env.FINGERPRINT_SILENCE_VOLUME_DB) || -65;
 /** Speaker musiqa odatda shundan balandroq */
-const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -50;
-/** Volume o'lchanmagan (telefon webm) — faqat shu balldan yuqori qabul */
-const UNKNOWN_VOLUME_MIN_SCORE = clamp(
-  Number(process.env.FINGERPRINT_UNKNOWN_VOLUME_MIN_SCORE) || 0.7,
-  0.66,
-  0.85
-);
+const LOUD_MUSIC_VOLUME_DB = Number(process.env.FINGERPRINT_LOUD_MUSIC_VOLUME_DB) || -52;
 // Erta probe (~4s) uchun 5s emas — 3s yetarli
 const MIN_QUERY_DURATION_SEC = Number(process.env.FINGERPRINT_MIN_QUERY_DURATION_SEC) || 3;
 const MIN_QUERY_FRAMES = Number(process.env.FINGERPRINT_MIN_QUERY_FRAMES) || 8;
@@ -152,10 +146,6 @@ const generateAllFingerprints = async ({ onlyMissing = true } = {}) => {
       { fingerprintWindows: { $exists: false } },
       { fingerprintWindows: { $size: 0 } },
       { [`fingerprintWindows.${MIN_WINDOWS_FOR_CATALOG - 1}`]: { $exists: false } },
-      { fingerprintDuration: { $in: [null, 0] } },
-      { fingerprintDuration: { $exists: false } },
-      { durationSec: { $in: [null, 0] } },
-      { durationSec: { $exists: false } },
     ],
   };
 
@@ -259,21 +249,17 @@ const pickConfidentMatches = (fpScored, meanVolumeDb = null) => {
   const strong = bestScore >= STRONG_MATCH_SCORE;
   const clearWinner = bestScore >= MATCH_THRESHOLD && gap >= MIN_SCORE_GAP;
 
-  // Baland speaker — yumshoqroq, lekin faqat o'lchangan baland ovozda
-  const loudMusicOk = isLoudMusic && bestScore >= 0.66 && gap >= 0.04;
+  // Faqat o'lchangan baland speaker (unknown volume bu yo'ldan o'tmaydi — false positive kam)
+  const loudMusicOk =
+    isLoudMusic && bestScore >= 0.63 && gap >= 0.035;
 
-  // Telefon mikrofoni / past ovoz — yuqoriroq ball yoki aniq gap
+  // Telefon mikrofoni / past ovoz
   const quietMusicOk =
     isQuietAmbient &&
-    (bestScore >= 0.72 || (bestScore >= 0.68 && gap >= 0.06));
+    (bestScore >= 0.72 || (bestScore >= 0.68 && gap >= 0.05));
 
-  // Volume unknown (ko'p telefon upload) — faqat kuchli match, loudMusicOk yo'q
-  const unknownVolumeOk =
-    !volumeKnown &&
-    (strong || (bestScore >= UNKNOWN_VOLUME_MIN_SCORE && gap >= 0.05));
-
-  const accepted =
-    strong || clearWinner || loudMusicOk || quietMusicOk || unknownVolumeOk;
+  // Volume unknown: clearWinner (0.66+) yoki strong — telefon uchun asosiy yo'l
+  const accepted = strong || clearWinner || loudMusicOk || quietMusicOk;
 
   if (!accepted) {
     return { matches: [], bestScore, rejectedReason: 'no_confident_match' };
@@ -362,8 +348,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
         bestResult = result;
         queryDuration = queryFp.duration;
       }
-      // Faqat kuchli matchda erta to'xtash — zaif false positive dan qochish
-      if (result.matches.length && result.bestScore >= STRONG_MATCH_SCORE) break;
+      if (result.matches.length) break;
     }
 
     const { matches: confident, bestScore, rejectedReason } = bestResult;
