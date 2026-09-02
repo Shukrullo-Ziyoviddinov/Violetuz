@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
 import VoiceModeToggle from './VoiceModeToggle';
 import VoiceModePanel from './VoiceModePanel';
@@ -13,8 +14,9 @@ import './VoiceSearchModal.css';
 /**
  * Voice search shell: Ovoz (STT → search input) | Tarona (audio identify → modal natija).
  */
-const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
+const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [mode, setMode] = useState(VOICE_SEARCH_MODE_VOICE);
   const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -77,6 +79,16 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
     setTaronaMatches(matches || []);
     setTaronaShowResults((matches || []).length > 0);
   }, []);
+
+  const handleGoToMusic = useCallback(
+    (item) => {
+      if (!item?.id) return;
+      dismissWithSlide();
+      releaseHistory();
+      navigate(`/music/${item.id}`);
+    },
+    [navigate, dismissWithSlide, releaseHistory]
+  );
 
   const handleModeChange = (nextMode) => {
     setMode(nextMode);
@@ -196,7 +208,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
 
       {isTarona && taronaShowResults ? (
         <div className="voice-search-modal-body voice-search-modal-body--tarona-results">
-          <TaronaResults matches={taronaMatches} />
+          <TaronaResults matches={taronaMatches} onGoToMusic={handleGoToMusic} />
           <TaronaModePanel
             isOpen={isOpen && !exiting}
             onResults={handleTaronaResults}

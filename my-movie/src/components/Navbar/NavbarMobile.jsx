@@ -224,12 +224,6 @@ const NavbarMobile = () => {
     handleQueryChange(value);
   };
 
-  const handleTaronaMusicSelect = (item) => {
-    if (!item?.id) return;
-    leaveSearchForNavigation();
-    navigate(`/music/${item.id}`);
-  };
-
   return (
     <>
       <nav className="navbar-mobile">
@@ -386,7 +380,6 @@ const NavbarMobile = () => {
         isOpen={showVoiceSearch}
         onClose={() => setShowVoiceSearch(false)}
         onResult={handleVoiceSearchResult}
-        onMusicSelect={handleTaronaMusicSelect}
       />
 
       <ShortsPickerModal
