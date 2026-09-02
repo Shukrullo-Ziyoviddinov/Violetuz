@@ -112,6 +112,7 @@
 
 /* --- Ovoz / Tarona toggle --- */
 .voice-search-mode-toggle {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
@@ -121,7 +122,32 @@
   z-index: 2;
 }
 
+.voice-search-mode-thumb {
+  position: absolute;
+  top: 0.22rem;
+  left: 0;
+  height: calc(100% - 0.44rem);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateX(0);
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.18s ease;
+  will-change: transform, width;
+}
+
+.voice-search-mode-thumb.is-ready {
+  opacity: 1;
+}
+
 .voice-search-mode-btn {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -133,6 +159,7 @@
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
   cursor: pointer;
+  transition: color 0.22s ease;
 }
 
 .voice-search-mode-btn i {
@@ -140,13 +167,23 @@
 }
 
 .voice-search-mode-btn--active {
-  background: #fff;
+  background: transparent;
   color: #111;
 }
 
 .voice-search-mode-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-search-mode-thumb {
+    transition: none;
+  }
+
+  .voice-search-mode-btn {
+    transition: none;
+  }
 }
 
 /* --- Tarona theme --- */
