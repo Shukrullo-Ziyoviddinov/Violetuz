@@ -200,6 +200,17 @@
   .artist-music-story-modal-overlay {
     align-items: flex-end;
     padding: 0;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+
+  .artist-music-story-modal-overlay--open {
+    opacity: 1;
+  }
+
+  .artist-music-story-modal-overlay--closing {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .artist-music-story-modal {
@@ -207,12 +218,21 @@
     max-width: none;
     max-height: 90vh;
     border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .artist-music-story-modal--open {
     transform: translateY(0);
-    transition: transform 0.25s ease-out;
+  }
+
+  .artist-music-story-modal--closing {
+    pointer-events: none;
   }
 
   .artist-music-story-modal--dragging {
-    transition: none;
+    transition: none !important;
   }
 
   .artist-music-story-modal-handle {

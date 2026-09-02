@@ -1,12 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDominantColor } from '../../utils/dominantColor';
 import { VisualImgLeftRight } from '../Visual';
 import './ArtistMusicStoryModal.css';
 
+const MOBILE_MAX = 500;
+const CLOSE_MS = 320;
+
 const ArtistMusicStoryModal = ({ stories = [], story, onClose, onStoryChange }) => {
   const navigate = useNavigate();
   const audioRef = useRef(null);
+  const modalRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
@@ -14,9 +18,43 @@ const ArtistMusicStoryModal = ({ stories = [], story, onClose, onStoryChange }) 
   const [dominantColor, setDominantColor] = useState(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const dragStartRef = useRef(null);
   const dragOffsetRef = useRef(0);
+  const closingRef = useRef(false);
+  const closeTimerRef = useRef(null);
   dragOffsetRef.current = dragOffset;
+
+  const finishClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setSheetOpen(false);
+    setIsClosing(false);
+    setIsDragging(false);
+    setDragOffset(0);
+    dragStartRef.current = null;
+    closingRef.current = false;
+    onClose?.();
+  }, [onClose]);
+
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    if (typeof window !== 'undefined' && window.innerWidth > MOBILE_MAX) {
+      onClose?.();
+      return;
+    }
+    closingRef.current = true;
+    dragStartRef.current = null;
+    setIsDragging(false);
+    const h = modalRef.current?.offsetHeight || Math.round(window.innerHeight * 0.5);
+    setDragOffset((prev) => (prev > 0 ? Math.max(prev, h + 24) : h + 24));
+    setSheetOpen(false);
+    setIsClosing(true);
+    closeTimerRef.current = window.setTimeout(finishClose, CLOSE_MS);
+  }, [finishClose, onClose]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -24,6 +62,21 @@ const ArtistMusicStoryModal = ({ stories = [], story, onClose, onStoryChange }) 
     return () => {
       document.body.style.overflow = prev || '';
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth > MOBILE_MAX) {
+      setSheetOpen(true);
+      return undefined;
+    }
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setSheetOpen(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  useEffect(() => () => {
+    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -114,12 +167,13 @@ const ArtistMusicStoryModal = ({ stories = [], story, onClose, onStoryChange }) 
   const handleTitleClick = () => {
     if (story?.artistMusicId != null) {
       navigate(`/music/${story.artistMusicId}`);
-      onClose();
+      requestClose();
     }
   };
 
   useEffect(() => {
     const onMove = (e) => {
+      if (closingRef.current) return;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       const start = dragStartRef.current;
       if (!start) return;
@@ -128,12 +182,12 @@ const ArtistMusicStoryModal = ({ stories = [], story, onClose, onStoryChange }) 
       setDragOffset(newOffset);
     };
     const onUp = () => {
+      if (closingRef.current) return;
       dragStartRef.current = null;
       setIsDragging(false);
       const offset = dragOffsetRef.current;
       if (offset > 100) {
-        onClose();
-        setDragOffset(0);
+        requestClose();
       } else {
         setDragOffset(0);
       }
@@ -150,25 +204,36 @@ const ArtistMusicStoryModal = ({ stories = [], story, onClose, onStoryChange }) 
       document.removeEventListener('touchmove', onMove);
       document.removeEventListener('touchend', onUp);
     };
-  }, [onClose]);
+  }, [requestClose]);
 
   const handleDragStart = (e) => {
-    if (window.innerWidth > 500) return;
+    if (window.innerWidth > MOBILE_MAX || closingRef.current) return;
     dragStartRef.current = { y: e.clientY, startOffset: dragOffset };
     setIsDragging(true);
   };
 
   return (
     <div
-      className="artist-music-story-modal-overlay"
-      onClick={onClose}
+      className={[
+        'artist-music-story-modal-overlay',
+        sheetOpen && !isClosing ? 'artist-music-story-modal-overlay--open' : '',
+        isClosing ? 'artist-music-story-modal-overlay--closing' : '',
+      ].filter(Boolean).join(' ')}
+      onClick={requestClose}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Escape' && onClose()}
+      onKeyDown={(e) => e.key === 'Escape' && requestClose()}
       aria-label="Modalni yopish"
     >
       <div
-        className={`artist-music-story-modal${dominantColor ? ' artist-music-story-modal--has-color' : ''}${isDragging ? ' artist-music-story-modal--dragging' : ''}`}
+        ref={modalRef}
+        className={[
+          'artist-music-story-modal',
+          dominantColor ? 'artist-music-story-modal--has-color' : '',
+          isDragging ? 'artist-music-story-modal--dragging' : '',
+          sheetOpen && !isClosing ? 'artist-music-story-modal--open' : '',
+          isClosing ? 'artist-music-story-modal--closing' : '',
+        ].filter(Boolean).join(' ')}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -193,7 +258,7 @@ const ArtistMusicStoryModal = ({ stories = [], story, onClose, onStoryChange }) 
         <button
           type="button"
           className="artist-music-story-modal-close"
-          onClick={onClose}
+          onClick={requestClose}
           aria-label="Yopish"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

@@ -24,6 +24,8 @@ const MODAL_SELECTOR = [
   '.message-modal--open',
   '.message-search-modal--open',
   '.music-detail-lyrics-modal',
+  '.artist-music-story-modal-overlay',
+  '.artist-music-story-modal',
   '.music-filter-modal-overlay',
   '.music-filter-modal',
   '.video-modal--sheet',
