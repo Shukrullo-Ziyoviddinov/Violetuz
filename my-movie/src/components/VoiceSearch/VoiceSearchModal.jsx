@@ -14,7 +14,7 @@ import './VoiceSearchModal.css';
 /**
  * Voice search shell: Ovoz (STT → search input) | Tarona (audio identify → modal natija).
  */
-const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
+const VoiceSearchModal = ({ isOpen, onClose, onResult, onNavigateAway }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [mode, setMode] = useState(VOICE_SEARCH_MODE_VOICE);
@@ -55,7 +55,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
     beginAnimatedClose('slide');
   }, [exiting]);
 
-  const { releaseHistory } = useModalHardwareBack({
+  const { releaseHistory, abandonHistory } = useModalHardwareBack({
     historyKey: 'violetVoiceSearch',
     isOpen: isOpen && !exiting,
     onCloseFromHardware: dismissWithSlide,
@@ -83,11 +83,15 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult }) => {
   const handleGoToMusic = useCallback(
     (item) => {
       if (!item?.id) return;
-      dismissWithSlide();
-      releaseHistory();
+      abandonHistory();
+      if (onNavigateAway) {
+        onNavigateAway();
+      } else {
+        onCloseRef.current?.();
+      }
       navigate(`/music/${item.id}`);
     },
-    [navigate, dismissWithSlide, releaseHistory]
+    [navigate, abandonHistory, onNavigateAway]
   );
 
   const handleModeChange = (nextMode) => {

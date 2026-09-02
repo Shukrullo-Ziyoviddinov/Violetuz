@@ -31,17 +31,18 @@ body.voice-search-tarona-sheet-open {
   box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
   padding-bottom: env(safe-area-inset-bottom, 0);
   transform: translateY(100%);
-  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   overscroll-behavior: none;
   will-change: transform;
 }
 
-.voice-search-tarona-modal-sheet.is-open {
-  transform: translateY(0);
+.voice-search-tarona-modal-sheet.is-animating {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .voice-search-tarona-modal-sheet.is-dragging {
-  transition: none;
+  transition-duration: 0ms !important;
 }
 
 .voice-search-tarona-modal-sheet.is-closing {
@@ -49,9 +50,14 @@ body.voice-search-tarona-sheet-open {
 }
 
 .voice-search-tarona-modal-drag-zone {
-  padding: 0.55rem 1rem 0.25rem;
+  padding: 0.65rem 1rem 0.35rem;
   touch-action: none;
   user-select: none;
+  cursor: grab;
+}
+
+.voice-search-tarona-modal-sheet.is-dragging .voice-search-tarona-modal-drag-zone {
+  cursor: grabbing;
 }
 
 .voice-search-tarona-modal-handle {
@@ -141,4 +147,11 @@ body.voice-search-tarona-sheet-open {
 
 .voice-search-tarona-modal-action--save.is-active svg {
   color: #a78bfa;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-search-tarona-modal-overlay,
+  .voice-search-tarona-modal-sheet {
+    transition-duration: 0.01ms !important;
+  }
 }

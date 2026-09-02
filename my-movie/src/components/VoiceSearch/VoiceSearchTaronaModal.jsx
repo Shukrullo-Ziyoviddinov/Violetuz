@@ -4,19 +4,22 @@ import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../../context/WishlistContext';
 import './VoiceSearchTaronaModal.css';
 
-const CLOSE_MS = 320;
-const DRAG_THRESHOLD = 8;
-const FLICK_MS = 280;
-const FLICK_MIN_PX = 48;
+const CLOSE_MS = 360;
+const OVERLAY_MS = 280;
+const DRAG_START_PX = 6;
+const DRAG_CLOSE_RATIO = 0.2;
+const FLICK_MS = 260;
+const FLICK_MIN_PX = 44;
 const BODY_LOCK = 'voice-search-tarona-sheet-open';
 
 const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [mounted, setMounted] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [translateY, setTranslateY] = useState(0);
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const [sheetY, setSheetY] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [animating, setAnimating] = useState(false);
 
   const sheetRef = useRef(null);
   const dragZoneRef = useRef(null);
@@ -25,9 +28,16 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
   const startYRef = useRef(null);
   const lastYRef = useRef(null);
   const startTimeRef = useRef(0);
+  const sheetHeightRef = useRef(320);
 
   const musicId = item?.id;
   const saved = musicId != null && isInWishlist(musicId, 'music');
+
+  const measureSheet = useCallback(() => {
+    const h = sheetRef.current?.offsetHeight;
+    if (h && h > 0) sheetHeightRef.current = h;
+    return sheetHeightRef.current;
+  }, []);
 
   const finishClose = useCallback(() => {
     if (closeTimerRef.current) {
@@ -35,24 +45,40 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
       closeTimerRef.current = null;
     }
     setMounted(false);
-    setVisible(false);
-    setTranslateY(0);
+    setOverlayVisible(false);
+    setSheetY(0);
     setDragging(false);
+    setAnimating(false);
     closingRef.current = false;
     startYRef.current = null;
     lastYRef.current = null;
     onClose?.();
   }, [onClose]);
 
+  const animateSheetTo = useCallback((targetY, onDone) => {
+    setDragging(false);
+    setAnimating(true);
+    setSheetY(targetY);
+
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setAnimating(false);
+      onDone?.();
+    }, CLOSE_MS);
+  }, []);
+
   const requestClose = useCallback(() => {
     if (closingRef.current) return;
     closingRef.current = true;
-    setDragging(false);
-    const h = sheetRef.current?.offsetHeight || Math.round(window.innerHeight * 0.35);
-    setTranslateY(h + 24);
-    setVisible(false);
-    closeTimerRef.current = window.setTimeout(finishClose, CLOSE_MS);
-  }, [finishClose]);
+    setOverlayVisible(false);
+
+    const h = measureSheet();
+    animateSheetTo(h + 28, finishClose);
+  }, [animateSheetTo, finishClose, measureSheet]);
 
   useEffect(() => {
     if (!open) {
@@ -64,15 +90,27 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
       window.clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
-    closingRef.current = false;
-    setMounted(true);
-    setTranslateY(0);
-    setDragging(false);
 
-    const id = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setVisible(true));
+    closingRef.current = false;
+    setDragging(false);
+    setAnimating(false);
+    setMounted(true);
+    setOverlayVisible(false);
+
+    const h = sheetHeightRef.current;
+    setSheetY(h + 28);
+
+    const outerId = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        measureSheet();
+        setOverlayVisible(true);
+        setAnimating(true);
+        setSheetY(0);
+        window.setTimeout(() => setAnimating(false), CLOSE_MS);
+      });
     });
-    return () => cancelAnimationFrame(id);
+
+    return () => window.cancelAnimationFrame(outerId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -103,7 +141,7 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
   );
 
   const handleTouchStart = (e) => {
-    if (closingRef.current) return;
+    if (closingRef.current || animating) return;
     const y = e.touches[0].clientY;
     startYRef.current = y;
     lastYRef.current = y;
@@ -111,34 +149,46 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
     setDragging(false);
   };
 
-  const handleTouchMove = useCallback((e) => {
-    if (closingRef.current || startYRef.current == null) return;
-    const y = e.touches[0].clientY;
-    const diff = y - startYRef.current;
-    lastYRef.current = y;
-    if (diff > DRAG_THRESHOLD) {
+  const handleTouchMove = useCallback(
+    (e) => {
+      if (closingRef.current || animating || startYRef.current == null) return;
+      const y = e.touches[0].clientY;
+      const diff = Math.max(0, y - startYRef.current);
+      lastYRef.current = y;
+
+      if (!dragging && diff < DRAG_START_PX) return;
+
       e.preventDefault();
       setDragging(true);
-      setTranslateY(diff);
-    }
-  }, []);
+      setSheetY(diff);
+    },
+    [animating, dragging]
+  );
 
   const handleTouchEnd = () => {
-    if (closingRef.current || startYRef.current == null) return;
+    if (closingRef.current || animating || startYRef.current == null) return;
+
     const distance = Math.max(0, (lastYRef.current ?? startYRef.current) - startYRef.current);
     const duration = performance.now() - startTimeRef.current;
-    const h = sheetRef.current?.offsetHeight || 280;
-    const farEnough = distance > h * 0.35;
+    const h = measureSheet();
+    const closeThreshold = h * DRAG_CLOSE_RATIO;
     const isFlick = duration < FLICK_MS && distance > FLICK_MIN_PX;
 
-    if (farEnough || isFlick) {
+    startYRef.current = null;
+    lastYRef.current = null;
+
+    if (distance >= closeThreshold || isFlick) {
       requestClose();
       return;
     }
+
+    if (distance > 0) {
+      animateSheetTo(0);
+      return;
+    }
+
     setDragging(false);
-    setTranslateY(0);
-    startYRef.current = null;
-    lastYRef.current = null;
+    setSheetY(0);
   };
 
   useEffect(() => {
@@ -162,12 +212,19 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
 
   if (!mounted || !item) return null;
 
-  const sheetStyle =
-    dragging || translateY > 0 ? { transform: `translateY(${translateY}px)` } : undefined;
+  const sheetClass = [
+    'voice-search-tarona-modal-sheet',
+    dragging ? 'is-dragging' : '',
+    animating ? 'is-animating' : '',
+    closingRef.current ? 'is-closing' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return createPortal(
     <div
-      className={`voice-search-tarona-modal-overlay${visible ? ' is-visible' : ''}`}
+      className={`voice-search-tarona-modal-overlay${overlayVisible ? ' is-visible' : ''}`}
+      style={{ transitionDuration: `${OVERLAY_MS}ms` }}
       onClick={(e) => {
         if (e.target === e.currentTarget) requestClose();
       }}
@@ -175,15 +232,11 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
     >
       <div
         ref={sheetRef}
-        className={[
-          'voice-search-tarona-modal-sheet',
-          visible && translateY === 0 && !dragging ? 'is-open' : '',
-          dragging ? 'is-dragging' : '',
-          !visible ? 'is-closing' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        style={sheetStyle}
+        className={sheetClass}
+        style={{
+          transform: `translateY(${sheetY}px)`,
+          transitionDuration: dragging ? '0ms' : `${CLOSE_MS}ms`,
+        }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

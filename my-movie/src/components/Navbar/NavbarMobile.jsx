@@ -380,6 +380,7 @@ const NavbarMobile = () => {
         isOpen={showVoiceSearch}
         onClose={() => setShowVoiceSearch(false)}
         onResult={handleVoiceSearchResult}
+        onNavigateAway={leaveSearchForNavigation}
       />
 
       <ShortsPickerModal
