@@ -57,11 +57,11 @@
 
 .message-search-modal-back {
   border: none;
-  background: rgba(255, 255, 255, 0.08);
+  background: none;
   color: #fff;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,7 +71,8 @@
 }
 
 .message-search-modal-back:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: none;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .message-search-modal-field {
