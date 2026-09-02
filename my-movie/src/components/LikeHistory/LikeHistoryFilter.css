@@ -20,8 +20,8 @@
   background: rgba(155, 79, 231, 0.22);
 }
 
-@media (max-width: 500px) {
-  .like-history-filter {
-    margin-bottom: 0.4rem;
+@media (max-width: 768px) {
+  .like-history-filter--desktop {
+    display: none !important;
   }
 }

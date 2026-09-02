@@ -20,6 +20,8 @@ const MODAL_SELECTOR = [
   '.filters-mobile-modal',
   '.wishlist-filter-modal-overlay',
   '.wishlist-filter-modal',
+  '.like-history-filter-modal-overlay',
+  '.like-history-filter-modal',
   '.global-modal-dialog',
   '.message-modal--open',
   '.message-search-modal--open',
