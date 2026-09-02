@@ -186,6 +186,7 @@
   flex-direction: column;
   min-height: 0;
   box-sizing: border-box;
+  background: #121212;
 }
 
 .global-modal-panel--open {
