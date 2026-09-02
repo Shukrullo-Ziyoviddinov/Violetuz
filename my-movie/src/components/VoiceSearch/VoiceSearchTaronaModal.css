@@ -133,6 +133,11 @@ body.voice-search-tarona-sheet-open {
   opacity: 0.88;
 }
 
+.voice-search-tarona-modal-action:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
 .voice-search-tarona-modal-action svg,
 .voice-search-tarona-modal-action i {
   width: 1.25rem;

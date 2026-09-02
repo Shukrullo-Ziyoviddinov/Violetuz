@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { fetchMusicById } from '../../api/musicApi';
 import { useWishlist } from '../../context/WishlistContext';
 import './VoiceSearchTaronaModal.css';
 
@@ -12,6 +13,21 @@ const FLICK_MS = 260;
 const FLICK_MIN_PX = 44;
 const BODY_LOCK = 'voice-search-tarona-sheet-open';
 
+const getAudioSrc = (musicItem) => {
+  const raw = musicItem?.audio;
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (typeof window !== 'undefined' && raw.startsWith('/')) {
+    return `${window.location.origin}${raw}`;
+  }
+  return raw;
+};
+
+const safeFileName = (title) =>
+  String(title || 'music')
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '')
+    .trim() || 'music';
+
 const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -20,6 +36,7 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
   const [sheetY, setSheetY] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const sheetRef = useRef(null);
   const dragZoneRef = useRef(null);
@@ -210,6 +227,33 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
     requestClose();
   };
 
+  const handleDownload = async () => {
+    if (musicId == null || downloading) return;
+
+    setDownloading(true);
+    try {
+      let audioUrl = getAudioSrc(item);
+      if (!audioUrl) {
+        const full = await fetchMusicById(musicId);
+        audioUrl = getAudioSrc(full);
+      }
+      if (!audioUrl) return;
+
+      const link = document.createElement('a');
+      link.href = audioUrl;
+      link.download = `${safeFileName(item.title)}.mp3`;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      // ignore — audio topilmasa yoki yuklab bo‘lmasa
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (!mounted || !item) return null;
 
   const sheetClass = [
@@ -302,6 +346,17 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
           >
             <i className="fa-solid fa-music" aria-hidden="true" />
             <span>{t('voiceSearch.taronaGoToMusic', "Musiqaga o'tish")}</span>
+          </button>
+
+          <button
+            type="button"
+            className="voice-search-tarona-modal-action voice-search-tarona-modal-action--download"
+            onClick={handleDownload}
+            disabled={downloading}
+            aria-busy={downloading}
+          >
+            <i className="fa-solid fa-download" aria-hidden="true" />
+            <span>{t('voiceSearch.taronaDownload', 'Yuklab olish')}</span>
           </button>
         </div>
       </div>
