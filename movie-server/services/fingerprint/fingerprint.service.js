@@ -365,6 +365,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
         artistName: artistMap.get(track.artistId) || track.artistId,
         img: track.img || '',
         durationSec: resolveDurationSec(track, durationByAudio),
+        audio: track.audio || '',
         score: Math.round(score * 1000) / 1000,
       })),
     };

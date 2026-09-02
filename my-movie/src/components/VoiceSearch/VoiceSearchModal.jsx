@@ -78,15 +78,6 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
     setTaronaShowResults((matches || []).length > 0);
   }, []);
 
-  const handleMusicSelect = useCallback(
-    (item) => {
-      onMusicSelect?.(item);
-      dismissWithSlide();
-      releaseHistory();
-    },
-    [onMusicSelect, dismissWithSlide, releaseHistory]
-  );
-
   const handleModeChange = (nextMode) => {
     setMode(nextMode);
     setTaronaMatches([]);
@@ -205,7 +196,7 @@ const VoiceSearchModal = ({ isOpen, onClose, onResult, onMusicSelect }) => {
 
       {isTarona && taronaShowResults ? (
         <div className="voice-search-modal-body voice-search-modal-body--tarona-results">
-          <TaronaResults matches={taronaMatches} onSelect={handleMusicSelect} />
+          <TaronaResults matches={taronaMatches} />
           <TaronaModePanel
             isOpen={isOpen && !exiting}
             onResults={handleTaronaResults}
