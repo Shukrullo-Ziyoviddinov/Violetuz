@@ -1802,6 +1802,7 @@ const MovieDetail = () => {
                 <ShareButton
                   movie={movie}
                   icon="send"
+                  dropdownInPortal
                   className="movie-detail-share-wrapper"
                   buttonClassName="movie-detail-action-btn movie-detail-action-btn-share"
                 />

@@ -28,7 +28,7 @@ const safeFileName = (title) =>
     .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '')
     .trim() || 'music';
 
-const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
+const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic, onShare }) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [mounted, setMounted] = useState(false);
@@ -96,6 +96,14 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
     const h = measureSheet();
     animateSheetTo(h + 28, finishClose);
   }, [animateSheetTo, finishClose, measureSheet]);
+
+  const dismissForHandoff = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    document.documentElement.classList.remove(BODY_LOCK);
+    document.body.classList.remove(BODY_LOCK);
+    finishClose();
+  }, [finishClose]);
 
   useEffect(() => {
     if (!open) {
@@ -225,6 +233,12 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
     if (musicId == null) return;
     onGoToMusic?.(item);
     requestClose();
+  };
+
+  const handleShare = () => {
+    if (musicId == null) return;
+    onShare?.(item);
+    dismissForHandoff();
   };
 
   const handleDownload = async () => {
@@ -357,6 +371,17 @@ const VoiceSearchTaronaModal = ({ open, onClose, item, onGoToMusic }) => {
           >
             <i className="fa-solid fa-download" aria-hidden="true" />
             <span>{t('voiceSearch.taronaDownload', 'Yuklab olish')}</span>
+          </button>
+
+          <button
+            type="button"
+            className="voice-search-tarona-modal-action voice-search-tarona-modal-action--share"
+            onClick={handleShare}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1.5-4.5 4.5-8.5 11-9V9z" />
+            </svg>
+            <span>{t('voiceSearch.taronaShare', 'Yuborish')}</span>
           </button>
         </div>
       </div>

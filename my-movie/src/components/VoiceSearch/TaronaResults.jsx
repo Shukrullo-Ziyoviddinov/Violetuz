@@ -1,8 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ShareButton from '../ShareButton/ShareButton';
 import TaronaPlayingBars from './TaronaPlayingBars';
 import VoiceSearchTaronaModal from './VoiceSearchTaronaModal';
 import useTaronaInlinePlayer from './useTaronaInlinePlayer';
+
+const TaronaShareLauncher = ({ item, launchKey }) => {
+  const { t } = useTranslation();
+  const hostRef = useRef(null);
+
+  useEffect(() => {
+    if (!item || !launchKey) return undefined;
+
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        hostRef.current?.querySelector('button.share-button')?.click();
+      });
+    });
+
+    return () => window.cancelAnimationFrame(id);
+  }, [item, launchKey]);
+
+  if (!item) return null;
+
+  return (
+    <div ref={hostRef} className="voice-search-tarona-share-host" aria-hidden="true">
+      <ShareButton
+        movie={{ title: item.title }}
+        sharePath={`/music/${item.id}`}
+        dropdownInPortal
+        icon="send"
+        label={t('voiceSearch.taronaShare', 'Yuborish')}
+        className="voice-search-tarona-share"
+        buttonClassName="voice-search-tarona-share-trigger"
+      />
+    </div>
+  );
+};
 
 const formatTrackDuration = (sec) => {
   if (sec == null || !Number.isFinite(sec) || sec <= 0) return '';
@@ -16,6 +50,8 @@ const TaronaResults = ({ matches, onGoToMusic }) => {
   const { t } = useTranslation();
   const [menuItem, setMenuItem] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [shareItem, setShareItem] = useState(null);
+  const [shareLaunchKey, setShareLaunchKey] = useState(0);
   const { audioRef, analyserRef, playingId, isPlaying, toggleTrack, stop, handlePlay, handlePause, handleEnded } =
     useTaronaInlinePlayer();
 
@@ -34,6 +70,11 @@ const TaronaResults = ({ matches, onGoToMusic }) => {
   const closeMenu = () => {
     setMenuOpen(false);
     setMenuItem(null);
+  };
+
+  const handleShareFromMenu = (item) => {
+    setShareItem(item);
+    setShareLaunchKey((key) => key + 1);
   };
 
   if (!matches?.length) {
@@ -113,7 +154,10 @@ const TaronaResults = ({ matches, onGoToMusic }) => {
         onClose={closeMenu}
         item={menuItem}
         onGoToMusic={onGoToMusic}
+        onShare={handleShareFromMenu}
       />
+
+      <TaronaShareLauncher item={shareItem} launchKey={shareLaunchKey} />
     </>
   );
 };

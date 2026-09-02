@@ -154,6 +154,19 @@ body.voice-search-tarona-sheet-open {
   color: #a78bfa;
 }
 
+.voice-search-tarona-share-host {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .voice-search-tarona-modal-overlay,
   .voice-search-tarona-modal-sheet {
