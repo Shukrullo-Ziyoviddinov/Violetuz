@@ -65,10 +65,16 @@ export const MusicPlayerProvider = ({ children }) => {
   const [treble, setTreble] = useState(0.5);
   const [audioGraphReady, setAudioGraphReady] = useState(false);
   const [lyricsModalOpen, setLyricsModalOpen] = useState(false);
+  const [lyricsSheetOpen, setLyricsSheetOpen] = useState(false);
+  const [lyricsClosing, setLyricsClosing] = useState(false);
   const [lyricsDragOffset, setLyricsDragOffset] = useState(0);
   const [lyricsDragging, setLyricsDragging] = useState(false);
   const lyricsDragStartRef = useRef(null);
   const lyricsDragOffsetRef = useRef(0);
+  const lyricsModalRef = useRef(null);
+  const lyricsClosingRef = useRef(false);
+  const lyricsCloseTimerRef = useRef(null);
+  const LYRICS_CLOSE_MS = 320;
   lyricsDragOffsetRef.current = lyricsDragOffset;
   const [playerModalOpen, setPlayerModalOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(() => window.innerWidth <= 768);
@@ -88,10 +94,71 @@ export const MusicPlayerProvider = ({ children }) => {
     if (!isMobileView && playerModalOpen) setPlayerModalOpen(false);
   }, [isMobileView, playerModalOpen]);
 
-  /* Lyrics modal drag */
+  /* Lyrics modal drag + open/close animation */
+  const finishLyricsClose = useCallback(() => {
+    if (lyricsCloseTimerRef.current) {
+      window.clearTimeout(lyricsCloseTimerRef.current);
+      lyricsCloseTimerRef.current = null;
+    }
+    setLyricsModalOpen(false);
+    setLyricsSheetOpen(false);
+    setLyricsClosing(false);
+    setLyricsDragging(false);
+    setLyricsDragOffset(0);
+    lyricsDragStartRef.current = null;
+    lyricsClosingRef.current = false;
+  }, []);
+
+  const closeLyricsModal = useCallback(() => {
+    if (lyricsClosingRef.current) return;
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      setLyricsModalOpen(false);
+      return;
+    }
+    lyricsClosingRef.current = true;
+    lyricsDragStartRef.current = null;
+    setLyricsDragging(false);
+    const h = lyricsModalRef.current?.offsetHeight || Math.round(window.innerHeight * 0.5);
+    setLyricsDragOffset((prev) => (prev > 0 ? Math.max(prev, h + 24) : h + 24));
+    setLyricsSheetOpen(false);
+    setLyricsClosing(true);
+    lyricsCloseTimerRef.current = window.setTimeout(finishLyricsClose, LYRICS_CLOSE_MS);
+  }, [finishLyricsClose]);
+
+  useEffect(() => {
+    if (!lyricsModalOpen) {
+      setLyricsSheetOpen(false);
+      setLyricsClosing(false);
+      return undefined;
+    }
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      setLyricsSheetOpen(true);
+      setLyricsDragOffset(0);
+      setLyricsDragging(false);
+      return undefined;
+    }
+    if (lyricsCloseTimerRef.current) {
+      window.clearTimeout(lyricsCloseTimerRef.current);
+      lyricsCloseTimerRef.current = null;
+    }
+    lyricsClosingRef.current = false;
+    setLyricsClosing(false);
+    setLyricsDragOffset(0);
+    setLyricsDragging(false);
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setLyricsSheetOpen(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [lyricsModalOpen]);
+
+  useEffect(() => () => {
+    if (lyricsCloseTimerRef.current) window.clearTimeout(lyricsCloseTimerRef.current);
+  }, []);
+
   useEffect(() => {
     if (!lyricsModalOpen) return;
     const onMove = (e) => {
+      if (lyricsClosingRef.current) return;
       const start = lyricsDragStartRef.current;
       if (start && e.cancelable) e.preventDefault();
       const clientY = e.touches ? e.touches[0]?.clientY : e.clientY;
@@ -101,12 +168,12 @@ export const MusicPlayerProvider = ({ children }) => {
       setLyricsDragOffset(newOffset);
     };
     const onUp = () => {
+      if (lyricsClosingRef.current) return;
       lyricsDragStartRef.current = null;
       setLyricsDragging(false);
       const offset = lyricsDragOffsetRef.current;
       if (offset > 100) {
-        setLyricsModalOpen(false);
-        setLyricsDragOffset(0);
+        closeLyricsModal();
       } else {
         setLyricsDragOffset(0);
       }
@@ -123,15 +190,7 @@ export const MusicPlayerProvider = ({ children }) => {
       document.removeEventListener('touchmove', onMove);
       document.removeEventListener('touchend', onUp);
     };
-  }, [lyricsModalOpen]);
-
-  useEffect(() => {
-    if (lyricsModalOpen) {
-      setLyricsDragOffset(0);
-      setLyricsDragging(false);
-    }
-  }, [lyricsModalOpen]);
-
+  }, [lyricsModalOpen, closeLyricsModal]);
   const { toggleWishlist, isInWishlist } = useWishlist();
   const artist = currentMusic
     ? (currentMusic.artistId ? getArtistById(currentMusic.artistId) : (currentMusic.artist ? { name: currentMusic.artist } : null))
@@ -729,18 +788,29 @@ export const MusicPlayerProvider = ({ children }) => {
           )}
           {lyricsModalOpen && currentMusic?.lyricsText && getLyricsText(currentMusic.lyricsText)?.trim() && (
             <div
-              className="music-detail-lyrics-modal-overlay"
-              onClick={() => setLyricsModalOpen(false)}
+              className={[
+                'music-detail-lyrics-modal-overlay',
+                lyricsSheetOpen && !lyricsClosing ? 'music-detail-lyrics-modal-overlay--open' : '',
+                lyricsClosing ? 'music-detail-lyrics-modal-overlay--closing' : '',
+              ].filter(Boolean).join(' ')}
+              onClick={closeLyricsModal}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Escape' && setLyricsModalOpen(false)}
+              onKeyDown={(e) => e.key === 'Escape' && closeLyricsModal()}
               aria-label="Lyrics modali"
             >
               <div
-                className={`music-detail-lyrics-modal ${lyricsDragging ? 'dragging' : ''}`}
+                ref={lyricsModalRef}
+                className={[
+                  'music-detail-lyrics-modal',
+                  lyricsDragging ? 'dragging' : '',
+                  lyricsSheetOpen && !lyricsClosing ? 'music-detail-lyrics-modal--open' : '',
+                  lyricsClosing ? 'music-detail-lyrics-modal--closing' : '',
+                ].filter(Boolean).join(' ')}
                 onClick={(e) => e.stopPropagation()}
-                style={{ transform: `translateY(${lyricsDragOffset}px)` }}
+                style={lyricsDragOffset ? { transform: `translateY(${lyricsDragOffset}px)` } : undefined}
                 onPointerDown={(e) => {
+                  if (lyricsClosingRef.current) return;
                   if (e.target.closest('.music-detail-lyrics-modal-back')) return;
                   if (e.target.closest('.music-detail-lyrics-modal-header')) {
                     lyricsDragStartRef.current = { y: e.clientY, startOffset: lyricsDragOffset };
@@ -759,7 +829,7 @@ export const MusicPlayerProvider = ({ children }) => {
                   <button
                     type="button"
                     className="music-detail-lyrics-modal-back"
-                    onClick={() => setLyricsModalOpen(false)}
+                    onClick={closeLyricsModal}
                     onPointerDown={(e) => e.stopPropagation()}
                     aria-label="Orqaga"
                   >

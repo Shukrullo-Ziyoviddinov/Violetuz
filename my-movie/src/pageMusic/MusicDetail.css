@@ -927,7 +927,7 @@
   width: 100%;
   max-width: 480px;
   max-height: 85vh;
-  background: rgba(28, 22, 36, 0.98);
+  background: #121212;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -1015,6 +1015,17 @@
   .music-detail-lyrics-modal-overlay {
     align-items: flex-end;
     padding: 0;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+
+  .music-detail-lyrics-modal-overlay--open {
+    opacity: 1;
+  }
+
+  .music-detail-lyrics-modal-overlay--closing {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .music-detail-lyrics-modal {
@@ -1022,13 +1033,22 @@
     max-width: none;
     max-height: 90vh;
     border-radius: 16px 16px 0 0;
-    transform: translateY(0);
-    transition: transform 0.25s ease-out;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
     touch-action: none;
   }
 
+  .music-detail-lyrics-modal--open {
+    transform: translateY(0);
+  }
+
+  .music-detail-lyrics-modal--closing {
+    pointer-events: none;
+  }
+
   .music-detail-lyrics-modal.dragging {
-    transition: none;
+    transition: none !important;
   }
 
   .music-detail-lyrics-modal-handle {
@@ -1063,7 +1083,7 @@
   }
 
   .music-detail-lyrics-modal-back {
-    display: flex;
+    display: none;
     position: absolute;
     top: 1rem;
     left: 1rem;
@@ -1084,10 +1104,6 @@
 
   .music-detail-lyrics-modal-line {
     text-align: center;
-  }
-
-  .music-detail-lyrics-modal-back{
-    display: none;
   }
 }
 

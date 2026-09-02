@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
@@ -190,10 +190,16 @@ const MusicAlbumDetail = () => {
   } = useMusicPlayer();
 
   const [lyricsModalOpen, setLyricsModalOpen] = useState(false);
+  const [lyricsSheetOpen, setLyricsSheetOpen] = useState(false);
+  const [lyricsClosing, setLyricsClosing] = useState(false);
   const [lyricsDragOffset, setLyricsDragOffset] = useState(0);
   const [lyricsDragging, setLyricsDragging] = useState(false);
   const lyricsDragStartRef = useRef(null);
   const lyricsDragOffsetRef = useRef(0);
+  const lyricsModalRef = useRef(null);
+  const lyricsClosingRef = useRef(false);
+  const lyricsCloseTimerRef = useRef(null);
+  const LYRICS_CLOSE_MS = 320;
   lyricsDragOffsetRef.current = lyricsDragOffset;
 
   const trendSkeletonItems = useMemo(
@@ -213,9 +219,70 @@ const MusicAlbumDetail = () => {
     []
   );
 
+  const finishLyricsClose = useCallback(() => {
+    if (lyricsCloseTimerRef.current) {
+      window.clearTimeout(lyricsCloseTimerRef.current);
+      lyricsCloseTimerRef.current = null;
+    }
+    setLyricsModalOpen(false);
+    setLyricsSheetOpen(false);
+    setLyricsClosing(false);
+    setLyricsDragging(false);
+    setLyricsDragOffset(0);
+    lyricsDragStartRef.current = null;
+    lyricsClosingRef.current = false;
+  }, []);
+
+  const closeLyricsModal = useCallback(() => {
+    if (lyricsClosingRef.current) return;
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      setLyricsModalOpen(false);
+      return;
+    }
+    lyricsClosingRef.current = true;
+    lyricsDragStartRef.current = null;
+    setLyricsDragging(false);
+    const h = lyricsModalRef.current?.offsetHeight || Math.round(window.innerHeight * 0.5);
+    setLyricsDragOffset((prev) => (prev > 0 ? Math.max(prev, h + 24) : h + 24));
+    setLyricsSheetOpen(false);
+    setLyricsClosing(true);
+    lyricsCloseTimerRef.current = window.setTimeout(finishLyricsClose, LYRICS_CLOSE_MS);
+  }, [finishLyricsClose]);
+
+  useEffect(() => {
+    if (!lyricsModalOpen) {
+      setLyricsSheetOpen(false);
+      setLyricsClosing(false);
+      return undefined;
+    }
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      setLyricsSheetOpen(true);
+      setLyricsDragOffset(0);
+      setLyricsDragging(false);
+      return undefined;
+    }
+    if (lyricsCloseTimerRef.current) {
+      window.clearTimeout(lyricsCloseTimerRef.current);
+      lyricsCloseTimerRef.current = null;
+    }
+    lyricsClosingRef.current = false;
+    setLyricsClosing(false);
+    setLyricsDragOffset(0);
+    setLyricsDragging(false);
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setLyricsSheetOpen(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [lyricsModalOpen]);
+
+  useEffect(() => () => {
+    if (lyricsCloseTimerRef.current) window.clearTimeout(lyricsCloseTimerRef.current);
+  }, []);
+
   useEffect(() => {
     if (!lyricsModalOpen) return;
     const onMove = (e) => {
+      if (lyricsClosingRef.current) return;
       const start = lyricsDragStartRef.current;
       if (start && e.cancelable) e.preventDefault();
       const clientY = e.touches ? e.touches[0]?.clientY : e.clientY;
@@ -225,12 +292,12 @@ const MusicAlbumDetail = () => {
       setLyricsDragOffset(newOffset);
     };
     const onUp = () => {
+      if (lyricsClosingRef.current) return;
       lyricsDragStartRef.current = null;
       setLyricsDragging(false);
       const offset = lyricsDragOffsetRef.current;
       if (offset > 100) {
-        setLyricsModalOpen(false);
-        setLyricsDragOffset(0);
+        closeLyricsModal();
       } else {
         setLyricsDragOffset(0);
       }
@@ -247,14 +314,7 @@ const MusicAlbumDetail = () => {
       document.removeEventListener('touchmove', onMove);
       document.removeEventListener('touchend', onUp);
     };
-  }, [lyricsModalOpen]);
-
-  useEffect(() => {
-    if (lyricsModalOpen) {
-      setLyricsDragOffset(0);
-      setLyricsDragging(false);
-    }
-  }, [lyricsModalOpen]);
+  }, [lyricsModalOpen, closeLyricsModal]);
 
   const album = allAlbums.find((a) => matchId(a.id, id));
 
@@ -735,14 +795,25 @@ const MusicAlbumDetail = () => {
 
       {lyricsModalOpen && hasActiveLyrics && (
         <div
-          className="music-detail-lyrics-modal-overlay"
-          onClick={() => setLyricsModalOpen(false)}
+          className={[
+            'music-detail-lyrics-modal-overlay',
+            lyricsSheetOpen && !lyricsClosing ? 'music-detail-lyrics-modal-overlay--open' : '',
+            lyricsClosing ? 'music-detail-lyrics-modal-overlay--closing' : '',
+          ].filter(Boolean).join(' ')}
+          onClick={closeLyricsModal}
         >
           <div
-            className={`music-detail-lyrics-modal ${lyricsDragging ? 'dragging' : ''}`}
+            ref={lyricsModalRef}
+            className={[
+              'music-detail-lyrics-modal',
+              lyricsDragging ? 'dragging' : '',
+              lyricsSheetOpen && !lyricsClosing ? 'music-detail-lyrics-modal--open' : '',
+              lyricsClosing ? 'music-detail-lyrics-modal--closing' : '',
+            ].filter(Boolean).join(' ')}
             onClick={(e) => e.stopPropagation()}
-            style={{ transform: `translateY(${lyricsDragOffset}px)` }}
+            style={lyricsDragOffset ? { transform: `translateY(${lyricsDragOffset}px)` } : undefined}
             onPointerDown={(e) => {
+              if (lyricsClosingRef.current) return;
               if (e.target.closest('.music-detail-lyrics-modal-back')) return;
               if (e.target.closest('.music-detail-lyrics-modal-header')) {
                 lyricsDragStartRef.current = {
@@ -761,7 +832,7 @@ const MusicAlbumDetail = () => {
               <button
                 type="button"
                 className="music-detail-lyrics-modal-back"
-                onClick={() => setLyricsModalOpen(false)}
+                onClick={closeLyricsModal}
                 onPointerDown={(e) => e.stopPropagation()}
                 aria-label="Orqaga"
               >
