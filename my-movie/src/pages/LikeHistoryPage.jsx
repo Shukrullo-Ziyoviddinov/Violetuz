@@ -6,10 +6,17 @@ import {
   LikeHistoryFilterModal,
   getAvailableLikeHistoryTabs,
   pickDefaultLikeHistoryCategory,
+  createEmptyLikeHistoryDrafts,
+  cloneLikeHistoryDrafts,
+  resolveLikeHistoryCatalogs,
+  filterLikeHistoryItems,
 } from '../components/LikeHistoryPageFilter';
 import { useLikeHistory } from '../context/LikesContext';
+import { useMoviesApi } from '../context/MoviesApiContext';
+import { useMusicApi } from '../context/MusicApiContext';
 import './LikeHistoryPage.css';
 import '../components/LikeHistoryPageFilter/LikeHistoryFilterModal.css';
+import '../components/Filters/FiltersSelect.css';
 
 const MOBILE_MAX = 768;
 
@@ -28,14 +35,34 @@ const useIsMobileLikeHistory = () => {
 const LikeHistoryPage = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobileLikeHistory();
+  const list = useLikeHistory();
+  const { allMovies } = useMoviesApi();
+  const { allClips, allConcerts } = useMusicApi();
+
   const [filter, setFilter] = useState('movie');
   const [draftTab, setDraftTab] = useState('movie');
   const [filterModalOpen, setFilterModalOpen] = useState(false);
-  const list = useLikeHistory();
+  const [appliedFilters, setAppliedFilters] = useState(() =>
+    createEmptyLikeHistoryDrafts()
+  );
+  const [draftFilters, setDraftFilters] = useState(() =>
+    createEmptyLikeHistoryDrafts()
+  );
 
   const availableTabs = useMemo(
     () => getAvailableLikeHistoryTabs(list, t),
     [list, t]
+  );
+
+  const filterCatalogs = useMemo(
+    () =>
+      resolveLikeHistoryCatalogs({
+        historyItems: list,
+        allMovies,
+        allClips,
+        allConcerts,
+      }),
+    [list, allMovies, allClips, allConcerts]
   );
 
   useEffect(() => {
@@ -43,23 +70,26 @@ const LikeHistoryPage = () => {
     if (next !== filter) setFilter(next);
   }, [list, filter]);
 
-  useEffect(() => {
-    if (filterModalOpen) setDraftTab(filter);
-  }, [filterModalOpen, filter]);
-
   const filtered = useMemo(
-    () => list.filter((item) => item.category === filter),
-    [list, filter]
+    () => filterLikeHistoryItems(list, filter, filterCatalogs, appliedFilters),
+    [list, filter, filterCatalogs, appliedFilters]
   );
 
   const openFilterModal = () => {
     setDraftTab(filter);
+    setDraftFilters(cloneLikeHistoryDrafts(appliedFilters));
     setFilterModalOpen(true);
   };
 
   const handleFilterApply = () => {
     setFilter(pickDefaultLikeHistoryCategory(list, draftTab));
+    setAppliedFilters(cloneLikeHistoryDrafts(draftFilters));
     setFilterModalOpen(false);
+  };
+
+  const handleDesktopFilterChange = (next) => {
+    setFilter(next);
+    setAppliedFilters(createEmptyLikeHistoryDrafts());
   };
 
   const showMobileFilter = isMobile && availableTabs.length > 0;
@@ -67,7 +97,11 @@ const LikeHistoryPage = () => {
   return (
     <div className="like-history-page">
       <div className="like-history-page-container">
-        <LikeHistoryFilter active={filter} onChange={setFilter} items={list} />
+        <LikeHistoryFilter
+          active={filter}
+          onChange={handleDesktopFilterChange}
+          items={list}
+        />
 
         {showMobileFilter ? (
           <>
@@ -103,7 +137,9 @@ const LikeHistoryPage = () => {
               tabs={availableTabs}
               selectedTab={draftTab}
               onSelectTab={setDraftTab}
-              items={list}
+              drafts={draftFilters}
+              onDraftsChange={setDraftFilters}
+              catalogs={filterCatalogs}
               onApply={handleFilterApply}
             />
           </>

@@ -3,15 +3,22 @@ import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import { LikeHistoryTabIcons } from './likeHistoryTabIcons';
-import LikeHistoryCategoryPanel from './LikeHistoryCategoryPanel';
-import { countLikeHistoryByCategory } from './likeHistoryFilterLogic';
+import LikeHistoryMovieFilters from './LikeHistoryMovieFilters';
+import LikeHistoryMusicFilters from './LikeHistoryMusicFilters';
+import {
+  getLikeHistoryFilterPanelKind,
+  countLikeHistoryDraftResults,
+  EMPTY_MOVIE_DRAFT,
+  EMPTY_MUSIC_DRAFT,
+} from './likeHistoryFilterLogic';
+import '../Filters/FiltersSelect.css';
 import './LikeHistoryFilterModal.css';
 
 const DRAG_CLOSE_THRESHOLD = 80;
 
 /**
  * Like-history mobil filter modal.
- * Tab → pastda kategoriya paneli (kino / klip / konsert).
+ * Tab → pastda kino yoki klip/konsert filter paneli (wishlist bilan bir xil).
  */
 const LikeHistoryFilterModal = ({
   isOpen,
@@ -19,7 +26,9 @@ const LikeHistoryFilterModal = ({
   tabs = [],
   selectedTab,
   onSelectTab,
-  items = [],
+  drafts,
+  onDraftsChange,
+  catalogs = {},
   onApply,
 }) => {
   const { t } = useTranslation();
@@ -32,7 +41,8 @@ const LikeHistoryFilterModal = ({
   const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const resultCount = countLikeHistoryByCategory(items, selectedTab);
+  const panelKind = getLikeHistoryFilterPanelKind(selectedTab);
+  const resultCount = countLikeHistoryDraftResults(selectedTab, catalogs, drafts);
 
   useEffect(() => {
     if (closeTimerRef.current) {
@@ -75,6 +85,7 @@ const LikeHistoryFilterModal = ({
 
   const handleDragStart = useCallback((e) => {
     if (e.target.closest?.('.like-history-tabs')) return;
+    if (e.target.closest?.('.filters-select')) return;
     if (e.target.closest?.('.like-history-filter-modal-footer')) return;
     isTouch.current = e.type.startsWith('touch');
     isDragging.current = true;
@@ -125,6 +136,13 @@ const LikeHistoryFilterModal = ({
     };
   }, [mounted, visible, handleDragMove, handleDragEnd]);
 
+  const patchDraft = (tabId, nextDraft) => {
+    onDraftsChange?.({
+      ...drafts,
+      [tabId]: nextDraft,
+    });
+  };
+
   if (!mounted) return null;
 
   return createPortal(
@@ -150,7 +168,7 @@ const LikeHistoryFilterModal = ({
           </div>
         </div>
 
-        <div className="like-history-filter-modal-body">
+        <div className="like-history-filter-modal-body filters-modal-sheet-body">
           <ScrollTouch className="like-history-tabs like-history-tabs--modal">
             {tabs.map((tab) => (
               <button
@@ -167,15 +185,27 @@ const LikeHistoryFilterModal = ({
             ))}
           </ScrollTouch>
 
-          <div className="like-history-filter-panels" aria-live="polite">
-            {selectedTab ? (
-              <LikeHistoryCategoryPanel
-                key={selectedTab}
-                category={selectedTab}
-                items={items}
-              />
-            ) : null}
-          </div>
+          {panelKind !== 'none' ? (
+            <div className="like-history-filter-panels" aria-live="polite">
+              {panelKind === 'movie' ? (
+                <LikeHistoryMovieFilters
+                  key="movie-panel"
+                  movies={catalogs.movie || []}
+                  draft={drafts?.movie || EMPTY_MOVIE_DRAFT}
+                  onChange={(next) => patchDraft('movie', next)}
+                />
+              ) : null}
+
+              {panelKind === 'music' ? (
+                <LikeHistoryMusicFilters
+                  key={`music-panel-${selectedTab}`}
+                  items={catalogs[selectedTab] || []}
+                  draft={drafts?.[selectedTab] || EMPTY_MUSIC_DRAFT}
+                  onChange={(next) => patchDraft(selectedTab, next)}
+                />
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <div className="like-history-filter-modal-footer">
@@ -183,8 +213,14 @@ const LikeHistoryFilterModal = ({
             type="button"
             className="like-history-filter-modal-clear"
             onClick={() => {
-              const first = tabs[0]?.id;
-              if (first) onSelectTab?.(first);
+              if (panelKind === 'movie') {
+                patchDraft('movie', {
+                  ...EMPTY_MOVIE_DRAFT,
+                  genres: [],
+                });
+              } else if (panelKind === 'music' && selectedTab) {
+                patchDraft(selectedTab, { ...EMPTY_MUSIC_DRAFT });
+              }
             }}
           >
             {t('music.filterClear', 'Tozalash')}

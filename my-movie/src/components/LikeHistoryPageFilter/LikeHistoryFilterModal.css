@@ -169,43 +169,40 @@
   color: #fff;
 }
 
-.like-history-filter-panel-summary {
+.like-history-filter-panel .filters-modal-reyting-type-row {
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.9rem 1rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0;
 }
 
-.like-history-filter-panel-summary-icon {
+.like-history-filter-panel .filters-modal-reyting-type-btn {
+  flex: 1;
+  min-width: 60px;
+  padding: 0.3rem;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: rgba(30, 3, 210, 0.25);
-  color: #fff;
-  flex-shrink: 0;
 }
 
-.like-history-filter-panel-summary-text {
-  min-width: 0;
+.like-history-filter-panel .filters-modal-reyting-type-btn--active {
+  background: #1e03d24d;
+  border-color: #1f16cc99;
 }
 
-.like-history-filter-panel-summary-hint {
-  margin: 0 0 0.2rem;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.75);
+.like-history-filter-panel .filters-modal-reyting-type-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
-.like-history-filter-panel-summary-count {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff;
+.like-history-filter-panel .filters-modal-reyting-type-img--netflix {
+  width: 45px;
+  height: 45px;
 }
 
 .like-history-filter-modal-footer {
