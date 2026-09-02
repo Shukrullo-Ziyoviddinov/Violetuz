@@ -1991,6 +1991,17 @@
   .movie-detail-description-modal {
     align-items: flex-end;
     justify-content: flex-end;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+
+  .movie-detail-description-modal--open {
+    opacity: 1;
+  }
+
+  .movie-detail-description-modal--closing {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .movie-detail-description-modal-overlay {
@@ -2004,22 +2015,21 @@
     border-radius: 20px 20px 0 0;
     position: relative;
     margin: 0;
-    animation: slideUp 0.3s ease-out;
-    transition: transform 0.2s ease-out;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .movie-detail-description-modal-content--open {
     transform: translateY(0);
   }
 
-  .movie-detail-description-modal.dragging .movie-detail-description-modal-content {
-    transition: none;
+  .movie-detail-description-modal-content--closing {
+    pointer-events: none;
   }
 
-  @keyframes slideUp {
-    from {
-      transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
-    }
+  .movie-detail-description-modal.dragging .movie-detail-description-modal-content {
+    transition: none !important;
   }
 
   .movie-detail-description-modal-header {
@@ -2031,7 +2041,7 @@
   }
 
   .movie-detail-description-modal-close {
-    left: 1.5rem;
+    display: none;
   }
 
   .movie-detail-description-modal-body {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useActorsApi } from '../../context/ActorsApiContext';
@@ -569,11 +569,13 @@ const MovieDetail = () => {
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [isMuted, setIsMuted] = useState(true);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
-  const [modalStartY, setModalStartY] = useState(0);
-  const [modalCurrentY, setModalCurrentY] = useState(0);
+  const [descSheetOpen, setDescSheetOpen] = useState(false);
+  const [descClosing, setDescClosing] = useState(false);
+  const [modalTranslateY, setModalTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const videoRef = React.useRef(null);
   const modalRef = React.useRef(null);
+  const modalContentRef = React.useRef(null);
   const commentsModalRef = useRef(null);
   const [commentsCount, setCommentsCount] = useState(0);
   const [imgModalOpen, setImgModalOpen] = useState(false);
@@ -594,6 +596,9 @@ const MovieDetail = () => {
   const modalHeaderRef = React.useRef(null);
   const isDraggingRef = React.useRef(false);
   const modalStartYRef = React.useRef(0);
+  const descClosingRef = React.useRef(false);
+  const descCloseTimerRef = React.useRef(null);
+  const DESC_CLOSE_MS = 320;
 
   const movie = allMovies.find((m) => m.id === parseInt(id, 10));
   const movieLikeQuery = useQuery({
@@ -894,6 +899,63 @@ const MovieDetail = () => {
     else if (seasonsLang === 'uz' && !hasUz && hasRu) setSeasonsLang('ru');
   }, [movie, seasonsLang]);
 
+  const finishDescriptionClose = useCallback(() => {
+    if (descCloseTimerRef.current) {
+      window.clearTimeout(descCloseTimerRef.current);
+      descCloseTimerRef.current = null;
+    }
+    setShowDescriptionModal(false);
+    setDescSheetOpen(false);
+    setDescClosing(false);
+    setIsDragging(false);
+    setModalTranslateY(0);
+    isDraggingRef.current = false;
+    descClosingRef.current = false;
+  }, []);
+
+  const closeDescriptionModal = useCallback(() => {
+    if (descClosingRef.current) return;
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      setShowDescriptionModal(false);
+      return;
+    }
+    descClosingRef.current = true;
+    setIsDragging(false);
+    isDraggingRef.current = false;
+    const h = modalContentRef.current?.offsetHeight || Math.round(window.innerHeight * 0.5);
+    setModalTranslateY((prev) => (prev > 0 ? Math.max(prev, h + 24) : h + 24));
+    setDescSheetOpen(false);
+    setDescClosing(true);
+    descCloseTimerRef.current = window.setTimeout(finishDescriptionClose, DESC_CLOSE_MS);
+  }, [finishDescriptionClose]);
+
+  useEffect(() => {
+    if (!showDescriptionModal) {
+      setDescSheetOpen(false);
+      setDescClosing(false);
+      return undefined;
+    }
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      setDescSheetOpen(true);
+      return undefined;
+    }
+    if (descCloseTimerRef.current) {
+      window.clearTimeout(descCloseTimerRef.current);
+      descCloseTimerRef.current = null;
+    }
+    descClosingRef.current = false;
+    setDescClosing(false);
+    setModalTranslateY(0);
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setDescSheetOpen(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [showDescriptionModal]);
+
+  useEffect(() => () => {
+    if (descCloseTimerRef.current) window.clearTimeout(descCloseTimerRef.current);
+  }, []);
+
   useEffect(() => {
     if (showDescriptionModal) {
       document.body.style.overflow = 'hidden';
@@ -992,15 +1054,15 @@ const MovieDetail = () => {
 
   // Mobile modal touchmove — passive: false (preventDefault uchun)
   const handleModalTouchMove = (e) => {
-    if (window.innerWidth <= 768 && isDraggingRef.current) {
+    if (window.innerWidth <= 768 && isDraggingRef.current && !descClosingRef.current) {
       e.preventDefault();
       e.stopPropagation();
       const currentY = e.touches[0].clientY;
       const deltaY = currentY - modalStartYRef.current;
       if (deltaY > 0) {
-        setModalCurrentY(currentY);
+        setModalTranslateY(deltaY);
       } else {
-        setModalCurrentY(modalStartYRef.current);
+        setModalTranslateY(0);
       }
     }
   };
@@ -1337,32 +1399,26 @@ const MovieDetail = () => {
 
   // Mobile swipe handlers for modal
   const handleModalHeaderTouchStart = (e) => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 768 && !descClosingRef.current) {
       e.stopPropagation();
       const touchY = e.touches[0].clientY;
       modalStartYRef.current = touchY;
       isDraggingRef.current = true;
       setIsDragging(true);
-      setModalStartY(touchY);
-      setModalCurrentY(touchY);
     }
   };
 
   const handleModalTouchEnd = (e) => {
-    if (window.innerWidth <= 768 && isDragging) {
+    if (window.innerWidth <= 768 && isDragging && !descClosingRef.current) {
       e.stopPropagation();
-      const deltaY = modalCurrentY - modalStartY;
-      const screenHeight = window.innerHeight;
-      const threshold = screenHeight * 0.1; // 10% of screen
-      
-      if (deltaY > threshold) {
-        setShowDescriptionModal(false);
+      const threshold = window.innerHeight * 0.1;
+      if (modalTranslateY > threshold) {
+        closeDescriptionModal();
+        return;
       }
-      
       isDraggingRef.current = false;
       setIsDragging(false);
-      setModalCurrentY(0);
-      setModalStartY(0);
+      setModalTranslateY(0);
     }
   };
 
@@ -2158,25 +2214,29 @@ const MovieDetail = () => {
       />
 
       {showDescriptionModal && (
-        <div 
-          className={`movie-detail-description-modal ${isDragging ? 'dragging' : ''}`}
+        <div
+          className={[
+            'movie-detail-description-modal',
+            isDragging ? 'dragging' : '',
+            descSheetOpen && !descClosing ? 'movie-detail-description-modal--open' : '',
+            descClosing ? 'movie-detail-description-modal--closing' : '',
+          ].filter(Boolean).join(' ')}
           ref={modalRef}
         >
-          <div 
-            className="movie-detail-description-modal-overlay" 
-            onClick={() => {
-              if (window.innerWidth > 768) {
-                setShowDescriptionModal(false);
-              }
-            }}
+          <div
+            className="movie-detail-description-modal-overlay"
+            onClick={closeDescriptionModal}
           ></div>
-          <div 
-            className="movie-detail-description-modal-content"
-            style={window.innerWidth <= 768 && isDragging && modalCurrentY > modalStartY ? {
-              transform: `translateY(${modalCurrentY - modalStartY}px)`
-            } : {}}
+          <div
+            ref={modalContentRef}
+            className={[
+              'movie-detail-description-modal-content',
+              descSheetOpen && !descClosing ? 'movie-detail-description-modal-content--open' : '',
+              descClosing ? 'movie-detail-description-modal-content--closing' : '',
+            ].filter(Boolean).join(' ')}
+            style={modalTranslateY ? { transform: `translateY(${modalTranslateY}px)` } : undefined}
           >
-            <div 
+            <div
               ref={modalHeaderRef}
               className="movie-detail-description-modal-header"
               onTouchStart={handleModalHeaderTouchStart}
@@ -2194,7 +2254,7 @@ const MovieDetail = () => {
               )}
               <button
                 className="movie-detail-description-modal-close"
-                onClick={() => setShowDescriptionModal(false)}
+                onClick={closeDescriptionModal}
                 aria-label="Close"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
