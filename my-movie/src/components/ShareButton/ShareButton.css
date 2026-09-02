@@ -134,16 +134,29 @@
   align-items: flex-end;
   justify-content: center;
   padding: 0;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.share-modal-overlay--open {
+  opacity: 1;
+}
+
+.share-modal-overlay--closing {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .share-modal-overlay--desktop {
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  opacity: 1;
+  transition: none;
 }
 
 .share-modal-content {
-  background: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%);
+  background: #121212;
   border: 1px solid rgba(70, 65, 80, 0.5);
   width: 100%;
   max-width: 100%;
@@ -152,7 +165,6 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: shareModalSlideUp 0.3s ease-out;
 }
 
 .share-modal-content--desktop {
@@ -176,6 +188,13 @@
 .share-modal-content--mobile {
   touch-action: none;
   cursor: grab;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.share-modal-content--mobile.share-modal-content--open {
+  transform: translateY(0);
 }
 
 .share-modal-content--mobile:active {
@@ -183,20 +202,11 @@
 }
 
 .share-modal-content--dragging {
-  transition: none;
+  transition: none !important;
 }
 
-.share-modal-content:not(.share-modal-content--dragging) {
-  transition: transform 0.2s ease-out;
-}
-
-@keyframes shareModalSlideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+.share-modal-content--closing {
+  pointer-events: none;
 }
 
 .share-modal-drag-zone {

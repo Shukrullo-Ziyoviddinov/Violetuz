@@ -98,6 +98,17 @@
 
 .shorts-share-overlay-mobile {
   align-items: flex-end;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.shorts-share-overlay-mobile.shorts-share-overlay--open {
+  opacity: 1;
+}
+
+.shorts-share-overlay-mobile.shorts-share-overlay--closing {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .shorts-share-overlay-desktop {
@@ -106,7 +117,7 @@
 }
 
 .shorts-share-modal-content {
-  background: linear-gradient(135deg, rgb(28, 22, 36) 0%, rgb(18, 14, 24) 100%);
+  background: #121212;
   border: 1px solid rgba(70, 65, 80, 0.5);
   width: 100%;
   max-width: 100%;
@@ -115,7 +126,6 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: shortsShareSlideUp 0.3s ease-out;
 }
 
 .shorts-share-modal-desktop {
@@ -140,6 +150,13 @@
 .shorts-share-modal-mobile {
   touch-action: none;
   cursor: grab;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.shorts-share-modal-mobile.shorts-share-modal--open {
+  transform: translateY(0);
 }
 
 .shorts-share-modal-mobile:active {
@@ -147,20 +164,11 @@
 }
 
 .shorts-share-modal-dragging {
-  transition: none;
+  transition: none !important;
 }
 
-.shorts-share-modal-content:not(.shorts-share-modal-dragging) {
-  transition: transform 0.2s ease-out;
-}
-
-@keyframes shortsShareSlideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+.shorts-share-modal--closing {
+  pointer-events: none;
 }
 
 .shorts-share-drag-zone {

@@ -8,6 +8,7 @@ import './ShareButton.css';
 
 const MOBILE_BREAKPOINT = 768;
 const DRAG_THRESHOLD = 8;
+const CLOSE_MS = 320;
 
 const ShareButton = ({
   movie,
@@ -24,6 +25,8 @@ const ShareButton = ({
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState({});
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -31,6 +34,8 @@ const ShareButton = ({
   const [modalTranslateY, setModalTranslateY] = useState(0);
   const dropdownRef = useRef(null);
   const modalRef = useRef(null);
+  const closingRef = useRef(false);
+  const closeTimerRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobileView(window.innerWidth <= MOBILE_BREAKPOINT);
@@ -88,7 +93,58 @@ const ShareButton = ({
     },
   ];
 
-  const closeModal = () => setIsOpen(false);
+  const finishClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setIsOpen(false);
+    setSheetOpen(false);
+    setIsClosing(false);
+    setIsDragging(false);
+    setModalTranslateY(0);
+    closingRef.current = false;
+  }, []);
+
+  const closeModal = useCallback(() => {
+    if (closingRef.current) return;
+    if (!isMobileView) {
+      setIsOpen(false);
+      return;
+    }
+    closingRef.current = true;
+    setIsDragging(false);
+    const h = modalRef.current?.offsetHeight || Math.round(window.innerHeight * 0.4);
+    setModalTranslateY(h + 24);
+    setSheetOpen(false);
+    setIsClosing(true);
+    closeTimerRef.current = window.setTimeout(finishClose, CLOSE_MS);
+  }, [finishClose, isMobileView]);
+
+  useEffect(() => {
+    if (!isOpen || !isMobileView) {
+      if (!isOpen) {
+        setSheetOpen(false);
+        setIsClosing(false);
+      }
+      return undefined;
+    }
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    closingRef.current = false;
+    setIsClosing(false);
+    setModalTranslateY(0);
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setSheetOpen(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [isOpen, isMobileView]);
+
+  useEffect(() => () => {
+    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+  }, []);
 
   useEffect(() => {
     if (isOpen && dropdownInPortal && dropdownRef.current && !isMobileView) {
@@ -140,7 +196,7 @@ const ShareButton = ({
   const touchStartRef = useRef(null);
 
   const handleTouchStart = (e) => {
-    if (!isMobileView) return;
+    if (!isMobileView || closingRef.current) return;
     const y = e.touches[0].clientY;
     setTouchStart(y);
     setTouchEnd(y);
@@ -148,7 +204,7 @@ const ShareButton = ({
   };
 
   const handleTouchMove = useCallback((e) => {
-    if (!isMobileView || touchStartRef.current === null) return;
+    if (!isMobileView || closingRef.current || touchStartRef.current === null) return;
     const currentY = e.touches[0].clientY;
     const diff = currentY - touchStartRef.current;
     if (diff > DRAG_THRESHOLD) {
@@ -166,7 +222,7 @@ const ShareButton = ({
   }, [isMobileView]);
 
   const handleTouchEnd = () => {
-    if (!isMobileView || touchStartRef.current === null) return;
+    if (!isMobileView || closingRef.current || touchStartRef.current === null) return;
     const distance = touchEnd !== null ? touchEnd - touchStartRef.current : 0;
     if (distance <= DRAG_THRESHOLD) {
       setIsDragging(false);
@@ -178,7 +234,11 @@ const ShareButton = ({
     const modalHeight = modalRef.current ? modalRef.current.offsetHeight : 300;
     const closeThreshold = modalHeight * 0.35;
     if (distance > closeThreshold) {
+      setTouchStart(null);
+      setTouchEnd(null);
+      touchStartRef.current = null;
       closeModal();
+      return;
     }
     setIsDragging(false);
     setModalTranslateY(0);
@@ -202,6 +262,11 @@ const ShareButton = ({
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) closeModal();
+  };
+
+  const toggleOpen = () => {
+    if (isOpen) closeModal();
+    else setIsOpen(true);
   };
 
   if (!movie) return null;
@@ -253,7 +318,7 @@ const ShareButton = ({
       <button
         type="button"
         className={`share-button ${label ? 'share-button--labeled' : ''} ${useSendIcon ? 'share-button--send' : ''} ${buttonClassName}`.trim()}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleOpen}
         aria-label={shareLabel}
       >
         {useSendIcon ? sendIcon : nodesIcon}
@@ -264,14 +329,20 @@ const ShareButton = ({
         <>
           {isMobileView ? createPortal(
             <div
-              className="share-modal-overlay"
+              className={`share-modal-overlay${sheetOpen && !isClosing ? ' share-modal-overlay--open' : ''}${isClosing ? ' share-modal-overlay--closing' : ''}`}
               onClick={handleOverlayClick}
             >
               <div
                 ref={modalRef}
-                className={`share-modal-content share-modal-content--mobile ${isDragging ? 'share-modal-content--dragging' : ''}`}
+                className={[
+                  'share-modal-content',
+                  'share-modal-content--mobile',
+                  sheetOpen && !isClosing ? 'share-modal-content--open' : '',
+                  isDragging ? 'share-modal-content--dragging' : '',
+                  isClosing ? 'share-modal-content--closing' : '',
+                ].filter(Boolean).join(' ')}
                 onClick={(e) => e.stopPropagation()}
-                style={{ transform: `translateY(${modalTranslateY}px)` }}
+                style={modalTranslateY ? { transform: `translateY(${modalTranslateY}px)` } : undefined}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
               >

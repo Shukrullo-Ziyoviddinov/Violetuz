@@ -10,6 +10,7 @@ import './ShortsShare.css';
 
 const MOBILE_BREAKPOINT = 768;
 const DRAG_THRESHOLD = 8;
+const CLOSE_MS = 320;
 
 const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenChange }) => {
   const { t } = useTranslation();
@@ -17,11 +18,15 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
   const { isLoggedIn } = useAuth();
   const [isShortsShareOpen, setIsShortsShareOpen] = useState(false);
   const [isShortsMobileView, setIsShortsMobileView] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [isShortsDragging, setIsShortsDragging] = useState(false);
   const [shortsModalTranslateY, setShortsModalTranslateY] = useState(0);
   const [extraShareCount, setExtraShareCount] = useState(0);
   const shortsDropdownRef = useRef(null);
   const shortsModalRef = useRef(null);
+  const closingRef = useRef(false);
+  const closeTimerRef = useRef(null);
 
   useEffect(() => {
     setExtraShareCount(0);
@@ -90,10 +95,60 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
     },
   ];
 
-  const closeShortsShareModal = () => {
+  const finishClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
     setIsShortsShareOpen(false);
+    setSheetOpen(false);
+    setIsClosing(false);
+    setIsShortsDragging(false);
+    setShortsModalTranslateY(0);
+    closingRef.current = false;
     onOpenChange?.(false);
-  };
+  }, [onOpenChange]);
+
+  const closeShortsShareModal = useCallback(() => {
+    if (closingRef.current) return;
+    if (!isShortsMobileView) {
+      setIsShortsShareOpen(false);
+      onOpenChange?.(false);
+      return;
+    }
+    closingRef.current = true;
+    setIsShortsDragging(false);
+    const h = shortsModalRef.current?.offsetHeight || Math.round(window.innerHeight * 0.4);
+    setShortsModalTranslateY(h + 24);
+    setSheetOpen(false);
+    setIsClosing(true);
+    closeTimerRef.current = window.setTimeout(finishClose, CLOSE_MS);
+  }, [finishClose, isShortsMobileView, onOpenChange]);
+
+  useEffect(() => {
+    if (!isShortsShareOpen || !isShortsMobileView) {
+      if (!isShortsShareOpen) {
+        setSheetOpen(false);
+        setIsClosing(false);
+      }
+      return undefined;
+    }
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    closingRef.current = false;
+    setIsClosing(false);
+    setShortsModalTranslateY(0);
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setSheetOpen(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [isShortsShareOpen, isShortsMobileView]);
+
+  useEffect(() => () => {
+    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+  }, []);
 
   useEffect(() => {
     if (isShortsShareOpen && isShortsMobileView) {
@@ -109,14 +164,14 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
   const shortsTouchEndRef = useRef(null);
 
   const handleShortsTouchStart = (e) => {
-    if (!isShortsMobileView) return;
+    if (!isShortsMobileView || closingRef.current) return;
     const y = e.touches[0].clientY;
     shortsTouchStartRef.current = y;
     shortsTouchEndRef.current = y;
   };
 
   const handleShortsTouchMove = useCallback((e) => {
-    if (!isShortsMobileView || shortsTouchStartRef.current === null) return;
+    if (!isShortsMobileView || closingRef.current || shortsTouchStartRef.current === null) return;
     const currentY = e.touches[0].clientY;
     const diff = currentY - shortsTouchStartRef.current;
     if (diff > DRAG_THRESHOLD) {
@@ -132,7 +187,7 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
   }, [isShortsMobileView]);
 
   const handleShortsTouchEnd = (e) => {
-    if (!isShortsMobileView || shortsTouchStartRef.current === null) return;
+    if (!isShortsMobileView || closingRef.current || shortsTouchStartRef.current === null) return;
     const endY = e.changedTouches?.[0]?.clientY ?? shortsTouchEndRef.current;
     const distance = endY - shortsTouchStartRef.current;
     if (distance <= DRAG_THRESHOLD) {
@@ -144,7 +199,9 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
     const modalHeight = shortsModalRef.current ? shortsModalRef.current.offsetHeight : 300;
     const closeThreshold = modalHeight * 0.35;
     if (distance > closeThreshold) {
+      shortsTouchStartRef.current = null;
       closeShortsShareModal();
+      return;
     }
     setIsShortsDragging(false);
     setShortsModalTranslateY(0);
@@ -228,14 +285,25 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
 
       {isShortsShareOpen && createPortal(
         <div
-          className={`shorts-share-overlay ${isShortsMobileView ? 'shorts-share-overlay-mobile' : 'shorts-share-overlay-desktop'}`}
+          className={[
+            'shorts-share-overlay',
+            isShortsMobileView ? 'shorts-share-overlay-mobile' : 'shorts-share-overlay-desktop',
+            isShortsMobileView && sheetOpen && !isClosing ? 'shorts-share-overlay--open' : '',
+            isShortsMobileView && isClosing ? 'shorts-share-overlay--closing' : '',
+          ].filter(Boolean).join(' ')}
           onClick={handleShortsOverlayClick}
         >
           <div
             ref={shortsModalRef}
-            className={`shorts-share-modal-content ${isShortsMobileView ? 'shorts-share-modal-mobile' : 'shorts-share-modal-desktop'} ${isShortsDragging ? 'shorts-share-modal-dragging' : ''}`}
+            className={[
+              'shorts-share-modal-content',
+              isShortsMobileView ? 'shorts-share-modal-mobile' : 'shorts-share-modal-desktop',
+              isShortsMobileView && sheetOpen && !isClosing ? 'shorts-share-modal--open' : '',
+              isShortsDragging ? 'shorts-share-modal-dragging' : '',
+              isClosing ? 'shorts-share-modal--closing' : '',
+            ].filter(Boolean).join(' ')}
             onClick={(e) => e.stopPropagation()}
-            style={isShortsMobileView ? { transform: `translateY(${shortsModalTranslateY}px)` } : undefined}
+            style={isShortsMobileView && shortsModalTranslateY ? { transform: `translateY(${shortsModalTranslateY}px)` } : undefined}
             onTouchStart={handleShortsTouchStart}
             onTouchEnd={handleShortsTouchEnd}
           >
