@@ -4,11 +4,6 @@ import './ScrollTouch.css';
 const DRAG_THRESHOLD = 3;
 const MOMENTUM_MIN_VELOCITY = 0.3;
 const MOMENTUM_FRICTION = 0.92;
-const INTERACTIVE_SELECTOR =
-  'button, a, input, textarea, select, label, [role="button"], .share-button-wrapper';
-
-const isInteractiveTarget = (target) =>
-  target instanceof Element && Boolean(target.closest(INTERACTIVE_SELECTOR));
 
 const ScrollTouch = ({ children, className = '', ...props }) => {
   const scrollRef = useRef(null);
@@ -67,7 +62,6 @@ const ScrollTouch = ({ children, className = '', ...props }) => {
     };
 
     const handleMouseDown = (e) => {
-      if (isInteractiveTarget(e.target)) return;
       if (e.target.closest('img')) {
         e.preventDefault();
       }
@@ -117,10 +111,6 @@ const ScrollTouch = ({ children, className = '', ...props }) => {
     let isHorizontal = null;
 
     const handleTouchStart = (e) => {
-      if (isInteractiveTarget(e.target)) {
-        isTouching = false;
-        return;
-      }
       stopMomentum();
       isTouching = true;
       isHorizontal = null;
