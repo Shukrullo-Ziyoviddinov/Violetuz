@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef, us
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import * as commentsApi from '../../api/commentsApi';
 import { useAuth } from '../../context/AuthContext';
 import { requestOpenAuthModal } from '../../authModalBridge';
@@ -15,6 +16,41 @@ import './MovieComments.css';
 
 const MOBILE_MAX = 900;
 const PREVIEW_LIMIT_DEFAULT = 4;
+
+const MovieCommentItemSkeleton = ({ isReply = false, isModal = false }) => (
+  <div
+    className={`movie-detail-comment-item${isReply ? ' movie-detail-comment-reply' : ''}${
+      isModal ? ' movie-detail-comment-item-modal' : ''
+    } movie-detail-comment-item--skeleton`}
+    aria-hidden="true"
+  >
+    <div className="movie-detail-comment-main">
+      <SkeletonLoader variant="movie-detail-comment-avatar" />
+      <div className="movie-detail-comment-body">
+        <div className="movie-detail-comment-meta">
+          <SkeletonLoader variant="movie-detail-comment-author" />
+          <SkeletonLoader variant="movie-detail-comment-time" />
+        </div>
+        <SkeletonLoader variant="movie-detail-comment-text" />
+        <SkeletonLoader
+          variant="movie-detail-comment-text"
+          className="movie-detail-comment-text-skeleton--short"
+        />
+      </div>
+      <div className="movie-detail-comment-like-wrap">
+        <SkeletonLoader variant="movie-detail-comment-like-btn" />
+      </div>
+    </div>
+  </div>
+);
+
+const MovieCommentsListSkeleton = ({ count = 4, isModal = false }) => (
+  <div className="movie-detail-comments-list movie-detail-comments-list--skeleton" aria-busy="true">
+    {Array.from({ length: Math.max(1, count) }, (_, i) => (
+      <MovieCommentItemSkeleton key={`comment-sk-${i}`} isModal={isModal} />
+    ))}
+  </div>
+);
 const migrateComment = (c) => ({
   ...c,
   likes: c.likes ?? 0,
@@ -122,6 +158,7 @@ const MovieComments = forwardRef(
     const { i18n } = useTranslation();
     const { profile, isLoggedIn } = useAuth();
     const [comments, setComments] = useState([]);
+    const [commentsLoading, setCommentsLoading] = useState(true);
     const [likedIds, setLikedIds] = useState(() => new Set());
     const [showCommentsModal, setShowCommentsModal] = useState(false);
     const [commentsModalOpen, setCommentsModalOpen] = useState(false);
@@ -160,12 +197,15 @@ const MovieComments = forwardRef(
       return false;
     }, [isLoggedIn]);
 
-    const reloadComments = useCallback(async () => {
+    const reloadComments = useCallback(async (opts = {}) => {
+      const silent = Boolean(opts.silent);
       if (!target.targetId) {
         setComments([]);
         setLikedIds(new Set());
+        setCommentsLoading(false);
         return;
       }
+      if (!silent) setCommentsLoading(true);
       try {
         const raw = await commentsApi.fetchComments(target);
         const tree = sortCommentListByLikes(raw.map(migrateComment));
@@ -173,6 +213,8 @@ const MovieComments = forwardRef(
         setLikedIds(collectLikedIds(tree));
       } catch {
         /* mavjud listni o‘chirmaymiz — tarmoq xatosida bo‘sh qilib yubormaslik */
+      } finally {
+        setCommentsLoading(false);
       }
     }, [target.targetType, target.targetId]);
 
@@ -183,6 +225,9 @@ const MovieComments = forwardRef(
     }, []);
 
     useEffect(() => {
+      setComments([]);
+      setLikedIds(new Set());
+      setCommentsLoading(true);
       setReplyingTo(null);
       setInputValue('');
       modalClosingRef.current = false;
@@ -202,7 +247,7 @@ const MovieComments = forwardRef(
         if (e.detail?.movieId !== mid) return;
         /* O‘zimiz create/like qilganimizda qayta GET qilmaymiz — sekinlik sababi */
         if (e.detail?.skipReload) return;
-        reloadComments();
+        reloadComments({ silent: true });
       };
       window.addEventListener(commentsApi.COMMENTS_CHANGED_EVENT, onRemote);
       return () => window.removeEventListener(commentsApi.COMMENTS_CHANGED_EVENT, onRemote);
@@ -544,10 +589,11 @@ const MovieComments = forwardRef(
     const totalCount = countTotalComments(comments);
     const hasComments = totalCount > 0;
     const hasMore = totalCount > limit;
+    const previewSkeletonCount = sheetMobile ? 1 : Math.max(1, limit);
 
-    const showInlineInput = !sheetMobile || !hasComments;
-    const showPreviewList = !sheetMobile || hasComments;
-    const showMoreBtn = !sheetMobile && hasMore;
+    const showInlineInput = !commentsLoading && (!sheetMobile || !hasComments);
+    const showPreviewList = commentsLoading || !sheetMobile || hasComments;
+    const showMoreBtn = !commentsLoading && !sheetMobile && hasMore;
 
     const carouselSafeIndex =
       comments.length > 0 ? carouselIndex % comments.length : 0;
@@ -656,6 +702,12 @@ const MovieComments = forwardRef(
             {loadedReplies.map((r) => renderComment(r, true, isPreview))}
           </div>
         )}
+        {repliesLoading && loadedReplies.length === 0 ? (
+          <div className="movie-detail-comment-replies" aria-busy="true">
+            <MovieCommentItemSkeleton isReply isModal={!isPreview} />
+            <MovieCommentItemSkeleton isReply isModal={!isPreview} />
+          </div>
+        ) : null}
         {remaining > 0 && (
           <button
             type="button"
@@ -675,6 +727,11 @@ const MovieComments = forwardRef(
                 : `Ещё ответы (${remaining})`}
           </button>
         )}
+        {repliesLoading && loadedReplies.length > 0 ? (
+          <div className="movie-detail-comment-replies movie-detail-comment-replies--loading-more" aria-busy="true">
+            <MovieCommentItemSkeleton isReply isModal={!isPreview} />
+          </div>
+        ) : null}
       </div>
       );
     };
@@ -751,11 +808,15 @@ const MovieComments = forwardRef(
           {showPreviewList ? (
             <div
               className={`movie-detail-comments-list${
-                sheetMobile && hasComments ? ' movie-detail-comments-list--open-modal' : ''
-              }${sheetMobile && hasComments ? ' movie-detail-comments-carousel' : ''}`}
-              onClick={sheetMobile && hasComments ? openModal : undefined}
+                !commentsLoading && sheetMobile && hasComments
+                  ? ' movie-detail-comments-list--open-modal'
+                  : ''
+              }${!commentsLoading && sheetMobile && hasComments ? ' movie-detail-comments-carousel' : ''}`}
+              onClick={
+                !commentsLoading && sheetMobile && hasComments ? openModal : undefined
+              }
               onKeyDown={
-                sheetMobile && hasComments
+                !commentsLoading && sheetMobile && hasComments
                   ? (e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -764,10 +825,12 @@ const MovieComments = forwardRef(
                     }
                   : undefined
               }
-              role={sheetMobile && hasComments ? 'button' : undefined}
-              tabIndex={sheetMobile && hasComments ? 0 : undefined}
+              role={!commentsLoading && sheetMobile && hasComments ? 'button' : undefined}
+              tabIndex={!commentsLoading && sheetMobile && hasComments ? 0 : undefined}
             >
-              {!sheetMobile && displayedComments.length === 0 ? (
+              {commentsLoading ? (
+                <MovieCommentsListSkeleton count={previewSkeletonCount} />
+              ) : !sheetMobile && displayedComments.length === 0 ? (
                 <p className="movie-detail-comments-empty">
                   {i18n.language === 'uz' ? "Komment bo'sh" : 'Комментариев нет'}
                 </p>
@@ -838,7 +901,9 @@ const MovieComments = forwardRef(
                 </div>
 
                 <div className="movie-detail-comments-modal-body" ref={commentsListRef}>
-                  {comments.length === 0 ? (
+                  {commentsLoading ? (
+                    <MovieCommentsListSkeleton count={Math.max(4, limit)} isModal />
+                  ) : comments.length === 0 ? (
                     <p className="movie-detail-comments-modal-empty">
                       {i18n.language === 'uz' ? "Komment bo'sh" : 'Комментариев нет'}
                     </p>

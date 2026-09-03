@@ -1585,11 +1585,32 @@
   border-radius: 4px;
 }
 
+.skeleton-loader--movie-detail-comment-time {
+  width: 2.75rem;
+  height: calc(0.7rem * 1.2);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
 .skeleton-loader--movie-detail-comment-text {
   width: 100%;
-  height: calc(0.75rem * 1.4);
+  height: calc(0.75rem * 1.5);
   margin-top: 0.25rem;
   border-radius: 4px;
+}
+
+.skeleton-loader--movie-detail-comment-text.movie-detail-comment-text-skeleton--short {
+  width: 62%;
+  margin-top: 0.2rem;
+}
+
+.skeleton-loader--movie-detail-comment-like-btn {
+  width: 25px;
+  height: 25px;
+  min-width: 25px;
+  min-height: 25px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 @media (max-width: 900px) {
