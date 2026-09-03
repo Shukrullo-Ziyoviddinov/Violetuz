@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   selectIsLoggedIn,
   selectAuthReady,
+  selectProfile,
 } from '../store/slices/userSlice';
 import {
   setRepostItems,
@@ -21,8 +22,10 @@ const RepostsBootstrap = () => {
   const dispatch = useAppDispatch();
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const profile = useAppSelector(selectProfile);
   const migratedRef = useRef(false);
   const wasLoggedInRef = useRef(false);
+  const prevProfileIdRef = useRef(profile?.id || null);
 
   useEffect(() => {
     if (!authReady) return undefined;
@@ -38,6 +41,15 @@ const RepostsBootstrap = () => {
     }
 
     wasLoggedInRef.current = true;
+
+    // Aktiv account (profile.id) o'zgarganda repostlarni ham qayta yuklaymiz.
+    const currentProfileId = profile?.id || null;
+    if (prevProfileIdRef.current !== currentProfileId) {
+      migratedRef.current = false;
+      dispatch(clearReposts());
+      prevProfileIdRef.current = currentProfileId;
+    }
+
     let cancelled = false;
 
     (async () => {
@@ -69,7 +81,7 @@ const RepostsBootstrap = () => {
     return () => {
       cancelled = true;
     };
-  }, [authReady, isLoggedIn, dispatch]);
+  }, [authReady, isLoggedIn, profile?.id, dispatch]);
 
   return null;
 };

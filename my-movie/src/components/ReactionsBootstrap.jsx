@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   selectIsLoggedIn,
   selectAuthReady,
+  selectProfile,
 } from '../store/slices/userSlice';
 import {
   hydrateLikesFromServer,
@@ -57,11 +58,13 @@ const ReactionsBootstrap = () => {
   const dispatch = useAppDispatch();
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const profile = useAppSelector(selectProfile);
   const likesState = useAppSelector((s) => s.likes);
   const migratedRef = useRef(false);
   const wasLoggedInRef = useRef(false);
   const likesRef = useRef(likesState);
   likesRef.current = likesState;
+  const prevProfileIdRef = useRef(profile?.id || null);
 
   useEffect(() => {
     if (!authReady) return undefined;
@@ -76,6 +79,14 @@ const ReactionsBootstrap = () => {
     }
 
     wasLoggedInRef.current = true;
+
+    // Aktiv account (profile.id) o'zgarganda likes/dislikes ham qayta yuklaymiz.
+    const currentProfileId = profile?.id || null;
+    if (prevProfileIdRef.current !== currentProfileId) {
+      migratedRef.current = false;
+      dispatch(clearLikes());
+      prevProfileIdRef.current = currentProfileId;
+    }
     let cancelled = false;
 
     (async () => {
@@ -123,7 +134,7 @@ const ReactionsBootstrap = () => {
     return () => {
       cancelled = true;
     };
-  }, [authReady, isLoggedIn, dispatch]);
+  }, [authReady, isLoggedIn, profile?.id, dispatch]);
 
   return null;
 };

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   selectIsLoggedIn,
   selectAuthReady,
+  selectProfile,
 } from '../store/slices/userSlice';
 import {
   setFollowingItems,
@@ -20,11 +21,13 @@ const FollowingBootstrap = () => {
   const dispatch = useAppDispatch();
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const profile = useAppSelector(selectProfile);
   const localItems = useAppSelector(selectFollowingItems);
   const migratedRef = useRef(false);
   const wasLoggedInRef = useRef(false);
   const localItemsRef = useRef(localItems);
   localItemsRef.current = localItems;
+  const prevProfileIdRef = useRef(profile?.id || null);
 
   useEffect(() => {
     if (!authReady) return undefined;
@@ -39,6 +42,16 @@ const FollowingBootstrap = () => {
     }
 
     wasLoggedInRef.current = true;
+
+    // Aktiv account (profile.id) o'zgarganda followinglarni ham qayta yuklaymiz.
+    const currentProfileId = profile?.id || null;
+    if (prevProfileIdRef.current !== currentProfileId) {
+      migratedRef.current = false;
+      dispatch(clearFollowing());
+      // eski local migration aralashmasin
+      localItemsRef.current = [];
+      prevProfileIdRef.current = currentProfileId;
+    }
     let cancelled = false;
 
     (async () => {
@@ -69,7 +82,7 @@ const FollowingBootstrap = () => {
     return () => {
       cancelled = true;
     };
-  }, [authReady, isLoggedIn, dispatch]);
+  }, [authReady, isLoggedIn, profile?.id, dispatch]);
 
   return null;
 };
