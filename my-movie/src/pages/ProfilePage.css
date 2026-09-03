@@ -522,10 +522,13 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
 }
 
 .profile-app-store-link {
   flex: 1;
+  border-radius: 15px;
+  overflow: hidden;
   /* min-width: 120px;
   max-width: 160px; */
   transition: opacity 0.25s;
