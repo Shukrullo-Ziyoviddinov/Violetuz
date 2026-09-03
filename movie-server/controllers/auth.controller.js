@@ -83,7 +83,8 @@ const listDeviceAccounts = asyncHandler(async (req, res) => {
   return sendSuccess(res, { data }, 200);
 });
 
-const logout = asyncHandler(async (_req, res) => {
+const logout = asyncHandler(async (req, res) => {
+  await authService.unlinkUserFromDevice(readDeviceKey(req), req.authUser?._id);
   clearAuthCookie(res);
   return sendSuccess(res, { data: { ok: true } }, 200);
 });

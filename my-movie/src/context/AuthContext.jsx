@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { logoutRequest } from '../api/authApi';
+import { logoutRequest, switchAccountRequest } from '../api/authApi';
 import {
   setLoggedIn as setLoggedInAction,
   updateProfile as updateProfileAction,
@@ -16,6 +16,9 @@ import {
   upsertAccountFromSession,
   patchActiveAccountProfile,
   setActiveAccountId,
+  getActiveAccountId,
+  removeAccount,
+  listAccountsState,
 } from '../accounts/accountsStorage';
 
 /** @deprecated Redux Provider yetarli — eski importlar buzilmasligi uchun qoldirilgan */
@@ -62,14 +65,38 @@ export const useAuth = () => {
   );
 
   const logout = useCallback(async () => {
+    const currentActiveId = profile?.id || getActiveAccountId();
     try {
       await logoutRequest();
     } catch {
       /* cookie yo‘q bo‘lsa ham UI tozalanadi */
     }
+
+    let state = currentActiveId ? removeAccount(currentActiveId) : listAccountsState();
+    let candidates = (state.accounts || []).map((account) => account.id).filter(Boolean);
+
+    while (candidates.length) {
+      const nextId = candidates[0];
+      try {
+        const data = await switchAccountRequest({ userId: nextId });
+        const nextUser = data?.user;
+        if (nextUser) {
+          dispatch(setAuthSessionAction({ user: nextUser }));
+          upsertAccountFromSession(nextUser);
+          setActiveAccountId(String(nextUser.id || nextUser._id || nextId));
+          return;
+        }
+      } catch {
+        /* stale account - remove and try the next one */
+      }
+
+      state = removeAccount(nextId);
+      candidates = (state.accounts || []).map((account) => account.id).filter(Boolean);
+    }
+
     dispatch(clearAuthSessionAction());
     setActiveAccountId(null);
-  }, [dispatch]);
+  }, [dispatch, profile?.id]);
 
   return {
     isLoggedIn,

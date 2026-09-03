@@ -368,6 +368,15 @@ const linkUserToDevice = async (deviceKey, userId) => {
   );
 };
 
+/** Logout: faqat joriy aktiv userni shu qurilmadagi ro‘yxatdan yechish */
+const unlinkUserFromDevice = async (deviceKey, userId) => {
+  const key = String(deviceKey || '').trim();
+  const id = String(userId || '').trim();
+  if (!key || !id) return;
+  const deviceKeyHash = hashDeviceKey(key);
+  await DeviceAccountLink.deleteOne({ deviceKeyHash, userId: id });
+};
+
 /**
  * Ko‘p hisob switch — client JWT yubormaydi.
  * Faqat httpOnly violet_device + userId (shu qurilmada login qilingan bo‘lishi kerak).
@@ -469,6 +478,7 @@ module.exports = {
   updateProfile,
   issueAuthSession,
   linkUserToDevice,
+  unlinkUserFromDevice,
   switchAccountSession,
   listDeviceAccounts,
 };
