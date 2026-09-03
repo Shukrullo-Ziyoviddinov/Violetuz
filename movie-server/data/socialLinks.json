@@ -36,11 +36,11 @@
   "appStoreLinks": {
     "android": {
       "link": "https://play.google.com/store/apps/details?id=com.violetmovie",
-      "icon": "/img/google-playy.png"
+      "icon": "/img/playmarketq.jpg"
     },
     "ios": {
       "link": "https://apps.apple.com/app/violet-movie/id123456789",
-      "icon": "/img/apsto2.png"
+      "icon": "/img/appstoreq.jpg"
     }
   }
 }
