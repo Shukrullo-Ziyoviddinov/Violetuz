@@ -241,20 +241,53 @@ const formatAuthorUsername = (user, authorName = '') => {
   return match ? match[1] : '';
 };
 
-const toClientComment = (row, viewerId = null) => {
+/** Komment authorlarini User dan bir so‘rovda yuklash (avatar/name yangilanishi uchun) */
+const loadAuthorsByIds = async (userIds) => {
+  const unique = [
+    ...new Set(
+      (userIds || [])
+        .map((id) => (id != null ? String(id) : ''))
+        .filter(Boolean)
+    ),
+  ];
+  const map = new Map();
+  if (!unique.length) return map;
+  const oids = unique.map(toObjectId).filter(Boolean);
+  if (!oids.length) return map;
+  const users = await User.find({ _id: { $in: oids } })
+    .select('name username avatar')
+    .lean();
+  for (const u of users) {
+    map.set(String(u._id), u);
+  }
+  return map;
+};
+
+const toClientComment = (row, viewerId = null, authorsById = null) => {
   const id = String(row._id);
   const likedBy = Array.isArray(row.likedBy) ? row.likedBy.map(String) : [];
   const viewer = viewerId ? String(viewerId) : null;
+  const authorId = row.userId ? String(row.userId) : null;
+  const live = authorId && authorsById ? authorsById.get(authorId) : null;
+  const authorName = live
+    ? formatAuthorName(live)
+    : row.authorName || '';
+  const authorUsername = live
+    ? formatAuthorUsername(live, authorName)
+    : row.authorUsername || formatAuthorUsername(null, row.authorName || '');
+  const authorAvatar = live
+    ? live.avatar || ''
+    : row.authorAvatar || '';
   return {
     id,
     targetType: row.targetType,
     targetId: row.targetId,
     parentId: row.parentId ? String(row.parentId) : null,
     text: row.text,
-    authorId: row.userId ? String(row.userId) : null,
-    authorName: row.authorName || '',
-    authorUsername: row.authorUsername || formatAuthorUsername(null, row.authorName || ''),
-    authorAvatar: row.authorAvatar || '',
+    authorId,
+    authorName,
+    authorUsername,
+    authorAvatar,
     createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
     updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
     likes: Number(row.likes) || likedBy.length || 0,
@@ -314,12 +347,12 @@ const parseReplyPage = (raw, fallback) => {
 };
 
 /** Flat ro‘yxatdan daraxt */
-const buildCommentTree = (rows, viewerId = null) => {
+const buildCommentTree = (rows, viewerId = null, authorsById = null) => {
   const map = new Map();
   const roots = [];
 
   for (const row of rows) {
-    map.set(String(row._id), toClientComment(row, viewerId));
+    map.set(String(row._id), toClientComment(row, viewerId, authorsById));
   }
 
   for (const row of rows) {
@@ -345,9 +378,10 @@ const listComments = async ({ targetType, targetId }, viewerId = null) => {
   const roots = await Comment.find({ targetType: type, targetId: id, parentId: null })
     .sort({ createdAt: 1 })
     .lean();
+  const authorsById = await loadAuthorsByIds(roots.map((r) => r.userId));
   return sortCommentListByLikes(
     roots.map((row) => ({
-      ...toClientComment(row, viewerId),
+      ...toClientComment(row, viewerId, authorsById),
       replyCount: counts.get(String(row._id)) || 0,
       replies: [],
     }))
@@ -371,7 +405,8 @@ const listReplies = async (rootId, { skip = 0, limit = REPLIES_PAGE_SIZE } = {},
     .sort({ createdAt: 1 })
     .lean();
 
-  const tree = buildCommentTree(rows, viewerId);
+  const authorsById = await loadAuthorsByIds(rows.map((r) => r.userId));
+  const tree = buildCommentTree(rows, viewerId, authorsById);
   const node = tree.find((n) => n.id === String(root._id));
   const flat = flattenThreadReplies(node).map((item) => ({
     ...item,
@@ -437,7 +472,8 @@ const createComment = async (userOrId, { targetType, targetId, text, parentId })
     targetSnapshot,
   });
 
-  return toClientComment(row.toObject ? row.toObject() : row, userId);
+  const authorsById = new Map([[String(userId), user]]);
+  return toClientComment(row.toObject ? row.toObject() : row, userId, authorsById);
 };
 
 const updateComment = async (userId, commentId, { text }) => {
@@ -453,7 +489,8 @@ const updateComment = async (userId, commentId, { text }) => {
 
   row.text = body;
   await row.save();
-  return toClientComment(row.toObject(), userId);
+  const authorsById = await loadAuthorsByIds([row.userId]);
+  return toClientComment(row.toObject(), userId, authorsById);
 };
 
 const deleteComment = async (userId, commentId) => {
@@ -522,8 +559,9 @@ const toggleLike = async (userId, commentId) => {
 /** Profil → komment history (faqat shu user yozganlari) */
 const listMyHistory = async (userId) => {
   const rows = await Comment.find({ userId }).sort({ createdAt: -1 }).lean();
+  const authorsById = await loadAuthorsByIds([userId]);
   return rows.map((row) => ({
-    ...toClientComment(row, userId),
+    ...toClientComment(row, userId, authorsById),
     targetSnapshot: row.targetSnapshot || null,
     filter:
       row.targetType === 'movie'

@@ -21,6 +21,17 @@ const migrateShortsComment = (c) => ({
   replies: Array.isArray(c.replies) ? c.replies.map(migrateShortsComment) : [],
 });
 
+const resolveCommentAvatar = (comment, profile) => {
+  if (
+    profile?.id != null &&
+    comment?.authorId != null &&
+    String(comment.authorId) === String(profile.id)
+  ) {
+    return profile.avatar || '';
+  }
+  return comment?.authorAvatar || '';
+};
+
 const collectLikedIds = (list, acc = new Set()) => {
   if (!Array.isArray(list)) return acc;
   for (const c of list) {
@@ -486,6 +497,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     const loadedReplies = !isReply && Array.isArray(c.replies) ? c.replies : [];
     const remaining = !isReply ? remainingRepliesOf(c) : 0;
     const repliesLoading = !isReply && loadingRepliesIds.has(String(c.id));
+    const avatarSrc = resolveCommentAvatar(c, profile);
     return (
     <div
       key={c.id}
@@ -495,8 +507,8 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
     >
       <div className="shorts-comment-main">
         <div className="shorts-comment-avatar">
-          {c.authorAvatar ? (
-            <img src={c.authorAvatar} alt="" className="profile-avatar-img" />
+          {avatarSrc ? (
+            <img src={avatarSrc} alt="" className="profile-avatar-img" />
           ) : (
             <div className="shorts-comment-avatar-placeholder">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
