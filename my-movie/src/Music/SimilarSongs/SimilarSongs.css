@@ -58,7 +58,6 @@
   overflow: hidden;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(215, 134, 228, 0.56);
 }
 
 .similar-songs-item-image-wrapper .similar-songs-item-image-skeleton,
