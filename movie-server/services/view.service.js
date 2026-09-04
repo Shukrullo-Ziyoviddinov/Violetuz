@@ -134,8 +134,9 @@ const getViewCount = async ({ id, type }) => {
 /**
  * Bitta user + type + id uchun bir marta yoziladi.
  * Qayta kirishda unique index tufayli +1 bo‘lmaydi.
+ * Movie recommendation/affinity bu endpoint orqali emas — /recommendations/progress.
  */
-const recordView = async (userId, { id, type }) => {
+const recordView = async (userId, { id, type } = {}) => {
   const safeType = assertType(type);
   const itemId = normalizeItemId(id);
 
@@ -154,6 +155,10 @@ const recordView = async (userId, { id, type }) => {
   }
 
   const viewCount = await ContentView.countDocuments({ type: safeType, itemId });
+
+  // Movie "ko'rildi" + affinity faqat POST /recommendations/progress (≥5 daqiqa) orqali.
+  // Bu yerda recommendation hook yo'q — threshold'siz affinity footgun oldini olish.
+
   return {
     viewCount,
     recorded,

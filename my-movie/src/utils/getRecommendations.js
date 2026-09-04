@@ -1,6 +1,6 @@
 /**
- * Ko'rgan kinolar asosida tavsiyalar - typeCategory, filterGenre, filterCountry
- * Backend qo'shilganda fetchRecommendations() ishlatiladi
+ * Local offline fallback — typeCategory / filterGenre / filterCountry scoring.
+ * Prefer api/recommendationsApi when the user is logged in.
  */
 
 const toArray = (x) => (Array.isArray(x) ? x : x ? [x] : []);

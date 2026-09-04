@@ -37,7 +37,8 @@
     "fingerprints:generate": "node scripts/generateFingerprints.js",
     "fingerprints:generate:all": "node scripts/generateFingerprints.js --all",
     "durations:backfill": "node scripts/backfillDurationSec.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "verify:recommendations": "node scripts/verifyRecommendationEngine.js",
+    "test": "npm run verify:recommendations"
   },
   "keywords": [],
   "author": "",

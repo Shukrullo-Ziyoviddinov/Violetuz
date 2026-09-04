@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_LIMIT } from '../components/ShowMoreButton/ShowMoreButton';
 import Banner from '../components/Banner/Banner';
@@ -10,6 +10,7 @@ import TopRatedContent from '../components/TopRatedContent/TopRatedContent';
 import RecommendedActors from '../components/RecommendedActors/RecommendedActors';
 import TrillerSection from '../components/Triller/TrillerSection';
 import { useMoviesApi } from '../context/MoviesApiContext';
+import { useHomeCategoryRecommendations } from '../hooks/useHomeCategoryRecommendations';
 import './Home.css';
 
 const HOME_MOVIE_SKELETON_COUNT = 3;
@@ -21,10 +22,25 @@ const Home = () => {
     getSectionById,
     homeContent,
     moviesLoading,
+    sections,
   } = useMoviesApi();
 
   const blocks = Array.isArray(homeContent) ? homeContent : [];
   const showHomeMovieSkeletons = moviesLoading && blocks.length === 0;
+
+  const homeCategoryNames = useMemo(() => {
+    const sectionList = Array.isArray(sections) ? sections : [];
+    const byId = new Map(sectionList.map((s) => [s.id, s]));
+    const names = [];
+    for (const block of blocks) {
+      if (!block?.sectionId) continue;
+      const section = byId.get(block.sectionId);
+      if (section?.categoryName) names.push(section.categoryName);
+    }
+    return names;
+  }, [blocks, sections]);
+
+  const personalizedByCategory = useHomeCategoryRecommendations(homeCategoryNames);
 
   return (
     <div className="home">
@@ -89,7 +105,11 @@ const Home = () => {
               moreTo,
               showHorizontalScroll,
             } = section;
-            const filteredMovies = getMoviesByCategory(categoryName);
+            const personalized = personalizedByCategory[categoryName];
+            const filteredMovies =
+              personalized?.length > 0
+                ? personalized
+                : getMoviesByCategory(categoryName);
             return (
               <React.Fragment key={sectionType}>
                 <Movies

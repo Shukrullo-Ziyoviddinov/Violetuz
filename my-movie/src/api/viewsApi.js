@@ -40,9 +40,11 @@ export const fetchViewCount = async ({ id, type }) => {
 
 /**
  * Login user uchun ko‘rishni yozadi (bir user + id = bir marta).
+ * Movie affinity uchun emas — WatchModal → /recommendations/progress.
+ * @param {{ id: string|number, type: string }} params
  * @returns {Promise<{ viewCount: number, recorded: boolean }>}
  */
-export const recordViewRequest = async ({ id, type }) => {
+export const recordViewRequest = async ({ id, type } = {}) => {
   const res = await viewsFetch('/views', {
     method: 'POST',
     body: JSON.stringify({ id, type }),

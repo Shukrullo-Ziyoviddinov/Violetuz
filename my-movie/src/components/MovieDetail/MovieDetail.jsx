@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useActorsApi } from '../../context/ActorsApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import WatchModal from './WatchModal';
@@ -561,7 +560,6 @@ const MovieDetail = () => {
   const { t, i18n } = useTranslation();
   const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { addMovie } = useViewedMovies();
   const [showWatchModal, setShowWatchModal] = useState(false);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState(null);
   const [seasonsLang, setSeasonsLang] = useState(i18n.language === 'uz' ? 'uz' : 'ru');
@@ -730,10 +728,6 @@ const MovieDetail = () => {
     const id = window.setInterval(check, 200);
     return () => window.clearInterval(id);
   }, [movieVideoSrc, videoReady, videoFailed]);
-
-  useEffect(() => {
-    if (movie) addMovie(movie);
-  }, [movie?.id, addMovie]);
 
   useEffect(() => {
     setCommentsCount(0);
@@ -1819,7 +1813,7 @@ const MovieDetail = () => {
                   <span className="movie-detail-action-count">{formatActionCount(commentsCount)}</span>
                 </button>
 
-                <ViewCount itemId={movie.id} type="movie" />
+                <ViewCount itemId={movie.id} type="movie" record={false} />
 
                 <button
                   className="movie-detail-action-btn movie-detail-action-btn-rate"

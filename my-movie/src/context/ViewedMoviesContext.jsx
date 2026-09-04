@@ -1,10 +1,11 @@
 /**
- * Ko'rgan kinolar - localStorage da saqlanadi, backend qo'shilganda oson almashtiriladi
+ * Haqiqiy tomosha (≥5 daqiqa / qisqa film ~80%) dan keyin saqlanadi —
+ * detail ochish emas. SearchModalTavsiya local signal sifatida ishlatadi.
  * Format: { items: [{ id, typeCategory, filterGenre, filterCountry }] }
  */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = 'violet_viewed_movies';
+const STORAGE_KEY = 'violet_viewed_movies_v2';
 const MAX_ITEMS = 50;
 
 const getStored = () => {

@@ -1,18 +1,26 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
+import { useAuth } from '../../context/AuthContext';
+import { useViewedMovies } from '../../context/ViewedMoviesContext';
+import { reportMovieProgress, fetchProgressConfig, DEFAULT_PROGRESS_CONFIG } from '../../api/recommendationsApi';
 import AdsMovie from './AdsMovie';
 import WatchSettingsModal from './WatchSettingsModal';
 import './WatchModal.css';
 
 const AD_INTERVAL_SECONDS = 900; // 15 daqiqa
+/** Progress serverga yuborish minimal oralig'i */
+const PROGRESS_REPORT_INTERVAL_MS = 30_000;
 
 const WatchModal = ({ movie, videoUrl, onClose }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { isLoggedIn } = useAuth();
+  const { addMovie } = useViewedMovies();
   const [watchVideoLang, setWatchVideoLang] = useState(() => (contentLang === 'ru' ? 'ru' : 'uz'));
   const seekAfterLangChangeRef = useRef(null);
+  const progressConfigRef = useRef({ ...DEFAULT_PROGRESS_CONFIG });
 
   const computedWatchVideoSrc = useMemo(() => {
     if (videoUrl) return videoUrl;
@@ -45,8 +53,18 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
 
   // Reklama state
   const [showAdOverlay, setShowAdOverlay] = useState(false);
+  const showAdOverlayRef = useRef(false);
   const hasUserStartedWatchingRef = useRef(false);
   const lastAdAtVideoTimeRef = useRef(-1); // -1 = birinchi reklama hali ko'rsatilmagan
+
+  // "Ko'rildi" + progress — faqat asosiy video ijrosida yig'ilgan vaqt
+  const viewMarkedRef = useRef(false);
+  const localViewedMarkedRef = useRef(false);
+  const accumulatedWatchSecRef = useRef(0);
+  const lastWatchTickWallRef = useRef(null);
+  const lastReportedCompletionRef = useRef(null);
+  const lastReportAtRef = useRef(0);
+  const progressInFlightRef = useRef(false);
 
   // useRef - stale closure muammosini hal qilish uchun
   const hideControlsTimeoutRef = useRef(null);
@@ -70,6 +88,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const playbackSpeedRef = useRef(1);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   
   const [touchStart, setTouchStart] = useState(null);
@@ -115,6 +134,149 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   useEffect(() => {
     showControlsRef.current = showControls;
   }, [showControls]);
+
+  useEffect(() => {
+    showAdOverlayRef.current = showAdOverlay;
+    if (showAdOverlay) {
+      lastWatchTickWallRef.current = null;
+    }
+  }, [showAdOverlay]);
+
+  useEffect(() => {
+    playbackSpeedRef.current = playbackSpeed;
+  }, [playbackSpeed]);
+
+  // Server threshold knobs (scoringWeights.progress) — FE/BE drift oldini olish
+  useEffect(() => {
+    let cancelled = false;
+    fetchProgressConfig()
+      .then((cfg) => {
+        if (!cancelled && cfg) progressConfigRef.current = cfg;
+      })
+      .catch(() => {
+        /* fallback DEFAULT_PROGRESS_CONFIG */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Film almashganda view hisoblagichni reset
+  useEffect(() => {
+    viewMarkedRef.current = false;
+    localViewedMarkedRef.current = false;
+    accumulatedWatchSecRef.current = 0;
+    lastWatchTickWallRef.current = null;
+    lastReportedCompletionRef.current = null;
+    lastReportAtRef.current = 0;
+    progressInFlightRef.current = false;
+  }, [movie?.id]);
+
+  // Haqiqiy film progressi: watched / duration (threshold bilan chalkashtirilmasin).
+  const buildCompletionRate = useCallback((watched, dur) => {
+    if (!Number.isFinite(dur) || dur <= 0) return 0;
+    return Math.min(1, Math.max(0, watched / dur));
+  }, []);
+
+  const isEligibleWatch = useCallback((watched, dur) => {
+    const { minWatchedSeconds, shortFilmCompleteRatio } = progressConfigRef.current;
+    if (watched >= minWatchedSeconds) return true;
+    return (
+      Number.isFinite(dur) &&
+      dur > 0 &&
+      dur < minWatchedSeconds &&
+      watched >= dur * shortFilmCompleteRatio
+    );
+  }, []);
+
+  const markLocalViewed = useCallback(() => {
+    if (localViewedMarkedRef.current || !movie?.id) return;
+    localViewedMarkedRef.current = true;
+    addMovie(movie);
+  }, [addMovie, movie]);
+
+  const syncWatchProgress = useCallback(
+    async ({ force = false } = {}) => {
+      if (movie?.id == null || movie?.id === '') return;
+      if (progressInFlightRef.current) return;
+
+      const watched = accumulatedWatchSecRef.current;
+      const dur = videoRef.current?.duration;
+      if (!isEligibleWatch(watched, dur)) return;
+
+      // Local "ko'rildi" — server bilan bir xil threshold (detail ochish emas)
+      markLocalViewed();
+
+      if (!isLoggedIn) return;
+
+      const { affinityMinDelta } = progressConfigRef.current;
+      const completionRate = buildCompletionRate(watched, dur);
+      const lastC = lastReportedCompletionRef.current;
+      const now = Date.now();
+      const raisedEnough =
+        lastC == null || completionRate >= lastC + affinityMinDelta - 1e-9;
+      const intervalOk =
+        lastC != null &&
+        completionRate > lastC + 1e-9 &&
+        now - lastReportAtRef.current >= PROGRESS_REPORT_INTERVAL_MS;
+
+      if (!force && !raisedEnough && !intervalOk && viewMarkedRef.current) return;
+
+      progressInFlightRef.current = true;
+      lastReportedCompletionRef.current = completionRate;
+      lastReportAtRef.current = now;
+      viewMarkedRef.current = true;
+
+      try {
+        await reportMovieProgress({
+          movieId: movie.id,
+          watchedSeconds: watched,
+          completionRate,
+          durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
+        });
+      } catch {
+        lastReportedCompletionRef.current = lastC;
+        lastReportAtRef.current = 0;
+        if (lastC == null) viewMarkedRef.current = false;
+      } finally {
+        progressInFlightRef.current = false;
+      }
+    },
+    [
+      buildCompletionRate,
+      isEligibleWatch,
+      isLoggedIn,
+      markLocalViewed,
+      movie,
+    ]
+  );
+
+  const handleClose = useCallback(() => {
+    // Modal yopilishidan oldin oxirgi progressni yuborish (yo'qolib ketmasin)
+    void syncWatchProgress({ force: true }).finally(() => {
+      onClose?.();
+    });
+  }, [onClose, syncWatchProgress]);
+
+  const accumulateWatchTime = useCallback(() => {
+    if (!isPlayingRef.current || showAdOverlayRef.current) {
+      lastWatchTickWallRef.current = null;
+      return;
+    }
+
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (lastWatchTickWallRef.current != null) {
+      const wallDeltaSec = (now - lastWatchTickWallRef.current) / 1000;
+      // Oddiy tick (~0.25–1s); uzun pauza/tab sleep qo'shilmasin
+      if (wallDeltaSec > 0 && wallDeltaSec < 2.5) {
+        const rate = Number(playbackSpeedRef.current) || 1;
+        // 2× tezkorda film content ham 2× — affinity/completion shunga mos
+        accumulatedWatchSecRef.current += wallDeltaSec * Math.max(0.25, rate);
+        syncWatchProgress();
+      }
+    }
+    lastWatchTickWallRef.current = now;
+  }, [syncWatchProgress]);
 
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {
@@ -184,7 +346,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     const modalHeight = modalRef.current ? modalRef.current.offsetHeight : window.innerHeight;
     const closeThreshold = modalHeight * 0.35;
     if (distance > closeThreshold) {
-      onClose();
+      handleClose();
     } else {
       setModalTranslateY(0);
     }
@@ -288,7 +450,11 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     if (videoRef.current) {
       const ct = videoRef.current.currentTime;
       setCurrentTime(ct);
-      if (showAdOverlay) return;
+      if (showAdOverlayRef.current) {
+        lastWatchTickWallRef.current = null;
+        return;
+      }
+      accumulateWatchTime();
       if (isPlayingRef.current && hasUserStartedWatchingRef.current && activeAd?.isActive) {
         const nextAdSlot = Math.floor(ct / AD_INTERVAL_SECONDS);
         if (nextAdSlot > lastAdAtVideoTimeRef.current) {
@@ -417,7 +583,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     if (showSettingsModal) clearHideTimeout();
   }, [showSettingsModal]);
 
-  const handleOverlayClick = (e) => { if (e.target === e.currentTarget) onClose(); };
+  const handleOverlayClick = (e) => { if (e.target === e.currentTarget) handleClose(); };
 
   const videoTapRef = useRef({ x: 0, y: 0, time: 0 });
 
@@ -488,7 +654,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
           transition: isDraggingModal ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       >
-        <button className="watch-modal-close" onClick={onClose} aria-label="Close">×</button>
+        <button className="watch-modal-close" onClick={handleClose} aria-label="Close">×</button>
         
         <div className="watch-modal-content">
           <div className="watch-modal-video-section">
@@ -504,8 +670,19 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
                 ref={videoRef}
                 src={computedWatchVideoSrc}
                 className="watch-modal-video"
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
+                onPlay={() => {
+                  // Ref darhol — timeupdate birinchi ticklarda hisob to'xtamasin
+                  isPlayingRef.current = true;
+                  setIsPlaying(true);
+                  lastWatchTickWallRef.current =
+                    typeof performance !== 'undefined' ? performance.now() : Date.now();
+                }}
+                onPause={() => {
+                  isPlayingRef.current = false;
+                  setIsPlaying(false);
+                  lastWatchTickWallRef.current = null;
+                  syncWatchProgress({ force: true });
+                }}
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 onLoadedData={handleLoadedMetadata}

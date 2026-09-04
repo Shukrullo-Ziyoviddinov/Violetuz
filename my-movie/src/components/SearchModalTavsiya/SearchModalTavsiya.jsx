@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
-import { fetchRecommendations } from '../../api/recommendationsApi';
+import { getRecommendations } from '../../utils/getRecommendations';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import { normalizeImagePath } from '../../utils/utils';
@@ -110,12 +110,13 @@ const SearchModalTavsiya = ({ onMovieClick }) => {
   useEffect(() => {
     let cancelled = false;
     setTavsiyaLoading(true);
+    // Umumiy search tavsiya — category engine emas (keyin alohida global algo).
     const viewedItems = getViewedItems();
-    fetchRecommendations(viewedItems, 12, allMovies).then((list) => {
-      if (cancelled) return;
+    const list = getRecommendations(allMovies, viewedItems, 12);
+    if (!cancelled) {
       setRecommendations(Array.isArray(list) ? list : []);
       setTavsiyaLoading(false);
-    });
+    }
     return () => {
       cancelled = true;
     };

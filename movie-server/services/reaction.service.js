@@ -217,10 +217,33 @@ const setReaction = async (userId, { id, type, value }) => {
       type: safeType,
       targetId,
     }).lean();
+
+    if (safeType === 'movie' && deleted?.value === 'like') {
+      try {
+        const { enqueueMovieUnlikeHook } = require('../recommendation/services/unlikeHook.service');
+        enqueueMovieUnlikeHook(userId, targetId);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('[reaction] unlike→recommendation hook failed:', err?.message || err);
+      }
+    }
+
     return {
       item: deleted ? { ...toClientItem(deleted), value: 'none' } : null,
       removed: true,
     };
+  }
+
+  let previousValue = null;
+  if (safeType === 'movie') {
+    const existing = await UserReaction.findOne({
+      userId,
+      type: safeType,
+      targetId,
+    })
+      .select('value')
+      .lean();
+    previousValue = existing?.value || null;
   }
 
   const snapshot = await resolveSnapshot(safeType, targetId);
@@ -232,6 +255,28 @@ const setReaction = async (userId, { id, type, value }) => {
     },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   ).lean();
+
+  // Movie like → affinity boost only (not "ko'rildi" / ContentView).
+  if (safeType === 'movie' && safeValue === 'like' && previousValue !== 'like') {
+    try {
+      const { enqueueMovieLikeHook } = require('../recommendation/services/likeHook.service');
+      enqueueMovieLikeHook(userId, targetId);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] like→recommendation hook failed:', err?.message || err);
+    }
+  }
+
+  // Like → dislike: reverse likedBoost
+  if (safeType === 'movie' && previousValue === 'like' && safeValue === 'dislike') {
+    try {
+      const { enqueueMovieUnlikeHook } = require('../recommendation/services/unlikeHook.service');
+      enqueueMovieUnlikeHook(userId, targetId);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] dislike→recommendation hook failed:', err?.message || err);
+    }
+  }
 
   return { item: toClientItem(row), removed: false };
 };
