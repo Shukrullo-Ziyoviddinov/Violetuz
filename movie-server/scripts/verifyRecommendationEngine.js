@@ -9,6 +9,7 @@
  *  - average (not sum) for multi-value dimensions
  *  - decay clamp
  *  - diversity: popular actor cannot dominate Top-N (>40%)
+ *  - blend scale normalize, liked→experience wiring, cache invalidation
  *
  * Run: node scripts/verifyRecommendationEngine.js
  *   or: npm run verify:recommendations
@@ -290,6 +291,108 @@ ok(
   })()
 );
 
+{
+  const withMeta = diversifyRecommendations(
+    [
+      {
+        movie: makeMovie({ id: 1, actors: ['A'], filterCountry: 'X' }),
+        score: 0.9,
+        alpha: 0.4,
+        experienceCount: 8,
+        personalizedScore: 12,
+        trendingScore: 0.7,
+        normalizedPersonalizedScore: 0.9,
+        normalizedTrendingScore: 0.7,
+        trendingSource: 'stored',
+        coldStart: false,
+      },
+      {
+        movie: makeMovie({ id: 2, actors: ['B'], filterCountry: 'Y' }),
+        score: 0.5,
+        alpha: 0.4,
+        experienceCount: 8,
+        personalizedScore: 4,
+        trendingScore: 0.2,
+        normalizedPersonalizedScore: 0.3,
+        normalizedTrendingScore: 0.2,
+        trendingSource: 'fallback',
+        coldStart: true,
+      },
+    ],
+    { limit: 2 }
+  );
+  ok(
+    'diversity preserves blend meta (alpha / personal / trending)',
+    withMeta[0]?.alpha === 0.4 &&
+      withMeta[0]?.personalizedScore === 12 &&
+      withMeta[0]?.trendingScore === 0.7 &&
+      withMeta[0]?.experienceCount === 8 &&
+      withMeta[0]?.normalizedPersonalizedScore === 0.9 &&
+      withMeta[1]?.trendingSource === 'fallback' &&
+      withMeta[1]?.coldStart === true
+  );
+}
+
+console.log('\n=== 8b) Diversity soft penalty scales with score range ===');
+{
+  const { resolveEffectiveRepeatPenalty } = require('../recommendation/services/diversity.service');
+  const largePool = [
+    { movie: makeMovie({ id: 1 }), score: 300 },
+    { movie: makeMovie({ id: 2 }), score: 100 },
+  ];
+  const unitPool = [
+    { movie: makeMovie({ id: 1 }), score: 1 },
+    { movie: makeMovie({ id: 2 }), score: 0 },
+  ];
+  const rangeCfg = { ...scoringWeights.diversity, penaltyScale: 'range', repeatPenalty: 0.35 };
+  const absCfg = { ...scoringWeights.diversity, penaltyScale: 'absolute', repeatPenalty: 0.35 };
+
+  const largeEff = resolveEffectiveRepeatPenalty(largePool, rangeCfg);
+  const unitEff = resolveEffectiveRepeatPenalty(unitPool, rangeCfg);
+  const absEff = resolveEffectiveRepeatPenalty(largePool, absCfg);
+
+  ok('range penalty ≫ absolute on large scores', largeEff > 50, `eff=${largeEff}`);
+  ok('range penalty ~ fraction of [0,1] span', Math.abs(unitEff - 0.35) < 1e-9, `eff=${unitEff}`);
+  ok('absolute mode keeps raw 0.35', Math.abs(absEff - 0.35) < 1e-9, `eff=${absEff}`);
+
+  // Soft-only: close large scores → prefer non-repeat over tiny score edge
+  const softOnly = diversifyRecommendations(
+    [
+      {
+        movie: makeMovie({ id: 1, actors: [starId], filterCountry: 'A' }),
+        score: 200,
+      },
+      {
+        movie: makeMovie({ id: 2, actors: [starId], filterCountry: 'B' }),
+        score: 199,
+      },
+      {
+        movie: makeMovie({ id: 3, actors: ['Other'], filterCountry: 'C' }),
+        score: 198.5,
+      },
+    ],
+    {
+      limit: 2,
+      diversity: {
+        ...scoringWeights.diversity,
+        maxSharePerActor: 1,
+        maxSharePerCountry: 1,
+        windowSize: 1,
+        maxRepeatsInWindow: 99,
+        penaltyScale: 'range',
+        repeatPenalty: 0.35,
+      },
+    }
+  );
+  ok(
+    'soft penalty picks non-star 2nd when scores are large',
+    softOnly.length === 2 &&
+      softOnly[0].movie.id === 1 &&
+      softOnly[1].movie.id === 3,
+    `order=${softOnly.map((x) => x.movie.id).join(',')}`
+  );
+}
+
 console.log('\n=== 9) Watched penalty ===');
 const withPenalty = scoreMovie(catalog[0], {
   affinityMap: affinityAfterOneWatch,
@@ -327,6 +430,328 @@ ok(
     scoringWeights.movieFields.actors === 'actors' &&
     scoringWeights.movieFields.category === 'categoryName'
 );
+{
+  const WatchEvent = require('../recommendation/models/WatchEvent.model');
+  const ttlDays = scoringWeights.watchEvent?.ttlDays;
+  const ttlIdx = WatchEvent.schema.indexes().find(
+    ([fields, opts]) => fields.watchedAt === 1 && opts && opts.expireAfterSeconds != null
+  );
+  ok('watchEvent.ttlDays configured', Number(ttlDays) > 0, `ttlDays=${ttlDays}`);
+  ok(
+    'WatchEvent watchedAt TTL index',
+    Boolean(ttlIdx) &&
+      ttlIdx[1].expireAfterSeconds === Math.floor(Number(ttlDays) * 86400),
+    ttlIdx ? `expireAfterSeconds=${ttlIdx[1].expireAfterSeconds}` : 'missing'
+  );
+  ok(
+    'TTL window ≫ trending window',
+    Number(ttlDays) > Number(scoringWeights.trending?.windowDays || 30)
+  );
+}
 
-console.log(`\n${fail === 0 ? 'ALL PASSED' : `FAILED: ${fail}`}\n`);
-process.exit(fail === 0 ? 0 : 1);
+console.log('\n=== 12) Confidence blending + trending ===');
+const { calculateAlpha, blendScores } = services;
+const { scoreTrendingBatch, resolveTrendingScore } = services;
+
+ok('blend + trending config present', Boolean(scoringWeights.blend && scoringWeights.trending));
+ok('alpha(0)=0 (100% trending)', calculateAlpha(0) === 0);
+ok('alpha(5)=0.25 linear', almost(calculateAlpha(5), 0.25));
+ok('alpha(20)=1 (100% personal)', calculateAlpha(20) === 1);
+ok('alpha never > 1', calculateAlpha(999) === 1);
+ok(
+  'alpha never < 0',
+  calculateAlpha(-5) === 0
+);
+ok(
+  'per-category alpha independence (same fn, different counts)',
+  calculateAlpha(0) === 0 && calculateAlpha(20) === 1
+);
+
+const expAlpha = calculateAlpha(10, {
+  blend: { strategy: 'exponential', confidenceK: 10 },
+});
+ok('exponential alpha in (0,1)', expAlpha > 0 && expAlpha < 1, String(expAlpha.toFixed(3)));
+
+ok('blend alpha=0 → pure trending', blendScores(10, 2, 0) === 2);
+ok('blend alpha=1 → pure personal', blendScores(10, 2, 1) === 10);
+ok('blend alpha=0.25', almost(blendScores(10, 2, 0.25), 4));
+
+const { minMaxNormalizeList, normalizePersonalLone } = services;
+const normP = minMaxNormalizeList([0, 10, 20]);
+ok('minmax personal 0→0', almost(normP[0], 0));
+ok('minmax personal mid→0.5', almost(normP[1], 0.5));
+ok('minmax personal max→1', almost(normP[2], 1));
+const normT = minMaxNormalizeList([0.2, 0.8]);
+ok('minmax trending comparable [0,1]', almost(normT[0], 0) && almost(normT[1], 1));
+ok(
+  'lone personal soft-cap',
+  almost(normalizePersonalLone(10, { blend: { personalNormCap: 20 } }), 0.5)
+);
+ok(
+  'normalized blend: mid personal vs high trending at α=0.25 prefers trend side',
+  (() => {
+    const p = minMaxNormalizeList([2, 18]); // → 0, 1
+    const t = minMaxNormalizeList([0.9, 0.1]); // → 1, 0
+    // movie0: p=0,t=1 → blend@0.25 = 0.75; movie1: p=1,t=0 → 0.25
+    return blendScores(p[0], t[0], 0.25) > blendScores(p[1], t[1], 0.25);
+  })()
+);
+
+const trendBatch = scoreTrendingBatch([
+  {
+    movieId: 1,
+    viewCountRecent: 100,
+    avgWatchDuration: 500,
+    likeCount: 50,
+    completionRateAvg: 0.9,
+  },
+  {
+    movieId: 2,
+    viewCountRecent: 0,
+    avgWatchDuration: 0,
+    likeCount: 0,
+    completionRateAvg: 0,
+  },
+]);
+ok(
+  'trending batch ranks high-signal movie first',
+  trendBatch[0].trendingScore > trendBatch[1].trendingScore
+);
+ok(
+  'missing trending → popularity fallback',
+  resolveTrendingScore(null, { like: '5000' }).source === 'popularity'
+);
+{
+  const { buildPopularityFallbackScores, getPopularitySignal } = (() => {
+    const trending = require('../recommendation/services/trending.service');
+    const { getPopularitySignal: pop } = require('../recommendation/utils/movieSignals');
+    return { ...trending, getPopularitySignal: pop };
+  })();
+  const movie = { id: 42, like: '5000', categoryName: 'drama' };
+  const rows = buildPopularityFallbackScores([movie], 'drama');
+  ok('fallback row count', rows.length === 1);
+  ok(
+    'fallback trendingScore === popularity (not fake views)',
+    almost(rows[0].trendingScore, getPopularitySignal(movie)) &&
+      rows[0].viewCountRecent === 0 &&
+      rows[0].avgWatchDuration === 0 &&
+      rows[0].completionRateAvg === 0 &&
+      rows[0].likeCount === 0 &&
+      rows[0].scoreSource === 'popularity'
+  );
+}
+ok(
+  'precompute uses blending export',
+  typeof services.scoreMoviesBlended === 'function' &&
+    typeof services.precomputeUserCategoryRecommendations === 'function'
+);
+
+const runSection13 = async () => {
+  console.log('\n=== 13) Blend scale + liked wiring + cache invalidation ===');
+
+  const { scoreMoviesBlended } = services;
+  const {
+    buildQualityWatchFilter,
+    unionDistinctCount,
+    qualityMinCompletion,
+  } = require('../recommendation/repositories/userExperience.repository');
+  const { evaluateUserCacheStale } = require('../recommendation/services/serve.service');
+
+  // --- Blend scale: without normalize personal dwarfs trending; with minmax they compete ---
+  const pool = [
+    makeMovie({ id: 101, like: '10', rating: 5 }),
+    makeMovie({ id: 102, like: '9000', rating: 9 }),
+  ];
+  const affinityHeavy = {
+    genre: { Jangari: 8 },
+    country: { India: 8 },
+    actor: { '7': 8 },
+    genre_country: { 'India::Jangari': 9 },
+    genre_actor: { 'Jangari::7': 9 },
+  };
+  const trendingMap = new Map([
+    ['101', 0.95],
+    ['102', 0.1],
+  ]);
+
+  const rawBlend = await scoreMoviesBlended(pool, {
+    experienceCount: 5, // α=0.25
+    trendingMap,
+    scoreOptions: { affinityMap: affinityHeavy },
+    weights: {
+      ...scoringWeights,
+      blend: { ...scoringWeights.blend, normalizeMode: 'none' },
+    },
+  });
+  const normBlend = await scoreMoviesBlended(pool, {
+    experienceCount: 5,
+    trendingMap,
+    scoreOptions: { affinityMap: affinityHeavy },
+    weights: {
+      ...scoringWeights,
+      blend: { ...scoringWeights.blend, normalizeMode: 'minmax' },
+    },
+  });
+
+  ok(
+    'normalizeMode=none: blended scores not both in [0,1]',
+    rawBlend.some((r) => r.score > 1.01 || r.score < 0),
+    `scores=${rawBlend.map((r) => r.score.toFixed(2)).join(',')}`
+  );
+  ok(
+    'normalizeMode=minmax: all blended scores in [0,1]',
+    normBlend.every((r) => r.score >= -1e-9 && r.score <= 1 + 1e-9),
+    `scores=${normBlend.map((r) => r.score.toFixed(3)).join(',')}`
+  );
+  ok(
+    'minmax keeps normalizedPersonalizedScore / Trending in [0,1]',
+    normBlend.every(
+      (r) =>
+        r.normalizedPersonalizedScore >= 0 &&
+        r.normalizedPersonalizedScore <= 1 &&
+        r.normalizedTrendingScore >= 0 &&
+        r.normalizedTrendingScore <= 1
+    )
+  );
+  // High trending + low personal (101) can beat high personal when α low + normalized
+  const coldAlpha = await scoreMoviesBlended(pool, {
+    experienceCount: 0, // α=0 → pure trending
+    trendingMap,
+    scoreOptions: { affinityMap: {} },
+    weights: scoringWeights,
+  });
+  ok(
+    'α=0 pure trending: higher trending movie ranks first',
+    String(coldAlpha[0].movie.id) === '101' && coldAlpha[0].alpha === 0,
+    `top=${coldAlpha[0].movie.id} α=${coldAlpha[0].alpha}`
+  );
+  const fullPersonal = await scoreMoviesBlended(pool, {
+    experienceCount: 20,
+    trendingMap,
+    scoreOptions: { affinityMap: affinityHeavy },
+    weights: scoringWeights,
+  });
+  ok(
+    'α=1 uses personal signal (alpha field)',
+    fullPersonal[0].alpha === 1 &&
+      fullPersonal.every((r) => almost(r.score, r.normalizedPersonalizedScore)),
+    `α=${fullPersonal[0].alpha}`
+  );
+
+  // --- Liked wiring: experience = DISTINCT(watch ∪ like), filter accepts liked ---
+  const minC = qualityMinCompletion();
+  const qFilter = buildQualityWatchFilter(minC);
+  ok(
+    'quality watch filter includes completion > threshold',
+    Array.isArray(qFilter.$or) &&
+      qFilter.$or.some((c) => c.completionRate && c.completionRate.$gt === minC)
+  );
+  ok(
+    'quality watch filter includes liked:true (legacy) — production likes via UserReaction',
+    Array.isArray(qFilter.$or) && qFilter.$or.some((c) => c.liked === true)
+  );
+  ok(
+    'unionDistinctCount: like alone raises experience',
+    unionDistinctCount([], [1, 2, 3]) === 3
+  );
+  ok(
+    'unionDistinctCount: watch∪like no double-count',
+    unionDistinctCount([1, 2], [2, 3]) === 3
+  );
+  ok(
+    'unionDistinctCount: duplicate events collapse',
+    unionDistinctCount([1, 1, 1], [1]) === 1
+  );
+  ok(
+    'like-sized experience raises alpha (wiring contract)',
+    calculateAlpha(unionDistinctCount([], [1, 2, 3, 4, 5])) === calculateAlpha(5)
+  );
+  ok(
+    'blend.qualityMinCompletion configured',
+    typeof scoringWeights.blend?.qualityMinCompletion === 'number' &&
+      scoringWeights.blend.qualityMinCompletion > 0
+  );
+
+  // --- Cache invalidation (pure evaluateUserCacheStale) ---
+  const t0 = Date.parse('2026-01-01T00:00:00Z');
+  const hour = 3_600_000;
+  ok(
+    'cache missing generatedAt → stale',
+    evaluateUserCacheStale({ cacheGeneratedAt: null }).reason === 'missing_generated_at'
+  );
+  ok(
+    'cache fresh + older trending → not stale',
+    evaluateUserCacheStale({
+      cacheGeneratedAt: new Date(t0 + hour),
+      trendingUpdatedAt: new Date(t0),
+      now: t0 + hour + 60_000,
+      weights: {
+        trending: {
+          invalidateUserCacheWhenNewer: true,
+          userCacheMaxAgeMs: 7_200_000,
+          precomputeIntervalMs: hour,
+        },
+      },
+    }).stale === false
+  );
+  ok(
+    'trending newer than cache → stale (lazy invalidate)',
+    evaluateUserCacheStale({
+      cacheGeneratedAt: new Date(t0),
+      trendingUpdatedAt: new Date(t0 + hour),
+      now: t0 + hour + 60_000,
+      weights: {
+        trending: {
+          invalidateUserCacheWhenNewer: true,
+          userCacheMaxAgeMs: 7_200_000,
+          precomputeIntervalMs: hour,
+        },
+      },
+    }).reason === 'trending_newer'
+  );
+  ok(
+    'absolute maxAge exceeded → stale',
+    evaluateUserCacheStale({
+      cacheGeneratedAt: new Date(t0),
+      trendingUpdatedAt: new Date(t0),
+      now: t0 + 10_000_000,
+      weights: {
+        trending: {
+          invalidateUserCacheWhenNewer: true,
+          userCacheMaxAgeMs: hour,
+          precomputeIntervalMs: hour,
+        },
+      },
+    }).reason === 'max_age'
+  );
+  ok(
+    'invalidateUserCacheWhenNewer=false ignores newer trending',
+    evaluateUserCacheStale({
+      cacheGeneratedAt: new Date(t0),
+      trendingUpdatedAt: new Date(t0 + hour),
+      now: t0 + 60_000,
+      weights: {
+        trending: {
+          invalidateUserCacheWhenNewer: false,
+          userCacheMaxAgeMs: 7_200_000,
+          precomputeIntervalMs: hour,
+        },
+      },
+    }).stale === false
+  );
+  ok(
+    'config enables trending→cache invalidate',
+    scoringWeights.trending?.invalidateUserCacheWhenNewer === true
+  );
+};
+
+runSection13()
+  .then(() => {
+    console.log(`\n${fail === 0 ? 'ALL PASSED' : `FAILED: ${fail}`}\n`);
+    process.exit(fail === 0 ? 0 : 1);
+  })
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+

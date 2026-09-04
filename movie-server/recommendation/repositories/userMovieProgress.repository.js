@@ -77,8 +77,60 @@ const markAffinityCompletion = async (userId, movieId, completionRate) => {
   );
 };
 
+/**
+ * Category × movieId bo‘yicha o‘rtacha watchedSeconds (trending avgWatchDuration).
+ * views/likes bilan bir xil oyna: faqat since dan keyin yangilangan progress.
+ *
+ * @param {Object} [opts]
+ * @param {string} [opts.category]
+ * @param {Date|number} [opts.since] — bo‘lmasa all-time (faqat debug)
+ * @returns {Promise<Map<string, number>>} key = `${category}\0${movieId}`
+ */
+const averageWatchedSecondsByCategory = async (opts = {}) => {
+  /** @type {Object} */
+  const match = {};
+
+  const category =
+    typeof opts === 'string' ? opts : opts && opts.category != null ? opts.category : null;
+  if (category) match.category = String(category).trim();
+
+  const sinceRaw = typeof opts === 'object' && opts ? opts.since : null;
+  if (sinceRaw != null) {
+    const since =
+      sinceRaw instanceof Date
+        ? sinceRaw
+        : typeof sinceRaw === 'number'
+          ? new Date(sinceRaw)
+          : new Date(sinceRaw);
+    if (!Number.isNaN(since.getTime())) {
+      match.updatedAt = { $gte: since };
+    }
+  }
+
+  const rows = await UserMovieProgress.aggregate([
+    ...(Object.keys(match).length ? [{ $match: match }] : []),
+    {
+      $group: {
+        _id: { category: '$category', movieId: '$movieId' },
+        avgWatchDuration: { $avg: '$watchedSeconds' },
+      },
+    },
+  ]);
+
+  /** @type {Map<string, number>} */
+  const map = new Map();
+  for (const row of rows) {
+    const cat = row._id?.category;
+    const movieId = row._id?.movieId;
+    if (!cat || movieId == null) continue;
+    map.set(`${cat}\0${movieId}`, Number(row.avgWatchDuration) || 0);
+  }
+  return map;
+};
+
 module.exports = {
   findProgress,
   upsertMaxProgress,
   markAffinityCompletion,
+  averageWatchedSecondsByCategory,
 };

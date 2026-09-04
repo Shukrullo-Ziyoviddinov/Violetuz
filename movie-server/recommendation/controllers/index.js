@@ -36,6 +36,7 @@ const getByCategory = asyncHandler(async (req, res) => {
     category: req.params.category,
     limit: req.query?.limit,
     hydrate: req.query?.hydrate !== 'false',
+    lazy: req.query?.lazy,
   });
 
   return sendSuccess(res, { data: result });

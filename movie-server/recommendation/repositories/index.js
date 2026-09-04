@@ -10,6 +10,9 @@ const watchEventRepository = require('./watchEvent.repository');
 const userAffinityRepository = require('./userAffinity.repository');
 const userRecommendationRepository = require('./userRecommendation.repository');
 const userMovieProgressRepository = require('./userMovieProgress.repository');
+const trendingRepository = require('./trending.repository');
+const userExperienceRepository = require('./userExperience.repository');
+const jobLockRepository = require('./jobLock.repository');
 
 module.exports = {
   ...movieProjectionRepository,
@@ -17,4 +20,7 @@ module.exports = {
   ...userAffinityRepository,
   ...userRecommendationRepository,
   ...userMovieProgressRepository,
+  ...trendingRepository,
+  ...userExperienceRepository,
+  ...jobLockRepository,
 };

@@ -79,9 +79,87 @@ const listWatchedMovieIds = async (userId, category, limit = 200) => {
   return [...new Set(rows.map((r) => String(r.movieId)))];
 };
 
+/**
+ * Aggregate watch_events in a time window with recency decay weights.
+ * Returns one row per (category, movieId).
+ *
+ * @param {Object} [opts]
+ * @param {Date|number} [opts.since]
+ * @param {Date|number} [opts.now]
+ * @param {number} [opts.halfLifeDays] — exponential decay half-life
+ * @returns {Promise<Array<{ category: string, movieId: string, viewCountRecent: number, likeCount: number, completionRateAvg: number }>>}
+ */
+const aggregateWatchStatsByCategory = async (opts = {}) => {
+  const nowMs =
+    opts.now instanceof Date
+      ? opts.now.getTime()
+      : typeof opts.now === 'number'
+        ? opts.now
+        : Date.now();
+  const now = new Date(nowMs);
+  const since =
+    opts.since instanceof Date
+      ? opts.since
+      : typeof opts.since === 'number'
+        ? new Date(opts.since)
+        : new Date(nowMs - 30 * 86_400_000);
+  const halfLifeDays = Math.max(1, Number(opts.halfLifeDays) || 15);
+  const msPerDay = 86_400_000;
+
+  const rows = await WatchEvent.aggregate([
+    {
+      $match: {
+        watchedAt: { $gte: since, $lte: now },
+      },
+    },
+    {
+      $addFields: {
+        weight: {
+          $pow: [
+            0.5,
+            {
+              $divide: [
+                {
+                  $divide: [{ $subtract: [now, '$watchedAt'] }, msPerDay],
+                },
+                halfLifeDays,
+              ],
+            },
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { category: '$category', movieId: '$movieId' },
+        viewCountRecent: { $sum: '$weight' },
+        likeCount: {
+          $sum: {
+            $cond: [{ $eq: ['$liked', true] }, '$weight', 0],
+          },
+        },
+        completionRateAvg: { $avg: '$completionRate' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        category: '$_id.category',
+        movieId: '$_id.movieId',
+        viewCountRecent: 1,
+        likeCount: 1,
+        completionRateAvg: { $ifNull: ['$completionRateAvg', 0] },
+      },
+    },
+  ]);
+
+  return rows;
+};
+
 module.exports = {
   createWatchEvent,
   countPriorWatches,
   findWatchEventById,
   listWatchedMovieIds,
+  aggregateWatchStatsByCategory,
 };

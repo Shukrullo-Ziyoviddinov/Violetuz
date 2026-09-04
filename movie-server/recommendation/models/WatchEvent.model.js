@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
+const { scoringWeights } = require('../config/scoringWeights');
 
 /**
  * Watch events for the recommendation engine.
  * Fast-growing append log — affinity updates read recent rows, not full history scans.
  *
  * Growth strategy (MongoDB):
- * - Keep hot window via TTL or periodic archive job (e.g. move docs older than 180d
- *   into watch_events_archive_* collections / cold storage).
- * - Optional: time-based sharding key { watchedAt: 1 } when cluster is introduced.
+ * - TTL on watchedAt (scoringWeights.watchEvent.ttlDays, default 180).
+ *   Affinity cells, UserReaction likes, and UserMovieProgress are NOT deleted by this.
+ * - Optional later: archive to watch_events_archive_* before TTL if analytics need history.
  * - Affinity jobs should prefer { userId, category, watchedAt: -1 } index range queries.
  *
  * Collection: recommendation_watch_events
@@ -70,7 +71,19 @@ const watchEventSchema = new mongoose.Schema(
 watchEventSchema.index({ userId: 1, category: 1, watchedAt: -1 });
 watchEventSchema.index({ userId: 1, movieId: 1, watchedAt: -1 });
 watchEventSchema.index({ category: 1, watchedAt: -1 });
-/** Archive / retention sweep helper */
-watchEventSchema.index({ watchedAt: 1 });
+
+const ttlDays = Number(scoringWeights.watchEvent?.ttlDays);
+if (Number.isFinite(ttlDays) && ttlDays > 0) {
+  /** Mongo TTL monitor deletes when watchedAt + expireAfterSeconds < now */
+  watchEventSchema.index(
+    { watchedAt: 1 },
+    {
+      expireAfterSeconds: Math.floor(ttlDays * 24 * 60 * 60),
+      name: 'watchedAt_ttl',
+    }
+  );
+} else {
+  watchEventSchema.index({ watchedAt: 1 }, { name: 'watchedAt_1' });
+}
 
 module.exports = mongoose.model('RecommendationWatchEvent', watchEventSchema);

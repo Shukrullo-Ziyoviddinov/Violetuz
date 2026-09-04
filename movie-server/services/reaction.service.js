@@ -303,13 +303,56 @@ const toggleShortsLike = async (userId, { id }) => {
   return { liked: true, item };
 };
 
+/**
+ * Bulk PUT /reactions sync — fire like/unlike hooks from movie reaction diff.
+ * Same rules as setReaction: like ≠ ko'rildi; only likedBoost reverse/apply.
+ *
+ * @param {string|import('mongoose').Types.ObjectId} userId
+ * @param {Set<string>} prevLikedMovieIds
+ * @param {Set<string>} nextLikedMovieIds
+ */
+const enqueueMovieReactionDiffHooks = (userId, prevLikedMovieIds, nextLikedMovieIds) => {
+  for (const movieId of prevLikedMovieIds) {
+    if (nextLikedMovieIds.has(movieId)) continue;
+    try {
+      const { enqueueMovieUnlikeHook } = require('../recommendation/services/unlikeHook.service');
+      enqueueMovieUnlikeHook(userId, movieId);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] replace unlike→recommendation hook failed:', err?.message || err);
+    }
+  }
+
+  for (const movieId of nextLikedMovieIds) {
+    if (prevLikedMovieIds.has(movieId)) continue;
+    try {
+      const { enqueueMovieLikeHook } = require('../recommendation/services/likeHook.service');
+      enqueueMovieLikeHook(userId, movieId);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] replace like→recommendation hook failed:', err?.message || err);
+    }
+  }
+};
+
 const replaceReactions = async (userId, itemsInput = []) => {
   if (!Array.isArray(itemsInput)) {
     throw badRequest('items massiv bo‘lishi kerak');
   }
 
+  const prevMovieLikes = await UserReaction.find({
+    userId,
+    type: 'movie',
+    value: 'like',
+  })
+    .select('targetId')
+    .lean();
+  const prevLikedMovieIds = new Set(prevMovieLikes.map((r) => String(r.targetId)));
+
   const docs = [];
   const seen = new Set();
+  /** @type {Set<string>} */
+  const nextLikedMovieIds = new Set();
 
   for (const raw of itemsInput) {
     if (!raw || raw.id == null || !raw.type) continue;
@@ -337,6 +380,9 @@ const replaceReactions = async (userId, itemsInput = []) => {
         value: safeValue,
         snapshot,
       });
+      if (safeType === 'movie' && safeValue === 'like') {
+        nextLikedMovieIds.add(String(targetId));
+      }
     } catch (err) {
       if (err.status === 404) continue;
       throw err;
@@ -347,6 +393,8 @@ const replaceReactions = async (userId, itemsInput = []) => {
   if (docs.length) {
     await UserReaction.insertMany(docs, { ordered: false });
   }
+
+  enqueueMovieReactionDiffHooks(userId, prevLikedMovieIds, nextLikedMovieIds);
 
   const items = await listReactions(userId);
   const history = await listLikeHistory(userId);

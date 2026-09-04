@@ -69,12 +69,18 @@ export const resolveRecommendationCategoryKey = ({
  * Personalized list for a categoryName section.
  * Auth cookie/Bearer yetarli — server req.authUser dan oladi.
  *
- * @returns {Promise<{ movies: Array, source?: string, category?: string, items?: Array }>}
+ * @param {Object} opts
+ * @param {string} opts.category
+ * @param {number} [opts.limit]
+ * @param {boolean} [opts.hydrate]
+ * @param {boolean} [opts.lazy] — Home: sync precompute o‘rniga queue + SWR
+ * @returns {Promise<{ movies: Array, source?: string, category?: string, items?: Array, queuedRefresh?: boolean }>}
  */
 export const fetchCategoryRecommendations = async ({
   category,
   limit = 120,
   hydrate = true,
+  lazy = false,
 } = {}) => {
   const categoryKey = String(category || '').trim();
   if (!categoryKey) {
@@ -84,6 +90,7 @@ export const fetchCategoryRecommendations = async ({
   const query = new URLSearchParams();
   if (limit) query.set('limit', String(limit));
   if (hydrate === false) query.set('hydrate', 'false');
+  if (lazy) query.set('lazy', '1');
 
   const res = await recommendationsFetch(
     `/recommendations/${encodeURIComponent(categoryKey)}?${query.toString()}`
@@ -97,6 +104,7 @@ export const fetchCategoryRecommendations = async ({
     category: data?.category || categoryKey,
     items: Array.isArray(data?.items) ? data.items : [],
     generatedAt: data?.generatedAt || null,
+    queuedRefresh: Boolean(data?.queuedRefresh),
   };
 };
 

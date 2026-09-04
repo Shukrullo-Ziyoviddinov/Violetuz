@@ -7,6 +7,7 @@
  *  3) Hard share cap (e.g. one actor/country ≤ 40% of final Top-N)
  *
  * Additive scoring stays intact — this only reorders / filters the ranked list.
+ * Blend meta (alpha, personalizedScore, trendingScore, …) is preserved via shallow copy.
  *
  * @module recommendation/services/diversity.service
  */
@@ -71,7 +72,7 @@ const violatesWindow = (selected, keys, diversity) => {
  * Soft penalty for already-selected actors/countries.
  * @param {Map<string, number>} counts
  * @param {string[]} keys
- * @param {number} repeatPenalty
+ * @param {number} repeatPenalty — already scale-adjusted unit
  * @returns {number}
  */
 const softRepeatPenalty = (counts, keys, repeatPenalty) => {
@@ -81,6 +82,39 @@ const softRepeatPenalty = (counts, keys, repeatPenalty) => {
     if (n > 0) penalty += repeatPenalty * n;
   }
   return penalty;
+};
+
+/**
+ * Map config repeatPenalty onto the candidate score scale.
+ * Absolute 0.35 is useless next to raw scores ~100–300; range mode fixes that
+ * without changing behavior much when scores are already ~[0,1] (blended).
+ *
+ * @param {import('../types/recommendation.types').ScoredMovie[]} items
+ * @param {import('../types/recommendation.types').DiversityConfig} diversity
+ * @returns {number}
+ */
+const resolveEffectiveRepeatPenalty = (items, diversity) => {
+  const base = Number(diversity.repeatPenalty);
+  const configured = Number.isFinite(base) ? base : 0.35;
+  const mode = String(diversity.penaltyScale || 'range').toLowerCase();
+
+  if (mode === 'absolute' || !items.length) return configured;
+
+  let min = Infinity;
+  let max = -Infinity;
+  for (const item of items) {
+    const s = typeof item.score === 'number' && !Number.isNaN(item.score) ? item.score : 0;
+    if (s < min) min = s;
+    if (s > max) max = s;
+  }
+
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return configured;
+
+  const span = max - min;
+  // Flat pool: soft MMR cannot reorder by score; keep a tiny absolute nudge.
+  if (span <= 1e-12) return configured * Math.max(Math.abs(max), 1e-6);
+
+  return configured * span;
 };
 
 /**
@@ -110,15 +144,12 @@ const diversifyRecommendations = (scoredMovies, options = {}) => {
 
   const maxActorShare = Math.max(1, Math.floor(limit * (diversity.maxSharePerActor ?? 0.4)));
   const maxCountryShare = Math.max(1, Math.floor(limit * (diversity.maxSharePerCountry ?? 0.4)));
-  const repeatPenalty = diversity.repeatPenalty ?? 0.35;
 
   /** @type {import('../types/recommendation.types').ScoredMovie[]} */
-  const remaining = scoredMovies.map((item) => ({
-    movie: item.movie,
-    score: item.score,
-    breakdown: item.breakdown,
-    coldStart: item.coldStart,
-  }));
+  // Shallow copy every field — do not strip blend meta (alpha / personal / trending).
+  const remaining = scoredMovies.map((item) => ({ ...item }));
+
+  const repeatPenalty = resolveEffectiveRepeatPenalty(remaining, diversity);
 
   /** @type {import('../types/recommendation.types').ScoredMovie[]} */
   const selected = [];
@@ -227,6 +258,7 @@ const measureDiversityShares = (items) => {
 
 module.exports = {
   extractDiversityKeys,
+  resolveEffectiveRepeatPenalty,
   diversifyRecommendations,
   measureDiversityShares,
 };

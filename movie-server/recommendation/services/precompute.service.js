@@ -1,6 +1,9 @@
 /**
- * Precompute personalized Top-N per user × category and write cache.
+ * Precompute blended Top-N per user × category and write cache.
  * Candidate pool is capped (candidatePoolSize) — never full-scans 20k+ blindly.
+ *
+ * Scoring: blending.service (personalized + trending via alpha).
+ * Diversity + cache write unchanged.
  *
  * @module recommendation/services/precompute.service
  */
@@ -8,10 +11,11 @@
 'use strict';
 
 const { scoringWeights } = require('../config/scoringWeights');
-const { scoreMovies, hasPersonalizationSignal } = require('./scoring.service');
+const { hasPersonalizationSignal } = require('./scoring.service');
+const { scoreMoviesBlended } = require('./blending.service');
 const { diversifyRecommendations } = require('./diversity.service');
 const { toDecayedAffinityMap } = require('../utils/decay');
-const { findMoviesByCategory } = require('../repositories/movieProjection.repository');
+const { buildCategoryCandidatePool } = require('../repositories/movieProjection.repository');
 const { getAffinityMapWithMeta } = require('../repositories/userAffinity.repository');
 const { listWatchedMovieIds } = require('../repositories/watchEvent.repository');
 const {
@@ -22,20 +26,14 @@ const {
 /**
  * Build diversified Top-N and persist to user_recommendations cache.
  *
+ * Candidate pool: popular slice + affinity niche expand (not popularity-only 400).
+ *
  * @param {string|import('mongoose').Types.ObjectId} userId
  * @param {string} category
  * @param {Object} [options]
  * @param {number} [options.topN]
- * @param {number} [options.candidatePoolSize]
+ * @param {number} [options.candidatePoolSize] — legacy alias → popularLimit
  * @param {Date|number} [options.now]
- * @returns {Promise<{
- *   userId: *,
- *   category: string,
- *   written: number,
- *   source: 'personalized'|'cold_start',
- *   generatedAt: Date,
- *   items: import('../types/recommendation.types').ScoredMovie[],
- * }>}
  */
 const precomputeUserCategoryRecommendations = async (userId, category, options = {}) => {
   const cat = String(category || '').trim();
@@ -46,13 +44,18 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
   }
 
   const topN = options.topN ?? scoringWeights.topN;
-  const poolSize = options.candidatePoolSize ?? scoringWeights.candidatePoolSize;
+  const popularLimit =
+    options.candidatePoolPopular ??
+    options.candidatePoolSize ??
+    scoringWeights.candidatePoolPopular ??
+    300;
+  const affinityLimit =
+    options.candidatePoolAffinity ?? scoringWeights.candidatePoolAffinity ?? 150;
   const now = options.now ?? Date.now();
   const nowMs = now instanceof Date ? now.getTime() : now;
   const generatedAt = new Date(nowMs);
 
-  const [movies, affinityMeta, watchedIds] = await Promise.all([
-    findMoviesByCategory(cat, poolSize),
+  const [affinityMeta, watchedIds] = await Promise.all([
     getAffinityMapWithMeta(userId, cat),
     listWatchedMovieIds(userId, cat),
   ]);
@@ -60,10 +63,23 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
   const affinityMap = toDecayedAffinityMap(affinityMeta, nowMs, scoringWeights.decay);
   const personalized = hasPersonalizationSignal(affinityMap);
 
-  const scored = scoreMovies(movies, {
-    affinityMap,
-    watchedIds,
-    now: nowMs,
+  const movies = await buildCategoryCandidatePool(cat, {
+    affinityMap: personalized ? affinityMap : null,
+    popularLimit,
+    affinityLimit: personalized ? affinityLimit : 0,
+    seedGenres: scoringWeights.affinitySeedGenres,
+    seedCountries: scoringWeights.affinitySeedCountries,
+    seedActors: scoringWeights.affinitySeedActors,
+  });
+
+  const scored = await scoreMoviesBlended(movies, {
+    userId,
+    category: cat,
+    scoreOptions: {
+      affinityMap,
+      watchedIds,
+      now: nowMs,
+    },
   });
 
   const diversified = diversifyRecommendations(scored, { limit: topN });
@@ -76,11 +92,18 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
 
   const { written } = await replaceUserCategoryRecommendations(userId, cat, cacheRows);
 
+  const alpha = diversified[0]?.alpha ?? scored[0]?.alpha ?? 0;
+  const experienceCount =
+    diversified[0]?.experienceCount ?? scored[0]?.experienceCount ?? 0;
+
   return {
     userId,
     category: cat,
     written,
-    source: personalized ? 'personalized' : 'cold_start',
+    source: personalized ? 'blended' : 'blended_cold_start',
+    alpha,
+    experienceCount,
+    poolSize: movies.length,
     generatedAt,
     items: diversified,
   };

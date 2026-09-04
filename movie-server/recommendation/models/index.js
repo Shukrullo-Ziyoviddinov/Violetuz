@@ -11,11 +11,15 @@ const WatchEvent = require('./WatchEvent.model');
 const UserAffinity = require('./UserAffinity.model');
 const UserRecommendation = require('./UserRecommendation.model');
 const UserMovieProgress = require('./UserMovieProgress.model');
+const CategoryTrendingScore = require('./CategoryTrendingScore.model');
+const JobLock = require('./JobLock.model');
 
 module.exports = {
   WatchEvent,
   UserAffinity,
   UserRecommendation,
   UserMovieProgress,
+  CategoryTrendingScore,
+  JobLock,
   KNOWN_DIMENSION_TYPES: UserAffinity.KNOWN_DIMENSION_TYPES,
 };

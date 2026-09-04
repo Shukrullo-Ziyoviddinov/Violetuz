@@ -84,6 +84,9 @@ const recordWatchEvent = async (input) => {
 
   const jobPayload = {
     watchEventId: watchEvent._id,
+    userId,
+    movieId: String(movieId),
+    category,
     // Pass snapshot so the worker usually skips a second movie fetch
     dimensionSnapshot,
     movie,

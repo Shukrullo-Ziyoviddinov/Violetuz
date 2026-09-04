@@ -54,6 +54,8 @@ const userReactionSchema = new mongoose.Schema(
 
 userReactionSchema.index({ userId: 1, type: 1, targetId: 1 }, { unique: true });
 userReactionSchema.index({ userId: 1, value: 1, updatedAt: -1 });
+/** Trending precompute: movie likes in time window ($match type+value+updatedAt) */
+userReactionSchema.index({ type: 1, value: 1, updatedAt: -1 });
 
 module.exports = mongoose.model('UserReaction', userReactionSchema);
 module.exports.REACTION_TYPES = REACTION_TYPES;

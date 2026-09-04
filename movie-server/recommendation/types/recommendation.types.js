@@ -101,6 +101,14 @@
  * @property {Movie} movie
  * @property {number} score
  * @property {ScoreBreakdown} [breakdown]
+ * @property {boolean} [coldStart]
+ * @property {number} [alpha]
+ * @property {number} [experienceCount]
+ * @property {number} [personalizedScore]
+ * @property {number} [trendingScore]
+ * @property {number} [normalizedPersonalizedScore]
+ * @property {number} [normalizedTrendingScore]
+ * @property {string} [trendingSource]
  */
 
 /**
@@ -127,6 +135,7 @@
  * @property {number} maxSharePerActor
  * @property {number} maxSharePerCountry
  * @property {number} repeatPenalty
+ * @property {'range'|'absolute'} [penaltyScale]
  * @property {number} windowSize
  * @property {number} maxRepeatsInWindow
  */
@@ -149,6 +158,48 @@
  */
 
 /**
+ * @typedef {Object} CategoryTrendingScore
+ * @property {string} category
+ * @property {string} movieId
+ * @property {number} viewCountRecent
+ * @property {number} avgWatchDuration
+ * @property {number} likeCount
+ * @property {number} completionRateAvg
+ * @property {number} trendingScore
+ * @property {Date} [updatedAt]
+ */
+
+/**
+ * @typedef {Object} ProgressConfig
+ * @property {number} minWatchedSeconds
+ * @property {number} shortFilmCompleteRatio
+ * @property {number} affinityMinDelta
+ */
+
+/**
+ * @typedef {Object} BlendConfig
+ * @property {'linear'|'exponential'} strategy
+ * @property {number} confidenceThreshold
+ * @property {number} confidenceK
+ * @property {number} qualityMinCompletion
+ * @property {'minmax'|'none'} [normalizeMode]
+ * @property {number} [personalNormCap]
+ */
+
+/**
+ * @typedef {Object} TrendingConfig
+ * @property {number} windowDays
+ * @property {number} precomputeIntervalMs
+ * @property {number} wViews
+ * @property {number} wAvgDuration
+ * @property {number} wLikes
+ * @property {number} wCompletion
+ * @property {boolean} usePopularityFallback
+ * @property {boolean} [invalidateUserCacheWhenNewer]
+ * @property {number|null} [userCacheMaxAgeMs]
+ */
+
+/**
  * @typedef {Object} ScoringWeightsConfig
  * @property {number} genre
  * @property {number} country
@@ -160,9 +211,13 @@
  * @property {number} recency
  * @property {number} watchedPenalty
  * @property {number} duplicateWatchCap
+ * @property {ProgressConfig} progress
+ * @property {{ ttlDays?: number|null }} [watchEvent]
  * @property {DecayConfig} decay
  * @property {number} topN
  * @property {number} candidatePoolSize
+ * @property {BlendConfig} blend
+ * @property {TrendingConfig} trending
  * @property {DiversityConfig} diversity
  * @property {MovieFieldMapping} movieFields
  * @property {DimensionTypeIds} dimensionTypes

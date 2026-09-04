@@ -3,8 +3,11 @@
  * Watch handlers enqueue and return immediately; workers run async.
  * Supports retries + coalesceKey (dedupe pending jobs with same key).
  *
- * Note: process restart still drops in-memory jobs; progress/like paths
- * re-enqueue on the next user action when lastAffinityCompletion was not marked.
+ * Limits (MVP):
+ *   - Process restart drops pending jobs (progress lastAffinityCompletion retries;
+ *     trending uses Mongo lock only for multi-instance cron overlap).
+ *   - For durable multi-worker queues, replace with Bull/Redis later — keep job
+ *     names/payloads stable.
  *
  * @module recommendation/jobs/inProcessQueue
  */
@@ -49,6 +52,8 @@ class InProcessQueue {
     /** @type {QueueJob[]} */
     this.pending = [];
     this.active = 0;
+    /** @type {Set<string>} coalesce keys currently running */
+    this.inFlightCoalesce = new Set();
   }
 
   /**
@@ -162,9 +167,17 @@ class InProcessQueue {
 
   _pump() {
     while (this.active < this.concurrency && this.pending.length > 0) {
-      const job = this.pending.shift();
+      const idx = this.pending.findIndex(
+        (j) => !j.coalesceKey || !this.inFlightCoalesce.has(j.coalesceKey)
+      );
+      if (idx < 0) break;
+
+      const job = this.pending.splice(idx, 1)[0];
+      if (job.coalesceKey) this.inFlightCoalesce.add(job.coalesceKey);
+
       this.active += 1;
       this._run(job).finally(() => {
+        if (job.coalesceKey) this.inFlightCoalesce.delete(job.coalesceKey);
         this.active -= 1;
         this._pump();
       });

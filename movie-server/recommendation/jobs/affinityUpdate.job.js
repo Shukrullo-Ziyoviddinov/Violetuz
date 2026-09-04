@@ -92,11 +92,25 @@ const registerAffinityUpdateJob = (queue = recommendationQueue) => {
 
 /**
  * Enqueue without awaiting (HTTP-safe).
+ * Bir user×movie uchun pending affinity joblar coalesce qilinadi
+ * (oxirgi watchEventId qoladi — eng yangi completion).
+ *
  * @param {Object} payload
  * @param {import('./inProcessQueue').InProcessQueue} [queue]
  */
-const enqueueAffinityUpdate = (payload, queue = recommendationQueue) =>
-  queue.enqueue(JOB_NAME, payload);
+const enqueueAffinityUpdate = (payload = {}, queue = recommendationQueue) => {
+  const userId = payload.userId != null ? String(payload.userId) : '';
+  const movieId =
+    payload.movieId != null
+      ? String(payload.movieId)
+      : payload.movie?.id != null
+        ? String(payload.movie.id)
+        : '';
+  const coalesceKey =
+    userId && movieId ? `affinity:${userId}:${movieId}` : null;
+
+  return queue.enqueue(JOB_NAME, payload, { coalesceKey });
+};
 
 module.exports = {
   JOB_NAME,
