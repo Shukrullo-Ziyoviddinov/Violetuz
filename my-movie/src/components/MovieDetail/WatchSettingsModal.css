@@ -23,7 +23,7 @@
   z-index: 2201;
   width: min(280px, calc(100vw - 2rem));
   background: #121212;
-  border: 1px solid rgba(155, 79, 231, 0.35);
+  border: none;
   border-radius: 14px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(16px);
@@ -116,13 +116,22 @@
   padding: 0;
 }
 
+.watch-settings-modal-back {
+  background: transparent;
+  border: none;
+}
+
 .watch-settings-modal-back-spacer {
   width: 32px;
   height: 32px;
   flex-shrink: 0;
 }
 
-.watch-settings-modal-back:hover,
+.watch-settings-modal-back:hover {
+  background: transparent;
+  color: #fff;
+}
+
 .watch-settings-modal-close:hover {
   background: rgba(155, 79, 231, 0.35);
   color: #fff;
@@ -223,7 +232,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.75rem;
   padding: 0.8rem 0.95rem;
   border: 1px solid transparent;
@@ -233,7 +242,7 @@
   font-size: 0.95rem;
   font-weight: 650;
   cursor: pointer;
-  text-align: center;
+  text-align: left;
   letter-spacing: 0.04em;
   position: relative;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -281,8 +290,8 @@
   border-color: transparent;
   box-shadow: none;
   color: #fff;
-  text-align: center;
-  justify-content: center;
+  text-align: left;
+  justify-content: flex-start;
 }
 
 .watch-settings-modal .watch-modal-lang-btn:hover,
