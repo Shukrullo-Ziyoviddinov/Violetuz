@@ -417,6 +417,11 @@
   gap: 1.25rem;
 }
 
+.watch-modal-settings-anchor {
+  position: relative;
+  z-index: 5;
+}
+
 /* Icon Buttons */
 .watch-modal-icon-btn {
   width: 44px;

@@ -1,0 +1,305 @@
+.watch-settings-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.watch-settings-modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.watch-settings-modal-backdrop.is-mobile.show {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.watch-settings-modal {
+  position: fixed;
+  z-index: 1401;
+  width: min(280px, calc(100vw - 2rem));
+  background: linear-gradient(145deg, rgba(18, 12, 28, 0.98), rgba(10, 8, 16, 0.98));
+  border: 1px solid rgba(155, 79, 231, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.watch-settings-modal.is-desktop {
+  transform: translateY(8px) scale(0.96);
+}
+
+.watch-settings-modal.is-desktop.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.watch-settings-modal.is-mobile {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 100vw;
+  border-radius: 18px 18px 0 0;
+  border-bottom: none;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  transform: translateY(100%);
+  opacity: 1;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.watch-settings-modal.is-mobile.show {
+  transform: translateY(var(--drag-y, 0px));
+  pointer-events: auto;
+}
+
+.watch-settings-modal.dragging {
+  transition: none;
+}
+
+.watch-settings-modal-handle {
+  display: none;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-handle {
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: 0.7rem auto 0.15rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.watch-settings-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.watch-settings-modal-title {
+  flex: 1;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.watch-settings-modal-back,
+.watch-settings-modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.watch-settings-modal-back-spacer {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.watch-settings-modal-back:hover,
+.watch-settings-modal-close:hover {
+  background: rgba(155, 79, 231, 0.35);
+  color: #fff;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-close {
+  display: none;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-back-spacer {
+  display: none;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-header:has(.watch-settings-modal-back-spacer) {
+  justify-content: center;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-header:has(.watch-settings-modal-back-spacer) .watch-settings-modal-title {
+  flex: none;
+}
+
+.watch-settings-modal-body {
+  position: relative;
+  overflow: hidden;
+  min-height: 96px;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-body {
+  min-height: 140px;
+}
+
+.watch-settings-modal-panel {
+  padding: 0.55rem;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-panel {
+  padding: 0.65rem 0.85rem 1rem;
+}
+
+.watch-settings-modal-panel--forward {
+  animation: watchSettingsSlideIn 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.watch-settings-modal-panel--back {
+  animation: watchSettingsSlideBack 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes watchSettingsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes watchSettingsSlideBack {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.watch-settings-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.watch-settings-modal-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.watch-settings-modal-row:hover {
+  background: rgba(155, 79, 231, 0.22);
+  border-color: rgba(155, 79, 231, 0.45);
+}
+
+.watch-settings-modal-row-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.watch-settings-modal-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-weight: 650;
+  cursor: pointer;
+  text-align: left;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.watch-settings-modal-option:hover {
+  background: rgba(155, 79, 231, 0.25);
+  color: #fff;
+}
+
+.watch-settings-modal-option.active {
+  background: linear-gradient(135deg, rgba(189, 2, 189, 0.55) 0%, rgba(155, 79, 231, 0.55) 100%);
+  border-color: rgba(224, 170, 255, 0.25);
+  color: #fff;
+}
+
+.watch-settings-modal-check {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.watch-settings-modal .watch-modal-speed-menu,
+.watch-settings-modal .watch-modal-lang-row {
+  position: static;
+  bottom: auto;
+  right: auto;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.watch-settings-modal .watch-modal-lang-btn,
+.watch-settings-modal .watch-modal-speed-option {
+  flex: none;
+  width: 100%;
+  margin: 0;
+}
+
+.watch-settings-modal .watch-modal-speed-option.active::after {
+  content: none;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-row,
+.watch-settings-modal.is-mobile .watch-settings-modal-option {
+  padding: 0.95rem 1rem;
+  font-size: 1rem;
+}
+
+.watch-settings-modal.is-mobile .watch-settings-modal-title {
+  font-size: 1.05rem;
+}
