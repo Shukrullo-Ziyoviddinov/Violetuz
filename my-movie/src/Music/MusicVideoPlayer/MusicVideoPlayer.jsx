@@ -1,11 +1,15 @@
 import React, { useRef, useState, useEffect, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import MusicSettingsModal from './MusicSettingsModal';
 import './MusicVideoPlayer.css';
 
 const speedOptions = [1, 1.5, 2];
 
 const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandToggle, expanded = false }, ref) => {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const videoWrapperRef = useRef(null);
+  const settingsBtnRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const hideControlsTimeoutRef = useRef(null);
@@ -19,7 +23,7 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showTimeRemaining, setShowTimeRemaining] = useState(false);
   const videoTapRef = useRef({ x: 0, y: 0, time: 0 });
@@ -55,7 +59,7 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
     hideControlsTimeoutRef.current = setTimeout(() => {
       setShowControls(false);
       showControlsRef.current = false;
-      setShowSpeedMenu(false);
+      setShowSettingsModal(false);
     }, 4000);
   };
 
@@ -119,7 +123,23 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
         console.error('Error setting playback rate:', error);
       }
     }
-    setShowSpeedMenu(false);
+    showControlsWithDelay();
+  };
+
+  const openSettingsModal = (e) => {
+    e?.stopPropagation?.();
+    if (showSettingsModal) {
+      closeSettingsModal();
+      return;
+    }
+    clearHideTimeout();
+    setShowControls(true);
+    showControlsRef.current = true;
+    setShowSettingsModal(true);
+  };
+
+  const closeSettingsModal = () => {
+    setShowSettingsModal(false);
     showControlsWithDelay();
   };
 
@@ -345,12 +365,11 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
   }, [isDragging]);
 
   useEffect(() => {
+    if (showSettingsModal) clearHideTimeout();
+  }, [showSettingsModal]);
+
+  useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        showSpeedMenu &&
-        !e.target.closest('.music-vp-speed-wrap')
-      )
-        setShowSpeedMenu(false);
       if (
         showVolumeSlider &&
         !e.target.closest('.music-vp-volume-wrap')
@@ -362,7 +381,7 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
       )
         setShowTimeRemaining(false);
     };
-    if (showSpeedMenu || showVolumeSlider || showTimeRemaining) {
+    if (showVolumeSlider || showTimeRemaining) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('touchstart', handleClickOutside);
     }
@@ -370,13 +389,15 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [showSpeedMenu, showVolumeSlider, showTimeRemaining]);
+  }, [showVolumeSlider, showTimeRemaining]);
 
   const handleVideoWrapperTouchStart = (e) => {
     if (!('ontouchstart' in window)) return;
     if (
       e.target.closest('.music-vp-control-btn') ||
       e.target.closest('.music-vp-bottom-controls') ||
+      e.target.closest('.watch-settings-modal') ||
+      e.target.closest('.watch-settings-modal-backdrop') ||
       e.target.closest('input')
     )
       return;
@@ -389,6 +410,8 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
     if (
       e.target.closest('.music-vp-control-btn') ||
       e.target.closest('.music-vp-bottom-controls') ||
+      e.target.closest('.watch-settings-modal') ||
+      e.target.closest('.watch-settings-modal-backdrop') ||
       e.target.closest('input')
     )
       return;
@@ -400,6 +423,7 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
     const dt = Date.now() - time;
     if (dx < 20 && dy < 20 && dt < 300) {
       e.preventDefault();
+      if (showSettingsModal) setShowSettingsModal(false);
       if (showControlsRef.current) {
         clearHideTimeout();
         setShowControls(false);
@@ -667,44 +691,26 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
           </div>
 
           <div className="music-vp-right-controls">
-            <div className="music-vp-speed-wrap" style={{ position: 'relative' }}>
+            <div className="music-vp-settings-anchor">
               <button
+                ref={settingsBtnRef}
                 className="music-vp-icon-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowSpeedMenu(!showSpeedMenu);
-                }}
-                title={`Tezlik: ${playbackSpeed}x`}
+                onClick={openSettingsModal}
+                title={t('player.settings')}
+                aria-label={t('player.settings')}
               >
-                <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
-                  {playbackSpeed}x
-                </span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.07 7.07 0 0 0-1.63-.94l-.36-2.54A.49.49 0 0 0 13.91 2h-3.82a.49.49 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.55-1.63.94l-2.39-.96a.49.49 0 0 0-.59.22L2.72 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.84 14.52a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.39 1.04.71 1.63.94l.36 2.54c.05.23.25.41.48.41h3.82c.23 0 .43-.18.48-.41l.36-2.54c.59-.24 1.13-.55 1.63-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+                </svg>
               </button>
-              {showSpeedMenu && (
-                <div
-                  className="music-vp-speed-menu"
-                  onClick={(e) => e.stopPropagation()}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
-                >
-                  {speedOptions.map((speed) => (
-                    <button
-                      key={speed}
-                      className={`music-vp-speed-option ${
-                        playbackSpeed === speed ? 'active' : ''
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSpeedChange(speed);
-                      }}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onTouchStart={(e) => e.stopPropagation()}
-                    >
-                      {speed}x
-                    </button>
-                  ))}
-                </div>
-              )}
+              <MusicSettingsModal
+                isOpen={showSettingsModal}
+                onClose={closeSettingsModal}
+                anchorRef={settingsBtnRef}
+                playbackSpeed={playbackSpeed}
+                onSpeedChange={handleSpeedChange}
+                speedOptions={speedOptions}
+              />
             </div>
 
             <button

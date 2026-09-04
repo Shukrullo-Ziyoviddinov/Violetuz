@@ -239,11 +239,11 @@
 
 /* Icon Buttons */
 .music-vp-icon-btn {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(15, 15, 15, 0.95));
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(4, 24, 157, 0.5);
+  border: none;
   border-radius: 10px;
   color: #ffffff;
   cursor: pointer;
@@ -255,13 +255,24 @@
   flex-shrink: 0;
 }
 
-.music-vp-icon-btn:hover {
-  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
-  border-color: #bd02bd;
+.music-vp-icon-btn svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  paint-order: stroke fill;
+  stroke: currentColor;
+  stroke-width: 1.15;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 .music-vp-icon-btn:active {
   transform: translateY(0) scale(1.02);
+}
+
+.music-vp-settings-anchor {
+  position: relative;
+  z-index: 5;
 }
 
 /* Volume Wrap - slider appears in popover on hover */
@@ -555,14 +566,15 @@
   }
 
   .music-vp-bottom-controls.show .music-vp-icon-btn {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 6px;
   }
 
   .music-vp-bottom-controls.show .music-vp-icon-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.1;
   }
 
   .music-vp-bottom-controls.show .music-vp-icon-btn span {
@@ -665,8 +677,14 @@
   }
 
   .music-vp-icon-btn {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .music-vp-icon-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.1;
   }
 
   .music-vp-volume-slider {
@@ -750,9 +768,15 @@
   }
 
   .music-vp-icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 7px;
+  }
+
+  .music-vp-icon-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.1;
   }
 
   .music-vp-volume-slider {
@@ -836,9 +860,15 @@
   }
 
   .music-vp-icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 6px;
+  }
+
+  .music-vp-icon-btn svg {
+    width: 19px;
+    height: 19px;
+    stroke-width: 1.05;
   }
 
   .music-vp-volume-slider {
@@ -920,9 +950,15 @@
   }
 
   .music-vp-icon-btn {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 5px;
+  }
+
+  .music-vp-icon-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1;
   }
 
   .music-vp-volume-slider {
