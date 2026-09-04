@@ -424,8 +424,8 @@
 
 /* Icon Buttons */
 .watch-modal-icon-btn {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(15, 15, 15, 0.95));
   backdrop-filter: blur(10px);
   border: 2px solid rgba(4, 24, 157, 0.5);
@@ -440,9 +440,15 @@
   flex-shrink: 0;
 }
 
-.watch-modal-icon-btn:hover {
-  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
-  border-color: #bd02bd;
+.watch-modal-icon-btn svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  paint-order: stroke fill;
+  stroke: currentColor;
+  stroke-width: 1.15;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 .watch-modal-icon-btn:active {
@@ -694,13 +700,14 @@
   
   /* Icon buttons - medium size */
   .watch-modal-icon-btn {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
   }
-  
+
   .watch-modal-icon-btn svg {
-    width: 17px;
-    height: 17px;
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.1;
   }
   
   /* Volume slider - medium */
@@ -897,14 +904,15 @@
   
   /* Icon buttons - smaller */
   .watch-modal-icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 7px;
   }
-  
+
   .watch-modal-icon-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.1;
   }
   
   /* Volume slider - compact */
@@ -1065,14 +1073,15 @@
   
   /* Icon buttons - tiny */
   .watch-modal-icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 6px;
   }
-  
+
   .watch-modal-icon-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 19px;
+    height: 19px;
+    stroke-width: 1.05;
   }
   
   /* Volume slider - minimal */
@@ -1231,14 +1240,15 @@
   
   /* Icon buttons - extreme tiny */
   .watch-modal-icon-btn {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 5px;
   }
-  
+
   .watch-modal-icon-btn svg {
-    width: 12px;
-    height: 12px;
+    width: 18px;
+    height: 18px;
+    stroke-width: 1;
   }
   
   /* Volume slider - extreme minimal */

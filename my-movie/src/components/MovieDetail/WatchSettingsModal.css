@@ -1,7 +1,7 @@
 .watch-settings-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1400;
+  z-index: 2200;
   background: transparent;
   opacity: 0;
   pointer-events: none;
@@ -20,7 +20,7 @@
 
 .watch-settings-modal {
   position: fixed;
-  z-index: 1401;
+  z-index: 2201;
   width: min(280px, calc(100vw - 2rem));
   background: linear-gradient(145deg, rgba(18, 12, 28, 0.98), rgba(10, 8, 16, 0.98));
   border: 1px solid rgba(155, 79, 231, 0.35);
