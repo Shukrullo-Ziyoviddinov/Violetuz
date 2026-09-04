@@ -324,7 +324,9 @@ const Triller = ({ activeId }) => {
         target.closest('.trailer-modal-progress-container') ||
         target.closest('.trailer-modal-icon-btn') ||
         target.closest('input') ||
-        target.closest('.trailer-modal-speed-menu')
+        target.closest('.trailer-modal-speed-menu') ||
+        target.closest('.watch-settings-modal') ||
+        target.closest('.watch-settings-modal-backdrop')
     );
   };
 

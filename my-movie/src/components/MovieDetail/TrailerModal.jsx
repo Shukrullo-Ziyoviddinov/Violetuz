@@ -342,6 +342,8 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
       || target.closest('.trailer-modal-icon-btn')
       || target.closest('input')
       || target.closest('.trailer-modal-speed-menu')
+      || target.closest('.watch-settings-modal')
+      || target.closest('.watch-settings-modal-backdrop')
     );
   };
 
