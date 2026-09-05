@@ -34,14 +34,16 @@ const getTrendingScore = async (category, movieId) => {
 };
 
 /**
- * Map movieId → trendingScore for a category (blending / precompute).
+ * Map movieId → { score, source } for a category (blending / precompute).
+ * Plain number values still accepted by resolveTrendingScore for back-compat.
+ *
  * @param {string} category
- * @param {Array<string|number>} [movieIds] — agar berilsa faqat shular
- * @returns {Promise<Map<string, number>>}
+ * @param {Array<string|number>} [movieIds]
+ * @returns {Promise<Map<string, { score: number, source: 'trending'|'popularity' }>>}
  */
 const getTrendingScoreMap = async (category, movieIds = null) => {
   const cat = String(category || '').trim();
-  /** @type {Map<string, number>} */
+  /** @type {Map<string, { score: number, source: 'trending'|'popularity' }>} */
   const map = new Map();
   if (!cat) return map;
 
@@ -54,11 +56,15 @@ const getTrendingScoreMap = async (category, movieIds = null) => {
   }
 
   const rows = await CategoryTrendingScore.find(filter)
-    .select({ movieId: 1, trendingScore: 1, _id: 0 })
+    .select({ movieId: 1, trendingScore: 1, scoreSource: 1, _id: 0 })
     .lean();
 
   for (const row of rows) {
-    map.set(String(row.movieId), Number(row.trendingScore) || 0);
+    const source = row.scoreSource === 'popularity' ? 'popularity' : 'trending';
+    map.set(String(row.movieId), {
+      score: Number(row.trendingScore) || 0,
+      source,
+    });
   }
   return map;
 };
@@ -111,6 +117,7 @@ const upsertTrendingScore = async (row) => {
           Math.max(0, Number(row.completionRateAvg) || 0)
         ),
         trendingScore: Math.max(0, Number(row.trendingScore) || 0),
+        scoreSource: row.scoreSource === 'popularity' ? 'popularity' : 'trending',
         updatedAt: now,
       },
       $setOnInsert: { category, movieId },
@@ -155,6 +162,7 @@ const replaceCategoryTrendingScores = async (category, rows) => {
               Math.max(0, Number(row.completionRateAvg) || 0)
             ),
             trendingScore: Math.max(0, Number(row.trendingScore) || 0),
+            scoreSource: row.scoreSource === 'popularity' ? 'popularity' : 'trending',
             updatedAt: now,
           },
           $setOnInsert: { category: cat, movieId },

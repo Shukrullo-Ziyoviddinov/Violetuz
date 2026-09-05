@@ -11,7 +11,11 @@ const startServer = async () => {
     // Recommendation jobs: handlers register via routes; cron after DB is ready
     const {
       startTrendingPrecomputeScheduler,
+      startRecommendationQueueRecovery,
     } = require('./recommendation/jobs');
+
+    await startRecommendationQueueRecovery();
+
     startTrendingPrecomputeScheduler({
       runImmediately: true,
       initialDelayMs: 5_000,

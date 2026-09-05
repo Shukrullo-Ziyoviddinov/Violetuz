@@ -23,4 +23,5 @@ module.exports = {
   ...trendingRepository,
   ...userExperienceRepository,
   ...jobLockRepository,
+  ...require('./queuedJob.repository'),
 };

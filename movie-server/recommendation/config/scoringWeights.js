@@ -90,9 +90,9 @@ const scoringWeights = {
     /** exponential: alpha = 1 - exp(-count / confidenceK) */
     confidenceK: 10,
     /**
-     * Sifatli tajriba: completionRate > qualityMinCompletion (DISTINCT film)
+     * Sifatli tajriba: UserMovieProgress.completionRate > qualityMinCompletion (DISTINCT)
      * YOKI UserReaction movie like shu categoryda.
-     * WatchEvent.liked production path’da yozilmaydi — like manbai UserReaction.
+     * WatchEvent TTL-safe emas — α uchun ishlatilmaydi.
      */
     qualityMinCompletion: 0.3,
     /**

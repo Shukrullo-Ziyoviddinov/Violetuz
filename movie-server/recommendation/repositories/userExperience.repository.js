@@ -3,16 +3,15 @@
  *
  * experienceCount = | qualityWatchMovieIds ∪ likedMovieIdsInCategory |
  *
- * Sources (to‘g‘ri yo‘l):
- *   1) WatchEvent — DISTINCT movieId, faqat sifatli tomosha
- *      (completionRate > qualityMinCompletion OR liked=true legacy/test)
- *   2) UserReaction — movie like (ishlab chiqarishdagi like manbai)
- *      keyin Movie.categoryName = category bilan filtr
+ * Sources (TTL-safe):
+ *   1) UserMovieProgress — DISTINCT movieId, completionRate > qualityMinCompletion
+ *      (WatchEvent TTL o‘chsa ham α saqlanadi)
+ *   2) UserReaction — movie like, keyin Movie.categoryName = category
  *
  * Noto‘g‘ri yo‘llar (qilmaymiz):
- *   - Like paytida soxta WatchEvent yozish → "ko‘rildi"/watched penalty chalkashadi
- *   - Oddiy COUNT(events) → bir film α ni shishiradi
- *   - Watch + Like ni qo‘shib hisoblash → bir film ikki marta kiradi
+ *   - Like paytida soxta WatchEvent yozish
+ *   - Oddiy COUNT(events) / WatchEvent ga tayanib α hisoblash
+ *   - Watch + Like ni qo‘shib hisoblash (bir film ikki marta)
  *
  * @module recommendation/repositories/userExperience.repository
  */
@@ -21,7 +20,9 @@
 
 const Movie = require('../../models/Movie.model');
 const UserReaction = require('../../models/UserReaction.model');
-const { WatchEvent } = require('../models');
+const {
+  listQualityWatchMovieIds: listQualityFromProgress,
+} = require('./userMovieProgress.repository');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -34,17 +35,14 @@ const qualityMinCompletion = (weights = scoringWeights) => {
 };
 
 /**
- * Sifatli watch_event filtri.
- * liked=true — faqat legacy/test; production like → UserReaction.
+ * Sifatli progress filtri (UserMovieProgress).
+ * Production like → UserReaction (bu filterda liked yo‘q).
  *
  * @param {number} [minCompletion]
  * @returns {Object}
  */
 const buildQualityWatchFilter = (minCompletion = qualityMinCompletion()) => ({
-  $or: [
-    { completionRate: { $gt: minCompletion } },
-    { liked: true },
-  ],
+  completionRate: { $gt: minCompletion },
 });
 
 /**
@@ -67,25 +65,15 @@ const toNumericMovieIds = (rawIds) => {
 };
 
 /**
- * Sifatli tomosha qilingan film id lari (DISTINCT).
+ * Sifatli tomosha qilingan film id lari (DISTINCT) — UserMovieProgress.
  *
  * @param {string|import('mongoose').Types.ObjectId} userId
  * @param {string} category
  * @param {number} minCompletion
  * @returns {Promise<string[]>}
  */
-const listQualityWatchMovieIds = async (userId, category, minCompletion) => {
-  const cat = String(category || '').trim();
-  if (!userId || !cat) return [];
-
-  const ids = await WatchEvent.distinct('movieId', {
-    userId,
-    category: cat,
-    ...buildQualityWatchFilter(minCompletion),
-  });
-
-  return [...new Set((ids || []).map((id) => String(id)).filter(Boolean))];
-};
+const listQualityWatchMovieIds = (userId, category, minCompletion) =>
+  listQualityFromProgress(userId, category, minCompletion);
 
 /**
  * User like qilgan filmlar shu category ichida (UserReaction → Movie).
@@ -137,7 +125,7 @@ const unionDistinctCount = (watchIds = [], likeIds = []) => {
 
 /**
  * userExperienceCount(userId, category)
- * = unique film soni (sifatli watch ∪ category like)
+ * = unique film soni (sifatli progress ∪ category like)
  *
  * @param {string|import('mongoose').Types.ObjectId} userId
  * @param {string} category

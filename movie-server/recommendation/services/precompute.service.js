@@ -17,7 +17,7 @@ const { diversifyRecommendations } = require('./diversity.service');
 const { toDecayedAffinityMap } = require('../utils/decay');
 const { buildCategoryCandidatePool } = require('../repositories/movieProjection.repository');
 const { getAffinityMapWithMeta } = require('../repositories/userAffinity.repository');
-const { listWatchedMovieIds } = require('../repositories/watchEvent.repository');
+const { listWatchedMovieIds } = require('../repositories/userMovieProgress.repository');
 const {
   replaceUserCategoryRecommendations,
   listCachedRecommendations,

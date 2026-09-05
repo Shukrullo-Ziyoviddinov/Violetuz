@@ -34,6 +34,7 @@ const ensureJobsRegistered = () => {
  * @param {string|import('mongoose').Types.ObjectId} input.userId
  * @param {string|number} input.movieId
  * @param {number} [input.completionRate]
+ * @param {number} [input.watchedSeconds] — session/report seconds (trending window)
  * @param {boolean} [input.liked]
  * @param {string} [input.category] — defaults to movie.categoryName
  * @param {boolean} [input.waitForAffinity=false] — tests only
@@ -77,6 +78,7 @@ const recordWatchEvent = async (input) => {
     movieId,
     category,
     completionRate: input.completionRate ?? 0,
+    watchedSeconds: Math.max(0, Number(input.watchedSeconds) || 0),
     liked: Boolean(input.liked),
     watchedAt: input.watchedAt || new Date(),
     dimensionSnapshot,

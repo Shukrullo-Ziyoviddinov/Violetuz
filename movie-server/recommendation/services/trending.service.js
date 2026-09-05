@@ -139,6 +139,7 @@ const scoreTrendingBatch = (rows = [], weights = scoringWeights) => {
     likeCount: Math.max(0, Number(row.likeCount) || 0),
     completionRateAvg: clamp(row.completionRateAvg ?? 0, 0, 1),
     trendingScore: computeTrendingScore(row, ranges, weights),
+    scoreSource: row.scoreSource === 'popularity' ? 'popularity' : 'trending',
   }));
 };
 
@@ -171,24 +172,40 @@ const buildPopularityFallbackScores = (movies = [], category = '') => {
 };
 
 /**
- * Resolve trending for blending: DB score, else popularity fallback, else 0.
+ * Resolve trending for blending.
  *
- * @param {number|null|undefined} storedTrendingScore
- * @param {Object} [movie] — for popularity fallback
+ * - Stored finite number (including 0) → use it (0 is NOT “missing”)
+ * - Stored { score, source|scoreSource: 'popularity' } → keep popularity label
+ * - Missing / null / NaN → live popularity fallback from movie, else zero
+ *
+ * @param {number|{ score: number, source?: string, scoreSource?: string }|null|undefined} stored
+ * @param {Object} [movie] — for live popularity fallback
  * @param {import('../types/recommendation.types').ScoringWeightsConfig} [weights]
  * @returns {{ score: number, source: 'trending'|'popularity'|'zero' }}
  */
 const resolveTrendingScore = (
-  storedTrendingScore,
+  stored,
   movie = null,
   weights = scoringWeights
 ) => {
-  if (
-    typeof storedTrendingScore === 'number' &&
-    !Number.isNaN(storedTrendingScore) &&
-    storedTrendingScore > 0
-  ) {
-    return { score: clamp(storedTrendingScore, 0, 1), source: 'trending' };
+  let score = null;
+  let labeledSource = null;
+
+  if (stored != null && typeof stored === 'object' && !Array.isArray(stored)) {
+    if (typeof stored.score === 'number' && !Number.isNaN(stored.score)) {
+      score = stored.score;
+      labeledSource = stored.source || stored.scoreSource || null;
+    }
+  } else if (typeof stored === 'number' && !Number.isNaN(stored)) {
+    score = stored;
+  }
+
+  if (score != null) {
+    const clamped = clamp(score, 0, 1);
+    if (labeledSource === 'popularity') {
+      return { score: clamped, source: 'popularity' };
+    }
+    return { score: clamped, source: 'trending' };
   }
 
   const useFallback = weights.trending?.usePopularityFallback !== false;

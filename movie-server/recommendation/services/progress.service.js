@@ -149,6 +149,7 @@ const reportMovieProgress = async (userId, input = {}) => {
       movieId,
       category,
       completionRate: progress.completionRate,
+      watchedSeconds: progress.watchedSeconds,
     });
     affinityQueued = true;
   }

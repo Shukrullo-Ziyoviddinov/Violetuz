@@ -521,6 +521,22 @@ ok(
   'missing trending → popularity fallback',
   resolveTrendingScore(null, { like: '5000' }).source === 'popularity'
 );
+ok(
+  'stored score 0 is trending (not treated as missing)',
+  resolveTrendingScore(0, { like: '5000' }).source === 'trending' &&
+    resolveTrendingScore(0, { like: '5000' }).score === 0
+);
+ok(
+  'stored popularity label preserved in blend resolve',
+  resolveTrendingScore(
+    { score: 0.42, source: 'popularity' },
+    { like: '1' }
+  ).source === 'popularity' &&
+    almost(
+      resolveTrendingScore({ score: 0.42, scoreSource: 'popularity' }).score,
+      0.42
+    )
+);
 {
   const { buildPopularityFallbackScores, getPopularitySignal } = (() => {
     const trending = require('../recommendation/services/trending.service');
@@ -638,17 +654,16 @@ const runSection13 = async () => {
     `α=${fullPersonal[0].alpha}`
   );
 
-  // --- Liked wiring: experience = DISTINCT(watch ∪ like), filter accepts liked ---
+  // --- Liked wiring: experience = DISTINCT(progress ∪ like), TTL-safe ---
   const minC = qualityMinCompletion();
   const qFilter = buildQualityWatchFilter(minC);
   ok(
-    'quality watch filter includes completion > threshold',
-    Array.isArray(qFilter.$or) &&
-      qFilter.$or.some((c) => c.completionRate && c.completionRate.$gt === minC)
+    'quality progress filter is completionRate > threshold (UserMovieProgress)',
+    qFilter.completionRate && qFilter.completionRate.$gt === minC
   );
   ok(
-    'quality watch filter includes liked:true (legacy) — production likes via UserReaction',
-    Array.isArray(qFilter.$or) && qFilter.$or.some((c) => c.liked === true)
+    'quality filter has no WatchEvent.liked (likes via UserReaction only)',
+    qFilter.liked === undefined && !qFilter.$or
   );
   ok(
     'unionDistinctCount: like alone raises experience',
@@ -670,6 +685,36 @@ const runSection13 = async () => {
     'blend.qualityMinCompletion configured',
     typeof scoringWeights.blend?.qualityMinCompletion === 'number' &&
       scoringWeights.blend.qualityMinCompletion > 0
+  );
+  ok(
+    'watchedPenalty source is UserMovieProgress (cap 5000, not WatchEvent 200)',
+    (() => {
+      const prog = require('../recommendation/repositories/userMovieProgress.repository');
+      const src = prog.listWatchedMovieIds.toString();
+      return (
+        typeof prog.listWatchedMovieIds === 'function' &&
+        src.includes('5000') &&
+        src.includes('UserMovieProgress')
+      );
+    })()
+  );
+  ok(
+    'experience α uses UserMovieProgress (TTL-safe)',
+    typeof require('../recommendation/repositories/userExperience.repository')
+      .listQualityWatchMovieIds === 'function'
+  );
+  ok(
+    'trending duration+views share decay-weighted WatchEvent window',
+    typeof require('../recommendation/repositories/watchEvent.repository')
+      .averageWatchedSecondsByCategory === 'function' &&
+      require('../recommendation/repositories/watchEvent.repository')
+        .averageWatchedSecondsByCategory.toString()
+        .includes('halfLifeDays')
+  );
+  ok(
+    'durable queue recover export present',
+    typeof require('../recommendation/jobs').startRecommendationQueueRecovery ===
+      'function'
   );
 
   // --- Cache invalidation (pure evaluateUserCacheStale) ---

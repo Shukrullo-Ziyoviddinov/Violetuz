@@ -13,6 +13,7 @@ const UserRecommendation = require('./UserRecommendation.model');
 const UserMovieProgress = require('./UserMovieProgress.model');
 const CategoryTrendingScore = require('./CategoryTrendingScore.model');
 const JobLock = require('./JobLock.model');
+const QueuedJob = require('./QueuedJob.model');
 
 module.exports = {
   WatchEvent,
@@ -21,5 +22,6 @@ module.exports = {
   UserMovieProgress,
   CategoryTrendingScore,
   JobLock,
+  QueuedJob,
   KNOWN_DIMENSION_TYPES: UserAffinity.KNOWN_DIMENSION_TYPES,
 };

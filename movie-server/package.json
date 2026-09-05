@@ -38,6 +38,7 @@
     "fingerprints:generate:all": "node scripts/generateFingerprints.js --all",
     "durations:backfill": "node scripts/backfillDurationSec.js",
     "verify:recommendations": "node scripts/verifyRecommendationEngine.js",
+    "verify:recommendations:e2e": "node scripts/verifyRecommendationE2E.js",
     "test": "npm run verify:recommendations"
   },
   "keywords": [],

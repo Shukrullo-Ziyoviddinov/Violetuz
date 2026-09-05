@@ -8,6 +8,8 @@ const { scoringWeights } = require('../config/scoringWeights');
  * Growth strategy (MongoDB):
  * - TTL on watchedAt (scoringWeights.watchEvent.ttlDays, default 180).
  *   Affinity cells, UserReaction likes, and UserMovieProgress are NOT deleted by this.
+ *   Experience (α) + watchedPenalty read UserMovieProgress — TTL-safe.
+ *   Trending recent window (≤30d) still uses this log (watchedSeconds + watchedAt).
  * - Optional later: archive to watch_events_archive_* before TTL if analytics need history.
  * - Affinity jobs should prefer { userId, category, watchedAt: -1 } index range queries.
  *
@@ -43,6 +45,15 @@ const watchEventSchema = new mongoose.Schema(
       default: 0,
       min: 0,
       max: 1,
+    },
+    /**
+     * Session / report watched seconds at event time (trending avgWatchDuration window).
+     * Lifetime max lives on UserMovieProgress — do not use that for recent-window trending.
+     */
+    watchedSeconds: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     liked: {
       type: Boolean,

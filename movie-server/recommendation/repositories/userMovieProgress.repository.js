@@ -78,54 +78,77 @@ const markAffinityCompletion = async (userId, movieId, completionRate) => {
 };
 
 /**
- * Category × movieId bo‘yicha o‘rtacha watchedSeconds (trending avgWatchDuration).
- * views/likes bilan bir xil oyna: faqat since dan keyin yangilangan progress.
+ * @deprecated Trending uses watchEvent.averageWatchedSecondsByCategory (watchedAt window).
+ * Thin alias for old callers.
  *
  * @param {Object} [opts]
- * @param {string} [opts.category]
- * @param {Date|number} [opts.since] — bo‘lmasa all-time (faqat debug)
- * @returns {Promise<Map<string, number>>} key = `${category}\0${movieId}`
+ * @returns {Promise<Map<string, number>>}
  */
 const averageWatchedSecondsByCategory = async (opts = {}) => {
-  /** @type {Object} */
-  const match = {};
+  const {
+    averageWatchedSecondsByCategory: fromWatchEvents,
+  } = require('./watchEvent.repository');
+  return fromWatchEvents(typeof opts === 'string' ? { category: opts } : opts);
+};
 
-  const category =
-    typeof opts === 'string' ? opts : opts && opts.category != null ? opts.category : null;
-  if (category) match.category = String(category).trim();
+/**
+ * Sifatli tomosha (TTL-safe) — UserMovieProgress, not WatchEvent.
+ *
+ * @param {string|import('mongoose').Types.ObjectId} userId
+ * @param {string} category
+ * @param {number} minCompletion
+ * @returns {Promise<string[]>}
+ */
+const listQualityWatchMovieIds = async (userId, category, minCompletion) => {
+  const cat = String(category || '').trim();
+  if (!userId || !cat) return [];
 
-  const sinceRaw = typeof opts === 'object' && opts ? opts.since : null;
-  if (sinceRaw != null) {
-    const since =
-      sinceRaw instanceof Date
-        ? sinceRaw
-        : typeof sinceRaw === 'number'
-          ? new Date(sinceRaw)
-          : new Date(sinceRaw);
-    if (!Number.isNaN(since.getTime())) {
-      match.updatedAt = { $gte: since };
-    }
-  }
+  const min =
+    typeof minCompletion === 'number' && !Number.isNaN(minCompletion)
+      ? minCompletion
+      : 0.3;
 
-  const rows = await UserMovieProgress.aggregate([
-    ...(Object.keys(match).length ? [{ $match: match }] : []),
-    {
-      $group: {
-        _id: { category: '$category', movieId: '$movieId' },
-        avgWatchDuration: { $avg: '$watchedSeconds' },
-      },
-    },
-  ]);
+  const rows = await UserMovieProgress.find({
+    userId,
+    category: cat,
+    completionRate: { $gt: min },
+  })
+    .select({ movieId: 1, _id: 0 })
+    .lean();
 
-  /** @type {Map<string, number>} */
-  const map = new Map();
-  for (const row of rows) {
-    const cat = row._id?.category;
-    const movieId = row._id?.movieId;
-    if (!cat || movieId == null) continue;
-    map.set(`${cat}\0${movieId}`, Number(row.avgWatchDuration) || 0);
-  }
-  return map;
+  return [...new Set((rows || []).map((r) => String(r.movieId)).filter(Boolean))];
+};
+
+/**
+ * Watched-penalty set (TTL-safe): durable progress that crossed the watch gate.
+ *
+ * @param {string|import('mongoose').Types.ObjectId} userId
+ * @param {string} category
+ * @param {number} [limit=5000]
+ * @returns {Promise<string[]>}
+ */
+const listWatchedMovieIds = async (userId, category, limit = 5000) => {
+  const cat = String(category || '').trim();
+  if (!userId || !cat) return [];
+
+  const cfg = require('../config/scoringWeights').scoringWeights.progress || {};
+  const minSec = cfg.minWatchedSeconds ?? 300;
+  const shortRatio = cfg.shortFilmCompleteRatio ?? 0.8;
+
+  const rows = await UserMovieProgress.find({
+    userId,
+    category: cat,
+    $or: [
+      { watchedSeconds: { $gte: minSec } },
+      { completionRate: { $gte: shortRatio } },
+    ],
+  })
+    .select({ movieId: 1, _id: 0 })
+    .sort({ updatedAt: -1 })
+    .limit(Math.max(1, limit))
+    .lean();
+
+  return [...new Set((rows || []).map((r) => String(r.movieId)).filter(Boolean))];
 };
 
 module.exports = {
@@ -133,4 +156,6 @@ module.exports = {
   upsertMaxProgress,
   markAffinityCompletion,
   averageWatchedSecondsByCategory,
+  listQualityWatchMovieIds,
+  listWatchedMovieIds,
 };

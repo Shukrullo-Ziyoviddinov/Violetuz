@@ -5,7 +5,8 @@
  * Payload: { windowDays?, categories? } — optional overrides
  *
  * Flow:
- *   watch_events (last N days, recency decay) + progress avg duration + reaction likes
+ *   watch_events (last N days) — views/likes/completion/duration ALL decay-weighted
+ *   + UserReaction likes (same decay on updatedAt)
  *   → trending.service.scoreTrendingBatch
  *   → replaceCategoryTrendingScores
  * Empty category → buildPopularityFallbackScores (trendingScore = popularity; components = 0)
@@ -21,10 +22,8 @@ const { scoringWeights } = require('../config/scoringWeights');
 const { recommendationQueue } = require('./inProcessQueue');
 const {
   aggregateWatchStatsByCategory,
-} = require('../repositories/watchEvent.repository');
-const {
   averageWatchedSecondsByCategory,
-} = require('../repositories/userMovieProgress.repository');
+} = require('../repositories/watchEvent.repository');
 const {
   replaceCategoryTrendingScores,
 } = require('../repositories/trending.repository');
@@ -58,23 +57,55 @@ const listCatalogCategories = async () => {
 };
 
 /**
- * Movie likes from UserReaction (watch_events.liked ko‘pincha bo‘sh — like hook WatchEvent yozmaydi).
+ * Movie likes from UserReaction — same window + decay as watch_events views.
+ * weight = 0.5 ^ (ageDays / halfLife) on updatedAt.
+ *
  * @param {Date} since
- * @returns {Promise<Map<string, number>>} key = movieId → count
+ * @param {Object} [opts]
+ * @param {Date|number} [opts.now]
+ * @param {number} [opts.halfLifeDays]
+ * @returns {Promise<Map<string, number>>} key = movieId → decayed like mass
  */
-const countRecentMovieLikes = async (since) => {
+const countRecentMovieLikes = async (since, opts = {}) => {
+  const nowMs =
+    opts.now instanceof Date
+      ? opts.now.getTime()
+      : typeof opts.now === 'number'
+        ? opts.now
+        : Date.now();
+  const now = new Date(nowMs);
+  const halfLifeDays = Math.max(1, Number(opts.halfLifeDays) || 15);
+  const msPerDay = 86_400_000;
+
   const rows = await UserReaction.aggregate([
     {
       $match: {
         type: 'movie',
         value: 'like',
-        updatedAt: { $gte: since },
+        updatedAt: { $gte: since, $lte: now },
+      },
+    },
+    {
+      $addFields: {
+        weight: {
+          $pow: [
+            0.5,
+            {
+              $divide: [
+                {
+                  $divide: [{ $subtract: [now, '$updatedAt'] }, msPerDay],
+                },
+                halfLifeDays,
+              ],
+            },
+          ],
+        },
       },
     },
     {
       $group: {
         _id: '$targetId',
-        likeCount: { $sum: 1 },
+        likeCount: { $sum: '$weight' },
       },
     },
   ]);
@@ -176,8 +207,8 @@ const runTrendingPrecomputeBody = async (payload = {}) => {
 
   const [watchRows, durationMap, reactionLikes] = await Promise.all([
     aggregateWatchStatsByCategory({ since, now, halfLifeDays }),
-    averageWatchedSecondsByCategory({ since }),
-    countRecentMovieLikes(since),
+    averageWatchedSecondsByCategory({ since, now, halfLifeDays }),
+    countRecentMovieLikes(since, { now, halfLifeDays }),
   ]);
 
   const likeMovieIds = [...reactionLikes.keys()];

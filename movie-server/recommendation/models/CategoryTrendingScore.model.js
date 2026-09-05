@@ -52,6 +52,16 @@ const categoryTrendingScoreSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    /**
+     * 'trending' — watch_events formula
+     * 'popularity' — empty-category catalog fallback (blend must keep this label)
+     */
+    scoreSource: {
+      type: String,
+      enum: ['trending', 'popularity'],
+      default: 'trending',
+      trim: true,
+    },
     updatedAt: {
       type: Date,
       default: Date.now,

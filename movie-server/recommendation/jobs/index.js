@@ -31,6 +31,13 @@ registerAffinityUpdateJob(recommendationQueue);
 registerPrecomputeRecommendationsJob(recommendationQueue);
 registerTrendingPrecomputeJob(recommendationQueue);
 
+/**
+ * Call after connectDB — reload pending durable jobs into memory workers.
+ * @returns {Promise<{ recovered: number }>}
+ */
+const startRecommendationQueueRecovery = () =>
+  recommendationQueue.recoverFromDurableStore();
+
 // Soatlik cron server boot’da (connectDB dan keyin) startTrendingPrecomputeScheduler()
 // bilan yoqiladi — test/require paytida Mongo’siz ishga tushmasin.
 
@@ -51,4 +58,5 @@ module.exports = {
   enqueueTrendingPrecompute,
   startTrendingPrecomputeScheduler,
   stopTrendingPrecomputeScheduler,
+  startRecommendationQueueRecovery,
 };
