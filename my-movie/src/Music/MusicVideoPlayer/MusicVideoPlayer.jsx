@@ -1,15 +1,36 @@
 import React, { useRef, useState, useEffect, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
+import { createMusicListenProgressReporter } from '../../utils/musicListenProgressReporter';
 import MusicSettingsModal from './MusicSettingsModal';
 import './MusicVideoPlayer.css';
 
 const speedOptions = [1, 1.5, 2];
 
-const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandToggle, expanded = false }, ref) => {
+const MusicVideoPlayer = forwardRef(({
+  src,
+  poster,
+  autoPlay,
+  onEnded,
+  onExpandToggle,
+  expanded = false,
+  /** Music rec engine — clip|concert only when provided */
+  contentType = null,
+  contentId = null,
+  categoryNameMusic = null,
+}, ref) => {
   const { t } = useTranslation();
+  const { isLoggedIn } = useAuth();
   const videoRef = useRef(null);
   const videoWrapperRef = useRef(null);
   const settingsBtnRef = useRef(null);
+  const listenProgressRef = useRef(null);
+  if (!listenProgressRef.current) {
+    listenProgressRef.current = createMusicListenProgressReporter();
+  }
+  const isLoggedInRef = useRef(isLoggedIn);
+  isLoggedInRef.current = isLoggedIn;
+  const playbackSpeedRef = useRef(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const hideControlsTimeoutRef = useRef(null);
@@ -30,6 +51,8 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
   const previewTimeRef = useRef(0);
   const progressContainerRef = useRef(null);
 
+  playbackSpeedRef.current = playbackSpeed;
+
   const mergedVideoRef = (node) => {
     videoRef.current = node;
     if (typeof ref === 'function') {
@@ -46,6 +69,52 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
   useEffect(() => {
     showControlsRef.current = showControls;
   }, [showControls]);
+
+  useEffect(() => {
+    void listenProgressRef.current.loadConfig();
+  }, []);
+
+  useEffect(() => {
+    const type = contentType ? String(contentType).trim() : '';
+    const id = contentId;
+    if (!type || id == null || id === '') {
+      listenProgressRef.current.reset(null, null);
+      return undefined;
+    }
+
+    listenProgressRef.current.reset(type, id);
+
+    return () => {
+      const cat = String(categoryNameMusic || '').trim();
+      if (!cat) return;
+      const el = videoRef.current;
+      const dur = el?.duration;
+      void listenProgressRef.current.sync({
+        force: true,
+        isLoggedIn: isLoggedInRef.current,
+        contentType: type,
+        contentId: id,
+        category: cat,
+        durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
+      });
+    };
+  }, [contentType, contentId, categoryNameMusic]);
+
+  const flushListenProgress = ({ force = false } = {}) => {
+    const type = contentType ? String(contentType).trim() : '';
+    const cat = String(categoryNameMusic || '').trim();
+    if (!type || contentId == null || contentId === '' || !cat) return;
+    const el = videoRef.current;
+    const dur = el?.duration;
+    void listenProgressRef.current.sync({
+      force,
+      isLoggedIn: isLoggedInRef.current,
+      contentType: type,
+      contentId,
+      category: cat,
+      durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
+    });
+  };
 
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {
@@ -67,6 +136,7 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
     if (videoRef.current) {
       if (isPlayingRef.current) {
         videoRef.current.pause();
+        flushListenProgress({ force: true });
       } else {
         videoRef.current.play().catch(() => {});
       }
@@ -188,6 +258,11 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
+      listenProgressRef.current.accumulate({
+        isPlaying: isPlayingRef.current,
+        playbackRate: playbackSpeedRef.current || 1,
+      });
+      flushListenProgress();
     }
   };
 
@@ -465,13 +540,19 @@ const MusicVideoPlayer = forwardRef(({ src, poster, autoPlay, onEnded, onExpandT
         autoPlay={autoPlay}
         playsInline
         onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
+        onPause={() => {
+          setIsPlaying(false);
+          flushListenProgress({ force: true });
+        }}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onLoadedData={handleLoadedMetadata}
         onCanPlay={handleLoadedMetadata}
         onClick={handleVideoClick}
-        onEnded={onEnded}
+        onEnded={(e) => {
+          flushListenProgress({ force: true });
+          onEnded?.(e);
+        }}
       />
 
       <div

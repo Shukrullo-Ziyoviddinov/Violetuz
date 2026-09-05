@@ -211,6 +211,10 @@ const setReaction = async (userId, { id, type, value }) => {
   const targetId = normalizeTargetId(id);
   const safeValue = assertValue(value, safeType);
 
+  const musicLikeTypes = new Set(['klip', 'konsert']);
+  const tracksAffinity =
+    safeType === 'movie' || musicLikeTypes.has(safeType);
+
   if (safeValue === 'none') {
     const deleted = await UserReaction.findOneAndDelete({
       userId,
@@ -218,13 +222,26 @@ const setReaction = async (userId, { id, type, value }) => {
       targetId,
     }).lean();
 
-    if (safeType === 'movie' && deleted?.value === 'like') {
-      try {
-        const { enqueueMovieUnlikeHook } = require('../recommendation/services/unlikeHook.service');
-        enqueueMovieUnlikeHook(userId, targetId);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('[reaction] unlike→recommendation hook failed:', err?.message || err);
+    if (deleted?.value === 'like') {
+      if (safeType === 'movie') {
+        try {
+          const { enqueueMovieUnlikeHook } = require('../recommendation/services/unlikeHook.service');
+          enqueueMovieUnlikeHook(userId, targetId);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error('[reaction] unlike→recommendation hook failed:', err?.message || err);
+        }
+      } else if (musicLikeTypes.has(safeType)) {
+        try {
+          const {
+            enqueueMusicUnlikeHook,
+          } = require('../recommendation-music/services/unlikeHook.service');
+          const contentType = safeType === 'klip' ? 'clip' : 'concert';
+          enqueueMusicUnlikeHook(userId, contentType, targetId);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error('[reaction] unlike→music-recommendation hook failed:', err?.message || err);
+        }
       }
     }
 
@@ -235,7 +252,7 @@ const setReaction = async (userId, { id, type, value }) => {
   }
 
   let previousValue = null;
-  if (safeType === 'movie') {
+  if (tracksAffinity) {
     const existing = await UserReaction.findOne({
       userId,
       type: safeType,
@@ -267,6 +284,18 @@ const setReaction = async (userId, { id, type, value }) => {
     }
   }
 
+  // Clip/concert like → music affinity (music/album like yo‘q).
+  if (musicLikeTypes.has(safeType) && safeValue === 'like' && previousValue !== 'like') {
+    try {
+      const { enqueueMusicLikeHook } = require('../recommendation-music/services/likeHook.service');
+      const contentType = safeType === 'klip' ? 'clip' : 'concert';
+      enqueueMusicLikeHook(userId, contentType, targetId);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] like→music-recommendation hook failed:', err?.message || err);
+    }
+  }
+
   // Like → dislike: reverse likedBoost
   if (safeType === 'movie' && previousValue === 'like' && safeValue === 'dislike') {
     try {
@@ -275,6 +304,19 @@ const setReaction = async (userId, { id, type, value }) => {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('[reaction] dislike→recommendation hook failed:', err?.message || err);
+    }
+  }
+
+  if (musicLikeTypes.has(safeType) && previousValue === 'like' && safeValue === 'dislike') {
+    try {
+      const {
+        enqueueMusicUnlikeHook,
+      } = require('../recommendation-music/services/unlikeHook.service');
+      const contentType = safeType === 'klip' ? 'clip' : 'concert';
+      enqueueMusicUnlikeHook(userId, contentType, targetId);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] dislike→music-recommendation hook failed:', err?.message || err);
     }
   }
 

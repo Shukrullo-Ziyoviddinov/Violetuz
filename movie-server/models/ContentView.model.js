@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const VIEW_TYPES = Object.freeze([
   'movie',
   'music',
+  'album',
   'klip',
   'konsert',
   'triller',

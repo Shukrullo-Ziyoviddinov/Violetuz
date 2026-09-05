@@ -5,6 +5,11 @@ import { useContentLanguage } from './ContentLanguageContext';
 import { useMusicApi } from './MusicApiContext';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { useWishlist } from './WishlistContext';
+import { useAuth } from './AuthContext';
+import {
+  createMusicListenProgressReporter,
+  resolveAudioListenTarget,
+} from '../utils/musicListenProgressReporter';
 import MusicMiniPlayer from '../Music/MusicMiniPlayer/MusicMiniPlayer';
 import MusicPlayerModal from '../Music/MusicPlayerModal/MusicPlayerModal';
 import '../pageMusic/MusicDetail.css';
@@ -18,6 +23,8 @@ const albumSongToTrack = (album, song) => ({
   audio: song.audio,
   year: album.year,
   albumId: album.id,
+  albumSongId: song.id,
+  categoryNameMusic: album.categoryNameMusic,
   lyricsText: song.lyricsText,
 });
 
@@ -29,6 +36,7 @@ export const MusicPlayerProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { contentLang } = useContentLanguage();
+  const { isLoggedIn } = useAuth();
   const { allMusic, getAlbumsByCategory, allArtists, getArtistById } = useMusicApi();
   const topAlbums = getAlbumsByCategory('TopAlbums');
 
@@ -52,6 +60,19 @@ export const MusicPlayerProvider = ({ children }) => {
   const trebleFilterRef = useRef(null);
   const analyserRef = useRef(null);
   const gainNodeRef = useRef(null);
+  const listenProgressRef = useRef(null);
+  if (!listenProgressRef.current) {
+    listenProgressRef.current = createMusicListenProgressReporter();
+  }
+  /** albumId → { songId → listenedSec } — albom bo‘ylab yig‘indi */
+  const albumListenByTrackRef = useRef({});
+  /** albumId → { songId → durationSec } */
+  const albumTrackDurRef = useRef({});
+  /** albumId → true after first ≥10s mark locally */
+  const albumOpenedRef = useRef({});
+  const isLoggedInRef = useRef(isLoggedIn);
+  isLoggedInRef.current = isLoggedIn;
+  const currentMusicRef = useRef(null);
 
   const [currentMusic, setCurrentMusic] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -78,6 +99,133 @@ export const MusicPlayerProvider = ({ children }) => {
   lyricsDragOffsetRef.current = lyricsDragOffset;
   const [playerModalOpen, setPlayerModalOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(() => window.innerWidth <= 768);
+
+  currentMusicRef.current = currentMusic;
+
+  useEffect(() => {
+    void listenProgressRef.current.loadConfig();
+  }, []);
+
+  // Trek almashganda: eski progress flush → yangi contentKey reset
+  useEffect(() => {
+    const target = resolveAudioListenTarget(currentMusic, ALBUM_TRACK_ID_OFFSET);
+    if (target) {
+      let restore = 0;
+      if (target.contentType === 'album' && target.trackId != null) {
+        const albumId = String(target.contentId);
+        const songId = String(target.trackId);
+        restore = albumListenByTrackRef.current[albumId]?.[songId] || 0;
+      }
+      listenProgressRef.current.reset(target.contentType, target.contentId, {
+        restoreAccumulated: restore,
+      });
+    } else {
+      listenProgressRef.current.reset(null, null);
+    }
+
+    return () => {
+      if (!target?.category) return;
+      const el = audioRef.current;
+      const dur = el?.duration;
+      const isAlbum = target.contentType === 'album';
+      let trackListenedSeconds;
+      let albumDurationSec;
+      if (isAlbum && target.trackId != null) {
+        const albumId = String(target.contentId);
+        const songId = String(target.trackId);
+        if (!albumListenByTrackRef.current[albumId]) {
+          albumListenByTrackRef.current[albumId] = {};
+        }
+        const cur = listenProgressRef.current.getAccumulated();
+        albumListenByTrackRef.current[albumId][songId] = Math.max(
+          albumListenByTrackRef.current[albumId][songId] || 0,
+          cur
+        );
+        trackListenedSeconds = albumListenByTrackRef.current[albumId][songId];
+        if (Number.isFinite(dur) && dur > 0) {
+          if (!albumTrackDurRef.current[albumId]) albumTrackDurRef.current[albumId] = {};
+          albumTrackDurRef.current[albumId][songId] = Math.max(
+            albumTrackDurRef.current[albumId][songId] || 0,
+            dur
+          );
+        }
+        albumDurationSec = Object.values(albumTrackDurRef.current[albumId] || {}).reduce(
+          (s, n) => s + (Number(n) || 0),
+          0
+        );
+      }
+      void listenProgressRef.current.sync({
+        force: true,
+        isLoggedIn: isLoggedInRef.current,
+        contentType: target.contentType,
+        contentId: target.contentId,
+        category: target.category,
+        durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
+        trackId: target.trackId,
+        trackListenedSeconds,
+        albumDurationSec: albumDurationSec > 0 ? albumDurationSec : undefined,
+        albumAlreadyOpen: Boolean(albumOpenedRef.current[String(target.contentId)]),
+      });
+      if (isAlbum && (trackListenedSeconds || 0) >= 10) {
+        albumOpenedRef.current[String(target.contentId)] = true;
+      }
+    };
+  }, [currentMusic?.id, currentMusic?.albumId, currentMusic?.albumSongId, currentMusic?.categoryNameMusic]);
+
+  const flushListenProgress = useCallback(
+    async ({ force = false } = {}) => {
+      const target = resolveAudioListenTarget(
+        currentMusicRef.current,
+        ALBUM_TRACK_ID_OFFSET
+      );
+      if (!target?.category) return;
+      const el = audioRef.current;
+      const dur = el?.duration;
+      const isAlbum = target.contentType === 'album';
+      let trackListenedSeconds;
+      let albumDurationSec;
+      if (isAlbum && target.trackId != null) {
+        const albumId = String(target.contentId);
+        const songId = String(target.trackId);
+        if (!albumListenByTrackRef.current[albumId]) {
+          albumListenByTrackRef.current[albumId] = {};
+        }
+        const cur = listenProgressRef.current.getAccumulated();
+        albumListenByTrackRef.current[albumId][songId] = Math.max(
+          albumListenByTrackRef.current[albumId][songId] || 0,
+          cur
+        );
+        trackListenedSeconds = albumListenByTrackRef.current[albumId][songId];
+        if (Number.isFinite(dur) && dur > 0) {
+          if (!albumTrackDurRef.current[albumId]) albumTrackDurRef.current[albumId] = {};
+          albumTrackDurRef.current[albumId][songId] = Math.max(
+            albumTrackDurRef.current[albumId][songId] || 0,
+            dur
+          );
+        }
+        albumDurationSec = Object.values(albumTrackDurRef.current[albumId] || {}).reduce(
+          (s, n) => s + (Number(n) || 0),
+          0
+        );
+      }
+      await listenProgressRef.current.sync({
+        force,
+        isLoggedIn: isLoggedInRef.current,
+        contentType: target.contentType,
+        contentId: target.contentId,
+        category: target.category,
+        durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
+        trackId: target.trackId,
+        trackListenedSeconds,
+        albumDurationSec: albumDurationSec > 0 ? albumDurationSec : undefined,
+        albumAlreadyOpen: Boolean(albumOpenedRef.current[String(target.contentId)]),
+      });
+      if (isAlbum && (trackListenedSeconds || 0) >= 10) {
+        albumOpenedRef.current[String(target.contentId)] = true;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     const check = () => setIsMobileView(window.innerWidth <= 768);
@@ -457,17 +605,23 @@ export const MusicPlayerProvider = ({ children }) => {
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      void flushListenProgress({ force: true });
     } else {
       audioRef.current.play().catch(() => setIsPlaying(false));
       setIsPlaying(true);
     }
-  }, [isPlaying]);
+  }, [isPlaying, flushListenProgress]);
 
   const handleTimeUpdate = useCallback(() => {
     const el = audioRef.current;
     if (!el) return;
     setCurrentTime(el.currentTime);
-  }, []);
+    listenProgressRef.current.accumulate({
+      isPlaying: !el.paused && !el.ended,
+      playbackRate: el.playbackRate || 1,
+    });
+    void flushListenProgress();
+  }, [flushListenProgress]);
 
   const handleLoadedMetadata = useCallback(() => {
     if (audioRef.current) {
@@ -486,6 +640,8 @@ export const MusicPlayerProvider = ({ children }) => {
   const handleEnded = useCallback(() => {
     const music = currentMusic;
     if (!music) return;
+
+    void flushListenProgress({ force: true });
 
     if (isRepeat) {
       if (audioRef.current) {
@@ -533,7 +689,7 @@ export const MusicPlayerProvider = ({ children }) => {
         }
       }
     }
-  }, [currentMusic, isRepeat, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic]);
+  }, [currentMusic, isRepeat, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic, topAlbums, flushListenProgress]);
 
   const handlePrevTrack = useCallback(() => {
     if (!currentMusic) return;

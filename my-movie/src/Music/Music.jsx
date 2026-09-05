@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import MusicBanner from './MusicBanner/MusicBanner';
 import VideoBanner from '../components/VideoBanner';
 import MusicCards from './MusicCards/MusicCards';
@@ -7,6 +7,11 @@ import HomeShorts from '../components/HomeShorts/HomeShorts';
 import RecommendedArtists from './RecommendedArtists/RecommendedArtists';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
 import { useMusicApi } from '../context/MusicApiContext';
+import {
+  useHomeMusicCategoryRecommendations,
+  filterMusicRecItemsByContentType,
+} from '../hooks/useHomeMusicCategoryRecommendations';
+import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import './Music.css';
 
 const MUSIC_SECTION_SKELETON_COUNT = 3;
@@ -34,6 +39,40 @@ const Music = () => {
 
   const blocks = Array.isArray(pageContent) ? pageContent : [];
   const showMusicSectionSkeletons = pageContentLoading && blocks.length === 0;
+
+  const homeCategoryNames = useMemo(() => {
+    const names = [];
+    for (const block of blocks) {
+      if (block?.type === 'music' && block.sectionId) {
+        const section = getSectionById(block.sectionId);
+        if (section?.categoryNameMusic) names.push(section.categoryNameMusic);
+      }
+      if (block?.type === 'clips' && block.sectionId) {
+        const clipSection = getClipSectionById(block.sectionId);
+        if (clipSection?.categoryNameMusic) {
+          names.push(clipSection.categoryNameMusic);
+          continue;
+        }
+        const concertSection = getConcertSectionById(block.sectionId);
+        if (concertSection?.categoryNameMusic) {
+          names.push(concertSection.categoryNameMusic);
+        }
+      }
+    }
+    return names;
+  }, [blocks, getSectionById, getClipSectionById, getConcertSectionById]);
+
+  const personalizedByCategory =
+    useHomeMusicCategoryRecommendations(homeCategoryNames);
+
+  const resolveSectionItems = (categoryNameMusic, wishlistType, catalogItems) => {
+    const contentType = wishlistTypeToContentType(wishlistType);
+    const personalized = filterMusicRecItemsByContentType(
+      personalizedByCategory[categoryNameMusic],
+      contentType
+    );
+    return personalized?.length > 0 ? personalized : catalogItems;
+  };
 
   return (
     <ActiveClipProvider>
@@ -75,12 +114,18 @@ const Music = () => {
                 if (block.type === 'clips') {
                   const clipSection = getClipSectionById(block.sectionId);
                   if (clipSection) {
+                    const catalog = getClipsByCategory(clipSection.categoryNameMusic);
+                    const data = resolveSectionItems(
+                      clipSection.categoryNameMusic,
+                      clipSection.wishlistType || 'klip',
+                      catalog
+                    );
                     return (
                       <ClipsCards
                         key={clipSection.id}
                         section={{
                           ...clipSection,
-                          data: getClipsByCategory(clipSection.categoryNameMusic),
+                          data,
                         }}
                       />
                     );
@@ -88,12 +133,20 @@ const Music = () => {
 
                   const concertSection = getConcertSectionById(block.sectionId);
                   if (concertSection) {
+                    const catalog = getConcertsByCategory(
+                      concertSection.categoryNameMusic
+                    );
+                    const data = resolveSectionItems(
+                      concertSection.categoryNameMusic,
+                      concertSection.wishlistType || 'konsert',
+                      catalog
+                    );
                     return (
                       <ClipsCards
                         key={concertSection.id}
                         section={{
                           ...concertSection,
-                          data: getConcertsByCategory(concertSection.categoryNameMusic),
+                          data,
                         }}
                       />
                     );
@@ -122,7 +175,19 @@ const Music = () => {
                 if (block.type === 'music') {
                   const section = getSectionById(block.sectionId);
                   if (section) {
-                    return <MusicCards key={section.id} section={section} />;
+                    return (
+                      <MusicCards
+                        key={section.id}
+                        section={section}
+                        items={
+                          resolveSectionItems(
+                            section.categoryNameMusic,
+                            section.wishlistType || 'music',
+                            null
+                          ) || undefined
+                        }
+                      />
+                    );
                   }
 
                   if (sectionsLoading || pageContentLoading) {

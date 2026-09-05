@@ -317,6 +317,9 @@ const VideoPage = () => {
                   onEnded={handleVideoEnded}
                   onExpandToggle={isMobileViewport() ? handleExpandToggle : undefined}
                   expanded={isImmersive}
+                  contentType={isConcertVideo ? 'concert' : 'clip'}
+                  contentId={video.id}
+                  categoryNameMusic={video.categoryNameMusic}
                 />
               ) : null}
             </div>

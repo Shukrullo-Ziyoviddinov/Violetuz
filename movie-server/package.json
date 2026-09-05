@@ -39,7 +39,9 @@
     "durations:backfill": "node scripts/backfillDurationSec.js",
     "verify:recommendations": "node scripts/verifyRecommendationEngine.js",
     "verify:recommendations:e2e": "node scripts/verifyRecommendationE2E.js",
-    "test": "npm run verify:recommendations"
+    "verify:music-recommendations": "node scripts/verifyMusicRecommendationEngine.js",
+    "verify:music-recommendations:e2e": "node scripts/verifyMusicRecommendationE2E.js",
+    "test": "npm run verify:recommendations && npm run verify:music-recommendations"
   },
   "keywords": [],
   "author": "",

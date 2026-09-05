@@ -40,8 +40,10 @@ const shortDownloadRoutes = require('./shortDownload.routes');
 const searchRoutes = require('./search.routes');
 const identifyRoutes = require('./identify.routes');
 const recommendationRoutes = require('../recommendation/routes');
+const musicRecommendationRoutes = require('../recommendation-music/routes');
 // Register affinity/precompute handlers at boot (not only on first watch/like).
 require('../recommendation/jobs');
+require('../recommendation-music/jobs');
 
 const router = Router();
 
@@ -86,5 +88,6 @@ router.use('/trillers', trillerRoutes);
 router.use('/search', searchRoutes);
 router.use('/identify', identifyRoutes);
 router.use('/recommendations', recommendationRoutes);
+router.use('/music-recommendations', musicRecommendationRoutes);
 
 module.exports = router;

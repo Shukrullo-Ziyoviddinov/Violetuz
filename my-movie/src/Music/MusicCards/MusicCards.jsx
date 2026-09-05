@@ -113,7 +113,7 @@ const MusicCardItem = ({
  * Har qanday musiqa bo'limi uchun ishlatiladi (Trend, Discover, Music Library va hokazo).
  * Section config orqali data, title, moreTo boshqariladi.
  */
-const MusicCards = ({ section, isLoading: isLoadingProp = null }) => {
+const MusicCards = ({ section, items: itemsProp = null, isLoading: isLoadingProp = null }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
@@ -144,10 +144,11 @@ const MusicCards = ({ section, isLoading: isLoadingProp = null }) => {
   const getDetailPath = (itemId) =>
     detailPathType === 'album' ? `/music/album/${itemId}` : `/music/${itemId}`;
 
-  const resolvedData = useMemo(
-    () => getSectionItems(section),
-    [getSectionItems, section]
-  );
+  // Login: Music Home personalized list; guest / empty → katalog
+  const resolvedData = useMemo(() => {
+    if (Array.isArray(itemsProp) && itemsProp.length > 0) return itemsProp;
+    return getSectionItems(section);
+  }, [getSectionItems, section, itemsProp]);
 
   const getTitle = (item) => {
     if (!item?.title) return '';
