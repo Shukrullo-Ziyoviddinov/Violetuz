@@ -2,7 +2,7 @@
  * Music recommendation HTTP routes.
  *
  * GET  /api/music-recommendations/config/progress
- * GET  /api/music-recommendations/:categoryNameMusic?limit=
+ * GET  /api/music-recommendations/:categoryNameMusic?contentType=&limit=
  * POST /api/music-recommendations/progress
  *
  * @module recommendation-music/routes

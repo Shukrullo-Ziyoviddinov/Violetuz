@@ -1,12 +1,12 @@
 /**
- * Music recommendation jobs — register on shared recommendationQueue.
+ * Music recommendation jobs — register on dedicated musicRecommendationQueue.
  *
  * @module recommendation-music/jobs
  */
 
 'use strict';
 
-const { recommendationQueue } = require('../../recommendation/jobs/inProcessQueue');
+const { musicRecommendationQueue } = require('./musicQueue');
 const {
   registerAffinityUpdateJob,
   enqueueAffinityUpdate,
@@ -18,15 +18,25 @@ const {
   JOB_NAME: PRECOMPUTE_JOB,
 } = require('./precomputeRecommendations.job');
 
-registerAffinityUpdateJob(recommendationQueue);
-registerPrecomputeRecommendationsJob(recommendationQueue);
+registerAffinityUpdateJob(musicRecommendationQueue);
+registerPrecomputeRecommendationsJob(musicRecommendationQueue);
+
+/**
+ * Call after connectDB — reload pending durable music:* jobs.
+ * @returns {Promise<{ recovered: number }>}
+ */
+const startMusicRecommendationQueueRecovery = () =>
+  musicRecommendationQueue.recoverFromDurableStore();
 
 module.exports = {
-  recommendationQueue,
+  musicRecommendationQueue,
+  /** @deprecated alias — use musicRecommendationQueue */
+  recommendationQueue: musicRecommendationQueue,
   registerAffinityUpdateJob,
   enqueueAffinityUpdate,
   registerPrecomputeRecommendationsJob,
   enqueuePrecomputeRecommendations,
+  startMusicRecommendationQueueRecovery,
   AFFINITY_JOB,
   PRECOMPUTE_JOB,
 };

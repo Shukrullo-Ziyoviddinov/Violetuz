@@ -28,12 +28,13 @@ const getProgressConfig = asyncHandler(async (_req, res) => {
 });
 
 /**
- * GET /api/music-recommendations/:categoryNameMusic?limit=&lazy=
+ * GET /api/music-recommendations/:categoryNameMusic?limit=&lazy=&contentType=
  */
 const getByCategory = asyncHandler(async (req, res) => {
   const result = await getRecommendationsByCategory({
     userId: req.authUser._id,
     category: req.params.categoryNameMusic,
+    contentType: req.query?.contentType ?? req.query?.type,
     limit: req.query?.limit,
     hydrate: req.query?.hydrate !== 'false',
     lazy: req.query?.lazy,

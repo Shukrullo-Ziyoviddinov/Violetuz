@@ -7,7 +7,7 @@
 
 'use strict';
 
-const { recommendationQueue } = require('../../recommendation/jobs/inProcessQueue');
+const { musicRecommendationQueue } = require('./musicQueue');
 const { findListenEventById } = require('../repositories/listenEvent.repository');
 const {
   findContentProjection,
@@ -16,6 +16,7 @@ const {
 const { markAffinityCompletion } = require('../repositories/userProgress.repository');
 const { applyListenToAffinities } = require('../services/affinity.service');
 const { enqueuePrecomputeRecommendations } = require('./precomputeRecommendations.job');
+const { normalizeContentType } = require('../utils/contentKey');
 
 const JOB_NAME = 'music:affinity:update';
 
@@ -71,9 +72,13 @@ const handleAffinityUpdate = async (payload = {}) => {
 
   let precomputeQueued = false;
   if (payload.skipPrecompute !== true) {
+    const contentType = normalizeContentType(
+      listen.contentType || content?.contentType
+    );
     enqueuePrecomputeRecommendations({
       userId: listen.userId,
       category: listen.category,
+      contentType: contentType || undefined,
     });
     precomputeQueued = true;
   }
@@ -84,12 +89,12 @@ const handleAffinityUpdate = async (payload = {}) => {
   };
 };
 
-const registerAffinityUpdateJob = (queue = recommendationQueue) => {
+const registerAffinityUpdateJob = (queue = musicRecommendationQueue) => {
   queue.register(JOB_NAME, handleAffinityUpdate);
   return JOB_NAME;
 };
 
-const enqueueAffinityUpdate = (payload = {}, queue = recommendationQueue) => {
+const enqueueAffinityUpdate = (payload = {}, queue = musicRecommendationQueue) => {
   const userId = payload.userId != null ? String(payload.userId) : '';
   const contentKey =
     payload.contentKey != null

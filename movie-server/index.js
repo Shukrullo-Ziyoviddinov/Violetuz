@@ -13,8 +13,12 @@ const startServer = async () => {
       startTrendingPrecomputeScheduler,
       startRecommendationQueueRecovery,
     } = require('./recommendation/jobs');
+    const {
+      startMusicRecommendationQueueRecovery,
+    } = require('./recommendation-music/jobs');
 
     await startRecommendationQueueRecovery();
+    await startMusicRecommendationQueueRecovery();
 
     startTrendingPrecomputeScheduler({
       runImmediately: true,

@@ -58,7 +58,8 @@ const main = async () => {
   const {
     getRecommendationsByCategory,
   } = require('../recommendation-music/services/serve.service');
-  const { recommendationQueue } = require('../recommendation/jobs/inProcessQueue');
+  const { musicRecommendationQueue } = require('../recommendation-music/jobs/musicQueue');
+  require('../recommendation-music/jobs');
   const { ensureJobsRegistered } = require('../recommendation-music/services/listenEvent.service');
 
   // Movie collections — must stay untouched by music path
@@ -122,7 +123,7 @@ const main = async () => {
 
     let affinityCount = 0;
     for (let i = 0; i < 40; i += 1) {
-      await recommendationQueue.drain();
+      await musicRecommendationQueue.drain();
       affinityCount = await UserMusicAffinity.countDocuments({ userId, category });
       if (affinityCount > 0) break;
       await new Promise((r) => setTimeout(r, 250));
@@ -143,10 +144,11 @@ const main = async () => {
     const cold = await precomputeUserCategoryRecommendations(
       new mongoose.Types.ObjectId(),
       category,
-      { topN: 20 }
+      { topN: 20, contentType: 'music' }
     );
     const personal = await precomputeUserCategoryRecommendations(userId, category, {
       topN: 20,
+      contentType: 'music',
     });
 
     const coldTop = (cold.items || []).slice(0, 5).map((i) => i.content.contentKey);
@@ -193,7 +195,7 @@ const main = async () => {
       const beforeLike = await UserMusicAffinity.countDocuments({ userId, category });
       enqueueMusicLikeHook(userId, 'clip', clip.id);
       for (let i = 0; i < 20; i += 1) {
-        await recommendationQueue.drain();
+        await musicRecommendationQueue.drain();
         await new Promise((r) => setTimeout(r, 100));
         const after = await UserMusicAffinity.countDocuments({ userId, category });
         if (after > beforeLike) break;
@@ -212,7 +214,7 @@ const main = async () => {
     const beforeMusicLike = await UserMusicAffinity.countDocuments({ userId, category });
     enqueueMusicLikeHook(userId, 'music', contentId);
     await new Promise((r) => setTimeout(r, 300));
-    await recommendationQueue.drain();
+    await musicRecommendationQueue.drain();
     const afterMusicLike = await UserMusicAffinity.countDocuments({ userId, category });
     ok(
       'music like hook does not add affinity cells',

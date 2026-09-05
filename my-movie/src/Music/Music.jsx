@@ -9,7 +9,7 @@ import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClip
 import { useMusicApi } from '../context/MusicApiContext';
 import {
   useHomeMusicCategoryRecommendations,
-  filterMusicRecItemsByContentType,
+  musicHomeRecKey,
 } from '../hooks/useHomeMusicCategoryRecommendations';
 import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import './Music.css';
@@ -40,37 +40,61 @@ const Music = () => {
   const blocks = Array.isArray(pageContent) ? pageContent : [];
   const showMusicSectionSkeletons = pageContentLoading && blocks.length === 0;
 
-  const homeCategoryNames = useMemo(() => {
-    const names = [];
+  const homeRecRequests = useMemo(() => {
+    const requests = [];
     for (const block of blocks) {
       if (block?.type === 'music' && block.sectionId) {
         const section = getSectionById(block.sectionId);
-        if (section?.categoryNameMusic) names.push(section.categoryNameMusic);
+        if (section?.categoryNameMusic) {
+          const contentType = wishlistTypeToContentType(
+            section.wishlistType || 'music'
+          );
+          if (contentType) {
+            requests.push({
+              category: section.categoryNameMusic,
+              contentType,
+            });
+          }
+        }
       }
       if (block?.type === 'clips' && block.sectionId) {
         const clipSection = getClipSectionById(block.sectionId);
         if (clipSection?.categoryNameMusic) {
-          names.push(clipSection.categoryNameMusic);
+          const contentType = wishlistTypeToContentType(
+            clipSection.wishlistType || 'klip'
+          );
+          if (contentType) {
+            requests.push({
+              category: clipSection.categoryNameMusic,
+              contentType,
+            });
+          }
           continue;
         }
         const concertSection = getConcertSectionById(block.sectionId);
         if (concertSection?.categoryNameMusic) {
-          names.push(concertSection.categoryNameMusic);
+          const contentType = wishlistTypeToContentType(
+            concertSection.wishlistType || 'konsert'
+          );
+          if (contentType) {
+            requests.push({
+              category: concertSection.categoryNameMusic,
+              contentType,
+            });
+          }
         }
       }
     }
-    return names;
+    return requests;
   }, [blocks, getSectionById, getClipSectionById, getConcertSectionById]);
 
-  const personalizedByCategory =
-    useHomeMusicCategoryRecommendations(homeCategoryNames);
+  const personalizedByKey = useHomeMusicCategoryRecommendations(homeRecRequests);
 
   const resolveSectionItems = (categoryNameMusic, wishlistType, catalogItems) => {
     const contentType = wishlistTypeToContentType(wishlistType);
-    const personalized = filterMusicRecItemsByContentType(
-      personalizedByCategory[categoryNameMusic],
-      contentType
-    );
+    const personalized =
+      contentType &&
+      personalizedByKey[musicHomeRecKey(categoryNameMusic, contentType)];
     return personalized?.length > 0 ? personalized : catalogItems;
   };
 

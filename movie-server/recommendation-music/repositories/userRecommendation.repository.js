@@ -1,5 +1,6 @@
 /**
  * Precomputed Top-N music recommendation cache.
+ * Scoped by user × categoryNameMusic × contentType (music|album|clip|concert).
  *
  * @module recommendation-music/repositories/userRecommendation.repository
  */
@@ -8,14 +9,27 @@
 
 const crypto = require('crypto');
 const { UserMusicRecommendation } = require('../models');
+const { normalizeContentType, isValidContentType } = require('../utils/contentKey');
 
-const replaceUserCategoryRecommendations = async (userId, category, items) => {
+const replaceUserCategoryRecommendations = async (
+  userId,
+  category,
+  items,
+  options = {}
+) => {
   const cat = String(category).trim();
+  const contentType = normalizeContentType(options.contentType);
+  const typeFilter =
+    contentType && isValidContentType(contentType) ? contentType : null;
   const now = new Date();
   const batchId = crypto.randomBytes(12).toString('hex');
 
+  const scopeFilter = typeFilter
+    ? { userId, category: cat, contentType: typeFilter }
+    : { userId, category: cat };
+
   if (!Array.isArray(items) || items.length === 0) {
-    await UserMusicRecommendation.deleteMany({ userId, category: cat });
+    await UserMusicRecommendation.deleteMany(scopeFilter);
     return { written: 0, batchId: null };
   }
 
@@ -48,17 +62,27 @@ const replaceUserCategoryRecommendations = async (userId, category, items) => {
   await UserMusicRecommendation.bulkWrite(ops, { ordered: false });
 
   await UserMusicRecommendation.deleteMany({
-    userId,
-    category: cat,
+    ...scopeFilter,
     batchId: { $ne: batchId },
   });
 
   return { written: items.length, batchId };
 };
 
-const listCachedRecommendations = async (userId, category, limit = 120) => {
+const listCachedRecommendations = async (
+  userId,
+  category,
+  limit = 120,
+  options = {}
+) => {
   const cat = String(category).trim();
-  return UserMusicRecommendation.find({ userId, category: cat })
+  const contentType = normalizeContentType(options.contentType);
+  const filter = { userId, category: cat };
+  if (contentType && isValidContentType(contentType)) {
+    filter.contentType = contentType;
+  }
+
+  return UserMusicRecommendation.find(filter)
     .select({
       contentKey: 1,
       contentType: 1,

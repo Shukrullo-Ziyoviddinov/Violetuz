@@ -16,7 +16,8 @@ const mongoose = require('mongoose');
     ListenEvent,
     UserMusicAffinity,
   } = require('../recommendation-music/models');
-  const { recommendationQueue } = require('../recommendation/jobs/inProcessQueue');
+  const { musicRecommendationQueue } = require('../recommendation-music/jobs/musicQueue');
+  require('../recommendation-music/jobs');
 
   ensureJobsRegistered();
 
@@ -71,7 +72,7 @@ const mongoose = require('mongoose');
   );
 
   for (let i = 0; i < 30; i += 1) {
-    await recommendationQueue.drain();
+    await musicRecommendationQueue.drain();
     await new Promise((res) => setTimeout(res, 100));
   }
 
@@ -116,7 +117,7 @@ const mongoose = require('mongoose');
     ok('clip 15s accepted', r.ignored !== true && (r.affinityQueued || r.updated));
 
     for (let i = 0; i < 30; i += 1) {
-      await recommendationQueue.drain();
+      await musicRecommendationQueue.drain();
       await new Promise((res) => setTimeout(res, 100));
     }
 
@@ -148,7 +149,7 @@ const mongoose = require('mongoose');
     ok('album progress accepted', r.ignored !== true);
 
     for (let i = 0; i < 20; i += 1) {
-      await recommendationQueue.drain();
+      await musicRecommendationQueue.drain();
       await new Promise((res) => setTimeout(res, 80));
     }
 

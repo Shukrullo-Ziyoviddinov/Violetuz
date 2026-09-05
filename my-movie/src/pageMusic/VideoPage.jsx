@@ -156,8 +156,12 @@ const VideoPage = () => {
       };
     }
 
+    const isConcert =
+      String(video.type || '').toLowerCase() === 'konsert' ||
+      String(video.type || '').toLowerCase() === 'concert';
+
     return {
-      list: video.type === 'konsert'
+      list: isConcert
         ? getConcertsByCategory(video.categoryNameMusic)
         : getClipsByCategory(video.categoryNameMusic),
       titleKey: 'music.trendClips',
@@ -168,7 +172,7 @@ const VideoPage = () => {
   const relatedList = Array.isArray(relatedMeta.list) ? relatedMeta.list : [];
   const relatedTitleKey = relatedMeta.titleKey;
   const relatedTitleDefault = relatedMeta.titleDefault;
-  const wishlistType = video?.type === 'konsert' ? 'konsert' : 'klip';
+  const wishlistType = isConcertVideo ? 'konsert' : 'klip';
 
   const genreOptions = useMemo(() => {
     const map = new Map();
@@ -385,7 +389,7 @@ const VideoPage = () => {
                       initialLikeCount={videoLikeCount}
                       initialDislikeCount={videoDislikeCount}
                       likeMeta={{
-                        category: video?.type || 'klip',
+                        category: wishlistType,
                         title: video?.title || '',
                         image: video?.img || '',
                         route: `/music/video/${video.id}`,
@@ -423,7 +427,7 @@ const VideoPage = () => {
                       label="Repost"
                       item={{
                         id: video.id,
-                        type: video.type === 'konsert' ? 'konsert' : 'klip',
+                        type: wishlistType,
                         title: video.title || '',
                         artistName: artist?.name || '',
                         image: video.img || '/img/movie1.jpg',
@@ -509,7 +513,7 @@ const VideoPage = () => {
                 key={String(id)}
                 ref={commentsRef}
                 movieId={`music:${String(id)}`}
-                targetType={video.type === 'konsert' ? 'konsert' : 'klip'}
+                targetType={wishlistType}
                 mobileSheetUi
               />
             )}

@@ -1,5 +1,6 @@
 /**
  * Serve music recommendations from precomputed cache (realtime fallback).
+ * Cache scope: user × categoryNameMusic × contentType.
  * V1: no trending invalidation — absolute max-age only.
  *
  * @module recommendation-music/services/serve.service
@@ -15,6 +16,7 @@ const {
 } = require('../repositories/contentProjection.repository');
 const { enqueuePrecomputeRecommendations } = require('../jobs/precomputeRecommendations.job');
 const { badRequest } = require('../../utils/errors');
+const { normalizeContentType, isValidContentType } = require('../utils/contentKey');
 
 const parseUserId = (value) => {
   if (!value) return null;
@@ -54,13 +56,16 @@ const evaluateUserCacheStale = ({
 };
 
 /**
- * GET recommendations for categoryNameMusic.
+ * GET recommendations for categoryNameMusic (+ optional contentType).
  *
  * @param {Object} params
  */
 const getRecommendationsByCategory = async (params) => {
   const userId = parseUserId(params.userId);
   const category = String(params.category || params.categoryNameMusic || '').trim();
+  const contentType = normalizeContentType(params.contentType);
+  const scopedType =
+    contentType && isValidContentType(contentType) ? contentType : null;
   const limit = Math.max(
     1,
     Math.min(Number(params.limit) || scoringWeights.topN, scoringWeights.topN)
@@ -75,9 +80,16 @@ const getRecommendationsByCategory = async (params) => {
     throw badRequest('categoryNameMusic majburiy');
   }
 
+  const cacheOpts = scopedType ? { contentType: scopedType } : {};
+  const enqueuePayload = {
+    userId,
+    category,
+    ...(scopedType ? { contentType: scopedType } : {}),
+  };
+
   let source = 'cache';
   let generatedAt = null;
-  let rows = await getCachedTopN(userId, category, limit);
+  let rows = await getCachedTopN(userId, category, limit, cacheOpts);
   let queuedRefresh = false;
 
   if (rows.length) {
@@ -85,7 +97,7 @@ const getRecommendationsByCategory = async (params) => {
     const freshness = evaluateUserCacheStale({ cacheGeneratedAt: generatedAt });
     if (freshness.stale) {
       if (lazy) {
-        enqueuePrecomputeRecommendations({ userId, category });
+        enqueuePrecomputeRecommendations(enqueuePayload);
         queuedRefresh = true;
         source = 'cache_stale';
       } else {
@@ -98,7 +110,7 @@ const getRecommendationsByCategory = async (params) => {
 
   if (!rows.length) {
     if (lazy) {
-      enqueuePrecomputeRecommendations({ userId, category });
+      enqueuePrecomputeRecommendations(enqueuePayload);
       source = 'pending';
       generatedAt = null;
       rows = [];
@@ -106,6 +118,7 @@ const getRecommendationsByCategory = async (params) => {
     } else {
       const computed = await precomputeUserCategoryRecommendations(userId, category, {
         topN: scoringWeights.topN,
+        ...(scopedType ? { contentType: scopedType } : {}),
       });
       source = computed.source === 'cold_start' ? 'cold_start' : 'realtime';
       generatedAt = computed.generatedAt;
@@ -133,6 +146,7 @@ const getRecommendationsByCategory = async (params) => {
     userId: String(userId),
     category,
     categoryNameMusic: category,
+    contentType: scopedType,
     source,
     generatedAt,
     queuedRefresh,

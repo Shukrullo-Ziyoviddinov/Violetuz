@@ -55,7 +55,9 @@ module.exports = {
   enqueueMusicLikeHook: services.enqueueMusicLikeHook,
   enqueueMusicUnlikeHook: services.enqueueMusicUnlikeHook,
   precomputeUserCategoryRecommendations: services.precomputeUserCategoryRecommendations,
-  recommendationQueue: jobs.recommendationQueue,
+  musicRecommendationQueue: jobs.musicRecommendationQueue,
+  /** @deprecated alias — use musicRecommendationQueue */
+  recommendationQueue: jobs.musicRecommendationQueue,
 
   scoreContent: services.scoreContent,
   scoreContents: services.scoreContents,

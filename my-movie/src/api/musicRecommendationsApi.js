@@ -1,6 +1,6 @@
 /**
  * Music category recommendations API.
- * Faqat Music Home sectionlari (categoryNameMusic) uchun.
+ * Faqat Music Home sectionlari (categoryNameMusic × contentType) uchun.
  * SimilarSongs / RecommendedClips / AlbumsForYou — ulanmaydi.
  */
 import { resolveApiBaseUrl } from './apiBase';
@@ -38,6 +38,7 @@ const parseJson = async (response) => {
  *
  * @param {Object} opts
  * @param {string} opts.category — categoryNameMusic
+ * @param {string} [opts.contentType] — music|album|clip|concert (scoped cache)
  * @param {number} [opts.limit]
  * @param {boolean} [opts.hydrate]
  * @param {boolean} [opts.lazy]
@@ -45,6 +46,7 @@ const parseJson = async (response) => {
  */
 export const fetchMusicCategoryRecommendations = async ({
   category,
+  contentType,
   limit = 120,
   hydrate = true,
   lazy = false,
@@ -58,6 +60,8 @@ export const fetchMusicCategoryRecommendations = async ({
   if (limit) query.set('limit', String(limit));
   if (hydrate === false) query.set('hydrate', 'false');
   if (lazy) query.set('lazy', '1');
+  const typeKey = String(contentType || '').trim();
+  if (typeKey) query.set('contentType', typeKey);
 
   const res = await musicRecFetch(
     `/music-recommendations/${encodeURIComponent(categoryKey)}?${query.toString()}`
@@ -70,6 +74,7 @@ export const fetchMusicCategoryRecommendations = async ({
     items: Array.isArray(data?.items) ? data.items : [],
     source: data?.source,
     category: data?.category || data?.categoryNameMusic || categoryKey,
+    contentType: data?.contentType || typeKey || null,
     generatedAt: data?.generatedAt || null,
     queuedRefresh: Boolean(data?.queuedRefresh),
   };

@@ -15,23 +15,12 @@ import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
 import { AudioVisualizerCanvas, CardVisual } from '../Music/Visual';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
+import { albumSongToTrack } from '../utils/albumSongToTrack';
 import './MusicDetail.css';
 import './MusicAlbumDetail.css';
 
-const ALBUM_TRACK_ID_OFFSET = 50000;
 const TREND_SKELETON_COUNT = 8;
 const SONGS_SKELETON_COUNT = 6;
-
-const albumSongToTrack = (album, song) => ({
-  id: ALBUM_TRACK_ID_OFFSET + album.id * 100 + song.id,
-  title: song.title,
-  artist: song.artist,
-  img: album.img,
-  audio: song.audio,
-  year: album.year,
-  albumId: album.id,
-  lyricsText: song.lyricsText,
-});
 
 const AlbumTrendCardSkeleton = () => (
   <div

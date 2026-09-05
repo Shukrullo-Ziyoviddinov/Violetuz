@@ -9,6 +9,15 @@ const HOME_FETCH_CONCURRENCY = 2;
 const HOME_PENDING_RETRY_DELAYS_MS = [2000, 4000, 8000, 12000, 20000];
 
 /**
+ * Cache key: categoryNameMusic + contentType (server scoped cache).
+ * @param {string} category
+ * @param {string} contentType
+ */
+export function musicHomeRecKey(category, contentType) {
+  return `${String(category || '').trim()}\0${String(contentType || '').trim()}`;
+}
+
+/**
  * @template T
  * @param {T[]} items
  * @param {number} concurrency
@@ -30,59 +39,72 @@ async function runPool(items, concurrency, worker) {
 }
 
 /**
- * Login user uchun Music Home categoryNameMusic bo‘limlariga personalized tartib.
+ * Login user uchun Music Home sectionlari — category × contentType scoped.
  * Guest / xato → bo‘sh map (katalog fallback).
  *
  * Faqat Music.jsx sectionlari — SimilarSongs / RecommendedClips / AlbumsForYou emas.
  *
- * @param {string[]} categoryNames — categoryNameMusic list
- * @returns {Record<string, Array>}
+ * @param {Array<{ category: string, contentType: string }>} sectionRequests
+ * @returns {Record<string, Array>} map keyed by musicHomeRecKey(category, contentType)
  */
-export function useHomeMusicCategoryRecommendations(categoryNames = []) {
+export function useHomeMusicCategoryRecommendations(sectionRequests = []) {
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const profile = useAppSelector(selectProfile);
-  const [byCategory, setByCategory] = useState({});
+  const [byKey, setByKey] = useState({});
 
-  const categoriesKey = useMemo(() => {
-    const unique = [
-      ...new Set(
-        (categoryNames || [])
-          .map((name) => (typeof name === 'string' ? name.trim() : ''))
-          .filter(Boolean)
-      ),
-    ].sort();
-    return unique.join('\0');
-  }, [categoryNames]);
+  const requestsKey = useMemo(() => {
+    const unique = new Map();
+    for (const req of sectionRequests || []) {
+      const category = typeof req?.category === 'string' ? req.category.trim() : '';
+      const contentType =
+        typeof req?.contentType === 'string' ? req.contentType.trim() : '';
+      if (!category || !contentType) continue;
+      unique.set(musicHomeRecKey(category, contentType), { category, contentType });
+    }
+    return [...unique.values()]
+      .sort((a, b) =>
+        musicHomeRecKey(a.category, a.contentType).localeCompare(
+          musicHomeRecKey(b.category, b.contentType)
+        )
+      )
+      .map((r) => musicHomeRecKey(r.category, r.contentType))
+      .join('|');
+  }, [sectionRequests]);
 
-  const categories = useMemo(
-    () => (categoriesKey ? categoriesKey.split('\0') : []),
-    [categoriesKey]
-  );
+  const requests = useMemo(() => {
+    if (!requestsKey) return [];
+    return requestsKey.split('|').map((key) => {
+      const [category, contentType] = key.split('\0');
+      return { category, contentType };
+    });
+  }, [requestsKey]);
 
   useEffect(() => {
     let cancelled = false;
     const retryTimers = [];
 
-    if (!authReady || !isLoggedIn || !profile?.id || !categories.length) {
-      setByCategory({});
+    if (!authReady || !isLoggedIn || !profile?.id || !requests.length) {
+      setByKey({});
       return undefined;
     }
 
-    setByCategory({});
+    setByKey({});
 
-    const applyCategory = (category, items) => {
+    const applyKey = (key, items) => {
       if (cancelled || !items?.length) return;
-      setByCategory((prev) => {
-        if (prev[category] === items) return prev;
-        return { ...prev, [category]: items };
+      setByKey((prev) => {
+        if (prev[key] === items) return prev;
+        return { ...prev, [key]: items };
       });
     };
 
-    const loadOne = async (category, attempt = 0) => {
+    const loadOne = async ({ category, contentType }, attempt = 0) => {
+      const key = musicHomeRecKey(category, contentType);
       try {
         const result = await fetchMusicCategoryRecommendations({
           category,
+          contentType,
           limit: HOME_REC_LIMIT,
           lazy: true,
         });
@@ -90,14 +112,14 @@ export function useHomeMusicCategoryRecommendations(categoryNames = []) {
 
         const items = Array.isArray(result.itemsHydrated) ? result.itemsHydrated : [];
         if (items.length) {
-          applyCategory(category, items);
+          applyKey(key, items);
           if (
             attempt === 0 &&
             (result.source === 'cache_stale' || result.queuedRefresh)
           ) {
             const delay = HOME_PENDING_RETRY_DELAYS_MS[0];
             const timer = setTimeout(() => {
-              if (!cancelled) void loadOne(category, 1);
+              if (!cancelled) void loadOne({ category, contentType }, 1);
             }, delay);
             retryTimers.push(timer);
           }
@@ -116,7 +138,7 @@ export function useHomeMusicCategoryRecommendations(categoryNames = []) {
             Math.min(attempt, HOME_PENDING_RETRY_DELAYS_MS.length - 1)
           ];
         const timer = setTimeout(() => {
-          if (!cancelled) void loadOne(category, nextAttempt);
+          if (!cancelled) void loadOne({ category, contentType }, nextAttempt);
         }, delay);
         retryTimers.push(timer);
       } catch {
@@ -124,32 +146,13 @@ export function useHomeMusicCategoryRecommendations(categoryNames = []) {
       }
     };
 
-    void runPool(categories, HOME_FETCH_CONCURRENCY, (category) =>
-      loadOne(category, 0)
-    );
+    void runPool(requests, HOME_FETCH_CONCURRENCY, (req) => loadOne(req, 0));
 
     return () => {
       cancelled = true;
       retryTimers.forEach((id) => clearTimeout(id));
     };
-  }, [authReady, isLoggedIn, profile?.id, categoriesKey, categories]);
+  }, [authReady, isLoggedIn, profile?.id, requestsKey, requests]);
 
-  return byCategory;
-}
-
-/**
- * Personalized listni section wishlistType bo‘yicha filtrlash.
- * (API category ichida music/album/clip/concert aralashishi mumkin.)
- *
- * @param {Array} items
- * @param {string} contentType — music|album|clip|concert
- * @returns {Array|null}
- */
-export function filterMusicRecItemsByContentType(items, contentType) {
-  const type = String(contentType || '').trim();
-  if (!type || !Array.isArray(items) || !items.length) return null;
-  const filtered = items.filter(
-    (item) => String(item?.contentType || '').trim() === type
-  );
-  return filtered.length ? filtered : null;
+  return byKey;
 }

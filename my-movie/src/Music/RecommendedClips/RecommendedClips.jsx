@@ -12,6 +12,16 @@ import './RecommendedClips.css';
 
 const DEFAULT_SKELETON_COUNT = 8;
 
+const isClipOrConcertItem = (item) => {
+  const t = String(item?.type || '').toLowerCase();
+  return t === 'klip' || t === 'clip' || t === 'konsert' || t === 'concert';
+};
+
+const wishlistTypeForVideoItem = (item) => {
+  const t = String(item?.type || '').toLowerCase();
+  return t === 'konsert' || t === 'concert' ? 'konsert' : 'klip';
+};
+
 const RecommendedClipSkeletonCard = ({ id }) => (
   <div
     className="recommended-clips-item recommended-clips-item--skeleton"
@@ -46,6 +56,7 @@ const RecommendedClipItem = ({
   onOpen,
   isInWishlist,
   onWishlistClick,
+  wishlistType,
   blockClick,
 }) => {
   const imgSrc = item.img || '';
@@ -98,16 +109,16 @@ const RecommendedClipItem = ({
           <>
             <button
               className={`recommended-clips-item-wishlist-btn ${
-                isInWishlist(item.id, 'klip') ? 'active' : ''
+                isInWishlist(item.id, wishlistType) ? 'active' : ''
               }`}
-              onClick={(e) => onWishlistClick(e, item.id)}
+              onClick={(e) => onWishlistClick(e, item.id, wishlistType)}
               aria-label="Sevimlilarga qo'shish"
             >
               <svg
                 width="18"
                 height="18"
                 viewBox="0 0 24 24"
-                fill={isInWishlist(item.id, 'klip') ? 'currentColor' : 'none'}
+                fill={isInWishlist(item.id, wishlistType) ? 'currentColor' : 'none'}
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
@@ -149,7 +160,7 @@ const RecommendedClips = ({
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getArtistById, clipsLoading } = useMusicApi();
+  const { getArtistById, clipsLoading, concertsLoading } = useMusicApi();
 
   const item = music || album || klip;
   const { items: recommendedClips, isLoading } = useRecommendedClips(
@@ -174,9 +185,9 @@ const RecommendedClips = ({
     navigate(`/music/video/${clipId}`, { replace: false });
   };
 
-  const handleWishlistClick = (e, clipId) => {
+  const handleWishlistClick = (e, clipId, wishlistType) => {
     e.stopPropagation();
-    toggleWishlist(clipId, 'klip');
+    toggleWishlist(clipId, wishlistType || 'klip');
   };
 
   const skeletonItems = useMemo(
@@ -189,7 +200,8 @@ const RecommendedClips = ({
   );
 
   const awaitingCatalog =
-    Boolean(forceSkeleton) || (Boolean(clipsLoading) && !item);
+    Boolean(forceSkeleton) ||
+    ((Boolean(clipsLoading) || Boolean(concertsLoading)) && !item);
   const showSectionSkeleton =
     awaitingCatalog || (Boolean(isLoading) && recommendedClips.length === 0);
   const itemsToRender = showSectionSkeleton ? skeletonItems : recommendedClips;
@@ -197,7 +209,7 @@ const RecommendedClips = ({
 
   if (music && music.type !== 'music') return null;
   if (album && album.type !== 'musicAlbom') return null;
-  if (klip && klip.type !== 'klip' && klip.type !== 'konsert') return null;
+  if (klip && !isClipOrConcertItem(klip)) return null;
   if (!item && !showSectionSkeleton) return null;
   if (!showSectionSkeleton && !recommendedClips.length) return null;
 
@@ -215,6 +227,7 @@ const RecommendedClips = ({
         onOpen={handleCardClick}
         isInWishlist={isInWishlist}
         onWishlistClick={handleWishlistClick}
+        wishlistType={wishlistTypeForVideoItem(clipItem)}
         blockClick={Boolean(isLoading) || showSectionSkeleton}
       />
     );

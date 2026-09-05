@@ -52,7 +52,7 @@ const enqueueMusicLikeHook = (userId, contentType, contentId) => {
           content,
         });
 
-        enqueuePrecomputeRecommendations({ userId, category });
+        enqueuePrecomputeRecommendations({ userId, category, contentType: type });
       })
       .catch((err) => {
         // eslint-disable-next-line no-console

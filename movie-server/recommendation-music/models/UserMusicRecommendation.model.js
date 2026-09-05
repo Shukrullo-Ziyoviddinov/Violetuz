@@ -66,6 +66,7 @@ userMusicRecommendationSchema.index(
   { userId: 1, category: 1, contentKey: 1 },
   { unique: true }
 );
+userMusicRecommendationSchema.index({ userId: 1, category: 1, contentType: 1, rank: 1 });
 userMusicRecommendationSchema.index({ userId: 1, category: 1, rank: 1 });
 userMusicRecommendationSchema.index({ userId: 1, category: 1, score: -1 });
 userMusicRecommendationSchema.index({ generatedAt: 1 });

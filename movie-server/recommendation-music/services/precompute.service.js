@@ -1,5 +1,6 @@
 /**
- * Precompute personalized Top-N per user × categoryNameMusic (no trending blend in v1).
+ * Precompute personalized Top-N per user × categoryNameMusic × contentType.
+ * (no trending blend in v1)
  *
  * @module recommendation-music/services/precompute.service
  */
@@ -17,11 +18,13 @@ const {
   replaceUserCategoryRecommendations,
   listCachedRecommendations,
 } = require('../repositories/userRecommendation.repository');
+const { normalizeContentType, isValidContentType } = require('../utils/contentKey');
 
 /**
  * @param {*} userId
  * @param {string} category — categoryNameMusic
  * @param {Object} [options]
+ * @param {string} [options.contentType] — music|album|clip|concert (recommended)
  */
 const precomputeUserCategoryRecommendations = async (userId, category, options = {}) => {
   const cat = String(category || '').trim();
@@ -30,6 +33,10 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
     err.status = 400;
     throw err;
   }
+
+  const contentType = normalizeContentType(options.contentType);
+  const scopedType =
+    contentType && isValidContentType(contentType) ? contentType : null;
 
   const topN = options.topN ?? scoringWeights.topN;
   const popularLimit =
@@ -51,6 +58,10 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
   const affinityMap = toDecayedAffinityMap(affinityMeta, nowMs, scoringWeights.decay);
   const personalized = hasPersonalizationSignal(affinityMap);
 
+  const contentTypes = scopedType
+    ? [scopedType]
+    : options.contentTypes || scoringWeights.contentTypes;
+
   const contents = await buildCategoryCandidatePool(cat, {
     affinityMap: personalized ? affinityMap : null,
     popularLimit,
@@ -59,7 +70,7 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
     seedCountries: scoringWeights.affinitySeedCountries,
     seedLanguages: scoringWeights.affinitySeedLanguages,
     seedArtists: scoringWeights.affinitySeedArtists,
-    contentTypes: options.contentTypes,
+    contentTypes,
   });
 
   const scored = scoreContents(contents, {
@@ -78,11 +89,17 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
     rank: index + 1,
   }));
 
-  const { written } = await replaceUserCategoryRecommendations(userId, cat, cacheRows);
+  const { written } = await replaceUserCategoryRecommendations(
+    userId,
+    cat,
+    cacheRows,
+    { contentType: scopedType || undefined }
+  );
 
   return {
     userId,
     category: cat,
+    contentType: scopedType,
     written,
     source: personalized ? 'personalized' : 'cold_start',
     poolSize: contents.length,
@@ -91,8 +108,8 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
   };
 };
 
-const getCachedTopN = (userId, category, limit = scoringWeights.topN) =>
-  listCachedRecommendations(userId, category, limit);
+const getCachedTopN = (userId, category, limit = scoringWeights.topN, options = {}) =>
+  listCachedRecommendations(userId, category, limit, options);
 
 module.exports = {
   precomputeUserCategoryRecommendations,

@@ -18,15 +18,15 @@ const {
   JOB_NAME,
 } = require('../jobs/affinityUpdate.job');
 const { registerPrecomputeRecommendationsJob } = require('../jobs/precomputeRecommendations.job');
-const { recommendationQueue } = require('../../recommendation/jobs/inProcessQueue');
+const { musicRecommendationQueue } = require('../jobs/musicQueue');
 const { toContentKey, normalizeContentType } = require('../utils/contentKey');
 
 let jobsRegistered = false;
 
 const ensureJobsRegistered = () => {
   if (!jobsRegistered) {
-    registerAffinityUpdateJob(recommendationQueue);
-    registerPrecomputeRecommendationsJob(recommendationQueue);
+    registerAffinityUpdateJob(musicRecommendationQueue);
+    registerPrecomputeRecommendationsJob(musicRecommendationQueue);
     jobsRegistered = true;
   }
 };
@@ -98,7 +98,10 @@ const recordListenEvent = async (input) => {
   };
 
   if (input.waitForAffinity) {
-    const affinityResult = await recommendationQueue.enqueueAndWait(JOB_NAME, jobPayload);
+    const affinityResult = await musicRecommendationQueue.enqueueAndWait(
+      JOB_NAME,
+      jobPayload
+    );
     return {
       listenEvent,
       queued: false,

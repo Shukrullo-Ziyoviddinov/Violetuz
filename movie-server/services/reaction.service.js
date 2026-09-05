@@ -345,6 +345,11 @@ const toggleShortsLike = async (userId, { id }) => {
   return { liked: true, item };
 };
 
+const MUSIC_LIKE_REACTION_TYPES = ['klip', 'konsert'];
+
+const musicContentTypeFromReactionType = (reactionType) =>
+  reactionType === 'klip' ? 'clip' : 'concert';
+
 /**
  * Bulk PUT /reactions sync — fire like/unlike hooks from movie reaction diff.
  * Same rules as setReaction: like ≠ ko'rildi; only likedBoost reverse/apply.
@@ -377,6 +382,58 @@ const enqueueMovieReactionDiffHooks = (userId, prevLikedMovieIds, nextLikedMovie
   }
 };
 
+/**
+ * Bulk PUT — klip/konsert like diff → music affinity (setReaction bilan bir xil qoida).
+ *
+ * @param {string|import('mongoose').Types.ObjectId} userId
+ * @param {{ klip: Set<string>, konsert: Set<string> }} prevLikedByType
+ * @param {{ klip: Set<string>, konsert: Set<string> }} nextLikedByType
+ */
+const enqueueMusicReactionDiffHooks = (userId, prevLikedByType, nextLikedByType) => {
+  for (const reactionType of MUSIC_LIKE_REACTION_TYPES) {
+    const prev = prevLikedByType[reactionType] || new Set();
+    const next = nextLikedByType[reactionType] || new Set();
+    const contentType = musicContentTypeFromReactionType(reactionType);
+
+    for (const contentId of prev) {
+      if (next.has(contentId)) continue;
+      try {
+        const {
+          enqueueMusicUnlikeHook,
+        } = require('../recommendation-music/services/unlikeHook.service');
+        enqueueMusicUnlikeHook(userId, contentType, contentId);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(
+          '[reaction] replace unlike→music-recommendation hook failed:',
+          err?.message || err
+        );
+      }
+    }
+
+    for (const contentId of next) {
+      if (prev.has(contentId)) continue;
+      try {
+        const {
+          enqueueMusicLikeHook,
+        } = require('../recommendation-music/services/likeHook.service');
+        enqueueMusicLikeHook(userId, contentType, contentId);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(
+          '[reaction] replace like→music-recommendation hook failed:',
+          err?.message || err
+        );
+      }
+    }
+  }
+};
+
+const emptyMusicLikeSets = () => ({
+  klip: new Set(),
+  konsert: new Set(),
+});
+
 const replaceReactions = async (userId, itemsInput = []) => {
   if (!Array.isArray(itemsInput)) {
     throw badRequest('items massiv bo‘lishi kerak');
@@ -391,10 +448,25 @@ const replaceReactions = async (userId, itemsInput = []) => {
     .lean();
   const prevLikedMovieIds = new Set(prevMovieLikes.map((r) => String(r.targetId)));
 
+  const prevMusicLikes = await UserReaction.find({
+    userId,
+    type: { $in: MUSIC_LIKE_REACTION_TYPES },
+    value: 'like',
+  })
+    .select('type targetId')
+    .lean();
+  const prevLikedByMusicType = emptyMusicLikeSets();
+  for (const row of prevMusicLikes) {
+    if (prevLikedByMusicType[row.type]) {
+      prevLikedByMusicType[row.type].add(String(row.targetId));
+    }
+  }
+
   const docs = [];
   const seen = new Set();
   /** @type {Set<string>} */
   const nextLikedMovieIds = new Set();
+  const nextLikedByMusicType = emptyMusicLikeSets();
 
   for (const raw of itemsInput) {
     if (!raw || raw.id == null || !raw.type) continue;
@@ -425,6 +497,12 @@ const replaceReactions = async (userId, itemsInput = []) => {
       if (safeType === 'movie' && safeValue === 'like') {
         nextLikedMovieIds.add(String(targetId));
       }
+      if (
+        MUSIC_LIKE_REACTION_TYPES.includes(safeType) &&
+        safeValue === 'like'
+      ) {
+        nextLikedByMusicType[safeType].add(String(targetId));
+      }
     } catch (err) {
       if (err.status === 404) continue;
       throw err;
@@ -437,6 +515,7 @@ const replaceReactions = async (userId, itemsInput = []) => {
   }
 
   enqueueMovieReactionDiffHooks(userId, prevLikedMovieIds, nextLikedMovieIds);
+  enqueueMusicReactionDiffHooks(userId, prevLikedByMusicType, nextLikedByMusicType);
 
   const items = await listReactions(userId);
   const history = await listLikeHistory(userId);

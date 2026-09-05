@@ -10,23 +10,10 @@ import {
   createMusicListenProgressReporter,
   resolveAudioListenTarget,
 } from '../utils/musicListenProgressReporter';
+import { albumSongToTrack, ALBUM_TRACK_ID_OFFSET } from '../utils/albumSongToTrack';
 import MusicMiniPlayer from '../Music/MusicMiniPlayer/MusicMiniPlayer';
 import MusicPlayerModal from '../Music/MusicPlayerModal/MusicPlayerModal';
 import '../pageMusic/MusicDetail.css';
-
-const ALBUM_TRACK_ID_OFFSET = 50000;
-const albumSongToTrack = (album, song) => ({
-  id: ALBUM_TRACK_ID_OFFSET + album.id * 100 + song.id,
-  title: song.title,
-  artist: song.artist,
-  img: album.img,
-  audio: song.audio,
-  year: album.year,
-  albumId: album.id,
-  albumSongId: song.id,
-  categoryNameMusic: album.categoryNameMusic,
-  lyricsText: song.lyricsText,
-});
 
 const MusicPlayerContext = createContext();
 

@@ -1,7 +1,6 @@
 /**
- * Tavsiya etilgan kliplar servisi.
- * type: 'klip' va genre bo'yicha music bilan mos kliplar.
- * Backend: GET /api/clips orqali API/DB dan keladi.
+ * Tavsiya etilgan kliplar / konsertlar servisi.
+ * Pool: allClips + allConcerts. Genre bo‘yicha tartib (lokal heuristika).
  */
 
 import { useMemo } from 'react';
@@ -11,6 +10,11 @@ const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
 
 const normalizeGenre = (g) =>
   typeof g === 'string' ? g.toLowerCase().trim() : null;
+
+const isClipOrConcertType = (type) => {
+  const t = String(type || '').toLowerCase();
+  return t === 'klip' || t === 'clip' || t === 'konsert' || t === 'concert';
+};
 
 const SECTION_BY_CATEGORY = {
   trendClipsData: 'trend-clips',
@@ -23,7 +27,7 @@ const SECTION_BY_CATEGORY = {
   starsStageData: 'stars-stage',
 };
 
-const getRecommendedClipsFromList = (item, allClips, options = {}) => {
+const getRecommendedClipsFromList = (item, pool, options = {}) => {
   const { limit = 12, excludeId } = options;
   if (!item?.id) return [];
 
@@ -31,8 +35,8 @@ const getRecommendedClipsFromList = (item, allClips, options = {}) => {
   const exclude = excludeId != null ? String(excludeId) : null;
   const seenIds = new Set();
 
-  const combined = ensureArray(allClips)
-    .filter((c) => (c.type === 'klip' || c.type === 'konsert') && !seenIds.has(c.id))
+  const combined = ensureArray(pool)
+    .filter((c) => isClipOrConcertType(c.type) && !seenIds.has(c.id))
     .filter((c) => !exclude || String(c.id) !== exclude)
     .map((clip) => {
       seenIds.add(clip.id);
@@ -56,24 +60,33 @@ const getRecommendedClipsFromList = (item, allClips, options = {}) => {
   return sorted.slice(0, limit);
 };
 
-export const fetchRecommendedClips = async (item, options = {}, allClips = []) =>
-  Promise.resolve(getRecommendedClipsFromList(item, allClips, options));
+export const fetchRecommendedClips = async (item, options = {}, pool = []) =>
+  Promise.resolve(getRecommendedClipsFromList(item, pool, options));
 
 /**
  * @returns {{ items: Array, isLoading: boolean }}
  */
 export const useRecommendedClips = (item, options = {}) => {
-  const { allClips, clipsLoading } = useMusicApi();
+  const { allClips, allConcerts, clipsLoading, concertsLoading } = useMusicApi();
   const itemId = item?.id;
   const excludeId = options?.excludeId;
   const limit = options?.limit;
 
-  const isLoading = Boolean(itemId) && Boolean(clipsLoading);
+  const pool = useMemo(
+    () => [
+      ...(Array.isArray(allClips) ? allClips : []),
+      ...(Array.isArray(allConcerts) ? allConcerts : []),
+    ],
+    [allClips, allConcerts]
+  );
+
+  const catalogLoading = Boolean(clipsLoading) || Boolean(concertsLoading);
+  const isLoading = Boolean(itemId) && catalogLoading;
 
   const items = useMemo(() => {
-    if (!itemId || clipsLoading) return [];
-    return getRecommendedClipsFromList(item, allClips, { limit, excludeId });
-  }, [itemId, item, allClips, clipsLoading, limit, excludeId]);
+    if (!itemId || catalogLoading) return [];
+    return getRecommendedClipsFromList(item, pool, { limit, excludeId });
+  }, [itemId, item, pool, catalogLoading, limit, excludeId]);
 
   return { items, isLoading };
 };

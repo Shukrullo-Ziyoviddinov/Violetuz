@@ -16,7 +16,8 @@ const mongoose = require('mongoose');
   const { ensureJobsRegistered } = require('../recommendation-music/services/listenEvent.service');
   const { UserMusicProgress, UserMusicAffinity, ListenEvent } =
     require('../recommendation-music/models');
-  const { recommendationQueue } = require('../recommendation/jobs/inProcessQueue');
+  const { musicRecommendationQueue } = require('../recommendation-music/jobs/musicQueue');
+  require('../recommendation-music/jobs');
 
   ensureJobsRegistered();
 
@@ -56,7 +57,7 @@ const mongoose = require('mongoose');
   ok('trek1 5min accepted', r.ignored !== true, JSON.stringify({ aq: r.affinityQueued, first: r.firstMark }));
 
   for (let i = 0; i < 25; i += 1) {
-    await recommendationQueue.drain();
+    await musicRecommendationQueue.drain();
     await new Promise((res) => setTimeout(res, 80));
   }
 
@@ -82,7 +83,7 @@ const mongoose = require('mongoose');
   ok('trek2 9min accepted', r.ignored !== true);
 
   for (let i = 0; i < 25; i += 1) {
-    await recommendationQueue.drain();
+    await musicRecommendationQueue.drain();
     await new Promise((res) => setTimeout(res, 80));
   }
 
