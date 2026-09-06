@@ -5,4 +5,5 @@ module.exports = {
   UserMusicProgress: require('./UserMusicProgress.model'),
   UserMusicAffinity: require('./UserMusicAffinity.model'),
   UserMusicRecommendation: require('./UserMusicRecommendation.model'),
+  CategoryMusicTrendingScore: require('./CategoryMusicTrendingScore.model'),
 };

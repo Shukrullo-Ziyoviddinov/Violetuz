@@ -6,4 +6,6 @@ module.exports = {
   userProgress: require('./userProgress.repository'),
   listenEvent: require('./listenEvent.repository'),
   userRecommendation: require('./userRecommendation.repository'),
+  trending: require('./trending.repository'),
+  userExperience: require('./userExperience.repository'),
 };

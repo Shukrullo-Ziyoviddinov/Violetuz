@@ -9,6 +9,8 @@ const serve = require('./serve.service');
 const likeHook = require('./likeHook.service');
 const unlikeHook = require('./unlikeHook.service');
 const progress = require('./progress.service');
+const trending = require('./trending.service');
+const blending = require('./blending.service');
 
 const namespaces = Object.freeze({
   scoring,
@@ -20,6 +22,8 @@ const namespaces = Object.freeze({
   likeHook,
   unlikeHook,
   progress,
+  trending,
+  blending,
 });
 
 const api = Object.freeze({
@@ -42,6 +46,9 @@ const api = Object.freeze({
 
   enqueueMusicLikeHook: likeHook.enqueueMusicLikeHook,
   enqueueMusicUnlikeHook: unlikeHook.enqueueMusicUnlikeHook,
+
+  scoreContentsBlended: blending.scoreContentsBlended,
+  scoreMusicTrendingBatch: trending.scoreMusicTrendingBatch,
 });
 
 module.exports = {

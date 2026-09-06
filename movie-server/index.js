@@ -15,6 +15,7 @@ const startServer = async () => {
     } = require('./recommendation/jobs');
     const {
       startMusicRecommendationQueueRecovery,
+      startMusicTrendingPrecomputeScheduler,
     } = require('./recommendation-music/jobs');
 
     await startRecommendationQueueRecovery();
@@ -23,6 +24,10 @@ const startServer = async () => {
     startTrendingPrecomputeScheduler({
       runImmediately: true,
       initialDelayMs: 5_000,
+    });
+    startMusicTrendingPrecomputeScheduler({
+      runImmediately: true,
+      initialDelayMs: 8_000,
     });
 
     app.listen(PORT, () => {

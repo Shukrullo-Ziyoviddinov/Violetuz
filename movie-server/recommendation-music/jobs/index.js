@@ -1,5 +1,5 @@
 /**
- * Music recommendation jobs — register on dedicated musicRecommendationQueue.
+ * Music recommendation jobs — dedicated musicRecommendationQueue.
  *
  * @module recommendation-music/jobs
  */
@@ -17,9 +17,17 @@ const {
   enqueuePrecomputeRecommendations,
   JOB_NAME: PRECOMPUTE_JOB,
 } = require('./precomputeRecommendations.job');
+const {
+  registerTrendingPrecomputeJob,
+  enqueueTrendingPrecompute,
+  startMusicTrendingPrecomputeScheduler,
+  stopMusicTrendingPrecomputeScheduler,
+  JOB_NAME: TRENDING_JOB,
+} = require('./trendingPrecompute.job');
 
 registerAffinityUpdateJob(musicRecommendationQueue);
 registerPrecomputeRecommendationsJob(musicRecommendationQueue);
+registerTrendingPrecomputeJob(musicRecommendationQueue);
 
 /**
  * Call after connectDB — reload pending durable music:* jobs.
@@ -36,7 +44,12 @@ module.exports = {
   enqueueAffinityUpdate,
   registerPrecomputeRecommendationsJob,
   enqueuePrecomputeRecommendations,
+  registerTrendingPrecomputeJob,
+  enqueueTrendingPrecompute,
+  startMusicTrendingPrecomputeScheduler,
+  stopMusicTrendingPrecomputeScheduler,
   startMusicRecommendationQueueRecovery,
   AFFINITY_JOB,
   PRECOMPUTE_JOB,
+  TRENDING_JOB,
 };

@@ -85,11 +85,40 @@ const scoringWeights = {
   affinitySeedArtists: 8,
 
   /**
-   * Absolute cache TTL (ms). Trending/blend music uchun ixtiyoriy keyin —
-   * v1 da faqat max-age stale (lazy refresh).
+   * Absolute cache TTL (ms). Trending yangilanganda serve stale bo‘lishi mumkin.
    */
   cache: {
     userCacheMaxAgeMs: 2 * 60 * 60 * 1000,
+  },
+
+  /**
+   * Confidence blend (personalized ↔ trending) — kinodagi formula, music data.
+   * alpha≈0 (tajriba yo‘q) → trending; alpha↑ → personal.
+   */
+  blend: {
+    strategy: 'linear',
+    confidenceThreshold: 20,
+    confidenceK: 10,
+    /** UserMusicProgress.completionRate > qualityMinCompletion */
+    qualityMinCompletion: 0.3,
+    normalizeMode: 'minmax',
+    personalNormCap: 20,
+  },
+
+  /**
+   * Category×contentType trending — ListenEvent (+ klip/konsert like).
+   * Collection: music_recommendation_category_trending_scores
+   */
+  trending: {
+    windowDays: 30,
+    precomputeIntervalMs: 60 * 60 * 1000,
+    wViews: 0.35,
+    wAvgDuration: 0.25,
+    wLikes: 0.25,
+    wCompletion: 0.15,
+    usePopularityFallback: true,
+    invalidateUserCacheWhenNewer: true,
+    userCacheMaxAgeMs: null,
   },
 
   diversity: {

@@ -1,7 +1,7 @@
 /**
  * Serve music recommendations from precomputed cache (realtime fallback).
  * Cache scope: user × categoryNameMusic × contentType.
- * V1: no trending invalidation — absolute max-age only.
+ * Stale: max-age OR music trending newer than cache (like movie serve).
  *
  * @module recommendation-music/services/serve.service
  */
@@ -14,6 +14,9 @@ const { getCachedTopN, precomputeUserCategoryRecommendations } = require('./prec
 const {
   findContentsByKeysPreserveOrder,
 } = require('../repositories/contentProjection.repository');
+const {
+  getCategoryTrendingUpdatedAt,
+} = require('../repositories/trending.repository');
 const { enqueuePrecomputeRecommendations } = require('../jobs/precomputeRecommendations.job');
 const { badRequest } = require('../../utils/errors');
 const { normalizeContentType, isValidContentType } = require('../utils/contentKey');
@@ -34,6 +37,7 @@ const toEpochMs = (value) => {
 
 const evaluateUserCacheStale = ({
   cacheGeneratedAt,
+  trendingUpdatedAt = null,
   now = Date.now(),
   weights = scoringWeights,
 } = {}) => {
@@ -43,13 +47,26 @@ const evaluateUserCacheStale = ({
   }
 
   const nowMs = now instanceof Date ? now.getTime() : now;
+  const trendingCfg = weights.trending || {};
   const maxAgeMs =
-    typeof weights.cache?.userCacheMaxAgeMs === 'number' && weights.cache.userCacheMaxAgeMs > 0
-      ? weights.cache.userCacheMaxAgeMs
-      : 2 * 60 * 60 * 1000;
+    typeof trendingCfg.userCacheMaxAgeMs === 'number' && trendingCfg.userCacheMaxAgeMs > 0
+      ? trendingCfg.userCacheMaxAgeMs
+      : typeof weights.cache?.userCacheMaxAgeMs === 'number' &&
+          weights.cache.userCacheMaxAgeMs > 0
+        ? weights.cache.userCacheMaxAgeMs
+        : Math.max(60_000, (trendingCfg.precomputeIntervalMs || 3_600_000) * 2);
 
   if (nowMs - cacheMs > maxAgeMs) {
     return { stale: true, reason: 'max_age' };
+  }
+
+  if (trendingCfg.invalidateUserCacheWhenNewer === false) {
+    return { stale: false, reason: null };
+  }
+
+  const trendingMs = toEpochMs(trendingUpdatedAt);
+  if (trendingMs != null && trendingMs > cacheMs) {
+    return { stale: true, reason: 'trending_newer' };
   }
 
   return { stale: false, reason: null };
@@ -87,6 +104,11 @@ const getRecommendationsByCategory = async (params) => {
     ...(scopedType ? { contentType: scopedType } : {}),
   };
 
+  let trendingUpdatedAt = null;
+  if (scoringWeights.trending?.invalidateUserCacheWhenNewer !== false) {
+    trendingUpdatedAt = await getCategoryTrendingUpdatedAt(category, scopedType);
+  }
+
   let source = 'cache';
   let generatedAt = null;
   let rows = await getCachedTopN(userId, category, limit, cacheOpts);
@@ -94,7 +116,10 @@ const getRecommendationsByCategory = async (params) => {
 
   if (rows.length) {
     generatedAt = rows[0]?.generatedAt || null;
-    const freshness = evaluateUserCacheStale({ cacheGeneratedAt: generatedAt });
+    const freshness = evaluateUserCacheStale({
+      cacheGeneratedAt: generatedAt,
+      trendingUpdatedAt,
+    });
     if (freshness.stale) {
       if (lazy) {
         enqueuePrecomputeRecommendations(enqueuePayload);
@@ -120,7 +145,10 @@ const getRecommendationsByCategory = async (params) => {
         topN: scoringWeights.topN,
         ...(scopedType ? { contentType: scopedType } : {}),
       });
-      source = computed.source === 'cold_start' ? 'cold_start' : 'realtime';
+      source =
+        computed.source === 'blended_cold_start' || computed.source === 'cold_start'
+          ? 'cold_start'
+          : 'realtime';
       generatedAt = computed.generatedAt;
       rows = computed.items.slice(0, limit).map((item, index) => ({
         contentKey: item.content.contentKey,

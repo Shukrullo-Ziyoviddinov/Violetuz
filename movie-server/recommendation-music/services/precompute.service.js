@@ -1,6 +1,7 @@
 /**
- * Precompute personalized Top-N per user × categoryNameMusic × contentType.
- * (no trending blend in v1)
+ * Precompute Top-N per user × categoryNameMusic × contentType.
+ * Scoring: personal dimensions + shared blend with music trending (alpha).
+ * Existing affinity/progress path unchanged — only ranking uses blend.
  *
  * @module recommendation-music/services/precompute.service
  */
@@ -8,7 +9,8 @@
 'use strict';
 
 const { scoringWeights } = require('../config/scoringWeights');
-const { hasPersonalizationSignal, scoreContents } = require('./scoring.service');
+const { hasPersonalizationSignal } = require('./scoring.service');
+const { scoreContentsBlended } = require('./blending.service');
 const { diversifyRecommendations } = require('./diversity.service');
 const { toDecayedAffinityMap } = require('../utils/decay');
 const { buildCategoryCandidatePool } = require('../repositories/contentProjection.repository');
@@ -73,13 +75,18 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
     contentTypes,
   });
 
-  const scored = scoreContents(contents, {
-    affinityMap,
-    listenedKeys,
-    now: nowMs,
+  const blended = await scoreContentsBlended(contents, {
+    userId,
+    category: cat,
+    contentType: scopedType || contentTypes[0] || null,
+    scoreOptions: {
+      affinityMap,
+      listenedKeys,
+      now: nowMs,
+    },
   });
 
-  const diversified = diversifyRecommendations(scored, { limit: topN });
+  const diversified = diversifyRecommendations(blended, { limit: topN });
 
   const cacheRows = diversified.map((item, index) => ({
     contentKey: item.content.contentKey,
@@ -96,12 +103,16 @@ const precomputeUserCategoryRecommendations = async (userId, category, options =
     { contentType: scopedType || undefined }
   );
 
+  const source = personalized
+    ? 'blended'
+    : 'blended_cold_start';
+
   return {
     userId,
     category: cat,
     contentType: scopedType,
     written,
-    source: personalized ? 'personalized' : 'cold_start',
+    source,
     poolSize: contents.length,
     generatedAt,
     items: diversified,
