@@ -23,6 +23,10 @@ import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
 import { formatCount } from '../utils/utils';
 import useImmersiveSheetDrag from '../hooks/useImmersiveSheetDrag';
+import {
+  useHomeMusicCategoryRecommendations,
+  musicHomeRecKey,
+} from '../hooks/useHomeMusicCategoryRecommendations';
 import './VideoPage.css';
 
 const formatGenreLabel = (genre) => {
@@ -129,7 +133,7 @@ const VideoPage = () => {
   const showArtistImgSkeleton = Boolean(artist) && artistImg.showSkeleton;
   const showArtistCard = showArtistCardDataSkeleton || Boolean(artist?.id);
 
-  const relatedMeta = useMemo(() => {
+  const catalogRelatedMeta = useMemo(() => {
     if (!video) {
       return { list: [], titleKey: 'music.trendClips', titleDefault: 'Trend Kliplar' };
     }
@@ -156,18 +160,56 @@ const VideoPage = () => {
       };
     }
 
-    const isConcert =
-      String(video.type || '').toLowerCase() === 'konsert' ||
-      String(video.type || '').toLowerCase() === 'concert';
-
     return {
-      list: isConcert
+      list: isConcertVideo
         ? getConcertsByCategory(video.categoryNameMusic)
         : getClipsByCategory(video.categoryNameMusic),
       titleKey: 'music.trendClips',
       titleDefault: 'Trend Kliplar',
     };
-  }, [video, clipSections, concertSections, getClipsByCategory, getConcertsByCategory]);
+  }, [
+    video,
+    isConcertVideo,
+    clipSections,
+    concertSections,
+    getClipsByCategory,
+    getConcertsByCategory,
+  ]);
+
+  const detailRecRequests = useMemo(() => {
+    const category = String(video?.categoryNameMusic || '').trim();
+    if (!category || !video) return [];
+    return [
+      {
+        category,
+        contentType: isConcertVideo ? 'concert' : 'clip',
+      },
+    ];
+  }, [video, isConcertVideo]);
+
+  const personalizedByKey =
+    useHomeMusicCategoryRecommendations(detailRecRequests);
+
+  const relatedMeta = useMemo(() => {
+    const category = String(video?.categoryNameMusic || '').trim();
+    const contentType = isConcertVideo ? 'concert' : 'clip';
+    if (category && video) {
+      const personalized =
+        personalizedByKey[musicHomeRecKey(category, contentType)];
+      if (personalized?.length) {
+        return {
+          ...catalogRelatedMeta,
+          list: personalized,
+        };
+      }
+    }
+    return catalogRelatedMeta;
+  }, [
+    video,
+    isConcertVideo,
+    personalizedByKey,
+    catalogRelatedMeta,
+  ]);
 
   const relatedList = Array.isArray(relatedMeta.list) ? relatedMeta.list : [];
   const relatedTitleKey = relatedMeta.titleKey;

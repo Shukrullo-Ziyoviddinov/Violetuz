@@ -39,10 +39,10 @@ async function runPool(items, concurrency, worker) {
 }
 
 /**
- * Login user uchun Music Home sectionlari — category × contentType scoped.
- * Guest / xato → bo‘sh map (katalog fallback).
+ * Login user uchun Music Home, Music/Album/Video Detail o‘ng rail —
+ * category × contentType scoped. Guest / xato → bo‘sh map (katalog fallback).
  *
- * Faqat Music.jsx sectionlari — SimilarSongs / RecommendedClips / AlbumsForYou emas.
+ * SimilarSongs / RecommendedClips / AlbumsForYou — ulanmaydi.
  *
  * @param {Array<{ category: string, contentType: string }>} sectionRequests
  * @returns {Record<string, Array>} map keyed by musicHomeRecKey(category, contentType)

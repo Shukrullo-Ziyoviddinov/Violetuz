@@ -16,6 +16,11 @@ import { AudioVisualizerCanvas, CardVisual } from '../Music/Visual';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
 import { albumSongToTrack } from '../utils/albumSongToTrack';
+import {
+  useHomeMusicCategoryRecommendations,
+  musicHomeRecKey,
+} from '../hooks/useHomeMusicCategoryRecommendations';
+import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import './MusicDetail.css';
 import './MusicAlbumDetail.css';
 
@@ -154,15 +159,15 @@ const AlbumSongRowSkeleton = () => (
 const MusicAlbumDetail = () => {
   const { id } = useParams();
   const { sections, allAlbums, getAlbumsByCategory, albumsLoading } = useMusicApi();
-  const albumSections = (sections || []).filter((s) => s.wishlistType === 'album');
+  const albumSections = useMemo(
+    () => (sections || []).filter((s) => s.wishlistType === 'album'),
+    [sections]
+  );
   const topAlbums = getAlbumsByCategory('TopAlbums');
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const fromSection = searchParams.get('section') || location.state?.fromSection;
-  const sectionConfig = fromSection
-    ? albumSections.find((s) => s.id === fromSection || s.slug === fromSection) || null
-    : null;
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
@@ -177,6 +182,63 @@ const MusicAlbumDetail = () => {
     analyserRef,
     audioGraphReady,
   } = useMusicPlayer();
+
+  const album = useMemo(
+    () => allAlbums.find((a) => matchId(a.id, id)),
+    [allAlbums, id]
+  );
+
+  const sectionConfig = useMemo(() => {
+    if (fromSection) {
+      return (
+        albumSections.find((s) => s.id === fromSection || s.slug === fromSection) ||
+        null
+      );
+    }
+    if (!album) return null;
+    return (
+      albumSections.find((s) => {
+        if (!s.categoryNameMusic) return false;
+        return getAlbumsByCategory(s.categoryNameMusic).some((item) =>
+          matchId(item.id, album.id)
+        );
+      }) || null
+    );
+  }, [fromSection, albumSections, album, getAlbumsByCategory]);
+
+  const resolvedSection = fromSection || sectionConfig?.id || sectionConfig?.slug;
+
+  const detailRecRequests = useMemo(() => {
+    const category = sectionConfig?.categoryNameMusic;
+    const contentType = wishlistTypeToContentType(
+      sectionConfig?.wishlistType || 'album'
+    );
+    if (!category || !contentType) return [];
+    return [{ category, contentType }];
+  }, [sectionConfig?.categoryNameMusic, sectionConfig?.wishlistType]);
+
+  const personalizedByKey =
+    useHomeMusicCategoryRecommendations(detailRecRequests);
+
+  const catalogAlbumList = useMemo(() => {
+    if (sectionConfig?.categoryNameMusic) {
+      return getAlbumsByCategory(sectionConfig.categoryNameMusic);
+    }
+    return topAlbums;
+  }, [sectionConfig?.categoryNameMusic, getAlbumsByCategory, topAlbums]);
+
+  const albumList = useMemo(() => {
+    const contentType = wishlistTypeToContentType(
+      sectionConfig?.wishlistType || 'album'
+    );
+    const category = sectionConfig?.categoryNameMusic;
+    if (category && contentType) {
+      const personalized =
+        personalizedByKey[musicHomeRecKey(category, contentType)];
+      if (personalized?.length) return personalized;
+    }
+    return catalogAlbumList;
+  }, [sectionConfig, personalizedByKey, catalogAlbumList]);
 
   const [lyricsModalOpen, setLyricsModalOpen] = useState(false);
   const [lyricsSheetOpen, setLyricsSheetOpen] = useState(false);
@@ -305,8 +367,6 @@ const MusicAlbumDetail = () => {
     };
   }, [lyricsModalOpen, closeLyricsModal]);
 
-  const album = allAlbums.find((a) => matchId(a.id, id));
-
   const coverSrc = album?.img || (album ? '/img/movie1.jpg' : '');
   const coverImg = useImageReady(coverSrc);
   const artistImgSrc = album ? album.img || '/img/movie1.jpg' : '';
@@ -320,9 +380,7 @@ const MusicAlbumDetail = () => {
   const showArtistImgSkeleton = Boolean(album) && artistImg.showSkeleton;
   const showSongsSkeleton = showHeroDataSkeleton || heroAwaitingCover;
 
-  const albumList = sectionConfig?.categoryNameMusic
-    ? getAlbumsByCategory(sectionConfig.categoryNameMusic)
-    : topAlbums;
+  // albumList — Home bilan bir xil personalized tartib (login), aks holda katalog
   const sectionTitle = sectionConfig
     ? t(sectionConfig.titleKey, sectionConfig.titleDefault)
     : t('music.topAlbums', 'Top Albomlar');
@@ -350,7 +408,9 @@ const MusicAlbumDetail = () => {
 
   const handleAlbumCardClick = (albumId) => {
     navigate(
-      `/music/album/${albumId}${fromSection ? `?section=${encodeURIComponent(fromSection)}` : ''}`
+      `/music/album/${albumId}${
+        resolvedSection ? `?section=${encodeURIComponent(resolvedSection)}` : ''
+      }`
     );
   };
 

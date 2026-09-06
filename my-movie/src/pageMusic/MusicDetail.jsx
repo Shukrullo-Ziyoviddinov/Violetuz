@@ -17,6 +17,11 @@ import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
+import {
+  useHomeMusicCategoryRecommendations,
+  musicHomeRecKey,
+} from '../hooks/useHomeMusicCategoryRecommendations';
+import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import './MusicDetail.css';
 
 const TREND_SKELETON_COUNT = 8;
@@ -237,6 +242,43 @@ const MusicDetail = () => {
 
   const sectionConfig = fromSection ? sectionById[fromSection] : (music ? findSectionForMusicId(music.id) : null);
   const resolvedSection = fromSection || sectionConfig?.id;
+
+  const detailRecRequests = useMemo(() => {
+    const category = sectionConfig?.categoryNameMusic;
+    const contentType = wishlistTypeToContentType(
+      sectionConfig?.wishlistType || 'music'
+    );
+    if (!category || !contentType) return [];
+    return [{ category, contentType }];
+  }, [sectionConfig?.categoryNameMusic, sectionConfig?.wishlistType]);
+
+  const personalizedByKey =
+    useHomeMusicCategoryRecommendations(detailRecRequests);
+
+  const catalogTrendList = useMemo(() => {
+    if (!music) return [];
+    if (sectionConfig?.categoryNameMusic) {
+      return getMusicByCategory(sectionConfig.categoryNameMusic);
+    }
+    if (sectionConfig && Array.isArray(sectionConfig.data)) {
+      return ensureArray(sectionConfig.data);
+    }
+    return ensureArray(allMusic);
+  }, [music, sectionConfig, getMusicByCategory, allMusic]);
+
+  const trendList = useMemo(() => {
+    const contentType = wishlistTypeToContentType(
+      sectionConfig?.wishlistType || 'music'
+    );
+    const category = sectionConfig?.categoryNameMusic;
+    if (category && contentType) {
+      const personalized =
+        personalizedByKey[musicHomeRecKey(category, contentType)];
+      if (personalized?.length) return personalized;
+    }
+    return catalogTrendList;
+  }, [sectionConfig, personalizedByKey, catalogTrendList]);
+
   const {
     currentMusic,
     artist,
@@ -348,17 +390,17 @@ const MusicDetail = () => {
     }
   }, [id, music?.id]);
 
-  // Bo'lim playlistini player contextga o'tkazish â€“ prev/next shu ro'yxat bo'yicha ishlaydi
+  // Bo'lim playlistini player contextga o'tkazish — prev/next Home algoritm tartibida
   useEffect(() => {
-    if (sectionConfig?.categoryNameMusic) {
-      setPlaylistFromPage(getMusicByCategory(sectionConfig.categoryNameMusic));
+    if (trendList.length) {
+      setPlaylistFromPage(trendList);
     } else if (sectionConfig && Array.isArray(sectionConfig.data) && sectionConfig.data.length) {
       setPlaylistFromPage(ensureArray(sectionConfig.data));
     } else {
       setPlaylistFromPage(null);
     }
     return () => setPlaylistFromPage(null);
-  }, [fromSection, setPlaylistFromPage, sectionConfig]);
+  }, [trendList, sectionConfig, setPlaylistFromPage]);
 
   // Lyrics tugmasi - sahifa o'zgaganda yoki openLyrics state kelganda
   useEffect(() => {
@@ -500,13 +542,7 @@ const MusicDetail = () => {
   );
 
   // Bo'lim bo'yicha ro'yxat va title (Trend, Musiqani kashf eting, va hokazo)
-  const trendList = !music
-    ? []
-    : sectionConfig?.categoryNameMusic
-      ? getMusicByCategory(sectionConfig.categoryNameMusic)
-      : sectionConfig && Array.isArray(sectionConfig.data)
-        ? ensureArray(sectionConfig.data)
-        : ensureArray(allMusic);
+  // trendList — Home bilan bir xil personalized tartib (login), aks holda katalog
   const sectionTitle = sectionConfig
     ? t(sectionConfig.titleKey, sectionConfig.titleDefault)
     : t('music.trendMusic', 'Trend Musiqa');
