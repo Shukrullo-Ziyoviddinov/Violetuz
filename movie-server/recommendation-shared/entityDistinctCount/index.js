@@ -76,7 +76,9 @@ const createEntityDistinctCountStore = (opts) => {
           collection: opts.creditCollection,
           versionKey: false,
         }
-      ).index({ userId: 1, [itemIdField]: 1 }, { unique: true })
+      )
+        .index({ userId: 1, [itemIdField]: 1 }, { unique: true })
+        .index({ creditedAt: -1 })
     );
 
   const ScoreModel =

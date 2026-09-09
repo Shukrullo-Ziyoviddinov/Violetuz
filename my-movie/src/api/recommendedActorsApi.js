@@ -54,3 +54,26 @@ export const fetchRecommendedActors = async ({ limit = 40 } = {}) => {
     source: data?.source || (actors.length ? 'actor_watch_score' : 'empty'),
   };
 };
+
+/**
+ * Global trending actors (public): /api/recommended-actors/trending
+ * @param {{ limit?: number, windowDays?: number }} [opts]
+ * @returns {Promise<{ actors: Array<{ actorId: string, score: number }>, limit?: number, windowDays?: number, source?: string }>}
+ */
+export const fetchTrendingActors = async ({ limit = 40, windowDays } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+  if (windowDays) query.set('windowDays', String(windowDays));
+
+  const res = await recommendedActorsFetch(`/recommended-actors/trending?${query.toString()}`);
+  const data = await parseJson(res);
+  const actors = Array.isArray(data?.actors) ? data.actors : [];
+
+  return {
+    actors,
+    minScore: data?.minScore,
+    limit: data?.limit,
+    windowDays: data?.windowDays,
+    source: data?.source || (actors.length ? 'actor_watch_credits_trending' : 'empty'),
+  };
+};

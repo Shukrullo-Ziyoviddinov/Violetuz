@@ -16,6 +16,7 @@ const controller = require('../controllers');
 const router = Router();
 
 router.get('/config', controller.getConfig);
+router.get('/trending', controller.listTrendingArtists);
 router.get('/', requireAuth, controller.listRecommendedArtists);
 
 module.exports = router;

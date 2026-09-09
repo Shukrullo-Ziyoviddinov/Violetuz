@@ -53,3 +53,26 @@ export const fetchRecommendedArtists = async ({ limit = 40 } = {}) => {
     source: data?.source || (artists.length ? 'artist_watch_score' : 'empty'),
   };
 };
+
+/**
+ * Global trending artists (public): /api/recommended-artists/trending
+ * @param {{ limit?: number, windowDays?: number }} [opts]
+ * @returns {Promise<{ artists: Array<{ artistId: string, score: number }>, limit?: number, windowDays?: number, source?: string }>}
+ */
+export const fetchTrendingArtists = async ({ limit = 40, windowDays } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+  if (windowDays) query.set('windowDays', String(windowDays));
+
+  const res = await recommendedArtistsFetch(`/recommended-artists/trending?${query.toString()}`);
+  const data = await parseJson(res);
+  const artists = Array.isArray(data?.artists) ? data.artists : [];
+
+  return {
+    artists,
+    minScore: data?.minScore,
+    limit: data?.limit,
+    windowDays: data?.windowDays,
+    source: data?.source || (artists.length ? 'artist_watch_credits_trending' : 'empty'),
+  };
+};

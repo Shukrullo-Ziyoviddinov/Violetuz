@@ -8,7 +8,10 @@
 
 const asyncHandler = require('../../middleware/asyncHandler');
 const { sendSuccess } = require('../../utils/response');
-const { getRecommendedArtists } = require('../services/artistWatchCount.service');
+const {
+  getRecommendedArtists,
+  getTrendingArtists,
+} = require('../services/artistWatchCount.service');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -20,6 +23,18 @@ const listRecommendedArtists = asyncHandler(async (req, res) => {
     minScore: req.query?.minScore,
   });
 
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/recommended-artists/trending
+ * Public global trending artists.
+ */
+const listTrendingArtists = asyncHandler(async (req, res) => {
+  const result = await getTrendingArtists({
+    limit: req.query?.limit,
+    windowDays: req.query?.windowDays,
+  });
   return sendSuccess(res, { data: result });
 });
 
@@ -37,5 +52,6 @@ const getConfig = asyncHandler(async (_req, res) => {
 
 module.exports = {
   listRecommendedArtists,
+  listTrendingArtists,
   getConfig,
 };

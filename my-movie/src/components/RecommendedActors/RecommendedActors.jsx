@@ -7,6 +7,7 @@ import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import { useRecommendedActorsRanking } from '../../hooks/useRecommendedActorsRanking';
+import { useTrendingActorsRanking } from '../../hooks/useTrendingActorsRanking';
 import { useAppSelector } from '../../store/hooks';
 import { selectIsLoggedIn, selectAuthReady } from '../../store/slices/userSlice';
 import './RecommendedActors.css';
@@ -42,6 +43,35 @@ const orderActorsByRanking = (catalogActors, ranked) => {
     seen.add(id);
     ordered.push(actor);
   }
+
+  return ordered.length ? ordered : unique;
+};
+
+/**
+ * Merge personal + trending into one ordered list:
+ * personal first (ranked), then trending (no duplicates).
+ */
+const mergeActorsByPersonalAndTrending = (catalogActors, ranked, trending) => {
+  const unique = uniqueActorsById(catalogActors);
+  const byId = new Map(unique.map((a) => [String(a.id), a]));
+
+  const ordered = [];
+  const seen = new Set();
+
+  const pushId = (actorId) => {
+    const id = String(actorId ?? '');
+    if (!id || seen.has(id)) return;
+    const actor = byId.get(id);
+    if (!actor) return;
+    seen.add(id);
+    ordered.push(actor);
+  };
+
+  const rankedList = Array.isArray(ranked) ? ranked : [];
+  const trendingList = Array.isArray(trending) ? trending : [];
+
+  for (const row of rankedList) pushId(row?.actorId);
+  for (const row of trendingList) pushId(row?.actorId);
 
   return ordered.length ? ordered : unique;
 };
@@ -127,15 +157,15 @@ const RecommendedActors = () => {
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const { ranked, loading: rankingLoading } = useRecommendedActorsRanking();
+  const { trending, loading: trendingLoading } = useTrendingActorsRanking();
 
   const displayActors = useMemo(
-    () => orderActorsByRanking(allActors, ranked),
-    [allActors, ranked]
+    () => mergeActorsByPersonalAndTrending(allActors, ranked, trending),
+    [allActors, ranked, trending]
   );
   const waitingPersonalized =
-    authReady && isLoggedIn && rankingLoading && ranked === null;
-  const showSectionSkeleton =
-    (actorsLoading && displayActors.length === 0) || waitingPersonalized;
+    authReady && isLoggedIn && rankingLoading;
+  const showSectionSkeleton = actorsLoading || trendingLoading || waitingPersonalized;
   const showTitleSkeleton = actorsLoading && allActors.length === 0;
 
   const handleActorClick = (actorId) => {

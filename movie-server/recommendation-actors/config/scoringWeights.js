@@ -11,6 +11,8 @@ const scoringWeights = Object.freeze({
   minMovieCount: 2,
   defaultLimit: 40,
   maxLimit: 80,
+  /** Global trending window (days) for cold-start. */
+  trendingWindowDays: 30,
 });
 
 module.exports = { scoringWeights };
