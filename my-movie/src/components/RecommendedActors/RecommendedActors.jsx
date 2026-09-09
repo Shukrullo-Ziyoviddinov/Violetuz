@@ -6,6 +6,9 @@ import { useActorsApi } from '../../context/ActorsApiContext';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
+import { useRecommendedActorsRanking } from '../../hooks/useRecommendedActorsRanking';
+import { useAppSelector } from '../../store/hooks';
+import { selectIsLoggedIn, selectAuthReady } from '../../store/slices/userSlice';
 import './RecommendedActors.css';
 
 const RECOMMENDED_ACTORS_SKELETON_COUNT = 8;
@@ -17,6 +20,30 @@ const uniqueActorsById = (list) => {
     seen.add(a.id);
     return true;
   });
+};
+
+/**
+ * Personalized order when ranked scores exist (≥2 films); else catalog order.
+ * @param {Array} catalogActors
+ * @param {Array<{ actorId: string, score: number }>|null} ranked
+ */
+const orderActorsByRanking = (catalogActors, ranked) => {
+  const unique = uniqueActorsById(catalogActors);
+  if (!ranked?.length) return unique;
+
+  const byId = new Map(unique.map((a) => [String(a.id), a]));
+  const ordered = [];
+  const seen = new Set();
+
+  for (const row of ranked) {
+    const id = String(row.actorId ?? '');
+    const actor = byId.get(id);
+    if (!actor || seen.has(id)) continue;
+    seen.add(id);
+    ordered.push(actor);
+  }
+
+  return ordered.length ? ordered : unique;
 };
 
 /** Rasm, ism va follow — rasm tayyor bo‘lguncha birga skeleton (cache-safe) */
@@ -97,10 +124,19 @@ const RecommendedActors = () => {
   const navigate = useNavigate();
   const lang = i18n.language === 'ru' ? 'ru' : 'uz';
   const { allActors, actorsLoading } = useActorsApi();
+  const authReady = useAppSelector(selectAuthReady);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const { ranked, loading: rankingLoading } = useRecommendedActorsRanking();
 
-  const displayActors = useMemo(() => uniqueActorsById(allActors), [allActors]);
-  const showSectionSkeleton = actorsLoading && displayActors.length === 0;
-  const showTitleSkeleton = actorsLoading;
+  const displayActors = useMemo(
+    () => orderActorsByRanking(allActors, ranked),
+    [allActors, ranked]
+  );
+  const waitingPersonalized =
+    authReady && isLoggedIn && rankingLoading && ranked === null;
+  const showSectionSkeleton =
+    (actorsLoading && displayActors.length === 0) || waitingPersonalized;
+  const showTitleSkeleton = actorsLoading && allActors.length === 0;
 
   const handleActorClick = (actorId) => {
     navigate(`/actor/${actorId}`);

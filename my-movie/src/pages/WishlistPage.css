@@ -87,7 +87,6 @@
   overflow: hidden;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid #9b4fe78f;
 }
 
 .wishlist-music-item-wishlist-btn {
@@ -331,7 +330,7 @@
 }
 
 .wishlist-shorts-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
 
 .wishlist-shorts-card {
@@ -343,7 +342,19 @@
 }
 
 .wishlist-shorts-card .shorts-video-thumb {
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  aspect-ratio: auto;
+  padding-top: 100%;
+}
+
+.wishlist-shorts-card .shorts-video-thumb .shorts-video-preview,
+.wishlist-shorts-card .shorts-video-thumb .shorts-video-thumb-skeleton,
+.wishlist-shorts-card .shorts-video-thumb .shorts-video-preview-placeholder,
+.wishlist-shorts-card .shorts-video-thumb .shorts-video-thumb-shield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .wishlist-shorts-save-btn {

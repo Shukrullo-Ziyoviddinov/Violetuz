@@ -39,6 +39,25 @@ const {
 } = require('../utils/progressRules');
 
 /**
+ * RecommendedArtists side-effect only. Lazy require + swallow errors so
+ * music affinity / progress never fails because of artist-count module.
+ */
+const safeApplyArtistWatchCredits = async (payload) => {
+  try {
+    const {
+      applyCreditsFromListenedContent,
+    } = require('../../recommendation-artists/services/artistWatchCount.service');
+    await applyCreditsFromListenedContent(payload);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(
+      '[recommendation-music] artist watch credit hook failed:',
+      err?.message || err
+    );
+  }
+};
+
+/**
  * ContentView — "tinglandi / ko'rildi" (unique user×type×itemId).
  */
 const ensureContentViewMarked = async (userId, contentType, contentId) => {
@@ -144,6 +163,13 @@ const reportSingleContentProgress = async ({
     completionRate,
   });
 
+  // RecommendedArtists: +1 artistId once per contentKey (idempotent).
+  await safeApplyArtistWatchCredits({
+    userId,
+    contentKey,
+    artistId: content.artistId,
+  });
+
   const needsAffinity = shouldQueueAffinity(progress);
   if (!raised && !needsAffinity) {
     return unchangedResult(progress);
@@ -209,6 +235,16 @@ const reportAlbumProgress = async ({
 
   const { minSec } = getProgressConfig();
   const albumGateOpen = (progress.listenedSeconds || 0) >= minSec;
+
+  // Artists carousel: only after album "tinglandi" (≥10s), once per album.
+  if (albumGateOpen) {
+    await safeApplyArtistWatchCredits({
+      userId,
+      contentKey,
+      artistId: content.artistId,
+    });
+  }
+
   const needsAffinity = albumGateOpen && shouldQueueAffinity(progress);
 
   if (!raised && !needsAffinity) {

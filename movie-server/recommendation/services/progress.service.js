@@ -15,6 +15,25 @@ const {
 const { recordWatchEvent, ensureJobsRegistered } = require('./watchEvent.service');
 const { badRequest, notFound } = require('../../utils/errors');
 
+/**
+ * RecommendedActors side-effect only. Lazy require + swallow errors so
+ * movie affinity / progress never fails because of actor-count module.
+ */
+const safeApplyActorWatchCredits = async (payload) => {
+  try {
+    const {
+      applyCreditsFromWatchedMovie,
+    } = require('../../recommendation-actors/services/actorWatchCount.service');
+    await applyCreditsFromWatchedMovie(payload);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(
+      '[recommendation] actor watch credit hook failed:',
+      err?.message || err
+    );
+  }
+};
+
 const clamp01 = (n) => Math.min(1, Math.max(0, Number(n) || 0));
 
 /**
@@ -115,6 +134,14 @@ const reportMovieProgress = async (userId, input = {}) => {
     category,
     watchedSeconds,
     completionRate,
+  });
+
+  // RecommendedActors: +1 cast once per watched movie (idempotent).
+  // Isolated side-effect — cannot break affinity / scoring path.
+  await safeApplyActorWatchCredits({
+    userId,
+    movieId,
+    actors: movie.actors,
   });
 
   const cfg = scoringWeights.progress || {};
