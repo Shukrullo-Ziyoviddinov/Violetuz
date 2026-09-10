@@ -81,8 +81,8 @@ const TopActors = () => {
                         alt={resolveName(actor)}
                         className="top-actors-img"
                       />
+                      <span className="top-actors-rank">{actor.rank}</span>
                     </div>
-                    <span className="top-actors-rank">{actor.rank}</span>
                     <p className="top-actors-name">{resolveName(actor)}</p>
                     <FollowingButton
                       artistId={actor.id}
