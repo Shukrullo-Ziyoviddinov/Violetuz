@@ -75,8 +75,8 @@ const TopArtist = () => {
                         alt={artist.name}
                         className="top-artist-img"
                       />
+                      <span className="top-artist-rank">{artist.rank}</span>
                     </div>
-                    <span className="top-artist-rank">{artist.rank}</span>
                     <p className="top-artist-name">{artist.name}</p>
                     <FollowingButton
                       artistId={artist.id}

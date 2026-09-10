@@ -35,10 +35,11 @@
 }
 
 .top-artist-img-wrap {
+  position: relative;
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible;
   background: rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
@@ -48,21 +49,28 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 50%;
 }
 
 .top-artist-rank {
-  margin: 0.4rem 0 0;
-  font-size: 0.8rem;
+  position: absolute;
+  left: 4px;
+  bottom: -6px;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  background: none;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.85);
   line-height: 1;
+  color: #9b4fe7e6;
 }
 
 .top-artist-name {
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
-  margin: 0.35rem 0 0;
+  margin: 0.65rem 0 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
