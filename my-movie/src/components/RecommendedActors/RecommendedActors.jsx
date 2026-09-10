@@ -24,30 +24,6 @@ const uniqueActorsById = (list) => {
 };
 
 /**
- * Personalized order when ranked scores exist (≥2 films); else catalog order.
- * @param {Array} catalogActors
- * @param {Array<{ actorId: string, score: number }>|null} ranked
- */
-const orderActorsByRanking = (catalogActors, ranked) => {
-  const unique = uniqueActorsById(catalogActors);
-  if (!ranked?.length) return unique;
-
-  const byId = new Map(unique.map((a) => [String(a.id), a]));
-  const ordered = [];
-  const seen = new Set();
-
-  for (const row of ranked) {
-    const id = String(row.actorId ?? '');
-    const actor = byId.get(id);
-    if (!actor || seen.has(id)) continue;
-    seen.add(id);
-    ordered.push(actor);
-  }
-
-  return ordered.length ? ordered : unique;
-};
-
-/**
  * Merge personal + trending into one ordered list:
  * personal first (ranked), then trending (no duplicates).
  */

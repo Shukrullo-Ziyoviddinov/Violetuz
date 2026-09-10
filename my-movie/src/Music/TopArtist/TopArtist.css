@@ -1,0 +1,109 @@
+.top-artist {
+  padding: 0.75rem 0 0.25rem;
+}
+
+.top-artist-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.top-artist-header {
+  margin-bottom: 0.85rem;
+}
+
+.top-artist-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #f2f2f2;
+  margin: 0;
+}
+
+.top-artist-item {
+  flex-shrink: 0;
+  width: 108px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.top-artist-item:hover {
+  transform: translateY(-2px);
+}
+
+.top-artist-avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-sizing: border-box;
+}
+
+.top-artist-rank {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 1;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.3rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  text-align: center;
+}
+
+.top-artist-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.top-artist-name {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 108px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-artist-score {
+  margin: 0.15rem 0 0;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+@media (max-width: 640px) {
+  .top-artist-title {
+    font-size: 1.25rem;
+  }
+
+  .top-artist-item {
+    width: 92px;
+  }
+
+  .top-artist-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 12px;
+  }
+
+  .top-artist-name {
+    max-width: 92px;
+    font-size: 0.75rem;
+  }
+}

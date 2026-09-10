@@ -76,3 +76,24 @@ export const fetchTrendingArtists = async ({ limit = 40, windowDays } = {}) => {
     source: data?.source || (artists.length ? 'artist_watch_credits_trending' : 'empty'),
   };
 };
+
+/**
+ * Global Top-N artists leaderboard (public): /api/recommended-artists/top
+ * @param {{ limit?: number, windowDays?: number }} [opts]
+ */
+export const fetchTopArtists = async ({ limit = 10, windowDays } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+  if (windowDays) query.set('windowDays', String(windowDays));
+
+  const res = await recommendedArtistsFetch(`/recommended-artists/top?${query.toString()}`);
+  const data = await parseJson(res);
+  const artists = Array.isArray(data?.artists) ? data.artists : [];
+
+  return {
+    artists,
+    limit: data?.limit,
+    windowDays: data?.windowDays,
+    source: data?.source || (artists.length ? 'top_artists' : 'empty'),
+  };
+};

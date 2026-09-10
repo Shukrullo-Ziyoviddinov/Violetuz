@@ -21,30 +21,6 @@ const uniqueArtistsById = (list) => {
 };
 
 /**
- * Personalized order when ranked scores exist (≥2 contents); else catalog.
- * @param {Array} catalogArtists
- * @param {Array<{ artistId: string, score: number }>|null} ranked
- */
-const orderArtistsByRanking = (catalogArtists, ranked) => {
-  const unique = uniqueArtistsById(catalogArtists);
-  if (!ranked?.length) return unique;
-
-  const byId = new Map(unique.map((a) => [String(a.id), a]));
-  const ordered = [];
-  const seen = new Set();
-
-  for (const row of ranked) {
-    const id = String(row.artistId ?? '');
-    const artist = byId.get(id);
-    if (!artist || seen.has(id)) continue;
-    seen.add(id);
-    ordered.push(artist);
-  }
-
-  return ordered.length ? ordered : unique;
-};
-
-/**
  * Merge personal + trending into one ordered list:
  * personal first (ranked), then trending (no duplicates).
  */

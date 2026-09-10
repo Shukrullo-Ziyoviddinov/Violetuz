@@ -5,6 +5,7 @@ import MusicCards from './MusicCards/MusicCards';
 import ClipsCards from './ClipsCards/ClipsCards';
 import HomeShorts from '../components/HomeShorts/HomeShorts';
 import RecommendedArtists from './RecommendedArtists/RecommendedArtists';
+import TopArtist from './TopArtist/TopArtist';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import {
@@ -200,17 +201,19 @@ const Music = () => {
                   const section = getSectionById(block.sectionId);
                   if (section) {
                     return (
-                      <MusicCards
-                        key={section.id}
-                        section={section}
-                        items={
-                          resolveSectionItems(
-                            section.categoryNameMusic,
-                            section.wishlistType || 'music',
-                            null
-                          ) || undefined
-                        }
-                      />
+                      <React.Fragment key={section.id}>
+                        <MusicCards
+                          section={section}
+                          items={
+                            resolveSectionItems(
+                              section.categoryNameMusic,
+                              section.wishlistType || 'music',
+                              null
+                            ) || undefined
+                          }
+                        />
+                        {section.id === 'music-drops' ? <TopArtist /> : null}
+                      </React.Fragment>
                     );
                   }
 

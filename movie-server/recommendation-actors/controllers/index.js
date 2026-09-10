@@ -12,6 +12,7 @@ const {
   getRecommendedActors,
   getTrendingActors,
 } = require('../services/actorWatchCount.service');
+const { getTopActors } = require('../services/topActors.service');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -41,6 +42,19 @@ const listTrendingActors = asyncHandler(async (req, res) => {
 });
 
 /**
+ * GET /api/recommended-actors/top
+ * Public Top-N actors leaderboard (default 10).
+ */
+const listTopActors = asyncHandler(async (req, res) => {
+  const result = await getTopActors({
+    limit: req.query?.limit,
+    windowDays: req.query?.windowDays,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * GET /api/recommended-actors/config
  * Public knobs for FE (no auth).
  */
@@ -49,6 +63,7 @@ const getConfig = asyncHandler(async (_req, res) => {
     data: {
       minMovieCount: scoringWeights.minMovieCount ?? 2,
       defaultLimit: scoringWeights.defaultLimit ?? 40,
+      topLimit: scoringWeights.topLimit ?? 10,
     },
   });
 });
@@ -56,5 +71,6 @@ const getConfig = asyncHandler(async (_req, res) => {
 module.exports = {
   listRecommendedActors,
   listTrendingActors,
+  listTopActors,
   getConfig,
 };

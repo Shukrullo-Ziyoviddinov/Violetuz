@@ -12,6 +12,7 @@ const {
   getRecommendedArtists,
   getTrendingArtists,
 } = require('../services/artistWatchCount.service');
+const { getTopArtists } = require('../services/topArtists.service');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -39,6 +40,18 @@ const listTrendingArtists = asyncHandler(async (req, res) => {
 });
 
 /**
+ * GET /api/recommended-artists/top
+ * Public Top-N artists leaderboard (default 10).
+ */
+const listTopArtists = asyncHandler(async (req, res) => {
+  const result = await getTopArtists({
+    limit: req.query?.limit,
+    windowDays: req.query?.windowDays,
+  });
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * GET /api/recommended-artists/config
  */
 const getConfig = asyncHandler(async (_req, res) => {
@@ -46,6 +59,7 @@ const getConfig = asyncHandler(async (_req, res) => {
     data: {
       minContentCount: scoringWeights.minContentCount ?? 2,
       defaultLimit: scoringWeights.defaultLimit ?? 40,
+      topLimit: scoringWeights.topLimit ?? 10,
     },
   });
 });
@@ -53,5 +67,6 @@ const getConfig = asyncHandler(async (_req, res) => {
 module.exports = {
   listRecommendedArtists,
   listTrendingArtists,
+  listTopArtists,
   getConfig,
 };

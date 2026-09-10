@@ -17,6 +17,7 @@ const router = Router();
 
 router.get('/config', controller.getConfig);
 router.get('/trending', controller.listTrendingActors);
+router.get('/top', controller.listTopActors);
 router.get('/', requireAuth, controller.listRecommendedActors);
 
 module.exports = router;

@@ -13,6 +13,9 @@ const scoringWeights = Object.freeze({
   maxLimit: 80,
   /** Global trending window (days) for cold-start. */
   trendingWindowDays: 30,
+  /** TopActors leaderboard size */
+  topLimit: 10,
+  topMaxLimit: 20,
 });
 
 module.exports = { scoringWeights };
