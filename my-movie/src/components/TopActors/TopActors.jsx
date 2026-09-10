@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
+import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import { useActorsApi } from '../../context/ActorsApiContext';
 import { useTopActors } from '../../hooks/useTopActors';
 import './TopActors.css';
@@ -18,9 +19,7 @@ const TopActors = () => {
   const { items, loading } = useTopActors(10);
 
   const displayActors = useMemo(() => {
-    const byId = new Map(
-      (allActors || []).map((a) => [String(a.id), a])
-    );
+    const byId = new Map((allActors || []).map((a) => [String(a.id), a]));
     const out = [];
     for (const row of items) {
       const actor = byId.get(String(row.actorId));
@@ -58,7 +57,7 @@ const TopActors = () => {
                     className="top-actors-item"
                     aria-hidden="true"
                   >
-                    <div className="top-actors-avatar" />
+                    <div className="top-actors-img-wrap" />
                   </div>
                 ))
               : displayActors.map((actor) => (
@@ -76,16 +75,21 @@ const TopActors = () => {
                     }}
                     aria-label={`${actor.rank}. ${resolveName(actor)}`}
                   >
-                    <div className="top-actors-avatar">
-                      <span className="top-actors-rank">{actor.rank}</span>
+                    <div className="top-actors-img-wrap">
                       <img
                         src={actor.image || '/img/movie1.jpg'}
                         alt={resolveName(actor)}
                         className="top-actors-img"
                       />
                     </div>
+                    <span className="top-actors-rank">{actor.rank}</span>
                     <p className="top-actors-name">{resolveName(actor)}</p>
-                    <p className="top-actors-score">{actor.score}</p>
+                    <FollowingButton
+                      artistId={actor.id}
+                      entityType="actor"
+                      wrapperClassName="top-actors-follow"
+                      stopPropagation
+                    />
                   </div>
                 ))}
           </HorizontalScroll>

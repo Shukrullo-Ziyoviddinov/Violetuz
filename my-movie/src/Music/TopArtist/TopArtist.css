@@ -1,5 +1,5 @@
 .top-artist {
-  padding: 0.75rem 0 0.25rem;
+  padding: 0.5rem 0;
 }
 
 .top-artist-container {
@@ -9,58 +9,38 @@
 }
 
 .top-artist-header {
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
 }
 
 .top-artist-title {
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
   color: #f2f2f2;
   margin: 0;
 }
 
 .top-artist-item {
   flex-shrink: 0;
-  width: 108px;
+  width: 110px;
   cursor: pointer;
+  transition: transform 0.25s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: transform 0.2s ease;
 }
 
 .top-artist-item:hover {
-  transform: translateY(-2px);
+  transform: scale(1.02);
 }
 
-.top-artist-avatar {
-  position: relative;
-  width: 96px;
-  height: 96px;
-  border-radius: 14px;
+.top-artist-img-wrap {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-sizing: border-box;
-}
-
-.top-artist-rank {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  z-index: 1;
-  min-width: 1.4rem;
-  height: 1.4rem;
-  padding: 0 0.3rem;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.72);
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1.4rem;
-  text-align: center;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
 }
 
 .top-artist-img {
@@ -70,40 +50,51 @@
   display: block;
 }
 
+.top-artist-rank {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1;
+}
+
 .top-artist-name {
-  margin: 0.45rem 0 0;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
-  max-width: 108px;
+  color: #fff;
+  margin: 0.35rem 0 0;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 100%;
 }
 
-.top-artist-score {
-  margin: 0.15rem 0 0;
+.top-artist-follow {
+  margin-top: 0.5rem;
+  align-self: stretch;
+  width: 100%;
+  display: flex;
+}
+
+.top-artist-follow .following-btn {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.35rem 0.5rem;
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 500px) {
   .top-artist-title {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
   }
 
   .top-artist-item {
-    width: 92px;
+    width: 96px;
   }
 
-  .top-artist-avatar {
-    width: 84px;
-    height: 84px;
-    border-radius: 12px;
-  }
-
-  .top-artist-name {
-    max-width: 92px;
-    font-size: 0.75rem;
+  .top-artist-img-wrap {
+    width: 96px;
+    height: 96px;
   }
 }
