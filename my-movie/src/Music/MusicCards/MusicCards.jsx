@@ -6,7 +6,6 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import MusicButtonMore from '../MusicButtonMore/MusicButtonMore';
-import MusicSectionIcons from '../MusicSectionIcons';
 import CartochkaHoverModal from '../../components/cartochkaHoverModal';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
@@ -261,9 +260,6 @@ const MusicCards = ({ section, items: itemsProp = null, isLoading: isLoadingProp
             />
           ) : (
             <h2 className="music-cards-title">
-              <span className="music-cards-title-icon" aria-hidden="true">
-                <MusicSectionIcons type={wishlistType} />
-              </span>
               <span className="music-cards-title-text">
                 {t(titleKey, titleDefault)}
               </span>

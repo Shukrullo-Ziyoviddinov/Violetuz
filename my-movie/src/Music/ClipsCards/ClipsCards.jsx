@@ -5,7 +5,6 @@ import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import CartochkaHoverModal from '../../components/cartochkaHoverModal';
 import CartochkaMobileAutoPlay from '../../components/cartochkaHoverModal/CartochkaMobileAutoPlay';
-import MusicSectionIcons from '../MusicSectionIcons';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import { useMusicApi } from '../../context/MusicApiContext';
@@ -235,9 +234,6 @@ const ClipsCards = ({ section, isLoading: isLoadingProp = null }) => {
             />
           ) : (
             <h2 className="music-cards-title">
-              <span className="music-cards-title-icon" aria-hidden="true">
-                <MusicSectionIcons type={wishlistType || 'klip'} />
-              </span>
               <span className="music-cards-title-text">
                 {t(titleKey, titleDefault)}
               </span>
