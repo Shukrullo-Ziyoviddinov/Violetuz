@@ -147,13 +147,17 @@ const Music = () => {
                       catalog
                     );
                     return (
-                      <ClipsCards
-                        key={clipSection.id}
-                        section={{
-                          ...clipSection,
-                          data,
-                        }}
-                      />
+                      <React.Fragment key={clipSection.id}>
+                        <ClipsCards
+                          section={{
+                            ...clipSection,
+                            data,
+                          }}
+                        />
+                        {clipSection.id === 'sevgi-va-ichq' ? (
+                          <WeeklyTopArtist />
+                        ) : null}
+                      </React.Fragment>
                     );
                   }
 
@@ -213,12 +217,7 @@ const Music = () => {
                             ) || undefined
                           }
                         />
-                        {section.id === 'music-drops' ? (
-                          <>
-                            <TopArtist />
-                            <WeeklyTopArtist />
-                          </>
-                        ) : null}
+                        {section.id === 'music-drops' ? <TopArtist /> : null}
                       </React.Fragment>
                     );
                   }

@@ -123,12 +123,8 @@ const Home = () => {
                   moreTo={moreTo}
                 />
                 {sectionType === 'koreaDrama' ? <TrillerSection /> : null}
-                {sectionType === 'russianMovies' ? (
-                  <>
-                    <TopActors />
-                    <WeeklyTopActors />
-                  </>
-                ) : null}
+                {sectionType === 'russianMovies' ? <TopActors /> : null}
+                {sectionType === 'actionMovies' ? <WeeklyTopActors /> : null}
               </React.Fragment>
             );
           })}
