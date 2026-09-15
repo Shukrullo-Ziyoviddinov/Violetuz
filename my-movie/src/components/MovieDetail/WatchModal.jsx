@@ -5,7 +5,7 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { reportMovieProgress, fetchProgressConfig, DEFAULT_PROGRESS_CONFIG } from '../../api/recommendationsApi';
-import { addWatchEvent as addGuestMovieWatchEvent } from '../../utils/guestHistory/movieGuestHistory';
+import { addWatchEvent as addGuestMovieWatchEvent } from '../../utils/localStorage/guestHistory/movieGuestHistory';
 import AdsMovie from './AdsMovie';
 import WatchSettingsModal from './WatchSettingsModal';
 import './WatchModal.css';

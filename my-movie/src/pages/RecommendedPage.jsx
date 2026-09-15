@@ -8,8 +8,8 @@ import {
   fetchViewerCategoryRecommendations,
   resolveRecommendationCategoryKey,
 } from '../api/recommendationsApi';
-import { getWatchHistory } from '../utils/guestHistory/movieGuestHistory';
-import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/guestHistory/events';
+import { getWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
+import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/events';
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
 import './RecommendedPage.css';

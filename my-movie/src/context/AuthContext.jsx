@@ -20,8 +20,8 @@ import {
   removeAccount,
   listAccountsState,
 } from '../accounts/accountsStorage';
-import { clearWatchHistory as clearGuestMovieWatchHistory } from '../utils/guestHistory/movieGuestHistory';
-import { clearListenHistory as clearGuestMusicListenHistory } from '../utils/guestHistory/musicGuestHistory';
+import { clearWatchHistory as clearGuestMovieWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
+import { clearListenHistory as clearGuestMusicListenHistory } from '../utils/localStorage/guestHistory/musicGuestHistory';
 import { clearViewedMoviesHistory } from './ViewedMoviesContext';
 
 /** @deprecated Redux Provider yetarli — eski importlar buzilmasligi uchun qoldirilgan */

@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { selectIsLoggedIn, selectAuthReady, selectProfile } from '../store/slices/userSlice';
 import { fetchViewerCategoryRecommendations } from '../api/recommendationsApi';
-import { getWatchHistory } from '../utils/guestHistory/movieGuestHistory';
-import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/guestHistory/events';
+import { getWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
+import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/events';
 
 /** Home carousel uchun yetarli; DEFAULT_LIMIT=10 */
 const HOME_REC_LIMIT = 40;

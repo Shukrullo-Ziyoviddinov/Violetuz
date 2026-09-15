@@ -11,8 +11,8 @@ import {
 } from '../../api/authApi';
 import { uploadFileDirectToR2 } from '../../api/uploadsApi';
 import { markNeedsAvatar, clearNeedsAvatar } from '../../authModalBridge';
-import { clearWatchHistory as clearGuestMovieWatchHistory } from '../../utils/guestHistory/movieGuestHistory';
-import { clearListenHistory as clearGuestMusicListenHistory } from '../../utils/guestHistory/musicGuestHistory';
+import { clearWatchHistory as clearGuestMovieWatchHistory } from '../../utils/localStorage/guestHistory/movieGuestHistory';
+import { clearListenHistory as clearGuestMusicListenHistory } from '../../utils/localStorage/guestHistory/musicGuestHistory';
 import { clearViewedMoviesHistory } from '../../context/ViewedMoviesContext';
 import '../Profile/ProfileEditModal.css';
 import './AuthModal.css';

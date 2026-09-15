@@ -4,7 +4,7 @@
  * SearchModalTavsiya, topRated, similar, nav chips (filterCategory) — ulanmaydi.
  */
 import { resolveApiBaseUrl } from './apiBase';
-import { getWatchHistory as getMovieGuestWatchHistory } from '../utils/guestHistory/movieGuestHistory';
+import { getWatchHistory as getMovieGuestWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
 
 const API_BASE_URL = resolveApiBaseUrl();
 

@@ -159,7 +159,7 @@ const hook = fs.readFileSync(
   'utf8'
 );
 const musicStore = fs.readFileSync(
-  path.join(root, 'utils/guestHistory/musicGuestHistory.js'),
+  path.join(root, 'utils/localStorage/guestHistory/musicGuestHistory.js'),
   'utf8'
 );
 

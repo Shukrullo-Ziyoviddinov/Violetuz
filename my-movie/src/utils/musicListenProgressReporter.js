@@ -11,7 +11,7 @@ import {
   fetchMusicProgressConfig,
   DEFAULT_MUSIC_PROGRESS_CONFIG,
 } from '../api/musicRecommendationsApi';
-import { addListenEvent as addGuestMusicListenEvent } from './guestHistory/musicGuestHistory';
+import { addListenEvent as addGuestMusicListenEvent } from './localStorage/guestHistory/musicGuestHistory';
 
 const PROGRESS_REPORT_INTERVAL_MS = 30_000;
 

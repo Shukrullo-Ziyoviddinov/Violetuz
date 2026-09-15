@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { selectIsLoggedIn, selectAuthReady, selectProfile } from '../store/slices/userSlice';
 import { fetchViewerMusicCategoryRecommendations } from '../api/musicRecommendationsApi';
-import { getListenHistory } from '../utils/guestHistory/musicGuestHistory';
-import { GUEST_MUSIC_HISTORY_CHANGED } from '../utils/guestHistory/events';
+import { getListenHistory } from '../utils/localStorage/guestHistory/musicGuestHistory';
+import { GUEST_MUSIC_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/events';
 
 /** Music Home carousel uchun yetarli */
 const HOME_REC_LIMIT = 40;

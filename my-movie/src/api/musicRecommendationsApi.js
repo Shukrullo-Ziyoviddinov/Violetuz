@@ -4,7 +4,7 @@
  * SimilarSongs / RecommendedClips / AlbumsForYou — ulanmaydi.
  */
 import { resolveApiBaseUrl } from './apiBase';
-import { getListenHistory as getMusicGuestListenHistory } from '../utils/guestHistory/musicGuestHistory';
+import { getListenHistory as getMusicGuestListenHistory } from '../utils/localStorage/guestHistory/musicGuestHistory';
 
 const API_BASE_URL = resolveApiBaseUrl();
 
