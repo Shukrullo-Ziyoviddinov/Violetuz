@@ -16,6 +16,8 @@ const scoringWeights = Object.freeze({
   /** TopActors leaderboard size */
   topLimit: 10,
   topMaxLimit: 20,
+  /** Haftaning Top-N — rolling week window */
+  weeklyWindowDays: 7,
 });
 
 module.exports = { scoringWeights };

@@ -36,6 +36,28 @@ const getTopArtists = async (opts = {}) => {
   };
 };
 
+/**
+ * Haftaning Top-N — same credits, rolling 7-day window.
+ * @param {{ limit?: number, windowDays?: number }} [opts]
+ */
+const getWeeklyTopArtists = async (opts = {}) => {
+  const windowDays =
+    Number(opts.windowDays) > 0
+      ? Number(opts.windowDays)
+      : scoringWeights.weeklyWindowDays ?? 7;
+
+  const result = await getTopArtists({
+    limit: opts.limit,
+    windowDays,
+  });
+
+  return {
+    ...result,
+    source: result.artists?.length ? 'weekly_top_artists' : 'empty',
+  };
+};
+
 module.exports = {
   getTopArtists,
+  getWeeklyTopArtists,
 };

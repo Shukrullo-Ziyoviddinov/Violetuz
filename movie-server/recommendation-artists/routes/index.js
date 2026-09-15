@@ -18,6 +18,7 @@ const router = Router();
 router.get('/config', controller.getConfig);
 router.get('/trending', controller.listTrendingArtists);
 router.get('/top', controller.listTopArtists);
+router.get('/weekly-top', controller.listWeeklyTopArtists);
 router.get('/', requireAuth, controller.listRecommendedArtists);
 
 module.exports = router;

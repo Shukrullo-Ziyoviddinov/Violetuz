@@ -12,7 +12,7 @@ const {
   getRecommendedActors,
   getTrendingActors,
 } = require('../services/actorWatchCount.service');
-const { getTopActors } = require('../services/topActors.service');
+const { getTopActors, getWeeklyTopActors } = require('../services/topActors.service');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -55,6 +55,19 @@ const listTopActors = asyncHandler(async (req, res) => {
 });
 
 /**
+ * GET /api/recommended-actors/weekly-top
+ * Public weekly Top-N (rolling 7 days).
+ */
+const listWeeklyTopActors = asyncHandler(async (req, res) => {
+  const result = await getWeeklyTopActors({
+    limit: req.query?.limit,
+    windowDays: req.query?.windowDays,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * GET /api/recommended-actors/config
  * Public knobs for FE (no auth).
  */
@@ -64,6 +77,7 @@ const getConfig = asyncHandler(async (_req, res) => {
       minMovieCount: scoringWeights.minMovieCount ?? 2,
       defaultLimit: scoringWeights.defaultLimit ?? 40,
       topLimit: scoringWeights.topLimit ?? 10,
+      weeklyWindowDays: scoringWeights.weeklyWindowDays ?? 7,
     },
   });
 });
@@ -72,5 +86,6 @@ module.exports = {
   listRecommendedActors,
   listTrendingActors,
   listTopActors,
+  listWeeklyTopActors,
   getConfig,
 };

@@ -8,4 +8,5 @@ module.exports = {
   getRecommendedArtists: artistWatchCount.getRecommendedArtists,
   getTrendingArtists: artistWatchCount.getTrendingArtists,
   getTopArtists: topArtists.getTopArtists,
+  getWeeklyTopArtists: topArtists.getWeeklyTopArtists,
 };

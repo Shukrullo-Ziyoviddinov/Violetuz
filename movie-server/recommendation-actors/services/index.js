@@ -8,4 +8,5 @@ module.exports = {
   getRecommendedActors: actorWatchCount.getRecommendedActors,
   getTrendingActors: actorWatchCount.getTrendingActors,
   getTopActors: topActors.getTopActors,
+  getWeeklyTopActors: topActors.getWeeklyTopActors,
 };

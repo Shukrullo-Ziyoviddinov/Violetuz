@@ -6,6 +6,7 @@ import ClipsCards from './ClipsCards/ClipsCards';
 import HomeShorts from '../components/HomeShorts/HomeShorts';
 import RecommendedArtists from './RecommendedArtists/RecommendedArtists';
 import TopArtist from './TopArtist/TopArtist';
+import WeeklyTopArtist from './WeeklyTopArtist/WeeklyTopArtist';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import {
@@ -212,7 +213,12 @@ const Music = () => {
                             ) || undefined
                           }
                         />
-                        {section.id === 'music-drops' ? <TopArtist /> : null}
+                        {section.id === 'music-drops' ? (
+                          <>
+                            <TopArtist />
+                            <WeeklyTopArtist />
+                          </>
+                        ) : null}
                       </React.Fragment>
                     );
                   }

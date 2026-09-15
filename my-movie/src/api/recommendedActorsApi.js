@@ -98,3 +98,27 @@ export const fetchTopActors = async ({ limit = 10, windowDays } = {}) => {
     source: data?.source || (actors.length ? 'top_actors' : 'empty'),
   };
 };
+
+/**
+ * Weekly Top-N actors (public): /api/recommended-actors/weekly-top
+ * Rolling 7-day window.
+ * @param {{ limit?: number, windowDays?: number }} [opts]
+ */
+export const fetchWeeklyTopActors = async ({ limit = 10, windowDays } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+  if (windowDays) query.set('windowDays', String(windowDays));
+
+  const res = await recommendedActorsFetch(
+    `/recommended-actors/weekly-top?${query.toString()}`
+  );
+  const data = await parseJson(res);
+  const actors = Array.isArray(data?.actors) ? data.actors : [];
+
+  return {
+    actors,
+    limit: data?.limit,
+    windowDays: data?.windowDays,
+    source: data?.source || (actors.length ? 'weekly_top_actors' : 'empty'),
+  };
+};

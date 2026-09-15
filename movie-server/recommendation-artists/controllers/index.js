@@ -12,7 +12,7 @@ const {
   getRecommendedArtists,
   getTrendingArtists,
 } = require('../services/artistWatchCount.service');
-const { getTopArtists } = require('../services/topArtists.service');
+const { getTopArtists, getWeeklyTopArtists } = require('../services/topArtists.service');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -52,6 +52,18 @@ const listTopArtists = asyncHandler(async (req, res) => {
 });
 
 /**
+ * GET /api/recommended-artists/weekly-top
+ * Public weekly Top-N (rolling 7 days).
+ */
+const listWeeklyTopArtists = asyncHandler(async (req, res) => {
+  const result = await getWeeklyTopArtists({
+    limit: req.query?.limit,
+    windowDays: req.query?.windowDays,
+  });
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * GET /api/recommended-artists/config
  */
 const getConfig = asyncHandler(async (_req, res) => {
@@ -60,6 +72,7 @@ const getConfig = asyncHandler(async (_req, res) => {
       minContentCount: scoringWeights.minContentCount ?? 2,
       defaultLimit: scoringWeights.defaultLimit ?? 40,
       topLimit: scoringWeights.topLimit ?? 10,
+      weeklyWindowDays: scoringWeights.weeklyWindowDays ?? 7,
     },
   });
 });
@@ -68,5 +81,6 @@ module.exports = {
   listRecommendedArtists,
   listTrendingArtists,
   listTopArtists,
+  listWeeklyTopArtists,
   getConfig,
 };

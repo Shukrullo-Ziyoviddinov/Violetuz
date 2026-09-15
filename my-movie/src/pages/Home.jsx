@@ -9,6 +9,7 @@ import Movies from '../components/Movies/Movies';
 import TopRatedContent from '../components/TopRatedContent/TopRatedContent';
 import RecommendedActors from '../components/RecommendedActors/RecommendedActors';
 import TopActors from '../components/TopActors/TopActors';
+import WeeklyTopActors from '../components/WeeklyTopActors/WeeklyTopActors';
 import TrillerSection from '../components/Triller/TrillerSection';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import { useHomeCategoryRecommendations } from '../hooks/useHomeCategoryRecommendations';
@@ -122,7 +123,12 @@ const Home = () => {
                   moreTo={moreTo}
                 />
                 {sectionType === 'koreaDrama' ? <TrillerSection /> : null}
-                {sectionType === 'russianMovies' ? <TopActors /> : null}
+                {sectionType === 'russianMovies' ? (
+                  <>
+                    <TopActors />
+                    <WeeklyTopActors />
+                  </>
+                ) : null}
               </React.Fragment>
             );
           })}
