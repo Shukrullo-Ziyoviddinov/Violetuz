@@ -7,7 +7,7 @@ import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import { useRecommendedArtistsRanking } from '../../hooks/useRecommendedArtistsRanking';
 import { useTrendingArtistsRanking } from '../../hooks/useTrendingArtistsRanking';
 import { useAppSelector } from '../../store/hooks';
-import { selectIsLoggedIn, selectAuthReady } from '../../store/slices/userSlice';
+import { selectAuthReady } from '../../store/slices/userSlice';
 import './RecommendedArtists.css';
 
 const uniqueArtistsById = (list) => {
@@ -54,7 +54,6 @@ const RecommendedArtists = () => {
   const navigate = useNavigate();
   const { allArtists } = useMusicApi();
   const authReady = useAppSelector(selectAuthReady);
-  const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const { ranked, loading: rankingLoading } = useRecommendedArtistsRanking();
   const { trending, loading: trendingLoading } = useTrendingArtistsRanking();
 
@@ -62,7 +61,9 @@ const RecommendedArtists = () => {
     () => mergeArtistsByPersonalAndTrending(allArtists, ranked, trending),
     [allArtists, ranked, trending]
   );
-  const waitingPersonalized = authReady && isLoggedIn && rankingLoading;
+  // Login + guest: shaxsiy ranking kelguncha skeleton (trending flash yo‘q)
+  // Merge tartibi o‘zgarmaydi: shaxsiy → trending
+  const waitingPersonalized = !authReady || rankingLoading;
   const waitingAny = waitingPersonalized || trendingLoading;
 
   const handleArtistClick = (artistId) => {

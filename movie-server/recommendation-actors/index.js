@@ -8,7 +8,7 @@
  *   recommendation_user_actor_watch_scores   — actor distinct-movie counts
  *
  * "Ko'rildi" gate: recommendation progress (≥5 daqiqa). This module only +1s cast.
- * Music artists: recommendation-artists (shared entityDistinctCount core).
+ * Guest: POST /guest + localHistory (no DB write). Music artists: recommendation-artists.
  *
  * @module recommendation-actors
  */
@@ -27,4 +27,5 @@ module.exports = {
   services,
   applyCreditsFromWatchedMovie: services.applyCreditsFromWatchedMovie,
   getRecommendedActors: services.getRecommendedActors,
+  getGuestRecommendedActors: services.getGuestRecommendedActors,
 };

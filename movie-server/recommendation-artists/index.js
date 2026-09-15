@@ -9,6 +9,7 @@
  *
  * "Tinglandi" gate: recommendation-music progress (≥10s).
  * +1 from content.artistId once per contentKey (music|clip|concert|album).
+ * Guest: POST /guest + localHistory (no DB write).
  * Shared counting core: recommendation-shared/entityDistinctCount
  *
  * @module recommendation-artists
@@ -29,4 +30,5 @@ module.exports = {
   services,
   applyCreditsFromListenedContent: services.applyCreditsFromListenedContent,
   getRecommendedArtists: services.getRecommendedArtists,
+  getGuestRecommendedArtists: services.getGuestRecommendedArtists,
 };

@@ -9,7 +9,7 @@ import { useImageReady } from '../../utils/useImageReady';
 import { useRecommendedActorsRanking } from '../../hooks/useRecommendedActorsRanking';
 import { useTrendingActorsRanking } from '../../hooks/useTrendingActorsRanking';
 import { useAppSelector } from '../../store/hooks';
-import { selectIsLoggedIn, selectAuthReady } from '../../store/slices/userSlice';
+import { selectAuthReady } from '../../store/slices/userSlice';
 import './RecommendedActors.css';
 
 const RECOMMENDED_ACTORS_SKELETON_COUNT = 8;
@@ -131,7 +131,6 @@ const RecommendedActors = () => {
   const lang = i18n.language === 'ru' ? 'ru' : 'uz';
   const { allActors, actorsLoading } = useActorsApi();
   const authReady = useAppSelector(selectAuthReady);
-  const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const { ranked, loading: rankingLoading } = useRecommendedActorsRanking();
   const { trending, loading: trendingLoading } = useTrendingActorsRanking();
 
@@ -139,8 +138,9 @@ const RecommendedActors = () => {
     () => mergeActorsByPersonalAndTrending(allActors, ranked, trending),
     [allActors, ranked, trending]
   );
-  const waitingPersonalized =
-    authReady && isLoggedIn && rankingLoading;
+  // Login + guest: shaxsiy ranking kelguncha skeleton (trending flash yo‘q)
+  // Merge tartibi o‘zgarmaydi: shaxsiy → trending
+  const waitingPersonalized = !authReady || rankingLoading;
   const showSectionSkeleton = actorsLoading || trendingLoading || waitingPersonalized;
   const showTitleSkeleton = actorsLoading && allActors.length === 0;
 

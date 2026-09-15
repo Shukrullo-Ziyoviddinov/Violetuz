@@ -1,8 +1,10 @@
 /**
  * Recommended actors carousel API (distinct watched-movie counts).
- * GET /api/recommended-actors
+ * GET /api/recommended-actors (login)
+ * POST /api/recommended-actors/guest (mehmon — localHistory, no DB write)
  */
 import { resolveApiBaseUrl } from './apiBase';
+import { getWatchHistory as getMovieGuestWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
 
 const API_BASE_URL = resolveApiBaseUrl();
 
@@ -34,6 +36,7 @@ const parseJson = async (response) => {
 
 /**
  * Personalized actors for .recommended-actors (score = distinct watched movies).
+ * Login only — GET /api/recommended-actors
  * @param {{ limit?: number }} [opts]
  * @returns {Promise<{ actors: Array<{ actorId: string, score: number }>, minScore?: number, source?: string }>}
  */
@@ -53,6 +56,75 @@ export const fetchRecommendedActors = async ({ limit = 40 } = {}) => {
     limit: data?.limit,
     source: data?.source || (actors.length ? 'actor_watch_score' : 'empty'),
   };
+};
+
+/**
+ * Guest personalized actors — POST /recommended-actors/guest
+ * localHistory bo‘sh → actors=[] (UI trending bilan to‘ldiradi).
+ * DB’ga yozilmaydi.
+ *
+ * @param {Object} [opts]
+ * @param {Array<{m,r,t}>} [opts.localHistory]
+ * @param {number} [opts.limit]
+ * @param {number} [opts.minScore]
+ */
+export const fetchGuestRecommendedActors = async ({
+  localHistory = [],
+  limit = 40,
+  minScore,
+} = {}) => {
+  const history = Array.isArray(localHistory) ? localHistory : [];
+
+  const body = { localHistory: history, limit };
+  if (minScore != null) body.minScore = minScore;
+
+  const res = await recommendedActorsFetch('/recommended-actors/guest', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  const data = await parseJson(res);
+  const actors = Array.isArray(data?.actors) ? data.actors : [];
+
+  return {
+    actors,
+    minScore: data?.minScore,
+    limit: data?.limit,
+    source:
+      data?.source ||
+      (actors.length ? 'guest_actor_watch_score' : 'guest_empty'),
+    userId: data?.userId ?? null,
+    creditedMovieCount: data?.creditedMovieCount,
+  };
+};
+
+/**
+ * Login → GET (mavjud). Guest → POST /guest + violet_guest_movies_v1.
+ * Login path o‘zgarmaydi.
+ *
+ * @param {Object} opts
+ * @param {boolean} opts.isLoggedIn
+ * @param {number} [opts.limit]
+ * @param {number} [opts.minScore]
+ * @param {Array<{m,r,t}>} [opts.localHistory] — berilmasa guest store o‘qiladi
+ */
+export const fetchViewerRecommendedActors = async ({
+  isLoggedIn,
+  limit = 40,
+  minScore,
+  localHistory,
+} = {}) => {
+  if (isLoggedIn) {
+    return fetchRecommendedActors({ limit });
+  }
+
+  const history =
+    localHistory != null ? localHistory : getMovieGuestWatchHistory();
+
+  return fetchGuestRecommendedActors({
+    localHistory: history,
+    limit,
+    minScore,
+  });
 };
 
 /**

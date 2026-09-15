@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { selectIsLoggedIn, selectAuthReady, selectProfile } from '../store/slices/userSlice';
-import { fetchRecommendedActors } from '../api/recommendedActorsApi';
+import { fetchViewerRecommendedActors } from '../api/recommendedActorsApi';
+import { getWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
+import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/events';
 
 /**
- * Login user uchun RecommendedActors tartibi (distinct watched-movie score).
- * Guest / empty / xato → null (katalog fallback).
+ * RecommendedActors tartibi (distinct watched-movie score).
+ *  - Login → GET (o‘zgarmagan path)
+ *  - Guest → POST /guest + violet_guest_movies_v1
+ * Empty / xato → null (UI trending bilan to‘ldiradi).
  *
  * @returns {{ ranked: Array<{ actorId: string, score: number }>|null, loading: boolean }}
  */
@@ -14,14 +18,29 @@ export function useRecommendedActorsRanking() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const profile = useAppSelector(selectProfile);
   const [ranked, setRanked] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // true by default — authReady oldin / fetch oldin flash yo‘q
+  const [loading, setLoading] = useState(true);
+  const [guestHistoryEpoch, setGuestHistoryEpoch] = useState(0);
+
+  useEffect(() => {
+    const onHistory = () => setGuestHistoryEpoch((n) => n + 1);
+    window.addEventListener(GUEST_MOVIE_HISTORY_CHANGED, onHistory);
+    return () => window.removeEventListener(GUEST_MOVIE_HISTORY_CHANGED, onHistory);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    if (!authReady || !isLoggedIn || !profile?.id) {
+    if (!authReady) {
       setRanked(null);
-      setLoading(false);
+      setLoading(true);
+      return undefined;
+    }
+
+    // Login: profile kelmaguncha kutish (GET path o‘zgarmaydi)
+    if (isLoggedIn && !profile?.id) {
+      setRanked(null);
+      setLoading(true);
       return undefined;
     }
 
@@ -29,7 +48,11 @@ export function useRecommendedActorsRanking() {
 
     (async () => {
       try {
-        const data = await fetchRecommendedActors({ limit: 40 });
+        const data = await fetchViewerRecommendedActors({
+          isLoggedIn,
+          limit: 40,
+          localHistory: isLoggedIn ? undefined : getWatchHistory(),
+        });
         if (cancelled) return;
         const list = Array.isArray(data?.actors) ? data.actors : [];
         setRanked(list.length ? list : null);
@@ -43,7 +66,7 @@ export function useRecommendedActorsRanking() {
     return () => {
       cancelled = true;
     };
-  }, [authReady, isLoggedIn, profile?.id]);
+  }, [authReady, isLoggedIn, profile?.id, guestHistoryEpoch]);
 
   return { ranked, loading };
 }

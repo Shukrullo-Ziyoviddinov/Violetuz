@@ -13,6 +13,9 @@ const {
   getTrendingArtists,
 } = require('../services/artistWatchCount.service');
 const { getTopArtists, getWeeklyTopArtists } = require('../services/topArtists.service');
+const {
+  getGuestRecommendedArtists,
+} = require('../services/guestRecommendedArtists.service');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -22,6 +25,21 @@ const listRecommendedArtists = asyncHandler(async (req, res) => {
   const result = await getRecommendedArtists(req.authUser._id, {
     limit: req.query?.limit,
     minScore: req.query?.minScore,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * POST /api/recommended-artists/guest
+ * Body: { localHistory: [{ m, ct, r, t }, ...], limit?, minScore? }
+ * Auth YO‘Q. DB’ga yozilmaydi — localHistory → distinct artist scores.
+ */
+const postGuestRecommendedArtists = asyncHandler(async (req, res) => {
+  const result = await getGuestRecommendedArtists({
+    localHistory: req.body?.localHistory,
+    limit: req.body?.limit ?? req.query?.limit,
+    minScore: req.body?.minScore ?? req.query?.minScore,
   });
 
   return sendSuccess(res, { data: result });
@@ -79,6 +97,7 @@ const getConfig = asyncHandler(async (_req, res) => {
 
 module.exports = {
   listRecommendedArtists,
+  postGuestRecommendedArtists,
   listTrendingArtists,
   listTopArtists,
   listWeeklyTopArtists,

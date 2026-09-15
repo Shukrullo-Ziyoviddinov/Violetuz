@@ -13,6 +13,9 @@ const {
   getTrendingActors,
 } = require('../services/actorWatchCount.service');
 const { getTopActors, getWeeklyTopActors } = require('../services/topActors.service');
+const {
+  getGuestRecommendedActors,
+} = require('../services/guestRecommendedActors.service');
 const { scoringWeights } = require('../config/scoringWeights');
 
 /**
@@ -23,6 +26,21 @@ const listRecommendedActors = asyncHandler(async (req, res) => {
   const result = await getRecommendedActors(req.authUser._id, {
     limit: req.query?.limit,
     minScore: req.query?.minScore,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * POST /api/recommended-actors/guest
+ * Body: { localHistory: [{ m, r, t }, ...], limit?, minScore? }
+ * Auth YO‘Q. DB’ga yozilmaydi — localHistory → distinct actor scores.
+ */
+const postGuestRecommendedActors = asyncHandler(async (req, res) => {
+  const result = await getGuestRecommendedActors({
+    localHistory: req.body?.localHistory,
+    limit: req.body?.limit ?? req.query?.limit,
+    minScore: req.body?.minScore ?? req.query?.minScore,
   });
 
   return sendSuccess(res, { data: result });
@@ -84,6 +102,7 @@ const getConfig = asyncHandler(async (_req, res) => {
 
 module.exports = {
   listRecommendedActors,
+  postGuestRecommendedActors,
   listTrendingActors,
   listTopActors,
   listWeeklyTopActors,

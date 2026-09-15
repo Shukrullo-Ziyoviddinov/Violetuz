@@ -1,8 +1,10 @@
 /**
  * Recommended artists carousel API (distinct content-key counts).
- * GET /api/recommended-artists
+ * GET /api/recommended-artists (login)
+ * POST /api/recommended-artists/guest (mehmon — localHistory, no DB write)
  */
 import { resolveApiBaseUrl } from './apiBase';
+import { getListenHistory as getMusicGuestListenHistory } from '../utils/localStorage/guestHistory/musicGuestHistory';
 
 const API_BASE_URL = resolveApiBaseUrl();
 
@@ -33,6 +35,7 @@ const parseJson = async (response) => {
 };
 
 /**
+ * Login only — GET /api/recommended-artists
  * @param {{ limit?: number }} [opts]
  * @returns {Promise<{ artists: Array<{ artistId: string, score: number }>, minScore?: number, source?: string }>}
  */
@@ -52,6 +55,75 @@ export const fetchRecommendedArtists = async ({ limit = 40 } = {}) => {
     limit: data?.limit,
     source: data?.source || (artists.length ? 'artist_watch_score' : 'empty'),
   };
+};
+
+/**
+ * Guest personalized artists — POST /recommended-artists/guest
+ * localHistory bo‘sh → artists=[] (UI trending bilan to‘ldiradi).
+ * DB’ga yozilmaydi.
+ *
+ * @param {Object} [opts]
+ * @param {Array<{m,ct,r,t}>} [opts.localHistory]
+ * @param {number} [opts.limit]
+ * @param {number} [opts.minScore]
+ */
+export const fetchGuestRecommendedArtists = async ({
+  localHistory = [],
+  limit = 40,
+  minScore,
+} = {}) => {
+  const history = Array.isArray(localHistory) ? localHistory : [];
+
+  const body = { localHistory: history, limit };
+  if (minScore != null) body.minScore = minScore;
+
+  const res = await recommendedArtistsFetch('/recommended-artists/guest', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  const data = await parseJson(res);
+  const artists = Array.isArray(data?.artists) ? data.artists : [];
+
+  return {
+    artists,
+    minScore: data?.minScore,
+    limit: data?.limit,
+    source:
+      data?.source ||
+      (artists.length ? 'guest_artist_watch_score' : 'guest_empty'),
+    userId: data?.userId ?? null,
+    creditedContentCount: data?.creditedContentCount,
+  };
+};
+
+/**
+ * Login → GET (mavjud). Guest → POST /guest + violet_guest_music_v1.
+ * Login path o‘zgarmaydi.
+ *
+ * @param {Object} opts
+ * @param {boolean} opts.isLoggedIn
+ * @param {number} [opts.limit]
+ * @param {number} [opts.minScore]
+ * @param {Array<{m,ct,r,t}>} [opts.localHistory] — berilmasa guest store o‘qiladi
+ */
+export const fetchViewerRecommendedArtists = async ({
+  isLoggedIn,
+  limit = 40,
+  minScore,
+  localHistory,
+} = {}) => {
+  if (isLoggedIn) {
+    return fetchRecommendedArtists({ limit });
+  }
+
+  const history =
+    localHistory != null ? localHistory : getMusicGuestListenHistory();
+
+  return fetchGuestRecommendedArtists({
+    localHistory: history,
+    limit,
+    minScore,
+  });
 };
 
 /**
