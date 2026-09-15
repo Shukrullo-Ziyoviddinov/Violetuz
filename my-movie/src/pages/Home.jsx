@@ -42,7 +42,8 @@ const Home = () => {
     return names;
   }, [blocks, sections]);
 
-  const personalizedByCategory = useHomeCategoryRecommendations(homeCategoryNames);
+  const { byCategory: personalizedByCategory, isLoading: recsLoading } =
+    useHomeCategoryRecommendations(homeCategoryNames);
 
   return (
     <div className="home">
@@ -107,10 +108,15 @@ const Home = () => {
               moreTo,
               showHorizontalScroll,
             } = section;
+            // Guest/login API birinchi; katalog faqat fetch tugagach / bo‘sh / xatoda
+            // authReady oldin ham recsLoading=true → skeleton, katalog flash yo‘q
             const personalized = personalizedByCategory[categoryName];
-            const filteredMovies =
-              personalized?.length > 0
-                ? personalized
+            const hasPersonalized = personalized?.length > 0;
+            const waitingRecs = recsLoading && !hasPersonalized;
+            const filteredMovies = hasPersonalized
+              ? personalized
+              : waitingRecs
+                ? []
                 : getMoviesByCategory(categoryName);
             return (
               <React.Fragment key={sectionType}>
@@ -121,6 +127,7 @@ const Home = () => {
                   showHorizontalScroll={!!showHorizontalScroll}
                   headerTitle={t(titleKey)}
                   moreTo={moreTo}
+                  isLoading={waitingRecs}
                 />
                 {sectionType === 'koreaDrama' ? <TrillerSection /> : null}
                 {sectionType === 'russianMovies' ? <TopActors /> : null}

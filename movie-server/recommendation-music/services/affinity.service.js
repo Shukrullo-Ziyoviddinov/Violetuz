@@ -1,6 +1,9 @@
 /**
  * Affinity updates from listen / like events (music dimensions).
  *
+ * Persistence + I/O live here. Pure math lives in utils/affinityCalculator.js
+ * so guestAffinityBuilder can reuse the same formula without DB writes.
+ *
  * @module recommendation-music/services/affinity.service
  */
 
@@ -8,12 +11,14 @@
 
 const { scoringWeights } = require('../config/scoringWeights');
 const { dimensions, extractAllDimensionValues } = require('../dimensions');
+const { applyDecay, capListenBoost } = require('../utils/decay');
 const {
-  applyDecay,
-  computeListenBoost,
-  capListenBoost,
-  reinforceAffinity,
-} = require('../utils/decay');
+  resolveBoost,
+  collectDimensionKeys,
+  cellMapKey,
+  computeReinforcedCells,
+  computeListenAffinityDelta,
+} = require('../utils/affinityCalculator');
 const {
   findAffinityCells,
   bulkUpsertAffinities,
@@ -21,16 +26,6 @@ const {
 } = require('../repositories/userAffinity.repository');
 const { countPriorListens } = require('../repositories/listenEvent.repository');
 const { toContentKey } = require('../utils/contentKey');
-
-const resolveBoost = (listenEvent, priorListenCount, weights = scoringWeights) => {
-  let boost = computeListenBoost(listenEvent, weights.decay);
-
-  if (priorListenCount > 0) {
-    boost *= Math.min(1, weights.duplicateListenCap / (priorListenCount + 1));
-  }
-
-  return capListenBoost(boost, weights);
-};
 
 /**
  * Apply one listen to all registered dimensions.
@@ -62,7 +57,6 @@ const applyListenToAffinities = async (params) => {
   }
 
   const nowMs = now instanceof Date ? now.getTime() : now;
-  const nowDate = new Date(nowMs);
 
   const valuesByType =
     dimensionSnapshot && typeof dimensionSnapshot === 'object'
@@ -71,44 +65,34 @@ const applyListenToAffinities = async (params) => {
         ? extractAllDimensionValues(content, dims)
         : {};
 
-  /** @type {Array<{ dimensionType: string, dimensionValue: string }>} */
-  const keys = [];
-  for (const dim of dims) {
-    const values = Array.isArray(valuesByType[dim.type]) ? valuesByType[dim.type] : [];
-    for (const value of values) {
-      if (!value) continue;
-      keys.push({ dimensionType: dim.type, dimensionValue: String(value) });
-    }
-  }
-
+  const keys = collectDimensionKeys(valuesByType, dims);
   if (!keys.length) {
     return { updatedCells: 0, boost: 0, priorListenCount: 0, valuesByType };
   }
 
   const priorListenCount = await countPriorListens(userId, contentKey, listenEventId);
-  const boost = resolveBoost({ completionRate, liked }, priorListenCount, weights);
-
   const existing = await findAffinityCells(userId, categoryName, keys);
+
+  const { cells: scoredCells, boost } = computeListenAffinityDelta({
+    valuesByType,
+    existing,
+    completionRate,
+    liked,
+    priorListenCount,
+    nowMs,
+    dims,
+    weights,
+  });
+
   /** @type {Array<Object>} */
-  const cells = [];
-
-  for (const key of keys) {
-    const mapKey = `${key.dimensionType}\0${key.dimensionValue}`;
-    const prev = existing.get(mapKey);
-    const decayed = prev
-      ? applyDecay(prev.affinityScore, prev.updatedAt, weights.decay, nowMs)
-      : 0;
-    const nextScore = reinforceAffinity(decayed, boost, weights.decay, weights);
-
-    cells.push({
-      userId,
-      category: categoryName,
-      dimensionType: key.dimensionType,
-      dimensionValue: key.dimensionValue,
-      affinityScore: nextScore,
-      updatedAt: nowDate,
-    });
-  }
+  const cells = scoredCells.map((cell) => ({
+    userId,
+    category: categoryName,
+    dimensionType: cell.dimensionType,
+    dimensionValue: cell.dimensionValue,
+    affinityScore: cell.affinityScore,
+    updatedAt: cell.updatedAt,
+  }));
 
   const writeResult = await bulkUpsertAffinities(cells);
 
@@ -149,7 +133,6 @@ const applyLikeToAffinities = async (params) => {
   }
 
   const nowMs = now instanceof Date ? now.getTime() : now;
-  const nowDate = new Date(nowMs);
 
   const valuesByType =
     dimensionSnapshot && typeof dimensionSnapshot === 'object'
@@ -158,42 +141,31 @@ const applyLikeToAffinities = async (params) => {
         ? extractAllDimensionValues(content, dims)
         : {};
 
-  /** @type {Array<{ dimensionType: string, dimensionValue: string }>} */
-  const keys = [];
-  for (const dim of dims) {
-    const values = Array.isArray(valuesByType[dim.type]) ? valuesByType[dim.type] : [];
-    for (const value of values) {
-      if (!value) continue;
-      keys.push({ dimensionType: dim.type, dimensionValue: String(value) });
-    }
-  }
-
+  const keys = collectDimensionKeys(valuesByType, dims);
   if (!keys.length) {
     return { updatedCells: 0, boost: 0, valuesByType };
   }
 
   const boost = capListenBoost(weights.decay.likedBoost, weights);
   const existing = await findAffinityCells(userId, categoryName, keys);
+
+  const scoredCells = computeReinforcedCells({
+    keys,
+    existing,
+    boost,
+    nowMs,
+    weights,
+  });
+
   /** @type {Array<Object>} */
-  const cells = [];
-
-  for (const key of keys) {
-    const mapKey = `${key.dimensionType}\0${key.dimensionValue}`;
-    const prev = existing.get(mapKey);
-    const decayed = prev
-      ? applyDecay(prev.affinityScore, prev.updatedAt, weights.decay, nowMs)
-      : 0;
-    const nextScore = reinforceAffinity(decayed, boost, weights.decay, weights);
-
-    cells.push({
-      userId,
-      category: categoryName,
-      dimensionType: key.dimensionType,
-      dimensionValue: key.dimensionValue,
-      affinityScore: nextScore,
-      updatedAt: nowDate,
-    });
-  }
+  const cells = scoredCells.map((cell) => ({
+    userId,
+    category: categoryName,
+    dimensionType: cell.dimensionType,
+    dimensionValue: cell.dimensionValue,
+    affinityScore: cell.affinityScore,
+    updatedAt: cell.updatedAt,
+  }));
 
   const writeResult = await bulkUpsertAffinities(cells);
 
@@ -240,27 +212,19 @@ const applyUnlikeToAffinities = async (params) => {
         ? extractAllDimensionValues(content, dims)
         : {};
 
-  /** @type {Array<{ dimensionType: string, dimensionValue: string }>} */
-  const keys = [];
-  for (const dim of dims) {
-    const values = Array.isArray(valuesByType[dim.type]) ? valuesByType[dim.type] : [];
-    for (const value of values) {
-      if (!value) continue;
-      keys.push({ dimensionType: dim.type, dimensionValue: String(value) });
-    }
-  }
-
+  const keys = collectDimensionKeys(valuesByType, dims);
   if (!keys.length) {
     return { updatedCells: 0, boost: 0, valuesByType };
   }
 
   const penalty = capListenBoost(weights.decay.likedBoost, weights);
   const existing = await findAffinityCells(userId, categoryName, keys);
+
   /** @type {Array<Object>} */
   const cells = [];
 
   for (const key of keys) {
-    const mapKey = `${key.dimensionType}\0${key.dimensionValue}`;
+    const mapKey = cellMapKey(key.dimensionType, key.dimensionValue);
     const prev = existing.get(mapKey);
     if (!prev) continue;
 
@@ -304,4 +268,9 @@ module.exports = {
   applyLikeToAffinities,
   applyUnlikeToAffinities,
   loadAffinityMap,
+  computeListenAffinityDelta,
+  computeAffinityDelta: computeListenAffinityDelta,
+  collectDimensionKeys,
+  computeReinforcedCells,
+  cellMapKey,
 };

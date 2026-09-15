@@ -11,6 +11,9 @@ const { sendSuccess } = require('../../utils/response');
 const { scoringWeights } = require('../config/scoringWeights');
 const { getRecommendationsByCategory } = require('../services/serve.service');
 const { reportMusicProgress } = require('../services/progress.service');
+const {
+  getGuestRecommendationsByCategory,
+} = require('../services/guestRecommendations.service');
 
 /**
  * GET /api/music-recommendations/config/progress
@@ -44,16 +47,25 @@ const getByCategory = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/music-recommendations/progress
- * Body: { contentType, contentId, listenedSeconds, completionRate?, durationSec?, category? }
+ * POST /api/music-recommendations/:categoryNameMusic/guest
+ * Body: { localHistory: [{ m, c, ct, r, t }], contentType?, limit?, hydrate? }
+ * Auth YO‘Q. DB yozuv yo‘q.
  */
+const postGuestByCategory = asyncHandler(async (req, res) => {
+  const result = await getGuestRecommendationsByCategory({
+    category: req.params.categoryNameMusic,
+    contentType:
+      req.body?.contentType ?? req.query?.contentType ?? req.query?.type,
+    localHistory: req.body?.localHistory,
+    limit: req.body?.limit ?? req.query?.limit,
+    hydrate: req.body?.hydrate !== false && req.query?.hydrate !== 'false',
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
 /**
  * POST /api/music-recommendations/progress
- * Body:
- *   music|clip|concert: { contentType, contentId, listenedSeconds, durationSec?, category? }
- *   album: + { trackId, trackListenedSeconds?, albumDurationSec? }
- *
- * Gate ≥10s; affinity strength = completionRate (0..1).
  */
 const postProgress = asyncHandler(async (req, res) => {
   const result = await reportMusicProgress(req.authUser._id, {
@@ -74,5 +86,6 @@ const postProgress = asyncHandler(async (req, res) => {
 module.exports = {
   getProgressConfig,
   getByCategory,
+  postGuestByCategory,
   postProgress,
 };

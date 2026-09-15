@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { selectIsLoggedIn, selectAuthReady, selectProfile } from '../store/slices/userSlice';
-import { fetchMusicCategoryRecommendations } from '../api/musicRecommendationsApi';
+import { fetchViewerMusicCategoryRecommendations } from '../api/musicRecommendationsApi';
+import { getListenHistory } from '../utils/guestHistory/musicGuestHistory';
+import { GUEST_MUSIC_HISTORY_CHANGED } from '../utils/guestHistory/events';
 
 /** Music Home carousel uchun yetarli */
 const HOME_REC_LIMIT = 40;
 const HOME_FETCH_CONCURRENCY = 2;
+/** Faqat login lazy GET uchun */
 const HOME_PENDING_RETRY_DELAYS_MS = [2000, 4000, 8000, 12000, 20000];
 
 /**
@@ -39,19 +42,27 @@ async function runPool(items, concurrency, worker) {
 }
 
 /**
- * Login user uchun Music Home, Music/Album/Video Detail o‘ng rail —
- * category × contentType scoped. Guest / xato → bo‘sh map (katalog fallback).
- *
- * SimilarSongs / RecommendedClips / AlbumsForYou — ulanmaydi.
+ * Music Home / detail rails:
+ *  - Login → GET (lazy + SWR) — o‘zgarmagan
+ *  - Guest → POST /guest (localHistory bo‘sh → trending; bor → blend)
  *
  * @param {Array<{ category: string, contentType: string }>} sectionRequests
- * @returns {Record<string, Array>} map keyed by musicHomeRecKey(category, contentType)
+ * @returns {{ byKey: Record<string, Array>, isLoading: boolean }}
  */
 export function useHomeMusicCategoryRecommendations(sectionRequests = []) {
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const profile = useAppSelector(selectProfile);
   const [byKey, setByKey] = useState({});
+  // true by default — authReady oldin katalog flash yo‘q
+  const [isLoading, setIsLoading] = useState(true);
+  const [guestHistoryEpoch, setGuestHistoryEpoch] = useState(0);
+
+  useEffect(() => {
+    const onHistory = () => setGuestHistoryEpoch((n) => n + 1);
+    window.addEventListener(GUEST_MUSIC_HISTORY_CHANGED, onHistory);
+    return () => window.removeEventListener(GUEST_MUSIC_HISTORY_CHANGED, onHistory);
+  }, []);
 
   const requestsKey = useMemo(() => {
     const unique = new Map();
@@ -84,12 +95,28 @@ export function useHomeMusicCategoryRecommendations(sectionRequests = []) {
     let cancelled = false;
     const retryTimers = [];
 
-    if (!authReady || !isLoggedIn || !profile?.id || !requests.length) {
+    if (!authReady) {
       setByKey({});
+      setIsLoading(requests.length > 0);
+      return undefined;
+    }
+
+    if (!requests.length) {
+      setByKey({});
+      setIsLoading(false);
+      return undefined;
+    }
+
+    if (isLoggedIn && !profile?.id) {
+      setByKey({});
+      setIsLoading(true);
       return undefined;
     }
 
     setByKey({});
+    setIsLoading(true);
+
+    const guestHistory = isLoggedIn ? null : getListenHistory();
 
     const applyKey = (key, items) => {
       if (cancelled || !items?.length) return;
@@ -102,11 +129,13 @@ export function useHomeMusicCategoryRecommendations(sectionRequests = []) {
     const loadOne = async ({ category, contentType }, attempt = 0) => {
       const key = musicHomeRecKey(category, contentType);
       try {
-        const result = await fetchMusicCategoryRecommendations({
+        const result = await fetchViewerMusicCategoryRecommendations({
+          isLoggedIn,
           category,
           contentType,
           limit: HOME_REC_LIMIT,
-          lazy: true,
+          lazy: isLoggedIn,
+          localHistory: guestHistory ?? undefined,
         });
         if (cancelled) return;
 
@@ -114,6 +143,7 @@ export function useHomeMusicCategoryRecommendations(sectionRequests = []) {
         if (items.length) {
           applyKey(key, items);
           if (
+            isLoggedIn &&
             attempt === 0 &&
             (result.source === 'cache_stale' || result.queuedRefresh)
           ) {
@@ -125,6 +155,8 @@ export function useHomeMusicCategoryRecommendations(sectionRequests = []) {
           }
           return;
         }
+
+        if (!isLoggedIn) return;
 
         const pending =
           result.source === 'pending' || Boolean(result.queuedRefresh);
@@ -146,13 +178,16 @@ export function useHomeMusicCategoryRecommendations(sectionRequests = []) {
       }
     };
 
-    void runPool(requests, HOME_FETCH_CONCURRENCY, (req) => loadOne(req, 0));
+    void (async () => {
+      await runPool(requests, HOME_FETCH_CONCURRENCY, (req) => loadOne(req, 0));
+      if (!cancelled) setIsLoading(false);
+    })();
 
     return () => {
       cancelled = true;
       retryTimers.forEach((id) => clearTimeout(id));
     };
-  }, [authReady, isLoggedIn, profile?.id, requestsKey, requests]);
+  }, [authReady, isLoggedIn, profile?.id, requestsKey, requests, guestHistoryEpoch]);
 
-  return byKey;
+  return { byKey, isLoading };
 }

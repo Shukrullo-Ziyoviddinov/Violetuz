@@ -11,6 +11,8 @@ const unlikeHook = require('./unlikeHook.service');
 const progress = require('./progress.service');
 const trending = require('./trending.service');
 const blending = require('./blending.service');
+const guestRecommendations = require('./guestRecommendations.service');
+const guestAffinityBuilder = require('./guestAffinityBuilder.service');
 
 const namespaces = Object.freeze({
   scoring,
@@ -24,6 +26,8 @@ const namespaces = Object.freeze({
   progress,
   trending,
   blending,
+  guestRecommendations,
+  guestAffinityBuilder,
 });
 
 const api = Object.freeze({
@@ -42,6 +46,8 @@ const api = Object.freeze({
 
   precomputeUserCategoryRecommendations: precompute.precomputeUserCategoryRecommendations,
   getRecommendationsByCategory: serve.getRecommendationsByCategory,
+  getGuestRecommendationsByCategory:
+    guestRecommendations.getGuestRecommendationsByCategory,
   reportMusicProgress: progress.reportMusicProgress,
 
   enqueueMusicLikeHook: likeHook.enqueueMusicLikeHook,

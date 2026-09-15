@@ -11,6 +11,9 @@ import {
 } from '../../api/authApi';
 import { uploadFileDirectToR2 } from '../../api/uploadsApi';
 import { markNeedsAvatar, clearNeedsAvatar } from '../../authModalBridge';
+import { clearWatchHistory as clearGuestMovieWatchHistory } from '../../utils/guestHistory/movieGuestHistory';
+import { clearListenHistory as clearGuestMusicListenHistory } from '../../utils/guestHistory/musicGuestHistory';
+import { clearViewedMoviesHistory } from '../../context/ViewedMoviesContext';
 import '../Profile/ProfileEditModal.css';
 import './AuthModal.css';
 
@@ -231,6 +234,10 @@ const AuthModal = ({
         markNeedsAvatar();
         onStepChange?.('avatar');
         setAuthSession({ user: data.user });
+        // Privacy: guest localHistory DB’ga merge qilinmaydi — faqat tozalanadi
+        clearGuestMovieWatchHistory();
+        clearGuestMusicListenHistory();
+        clearViewedMoviesHistory();
         setError('');
         resetAvatarPick();
       } else {

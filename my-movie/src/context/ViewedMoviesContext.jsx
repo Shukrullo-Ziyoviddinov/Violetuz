@@ -2,6 +2,9 @@
  * Haqiqiy tomosha (≥5 daqiqa / qisqa film ~80%) dan keyin saqlanadi —
  * detail ochish emas. SearchModalTavsiya local signal sifatida ishlatadi.
  * Format: { items: [{ id, typeCategory, filterGenre, filterCountry }] }
+ *
+ * Privacy: register / to‘liq logout da tozalanadi (guest rec history bilan bir xil
+ * tamoyil — merge yo‘q, tiklash yo‘q).
  */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
@@ -27,6 +30,20 @@ const saveStored = (data) => {
   }
 };
 
+/** Imperative wipe (AuthModal / logout — Context tashqarisidan ham). */
+export const VIEWED_MOVIES_CLEARED_EVENT = 'violet:viewed-movies-cleared';
+
+export const clearViewedMoviesHistory = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(VIEWED_MOVIES_CLEARED_EVENT));
+  }
+};
+
 const ViewedMoviesContext = createContext(null);
 
 export const ViewedMoviesProvider = ({ children }) => {
@@ -36,13 +53,20 @@ export const ViewedMoviesProvider = ({ children }) => {
     saveStored(data);
   }, [data]);
 
+  // AuthModal / logout imperative clear — state ham sync (LS qayta yozilmasin)
+  useEffect(() => {
+    const onCleared = () => setData({ items: [] });
+    window.addEventListener(VIEWED_MOVIES_CLEARED_EVENT, onCleared);
+    return () => window.removeEventListener(VIEWED_MOVIES_CLEARED_EVENT, onCleared);
+  }, []);
+
   const addMovie = useCallback((movie) => {
     if (!movie?.id) return;
     const item = {
       id: movie.id,
       typeCategory: movie.typeCategory || [],
       filterGenre: movie.filterGenre || [],
-      filterCountry: movie.filterCountry || null
+      filterCountry: movie.filterCountry || null,
     };
     setData((prev) => {
       const filtered = prev.items.filter((i) => i.id !== movie.id);
@@ -51,10 +75,15 @@ export const ViewedMoviesProvider = ({ children }) => {
     });
   }, []);
 
+  const clearViewed = useCallback(() => {
+    clearViewedMoviesHistory();
+    setData({ items: [] });
+  }, []);
+
   const getViewedItems = useCallback(() => data.items, [data.items]);
 
   return (
-    <ViewedMoviesContext.Provider value={{ addMovie, getViewedItems }}>
+    <ViewedMoviesContext.Provider value={{ addMovie, getViewedItems, clearViewed }}>
       {children}
     </ViewedMoviesContext.Provider>
   );

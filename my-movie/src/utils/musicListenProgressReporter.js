@@ -3,6 +3,7 @@
  * Threshold: ≥10s (server music engine) — not movie 5 min.
  *
  * Album: per-track seconds; server sums for total minutes / completion.
+ * Guest: after gate → local violet_guest_music_v1 only (no /progress).
  */
 
 import {
@@ -10,6 +11,7 @@ import {
   fetchMusicProgressConfig,
   DEFAULT_MUSIC_PROGRESS_CONFIG,
 } from '../api/musicRecommendationsApi';
+import { addListenEvent as addGuestMusicListenEvent } from './guestHistory/musicGuestHistory';
 
 const PROGRESS_REPORT_INTERVAL_MS = 30_000;
 
@@ -131,16 +133,14 @@ export function createMusicListenProgressReporter() {
 
     if (!eligible) return;
 
-    if (!isLoggedIn) {
-      markedRef.current = true;
-      return;
-    }
-
     const cat = String(category || '').trim();
-    if (!cat) return;
-
     const { affinityMinDelta } = progressConfigRef.current;
-    const completionRate = buildCompletionRate(listened, dur);
+    // Album: login server uses albumDurationSec; guest must match (not track duration)
+    const completionDur =
+      isAlbum && Number.isFinite(albumDurationSec) && albumDurationSec > 0
+        ? albumDurationSec
+        : dur;
+    const completionRate = buildCompletionRate(listened, completionDur);
     const lastC = lastReportedCompletionRef.current;
     const now = Date.now();
     const raisedEnough =
@@ -152,11 +152,19 @@ export function createMusicListenProgressReporter() {
 
     if (!force && !raisedEnough && !intervalOk && markedRef.current) return;
 
-    progressInFlightRef.current = true;
     lastReportedCompletionRef.current = completionRate;
     lastReportAtRef.current = now;
     markedRef.current = true;
 
+    // Guest: hech qachon /music-recommendations/progress ga yuborilmaydi
+    if (!isLoggedIn) {
+      addGuestMusicListenEvent(contentId, cat, completionRate, contentType);
+      return;
+    }
+
+    if (!cat) return;
+
+    progressInFlightRef.current = true;
     try {
       await reportMusicProgress({
         contentType,

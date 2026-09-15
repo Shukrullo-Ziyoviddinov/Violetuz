@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { selectIsLoggedIn, selectAuthReady, selectProfile } from '../store/slices/userSlice';
-import { fetchCategoryRecommendations } from '../api/recommendationsApi';
+import { fetchViewerCategoryRecommendations } from '../api/recommendationsApi';
+import { getWatchHistory } from '../utils/guestHistory/movieGuestHistory';
+import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/guestHistory/events';
 
 /** Home carousel uchun yetarli; DEFAULT_LIMIT=10 */
 const HOME_REC_LIMIT = 40;
@@ -10,6 +12,7 @@ const HOME_FETCH_CONCURRENCY = 2;
 /**
  * pending / queuedRefresh — SWR poll backoff (ms).
  * Bitta 4s emas: bir necha urinish, oxirgi gacha kutadi.
+ * Faqat login lazy GET uchun.
  */
 const HOME_PENDING_RETRY_DELAYS_MS = [2000, 4000, 8000, 12000, 20000];
 
@@ -35,19 +38,30 @@ async function runPool(items, concurrency, worker) {
 }
 
 /**
- * Login user uchun home categoryName bo‘limlariga personalized tartib.
- * Guest / xato → bo‘sh map (katalog fallback).
+ * Home categoryName bo‘limlari:
+ *  - Login → GET (lazy + SWR) — o‘zgarmagan
+ *  - Guest → POST /guest (localHistory bo‘sh → trending; bor → blend)
  *
- * Cold-start: lazy=1 + concurrency + progressive SWR + multi-retry poll.
+ * Katalog faqat fetch tugagach / xatoda fallback.
+ * authReady=false paytida isLoading=true — katalog flash yo‘q.
  *
  * @param {string[]} categoryNames
- * @returns {Record<string, Array>}
+ * @returns {{ byCategory: Record<string, Array>, isLoading: boolean }}
  */
 export function useHomeCategoryRecommendations(categoryNames = []) {
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const profile = useAppSelector(selectProfile);
   const [byCategory, setByCategory] = useState({});
+  // true by default — authReady oldin katalog flash yo‘q
+  const [isLoading, setIsLoading] = useState(true);
+  const [guestHistoryEpoch, setGuestHistoryEpoch] = useState(0);
+
+  useEffect(() => {
+    const onHistory = () => setGuestHistoryEpoch((n) => n + 1);
+    window.addEventListener(GUEST_MOVIE_HISTORY_CHANGED, onHistory);
+    return () => window.removeEventListener(GUEST_MOVIE_HISTORY_CHANGED, onHistory);
+  }, []);
 
   const categoriesKey = useMemo(() => {
     const unique = [
@@ -69,12 +83,28 @@ export function useHomeCategoryRecommendations(categoryNames = []) {
     let cancelled = false;
     const retryTimers = [];
 
-    if (!authReady || !isLoggedIn || !profile?.id || !categories.length) {
+    // authReady oldin: katalog flash emas — loading ushlab turiladi
+    if (!authReady) {
       setByCategory({});
+      setIsLoading(categories.length > 0);
+      return undefined;
+    }
+
+    if (!categories.length) {
+      setByCategory({});
+      setIsLoading(false);
+      return undefined;
+    }
+
+    // Login: profile kelmaguncha kutish (katalog flash yo‘q)
+    if (isLoggedIn && !profile?.id) {
+      setByCategory({});
+      setIsLoading(true);
       return undefined;
     }
 
     setByCategory({});
+    setIsLoading(true);
 
     const applyCategory = (category, movies) => {
       if (cancelled || !movies?.length) return;
@@ -84,25 +114,30 @@ export function useHomeCategoryRecommendations(categoryNames = []) {
       });
     };
 
+    // Snapshot once per effect — guest history for all category POSTs
+    const guestHistory = isLoggedIn ? null : getWatchHistory();
+
     /**
      * @param {string} category
-     * @param {number} attempt — 0 = first fetch
+     * @param {number} attempt — 0 = first fetch (login pending only)
      */
     const loadOne = async (category, attempt = 0) => {
       try {
-        const result = await fetchCategoryRecommendations({
+        const result = await fetchViewerCategoryRecommendations({
+          isLoggedIn,
           category,
           limit: HOME_REC_LIMIT,
-          lazy: true,
+          lazy: isLoggedIn,
+          localHistory: guestHistory ?? undefined,
         });
         if (cancelled) return;
 
         const movies = Array.isArray(result.movies) ? result.movies : [];
         if (movies.length) {
           applyCategory(category, movies);
-          // Stale-while-revalidate: cache_stale + queuedRefresh bo‘lsa ham
-          // bir marta yana yangilab olish (fon precompute tugagach).
+          // Login SWR only
           if (
+            isLoggedIn &&
             attempt === 0 &&
             (result.source === 'cache_stale' || result.queuedRefresh)
           ) {
@@ -114,6 +149,8 @@ export function useHomeCategoryRecommendations(categoryNames = []) {
           }
           return;
         }
+
+        if (!isLoggedIn) return;
 
         const pending =
           result.source === 'pending' || Boolean(result.queuedRefresh);
@@ -131,19 +168,22 @@ export function useHomeCategoryRecommendations(categoryNames = []) {
         }, delay);
         retryTimers.push(timer);
       } catch {
-        /* katalog fallback */
+        /* katalog fallback after isLoading=false */
       }
     };
 
-    void runPool(categories, HOME_FETCH_CONCURRENCY, (category) =>
-      loadOne(category, 0)
-    );
+    void (async () => {
+      await runPool(categories, HOME_FETCH_CONCURRENCY, (category) =>
+        loadOne(category, 0)
+      );
+      if (!cancelled) setIsLoading(false);
+    })();
 
     return () => {
       cancelled = true;
       retryTimers.forEach((id) => clearTimeout(id));
     };
-  }, [authReady, isLoggedIn, profile?.id, categoriesKey, categories]);
+  }, [authReady, isLoggedIn, profile?.id, categoriesKey, categories, guestHistoryEpoch]);
 
-  return byCategory;
+  return { byCategory, isLoading };
 }

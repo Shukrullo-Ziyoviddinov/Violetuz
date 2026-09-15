@@ -11,6 +11,7 @@ const comboKeys = require('./comboKeys');
 const clamp = require('./clamp');
 const decay = require('./decay');
 const movieSignals = require('./movieSignals');
+const affinityCalculator = require('./affinityCalculator');
 
 module.exports = {
   ...values,
@@ -18,4 +19,5 @@ module.exports = {
   ...clamp,
   ...decay,
   ...movieSignals,
+  ...affinityCalculator,
 };

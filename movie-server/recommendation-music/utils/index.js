@@ -8,4 +8,5 @@ module.exports = {
   ...require('./contentSignals'),
   ...require('./decay'),
   ...require('./progressRules'),
+  ...require('./affinityCalculator'),
 };

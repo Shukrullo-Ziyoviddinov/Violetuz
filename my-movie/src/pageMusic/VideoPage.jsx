@@ -187,7 +187,7 @@ const VideoPage = () => {
     ];
   }, [video, isConcertVideo]);
 
-  const personalizedByKey =
+  const { byKey: personalizedByKey, isLoading: recsLoading } =
     useHomeMusicCategoryRecommendations(detailRecRequests);
 
   const relatedMeta = useMemo(() => {
@@ -202,6 +202,12 @@ const VideoPage = () => {
           list: personalized,
         };
       }
+      if (recsLoading) {
+        return {
+          ...catalogRelatedMeta,
+          list: [],
+        };
+      }
     }
     return catalogRelatedMeta;
   }, [
@@ -209,6 +215,7 @@ const VideoPage = () => {
     isConcertVideo,
     personalizedByKey,
     catalogRelatedMeta,
+    recsLoading,
   ]);
 
   const relatedList = Array.isArray(relatedMeta.list) ? relatedMeta.list : [];

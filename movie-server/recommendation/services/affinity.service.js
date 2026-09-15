@@ -1,6 +1,9 @@
 /**
  * Affinity updates from watch events — generic over AffinityDimension registry.
  *
+ * Persistence + I/O live here. Pure math lives in utils/affinityCalculator.js
+ * so guestAffinityBuilder can reuse the same formula without DB writes.
+ *
  * @module recommendation/services/affinity.service
  */
 
@@ -8,37 +11,20 @@
 
 const { scoringWeights } = require('../config/scoringWeights');
 const { dimensions, extractAllDimensionValues } = require('../dimensions');
+const { applyDecay, capWatchBoost } = require('../utils/decay');
 const {
-  applyDecay,
-  computeWatchBoost,
-  capWatchBoost,
-  reinforceAffinity,
-} = require('../utils/decay');
+  resolveBoost,
+  collectDimensionKeys,
+  cellMapKey,
+  computeReinforcedCells,
+  computeWatchAffinityDelta,
+} = require('../utils/affinityCalculator');
 const {
   findAffinityCells,
   bulkUpsertAffinities,
   getAffinityMapWithMeta,
 } = require('../repositories/userAffinity.repository');
 const { countPriorWatches } = require('../repositories/watchEvent.repository');
-
-/**
- * Effective boost after duplicate-watch dampening.
- *
- * @param {Object} watchEvent
- * @param {number} priorWatchCount
- * @param {import('../types/recommendation.types').ScoringWeightsConfig} [weights]
- * @returns {number}
- */
-const resolveBoost = (watchEvent, priorWatchCount, weights = scoringWeights) => {
-  let boost = computeWatchBoost(watchEvent, weights.decay);
-
-  if (priorWatchCount > 0) {
-    // Rewatch: shrink boost so repeated events cannot explode affinity
-    boost *= Math.min(1, weights.duplicateWatchCap / (priorWatchCount + 1));
-  }
-
-  return capWatchBoost(boost, weights);
-};
 
 /**
  * Apply one watch to all registered dimensions (additive, not filtering).
@@ -78,7 +64,6 @@ const applyWatchToAffinities = async (params) => {
   }
 
   const nowMs = now instanceof Date ? now.getTime() : now;
-  const nowDate = new Date(nowMs);
 
   const valuesByType =
     dimensionSnapshot && typeof dimensionSnapshot === 'object'
@@ -87,45 +72,34 @@ const applyWatchToAffinities = async (params) => {
         ? extractAllDimensionValues(movie, dims)
         : {};
 
-  /** @type {Array<{ dimensionType: string, dimensionValue: string }>} */
-  const keys = [];
-  for (const dim of dims) {
-    const values = Array.isArray(valuesByType[dim.type]) ? valuesByType[dim.type] : [];
-    for (const value of values) {
-      if (!value) continue;
-      keys.push({ dimensionType: dim.type, dimensionValue: String(value) });
-    }
-  }
-
+  const keys = collectDimensionKeys(valuesByType, dims);
   if (!keys.length) {
     return { updatedCells: 0, boost: 0, priorWatchCount: 0, valuesByType };
   }
 
   const priorWatchCount = await countPriorWatches(userId, movieId, watchEventId);
-  const boost = resolveBoost({ completionRate, liked }, priorWatchCount, weights);
-
   const existing = await findAffinityCells(userId, categoryName, keys);
 
+  const { cells: scoredCells, boost } = computeWatchAffinityDelta({
+    valuesByType,
+    existing,
+    completionRate,
+    liked,
+    priorWatchCount,
+    nowMs,
+    dims,
+    weights,
+  });
+
   /** @type {Array<Object>} */
-  const cells = [];
-
-  for (const key of keys) {
-    const mapKey = `${key.dimensionType}\0${key.dimensionValue}`;
-    const prev = existing.get(mapKey);
-    const decayed = prev
-      ? applyDecay(prev.affinityScore, prev.updatedAt, weights.decay, nowMs)
-      : 0;
-    const nextScore = reinforceAffinity(decayed, boost, weights.decay, weights);
-
-    cells.push({
-      userId,
-      category: categoryName,
-      dimensionType: key.dimensionType,
-      dimensionValue: key.dimensionValue,
-      affinityScore: nextScore,
-      updatedAt: nowDate,
-    });
-  }
+  const cells = scoredCells.map((cell) => ({
+    userId,
+    category: categoryName,
+    dimensionType: cell.dimensionType,
+    dimensionValue: cell.dimensionValue,
+    affinityScore: cell.affinityScore,
+    updatedAt: cell.updatedAt,
+  }));
 
   const writeResult = await bulkUpsertAffinities(cells);
 
@@ -171,7 +145,6 @@ const applyLikeToAffinities = async (params) => {
   }
 
   const nowMs = now instanceof Date ? now.getTime() : now;
-  const nowDate = new Date(nowMs);
 
   const valuesByType =
     dimensionSnapshot && typeof dimensionSnapshot === 'object'
@@ -180,45 +153,32 @@ const applyLikeToAffinities = async (params) => {
         ? extractAllDimensionValues(movie, dims)
         : {};
 
-  /** @type {Array<{ dimensionType: string, dimensionValue: string }>} */
-  const keys = [];
-  for (const dim of dims) {
-    const values = Array.isArray(valuesByType[dim.type]) ? valuesByType[dim.type] : [];
-    for (const value of values) {
-      if (!value) continue;
-      keys.push({ dimensionType: dim.type, dimensionValue: String(value) });
-    }
-  }
-
+  const keys = collectDimensionKeys(valuesByType, dims);
   if (!keys.length) {
     return { updatedCells: 0, boost: 0, valuesByType };
   }
 
   // Like ≠ watch: only likedBoost (no watchBoost / completion).
   const boost = capWatchBoost(weights.decay.likedBoost, weights);
-
   const existing = await findAffinityCells(userId, categoryName, keys);
 
+  const scoredCells = computeReinforcedCells({
+    keys,
+    existing,
+    boost,
+    nowMs,
+    weights,
+  });
+
   /** @type {Array<Object>} */
-  const cells = [];
-
-  for (const key of keys) {
-    const mapKey = `${key.dimensionType}\0${key.dimensionValue}`;
-    const prev = existing.get(mapKey);
-    const decayed = prev
-      ? applyDecay(prev.affinityScore, prev.updatedAt, weights.decay, nowMs)
-      : 0;
-    const nextScore = reinforceAffinity(decayed, boost, weights.decay, weights);
-
-    cells.push({
-      userId,
-      category: categoryName,
-      dimensionType: key.dimensionType,
-      dimensionValue: key.dimensionValue,
-      affinityScore: nextScore,
-      updatedAt: nowDate,
-    });
-  }
+  const cells = scoredCells.map((cell) => ({
+    userId,
+    category: categoryName,
+    dimensionType: cell.dimensionType,
+    dimensionValue: cell.dimensionValue,
+    affinityScore: cell.affinityScore,
+    updatedAt: cell.updatedAt,
+  }));
 
   const writeResult = await bulkUpsertAffinities(cells);
 
@@ -264,16 +224,7 @@ const applyUnlikeToAffinities = async (params) => {
         ? extractAllDimensionValues(movie, dims)
         : {};
 
-  /** @type {Array<{ dimensionType: string, dimensionValue: string }>} */
-  const keys = [];
-  for (const dim of dims) {
-    const values = Array.isArray(valuesByType[dim.type]) ? valuesByType[dim.type] : [];
-    for (const value of values) {
-      if (!value) continue;
-      keys.push({ dimensionType: dim.type, dimensionValue: String(value) });
-    }
-  }
-
+  const keys = collectDimensionKeys(valuesByType, dims);
   if (!keys.length) {
     return { updatedCells: 0, boost: 0, valuesByType };
   }
@@ -285,7 +236,7 @@ const applyUnlikeToAffinities = async (params) => {
   const cells = [];
 
   for (const key of keys) {
-    const mapKey = `${key.dimensionType}\0${key.dimensionValue}`;
+    const mapKey = cellMapKey(key.dimensionType, key.dimensionValue);
     const prev = existing.get(mapKey);
     if (!prev) continue;
 
@@ -332,4 +283,10 @@ module.exports = {
   applyLikeToAffinities,
   applyUnlikeToAffinities,
   loadAffinityMap,
+  // Pure kernel re-exports (guest builder / tests)
+  computeWatchAffinityDelta,
+  computeAffinityDelta: computeWatchAffinityDelta,
+  collectDimensionKeys,
+  computeReinforcedCells,
+  cellMapKey,
 };

@@ -4,6 +4,7 @@
  * SimilarSongs / RecommendedClips / AlbumsForYou — ulanmaydi.
  */
 import { resolveApiBaseUrl } from './apiBase';
+import { getListenHistory as getMusicGuestListenHistory } from '../utils/guestHistory/musicGuestHistory';
 
 const API_BASE_URL = resolveApiBaseUrl();
 
@@ -34,7 +35,7 @@ const parseJson = async (response) => {
 };
 
 /**
- * Personalized list for a categoryNameMusic section.
+ * Personalized list for a categoryNameMusic section (login).
  *
  * @param {Object} opts
  * @param {string} opts.category — categoryNameMusic
@@ -77,7 +78,90 @@ export const fetchMusicCategoryRecommendations = async ({
     contentType: data?.contentType || typeKey || null,
     generatedAt: data?.generatedAt || null,
     queuedRefresh: Boolean(data?.queuedRefresh),
+    alpha: data?.alpha,
+    experienceCount: data?.experienceCount,
   };
+};
+
+/**
+ * Guest blend — POST /music-recommendations/:category/guest
+ * localHistory bo‘sh → α≈0 trending; tarix bor → personal+trending.
+ */
+export const fetchGuestMusicCategoryRecommendations = async ({
+  category,
+  contentType,
+  localHistory = [],
+  limit = 120,
+  hydrate = true,
+} = {}) => {
+  const categoryKey = String(category || '').trim();
+  if (!categoryKey) {
+    throw new Error('categoryNameMusic is required');
+  }
+
+  const typeKey = String(contentType || '').trim();
+  const history = Array.isArray(localHistory) ? localHistory : [];
+
+  const res = await musicRecFetch(
+    `/music-recommendations/${encodeURIComponent(categoryKey)}/guest`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        localHistory: history,
+        contentType: typeKey || undefined,
+        limit,
+        hydrate,
+      }),
+    }
+  );
+  const data = await parseJson(res);
+  const itemsHydrated = Array.isArray(data?.itemsHydrated) ? data.itemsHydrated : [];
+
+  return {
+    itemsHydrated,
+    items: Array.isArray(data?.items) ? data.items : [],
+    source: data?.source,
+    category: data?.category || data?.categoryNameMusic || categoryKey,
+    contentType: data?.contentType || typeKey || null,
+    generatedAt: data?.generatedAt || null,
+    queuedRefresh: false,
+    alpha: data?.alpha,
+    experienceCount: data?.experienceCount,
+  };
+};
+
+/**
+ * Login → GET (mavjud). Guest → POST /guest + local listen history.
+ */
+export const fetchViewerMusicCategoryRecommendations = async ({
+  isLoggedIn,
+  category,
+  contentType,
+  limit = 120,
+  hydrate = true,
+  lazy = false,
+  localHistory,
+} = {}) => {
+  if (isLoggedIn) {
+    return fetchMusicCategoryRecommendations({
+      category,
+      contentType,
+      limit,
+      hydrate,
+      lazy,
+    });
+  }
+
+  const history =
+    localHistory != null ? localHistory : getMusicGuestListenHistory();
+
+  return fetchGuestMusicCategoryRecommendations({
+    category,
+    contentType,
+    localHistory: history,
+    limit,
+    hydrate,
+  });
 };
 
 /**

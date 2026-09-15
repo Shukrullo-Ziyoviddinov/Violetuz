@@ -21,6 +21,8 @@ const unlikeHook = require('./unlikeHook.service');
 const progress = require('./progress.service');
 const trending = require('./trending.service');
 const blending = require('./blending.service');
+const guestRecommendations = require('./guestRecommendations.service');
+const guestAffinityBuilder = require('./guestAffinityBuilder.service');
 
 /** Full modules — use for helpers not on the curated flat API. */
 const namespaces = Object.freeze({
@@ -35,6 +37,8 @@ const namespaces = Object.freeze({
   progress,
   trending,
   blending,
+  guestRecommendations,
+  guestAffinityBuilder,
 });
 
 /**
@@ -63,6 +67,8 @@ const api = Object.freeze({
 
   precomputeUserCategoryRecommendations: precompute.precomputeUserCategoryRecommendations,
   getRecommendationsByCategory: serve.getRecommendationsByCategory,
+  getGuestRecommendationsByCategory:
+    guestRecommendations.getGuestRecommendationsByCategory,
   reportMovieProgress: progress.reportMovieProgress,
 
   enqueueMovieLikeHook: likeHook.enqueueMovieLikeHook,

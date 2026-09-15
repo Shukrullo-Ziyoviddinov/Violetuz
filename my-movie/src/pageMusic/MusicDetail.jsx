@@ -252,7 +252,7 @@ const MusicDetail = () => {
     return [{ category, contentType }];
   }, [sectionConfig?.categoryNameMusic, sectionConfig?.wishlistType]);
 
-  const personalizedByKey =
+  const { byKey: personalizedByKey, isLoading: recsLoading } =
     useHomeMusicCategoryRecommendations(detailRecRequests);
 
   const catalogTrendList = useMemo(() => {
@@ -275,9 +275,10 @@ const MusicDetail = () => {
       const personalized =
         personalizedByKey[musicHomeRecKey(category, contentType)];
       if (personalized?.length) return personalized;
+      if (recsLoading) return [];
     }
     return catalogTrendList;
-  }, [sectionConfig, personalizedByKey, catalogTrendList]);
+  }, [sectionConfig, personalizedByKey, catalogTrendList, recsLoading]);
 
   const {
     currentMusic,

@@ -10,6 +10,9 @@ const { sendSuccess } = require('../../utils/response');
 const { scoringWeights } = require('../config/scoringWeights');
 const { getRecommendationsByCategory } = require('../services/serve.service');
 const { reportMovieProgress } = require('../services/progress.service');
+const {
+  getGuestRecommendationsByCategory,
+} = require('../services/guestRecommendations.service');
 
 /**
  * GET /api/recommendations/config/progress
@@ -43,6 +46,22 @@ const getByCategory = asyncHandler(async (req, res) => {
 });
 
 /**
+ * POST /api/recommendations/:category/guest
+ * Body: { localHistory: [{ m, c, r, t }, ...], limit?, hydrate? }
+ * Auth YO‘Q. DB’ga yozilmaydi — faqat kelgan tarix + trending blend.
+ */
+const postGuestByCategory = asyncHandler(async (req, res) => {
+  const result = await getGuestRecommendationsByCategory({
+    category: req.params.category,
+    localHistory: req.body?.localHistory,
+    limit: req.body?.limit ?? req.query?.limit,
+    hydrate: req.body?.hydrate !== false && req.query?.hydrate !== 'false',
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * POST /api/recommendations/progress
  * Body: { movieId, watchedSeconds, completionRate?, durationSec? }
  * Min 5 daqiqa (yoki qisqa film ~80%) → ko'rildi + max progress upsert.
@@ -62,5 +81,6 @@ const postProgress = asyncHandler(async (req, res) => {
 module.exports = {
   getProgressConfig,
   getByCategory,
+  postGuestByCategory,
   postProgress,
 };

@@ -4,6 +4,7 @@
  * SearchModalTavsiya, topRated, similar, nav chips (filterCategory) — ulanmaydi.
  */
 import { resolveApiBaseUrl } from './apiBase';
+import { getWatchHistory as getMovieGuestWatchHistory } from '../utils/guestHistory/movieGuestHistory';
 
 const API_BASE_URL = resolveApiBaseUrl();
 
@@ -105,7 +106,86 @@ export const fetchCategoryRecommendations = async ({
     items: Array.isArray(data?.items) ? data.items : [],
     generatedAt: data?.generatedAt || null,
     queuedRefresh: Boolean(data?.queuedRefresh),
+    alpha: data?.alpha,
+    experienceCount: data?.experienceCount,
   };
+};
+
+/**
+ * Guest personalized / trending blend — POST /recommendations/:category/guest
+ * localHistory bo‘sh bo‘lsa ham chaqiriladi (α≈0 → trending og‘irligi).
+ * DB’ga yozilmaydi.
+ *
+ * @param {Object} opts
+ * @param {string} opts.category
+ * @param {Array<{m,c,r,t}>} [opts.localHistory]
+ * @param {number} [opts.limit]
+ * @param {boolean} [opts.hydrate]
+ */
+export const fetchGuestCategoryRecommendations = async ({
+  category,
+  localHistory = [],
+  limit = 120,
+  hydrate = true,
+} = {}) => {
+  const categoryKey = String(category || '').trim();
+  if (!categoryKey) {
+    throw new Error('category is required');
+  }
+
+  const history = Array.isArray(localHistory) ? localHistory : [];
+
+  const res = await recommendationsFetch(
+    `/recommendations/${encodeURIComponent(categoryKey)}/guest`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        localHistory: history,
+        limit,
+        hydrate,
+      }),
+    }
+  );
+  const data = await parseJson(res);
+  const movies = Array.isArray(data?.movies) ? data.movies : [];
+
+  return {
+    movies,
+    source: data?.source,
+    category: data?.category || categoryKey,
+    items: Array.isArray(data?.items) ? data.items : [],
+    generatedAt: data?.generatedAt || null,
+    queuedRefresh: false,
+    alpha: data?.alpha,
+    experienceCount: data?.experienceCount,
+  };
+};
+
+/**
+ * Login → GET (mavjud). Guest → POST /guest + localStorage tarix.
+ * Login path o‘zgarmaydi.
+ */
+export const fetchViewerCategoryRecommendations = async ({
+  isLoggedIn,
+  category,
+  limit = 120,
+  hydrate = true,
+  lazy = false,
+  localHistory,
+} = {}) => {
+  if (isLoggedIn) {
+    return fetchCategoryRecommendations({ category, limit, hydrate, lazy });
+  }
+
+  const history =
+    localHistory != null ? localHistory : getMovieGuestWatchHistory();
+
+  return fetchGuestCategoryRecommendations({
+    category,
+    localHistory: history,
+    limit,
+    hydrate,
+  });
 };
 
 /**

@@ -217,7 +217,7 @@ const MusicAlbumDetail = () => {
     return [{ category, contentType }];
   }, [sectionConfig?.categoryNameMusic, sectionConfig?.wishlistType]);
 
-  const personalizedByKey =
+  const { byKey: personalizedByKey, isLoading: recsLoading } =
     useHomeMusicCategoryRecommendations(detailRecRequests);
 
   const catalogAlbumList = useMemo(() => {
@@ -236,9 +236,10 @@ const MusicAlbumDetail = () => {
       const personalized =
         personalizedByKey[musicHomeRecKey(category, contentType)];
       if (personalized?.length) return personalized;
+      if (recsLoading) return [];
     }
     return catalogAlbumList;
-  }, [sectionConfig, personalizedByKey, catalogAlbumList]);
+  }, [sectionConfig, personalizedByKey, catalogAlbumList, recsLoading]);
 
   const [lyricsModalOpen, setLyricsModalOpen] = useState(false);
   const [lyricsSheetOpen, setLyricsSheetOpen] = useState(false);

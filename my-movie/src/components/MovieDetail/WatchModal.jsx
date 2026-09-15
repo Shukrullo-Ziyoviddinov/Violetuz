@@ -5,6 +5,7 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { reportMovieProgress, fetchProgressConfig, DEFAULT_PROGRESS_CONFIG } from '../../api/recommendationsApi';
+import { addWatchEvent as addGuestMovieWatchEvent } from '../../utils/guestHistory/movieGuestHistory';
 import AdsMovie from './AdsMovie';
 import WatchSettingsModal from './WatchSettingsModal';
 import './WatchModal.css';
@@ -207,8 +208,6 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       // Local "ko'rildi" — server bilan bir xil threshold (detail ochish emas)
       markLocalViewed();
 
-      if (!isLoggedIn) return;
-
       const { affinityMinDelta } = progressConfigRef.current;
       const completionRate = buildCompletionRate(watched, dur);
       const lastC = lastReportedCompletionRef.current;
@@ -222,17 +221,25 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
 
       if (!force && !raisedEnough && !intervalOk && viewMarkedRef.current) return;
 
-      progressInFlightRef.current = true;
       lastReportedCompletionRef.current = completionRate;
       lastReportAtRef.current = now;
       viewMarkedRef.current = true;
 
+      // Guest: hech qachon /progress ga yuborilmaydi — faqat localStorage
+      if (!isLoggedIn) {
+        const category = String(movie.categoryName || '').trim();
+        addGuestMovieWatchEvent(movie.id, category, completionRate);
+        return;
+      }
+
+      progressInFlightRef.current = true;
       try {
         await reportMovieProgress({
           movieId: movie.id,
           watchedSeconds: watched,
           completionRate,
           durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
+          category: movie.categoryName || undefined,
         });
       } catch {
         lastReportedCompletionRef.current = lastC;

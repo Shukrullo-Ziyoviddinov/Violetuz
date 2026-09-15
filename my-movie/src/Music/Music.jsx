@@ -90,14 +90,29 @@ const Music = () => {
     return requests;
   }, [blocks, getSectionById, getClipSectionById, getConcertSectionById]);
 
-  const personalizedByKey = useHomeMusicCategoryRecommendations(homeRecRequests);
+  const { byKey: personalizedByKey, isLoading: recsLoading } =
+    useHomeMusicCategoryRecommendations(homeRecRequests);
 
+  /**
+   * API birinchi; katalog faqat fetch tugagach / bo‘sh / xato.
+   * authReady/recsLoading paytida waiting — katalog flash yo‘q.
+   */
   const resolveSectionItems = (categoryNameMusic, wishlistType, catalogItems) => {
     const contentType = wishlistTypeToContentType(wishlistType);
     const personalized =
       contentType &&
       personalizedByKey[musicHomeRecKey(categoryNameMusic, contentType)];
-    return personalized?.length > 0 ? personalized : catalogItems;
+    const hasPersonalized = personalized?.length > 0;
+    if (hasPersonalized) {
+      return { items: personalized, waitingRecs: false };
+    }
+    if (recsLoading) {
+      return { items: [], waitingRecs: true };
+    }
+    return {
+      items: catalogItems == null ? null : catalogItems,
+      waitingRecs: false,
+    };
   };
 
   return (
@@ -141,7 +156,7 @@ const Music = () => {
                   const clipSection = getClipSectionById(block.sectionId);
                   if (clipSection) {
                     const catalog = getClipsByCategory(clipSection.categoryNameMusic);
-                    const data = resolveSectionItems(
+                    const { items: data, waitingRecs } = resolveSectionItems(
                       clipSection.categoryNameMusic,
                       clipSection.wishlistType || 'klip',
                       catalog
@@ -151,8 +166,9 @@ const Music = () => {
                         <ClipsCards
                           section={{
                             ...clipSection,
-                            data,
+                            data: data || [],
                           }}
+                          isLoading={waitingRecs}
                         />
                         {clipSection.id === 'sevgi-va-ichq' ? (
                           <WeeklyTopArtist />
@@ -166,7 +182,7 @@ const Music = () => {
                     const catalog = getConcertsByCategory(
                       concertSection.categoryNameMusic
                     );
-                    const data = resolveSectionItems(
+                    const { items: data, waitingRecs } = resolveSectionItems(
                       concertSection.categoryNameMusic,
                       concertSection.wishlistType || 'konsert',
                       catalog
@@ -176,8 +192,9 @@ const Music = () => {
                         key={concertSection.id}
                         section={{
                           ...concertSection,
-                          data,
+                          data: data || [],
                         }}
+                        isLoading={waitingRecs}
                       />
                     );
                   }
@@ -205,17 +222,17 @@ const Music = () => {
                 if (block.type === 'music') {
                   const section = getSectionById(block.sectionId);
                   if (section) {
+                    const { items, waitingRecs } = resolveSectionItems(
+                      section.categoryNameMusic,
+                      section.wishlistType || 'music',
+                      null
+                    );
                     return (
                       <React.Fragment key={section.id}>
                         <MusicCards
                           section={section}
-                          items={
-                            resolveSectionItems(
-                              section.categoryNameMusic,
-                              section.wishlistType || 'music',
-                              null
-                            ) || undefined
-                          }
+                          items={items == null ? undefined : items}
+                          isLoading={waitingRecs}
                         />
                         {section.id === 'music-drops' ? <TopArtist /> : null}
                       </React.Fragment>

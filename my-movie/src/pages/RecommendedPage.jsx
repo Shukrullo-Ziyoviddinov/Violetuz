@@ -5,9 +5,11 @@ import { useMoviesApi } from '../context/MoviesApiContext';
 import { useAppSelector } from '../store/hooks';
 import { selectIsLoggedIn, selectAuthReady, selectProfile } from '../store/slices/userSlice';
 import {
-  fetchCategoryRecommendations,
+  fetchViewerCategoryRecommendations,
   resolveRecommendationCategoryKey,
 } from '../api/recommendationsApi';
+import { getWatchHistory } from '../utils/guestHistory/movieGuestHistory';
+import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/guestHistory/events';
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
 import './RecommendedPage.css';
@@ -91,7 +93,15 @@ const RecommendedPage = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedAge, setSelectedAge] = useState(null);
   const [personalizedMovies, setPersonalizedMovies] = useState(null);
-  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  // true by default — authReady oldin katalog flash yo‘q
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
+  const [guestHistoryEpoch, setGuestHistoryEpoch] = useState(0);
+
+  useEffect(() => {
+    const onHistory = () => setGuestHistoryEpoch((n) => n + 1);
+    window.addEventListener(GUEST_MOVIE_HISTORY_CHANGED, onHistory);
+    return () => window.removeEventListener(GUEST_MOVIE_HISTORY_CHANGED, onHistory);
+  }, []);
 
   useEffect(() => {
     if (genreFromUrl) {
@@ -160,22 +170,28 @@ const RecommendedPage = () => {
   useEffect(() => {
     let cancelled = false;
 
-    if (
-      !authReady ||
-      !isLoggedIn ||
-      !profile?.id ||
-      !recommendationCategoryKey ||
-      moviesLoading
-    ) {
+    // Nav chip / similar — personalized API yo‘q
+    if (!recommendationCategoryKey) {
       setPersonalizedMovies(null);
       setRecommendationsLoading(false);
       return undefined;
     }
 
+    // authReady / movies / login profile — katalog flash emas
+    if (!authReady || moviesLoading || (isLoggedIn && !profile?.id)) {
+      setPersonalizedMovies(null);
+      setRecommendationsLoading(true);
+      return undefined;
+    }
+
+    // Kategoriya almashganda eski ro‘yxatni darhol tozalash
+    setPersonalizedMovies(null);
     setRecommendationsLoading(true);
-    fetchCategoryRecommendations({
+    fetchViewerCategoryRecommendations({
+      isLoggedIn,
       category: recommendationCategoryKey,
       limit: 120,
+      localHistory: isLoggedIn ? undefined : getWatchHistory(),
     })
       .then((result) => {
         if (cancelled) return;
@@ -198,12 +214,19 @@ const RecommendedPage = () => {
     profile?.id,
     recommendationCategoryKey,
     moviesLoading,
+    guestHistoryEpoch,
   ]);
+
+  // Fetch davomida / authReady oldin — eski personalized yo‘q, katalog flash yo‘q
+  const showRecLoading =
+    Boolean(recommendationCategoryKey) && recommendationsLoading;
 
   const categoryFiltered =
     personalizedMovies && personalizedMovies.length > 0
       ? personalizedMovies
-      : localCategoryMovies;
+      : showRecLoading
+        ? []
+        : localCategoryMovies;
 
   // VL faqat anonslar sahifasida yashiriladi; aralash kontentda VL ko'rinadi, lekin anonslar VL filteriga kirmaydi
   const hideVlFilter = categoryId === 'anonslar';
