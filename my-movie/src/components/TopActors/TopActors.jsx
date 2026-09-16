@@ -5,6 +5,7 @@ import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import { useActorsApi } from '../../context/ActorsApiContext';
 import { useTopActors } from '../../hooks/useTopActors';
+import { topRankSrc } from '../../utils/topRankPreview';
 import './TopActors.css';
 
 /**
@@ -81,7 +82,12 @@ const TopActors = () => {
                         alt={resolveName(actor)}
                         className="top-actors-img"
                       />
-                      <span className="top-actors-rank">{actor.rank}</span>
+                      <img
+                        className="top-actors-rank"
+                        src={encodeURI(topRankSrc(actor.rank))}
+                        alt=""
+                        aria-hidden="true"
+                      />
                     </div>
                     <p className="top-actors-name">{resolveName(actor)}</p>
                     <FollowingButton
