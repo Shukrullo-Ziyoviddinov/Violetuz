@@ -16,6 +16,9 @@ const {
 const {
   getWeeklyTopMoviesFromWatchEvents,
 } = require('../services/weeklyTopMoviesRead.service');
+const {
+  getMonthlyTopMoviesFromWatchEvents,
+} = require('../services/monthlyTopMoviesRead.service');
 
 /**
  * GET /api/recommendations/config/progress
@@ -38,6 +41,18 @@ const getProgressConfig = asyncHandler(async (_req, res) => {
  */
 const getWeeklyTopMovies = asyncHandler(async (req, res) => {
   const result = await getWeeklyTopMoviesFromWatchEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/recommendations/monthly-top
+ * Public. Hafta bilan bir xil ranker, oyna 30 kun. Yozuv yo‘q.
+ */
+const getMonthlyTopMovies = asyncHandler(async (req, res) => {
+  const result = await getMonthlyTopMoviesFromWatchEvents({
     limit: req.query?.limit,
   });
 
@@ -96,6 +111,7 @@ const postProgress = asyncHandler(async (req, res) => {
 module.exports = {
   getProgressConfig,
   getWeeklyTopMovies,
+  getMonthlyTopMovies,
   getByCategory,
   postGuestByCategory,
   postProgress,

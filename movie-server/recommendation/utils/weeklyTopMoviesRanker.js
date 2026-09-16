@@ -61,7 +61,7 @@ const sameTieGroup = (a, b) =>
 
 /**
  * @param {unknown[]} rawRows
- * @param {{ limit?: number, minViews?: number }} [opts]
+ * @param {{ limit?: number, minViews?: number, maxLimit?: number }} [opts]
  * @returns {Array<{ movieId: string, viewCount: number, watchedSeconds: number, rank: number }>}
  */
 const rankWeeklyTopMovies = (rawRows, opts = {}) => {
@@ -73,7 +73,12 @@ const rankWeeklyTopMovies = (rawRows, opts = {}) => {
 
   let limit = Number(opts.limit);
   if (!Number.isFinite(limit) || limit <= 0) limit = cfg.topLimit;
-  limit = Math.min(cfg.topMaxLimit ?? cfg.topLimit, Math.floor(limit));
+  const maxLimitRaw = Number(opts.maxLimit);
+  const maxLimit =
+    Number.isFinite(maxLimitRaw) && maxLimitRaw > 0
+      ? Math.floor(maxLimitRaw)
+      : cfg.topMaxLimit ?? cfg.topLimit;
+  limit = Math.min(maxLimit, Math.floor(limit));
 
   const normalized = (Array.isArray(rawRows) ? rawRows : [])
     .map(normalizeRow)
