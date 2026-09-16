@@ -27,3 +27,120 @@
   height: 100%;
   object-fit: contain;
 }
+
+.ads-movie-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 14px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
+
+.ads-movie-progress-time {
+  flex-shrink: 0;
+  min-width: 42px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+}
+
+.ads-movie-progress-time--end {
+  text-align: right;
+}
+
+.ads-movie-progress-track {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ads-movie-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  border-radius: inherit;
+  background: #ffd400;
+}
+
+.ads-movie-skip {
+  position: absolute;
+  right: 16px;
+  bottom: 48px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  cursor: default;
+  pointer-events: auto;
+}
+
+.ads-movie-skip:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.ads-movie-skip--ready {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111;
+  border-color: transparent;
+}
+
+.ads-movie-skip--ready:hover {
+  background: #fff;
+}
+
+.ads-movie-skip-timer {
+  min-width: 2ch;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.9;
+}
+
+.ads-movie-skip-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .ads-movie-progress {
+    gap: 8px;
+    padding: 16px 12px 10px;
+  }
+
+  .ads-movie-progress-time {
+    min-width: 38px;
+    font-size: 12px;
+  }
+
+  .ads-movie-skip {
+    right: 12px;
+    bottom: 42px;
+    min-height: 36px;
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+}
