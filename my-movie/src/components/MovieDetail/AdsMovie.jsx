@@ -1,9 +1,10 @@
-import React, { forwardRef, useRef, useState, useImperativeHandle, useCallback } from 'react';
+import React, { forwardRef, useRef, useState, useEffect, useImperativeHandle, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import './AdsMovie.css';
 
 const SKIP_AFTER_SECONDS = 10;
+const PLAYBACK_ICON_MS = 2000;
 
 const formatAdTime = (seconds) => {
   if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
@@ -16,20 +17,46 @@ const formatAdTime = (seconds) => {
 const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) => {
   const { t } = useTranslation();
   const adVideoRef = useRef(null);
+  const playbackIconTimerRef = useRef(null);
   const [showAdOverlay, setShowAdOverlay] = useState(false);
   const [adCurrentTime, setAdCurrentTime] = useState(0);
   const [adDuration, setAdDuration] = useState(0);
+  const [isAdPlaying, setIsAdPlaying] = useState(false);
+  const [playbackIcon, setPlaybackIcon] = useState('play');
+  const [showPlaybackIcon, setShowPlaybackIcon] = useState(false);
   const { getActiveAd } = useMoviesApi();
   const activeAd = getActiveAd();
   const playedSeconds = Number.isFinite(adCurrentTime) ? adCurrentTime : 0;
   const skipSecondsLeft = Math.max(0, Math.ceil(SKIP_AFTER_SECONDS - playedSeconds));
   const canSkip = playedSeconds >= SKIP_AFTER_SECONDS;
 
+  const clearPlaybackIconTimer = () => {
+    if (playbackIconTimerRef.current) {
+      clearTimeout(playbackIconTimerRef.current);
+      playbackIconTimerRef.current = null;
+    }
+  };
+
+  const revealPlaybackIcon = (icon) => {
+    setPlaybackIcon(icon);
+    setShowPlaybackIcon(true);
+    clearPlaybackIconTimer();
+    playbackIconTimerRef.current = setTimeout(() => {
+      setShowPlaybackIcon(false);
+      playbackIconTimerRef.current = null;
+    }, PLAYBACK_ICON_MS);
+  };
+
+  useEffect(() => () => clearPlaybackIconTimer(), []);
+
   const showAd = useCallback(() => {
     if (!activeAd || !activeAd.isActive) return;
     if (videoRef?.current) {
       videoRef.current.pause();
     }
+    clearPlaybackIconTimer();
+    setShowPlaybackIcon(false);
+    setIsAdPlaying(false);
     setAdCurrentTime(0);
     setAdDuration(0);
     setShowAdOverlay(true);
@@ -43,6 +70,9 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
   }, [activeAd, videoRef, onVisibilityChange]);
 
   const handleAdEnded = useCallback(() => {
+    clearPlaybackIconTimer();
+    setShowPlaybackIcon(false);
+    setIsAdPlaying(false);
     setAdCurrentTime(0);
     setAdDuration(0);
     setShowAdOverlay(false);
@@ -59,9 +89,25 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
 
   useImperativeHandle(ref, () => ({ showAd }));
 
-  const handleSkipClick = () => {
+  const handleSkipClick = (e) => {
+    e.stopPropagation();
     if (!canSkip) return;
     handleAdEnded();
+  };
+
+  const toggleAdPlayback = (e) => {
+    e.stopPropagation();
+    const video = adVideoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play().catch(() => setIsAdPlaying(false));
+      setIsAdPlaying(true);
+      revealPlaybackIcon('play');
+      return;
+    }
+    video.pause();
+    setIsAdPlaying(false);
+    revealPlaybackIcon('pause');
   };
 
   const syncAdProgress = () => {
@@ -89,8 +135,31 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
         onTimeUpdate={syncAdProgress}
         onLoadedMetadata={syncAdProgress}
         onDurationChange={syncAdProgress}
+        onPlay={() => setIsAdPlaying(true)}
+        onPause={() => setIsAdPlaying(false)}
         onEnded={handleAdEnded}
       />
+      <button
+        type="button"
+        className="ads-movie-hit"
+        onClick={toggleAdPlayback}
+        aria-label={isAdPlaying ? t('player.pause') : t('player.play')}
+      />
+      <div
+        className={`ads-movie-playback${showPlaybackIcon ? ' show' : ''}`}
+        aria-hidden={!showPlaybackIcon}
+      >
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="currentColor">
+          {playbackIcon === 'pause' ? (
+            <>
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </>
+          ) : (
+            <polygon points="6 4 20 12 6 20 6 4" />
+          )}
+        </svg>
+      </div>
       <div className="ads-movie-progress">
         <span className="ads-movie-progress-time">{formatAdTime(adCurrentTime)}</span>
         <div
