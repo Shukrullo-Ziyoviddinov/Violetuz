@@ -13,6 +13,9 @@ const { reportMovieProgress } = require('../services/progress.service');
 const {
   getGuestRecommendationsByCategory,
 } = require('../services/guestRecommendations.service');
+const {
+  getWeeklyTopMoviesFromWatchEvents,
+} = require('../services/weeklyTopMoviesRead.service');
 
 /**
  * GET /api/recommendations/config/progress
@@ -27,6 +30,18 @@ const getProgressConfig = asyncHandler(async (_req, res) => {
       affinityMinDelta: progress.affinityMinDelta ?? 0.1,
     },
   });
+});
+
+/**
+ * GET /api/recommendations/weekly-top
+ * Public. Faqat WatchEvent o‘qiydi — progress/affinity yozilmaydi.
+ */
+const getWeeklyTopMovies = asyncHandler(async (req, res) => {
+  const result = await getWeeklyTopMoviesFromWatchEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
 });
 
 /**
@@ -80,6 +95,7 @@ const postProgress = asyncHandler(async (req, res) => {
 
 module.exports = {
   getProgressConfig,
+  getWeeklyTopMovies,
   getByCategory,
   postGuestByCategory,
   postProgress,

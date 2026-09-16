@@ -2,6 +2,7 @@
  * Recommendation HTTP routes.
  *
  * GET  /api/recommendations/config/progress       (public knobs)
+ * GET  /api/recommendations/weekly-top            (public, read-only WatchEvent)
  * POST /api/recommendations/:category/guest       (public, rate-limited, no DB write)
  * GET  /api/recommendations/:category?limit=      (auth)
  * POST /api/recommendations/progress              (auth) — threshold + max progress upsert
@@ -21,6 +22,7 @@ const {
 const router = Router();
 
 router.get('/config/progress', recommendationController.getProgressConfig);
+router.get('/weekly-top', recommendationController.getWeeklyTopMovies);
 router.post('/progress', requireAuth, recommendationController.postProgress);
 
 // Guest path — before auth GET so :category/guest is not swallowed incorrectly

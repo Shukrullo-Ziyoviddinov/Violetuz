@@ -224,6 +224,34 @@ export const DEFAULT_PROGRESS_CONFIG = Object.freeze({
  * Server threshold knobs (FE/BE copy-paste drift oldini olish).
  * GET /api/recommendations/config/progress
  */
+/**
+ * Haftaning top filmlari (public): GET /api/recommendations/weekly-top
+ * Limit/oyna server configda. Login GET va guest POST ga tegilmaydi.
+ *
+ * @param {{ limit?: number }} [opts]
+ * @returns {Promise<{ movies: Array<{ movieId: string, viewCount: number, watchedSeconds: number, rank: number }>, windowDays?: number, limit?: number, minViews?: number, source?: string }>}
+ */
+export const fetchWeeklyTopMovies = async ({ limit } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/recommendations/weekly-top?${query.toString()}`
+    : '/recommendations/weekly-top';
+
+  const res = await recommendationsFetch(path);
+  const data = await parseJson(res);
+  const movies = Array.isArray(data?.movies) ? data.movies : [];
+
+  return {
+    movies,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    source: data?.source || (movies.length ? 'weekly_top_movies' : 'empty'),
+  };
+};
+
 export const fetchProgressConfig = async () => {
   const res = await recommendationsFetch('/recommendations/config/progress');
   const data = await parseJson(res);
