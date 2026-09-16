@@ -23,6 +23,7 @@ const MoviePosterItem = ({
   toggleWishlist,
   t,
   blockClick,
+  rankSrc = '',
 }) => {
   const imgSrc = movie.homeImg
     ? movie.homeImg[contentLang] || movie.homeImg.uz || movie.homeImg.ru || ''
@@ -34,7 +35,7 @@ const MoviePosterItem = ({
   const isSoon = movie.category === 'anonslar';
   const showRating =
     !isSoon && movie.rating != null && movie.rating !== '' && movie.rating !== 'none';
-  const showAge = movie.ageRestriction != null;
+  const showAge = !rankSrc && movie.ageRestriction != null;
 
   const year = movie.specs?.year;
   const countries = Array.isArray(movie.specs?.countries)
@@ -126,8 +127,16 @@ const MoviePosterItem = ({
             ) : (
               <div className="movies-item-badge movies-item-badge-fhd">FHD</div>
             )}
-            {showAge && (
-              <div className="movies-item-badge movies-item-badge-age">{movie.ageRestriction}+</div>
+            {rankSrc ? (
+              <img
+                className="movies-item-weekly-rank"
+                src={encodeURI(rankSrc)}
+                alt=""
+              />
+            ) : (
+              showAge && (
+                <div className="movies-item-badge movies-item-badge-age">{movie.ageRestriction}+</div>
+              )
             )}
             {showRating && (
               <div className="movies-item-rating">
@@ -156,6 +165,7 @@ const Movies = ({
   hideHeader = false,
   moreTo = null,
   isLoading: isLoadingProp = null,
+  showRankBadge = false,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -243,10 +253,12 @@ const Movies = ({
               className="movies-item-badge movies-item-badge-fhd movies-item-badge--skeleton"
               aria-hidden="true"
             />
-            <span
-              className="movies-item-badge movies-item-badge-age movies-item-badge--skeleton"
-              aria-hidden="true"
-            />
+            {!showRankBadge && (
+              <span
+                className="movies-item-badge movies-item-badge-age movies-item-badge--skeleton"
+                aria-hidden="true"
+              />
+            )}
             <span
               className="movies-item-rating movies-item-rating--skeleton"
               aria-hidden="true"
@@ -271,6 +283,7 @@ const Movies = ({
         toggleWishlist={toggleWishlist}
         t={t}
         blockClick={isLoading}
+        rankSrc={showRankBadge ? movie.weeklyRankSrc || '' : ''}
       />
     );
   };
