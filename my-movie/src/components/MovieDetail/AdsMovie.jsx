@@ -18,6 +18,7 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
   const { t } = useTranslation();
   const adVideoRef = useRef(null);
   const playbackIconTimerRef = useRef(null);
+  const touchActionAtRef = useRef(0);
   const [showAdOverlay, setShowAdOverlay] = useState(false);
   const [adCurrentTime, setAdCurrentTime] = useState(0);
   const [adDuration, setAdDuration] = useState(0);
@@ -89,14 +90,27 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
 
   useImperativeHandle(ref, () => ({ showAd }));
 
-  const handleSkipClick = (e) => {
+  const stopAdTouch = (e) => {
     e.stopPropagation();
+  };
+
+  const consumeTouchAction = (e) => {
+    stopAdTouch(e);
+    if (e.type === 'touchend') {
+      touchActionAtRef.current = Date.now();
+      return false;
+    }
+    return Date.now() - touchActionAtRef.current < 700;
+  };
+
+  const handleSkipClick = (e) => {
+    if (consumeTouchAction(e)) return;
     if (!canSkip) return;
     handleAdEnded();
   };
 
   const toggleAdPlayback = (e) => {
-    e.stopPropagation();
+    if (consumeTouchAction(e)) return;
     const video = adVideoRef.current;
     if (!video) return;
     if (video.paused) {
@@ -126,12 +140,17 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
   if (!showAdOverlay || !activeAd) return null;
 
   return (
-    <div className="ads-movie-overlay show">
+    <div
+      className="ads-movie-overlay show"
+      onTouchStart={stopAdTouch}
+      onTouchEnd={stopAdTouch}
+    >
       <video
         ref={adVideoRef}
         src={activeAd.videoUrl}
         className="ads-movie-video"
         playsInline
+        style={{ pointerEvents: 'none' }}
         onTimeUpdate={syncAdProgress}
         onLoadedMetadata={syncAdProgress}
         onDurationChange={syncAdProgress}
@@ -143,6 +162,7 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
         type="button"
         className="ads-movie-hit"
         onClick={toggleAdPlayback}
+        onTouchEnd={toggleAdPlayback}
         aria-label={isAdPlaying ? t('player.pause') : t('player.play')}
       />
       <div
@@ -178,7 +198,8 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
         type="button"
         className={`ads-movie-skip${canSkip ? ' ads-movie-skip--ready' : ''}`}
         onClick={handleSkipClick}
-        disabled={!canSkip}
+        onTouchStart={stopAdTouch}
+        onTouchEnd={handleSkipClick}
         aria-disabled={!canSkip}
         aria-label={canSkip ? t('player.skipAd') : `${t('player.skipAd')} ${skipSecondsLeft}s`}
       >

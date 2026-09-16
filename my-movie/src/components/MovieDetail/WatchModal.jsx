@@ -326,7 +326,8 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       e.target.closest('.watch-modal-bottom-controls') ||
       e.target.closest('.watch-modal-controls-overlay') ||
       e.target.closest('.watch-settings-modal') ||
-      e.target.closest('.watch-settings-modal-backdrop')
+      e.target.closest('.watch-settings-modal-backdrop') ||
+      e.target.closest('.ads-movie-overlay')
     ) return;
     setTouchStart(e.touches[0].clientY);
     setTouchEnd(null);
@@ -646,6 +647,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       e.target.closest('.watch-modal-bottom-controls') ||
       e.target.closest('.watch-settings-modal') ||
       e.target.closest('.watch-settings-modal-backdrop') ||
+      e.target.closest('.ads-movie-overlay') ||
       e.target.closest('input')
     ) return;
     const touch = e.touches[0];
@@ -659,6 +661,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       e.target.closest('.watch-modal-bottom-controls') ||
       e.target.closest('.watch-settings-modal') ||
       e.target.closest('.watch-settings-modal-backdrop') ||
+      e.target.closest('.ads-movie-overlay') ||
       e.target.closest('input')
     ) return;
     const touch = e.changedTouches?.[0];
