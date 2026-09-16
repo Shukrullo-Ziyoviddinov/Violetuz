@@ -58,10 +58,12 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   const hasUserStartedWatchingRef = useRef(false);
   const lastAdAtVideoTimeRef = useRef(-1); // -1 = birinchi reklama hali ko'rsatilmagan
 
-  // "Ko'rildi" + progress — faqat asosiy video ijrosida yig'ilgan vaqt
+  // "Ko'rildi" + progress — ijro va oldinga o'tkazish. Orqaga ayirilmaydi.
   const viewMarkedRef = useRef(false);
   const localViewedMarkedRef = useRef(false);
   const accumulatedWatchSecRef = useRef(0);
+  const watchHighWaterRef = useRef(0);
+  const mediaTimeRef = useRef(0);
   const lastWatchTickWallRef = useRef(null);
   const lastReportedCompletionRef = useRef(null);
   const lastReportAtRef = useRef(0);
@@ -167,6 +169,8 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     viewMarkedRef.current = false;
     localViewedMarkedRef.current = false;
     accumulatedWatchSecRef.current = 0;
+    watchHighWaterRef.current = 0;
+    mediaTimeRef.current = 0;
     lastWatchTickWallRef.current = null;
     lastReportedCompletionRef.current = null;
     lastReportAtRef.current = 0;
@@ -285,6 +289,21 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     lastWatchTickWallRef.current = now;
   }, [syncWatchProgress]);
 
+  // Oldinga sakrash ( +10 yoki progress ). Allaqachon o'tilgan oraliq qayta yozilmaydi.
+  const creditForwardSeek = (fromTime, toTime) => {
+    if (showAdOverlayRef.current) return;
+    const from = Number(fromTime);
+    const to = Number(toTime);
+    if (!Number.isFinite(from) || !Number.isFinite(to) || to <= from + 0.4) return;
+    const coveredTo = Math.max(watchHighWaterRef.current, from);
+    const delta = to - coveredTo;
+    watchHighWaterRef.current = Math.max(watchHighWaterRef.current, to);
+    mediaTimeRef.current = to;
+    if (delta <= 0.4) return;
+    accumulatedWatchSecRef.current += delta;
+    void syncWatchProgress();
+  };
+
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {
       clearTimeout(hideControlsTimeoutRef.current);
@@ -370,8 +389,14 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   };
 
   const handleForward10 = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = Math.min(videoRef.current.duration, videoRef.current.currentTime + 10);
+    const video = videoRef.current;
+    if (video) {
+      const from = video.currentTime;
+      const dur = video.duration;
+      const to = Number.isFinite(dur) ? Math.min(dur, from + 10) : from + 10;
+      video.currentTime = to;
+      setCurrentTime(to);
+      creditForwardSeek(from, to);
     }
     showControlsWithDelay();
   };
@@ -459,8 +484,14 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       setCurrentTime(ct);
       if (showAdOverlayRef.current) {
         lastWatchTickWallRef.current = null;
+        mediaTimeRef.current = ct;
         return;
       }
+      const jump = ct - mediaTimeRef.current;
+      if (jump > 0 && jump < 2.5) {
+        watchHighWaterRef.current = Math.max(watchHighWaterRef.current, ct);
+      }
+      mediaTimeRef.current = ct;
       accumulateWatchTime();
       if (isPlayingRef.current && hasUserStartedWatchingRef.current && activeAd?.isActive) {
         const nextAdSlot = Math.floor(ct / AD_INTERVAL_SECONDS);
@@ -503,9 +534,11 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     e.stopPropagation();
     const newTime = updateProgress(e.clientX, e.currentTarget);
     if (videoRef.current && newTime >= 0) {
+      const from = videoRef.current.currentTime;
       videoRef.current.currentTime = newTime;
       setCurrentTime(newTime);
       setPreviewTime(0);
+      creditForwardSeek(from, newTime);
     }
   };
 
@@ -514,7 +547,13 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   const handleProgressMouseUp = (e) => {
     if (isDragging) {
       e.stopPropagation();
-      if (videoRef.current && previewTime >= 0) { videoRef.current.currentTime = previewTime; setCurrentTime(previewTime); setPreviewTime(0); }
+      if (videoRef.current && previewTime >= 0) {
+        const from = videoRef.current.currentTime;
+        videoRef.current.currentTime = previewTime;
+        setCurrentTime(previewTime);
+        setPreviewTime(0);
+        creditForwardSeek(from, previewTime);
+      }
       setIsDragging(false);
     }
   };
@@ -522,7 +561,13 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   const handleProgressTouchMove = (e) => { e.stopPropagation(); if (isDragging) updateProgress(e.touches[0].clientX, e.currentTarget); };
   const handleProgressTouchEnd = (e) => {
     e.stopPropagation();
-    if (isDragging && videoRef.current && previewTime >= 0) { videoRef.current.currentTime = previewTime; setCurrentTime(previewTime); setPreviewTime(0); }
+    if (isDragging && videoRef.current && previewTime >= 0) {
+      const from = videoRef.current.currentTime;
+      videoRef.current.currentTime = previewTime;
+      setCurrentTime(previewTime);
+      setPreviewTime(0);
+      creditForwardSeek(from, previewTime);
+    }
     setIsDragging(false);
   };
 
