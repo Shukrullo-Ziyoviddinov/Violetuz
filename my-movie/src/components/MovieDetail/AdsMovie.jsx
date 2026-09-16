@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, useEffect, useImperativeHandle, useCallback } from 'react';
+import React, { forwardRef, useRef, useState, useImperativeHandle, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import './AdsMovie.css';
@@ -17,12 +17,13 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
   const { t } = useTranslation();
   const adVideoRef = useRef(null);
   const [showAdOverlay, setShowAdOverlay] = useState(false);
-  const [skipSecondsLeft, setSkipSecondsLeft] = useState(SKIP_AFTER_SECONDS);
   const [adCurrentTime, setAdCurrentTime] = useState(0);
   const [adDuration, setAdDuration] = useState(0);
   const { getActiveAd } = useMoviesApi();
   const activeAd = getActiveAd();
-  const canSkip = skipSecondsLeft <= 0;
+  const playedSeconds = Number.isFinite(adCurrentTime) ? adCurrentTime : 0;
+  const skipSecondsLeft = Math.max(0, Math.ceil(SKIP_AFTER_SECONDS - playedSeconds));
+  const canSkip = playedSeconds >= SKIP_AFTER_SECONDS;
 
   const showAd = useCallback(() => {
     if (!activeAd || !activeAd.isActive) return;
@@ -57,21 +58,6 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
   }, [videoRef, onVisibilityChange, onAdEnded]);
 
   useImperativeHandle(ref, () => ({ showAd }));
-
-  useEffect(() => {
-    if (!showAdOverlay) return undefined;
-    setSkipSecondsLeft(SKIP_AFTER_SECONDS);
-    const id = window.setInterval(() => {
-      setSkipSecondsLeft((prev) => {
-        if (prev <= 1) {
-          window.clearInterval(id);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, [showAdOverlay]);
 
   const handleSkipClick = () => {
     if (!canSkip) return;
