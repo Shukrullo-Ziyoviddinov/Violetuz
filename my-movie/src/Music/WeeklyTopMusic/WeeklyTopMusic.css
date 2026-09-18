@@ -27,13 +27,17 @@
   gap: 0.75rem;
   padding: 0.65rem 0.75rem;
   border-radius: 16px;
+  border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.06);
   cursor: pointer;
   box-sizing: border-box;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.weekly-top-music-card:hover,
+.weekly-top-music-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .weekly-top-music-card--active {
   background: rgba(255, 255, 255, 0.1);
 }
@@ -110,13 +114,12 @@
 .weekly-top-music-views {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
   margin: 0;
   padding: 0;
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.2;
   cursor: default;

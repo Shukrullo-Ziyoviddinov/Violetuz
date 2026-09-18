@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
@@ -40,6 +41,7 @@ const WeeklyTopMusicDuration = ({ item, isCurrent, playerDuration }) => {
  */
 const WeeklyTopMusic = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { items, loading } = useWeeklyTopMusic();
   const { allMusic, musicLoading, getArtistById } = useMusicApi();
@@ -47,6 +49,7 @@ const WeeklyTopMusic = () => {
     currentMusic,
     isPlaying,
     duration: playerDuration,
+    dominantColor,
     loadAndPlayTrack,
     togglePlay,
     getTitle: getPlayerTitle,
@@ -96,12 +99,17 @@ const WeeklyTopMusic = () => {
   };
 
   const handleCardClick = (item) => {
-    if (currentMusic && String(currentMusic.id) === String(item.id)) {
-      togglePlay();
-      return;
-    }
-    loadAndPlayTrack(item.id, { autoplay: true, playlist: displayItems });
+    if (item?.id == null) return;
+    navigate(`/music/${item.id}`);
   };
+
+  const activeCardStyle =
+    dominantColor && typeof dominantColor.r === 'number'
+      ? {
+          background: `rgba(${dominantColor.r}, ${dominantColor.g}, ${dominantColor.b}, 0.25)`,
+          border: `1px solid rgba(${dominantColor.r}, ${dominantColor.g}, ${dominantColor.b}, 0.5)`,
+        }
+      : undefined;
 
   if (!waiting && displayItems.length === 0) return null;
 
@@ -142,6 +150,7 @@ const WeeklyTopMusic = () => {
                       className={`weekly-top-music-card${
                         active ? ' weekly-top-music-card--active' : ''
                       }`}
+                      style={active ? activeCardStyle : undefined}
                       onClick={() => handleCardClick(item)}
                       role="button"
                       tabIndex={0}
@@ -172,11 +181,6 @@ const WeeklyTopMusic = () => {
                           {getArtistName(item)}
                         </span>
                         <div className="weekly-top-music-meta-row">
-                          <WeeklyTopMusicDuration
-                            item={item}
-                            isCurrent={!!active}
-                            playerDuration={playerDuration}
-                          />
                           <ViewCount
                             itemId={item.id}
                             type="music"
@@ -184,6 +188,11 @@ const WeeklyTopMusic = () => {
                             iconKind="headphones"
                             record={false}
                             className="weekly-top-music-views"
+                          />
+                          <WeeklyTopMusicDuration
+                            item={item}
+                            isCurrent={!!active}
+                            playerDuration={playerDuration}
                           />
                         </div>
                       </div>
