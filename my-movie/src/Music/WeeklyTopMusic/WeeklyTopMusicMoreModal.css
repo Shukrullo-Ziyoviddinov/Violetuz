@@ -1,0 +1,173 @@
+html.weekly-top-music-more-open,
+body.weekly-top-music-more-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* —— Desktop: ⋯ ostidan —— */
+.weekly-top-music-more-desktop {
+  position: fixed;
+  z-index: 1250;
+  min-width: 180px;
+  padding: 0.4rem;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  pointer-events: none;
+}
+
+.weekly-top-music-more-desktop.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* —— Mobile sheet —— */
+.weekly-top-music-more-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1250;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.weekly-top-music-more-overlay.is-visible {
+  opacity: 1;
+}
+
+.weekly-top-music-more-sheet {
+  width: 100%;
+  max-width: 100%;
+  background: #121212;
+  border-radius: 16px 16px 0 0;
+  color: #fff;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  overscroll-behavior: none;
+  will-change: transform;
+}
+
+.weekly-top-music-more-sheet.is-open {
+  transform: translateY(0);
+}
+
+.weekly-top-music-more-sheet.is-dragging {
+  transition: none;
+}
+
+.weekly-top-music-more-sheet.is-closing {
+  pointer-events: none;
+}
+
+.weekly-top-music-more-drag-zone {
+  padding: 0.55rem 1rem 0.25rem;
+  touch-action: none;
+  user-select: none;
+}
+
+.weekly-top-music-more-handle {
+  width: 42px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  margin: 0 auto;
+}
+
+.weekly-top-music-more-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.weekly-top-music-more-desktop .weekly-top-music-more-actions {
+  padding: 0;
+  gap: 0.2rem;
+}
+
+.weekly-top-music-more-share-wrap {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.weekly-top-music-more-share-wrap .share-button-wrapper,
+.weekly-top-music-more-share-wrap .weekly-top-music-more-share.share-button-wrapper {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  z-index: auto !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+.weekly-top-music-more-action,
+.weekly-top-music-more-share-wrap .share-button.share-button--labeled,
+.weekly-top-music-more-action--share {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0;
+  padding: 0.85rem 0.9rem !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  box-sizing: border-box;
+  min-height: 48px;
+  height: auto !important;
+  position: relative !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  flex-shrink: 0;
+}
+
+.weekly-top-music-more-action:hover,
+.weekly-top-music-more-share-wrap .share-button.share-button--labeled:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.weekly-top-music-more-action svg,
+.weekly-top-music-more-share-wrap .share-button.share-button--labeled svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.weekly-top-music-more-action--save.is-active {
+  color: #e0aaff !important;
+}
+
+.weekly-top-music-more-desktop .weekly-top-music-more-action,
+.weekly-top-music-more-desktop .weekly-top-music-more-share-wrap .share-button.share-button--labeled {
+  padding: 0.65rem 0.75rem !important;
+  min-height: 42px;
+  font-size: 0.88rem;
+}

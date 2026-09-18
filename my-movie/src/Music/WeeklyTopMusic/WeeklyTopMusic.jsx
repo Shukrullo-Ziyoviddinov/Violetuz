@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
@@ -10,6 +10,7 @@ import { useWeeklyTopMusic } from '../../hooks/useWeeklyTopMusic';
 import { topRankSrc } from '../../utils/topRankPreview';
 import ViewCount from '../../components/ViewCount/ViewCount';
 import AudioDuration from '../AudioDuration/AudioDuration';
+import WeeklyTopMusicMoreModal from './WeeklyTopMusicMoreModal';
 import './WeeklyTopMusic.css';
 
 const formatDuration = (sec) => {
@@ -54,6 +55,10 @@ const WeeklyTopMusic = () => {
     togglePlay,
     getTitle: getPlayerTitle,
   } = useMusicPlayer();
+
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [moreAnchorRect, setMoreAnchorRect] = useState(null);
+  const [moreMusic, setMoreMusic] = useState(null);
 
   const displayItems = useMemo(() => {
     const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
@@ -101,6 +106,20 @@ const WeeklyTopMusic = () => {
   const handleCardClick = (item) => {
     if (item?.id == null) return;
     navigate(`/music/${item.id}`);
+  };
+
+  const handleMoreClick = (e, item) => {
+    e.stopPropagation();
+    const rect = e.currentTarget?.getBoundingClientRect?.() || null;
+    setMoreMusic({ id: item.id, title: getTitle(item) });
+    setMoreAnchorRect(rect);
+    setMoreOpen(true);
+  };
+
+  const handleMoreClose = () => {
+    setMoreOpen(false);
+    setMoreMusic(null);
+    setMoreAnchorRect(null);
   };
 
   const activeCardStyle =
@@ -213,12 +232,36 @@ const WeeklyTopMusic = () => {
                           </svg>
                         )}
                       </button>
+                      <button
+                        type="button"
+                        className="weekly-top-music-more"
+                        onClick={(e) => handleMoreClick(e, item)}
+                        aria-label={t('music.moreActions', 'Boshqa amallar')}
+                        aria-haspopup="menu"
+                        aria-expanded={
+                          moreOpen && moreMusic && String(moreMusic.id) === String(item.id)
+                        }
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <circle cx="12" cy="5" r="1.6" />
+                          <circle cx="12" cy="12" r="1.6" />
+                          <circle cx="12" cy="19" r="1.6" />
+                        </svg>
+                      </button>
                     </div>
                   );
                 })}
           </HorizontalScroll>
         </div>
       </div>
+
+      <WeeklyTopMusicMoreModal
+        open={moreOpen}
+        onClose={handleMoreClose}
+        anchorRect={moreAnchorRect}
+        musicId={moreMusic?.id}
+        title={moreMusic?.title || ''}
+      />
     </div>
   );
 };

@@ -166,6 +166,33 @@
   display: block;
 }
 
+.weekly-top-music-more {
+  flex-shrink: 0;
+  align-self: center;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.weekly-top-music-more:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.weekly-top-music-more svg {
+  display: block;
+}
+
 .weekly-top-music-card--skeleton {
   cursor: default;
   pointer-events: none;
