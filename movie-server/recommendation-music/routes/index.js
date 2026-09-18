@@ -2,6 +2,7 @@
  * Music recommendation HTTP routes.
  *
  * GET  /api/music-recommendations/config/progress
+ * GET  /api/music-recommendations/weekly-top              (public, read-only ListenEvent)
  * POST /api/music-recommendations/:categoryNameMusic/guest  (public, rate-limited)
  * GET  /api/music-recommendations/:categoryNameMusic?contentType=&limit=
  * POST /api/music-recommendations/progress
@@ -21,6 +22,7 @@ const {
 const router = Router();
 
 router.get('/config/progress', controller.getProgressConfig);
+router.get('/weekly-top', controller.getWeeklyTopMusic);
 router.post('/progress', requireAuth, controller.postProgress);
 
 router.post(

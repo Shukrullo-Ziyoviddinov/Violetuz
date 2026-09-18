@@ -128,6 +128,20 @@
   z-index: 2;
 }
 
+.music-cards-item-weekly-rank {
+  position: absolute;
+  left: 0.2rem;
+  bottom: 0.15rem;
+  height: 45%;
+  width: auto;
+  max-width: 45%;
+  object-fit: contain;
+  object-position: left bottom;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+
 .music-cards-item-play svg {
   width: 20px;
   height: 20px;

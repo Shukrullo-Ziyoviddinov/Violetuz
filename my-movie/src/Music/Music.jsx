@@ -7,6 +7,7 @@ import HomeShorts from '../components/HomeShorts/HomeShorts';
 import RecommendedArtists from './RecommendedArtists/RecommendedArtists';
 import TopArtist from './TopArtist/TopArtist';
 import WeeklyTopArtist from './WeeklyTopArtist/WeeklyTopArtist';
+import WeeklyTopMusic from './WeeklyTopMusic/WeeklyTopMusic';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import {
@@ -170,6 +171,7 @@ const Music = () => {
                           }}
                           isLoading={waitingRecs}
                         />
+                        {clipSection.id === 'trend-clips' ? <WeeklyTopMusic /> : null}
                         {clipSection.id === 'sevgi-va-ichq' ? (
                           <WeeklyTopArtist />
                         ) : null}

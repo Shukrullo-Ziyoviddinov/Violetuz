@@ -226,6 +226,35 @@ export const fetchMusicProgressConfig = async () => {
   };
 };
 
+/**
+ * Haftaning top musiqalari (public): GET /api/music-recommendations/weekly-top
+ * Limit/oyna server configda. Artist weekly API ga tegilmaydi.
+ *
+ * @param {{ limit?: number }} [opts]
+ * @returns {Promise<{ items: Array<{ contentKey: string, contentId: string, viewCount: number, listenedSeconds: number, rank: number }>, windowDays?: number, limit?: number, minViews?: number, contentType?: string, source?: string }>}
+ */
+export const fetchWeeklyTopMusic = async ({ limit } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/music-recommendations/weekly-top?${query.toString()}`
+    : '/music-recommendations/weekly-top';
+
+  const res = await musicRecFetch(path);
+  const data = await parseJson(res);
+  const items = Array.isArray(data?.items) ? data.items : [];
+
+  return {
+    items,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    contentType: data?.contentType,
+    source: data?.source || (items.length ? 'weekly_top_music' : 'empty'),
+  };
+};
+
 /** wishlistType / reaction type → engine contentType */
 export const wishlistTypeToContentType = (wishlistType) => {
   const raw = String(wishlistType || '')

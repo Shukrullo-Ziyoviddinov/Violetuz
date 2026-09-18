@@ -1,9 +1,6 @@
 /**
- * Haftaning top filmlari tartibi — sof funksiya, DB / progress / affinity yo‘q.
- *
- * 1) viewCount yuqori bo‘lsa oldinda (daqiqa buni yengmaydi)
- * 2) viewCount teng bo‘lsa watchedSeconds (jami daqiqa)
- * 3) ikkalasi ham teng bo‘lgan guruh qolgan joyga to‘liq sig‘masa — hech biri kirmaydi
+ * Kino weekly/monthly top — umumiy ranker ustida yupqa adapter.
+ * Formula bu yerda emas. Config defaultlari shu faylda.
  *
  * @module recommendation/utils/weeklyTopMoviesRanker
  */
@@ -11,53 +8,26 @@
 'use strict';
 
 const { weeklyTopMoviesConfig } = require('../config/weeklyTopMovies.config');
+const {
+  rankByViewsThenSeconds,
+} = require('../../recommendation-shared/viewsSecondsTopRanker');
 
 /**
  * @param {unknown} row
- * @returns {{ movieId: string, viewCount: number, watchedSeconds: number } | null}
+ * @returns {{ itemId: string, viewCount: number, seconds: number } | null}
  */
-const normalizeRow = (row) => {
+const toSharedRow = (row) => {
   if (!row || typeof row !== 'object') return null;
-  const movieId = String(row.movieId ?? row.id ?? '').trim();
-  if (!movieId) return null;
+  const itemId = String(row.movieId ?? row.id ?? '').trim();
+  if (!itemId) return null;
 
   const viewCount = Number(row.viewCount);
-  const watchedSeconds = Number(row.watchedSeconds);
+  const seconds = Number(row.watchedSeconds);
   if (!Number.isFinite(viewCount) || viewCount < 0) return null;
-  if (!Number.isFinite(watchedSeconds) || watchedSeconds < 0) return null;
+  if (!Number.isFinite(seconds) || seconds < 0) return null;
 
-  return {
-    movieId,
-    viewCount,
-    watchedSeconds,
-  };
+  return { itemId, viewCount, seconds };
 };
-
-/**
- * Same movieId twice: keep the stronger signal (views, then seconds).
- * @param {Array<{ movieId: string, viewCount: number, watchedSeconds: number }>} rows
- */
-const dedupeByMovieId = (rows) => {
-  const byId = new Map();
-  for (const row of rows) {
-    const prev = byId.get(row.movieId);
-    if (!prev) {
-      byId.set(row.movieId, row);
-      continue;
-    }
-    if (row.viewCount > prev.viewCount) {
-      byId.set(row.movieId, row);
-      continue;
-    }
-    if (row.viewCount === prev.viewCount && row.watchedSeconds > prev.watchedSeconds) {
-      byId.set(row.movieId, row);
-    }
-  }
-  return [...byId.values()];
-};
-
-const sameTieGroup = (a, b) =>
-  a.viewCount === b.viewCount && a.watchedSeconds === b.watchedSeconds;
 
 /**
  * @param {unknown[]} rawRows
@@ -73,48 +43,26 @@ const rankWeeklyTopMovies = (rawRows, opts = {}) => {
 
   let limit = Number(opts.limit);
   if (!Number.isFinite(limit) || limit <= 0) limit = cfg.topLimit;
+
   const maxLimitRaw = Number(opts.maxLimit);
   const maxLimit =
     Number.isFinite(maxLimitRaw) && maxLimitRaw > 0
       ? Math.floor(maxLimitRaw)
       : cfg.topMaxLimit ?? cfg.topLimit;
-  limit = Math.min(maxLimit, Math.floor(limit));
 
-  const normalized = (Array.isArray(rawRows) ? rawRows : [])
-    .map(normalizeRow)
-    .filter(Boolean)
-    .filter((row) => row.viewCount >= minViews);
+  const sharedRows = (Array.isArray(rawRows) ? rawRows : [])
+    .map(toSharedRow)
+    .filter(Boolean);
 
-  const rows = dedupeByMovieId(normalized);
-  rows.sort((a, b) => {
-    if (b.viewCount !== a.viewCount) return b.viewCount - a.viewCount;
-    if (b.watchedSeconds !== a.watchedSeconds) return b.watchedSeconds - a.watchedSeconds;
-    return String(a.movieId).localeCompare(String(b.movieId));
-  });
-
-  const selected = [];
-  let index = 0;
-
-  while (index < rows.length && selected.length < limit) {
-    const head = rows[index];
-    let end = index + 1;
-    while (end < rows.length && sameTieGroup(rows[end], head)) end += 1;
-
-    const groupSize = end - index;
-    const remaining = limit - selected.length;
-    if (groupSize > remaining) break;
-
-    for (let i = index; i < end; i += 1) {
-      selected.push(rows[i]);
-    }
-    index = end;
-  }
-
-  return selected.map((row, i) => ({
-    movieId: row.movieId,
+  return rankByViewsThenSeconds(sharedRows, {
+    limit,
+    minViews,
+    maxLimit,
+  }).map((row) => ({
+    movieId: row.itemId,
     viewCount: row.viewCount,
-    watchedSeconds: row.watchedSeconds,
-    rank: i + 1,
+    watchedSeconds: row.seconds,
+    rank: row.rank,
   }));
 };
 

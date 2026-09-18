@@ -23,6 +23,7 @@ const MusicCardItem = ({
   isInWishlist,
   onWishlistClick,
   blockClick,
+  rankSrc = '',
 }) => {
   const imgSrc = item.img || '';
   const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError, failed: imgFailed } =
@@ -96,6 +97,14 @@ const MusicCardItem = ({
                 <polygon points="5 3 19 12 5 21" />
               </svg>
             </div>
+            {rankSrc ? (
+              <img
+                className="music-cards-item-weekly-rank"
+                src={encodeURI(rankSrc)}
+                alt=""
+                aria-hidden="true"
+              />
+            ) : null}
             <div className="music-cards-item-info">
               <h3 className="music-cards-item-title">{getTitle(item)}</h3>
               <p className="music-cards-item-artist">{getArtistText(item)}</p>
@@ -145,7 +154,8 @@ const MusicCards = ({ section, items: itemsProp = null, isLoading: isLoadingProp
 
   // Login: Music Home personalized list; guest / empty → katalog
   const resolvedData = useMemo(() => {
-    if (Array.isArray(itemsProp) && itemsProp.length > 0) return itemsProp;
+    // null/undefined → katalog; [] → majburiy bo‘sh (weekly top / waiting)
+    if (itemsProp != null) return Array.isArray(itemsProp) ? itemsProp : [];
     return getSectionItems(section);
   }, [getSectionItems, section, itemsProp]);
 
@@ -241,6 +251,7 @@ const MusicCards = ({ section, items: itemsProp = null, isLoading: isLoadingProp
           isInWishlist={isInWishlist}
           onWishlistClick={handleWishlistClick}
           blockClick={Boolean(isLoading)}
+          rankSrc={item.weeklyRankSrc || ''}
         />
       </CartochkaHoverModal>
     );

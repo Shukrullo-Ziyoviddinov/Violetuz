@@ -67,6 +67,19 @@ assert(weeklyTopMoviesConfig.topLimit === 10, 'config topLimit=10');
 assert(weeklyTopMoviesConfig.weeklyWindowDays === 7, 'config window=7');
 assert(weeklyTopMoviesConfig.minViews === 1, 'config minViews=1');
 
+const adapterSrc = fs.readFileSync(
+  path.join(__dirname, '../recommendation/utils/weeklyTopMoviesRanker.js'),
+  'utf8'
+);
+assert(adapterSrc.includes('rankByViewsThenSeconds'), 'hafta adapter umumiy rankerdan');
+assert(!adapterSrc.includes('sameTieGroup'), 'hafta adapterda formula nusxasi yo‘q');
+assert(
+  fs.existsSync(
+    path.join(__dirname, '../recommendation-shared/viewsSecondsTopRanker.js')
+  ),
+  'umumiy viewsSecondsTopRanker bor'
+);
+
 console.log('\n=== 4) Progress export buzilmagan ===');
 const progress = require('../recommendation/services/progress.service');
 assert(typeof progress.reportMovieProgress === 'function', 'reportMovieProgress intact');

@@ -14,6 +14,9 @@ const { reportMusicProgress } = require('../services/progress.service');
 const {
   getGuestRecommendationsByCategory,
 } = require('../services/guestRecommendations.service');
+const {
+  getWeeklyTopMusicFromListenEvents,
+} = require('../services/weeklyTopMusicRead.service');
 
 /**
  * GET /api/music-recommendations/config/progress
@@ -28,6 +31,18 @@ const getProgressConfig = asyncHandler(async (_req, res) => {
       likeEnabledTypes: [...(scoringWeights.likeEnabledTypes || [])],
     },
   });
+});
+
+/**
+ * GET /api/music-recommendations/weekly-top
+ * Public. Faqat ListenEvent o‘qiydi — progress/affinity yozilmaydi.
+ */
+const getWeeklyTopMusic = asyncHandler(async (req, res) => {
+  const result = await getWeeklyTopMusicFromListenEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
 });
 
 /**
@@ -85,6 +100,7 @@ const postProgress = asyncHandler(async (req, res) => {
 
 module.exports = {
   getProgressConfig,
+  getWeeklyTopMusic,
   getByCategory,
   postGuestByCategory,
   postProgress,

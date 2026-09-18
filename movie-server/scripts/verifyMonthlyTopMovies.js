@@ -36,7 +36,16 @@ const rankerSrc = fs.readFileSync(
   'utf8'
 );
 assert(rankerSrc.includes('opts.maxLimit'), 'ranker oylik capni qabul qiladi');
+assert(rankerSrc.includes('rankByViewsThenSeconds'), 'kino adapter umumiy rankerdan');
+assert(!rankerSrc.includes('sameTieGroup'), 'kino adapterda formula nusxasi yo‘q');
 assert(!rankerSrc.includes('windowDays'), 'ranker oyna bilmaydi');
+
+const sharedSrc = fs.readFileSync(
+  path.join(__dirname, '../recommendation-shared/viewsSecondsTopRanker.js'),
+  'utf8'
+);
+assert(sharedSrc.includes('rankByViewsThenSeconds'), 'umumiy ranker bor');
+assert(sharedSrc.includes('sameTieGroup'), 'formula umumiy faylda');
 
 const ctrl = require('../recommendation/controllers');
 assert(typeof ctrl.getMonthlyTopMovies === 'function', 'monthly-top handler');
