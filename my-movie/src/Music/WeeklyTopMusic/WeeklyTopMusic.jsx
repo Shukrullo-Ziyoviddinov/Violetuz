@@ -215,39 +215,41 @@ const WeeklyTopMusic = () => {
                           />
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        className="weekly-top-music-play"
-                        onClick={(e) => handlePlayClick(e, item)}
-                        aria-label={playing ? t('player.pause', 'Pauza') : t('player.play', 'Ijro')}
-                      >
-                        {playing ? (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <rect x="6" y="4" width="4" height="16" />
-                            <rect x="14" y="4" width="4" height="16" />
+                      <div className="weekly-top-music-actions">
+                        <button
+                          type="button"
+                          className="weekly-top-music-play"
+                          onClick={(e) => handlePlayClick(e, item)}
+                          aria-label={playing ? t('player.pause', 'Pauza') : t('player.play', 'Ijro')}
+                        >
+                          {playing ? (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                              <rect x="6" y="4" width="4" height="16" />
+                              <rect x="14" y="4" width="4" height="16" />
+                            </svg>
+                          ) : (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                              <polygon points="5 3 19 12 5 21" />
+                            </svg>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className="weekly-top-music-more"
+                          onClick={(e) => handleMoreClick(e, item)}
+                          aria-label={t('music.moreActions', 'Boshqa amallar')}
+                          aria-haspopup="menu"
+                          aria-expanded={
+                            moreOpen && moreMusic && String(moreMusic.id) === String(item.id)
+                          }
+                        >
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <circle cx="12" cy="5" r="1.6" />
+                            <circle cx="12" cy="12" r="1.6" />
+                            <circle cx="12" cy="19" r="1.6" />
                           </svg>
-                        ) : (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <polygon points="5 3 19 12 5 21" />
-                          </svg>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        className="weekly-top-music-more"
-                        onClick={(e) => handleMoreClick(e, item)}
-                        aria-label={t('music.moreActions', 'Boshqa amallar')}
-                        aria-haspopup="menu"
-                        aria-expanded={
-                          moreOpen && moreMusic && String(moreMusic.id) === String(item.id)
-                        }
-                      >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <circle cx="12" cy="5" r="1.6" />
-                          <circle cx="12" cy="12" r="1.6" />
-                          <circle cx="12" cy="19" r="1.6" />
-                        </svg>
-                      </button>
+                        </button>
+                      </div>
                     </div>
                   );
                 })}

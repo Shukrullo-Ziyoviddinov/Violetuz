@@ -21,11 +21,11 @@
 
 .weekly-top-music-card {
   flex-shrink: 0;
-  width: min(320px, 85vw);
+  width: min(330px, 85vw);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.75rem;
+  gap: 0.5rem;
+  padding: 0.5rem;
   border-radius: 16px;
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.06);
@@ -143,8 +143,8 @@
 .weekly-top-music-play {
   flex-shrink: 0;
   align-self: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.35rem;
+  height: 2.35rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,6 +154,7 @@
   color: #fff;
   cursor: pointer;
   padding: 0;
+  margin: 0;
   transition: transform 0.15s ease, background 0.15s ease;
 }
 
@@ -166,31 +167,41 @@
   display: block;
 }
 
-.weekly-top-music-more {
+.weekly-top-music-actions {
   flex-shrink: 0;
-  align-self: center;
-  width: 2rem;
-  height: 2rem;
   display: flex;
   align-items: center;
+  gap: 0.15rem;
+  margin-left: auto;
+}
+
+.weekly-top-music-more {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: auto;
+  height: auto;
   margin: 0;
   padding: 0;
   border: none;
-  border-radius: 50%;
+  border-radius: 0;
   background: transparent;
   color: rgba(255, 255, 255, 0.75);
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
+  line-height: 0;
+  transition: color 0.15s ease;
 }
 
 .weekly-top-music-more:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
 }
 
 .weekly-top-music-more svg {
   display: block;
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .weekly-top-music-card--skeleton {
@@ -226,9 +237,9 @@
   }
 
   .weekly-top-music-card {
-    width: min(280px, 88vw);
-    padding: 0.55rem 0.65rem;
-    gap: 0.6rem;
+    width: min(330px, 85vw);
+    padding: 0.5rem;
+    gap: 0.4rem;
   }
 
   .weekly-top-music-cover {
@@ -237,7 +248,11 @@
   }
 
   .weekly-top-music-play {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+
+  .weekly-top-music-actions {
+    gap: 0.1rem;
   }
 }
