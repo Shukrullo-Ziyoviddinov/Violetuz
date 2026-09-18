@@ -15,6 +15,10 @@ import './ViewCount.css';
  * record:
  * - true  (default) — login user uchun ko‘rishni yozadi (+1, bir marta)
  * - false — faqat sonni ko‘rsatadi, hisoblamaydi
+ *
+ * iconKind (faqat variant="icon"):
+ * - "eye" (default)
+ * - "headphones" — musiqa kartochkalari
  */
 const ViewCount = ({
   itemId,
@@ -23,6 +27,7 @@ const ViewCount = ({
   className,
   countFormatter = formatActionCount,
   record = true,
+  iconKind = 'eye',
 }) => {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
@@ -83,20 +88,37 @@ const ViewCount = ({
       aria-label={`Ko‘rishlar: ${formatted}`}
       title="Ko‘rishlar"
     >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-        <circle cx="12" cy="12" r="3" />
-      </svg>
+      {iconKind === 'headphones' ? (
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+        </svg>
+      ) : (
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      )}
       <span className="movie-detail-action-count">{formatted}</span>
     </div>
   );

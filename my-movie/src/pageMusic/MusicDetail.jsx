@@ -22,6 +22,8 @@ import {
   musicHomeRecKey,
 } from '../hooks/useHomeMusicCategoryRecommendations';
 import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
+import { useAuth } from '../context/AuthContext';
+import { recordViewRequest } from '../api/viewsApi';
 import './MusicDetail.css';
 
 const TREND_SKELETON_COUNT = 8;
@@ -194,6 +196,7 @@ const MusicDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
     allMusic,
@@ -359,6 +362,18 @@ const MusicDetail = () => {
 
   /** Sahifada ko'rsatilgan trekning rasmidan rang â€“ prev/next bilan navigatsiya qilganda ham to'g'ri ishlaydi */
   const pageDominantColor = useDominantColor(typeof music?.img === 'string' ? music.img : null);
+
+  // Login: ContentView yozuvi (UI yo‘q — son weekly-top-music-card da)
+  useEffect(() => {
+    if (!isLoggedIn || music?.id == null) return undefined;
+    let cancelled = false;
+    recordViewRequest({ id: music.id, type: 'music' }).catch(() => {
+      if (cancelled) return;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, music?.id]);
 
   // On mount: load track and handle initial state (autoplay, keepModalOpen, syncFromPlayer)
   useEffect(() => {

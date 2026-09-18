@@ -7,6 +7,8 @@ import { useMusicApi } from '../../context/MusicApiContext';
 import { useMusicPlayer } from '../../context/MusicPlayerContext';
 import { useWeeklyTopMusic } from '../../hooks/useWeeklyTopMusic';
 import { topRankSrc } from '../../utils/topRankPreview';
+import ViewCount from '../../components/ViewCount/ViewCount';
+import AudioDuration from '../AudioDuration/AudioDuration';
 import './WeeklyTopMusic.css';
 
 const formatDuration = (sec) => {
@@ -16,9 +18,25 @@ const formatDuration = (sec) => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
+const DURATION_CLASS = 'music-detail-artist-duration weekly-top-music-duration';
+
+/** Katalog → player → audio metadata. Play shart emas. */
+const WeeklyTopMusicDuration = ({ item, isCurrent, playerDuration }) => {
+  const catalogSec = Number(item.durationSec ?? item.duration);
+  if (Number.isFinite(catalogSec) && catalogSec > 0) {
+    return <span className={DURATION_CLASS}>{formatDuration(catalogSec)}</span>;
+  }
+  if (isCurrent && playerDuration > 0) {
+    return <span className={DURATION_CLASS}>{formatDuration(playerDuration)}</span>;
+  }
+  if (!item.audio) return null;
+  return <AudioDuration audioUrl={item.audio} className={DURATION_CLASS} />;
+};
+
 /**
  * Haftaning top musiqalari — horizontal kartochka UI.
- * Rank | cover | title/artist/duration | play. Views/wishlist yo‘q.
+ * Rank | cover | title/artist/duration+views | play.
+ * ViewCount faqat ko‘rsatadi (record=false). Yozuv Music Detail da.
  */
 const WeeklyTopMusic = () => {
   const { t } = useTranslation();
@@ -66,17 +84,6 @@ const WeeklyTopMusic = () => {
   const getArtistName = (item) => {
     const artist = getArtistById?.(item.artistId);
     return artist?.name || item.artist || '';
-  };
-
-  const getItemDurationLabel = (item) => {
-    const catalogSec = Number(item.durationSec ?? item.duration);
-    if (Number.isFinite(catalogSec) && catalogSec > 0) {
-      return formatDuration(catalogSec);
-    }
-    if (currentMusic && String(currentMusic.id) === String(item.id) && playerDuration > 0) {
-      return formatDuration(playerDuration);
-    }
-    return '';
   };
 
   const handlePlayClick = (e, item) => {
@@ -128,7 +135,6 @@ const WeeklyTopMusic = () => {
                   const active =
                     currentMusic && String(currentMusic.id) === String(item.id);
                   const playing = active && isPlaying;
-                  const durationLabel = getItemDurationLabel(item);
 
                   return (
                     <div
@@ -165,11 +171,21 @@ const WeeklyTopMusic = () => {
                         <span className="weekly-top-music-artist">
                           {getArtistName(item)}
                         </span>
-                        {durationLabel ? (
-                          <span className="music-detail-artist-duration weekly-top-music-duration">
-                            {durationLabel}
-                          </span>
-                        ) : null}
+                        <div className="weekly-top-music-meta-row">
+                          <WeeklyTopMusicDuration
+                            item={item}
+                            isCurrent={!!active}
+                            playerDuration={playerDuration}
+                          />
+                          <ViewCount
+                            itemId={item.id}
+                            type="music"
+                            variant="icon"
+                            iconKind="headphones"
+                            record={false}
+                            className="weekly-top-music-views"
+                          />
+                        </div>
                       </div>
                       <button
                         type="button"

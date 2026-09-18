@@ -7,11 +7,15 @@ const formatTime = (sec) => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-const AudioDuration = ({ audioUrl, prefix = '' }) => {
+const AudioDuration = ({
+  audioUrl,
+  prefix = '',
+  className = 'music-detail-trend-card-duration',
+}) => {
   const [duration, setDuration] = useState(null);
 
   useEffect(() => {
-    if (!audioUrl) return;
+    if (!audioUrl) return undefined;
     const audio = new Audio(audioUrl);
     const handler = () => {
       setDuration(audio.duration);
@@ -28,7 +32,7 @@ const AudioDuration = ({ audioUrl, prefix = '' }) => {
   return (
     <>
       {prefix && <span className="music-detail-trend-card-meta-dot">{prefix}</span>}
-      <span className="music-detail-trend-card-duration">{formatTime(duration)}</span>
+      <span className={className}>{formatTime(duration)}</span>
     </>
   );
 };
