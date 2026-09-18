@@ -6,6 +6,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { useMusicPlayer } from '../../context/MusicPlayerContext';
 import { useWeeklyTopMusic } from '../../hooks/useWeeklyTopMusic';
+import { topRankSrc } from '../../utils/topRankPreview';
 import './WeeklyTopMusic.css';
 
 const formatDuration = (sec) => {
@@ -146,7 +147,12 @@ const WeeklyTopMusic = () => {
                       }}
                       aria-label={`${item.rank}. ${getTitle(item)}`}
                     >
-                      <span className="weekly-top-music-rank">{item.rank}</span>
+                      <img
+                        className="weekly-top-music-rank"
+                        src={encodeURI(topRankSrc(item.rank))}
+                        alt=""
+                        aria-hidden="true"
+                      />
                       <div className="weekly-top-music-cover">
                         <img
                           src={item.img || '/img/movie1.jpg'}

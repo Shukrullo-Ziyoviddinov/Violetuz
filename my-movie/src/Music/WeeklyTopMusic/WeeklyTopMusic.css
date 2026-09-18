@@ -40,23 +40,20 @@
 
 .weekly-top-music-rank {
   flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: #9b4fe7;
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1;
+  height: 2.55rem;
+  width: auto;
+  max-width: 2.75rem;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  display: block;
+  background: none;
 }
 
 .weekly-top-music-cover {
   flex-shrink: 0;
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 6.25rem;
+  height: 6.25rem;
   border-radius: 10px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.08);
@@ -133,7 +130,14 @@
   pointer-events: none;
 }
 
-.weekly-top-music-rank--skeleton,
+.weekly-top-music-rank--skeleton {
+  width: 2.55rem;
+  height: 2.55rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: transparent;
+  border-radius: 6px;
+}
+
 .weekly-top-music-cover--skeleton,
 .weekly-top-music-play--skeleton {
   background: rgba(255, 255, 255, 0.1);
@@ -160,8 +164,8 @@
   }
 
   .weekly-top-music-cover {
-    width: 2.85rem;
-    height: 2.85rem;
+    width: 4.85rem;
+    height: 4.85rem;
   }
 
   .weekly-top-music-play {
