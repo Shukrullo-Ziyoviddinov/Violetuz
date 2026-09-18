@@ -146,10 +146,6 @@ const artistUi = fs.readFileSync(
   'utf8'
 );
 const musicPage = fs.readFileSync(path.join(root, 'Music/Music.jsx'), 'utf8');
-const musicCards = fs.readFileSync(
-  path.join(root, 'Music/MusicCards/MusicCards.jsx'),
-  'utf8'
-);
 
 assert(api.includes('/music-recommendations/weekly-top'), 'FE GET weekly-top music');
 assert(api.includes('fetchWeeklyTopMusic'), 'fetchWeeklyTopMusic export');
@@ -162,13 +158,15 @@ assert(
 assert(ui.includes('useWeeklyTopMusic'), 'UI o‘z hookini chaqiradi');
 assert(!ui.includes('useWeeklyTopArtists'), 'UI artist hookiga chiqmagan');
 assert(ui.includes('displayItems.length === 0) return null'), 'empty block hidden');
+assert(ui.includes('weekly-top-music-card'), 'horizontal card UI');
+assert(ui.includes('weekly-top-music-play'), 'play/pause tugmasi');
+assert(ui.includes('music-detail-artist-duration'), 'duration music-detail uslubida');
+assert(!ui.includes('MusicCards'), 'poster MusicCards emas');
 assert(artistUi.includes('useWeeklyTopArtists'), 'artist UI o‘zgarmagan');
 assert(
   musicPage.includes("clipSection.id === 'trend-clips' ? <WeeklyTopMusic />"),
   'Music: Trend kliplardan keyin'
 );
 assert(musicPage.includes('music-drops'), 'Music drops joyi saqlangan');
-assert(musicCards.includes('itemsProp != null'), 'MusicCards bo‘sh items override');
-assert(musicCards.includes('weeklyRankSrc'), 'MusicCards rank rasm');
 
 console.log('\nALL WEEKLY TOP MUSIC VERIFICATION PASSED');
