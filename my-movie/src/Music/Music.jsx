@@ -8,6 +8,7 @@ import RecommendedArtists from './RecommendedArtists/RecommendedArtists';
 import TopArtist from './TopArtist/TopArtist';
 import WeeklyTopArtist from './WeeklyTopArtist/WeeklyTopArtist';
 import WeeklyTopMusic from './WeeklyTopMusic/WeeklyTopMusic';
+import MonthlyTopMusic from './MonthlyTopMusic/MonthlyTopMusic';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import {
@@ -190,14 +191,18 @@ const Music = () => {
                       catalog
                     );
                     return (
-                      <ClipsCards
-                        key={concertSection.id}
-                        section={{
-                          ...concertSection,
-                          data: data || [],
-                        }}
-                        isLoading={waitingRecs}
-                      />
+                      <React.Fragment key={concertSection.id}>
+                        <ClipsCards
+                          section={{
+                            ...concertSection,
+                            data: data || [],
+                          }}
+                          isLoading={waitingRecs}
+                        />
+                        {concertSection.id === 'jaxon-concerts' ? (
+                          <MonthlyTopMusic />
+                        ) : null}
+                      </React.Fragment>
                     );
                   }
 

@@ -5,7 +5,7 @@
  * Eventdagi listenedSeconds = o‘sha paytdagi progress maksimumi (sessiya deltasi emas).
  * Shu sabab bir user×contentKey uchun oynadagi $max olinadi, keyin userlar bo‘yicha yig‘iladi.
  * viewCount = distinct userId (qayta eshitish +1 emas).
- * Tartib: umumiy rankByViewsThenSeconds.
+ * Tartib: musicListenStatsRanker → umumiy rankByViewsThenSeconds.
  *
  * @module recommendation-music/services/weeklyTopMusicRead.service
  */
@@ -14,9 +14,7 @@
 
 const { ListenEvent } = require('../models');
 const { weeklyTopMusicConfig } = require('../config/weeklyTopMusic.config');
-const {
-  rankByViewsThenSeconds,
-} = require('../../recommendation-shared/viewsSecondsTopRanker');
+const { rankMusicListenStats } = require('../utils/musicListenStatsRanker');
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -85,16 +83,7 @@ const readWeeklyMusicListenStats = async (opts = {}) => {
 };
 
 /**
- * @param {unknown} value
- * @returns {number | undefined}
- */
-const positiveNumber = (value) => {
-  const n = Number(value);
-  return Number.isFinite(n) && n > 0 ? n : undefined;
-};
-
-/**
- * Read + shared ranker. Writes nothing.
+ * Read + music adapter ranker. Writes nothing.
  *
  * @param {{ now?: Date, windowDays?: number, limit?: number, minViews?: number }} [opts]
  */
@@ -112,32 +101,10 @@ const getWeeklyTopMusicFromListenEvents = async (opts = {}) => {
     contentType: weeklyTopMusicConfig.contentType,
   });
 
-  const sharedRows = stats.map((row) => ({
-    itemId: String(row.contentKey || '').trim(),
-    viewCount: Number(row.viewCount) || 0,
-    seconds: Number(row.listenedSeconds) || 0,
-    contentId: row.contentId,
-  }));
-
-  const ranked = rankByViewsThenSeconds(sharedRows, {
-    limit: positiveNumber(opts.limit) ?? weeklyTopMusicConfig.topLimit,
-    minViews: positiveNumber(opts.minViews) ?? weeklyTopMusicConfig.minViews,
+  const items = rankMusicListenStats(stats, {
+    limit: opts.limit,
+    minViews: opts.minViews,
     maxLimit: weeklyTopMusicConfig.topMaxLimit,
-  });
-
-  const byKey = new Map(
-    stats.map((row) => [String(row.contentKey), row])
-  );
-
-  const items = ranked.map((row) => {
-    const raw = byKey.get(row.itemId);
-    return {
-      contentKey: row.itemId,
-      contentId: raw?.contentId != null ? String(raw.contentId) : '',
-      viewCount: row.viewCount,
-      listenedSeconds: row.seconds,
-      rank: row.rank,
-    };
   });
 
   return {

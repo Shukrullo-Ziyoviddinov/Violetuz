@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { loadMusicTopChartsOnce } from './musicTopChartsShared';
 
 /**
- * Haftaning top musiqalari.
- * Ma’lumot: shared top-charts (oy bilan bitta so‘rov).
+ * Oyning top musiqalari.
+ * Ma’lumot: shared top-charts (hafta bilan bitta so‘rov).
  *
  * @returns {{ items: Array<{ contentKey: string, contentId: string, viewCount: number, listenedSeconds: number, rank: number }>, loading: boolean }}
  */
-export function useWeeklyTopMusic() {
+export function useMonthlyTopMusic() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ export function useWeeklyTopMusic() {
     (async () => {
       try {
         const data = await loadMusicTopChartsOnce();
-        const list = Array.isArray(data?.weekly?.items) ? data.weekly.items : [];
+        const list = Array.isArray(data?.monthly?.items) ? data.monthly.items : [];
         if (!cancelled) setItems(list);
       } catch {
         if (!cancelled) setItems([]);

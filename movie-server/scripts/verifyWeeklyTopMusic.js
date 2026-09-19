@@ -70,7 +70,7 @@ const readSrc = fs.readFileSync(
   'utf8'
 );
 assert(readSrc.includes('ListenEvent'), 'ListenEvent o‘qiydi');
-assert(readSrc.includes('rankByViewsThenSeconds'), 'umumiy rankerdan');
+assert(readSrc.includes('rankMusicListenStats'), 'music adapter rankerdan');
 assert(!readSrc.includes('sameTieGroup'), 'formula nusxasi yo‘q');
 assert(!readSrc.includes('.sort('), 'o‘z sorti yo‘q');
 assert(
@@ -141,31 +141,42 @@ const ui = fs.readFileSync(
   path.join(root, 'Music/WeeklyTopMusic/WeeklyTopMusic.jsx'),
   'utf8'
 );
+const chartUi = fs.readFileSync(
+  path.join(root, 'Music/TopMusicChart/TopMusicChart.jsx'),
+  'utf8'
+);
 const artistUi = fs.readFileSync(
   path.join(root, 'Music/WeeklyTopArtist/WeeklyTopArtist.jsx'),
   'utf8'
 );
 const musicPage = fs.readFileSync(path.join(root, 'Music/Music.jsx'), 'utf8');
 
+assert(
+  hook.includes('loadMusicTopChartsOnce') && /useState\(\s*true\s*\)/.test(hook),
+  'hook shared top-charts + loading true'
+);
+assert(api.includes('fetchMusicTopCharts') || api.includes('/music-recommendations/top-charts'), 'FE top-charts');
 assert(api.includes('/music-recommendations/weekly-top'), 'FE GET weekly-top music');
 assert(api.includes('fetchWeeklyTopMusic'), 'fetchWeeklyTopMusic export');
 assert(api.includes('fetchViewerMusicCategoryRecommendations') || api.includes('fetchMusicCategoryRecommendations'), 'login/guest music path kept');
 assert(artistsApi.includes('fetchWeeklyTopArtists'), 'artist weekly FE intact');
-assert(
-  hook.includes('fetchWeeklyTopMusic') && /useState\(\s*true\s*\)/.test(hook),
-  'hook fetch + loading true'
-);
 assert(ui.includes('useWeeklyTopMusic'), 'UI o‘z hookini chaqiradi');
+assert(ui.includes('TopMusicChart'), 'UI shared TopMusicChart');
 assert(!ui.includes('useWeeklyTopArtists'), 'UI artist hookiga chiqmagan');
-assert(ui.includes('displayItems.length === 0) return null'), 'empty block hidden');
-assert(ui.includes('weekly-top-music-card'), 'horizontal card UI');
-assert(ui.includes('weekly-top-music-play'), 'play/pause tugmasi');
-assert(ui.includes('music-detail-artist-duration'), 'duration music-detail uslubida');
-assert(!ui.includes('MusicCards'), 'poster MusicCards emas');
+assert(chartUi.includes('top-music-chart-card'), 'horizontal card UI (shared)');
+assert(chartUi.includes('top-music-chart-play'), 'play/pause tugmasi (shared)');
+assert(chartUi.includes('music-detail-artist-duration'), 'duration music-detail uslubida');
+assert(!chartUi.includes('MusicCards'), 'poster MusicCards emas');
 assert(artistUi.includes('useWeeklyTopArtists'), 'artist UI o‘zgarmagan');
 assert(
-  musicPage.includes("clipSection.id === 'trend-clips' ? <WeeklyTopMusic />"),
-  'Music: Trend kliplardan keyin'
+  musicPage.includes('WeeklyTopMusic') &&
+    musicPage.includes("clipSection.id === 'trend-clips'"),
+  'Music: Trend kliplardan keyin weekly'
+);
+assert(
+  musicPage.includes('MonthlyTopMusic') &&
+    musicPage.includes("concertSection.id === 'jaxon-concerts'"),
+  'Music: Jaxon konsertlaridan keyin monthly'
 );
 assert(musicPage.includes('music-drops'), 'Music drops joyi saqlangan');
 

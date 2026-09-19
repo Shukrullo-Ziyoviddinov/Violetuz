@@ -255,6 +255,78 @@ export const fetchWeeklyTopMusic = async ({ limit } = {}) => {
   };
 };
 
+/**
+ * Oyning top musiqalari (public): GET /api/music-recommendations/monthly-top
+ * Tartib serverdagi shared rankerda. Limit/oyna oylik configda.
+ *
+ * @param {{ limit?: number }} [opts]
+ * @returns {Promise<{ items: Array<{ contentKey: string, contentId: string, viewCount: number, listenedSeconds: number, rank: number }>, windowDays?: number, limit?: number, minViews?: number, contentType?: string, source?: string }>}
+ */
+export const fetchMonthlyTopMusic = async ({ limit } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/music-recommendations/monthly-top?${query.toString()}`
+    : '/music-recommendations/monthly-top';
+
+  const res = await musicRecFetch(path);
+  const data = await parseJson(res);
+  const items = Array.isArray(data?.items) ? data.items : [];
+
+  return {
+    items,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    contentType: data?.contentType,
+    source: data?.source || (items.length ? 'monthly_top_music' : 'empty'),
+  };
+};
+
+/**
+ * Hafta + oy top (public): GET /api/music-recommendations/top-charts
+ * Music page da bitta so‘rov — ikkala blok shu javobdan o‘qiydi.
+ *
+ * @param {{ limit?: number }} [opts]
+ */
+export const fetchMusicTopCharts = async ({ limit } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/music-recommendations/top-charts?${query.toString()}`
+    : '/music-recommendations/top-charts';
+
+  const res = await musicRecFetch(path);
+  const data = await parseJson(res);
+  const weeklyItems = Array.isArray(data?.weekly?.items) ? data.weekly.items : [];
+  const monthlyItems = Array.isArray(data?.monthly?.items)
+    ? data.monthly.items
+    : [];
+
+  return {
+    weekly: {
+      items: weeklyItems,
+      windowDays: data?.weekly?.windowDays,
+      limit: data?.weekly?.limit,
+      minViews: data?.weekly?.minViews,
+      contentType: data?.weekly?.contentType,
+      source: data?.weekly?.source || (weeklyItems.length ? 'weekly_top_music' : 'empty'),
+    },
+    monthly: {
+      items: monthlyItems,
+      windowDays: data?.monthly?.windowDays,
+      limit: data?.monthly?.limit,
+      minViews: data?.monthly?.minViews,
+      contentType: data?.monthly?.contentType,
+      source:
+        data?.monthly?.source || (monthlyItems.length ? 'monthly_top_music' : 'empty'),
+    },
+    source: data?.source || (weeklyItems.length || monthlyItems.length ? 'top_music_charts' : 'empty'),
+  };
+};
+
 /** wishlistType / reaction type → engine contentType */
 export const wishlistTypeToContentType = (wishlistType) => {
   const raw = String(wishlistType || '')

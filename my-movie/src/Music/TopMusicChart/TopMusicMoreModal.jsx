@@ -3,22 +3,22 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import ShareButton from '../../components/ShareButton/ShareButton';
 import { useWishlist } from '../../context/WishlistContext';
-import './WeeklyTopMusicMoreModal.css';
+import './TopMusicMoreModal.css';
 
 const MOBILE_MAX = 900;
 const CLOSE_MS = 320;
 const DRAG_THRESHOLD = 8;
 const FLICK_MS = 280;
 const FLICK_MIN_PX = 48;
-const BODY_LOCK = 'weekly-top-music-more-open';
+const BODY_LOCK = 'top-music-more-open';
 
 /**
- * Weekly top card ⋯ menyusi:
+ * Top music chart ⋯ menyusi (hafta / oy umumiy):
  * Desktop — icon ostidan dropdown
  * Mobile — pastdan sheet + drag yopish
  * Yuborish → ShareButton; Saqlash → wishlist (music).
  */
-const WeeklyTopMusicMoreModal = ({
+const TopMusicMoreModal = ({
   open,
   onClose,
   anchorRect = null,
@@ -119,7 +119,7 @@ const WeeklyTopMusicMoreModal = ({
   useEffect(() => {
     if (!mounted || isMobile) return undefined;
     const onDoc = (e) => {
-      if (e.target.closest?.('.weekly-top-music-more')) return;
+      if (e.target.closest?.('.top-music-chart-more')) return;
       if (e.target.closest?.('.share-button-dropdown') || e.target.closest?.('.share-modal-overlay')) {
         return;
       }
@@ -216,21 +216,21 @@ const WeeklyTopMusicMoreModal = ({
     dragging || translateY > 0 ? { transform: `translateY(${translateY}px)` } : undefined;
 
   const actions = (
-    <div className="weekly-top-music-more-actions">
-      <div className="weekly-top-music-more-share-wrap">
+    <div className="top-music-more-actions">
+      <div className="top-music-more-share-wrap">
         <ShareButton
           movie={shareMovie}
           sharePath={sharePath}
           dropdownInPortal
           icon="send"
           label={t('share.yuborish', 'Yuborish')}
-          className="weekly-top-music-more-share"
-          buttonClassName="weekly-top-music-more-action weekly-top-music-more-action--share"
+          className="top-music-more-share"
+          buttonClassName="top-music-more-action top-music-more-action--share"
         />
       </div>
       <button
         type="button"
-        className={`weekly-top-music-more-action weekly-top-music-more-action--save${
+        className={`top-music-more-action top-music-more-action--save${
           saved ? ' is-active' : ''
         }`}
         onClick={handleSave}
@@ -258,7 +258,7 @@ const WeeklyTopMusicMoreModal = ({
     return createPortal(
       <div
         ref={menuRef}
-        className={`weekly-top-music-more-desktop${visible ? ' is-visible' : ''}`}
+        className={`top-music-more-desktop${visible ? ' is-visible' : ''}`}
         style={{ top: desktopPos.top, left: desktopPos.left }}
         role="menu"
         aria-label={t('music.moreActions', 'Boshqa amallar')}
@@ -272,7 +272,7 @@ const WeeklyTopMusicMoreModal = ({
 
   return createPortal(
     <div
-      className={`weekly-top-music-more-overlay${visible ? ' is-visible' : ''}`}
+      className={`top-music-more-overlay${visible ? ' is-visible' : ''}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) requestClose();
       }}
@@ -284,7 +284,7 @@ const WeeklyTopMusicMoreModal = ({
       <div
         ref={sheetRef}
         className={[
-          'weekly-top-music-more-sheet',
+          'top-music-more-sheet',
           visible && translateY === 0 && !dragging ? 'is-open' : '',
           dragging ? 'is-dragging' : '',
           !visible ? 'is-closing' : '',
@@ -300,12 +300,12 @@ const WeeklyTopMusicMoreModal = ({
       >
         <div
           ref={dragZoneRef}
-          className="weekly-top-music-more-drag-zone"
+          className="top-music-more-drag-zone"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchEnd}
         >
-          <div className="weekly-top-music-more-handle" />
+          <div className="top-music-more-handle" />
         </div>
         {actions}
       </div>
@@ -314,4 +314,4 @@ const WeeklyTopMusicMoreModal = ({
   );
 };
 
-export default WeeklyTopMusicMoreModal;
+export default TopMusicMoreModal;

@@ -17,6 +17,12 @@ const {
 const {
   getWeeklyTopMusicFromListenEvents,
 } = require('../services/weeklyTopMusicRead.service');
+const {
+  getMonthlyTopMusicFromListenEvents,
+} = require('../services/monthlyTopMusicRead.service');
+const {
+  getTopMusicChartsFromListenEvents,
+} = require('../services/topMusicChartsRead.service');
 
 /**
  * GET /api/music-recommendations/config/progress
@@ -39,6 +45,30 @@ const getProgressConfig = asyncHandler(async (_req, res) => {
  */
 const getWeeklyTopMusic = asyncHandler(async (req, res) => {
   const result = await getWeeklyTopMusicFromListenEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/music-recommendations/monthly-top
+ * Public. Hafta bilan bir xil ranker, oyna 30 kun. Yozuv yo‘q.
+ */
+const getMonthlyTopMusic = asyncHandler(async (req, res) => {
+  const result = await getMonthlyTopMusicFromListenEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/music-recommendations/top-charts
+ * Public. Hafta + oy bir so‘rovda (parallel compose). Yozuv yo‘q.
+ */
+const getTopMusicCharts = asyncHandler(async (req, res) => {
+  const result = await getTopMusicChartsFromListenEvents({
     limit: req.query?.limit,
   });
 
@@ -101,6 +131,8 @@ const postProgress = asyncHandler(async (req, res) => {
 module.exports = {
   getProgressConfig,
   getWeeklyTopMusic,
+  getMonthlyTopMusic,
+  getTopMusicCharts,
   getByCategory,
   postGuestByCategory,
   postProgress,

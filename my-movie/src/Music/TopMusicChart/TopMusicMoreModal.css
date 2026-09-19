@@ -1,11 +1,11 @@
-html.weekly-top-music-more-open,
-body.weekly-top-music-more-open {
+﻿html.top-music-more-open,
+body.top-music-more-open {
   overflow: hidden !important;
   overscroll-behavior: none !important;
 }
 
-/* —— Desktop: ⋯ ostidan —— */
-.weekly-top-music-more-desktop {
+/* â€”â€” Desktop: â‹¯ ostidan â€”â€” */
+.top-music-more-desktop {
   position: fixed;
   z-index: 1250;
   min-width: 180px;
@@ -20,14 +20,14 @@ body.weekly-top-music-more-open {
   pointer-events: none;
 }
 
-.weekly-top-music-more-desktop.is-visible {
+.top-music-more-desktop.is-visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
 
-/* —— Mobile sheet —— */
-.weekly-top-music-more-overlay {
+/* â€”â€” Mobile sheet â€”â€” */
+.top-music-more-overlay {
   position: fixed;
   inset: 0;
   z-index: 1250;
@@ -41,11 +41,11 @@ body.weekly-top-music-more-open {
   touch-action: none;
 }
 
-.weekly-top-music-more-overlay.is-visible {
+.top-music-more-overlay.is-visible {
   opacity: 1;
 }
 
-.weekly-top-music-more-sheet {
+.top-music-more-sheet {
   width: 100%;
   max-width: 100%;
   background: #121212;
@@ -59,25 +59,25 @@ body.weekly-top-music-more-open {
   will-change: transform;
 }
 
-.weekly-top-music-more-sheet.is-open {
+.top-music-more-sheet.is-open {
   transform: translateY(0);
 }
 
-.weekly-top-music-more-sheet.is-dragging {
+.top-music-more-sheet.is-dragging {
   transition: none;
 }
 
-.weekly-top-music-more-sheet.is-closing {
+.top-music-more-sheet.is-closing {
   pointer-events: none;
 }
 
-.weekly-top-music-more-drag-zone {
+.top-music-more-drag-zone {
   padding: 0.55rem 1rem 0.25rem;
   touch-action: none;
   user-select: none;
 }
 
-.weekly-top-music-more-handle {
+.top-music-more-handle {
   width: 42px;
   height: 4px;
   border-radius: 999px;
@@ -85,7 +85,7 @@ body.weekly-top-music-more-open {
   margin: 0 auto;
 }
 
-.weekly-top-music-more-actions {
+.top-music-more-actions {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -94,20 +94,20 @@ body.weekly-top-music-more-open {
   z-index: 1;
 }
 
-.weekly-top-music-more-desktop .weekly-top-music-more-actions {
+.top-music-more-desktop .top-music-more-actions {
   padding: 0;
   gap: 0.2rem;
 }
 
-.weekly-top-music-more-share-wrap {
+.top-music-more-share-wrap {
   display: block;
   width: 100%;
   position: relative;
   z-index: 1;
 }
 
-.weekly-top-music-more-share-wrap .share-button-wrapper,
-.weekly-top-music-more-share-wrap .weekly-top-music-more-share.share-button-wrapper {
+.top-music-more-share-wrap .share-button-wrapper,
+.top-music-more-share-wrap .top-music-more-share.share-button-wrapper {
   position: static !important;
   top: auto !important;
   right: auto !important;
@@ -120,9 +120,9 @@ body.weekly-top-music-more-open {
   margin: 0 !important;
 }
 
-.weekly-top-music-more-action,
-.weekly-top-music-more-share-wrap .share-button.share-button--labeled,
-.weekly-top-music-more-action--share {
+.top-music-more-action,
+.top-music-more-share-wrap .share-button.share-button--labeled,
+.top-music-more-action--share {
   display: flex !important;
   align-items: center;
   justify-content: flex-start;
@@ -149,24 +149,24 @@ body.weekly-top-music-more-open {
   flex-shrink: 0;
 }
 
-.weekly-top-music-more-action:hover,
-.weekly-top-music-more-share-wrap .share-button.share-button--labeled:hover {
+.top-music-more-action:hover,
+.top-music-more-share-wrap .share-button.share-button--labeled:hover {
   background: rgba(255, 255, 255, 0.08) !important;
 }
 
-.weekly-top-music-more-action svg,
-.weekly-top-music-more-share-wrap .share-button.share-button--labeled svg {
+.top-music-more-action svg,
+.top-music-more-share-wrap .share-button.share-button--labeled svg {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
 }
 
-.weekly-top-music-more-action--save.is-active {
+.top-music-more-action--save.is-active {
   color: #e0aaff !important;
 }
 
-.weekly-top-music-more-desktop .weekly-top-music-more-action,
-.weekly-top-music-more-desktop .weekly-top-music-more-share-wrap .share-button.share-button--labeled {
+.top-music-more-desktop .top-music-more-action,
+.top-music-more-desktop .top-music-more-share-wrap .share-button.share-button--labeled {
   padding: 0.65rem 0.75rem !important;
   min-height: 42px;
   font-size: 0.88rem;
