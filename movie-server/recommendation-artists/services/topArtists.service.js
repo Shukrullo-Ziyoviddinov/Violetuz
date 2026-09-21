@@ -13,12 +13,19 @@ const { getTrendingArtists } = require('./artistWatchCount.service');
 
 /**
  * Global Top-N artists by distinct user×content listen credits.
- * @param {{ limit?: number, windowDays?: number }} [opts]
+ * @param {{
+ *   limit?: number,
+ *   windowDays?: number,
+ *   defaultLimit?: number,
+ *   maxLimit?: number,
+ * }} [opts]
+ * `defaultLimit` / `maxLimit` — product adapters (weekly/popular) o‘z knoblarini berishi mumkin;
+ * berilmasa scoringWeights (top leaderboard) ishlatiladi.
  */
 const getTopArtists = async (opts = {}) => {
   const limit = resolveTopLimit(opts.limit, {
-    defaultLimit: scoringWeights.topLimit,
-    maxLimit: scoringWeights.topMaxLimit,
+    defaultLimit: opts.defaultLimit ?? scoringWeights.topLimit,
+    maxLimit: opts.maxLimit ?? scoringWeights.topMaxLimit,
   });
 
   const trending = await getTrendingArtists({

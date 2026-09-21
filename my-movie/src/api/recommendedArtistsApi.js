@@ -193,3 +193,28 @@ export const fetchWeeklyTopArtists = async ({ limit = 10, windowDays } = {}) => 
     source: data?.source || (artists.length ? 'weekly_top_artists' : 'empty'),
   };
 };
+
+/**
+ * Mashhur artistlar (public): /api/recommended-artists/popular
+ * Rolling 30-day window, limit 20 — oyna server configdan.
+ * @param {{ limit?: number }} [opts]
+ */
+export const fetchPopularArtists = async ({ limit = 20 } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/recommended-artists/popular?${query.toString()}`
+    : '/recommended-artists/popular';
+
+  const res = await recommendedArtistsFetch(path);
+  const data = await parseJson(res);
+  const artists = Array.isArray(data?.artists) ? data.artists : [];
+
+  return {
+    artists,
+    limit: data?.limit,
+    windowDays: data?.windowDays,
+    source: data?.source || (artists.length ? 'popular_artists' : 'empty'),
+  };
+};

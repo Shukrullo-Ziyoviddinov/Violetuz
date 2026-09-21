@@ -5,6 +5,7 @@
  * GET  /api/recommended-artists/trending     (public)
  * GET  /api/recommended-artists/top          (public)
  * GET  /api/recommended-artists/weekly-top   (public)
+ * GET  /api/recommended-artists/popular      (public, 30-day window, limit 20)
  * POST /api/recommended-artists/guest        (public, rate-limited, no DB write)
  * GET  /api/recommended-artists?limit=       (auth)
  *
@@ -26,6 +27,7 @@ router.get('/config', controller.getConfig);
 router.get('/trending', controller.listTrendingArtists);
 router.get('/top', controller.listTopArtists);
 router.get('/weekly-top', controller.listWeeklyTopArtists);
+router.get('/popular', controller.listPopularArtists);
 
 router.post(
   '/guest',

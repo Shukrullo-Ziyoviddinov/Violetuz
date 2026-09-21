@@ -13,6 +13,7 @@ const {
   getTrendingArtists,
 } = require('../services/artistWatchCount.service');
 const { getTopArtists, getWeeklyTopArtists } = require('../services/topArtists.service');
+const { getPopularArtists } = require('../services/popularArtistsRead.service');
 const {
   getGuestRecommendedArtists,
 } = require('../services/guestRecommendedArtists.service');
@@ -82,6 +83,17 @@ const listWeeklyTopArtists = asyncHandler(async (req, res) => {
 });
 
 /**
+ * GET /api/recommended-artists/popular
+ * Public Mashhur artistlar (rolling 30 days, limit 20). Oyna configdan.
+ */
+const listPopularArtists = asyncHandler(async (req, res) => {
+  const result = await getPopularArtists({
+    limit: req.query?.limit,
+  });
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * GET /api/recommended-artists/config
  */
 const getConfig = asyncHandler(async (_req, res) => {
@@ -101,5 +113,6 @@ module.exports = {
   listTrendingArtists,
   listTopArtists,
   listWeeklyTopArtists,
+  listPopularArtists,
   getConfig,
 };
