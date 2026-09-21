@@ -23,6 +23,9 @@ const {
 const {
   getTopMusicChartsFromListenEvents,
 } = require('../services/topMusicChartsRead.service');
+const {
+  getPopularAlbumsFromListenEvents,
+} = require('../services/popularAlbumsRead.service');
 
 /**
  * GET /api/music-recommendations/config/progress
@@ -69,6 +72,18 @@ const getMonthlyTopMusic = asyncHandler(async (req, res) => {
  */
 const getTopMusicCharts = asyncHandler(async (req, res) => {
   const result = await getTopMusicChartsFromListenEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/music-recommendations/popular-albums
+ * Public. ListenEvent album, oyna 30 kun, limit 20. Yozuv yo‘q.
+ */
+const getPopularAlbums = asyncHandler(async (req, res) => {
+  const result = await getPopularAlbumsFromListenEvents({
     limit: req.query?.limit,
   });
 
@@ -133,6 +148,7 @@ module.exports = {
   getWeeklyTopMusic,
   getMonthlyTopMusic,
   getTopMusicCharts,
+  getPopularAlbums,
   getByCategory,
   postGuestByCategory,
   postProgress,

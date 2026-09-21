@@ -285,6 +285,35 @@ export const fetchMonthlyTopMusic = async ({ limit } = {}) => {
 };
 
 /**
+ * Mashhur albomlar (public): GET /api/music-recommendations/popular-albums
+ * ListenEvent album, oyna/limit server configda (30 kun, max 20).
+ *
+ * @param {{ limit?: number }} [opts]
+ * @returns {Promise<{ items: Array<{ contentKey: string, contentId: string, viewCount: number, listenedSeconds: number, rank: number }>, windowDays?: number, limit?: number, minViews?: number, contentType?: string, source?: string }>}
+ */
+export const fetchPopularAlbums = async ({ limit } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/music-recommendations/popular-albums?${query.toString()}`
+    : '/music-recommendations/popular-albums';
+
+  const res = await musicRecFetch(path);
+  const data = await parseJson(res);
+  const items = Array.isArray(data?.items) ? data.items : [];
+
+  return {
+    items,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    contentType: data?.contentType,
+    source: data?.source || (items.length ? 'popular_albums' : 'empty'),
+  };
+};
+
+/**
  * Hafta + oy top (public): GET /api/music-recommendations/top-charts
  * Music page da bitta so‘rov — ikkala blok shu javobdan o‘qiydi.
  *
