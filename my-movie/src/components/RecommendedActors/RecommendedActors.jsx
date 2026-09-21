@@ -3,13 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import { useActorsApi } from '../../context/ActorsApiContext';
-import FollowingButton from '../../Music/FollowingButton/FollowingButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
-import { useImageReady } from '../../utils/useImageReady';
 import { useRecommendedActorsRanking } from '../../hooks/useRecommendedActorsRanking';
 import { useTrendingActorsRanking } from '../../hooks/useTrendingActorsRanking';
 import { useAppSelector } from '../../store/hooks';
 import { selectAuthReady } from '../../store/slices/userSlice';
+import RecommendedActorCard from './RecommendedActorCard';
 import './RecommendedActors.css';
 
 const RECOMMENDED_ACTORS_SKELETON_COUNT = 8;
@@ -50,79 +49,6 @@ const mergeActorsByPersonalAndTrending = (catalogActors, ranked, trending) => {
   for (const row of trendingList) pushId(row?.actorId);
 
   return ordered.length ? ordered : unique;
-};
-
-/** Rasm, ism va follow — rasm tayyor bo‘lguncha birga skeleton (cache-safe) */
-const RecommendedActorCard = ({ actor, lang, onOpen, t }) => {
-  const name = (() => {
-    const n = actor?.name?.[lang] ?? actor?.name?.uz ?? actor?.name?.ru ?? '';
-    return String(n).trim() || actor?.name?.uz || actor?.name?.ru || '';
-  })();
-
-  const imgSrc = actor.image || '/img/movie1.jpg';
-  const { showSkeleton, imgRef, onLoad, onError } = useImageReady(imgSrc);
-
-  return (
-    <div
-      className={`recommended-actors-item${showSkeleton ? ' recommended-actors-item--loading' : ''}`}
-      onClick={() => !showSkeleton && onOpen?.(actor.id)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (showSkeleton) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onOpen?.(actor.id);
-        }
-      }}
-      aria-busy={showSkeleton || undefined}
-      aria-label={`${name} — ${t('navbar.movies', 'Filmlar')}`}
-    >
-      <div className="recommended-actors-img-wrap">
-        {showSkeleton && (
-          <SkeletonLoader
-            variant="recommended-actor-img"
-            className="recommended-actors-img-skeleton"
-          />
-        )}
-        <img
-          ref={imgRef}
-          src={imgSrc}
-          alt={name}
-          className={`recommended-actors-img${showSkeleton ? ' recommended-actors-img--loading' : ''}`}
-          onLoad={onLoad}
-          onError={onError}
-        />
-      </div>
-
-      {showSkeleton ? (
-        <>
-          <div className="recommended-actors-name recommended-actors-name--skeleton">
-            <SkeletonLoader
-              variant="recommended-actor-name"
-              className="recommended-actors-name-skeleton"
-            />
-          </div>
-          <div className="recommended-actors-follow">
-            <SkeletonLoader
-              variant="recommended-actor-follow"
-              className="recommended-actors-follow-skeleton following-btn"
-            />
-          </div>
-        </>
-      ) : (
-        <>
-          <p className="recommended-actors-name">{name}</p>
-          <FollowingButton
-            artistId={actor.id}
-            entityType="actor"
-            wrapperClassName="recommended-actors-follow"
-            stopPropagation
-          />
-        </>
-      )}
-    </div>
-  );
 };
 
 const RecommendedActors = () => {
