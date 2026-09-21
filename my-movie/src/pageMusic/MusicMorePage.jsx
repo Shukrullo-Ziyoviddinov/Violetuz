@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
+import { fetchPopularAlbums } from '../api/musicRecommendationsApi';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
@@ -145,6 +146,13 @@ const SECTIONS = {
     titleDefault: "Mashhur to'plamlar",
     wishlistType: 'album',
     getDetailPath: (id) => `/music/album/${id}`,
+  },
+  'popular-albums': {
+    titleKey: 'music.mashhurAlbomlar',
+    titleDefault: 'Mashhur Albomlar',
+    wishlistType: 'album',
+    getDetailPath: (id) => `/music/album/${id}`,
+    isPopularAlbums: true,
   },
   'trend-clips': {
     categoryNameMusic: 'trendClipsData',
@@ -386,7 +394,37 @@ const MusicMorePage = () => {
     isAggregate,
   } = config;
 
+  const [popularRanked, setPopularRanked] = useState([]);
+  const [popularLoading, setPopularLoading] = useState(false);
+
+  useEffect(() => {
+    if (!config.isPopularAlbums) {
+      setPopularRanked([]);
+      setPopularLoading(false);
+      return undefined;
+    }
+    let cancelled = false;
+    setPopularLoading(true);
+    (async () => {
+      try {
+        const data = await fetchPopularAlbums();
+        const list = Array.isArray(data?.items) ? data.items : [];
+        if (!cancelled) setPopularRanked(list);
+      } catch {
+        if (!cancelled) setPopularRanked([]);
+      } finally {
+        if (!cancelled) setPopularLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [config.isPopularAlbums]);
+
   const catalogLoading = useMemo(() => {
+    if (config.isPopularAlbums) {
+      return Boolean(popularLoading) || Boolean(albumsLoading);
+    }
     if (config.isAllArtists) return Boolean(artistsLoading);
     if (categoryNameMusic === '__all__') return Boolean(musicLoading);
     if (categoryNameMusic === '__all_albums__') return Boolean(albumsLoading);
@@ -398,9 +436,11 @@ const MusicMorePage = () => {
     if (wishlistType === 'artist') return Boolean(artistsLoading);
     return Boolean(musicLoading);
   }, [
+    config.isPopularAlbums,
     config.isAllArtists,
     categoryNameMusic,
     wishlistType,
+    popularLoading,
     musicLoading,
     albumsLoading,
     clipsLoading,
@@ -410,6 +450,18 @@ const MusicMorePage = () => {
 
   /* filter() har renderda yangi massiv — useMemo yo‘q bo‘lsa useEffect loop → navbar ishlamaydi */
   const safeSectionData = useMemo(() => {
+    if (config.isPopularAlbums) {
+      const byId = new Map(
+        (allAlbums || []).map((album) => [String(album.id), album])
+      );
+      const out = [];
+      for (const row of popularRanked) {
+        const album = byId.get(String(row.contentId));
+        if (!album) continue;
+        out.push(album);
+      }
+      return out;
+    }
     if (config.isAllArtists) {
       return allArtists.map((a) => ({ ...a, title: a.name, artist: a.description }));
     }
@@ -431,9 +483,11 @@ const MusicMorePage = () => {
     }
     return ensureArray(sectionData);
   }, [
+    config.isPopularAlbums,
     config.isAllArtists,
     categoryNameMusic,
     wishlistType,
+    popularRanked,
     allMusic,
     allAlbums,
     allClips,

@@ -141,7 +141,8 @@ assert(ui.includes('MusicCards'), 'UI MusicCards');
 assert(ui.includes("wishlistType: 'album'"), 'smoke: wishlist album');
 assert(ui.includes("detailPathType: 'album'"), 'smoke: detail album path');
 assert(ui.includes('Mashhur Albomlar'), 'title Mashhur Albomlar');
-assert(ui.includes('initialCount: 20'), 'limit 20');
+assert(ui.includes('initialCount: 10'), 'home limit 10');
+assert(ui.includes("/music/more/popular-albums"), 'home moreTo MusicMorePage');
 assert(!ui.includes('weeklyRankSrc'), 'smoke: rank PNG yo‘q');
 assert(!ui.includes('TopMusicChart'), 'smoke: TopMusicChart emas');
 assert(!ui.includes('oytop'), 'smoke: oytop yo‘q');
@@ -149,7 +150,17 @@ assert(!ui.includes('oytop'), 'smoke: oytop yo‘q');
 assert(cards.includes("`/music/album/${itemId}`"), 'MusicCards album detail');
 assert(cards.includes('toggleWishlist(itemId, wishlistType)'), 'MusicCards wishlist');
 assert(cards.includes('CartochkaHoverModal'), 'MusicCards play/hover (albumdek)');
+assert(cards.includes('MusicButtonMore'), 'MusicCards more tugmasi');
 assert(cards.includes('rankSrc={item.weeklyRankSrc || \'\'}'), 'rank faqat weeklyRankSrc bo‘lsa');
+
+const morePage = fs.readFileSync(
+  path.join(root, 'pageMusic/MusicMorePage.jsx'),
+  'utf8'
+);
+assert(morePage.includes("'popular-albums'"), 'MusicMorePage section popular-albums');
+assert(morePage.includes('isPopularAlbums'), 'MusicMorePage popular ranked list');
+assert(morePage.includes('fetchPopularAlbums'), 'MusicMorePage API fetch');
+assert(morePage.includes('Mashhur Albomlar'), 'MusicMorePage title');
 
 assert(
   musicPage.includes('PopularAlbums') &&
