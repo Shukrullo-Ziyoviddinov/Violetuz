@@ -57,6 +57,15 @@ assert(
   serviceSrc.includes("source: items.length ? 'popular_albums' : 'empty'"),
   'source popular_albums'
 );
+assert(
+  serviceSrc.includes('keepStatsWithLiveAlbums') ||
+    serviceSrc.includes('Album.find'),
+  'katalogda bor albomlar filtrlanadi (o‘lik id yo‘q)'
+);
+assert(
+  serviceSrc.includes("require('../../models/Album.model')"),
+  'Album katalogdan tekshiradi'
+);
 assert(!serviceSrc.includes('sameTieGroup'), 'albom faylida formula nusxasi yo‘q');
 assert(!serviceSrc.includes('.sort('), 'albom faylida o‘z sorti yo‘q');
 assert(!serviceSrc.includes('ListenEvent.aggregate'), 'albom faylida o‘z aggregate yo‘q');

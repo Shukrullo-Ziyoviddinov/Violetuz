@@ -11,6 +11,7 @@ import WeeklyTopMusic from './WeeklyTopMusic/WeeklyTopMusic';
 import MonthlyTopMusic from './MonthlyTopMusic/MonthlyTopMusic';
 import PopularAlbums from './PopularAlbums/PopularAlbums';
 import PopularArtists from './PopularArtists/PopularArtists';
+import PopularClips from './PopularClips/PopularClips';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import {
@@ -250,6 +251,7 @@ const Music = () => {
                           isLoading={waitingRecs}
                         />
                         {section.id === 'music-drops' ? <TopArtist /> : null}
+                        {section.id === 'music-library' ? <PopularClips /> : null}
                       </React.Fragment>
                     );
                   }

@@ -26,6 +26,9 @@ const {
 const {
   getPopularAlbumsFromListenEvents,
 } = require('../services/popularAlbumsRead.service');
+const {
+  getPopularClipsFromListenEvents,
+} = require('../services/popularClipsRead.service');
 
 /**
  * GET /api/music-recommendations/config/progress
@@ -91,6 +94,18 @@ const getPopularAlbums = asyncHandler(async (req, res) => {
 });
 
 /**
+ * GET /api/music-recommendations/popular-clips
+ * Public. ListenEvent clip, oyna 30 kun, limit 20. Yozuv yo‘q.
+ */
+const getPopularClips = asyncHandler(async (req, res) => {
+  const result = await getPopularClipsFromListenEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * GET /api/music-recommendations/:categoryNameMusic?limit=&lazy=&contentType=
  */
 const getByCategory = asyncHandler(async (req, res) => {
@@ -149,6 +164,7 @@ module.exports = {
   getMonthlyTopMusic,
   getTopMusicCharts,
   getPopularAlbums,
+  getPopularClips,
   getByCategory,
   postGuestByCategory,
   postProgress,

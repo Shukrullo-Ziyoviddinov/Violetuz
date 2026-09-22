@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { fetchPopularAlbums } from '../api/musicRecommendationsApi';
+import { fetchPopularAlbums, fetchPopularClips } from '../api/musicRecommendationsApi';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
@@ -153,6 +153,14 @@ const SECTIONS = {
     wishlistType: 'album',
     getDetailPath: (id) => `/music/album/${id}`,
     isPopularAlbums: true,
+  },
+  'popular-clips': {
+    titleKey: 'music.mashhurKliplar',
+    titleDefault: 'Mashhur kliplar',
+    wishlistType: 'klip',
+    getDetailPath: (id) => `/music/video/${id}`,
+    isPopularClips: true,
+    isClips: true,
   },
   'trend-clips': {
     categoryNameMusic: 'trendClipsData',
@@ -396,9 +404,10 @@ const MusicMorePage = () => {
 
   const [popularRanked, setPopularRanked] = useState([]);
   const [popularLoading, setPopularLoading] = useState(false);
+  const isPopularRanked = Boolean(config.isPopularAlbums || config.isPopularClips);
 
   useEffect(() => {
-    if (!config.isPopularAlbums) {
+    if (!isPopularRanked) {
       setPopularRanked([]);
       setPopularLoading(false);
       return undefined;
@@ -407,7 +416,9 @@ const MusicMorePage = () => {
     setPopularLoading(true);
     (async () => {
       try {
-        const data = await fetchPopularAlbums();
+        const data = config.isPopularClips
+          ? await fetchPopularClips()
+          : await fetchPopularAlbums();
         const list = Array.isArray(data?.items) ? data.items : [];
         if (!cancelled) setPopularRanked(list);
       } catch {
@@ -419,11 +430,14 @@ const MusicMorePage = () => {
     return () => {
       cancelled = true;
     };
-  }, [config.isPopularAlbums]);
+  }, [isPopularRanked, config.isPopularAlbums, config.isPopularClips]);
 
   const catalogLoading = useMemo(() => {
     if (config.isPopularAlbums) {
       return Boolean(popularLoading) || Boolean(albumsLoading);
+    }
+    if (config.isPopularClips) {
+      return Boolean(popularLoading) || Boolean(clipsLoading);
     }
     if (config.isAllArtists) return Boolean(artistsLoading);
     if (categoryNameMusic === '__all__') return Boolean(musicLoading);
@@ -437,6 +451,7 @@ const MusicMorePage = () => {
     return Boolean(musicLoading);
   }, [
     config.isPopularAlbums,
+    config.isPopularClips,
     config.isAllArtists,
     categoryNameMusic,
     wishlistType,
@@ -462,6 +477,18 @@ const MusicMorePage = () => {
       }
       return out;
     }
+    if (config.isPopularClips) {
+      const byId = new Map(
+        (allClips || []).map((clip) => [String(clip.id), clip])
+      );
+      const out = [];
+      for (const row of popularRanked) {
+        const clip = byId.get(String(row.contentId));
+        if (!clip) continue;
+        out.push(clip);
+      }
+      return out;
+    }
     if (config.isAllArtists) {
       return allArtists.map((a) => ({ ...a, title: a.name, artist: a.description }));
     }
@@ -484,6 +511,7 @@ const MusicMorePage = () => {
     return ensureArray(sectionData);
   }, [
     config.isPopularAlbums,
+    config.isPopularClips,
     config.isAllArtists,
     categoryNameMusic,
     wishlistType,

@@ -1,17 +1,17 @@
 /**
- * Mashhur albomlar — faqat ListenEvent o‘qish.
+ * Mashhur kliplar — faqat ListenEvent o‘qish.
  * Pipeline weekly moduldan (`readWeeklyMusicListenStats`), tartib musicListenStatsRanker.
- * Bu fayl faqat 30 kunlik oyna, contentType album va limit 20 beradi.
+ * Bu fayl faqat 30 kunlik oyna, contentType clip va limit 20 beradi.
  * Progress, affinity, ContentView ga yozilmaydi.
  * Katalogda yo‘q (o‘chirilgan) contentId lar rankga kirmaydi — UI da “o‘lik id” qolmasin.
  *
- * @module recommendation-music/services/popularAlbumsRead.service
+ * @module recommendation-music/services/popularClipsRead.service
  */
 
 'use strict';
 
-const Album = require('../../models/Album.model');
-const { popularAlbumsConfig } = require('../config/popularAlbums.config');
+const Clip = require('../../models/Clip.model');
+const { popularClipsConfig } = require('../config/popularClips.config');
 const {
   readWeeklyMusicListenStats,
 } = require('./weeklyTopMusicRead.service');
@@ -21,7 +21,7 @@ const { rankMusicListenStats } = require('../utils/musicListenStatsRanker');
  * @param {Array<{ contentId?: unknown }>} stats
  * @returns {Promise<Array<{ contentId?: unknown }>>}
  */
-const keepStatsWithLiveAlbums = async (stats) => {
+const keepStatsWithLiveClips = async (stats) => {
   const rows = Array.isArray(stats) ? stats : [];
   if (rows.length === 0) return [];
 
@@ -35,7 +35,7 @@ const keepStatsWithLiveAlbums = async (stats) => {
   }
   if (idNums.length === 0) return [];
 
-  const docs = await Album.find({ id: { $in: idNums } })
+  const docs = await Clip.find({ id: { $in: idNums } })
     .select({ id: 1, _id: 0 })
     .lean();
   const live = new Set((docs || []).map((d) => String(d.id)));
@@ -48,35 +48,35 @@ const keepStatsWithLiveAlbums = async (stats) => {
  *
  * @param {{ now?: Date, limit?: number }} [opts]
  */
-const getPopularAlbumsFromListenEvents = async (opts = {}) => {
+const getPopularClipsFromListenEvents = async (opts = {}) => {
   const now = opts.now instanceof Date ? opts.now : new Date();
-  const windowDays = popularAlbumsConfig.windowDays;
+  const windowDays = popularClipsConfig.windowDays;
 
   const stats = await readWeeklyMusicListenStats({
     now,
     windowDays,
-    contentType: popularAlbumsConfig.contentType,
+    contentType: popularClipsConfig.contentType,
   });
 
-  const liveStats = await keepStatsWithLiveAlbums(stats);
+  const liveStats = await keepStatsWithLiveClips(stats);
 
   const items = rankMusicListenStats(liveStats, {
     limit: opts.limit,
-    minViews: popularAlbumsConfig.minViews,
-    maxLimit: popularAlbumsConfig.topMaxLimit,
+    minViews: popularClipsConfig.minViews,
+    maxLimit: popularClipsConfig.topMaxLimit,
   });
 
   return {
     items,
     windowDays,
-    limit: popularAlbumsConfig.topLimit,
-    minViews: popularAlbumsConfig.minViews,
-    contentType: popularAlbumsConfig.contentType,
-    source: items.length ? 'popular_albums' : 'empty',
+    limit: popularClipsConfig.topLimit,
+    minViews: popularClipsConfig.minViews,
+    contentType: popularClipsConfig.contentType,
+    source: items.length ? 'popular_clips' : 'empty',
   };
 };
 
 module.exports = {
-  getPopularAlbumsFromListenEvents,
-  keepStatsWithLiveAlbums,
+  getPopularClipsFromListenEvents,
+  keepStatsWithLiveClips,
 };
