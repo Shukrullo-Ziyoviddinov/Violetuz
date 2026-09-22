@@ -1,5 +1,4 @@
 [
-  { "id": "recommended", "slug": "recommended", "categoryName": "movies", "titleKey": "movies.recommended", "moreTo": "/recommended", "showHorizontalScroll": true },
   { "id": "koreaDrama", "slug": "korea-drama", "categoryName": "koreaDrama", "titleKey": "movies.koreaDrama", "moreTo": "/category/koreaDrama", "showHorizontalScroll": true },
   { "id": "kinolar", "slug": "kinolar", "categoryName": "kinolar", "titleKey": "movies.kinolar", "moreTo": "/category/kinolar", "showHorizontalScroll": true },
   { "id": "worldMovies", "slug": "world-movies", "categoryName": "worldMovies", "titleKey": "movies.worldMovies", "moreTo": "/category/worldMovies", "showHorizontalScroll": true },

@@ -1,5 +1,4 @@
 [
-  { "type": "movies", "sectionId": "recommended" },
   { "type": "shorts", "variant": "default" },
   { "type": "movies", "sectionId": "koreaDrama" },
   { "type": "movies", "sectionId": "kinolar" },

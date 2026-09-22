@@ -51,7 +51,8 @@ export const resolveRecommendationCategoryKey = ({
 } = {}) => {
   if (String(pathname).startsWith('/similar-movies')) return null;
   if (categoryId === 'topRated') return null;
-  if (pathname === '/recommended') return 'movies';
+  // /recommended — bo‘lim filteri emas (categoryName "movies" olib tashlangan)
+  if (pathname === '/recommended') return null;
 
   const known = new Set(
     (sectionCategoryNames || []).filter((name) => typeof name === 'string' && name.trim())

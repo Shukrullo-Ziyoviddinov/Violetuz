@@ -7764,7 +7764,7 @@
   },
   {
     "id": 1,
-    "categoryName": "movies",
+    "categoryName": "actionMovies",
     "title": {
       "uz": "Inception",
       "ru": "Начало"
@@ -8063,7 +8063,7 @@
   },
   {
     "id": 2,
-    "categoryName": "movies",
+    "categoryName": "actionMovies",
     "title": {
       "uz": "Qora Ritsar",
       "ru": "Темный рыцарь"
@@ -8350,7 +8350,7 @@
   },
   {
     "id": 3,
-    "categoryName": "movies",
+    "categoryName": "romanceMovies",
     "title": {
       "uz": "Dilwale",
       "ru": "Дилвале"
@@ -8634,7 +8634,7 @@
   },
   {
     "id": 4,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "3 Ahmoq",
       "ru": "3 идиота"
@@ -8759,7 +8759,7 @@
   },
   {
     "id": 5,
-    "categoryName": "movies",
+    "categoryName": "koreaDrama",
     "title": {
       "uz": "Interstellar",
       "ru": "Интерстеллар"
@@ -8882,7 +8882,7 @@
   },
   {
     "id": 6,
-    "categoryName": "movies",
+    "categoryName": "koreaDrama",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9005,7 +9005,7 @@
   },
   {
     "id": 7,
-    "categoryName": "movies",
+    "categoryName": "russianMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9127,7 +9127,7 @@
   },
   {
     "id": 8,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9249,7 +9249,7 @@
   },
   {
     "id": 9,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9371,7 +9371,7 @@
   },
   {
     "id": 10,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9493,7 +9493,7 @@
   },
   {
     "id": 11,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9616,7 +9616,7 @@
   },
   {
     "id": 12,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9739,7 +9739,7 @@
   },
   {
     "id": 13,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9862,7 +9862,7 @@
   },
   {
     "id": 14,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -9962,7 +9962,7 @@
   },
   {
     "id": 16,
-    "categoryName": "movies",
+    "categoryName": "russianMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10085,7 +10085,7 @@
   },
   {
     "id": 17,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10203,7 +10203,7 @@
   },
   {
     "id": 18,
-    "categoryName": "movies",
+    "categoryName": "uzbekMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10326,7 +10326,7 @@
   },
   {
     "id": 19,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10431,7 +10431,7 @@
   },
   {
     "id": 20,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10554,7 +10554,7 @@
   },
   {
     "id": 21,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10677,7 +10677,7 @@
   },
   {
     "id": 22,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10782,7 +10782,7 @@
   },
   {
     "id": 23,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -10905,7 +10905,7 @@
   },
   {
     "id": 24,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11010,7 +11010,7 @@
   },
   {
     "id": 25,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11133,7 +11133,7 @@
   },
   {
     "id": 26,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11238,7 +11238,7 @@
   },
   {
     "id": 27,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11343,7 +11343,7 @@
   },
   {
     "id": 28,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11466,7 +11466,7 @@
   },
   {
     "id": 29,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11571,7 +11571,7 @@
   },
   {
     "id": 31,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11694,7 +11694,7 @@
   },
   {
     "id": 32,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"
@@ -11799,7 +11799,7 @@
   },
   {
     "id": 33,
-    "categoryName": "movies",
+    "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
       "ru": "Побег из Шоушенка"

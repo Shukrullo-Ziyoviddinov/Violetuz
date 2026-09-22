@@ -124,9 +124,8 @@ const RecommendedPage = () => {
       return getSimilarMovies(currentMovie, allMovies);
     }
     if (useAllMoviesForGenre) return allMovies;
-    if (location.pathname === '/recommended') {
-      return allMovies.filter((movie) => movie.categoryName === 'movies');
-    }
+    // /recommended — umumiy katalog (categoryName "movies" endi yo‘q)
+    if (location.pathname === '/recommended') return allMovies;
     if (categoryId === 'topRated') return getTopRatedMovies(allMovies);
     if (isNavCategory) return filterMoviesByNavCategory(allMovies, navCategory);
     if (categoryId) {
