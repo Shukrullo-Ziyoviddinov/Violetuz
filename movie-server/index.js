@@ -30,6 +30,12 @@ const startServer = async () => {
       initialDelayMs: 8_000,
     });
 
+    const { startHomeFeedSchedulers } = require('./home-feed/jobs');
+    startHomeFeedSchedulers({
+      feed: { runImmediately: true, initialDelayMs: 15_000 },
+      coOccurrence: { runImmediately: true, initialDelayMs: 20_000 },
+    });
+
     app.listen(PORT, () => {
       console.log(`Movie server running on http://localhost:${PORT}`);
     });

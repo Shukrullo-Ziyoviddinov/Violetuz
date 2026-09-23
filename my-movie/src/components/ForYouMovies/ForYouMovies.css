@@ -1,0 +1,135 @@
+.for-you {
+  margin-bottom: 1rem;
+  padding: 0 2rem;
+}
+
+.for-you-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.for-you-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.for-you-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 30%, #c0c0c0 60%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.for-you-title-skeleton {
+  width: 240px;
+  height: 28px;
+}
+
+.for-you-card {
+  flex-shrink: 0;
+  width: 200px;
+  cursor: pointer;
+}
+
+.for-you-card--skeleton,
+.for-you-card--loading {
+  cursor: default;
+}
+
+.for-you-card-image-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 130%;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.for-you-card-image,
+.for-you-card-image-skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.for-you-card-image--loading {
+  opacity: 0;
+}
+
+.for-you-card:hover .for-you-card-image {
+  transform: scale(1.05);
+  transition: transform 0.3s;
+}
+
+.for-you-card-save {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.for-you-card-save--on {
+  color: #ff4d6d;
+}
+
+.for-you-card-rating {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 2;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffd700;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.for-you-card-title {
+  margin: 0.55rem 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.for-you-card-title--skeleton {
+  display: block;
+  width: 72%;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 768px) {
+  .for-you {
+    padding: 0 0.7rem;
+  }
+
+  .for-you-title {
+    font-size: 1.35rem;
+  }
+
+  .for-you-card {
+    width: 150px;
+  }
+}

@@ -13,6 +13,7 @@ import WeeklyTopActors from '../components/WeeklyTopActors/WeeklyTopActors';
 import WeeklyTopMovies from '../components/WeeklyTopMovies/WeeklyTopMovies';
 import MonthlyTopMovies from '../components/MonthlyTopMovies/MonthlyTopMovies';
 import TrillerSection from '../components/Triller/TrillerSection';
+import ForYouMovies from '../components/ForYouMovies/ForYouMovies';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import { useHomeCategoryRecommendations } from '../hooks/useHomeCategoryRecommendations';
 import './Home.css';
@@ -51,6 +52,7 @@ const Home = () => {
     <div className="home">
       <Banner />
       <Categories />
+      <ForYouMovies />
       {showHomeMovieSkeletons
         ? Array.from({ length: HOME_MOVIE_SKELETON_COUNT }, (_, index) => (
             <Movies
