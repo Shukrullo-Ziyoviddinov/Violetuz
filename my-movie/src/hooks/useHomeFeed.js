@@ -8,12 +8,14 @@ import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/
 /**
  * Login: cookie. Mehmon: localHistory.
  * Bo'lim tavsiya hookiga ulanmaydi.
+ *
+ * @param {{ enabled?: boolean }} [opts]
  */
-export function useHomeFeed() {
+export function useHomeFeed({ enabled = true } = {}) {
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const [items, setItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [guestHistoryEpoch, setGuestHistoryEpoch] = useState(0);
 
   useEffect(() => {
@@ -24,6 +26,12 @@ export function useHomeFeed() {
 
   useEffect(() => {
     let cancelled = false;
+
+    if (!enabled) {
+      setItems([]);
+      setIsLoading(false);
+      return undefined;
+    }
 
     if (!authReady) {
       setItems([]);
@@ -49,7 +57,7 @@ export function useHomeFeed() {
     return () => {
       cancelled = true;
     };
-  }, [authReady, isLoggedIn, guestHistoryEpoch]);
+  }, [authReady, enabled, isLoggedIn, guestHistoryEpoch]);
 
   return { items, isLoading };
 }

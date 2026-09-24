@@ -12,6 +12,7 @@ import { getWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHi
 import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/events';
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
+import { useHomeFeed } from '../hooks/useHomeFeed';
 import './RecommendedPage.css';
 
 const getRatingFilter = (movie, selectedRatingType, selectedRating) => {
@@ -110,6 +111,10 @@ const RecommendedPage = () => {
   }, [genreFromUrl, getGenresFromUrl]);
 
   const isSimilarMoviesPage = location.pathname.startsWith('/similar-movies/');
+  const isForYouPage = location.pathname === '/recommended';
+  const { items: feedItems, isLoading: feedLoading } = useHomeFeed({
+    enabled: isForYouPage && !genreFromUrl,
+  });
 
   // Genre filter bo'lsa (URL ?genre=) - barcha kinolardan qidirish (allMovies)
   const useAllMoviesForGenre = genreFromUrl && selectedGenres.length > 0;
@@ -118,14 +123,21 @@ const RecommendedPage = () => {
   const navCategory = categoryId ? getCategoryById(categoryId) : null;
   const isNavCategory = Boolean(navCategory);
 
+  const forYouMovies = useMemo(() => {
+    if (!isForYouPage || useAllMoviesForGenre) return [];
+    const byId = new Map(allMovies.map((movie) => [String(movie.id), movie]));
+    return feedItems
+      .map((item) => byId.get(String(item.movieId)))
+      .filter(Boolean);
+  }, [allMovies, feedItems, isForYouPage, useAllMoviesForGenre]);
+
   const localCategoryMovies = useMemo(() => {
     if (isSimilarMoviesPage && movieId) {
       const currentMovie = allMovies.find((m) => String(m.id) === String(movieId));
       return getSimilarMovies(currentMovie, allMovies);
     }
-    if (useAllMoviesForGenre) return allMovies;
-    // /recommended — umumiy katalog (categoryName "movies" endi yo‘q)
-    if (location.pathname === '/recommended') return allMovies;
+    if (genreFromUrl || useAllMoviesForGenre) return allMovies;
+    if (isForYouPage) return forYouMovies;
     if (categoryId === 'topRated') return getTopRatedMovies(allMovies);
     if (isNavCategory) return filterMoviesByNavCategory(allMovies, navCategory);
     if (categoryId) {
@@ -140,6 +152,9 @@ const RecommendedPage = () => {
   }, [
     allMovies,
     categoryId,
+    forYouMovies,
+    genreFromUrl,
+    isForYouPage,
     isNavCategory,
     isSimilarMoviesPage,
     location.pathname,
@@ -255,7 +270,8 @@ const RecommendedPage = () => {
     filteredMovies = filteredMovies.filter(movie => movie.ageRestriction === selectedAge);
   }
 
-  const listLoading = moviesLoading || recommendationsLoading;
+  const listLoading =
+    moviesLoading || recommendationsLoading || (isForYouPage && !useAllMoviesForGenre && feedLoading);
 
   return (
     <div className="recommended-page">
