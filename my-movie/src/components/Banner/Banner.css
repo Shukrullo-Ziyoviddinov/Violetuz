@@ -140,6 +140,21 @@
     }
 }
 
+/* Desktop: balandlik 570px qoladi, slayd keng (taxminan 16:9) */
+@media (min-width: 993px) {
+    .manga-image {
+        width: min(72%, calc(570px * 16 / 9));
+    }
+
+    .manga-image img {
+        object-fit: cover;
+    }
+
+    .manga-image video.manga-banner-video {
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+}
+
 .manga-banner-sound-btn {
     position: absolute;
     right: 0.65rem;
