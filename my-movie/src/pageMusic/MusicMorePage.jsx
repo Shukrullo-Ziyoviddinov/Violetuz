@@ -165,7 +165,7 @@ const SECTIONS = {
   },
   'sizga-mos-musiqalar': {
     titleKey: 'music.forYouMusic',
-    titleDefault: 'Sizga mos musiqalar',
+    titleDefault: 'Siz uchun mos musiqalar',
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
     isMusicHomeFeed: true,

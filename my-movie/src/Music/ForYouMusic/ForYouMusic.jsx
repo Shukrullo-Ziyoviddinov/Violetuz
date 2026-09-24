@@ -49,7 +49,6 @@ const ForYouMusic = () => {
   if (!waiting && tracks.length === 0) return null;
 
   const visible = tracks.slice(0, HOME_LIMIT);
-  const showMore = tracks.length > HOME_LIMIT;
 
   return (
     <div className="music-cards music-cards--sizga-mos-musiqalar" aria-busy={waiting || undefined}>
@@ -60,7 +59,7 @@ const ForYouMusic = () => {
           ) : (
             <h2 className="music-cards-title">
               <span className="music-cards-title-text">
-                {t('music.forYouMusic', 'Sizga mos musiqalar')}
+                {t('music.forYouMusic', 'Siz uchun mos musiqalar')}
               </span>
             </h2>
           )}
@@ -86,7 +85,7 @@ const ForYouMusic = () => {
                     />
                   </CartochkaHoverModal>
                 ))}
-            {showMore ? <MusicButtonMore to={MORE_PATH} /> : null}
+            {!waiting && tracks.length > 0 ? <MusicButtonMore to={MORE_PATH} /> : null}
           </HorizontalScroll>
         </div>
       </div>
