@@ -32,6 +32,7 @@ const emptyBanner = () => ({
   titleImg: '',
   title: '',
   description: '',
+  detailsUrl: '',
 });
 
 /**
@@ -173,6 +174,7 @@ const AdminPage = () => {
       titleImg: b.titleImg || '',
       title: b.title || '',
       description: b.description || '',
+      detailsUrl: b.detailsUrl || '',
     });
     setMessage('');
   };
@@ -197,6 +199,7 @@ const AdminPage = () => {
         titleImg: bannerForm.titleImg || '',
         title: bannerForm.title || '',
         description: bannerForm.description || '',
+        detailsUrl: bannerForm.detailsUrl || '',
       };
       if (editingBannerId) {
         await updateAdminBanner(editingBannerId, payload);
@@ -444,6 +447,15 @@ const AdminPage = () => {
                 onChange={(e) => setBannerForm((s) => ({ ...s, description: e.target.value }))}
                 placeholder="ixtiyoriy"
                 rows={3}
+              />
+            </label>
+            <label>
+              detailsUrl
+              <input
+                type="text"
+                value={bannerForm.detailsUrl}
+                onChange={(e) => setBannerForm((s) => ({ ...s, detailsUrl: e.target.value }))}
+                placeholder="ixtiyoriy"
               />
             </label>
             <div className="admin-form-actions">

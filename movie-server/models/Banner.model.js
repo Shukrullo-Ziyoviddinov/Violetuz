@@ -44,6 +44,11 @@ const bannerSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    detailsUrl: {
+      type: String,
+      trim: true,
+      default: '',
+    },
   },
   {
     strict: true,

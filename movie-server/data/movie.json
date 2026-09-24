@@ -2478,6 +2478,10 @@
       "uz": "Coco",
       "ru": "Тайна Коко"
     },
+    "titleImg": {
+      "uz": "/img/banner-title-4.png",
+      "ru": "/img/banner-title-4.png"
+    },
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
@@ -2603,6 +2607,10 @@
     "title": {
       "uz": "Coco",
       "ru": "Тайна Коко"
+    },
+    "titleImg": {
+      "uz": "/img/banner-title-3.png",
+      "ru": "/img/banner-title-3.png"
     },
     "homeImg": {
       "uz": "/img/movie12.jpg",
@@ -14127,6 +14135,10 @@
       "uz": "Taqdirning Ironiyasi",
       "ru": "Ирония судьбы"
     },
+    "titleImg": {
+      "uz": "/img/banner-title-1.png",
+      "ru": "/img/banner-title-1.png"
+    },
     "homeImg": {
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
@@ -15041,6 +15053,10 @@
     "title": {
       "uz": "Taqiq Qilingan Sevgi",
       "ru": "Запретная любовь"
+    },
+    "titleImg": {
+      "uz": "/img/banner-title-2.png",
+      "ru": "/img/banner-title-2.png"
     },
     "homeImg": {
       "uz": "/img/movie6.jpg",

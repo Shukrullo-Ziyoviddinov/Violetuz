@@ -71,6 +71,7 @@ const Banner = () => {
                 titleText: manualTitle,
                 titleFallback: movieTitleText,
                 description: String(banner.description || '').trim(),
+                detailsUrl: String(banner.detailsUrl || '').trim(),
                 category: movie?.category || '',
                 rating: movie?.rating,
                 ratingImdb: movie?.ratingImdb,
@@ -498,8 +499,10 @@ const Banner = () => {
         const showTitleImg = Boolean(image.titleImg) && !failedTitleKeys.has(titleKey);
         const titleText = image.titleText || (!showTitleImg ? image.titleFallback : '');
         const description = image.description || '';
+        const showWatch = Boolean(image.movieId && image.link);
+        const showDetails = !image.movieId && Boolean(image.detailsUrl);
         const hasCopy = showTitleImg || Boolean(titleText) || Boolean(description);
-        if (!image?.movieId && !hasCopy) return null;
+        if (!showWatch && !showDetails && !hasCopy) return null;
 
         const ratings = [
             image.category !== 'anonslar' && hasRatingValue(image.rating)
@@ -590,7 +593,29 @@ const Banner = () => {
             });
         }
 
-        if (!hasCopy && ratings.length === 0 && specItems.length === 0) return null;
+        if (!hasCopy && ratings.length === 0 && specItems.length === 0 && !showWatch && !showDetails) return null;
+
+        const stopBannerDrag = (e) => {
+            e.stopPropagation();
+        };
+
+        const openWatch = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (wasDragRef.current || !image.link) return;
+            navigate(image.link);
+        };
+
+        const openDetails = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (wasDragRef.current || !image.detailsUrl) return;
+            if (/^https?:\/\//i.test(image.detailsUrl)) {
+                window.location.assign(image.detailsUrl);
+                return;
+            }
+            navigate(image.detailsUrl);
+        };
 
         return (
             <div className="manga-banner-meta">
@@ -644,6 +669,34 @@ const Banner = () => {
                                 <span className="movie-detail-spec-value">{item.value}</span>
                             </div>
                         ))}
+                    </div>
+                ) : null}
+                {showWatch || showDetails ? (
+                    <div className="manga-banner-actions">
+                        {showWatch ? (
+                            <button
+                                type="button"
+                                className="manga-banner-action"
+                                onClick={openWatch}
+                                onMouseDown={stopBannerDrag}
+                                onTouchStart={stopBannerDrag}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5.5v13l11-6.5L8 5.5z" />
+                                </svg>
+                                <span>{contentLang === 'ru' ? 'Смотреть' : "Ko'rish"}</span>
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                className="manga-banner-action"
+                                onClick={openDetails}
+                                onMouseDown={stopBannerDrag}
+                                onTouchStart={stopBannerDrag}
+                            >
+                                <span>{contentLang === 'ru' ? 'Подробнее' : 'Batafsil'}</span>
+                            </button>
+                        )}
                     </div>
                 ) : null}
             </div>

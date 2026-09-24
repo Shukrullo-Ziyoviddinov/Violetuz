@@ -78,6 +78,7 @@ class BannerService {
     if (patch.titleImg !== undefined) item.titleImg = String(patch.titleImg ?? '').trim();
     if (patch.title !== undefined) item.title = String(patch.title ?? '').trim();
     if (patch.description !== undefined) item.description = String(patch.description ?? '').trim();
+    if (patch.detailsUrl !== undefined) item.detailsUrl = String(patch.detailsUrl ?? '').trim();
 
     await item.save();
     return stripMongoId(item);

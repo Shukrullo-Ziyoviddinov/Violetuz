@@ -487,6 +487,34 @@
     overflow: hidden;
 }
 
+.manga-banner-actions {
+    display: flex;
+    pointer-events: auto;
+}
+
+.manga-banner-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.15rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #b87ff7, #9b4fe7);
+    color: #fff;
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.manga-banner-action svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    display: block;
+}
+
 .manga-banner-meta .movie-detail-rating {
     display: flex;
     align-items: center;
@@ -573,6 +601,11 @@
     .manga-banner-description {
         font-size: 0.78rem;
         -webkit-line-clamp: 2;
+    }
+
+    .manga-banner-action {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.85rem;
     }
 
     .manga-banner-meta .movie-detail-rating-logo {

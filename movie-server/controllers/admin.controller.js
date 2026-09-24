@@ -102,6 +102,18 @@ const optionalBannerText = (value, field, max) => {
   return text;
 };
 
+const optionalDetailsUrl = (value) => {
+  const text = String(value ?? '').trim();
+  if (!text) return '';
+  if (text.length > 500) {
+    throw badRequest('detailsUrl 500 belgidan oshmasligi kerak');
+  }
+  if (!/^https?:\/\//i.test(text) && !text.startsWith('/')) {
+    throw badRequest('detailsUrl http(s) yoki / bilan boshlanadigan manzil bo‘lishi kerak');
+  }
+  return text;
+};
+
 const createBanner = async (req, res) => {
   const body = req.body || {};
   const lang = String(body.lang || '').trim();
@@ -122,6 +134,7 @@ const createBanner = async (req, res) => {
   const titleImg = assertR2MediaUrl(body.titleImg ?? '', { field: 'titleImg' });
   const title = optionalBannerText(body.title, 'title', 180);
   const description = optionalBannerText(body.description, 'description', 600);
+  const detailsUrl = optionalDetailsUrl(body.detailsUrl);
 
   const item = await bannerService.create({
     lang,
@@ -131,6 +144,7 @@ const createBanner = async (req, res) => {
     titleImg: titleImg || '',
     title,
     description,
+    detailsUrl,
   });
 
   sendSuccess(res, { data: item }, 201);
@@ -155,6 +169,7 @@ const updateBanner = async (req, res) => {
   if (body.description !== undefined) {
     patch.description = optionalBannerText(body.description, 'description', 600);
   }
+  if (body.detailsUrl !== undefined) patch.detailsUrl = optionalDetailsUrl(body.detailsUrl);
 
   const existing = await bannerService.getById(req.params.id);
   const item = await bannerService.update(req.params.id, patch);
