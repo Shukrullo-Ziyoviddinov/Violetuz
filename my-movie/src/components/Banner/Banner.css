@@ -498,9 +498,9 @@
     justify-content: center;
     gap: 0.4rem;
     padding: 0.7rem 1.15rem;
-    border: none;
+    border: 1.5px solid #0313ea;
     border-radius: 12px;
-    background: linear-gradient(135deg, #b87ff7, #9b4fe7);
+    background: #1e03d24d;
     color: #fff;
     font-size: 0.98rem;
     font-weight: 600;
