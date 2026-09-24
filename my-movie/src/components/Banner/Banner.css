@@ -28,6 +28,12 @@
     cursor: grabbing;
 }
 
+@media (min-width: 993px) {
+    .manga-carousel {
+        margin-top: 2rem;
+    }
+}
+
 /* Slides Container - Rasmlar bir qatorda */
 .manga-slides {
     position: relative;
