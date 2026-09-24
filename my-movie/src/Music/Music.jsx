@@ -12,6 +12,7 @@ import MonthlyTopMusic from './MonthlyTopMusic/MonthlyTopMusic';
 import PopularAlbums from './PopularAlbums/PopularAlbums';
 import PopularArtists from './PopularArtists/PopularArtists';
 import PopularClips from './PopularClips/PopularClips';
+import ForYouMusic from './ForYouMusic/ForYouMusic';
 import { ActiveClipProvider } from '../components/cartochkaHoverModal/ActiveClipContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import {
@@ -125,6 +126,7 @@ const Music = () => {
       <div className="music-section">
         <MusicBanner />
         <div className="music-container">
+          <ForYouMusic />
           {showMusicSectionSkeletons
             ? Array.from({ length: MUSIC_SECTION_SKELETON_COUNT }, (_, index) => (
                 <MusicCards

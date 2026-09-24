@@ -5,6 +5,7 @@ import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { fetchPopularAlbums, fetchPopularClips } from '../api/musicRecommendationsApi';
+import { useMusicHomeFeed } from '../hooks/useMusicHomeFeed';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
@@ -161,6 +162,13 @@ const SECTIONS = {
     getDetailPath: (id) => `/music/video/${id}`,
     isPopularClips: true,
     isClips: true,
+  },
+  'sizga-mos-musiqalar': {
+    titleKey: 'music.forYouMusic',
+    titleDefault: 'Sizga mos musiqalar',
+    wishlistType: 'music',
+    getDetailPath: (id) => `/music/${id}`,
+    isMusicHomeFeed: true,
   },
   'trend-clips': {
     categoryNameMusic: 'trendClipsData',
@@ -375,6 +383,10 @@ const MusicMorePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { section = 'trend' } = useParams();
+  const isForYouMusicPage = section === 'sizga-mos-musiqalar';
+  const { items: forYouFeed, isLoading: forYouFeedLoading } = useMusicHomeFeed({
+    enabled: isForYouMusicPage,
+  });
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
@@ -433,6 +445,9 @@ const MusicMorePage = () => {
   }, [isPopularRanked, config.isPopularAlbums, config.isPopularClips]);
 
   const catalogLoading = useMemo(() => {
+    if (config.isMusicHomeFeed) {
+      return Boolean(forYouFeedLoading) || Boolean(musicLoading);
+    }
     if (config.isPopularAlbums) {
       return Boolean(popularLoading) || Boolean(albumsLoading);
     }
@@ -450,6 +465,7 @@ const MusicMorePage = () => {
     if (wishlistType === 'artist') return Boolean(artistsLoading);
     return Boolean(musicLoading);
   }, [
+    config.isMusicHomeFeed,
     config.isPopularAlbums,
     config.isPopularClips,
     config.isAllArtists,
@@ -461,10 +477,21 @@ const MusicMorePage = () => {
     clipsLoading,
     concertsLoading,
     artistsLoading,
+    forYouFeedLoading,
   ]);
 
   /* filter() har renderda yangi massiv — useMemo yo‘q bo‘lsa useEffect loop → navbar ishlamaydi */
   const safeSectionData = useMemo(() => {
+    if (config.isMusicHomeFeed) {
+      const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
+      const out = [];
+      for (const row of forYouFeed) {
+        const track = byId.get(String(row.contentId));
+        if (!track) continue;
+        out.push(track);
+      }
+      return out;
+    }
     if (config.isPopularAlbums) {
       const byId = new Map(
         (allAlbums || []).map((album) => [String(album.id), album])
@@ -510,6 +537,7 @@ const MusicMorePage = () => {
     }
     return ensureArray(sectionData);
   }, [
+    config.isMusicHomeFeed,
     config.isPopularAlbums,
     config.isPopularClips,
     config.isAllArtists,
@@ -522,6 +550,7 @@ const MusicMorePage = () => {
     allConcerts,
     allArtists,
     sectionData,
+    forYouFeed,
   ]);
 
   const [filteredItems, setFilteredItems] = useState(safeSectionData);

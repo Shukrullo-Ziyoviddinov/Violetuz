@@ -36,6 +36,12 @@ const startServer = async () => {
       coOccurrence: { runImmediately: true, initialDelayMs: 20_000 },
     });
 
+    const { startMusicHomeFeedSchedulers } = require('./music-home-feed/jobs');
+    startMusicHomeFeedSchedulers({
+      feed: { runImmediately: true, initialDelayMs: 25_000 },
+      coListen: { runImmediately: true, initialDelayMs: 30_000 },
+    });
+
     app.listen(PORT, () => {
       console.log(`Movie server running on http://localhost:${PORT}`);
     });
