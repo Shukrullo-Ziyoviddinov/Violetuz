@@ -135,7 +135,7 @@
         min-height: 100%;
         transform: translate(-50%, -50%) scale(1.05);
         object-fit: cover;
-        object-position: right center;
+        object-position: 82% center;
     }
 }
 
@@ -144,7 +144,7 @@
         min-width: 100%;
         min-height: 100%;
         transform: translate(-50%, -50%) scale(1.05);
-        object-position: right center;
+        object-position: 82% center;
     }
 }
 
@@ -329,7 +329,7 @@
     .manga-image img,
     .manga-image video.manga-banner-video {
         object-fit: cover;
-        object-position: right center;
+        object-position: 82% center;
     }
 }
 
