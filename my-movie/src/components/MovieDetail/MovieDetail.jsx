@@ -622,7 +622,8 @@ const MovieDetail = () => {
     if (!movie?.titleImg) return null;
     const src =
       movie.titleImg[contentLang] || movie.titleImg.uz || movie.titleImg.ru || null;
-    return src && String(src).trim() ? String(src).trim() : null;
+    const trimmed = src && String(src).trim() ? String(src).trim() : '';
+    return trimmed ? normalizeImagePath(trimmed) : null;
   }, [movie, contentLang]);
 
   useEffect(() => {
@@ -641,7 +642,7 @@ const MovieDetail = () => {
     if (img.complete && img.naturalWidth > 0) {
       setTitleImgReady(true);
     }
-    const soft = window.setTimeout(() => setTitleImgReady(true), 12000);
+    const soft = window.setTimeout(() => setTitleImgReady(true), 1500);
     return () => {
       img.onload = null;
       img.onerror = null;

@@ -203,6 +203,13 @@
   display: block;
 }
 
+.movie-detail-title-img-wrapper--loading .movie-detail-title-img-skeleton,
+.movie-detail-title-img-wrapper--loading .skeleton-loader--movie-detail-title-img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
 .movie-detail-title-img-skeleton,
 .skeleton-loader--movie-detail-title-img {
   display: block;
@@ -220,11 +227,9 @@
 }
 
 .movie-detail-title-img--loading {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-  width: 1px;
-  height: 1px;
+  position: relative;
+  z-index: 1;
+  opacity: 1;
 }
 
 .movie-detail-title-sr-only {

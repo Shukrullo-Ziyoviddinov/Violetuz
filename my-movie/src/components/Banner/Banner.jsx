@@ -151,7 +151,18 @@ const Banner = () => {
 
         const normalized = images.map((img) => normalizeImagePath(img.src)).filter(Boolean);
         const uniqueSrcs = [...new Set(normalized)];
+        const titleSrcs = [...new Set(
+            images.flatMap((img) => [img.movieTitleImg, img.manualTitleImg, img.titleImg])
+                .map((src) => normalizeImagePath(src))
+                .filter(Boolean)
+        )];
         const preloaders = [];
+
+        titleSrcs.forEach((src) => {
+            const img = new Image();
+            img.src = src;
+            preloaders.push(img);
+        });
 
         uniqueSrcs.forEach((src) => {
             const existing = typeof document !== 'undefined'
