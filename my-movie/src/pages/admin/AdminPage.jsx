@@ -29,6 +29,9 @@ const emptyBanner = () => ({
   movieId: '',
   image: '',
   video: '',
+  titleImg: '',
+  title: '',
+  description: '',
 });
 
 /**
@@ -167,6 +170,9 @@ const AdminPage = () => {
       movieId: String(b.movieId ?? ''),
       image: b.image || '',
       video: b.video || '',
+      titleImg: b.titleImg || '',
+      title: b.title || '',
+      description: b.description || '',
     });
     setMessage('');
   };
@@ -181,11 +187,16 @@ const AdminPage = () => {
     setBusy(true);
     setMessage('');
     try {
+      const rawMovieId = String(bannerForm.movieId || '').trim();
+      const movieIdNum = Number(rawMovieId);
       const payload = {
         lang: bannerForm.lang,
-        movieId: Number(bannerForm.movieId),
+        movieId: rawMovieId && Number.isInteger(movieIdNum) && movieIdNum > 0 ? movieIdNum : null,
         image: bannerForm.image || '',
         video: bannerForm.video || '',
+        titleImg: bannerForm.titleImg || '',
+        title: bannerForm.title || '',
+        description: bannerForm.description || '',
       };
       if (editingBannerId) {
         await updateAdminBanner(editingBannerId, payload);
@@ -392,7 +403,7 @@ const AdminPage = () => {
                 type="number"
                 value={bannerForm.movieId}
                 onChange={(e) => setBannerForm((s) => ({ ...s, movieId: e.target.value }))}
-                required
+                placeholder="ixtiyoriy"
               />
             </label>
             <AdminMediaField
@@ -410,6 +421,31 @@ const AdminPage = () => {
               onChange={(video) => setBannerForm((s) => ({ ...s, video }))}
               disabled={busy}
             />
+            <AdminMediaField
+              label="titleImg → img/ (ixtiyoriy)"
+              folder="img"
+              value={bannerForm.titleImg}
+              onChange={(titleImg) => setBannerForm((s) => ({ ...s, titleImg }))}
+              disabled={busy}
+            />
+            <label>
+              title
+              <input
+                type="text"
+                value={bannerForm.title}
+                onChange={(e) => setBannerForm((s) => ({ ...s, title: e.target.value }))}
+                placeholder="ixtiyoriy"
+              />
+            </label>
+            <label>
+              description
+              <textarea
+                value={bannerForm.description}
+                onChange={(e) => setBannerForm((s) => ({ ...s, description: e.target.value }))}
+                placeholder="ixtiyoriy"
+                rows={3}
+              />
+            </label>
             <div className="admin-form-actions">
               <button type="submit" className="admin-btn" disabled={busy}>
                 {editingBannerId ? 'Yangilash' : 'Yaratish'}

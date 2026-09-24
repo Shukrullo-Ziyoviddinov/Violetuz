@@ -94,26 +94,43 @@ const listBanners = async (req, res) => {
   sendSuccess(res, { count: items.length, data: items });
 };
 
+const optionalBannerText = (value, field, max) => {
+  const text = String(value ?? '').trim();
+  if (text.length > max) {
+    throw badRequest(`${field} ${max} belgidan oshmasligi kerak`);
+  }
+  return text;
+};
+
 const createBanner = async (req, res) => {
   const body = req.body || {};
   const lang = String(body.lang || '').trim();
-  const movieId = Number(body.movieId);
+  let movieId = null;
+  if (body.movieId != null && body.movieId !== '') {
+    movieId = Number(body.movieId);
+    if (!Number.isInteger(movieId) || movieId <= 0) {
+      throw badRequest('movieId musbat butun son bo‘lishi kerak');
+    }
+  }
 
   if (lang !== 'uz' && lang !== 'ru') {
     throw badRequest('lang uz|ru bo‘lishi kerak');
   }
-  if (!Number.isInteger(movieId) || movieId <= 0) {
-    throw badRequest('movieId majburiy');
-  }
 
   const image = assertR2MediaUrl(body.image ?? '', { field: 'image' });
   const video = assertR2MediaUrl(body.video ?? '', { field: 'video' });
+  const titleImg = assertR2MediaUrl(body.titleImg ?? '', { field: 'titleImg' });
+  const title = optionalBannerText(body.title, 'title', 180);
+  const description = optionalBannerText(body.description, 'description', 600);
 
   const item = await bannerService.create({
     lang,
     movieId,
     image: image || '',
     video: video || '',
+    titleImg: titleImg || '',
+    title,
+    description,
   });
 
   sendSuccess(res, { data: item }, 201);
@@ -130,6 +147,13 @@ const updateBanner = async (req, res) => {
   }
   if (body.video !== undefined) {
     patch.video = assertR2MediaUrl(body.video, { field: 'video' });
+  }
+  if (body.titleImg !== undefined) {
+    patch.titleImg = assertR2MediaUrl(body.titleImg ?? '', { field: 'titleImg' });
+  }
+  if (body.title !== undefined) patch.title = optionalBannerText(body.title, 'title', 180);
+  if (body.description !== undefined) {
+    patch.description = optionalBannerText(body.description, 'description', 600);
   }
 
   const existing = await bannerService.getById(req.params.id);

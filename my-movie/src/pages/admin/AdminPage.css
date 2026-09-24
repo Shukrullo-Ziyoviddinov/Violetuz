@@ -113,7 +113,8 @@
 }
 
 .admin-form input,
-.admin-form select {
+.admin-form select,
+.admin-form textarea {
   background: #0f1117;
   border: 1px solid var(--admin-line);
   color: var(--admin-text);

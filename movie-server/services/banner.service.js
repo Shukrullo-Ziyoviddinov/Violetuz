@@ -69,9 +69,15 @@ class BannerService {
     delete patch.id;
 
     if (patch.lang !== undefined) item.lang = String(patch.lang).trim();
-    if (patch.movieId !== undefined) item.movieId = Number(patch.movieId);
+    if (patch.movieId !== undefined) {
+      const movieId = Number(patch.movieId);
+      item.movieId = Number.isInteger(movieId) && movieId > 0 ? movieId : null;
+    }
     if (patch.image !== undefined) item.image = patch.image;
     if (patch.video !== undefined) item.video = patch.video;
+    if (patch.titleImg !== undefined) item.titleImg = String(patch.titleImg ?? '').trim();
+    if (patch.title !== undefined) item.title = String(patch.title ?? '').trim();
+    if (patch.description !== undefined) item.description = String(patch.description ?? '').trim();
 
     await item.save();
     return stripMongoId(item);

@@ -16,7 +16,7 @@ const bannerSchema = new mongoose.Schema(
     },
     movieId: {
       type: Number,
-      required: true,
+      default: null,
       index: true,
     },
     image: {
@@ -25,6 +25,21 @@ const bannerSchema = new mongoose.Schema(
       default: '',
     },
     video: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    titleImg: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    title: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    description: {
       type: String,
       trim: true,
       default: '',

@@ -6,8 +6,7 @@ export const isBannerLike = (item) =>
   item &&
   typeof item === 'object' &&
   item.id != null &&
-  (item.lang === 'uz' || item.lang === 'ru') &&
-  item.movieId != null;
+  (item.lang === 'uz' || item.lang === 'ru');
 
 export const normalizeBannersPayload = (payload) => {
   const list = Array.isArray(payload)

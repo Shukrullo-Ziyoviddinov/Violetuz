@@ -1,10 +1,34 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { normalizeImagePath } from '../../utils/utils';
+import { matchId } from '../../utils/musicDataUtils';
+import { formatMovieRating } from '../Rating/CalculateRating';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './Banner.css';
+
+const RATING_LOGOS = {
+    vl: '/img/photo_2026-02-16_20-30-31_preview_rev_1.png',
+    imdb: '/img/imdb.jpg',
+    kp: '/img/kinopoisk.jpg',
+    netflix: '/img/netflix.jpg',
+};
+
+const hasRatingValue = (value) => value != null && value !== '' && value !== 'none';
+
+const linkedMovieId = (movieId) => {
+    const n = Number(movieId);
+    return Number.isInteger(n) && n > 0 ? n : null;
+};
+
+const pickLocalized = (value, lang) => {
+    if (!value) return '';
+    if (typeof value === 'string') return value.trim();
+    const picked = value[lang] || value.uz || value.ru || '';
+    return String(picked).trim();
+};
 
 const BANNER_SKELETON_SLIDES = ['left', 'center', 'right'];
 /** Broken/slow CDN — skeleton ushlab qolmasin */
@@ -14,6 +38,7 @@ const BANNER_VIDEO_REVEAL_MS = 5000;
 
 const Banner = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { contentLang } = useContentLanguage();
     const { allMovies, getBannersByLang, bannersLoading } = useMoviesApi();
     const currentBanners = useMemo(() => {
@@ -27,14 +52,31 @@ const Banner = () => {
     const images = useMemo(() => {
         const movies = Array.isArray(allMovies) ? allMovies : [];
         return currentBanners.map((banner) => {
-            const movie = movies.find((m) => m.id === banner.movieId);
+            const movieId = linkedMovieId(banner.movieId);
+            const movie = movieId ? movies.find((m) => matchId(m.id, movieId)) : null;
             const movieImg = movie?.homeImg?.[contentLang] || movie?.homeImg?.uz || movie?.homeImg?.ru;
             const src = banner.image || movieImg || '';
+            const manualTitleImg = String(banner.titleImg || '').trim();
+            const manualTitle = String(banner.title || '').trim();
+            const movieTitleImg = movie ? pickLocalized(movie.titleImg, contentLang) : '';
+            const movieTitleText = movie ? pickLocalized(movie.title, contentLang) : '';
+            const titleImg = manualTitleImg || movieTitleImg;
             return {
                 id: banner.id,
                 src,
                 video: banner.video || '',
-                link: banner.movieId ? `/movie/${banner.movieId}` : null
+                movieId,
+                link: movieId ? `/movie/${movieId}` : null,
+                titleImg,
+                titleText: manualTitle,
+                titleFallback: movieTitleText,
+                description: String(banner.description || '').trim(),
+                category: movie?.category || '',
+                rating: movie?.rating,
+                ratingImdb: movie?.ratingImdb,
+                ratingKinopoisk: movie?.ratingKinopoisk,
+                ratingNetflix: movie?.ratingNetflix,
+                specs: movie?.specs || null,
             };
         }).filter((img) => img.src);
     }, [currentBanners, contentLang, allMovies]);
@@ -52,6 +94,7 @@ const Banner = () => {
     const [showCenterVideo, setShowCenterVideo] = useState(false);
     const [bannerInView, setBannerInView] = useState(true);
     const [unmuted, setUnmuted] = useState(false);
+    const [failedTitleKeys, setFailedTitleKeys] = useState(() => new Set());
     const startXRef = useRef(0);
     const currentXRef = useRef(0);
     const carouselRef = useRef(null);
@@ -450,6 +493,163 @@ const Banner = () => {
         return 'hidden';
     };
 
+    const renderBannerMeta = (image) => {
+        const titleKey = `${image.id}:${image.titleImg}`;
+        const showTitleImg = Boolean(image.titleImg) && !failedTitleKeys.has(titleKey);
+        const titleText = image.titleText || (!showTitleImg ? image.titleFallback : '');
+        const description = image.description || '';
+        const hasCopy = showTitleImg || Boolean(titleText) || Boolean(description);
+        if (!image?.movieId && !hasCopy) return null;
+
+        const ratings = [
+            image.category !== 'anonslar' && hasRatingValue(image.rating)
+                ? { key: 'vl', src: RATING_LOGOS.vl, value: formatMovieRating(image.rating), alt: 'Rating' }
+                : null,
+            hasRatingValue(image.ratingImdb)
+                ? { key: 'imdb', src: RATING_LOGOS.imdb, value: formatMovieRating(image.ratingImdb), alt: 'IMDb' }
+                : null,
+            hasRatingValue(image.ratingKinopoisk)
+                ? { key: 'kp', src: RATING_LOGOS.kp, value: formatMovieRating(image.ratingKinopoisk), alt: 'Kinopoisk' }
+                : null,
+            hasRatingValue(image.ratingNetflix)
+                ? { key: 'netflix', src: RATING_LOGOS.netflix, value: formatMovieRating(image.ratingNetflix), alt: 'Netflix' }
+                : null,
+        ].filter(Boolean);
+
+        const specs = image.specs;
+        const specItems = [];
+        if (specs?.duration != null && specs.duration !== '') {
+            specItems.push({
+                key: 'duration',
+                label: t('detail.duration'),
+                value: `${specs.duration} min`,
+                icon: (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                ),
+            });
+        }
+        if (specs?.ageRating) {
+            specItems.push({
+                key: 'age',
+                label: t('detail.ageRating'),
+                value: specs.ageRating,
+                icon: (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                ),
+            });
+        }
+        if (specs?.year) {
+            specItems.push({
+                key: 'year',
+                label: t('detail.year'),
+                value: specs.year,
+                icon: (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                ),
+            });
+        }
+        if (Array.isArray(specs?.countries) && specs.countries.length > 0) {
+            specItems.push({
+                key: 'countries',
+                label: t('detail.countries'),
+                value: specs.countries.join(', '),
+                icon: (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                ),
+            });
+        }
+        if (Array.isArray(specs?.languages) && specs.languages.length > 0) {
+            specItems.push({
+                key: 'languages',
+                label: t('detail.languages'),
+                value: specs.languages.join(', '),
+                icon: (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m5 8 6 6" />
+                        <path d="m4 14 6-6 2-3" />
+                        <path d="M2 5h12" />
+                        <path d="M7 2h1" />
+                        <path d="m22 22-5-10-5 10" />
+                        <path d="M14 18h6" />
+                    </svg>
+                ),
+            });
+        }
+
+        if (!hasCopy && ratings.length === 0 && specItems.length === 0) return null;
+
+        return (
+            <div className="manga-banner-meta">
+                {showTitleImg || titleText ? (
+                    <div className="manga-banner-title">
+                        {showTitleImg ? (
+                            <img
+                                className="manga-banner-title-img"
+                                src={normalizeImagePath(image.titleImg)}
+                                alt={titleText || image.titleFallback || ''}
+                                draggable={false}
+                                onError={() => {
+                                    setFailedTitleKeys((prev) => {
+                                        if (prev.has(titleKey)) return prev;
+                                        const next = new Set(prev);
+                                        next.add(titleKey);
+                                        return next;
+                                    });
+                                }}
+                            />
+                        ) : null}
+                        {titleText ? <h2 className="manga-banner-title-text">{titleText}</h2> : null}
+                    </div>
+                ) : null}
+                {description ? <p className="manga-banner-description">{description}</p> : null}
+                {ratings.length > 0 ? (
+                    <div className="movie-detail-rating">
+                        {ratings.map((rating) => (
+                            <div key={rating.key} className="movie-detail-rating-item">
+                                <img
+                                    src={normalizeImagePath(rating.src)}
+                                    alt={rating.alt}
+                                    className="movie-detail-rating-logo"
+                                    draggable={false}
+                                />
+                                <span className="movie-detail-rating-value rating-value-display">{rating.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
+                {specItems.length > 0 ? (
+                    <div className="movie-detail-specs-container">
+                        {specItems.map((item) => (
+                            <div
+                                key={item.key}
+                                className="movie-detail-spec-item"
+                                title={item.label}
+                                aria-label={`${item.label}: ${item.value}`}
+                            >
+                                <span className="movie-detail-spec-icon" aria-hidden="true">{item.icon}</span>
+                                <span className="movie-detail-spec-value">{item.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
+            </div>
+        );
+    };
+
     const renderSlideContent = (image, index, { isPrimaryCenter = false } = {}) => {
         const src = normalizeImagePath(image.src);
         const videoSrc = normalizeImagePath(image.video);
@@ -504,6 +704,7 @@ const Banner = () => {
                         )}
                     </button>
                 ) : null}
+                {isActiveCenter ? renderBannerMeta(image) : null}
             </>
         );
     };
