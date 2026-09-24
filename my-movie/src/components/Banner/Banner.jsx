@@ -68,6 +68,8 @@ const Banner = () => {
                 movieId,
                 link: movieId ? `/movie/${movieId}` : null,
                 titleImg,
+                movieTitleImg,
+                manualTitleImg,
                 titleText: manualTitle,
                 titleFallback: movieTitleText,
                 description: String(banner.description || '').trim(),
@@ -617,8 +619,22 @@ const Banner = () => {
             navigate(image.detailsUrl);
         };
 
+        const movieTitleKey = `${image.id}:movie:${image.movieTitleImg}`;
+        const showMovieTitleImg = Boolean(image.movieTitleImg) && !failedTitleKeys.has(movieTitleKey);
+        const manualTitleKey = `${image.id}:manual:${image.manualTitleImg}`;
+        const showManualTitleImg = Boolean(image.manualTitleImg) && !failedTitleKeys.has(manualTitleKey);
+        const markTitleFailed = (key) => {
+            setFailedTitleKeys((prev) => {
+                if (prev.has(key)) return prev;
+                const next = new Set(prev);
+                next.add(key);
+                return next;
+            });
+        };
+
         return (
-            <div className="manga-banner-meta">
+            <div className={`manga-banner-meta${image.movieId ? ' manga-banner-meta--linked' : ''}`}>
+                <div className="manga-banner-meta-desktop">
                 {showTitleImg || titleText ? (
                     <div className="manga-banner-title">
                         {showTitleImg ? (
@@ -699,6 +715,51 @@ const Banner = () => {
                         )}
                     </div>
                 ) : null}
+                </div>
+                <div className="manga-banner-meta-mobile">
+                    {image.movieId ? (
+                        showMovieTitleImg ? (
+                            <img
+                                className="manga-banner-title-img"
+                                src={normalizeImagePath(image.movieTitleImg)}
+                                alt={image.titleFallback || ''}
+                                draggable={false}
+                                onError={() => markTitleFailed(movieTitleKey)}
+                            />
+                        ) : null
+                    ) : (
+                        <>
+                            {showManualTitleImg || image.titleText ? (
+                                <div className="manga-banner-title">
+                                    {showManualTitleImg ? (
+                                        <img
+                                            className="manga-banner-title-img"
+                                            src={normalizeImagePath(image.manualTitleImg)}
+                                            alt={image.titleText || ''}
+                                            draggable={false}
+                                            onError={() => markTitleFailed(manualTitleKey)}
+                                        />
+                                    ) : null}
+                                    {image.titleText ? <h2 className="manga-banner-title-text">{image.titleText}</h2> : null}
+                                </div>
+                            ) : null}
+                            {description ? <p className="manga-banner-description">{description}</p> : null}
+                            {showDetails ? (
+                                <div className="manga-banner-actions">
+                                    <button
+                                        type="button"
+                                        className="manga-banner-action"
+                                        onClick={openDetails}
+                                        onMouseDown={stopBannerDrag}
+                                        onTouchStart={stopBannerDrag}
+                                    >
+                                        <span>{contentLang === 'ru' ? 'Подробнее' : 'Batafsil'}</span>
+                                    </button>
+                                </div>
+                            ) : null}
+                        </>
+                    )}
+                </div>
             </div>
         );
     };
