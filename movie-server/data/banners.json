@@ -6,5 +6,9 @@
   { "id": 5, "lang": "ru", "movieId": 6005, "image": "/img/banner-1.png", "video": "/video/shorts4.mp4", "titleImg": "", "title": "", "description": "", "detailsUrl": "" },
   { "id": 6, "lang": "ru", "movieId": 5004, "image": "/img/banner-2.png", "video": "/video/shorts10.mp4", "titleImg": "", "title": "", "description": "", "detailsUrl": "" },
   { "id": 7, "lang": "ru", "movieId": 5008, "image": "/img/banner-3.png", "video": "/video/shorts2.mp4", "titleImg": "", "title": "", "description": "", "detailsUrl": "" },
-  { "id": 8, "lang": "ru", "movieId": 4007, "image": "/img/banner-4.png", "video": "/video/shorts4.mp4", "titleImg": "", "title": "", "description": "", "detailsUrl": "" }
+  { "id": 8, "lang": "ru", "movieId": 4007, "image": "/img/banner-4.png", "video": "/video/shorts4.mp4", "titleImg": "", "title": "", "description": "", "detailsUrl": "" },
+  { "id": 9, "lang": "uz", "movieId": null, "image": "/img/banner-1.png", "video": "/video/shorts2.mp4", "titleImg": "", "title": "Violet yangiliklari", "description": "Yangi filmlar, treylerlar va maxsus tanlovlar shu yerda.", "detailsUrl": "/recommended" },
+  { "id": 10, "lang": "uz", "movieId": null, "image": "/img/banner-2.png", "video": "/video/shorts4.mp4", "titleImg": "", "title": "Haftalik tanlov", "description": "Muharrirlar tanlagan filmlar va seriallar to‘plami.", "detailsUrl": "" },
+  { "id": 11, "lang": "ru", "movieId": null, "image": "/img/banner-1.png", "video": "/video/shorts2.mp4", "titleImg": "", "title": "Новости Violet", "description": "Новые фильмы, трейлеры и специальные подборки.", "detailsUrl": "/recommended" },
+  { "id": 12, "lang": "ru", "movieId": null, "image": "/img/banner-2.png", "video": "/video/shorts4.mp4", "titleImg": "", "title": "Подборка недели", "description": "Фильмы и сериалы, которые выбрала редакция.", "detailsUrl": "" }
 ]

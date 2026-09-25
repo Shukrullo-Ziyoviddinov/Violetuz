@@ -723,7 +723,7 @@
 @media (min-width: 993px) {
     .manga-banner-meta {
         justify-content: flex-end;
+        padding-bottom: 7rem;
         padding-top: 1.5rem;
-        padding-bottom: 2.6rem;
     }
 }
