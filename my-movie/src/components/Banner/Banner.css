@@ -701,7 +701,10 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
-        margin-bottom: 2.2rem;
+    }
+
+    .manga-banner-meta-mobile .manga-banner-title-text {
+        margin-bottom: 0.5rem;
     }
 
     .manga-banner-meta-mobile .manga-banner-title-img {
