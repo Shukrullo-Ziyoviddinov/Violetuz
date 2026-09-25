@@ -32,11 +32,6 @@
     .manga-carousel {
         margin-top: 2rem;
     }
-
-    .manga-banner-meta {
-        padding-top: 4.6rem;
-        padding-bottom: 1.2rem;
-    }
 }
 
 /* Slides Container - Rasmlar bir qatorda */
@@ -471,8 +466,8 @@
 
 .manga-banner-title-img {
     display: block;
-    max-width: min(320px, 100%);
-    max-height: 112px;
+    max-width: min(400px, 100%);
+    max-height: 140px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -482,7 +477,7 @@
 .manga-banner-title-text {
     margin: 0;
     max-width: 100%;
-    font-size: 1.85rem;
+    font-size: 2.15rem;
     line-height: 1.1;
     font-weight: 700;
     color: #fff;
@@ -620,12 +615,12 @@
     }
 
     .manga-banner-title-img {
-        max-width: 210px;
-        max-height: 74px;
+        max-width: 268px;
+        max-height: 96px;
     }
 
     .manga-banner-title-text {
-        font-size: 1.25rem;
+        font-size: 1.45rem;
     }
 
     .manga-banner-description {
@@ -655,12 +650,12 @@
     }
 
     .manga-banner-title-img {
-        max-width: 164px;
-        max-height: 56px;
+        max-width: 210px;
+        max-height: 72px;
     }
 
     .manga-banner-title-text {
-        font-size: 1rem;
+        font-size: 1.15rem;
     }
 
     .manga-banner-meta .movie-detail-spec-item {
@@ -706,6 +701,7 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
+        margin-bottom: 2.2rem;
     }
 
     .manga-banner-meta-mobile .manga-banner-title-img {
@@ -721,5 +717,13 @@
 
     .manga-banner-meta-mobile .manga-banner-actions {
         justify-content: center;
+    }
+}
+
+@media (min-width: 993px) {
+    .manga-banner-meta {
+        justify-content: flex-end;
+        padding-top: 1.5rem;
+        padding-bottom: 2.6rem;
     }
 }
