@@ -26,7 +26,7 @@
 .your-mixes-cover {
   position: relative;
   width: 100%;
-  padding-top: 115%;
+  padding-top: 56.25%;
   border-radius: 12px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.08);
@@ -37,14 +37,11 @@
   position: absolute;
   top: 0;
   height: 100%;
-  width: var(--mix-cover-width, 62%);
+  width: var(--mix-cover-width, 66%);
   object-fit: cover;
   display: block;
   border-radius: 10px;
-  left: calc(
-    var(--mix-cover-index) * (100% - var(--mix-cover-width, 62%)) /
-      max(var(--mix-cover-count) - 1, 1)
-  );
+  left: 0;
   z-index: calc(8 - var(--mix-cover-index));
   box-shadow: 8px 0 16px rgba(0, 0, 0, 0.55);
 }
@@ -59,15 +56,39 @@
 }
 
 .your-mixes-cover--2 {
-  --mix-cover-width: 68%;
+  --mix-cover-width: 80%;
+}
+
+.your-mixes-cover--2 img:nth-child(2) {
+  left: 20%;
 }
 
 .your-mixes-cover--3 {
-  --mix-cover-width: 56%;
+  --mix-cover-width: 74%;
+}
+
+.your-mixes-cover--3 img:nth-child(2) {
+  left: 15%;
+}
+
+.your-mixes-cover--3 img:nth-child(3) {
+  left: 26%;
 }
 
 .your-mixes-cover--4 {
-  --mix-cover-width: 48%;
+  --mix-cover-width: 66%;
+}
+
+.your-mixes-cover--4 img:nth-child(2) {
+  left: 15%;
+}
+
+.your-mixes-cover--4 img:nth-child(3) {
+  left: 26%;
+}
+
+.your-mixes-cover--4 img:nth-child(4) {
+  left: 34%;
 }
 
 @media (max-width: 390px) {
