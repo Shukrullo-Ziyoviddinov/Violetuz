@@ -32,9 +32,11 @@ import './MusicDetail.css';
 
 const TREND_SKELETON_COUNT = 8;
 
-const MusicDetailTrendCardSkeleton = () => (
+const MusicDetailTrendCardSkeleton = ({ mix = false }) => (
   <div
-    className="music-detail-trend-card music-detail-trend-card--skeleton"
+    className={`music-detail-trend-card music-detail-trend-card--skeleton${
+      mix ? ' music-detail-trend-card--mix' : ''
+    }`}
     aria-hidden="true"
   >
     <div className="music-detail-trend-card-img-wrap">
@@ -42,10 +44,12 @@ const MusicDetailTrendCardSkeleton = () => (
         variant="music-detail-trend-img"
         className="music-detail-trend-card-img-skeleton"
       />
-      <span
-        className="music-detail-trend-card-wishlist music-detail-trend-card-wishlist--skeleton"
-        aria-hidden="true"
-      />
+      {!mix && (
+        <span
+          className="music-detail-trend-card-wishlist music-detail-trend-card-wishlist--skeleton"
+          aria-hidden="true"
+        />
+      )}
       <span
         className="music-detail-trend-card-play music-detail-trend-card-play--skeleton"
         aria-hidden="true"
@@ -74,6 +78,7 @@ const MusicDetailTrendCard = ({
   isPlaying,
   audioGraphReady,
   blockClick,
+  mix = false,
 }) => {
   const imgSrc = item.img || '/img/movie1.jpg';
   const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError } = useImageReady(imgSrc);
@@ -81,8 +86,10 @@ const MusicDetailTrendCard = ({
   return (
     <div
       className={`music-detail-trend-card${
-        isPlayingTrack ? ' music-detail-trend-card-active' : ''
-      }${showImgSkeleton ? ' music-detail-trend-card--loading' : ''}`}
+        mix ? ' music-detail-trend-card--mix' : ''
+      }${isPlayingTrack ? ' music-detail-trend-card-active' : ''}${
+        showImgSkeleton ? ' music-detail-trend-card--loading' : ''
+      }`}
       style={
         isPlayingTrack &&
         cardDominantColor &&
@@ -118,10 +125,12 @@ const MusicDetailTrendCard = ({
         )}
         {showImgSkeleton ? (
           <>
-            <span
-              className="music-detail-trend-card-wishlist music-detail-trend-card-wishlist--skeleton"
-              aria-hidden="true"
-            />
+            {!mix && (
+              <span
+                className="music-detail-trend-card-wishlist music-detail-trend-card-wishlist--skeleton"
+                aria-hidden="true"
+              />
+            )}
             <span
               className="music-detail-trend-card-play music-detail-trend-card-play--skeleton"
               aria-hidden="true"
@@ -129,26 +138,28 @@ const MusicDetailTrendCard = ({
           </>
         ) : (
           <>
-            <button
-              className={`music-detail-trend-card-wishlist ${
-                isInWishlist(item.id, 'music') ? 'active' : ''
-              }`}
-              onClick={(e) => onWishlistClick(e, item.id)}
-              aria-label="Sevimlilarga qo'shish"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill={isInWishlist(item.id, 'music') ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {!mix && (
+              <button
+                className={`music-detail-trend-card-wishlist ${
+                  isInWishlist(item.id, 'music') ? 'active' : ''
+                }`}
+                onClick={(e) => onWishlistClick(e, item.id)}
+                aria-label="Sevimlilarga qo'shish"
               >
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-            </button>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill={isInWishlist(item.id, 'music') ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </button>
+            )}
             <div className="music-detail-trend-card-play">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="5 3 19 12 5 21" />
@@ -657,12 +668,13 @@ const MusicDetail = () => {
   const renderMixCards = () =>
     (mixBusy ? trendSkeletonItems : mixTracks).map((item) => {
       if (item._skeleton) {
-        return <MusicDetailTrendCardSkeleton key={item.id} />;
+        return <MusicDetailTrendCardSkeleton key={item.id} mix />;
       }
       const itemArtist = getArtistById(item.artistId);
       return (
         <MusicDetailTrendCard
           key={item.id}
+          mix
           item={item}
           itemArtist={itemArtist}
           isPlayingTrack={false}
