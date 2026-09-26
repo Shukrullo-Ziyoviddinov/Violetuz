@@ -10,6 +10,7 @@ import {
   createMusicListenProgressReporter,
   resolveAudioListenTarget,
 } from '../utils/musicListenProgressReporter';
+import { createMusicMixPlaySignal } from '../utils/musicMixPlaySignal';
 import { albumSongToTrack, ALBUM_TRACK_ID_OFFSET } from '../utils/albumSongToTrack';
 import MusicMiniPlayer from '../Music/MusicMiniPlayer/MusicMiniPlayer';
 import MusicPlayerModal from '../Music/MusicPlayerModal/MusicPlayerModal';
@@ -48,9 +49,25 @@ export const MusicPlayerProvider = ({ children }) => {
   const analyserRef = useRef(null);
   const gainNodeRef = useRef(null);
   const listenProgressRef = useRef(null);
+  const mixPlayRef = useRef(null);
   if (!listenProgressRef.current) {
     listenProgressRef.current = createMusicListenProgressReporter();
   }
+  if (!mixPlayRef.current) {
+    mixPlayRef.current = createMusicMixPlaySignal();
+  }
+
+  const openMixSession = (track) => {
+    const target = resolveAudioListenTarget(track, ALBUM_TRACK_ID_OFFSET);
+    if (target?.contentType !== 'music') {
+      mixPlayRef.current.clear();
+      return;
+    }
+    mixPlayRef.current.begin(
+      target.contentId,
+      listenProgressRef.current.getAccumulated()
+    );
+  };
   /** albumId → { songId → listenedSec } — albom bo‘ylab yig‘indi */
   const albumListenByTrackRef = useRef({});
   /** albumId → { songId → durationSec } */
@@ -106,8 +123,17 @@ export const MusicPlayerProvider = ({ children }) => {
       listenProgressRef.current.reset(target.contentType, target.contentId, {
         restoreAccumulated: restore,
       });
+      if (target.contentType === 'music') {
+        mixPlayRef.current.begin(
+          target.contentId,
+          listenProgressRef.current.getAccumulated()
+        );
+      } else {
+        mixPlayRef.current.clear();
+      }
     } else {
       listenProgressRef.current.reset(null, null);
+      mixPlayRef.current.clear();
     }
 
     return () => {
@@ -357,6 +383,7 @@ export const MusicPlayerProvider = ({ children }) => {
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
+    openMixSession(music);
 
     const el = audioRef.current;
     if (el) {
@@ -485,6 +512,7 @@ export const MusicPlayerProvider = ({ children }) => {
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
+    openMixSession(track);
 
     const el = audioRef.current;
     if (el) {
@@ -607,6 +635,19 @@ export const MusicPlayerProvider = ({ children }) => {
       isPlaying: !el.paused && !el.ended,
       playbackRate: el.playbackRate || 1,
     });
+    const mixTarget = resolveAudioListenTarget(
+      currentMusicRef.current,
+      ALBUM_TRACK_ID_OFFSET
+    );
+    if (mixTarget?.contentType === 'music') {
+      const catalogDur = Number(currentMusicRef.current?.durationSec);
+      mixPlayRef.current.note({
+        isLoggedIn: isLoggedInRef.current,
+        listenedSeconds: listenProgressRef.current.getAccumulated(),
+        durationSec:
+          Number.isFinite(catalogDur) && catalogDur > 0 ? catalogDur : el.duration,
+      });
+    }
     void flushListenProgress();
   }, [flushListenProgress]);
 
@@ -635,6 +676,7 @@ export const MusicPlayerProvider = ({ children }) => {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch(() => {});
       }
+      openMixSession(music);
       setIsPlaying(true);
     } else {
       const list = playlistRef.current?.length ? playlistRef.current : allMusic;

@@ -23,6 +23,9 @@ import {
 } from '../hooks/useHomeMusicCategoryRecommendations';
 import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import { useAuth } from '../context/AuthContext';
+import { useMusicMixes } from '../hooks/useMusicMixes';
+import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
+import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
 import { recordViewRequest } from '../api/viewsApi';
 import './MusicDetail.css';
 
@@ -226,7 +229,10 @@ const MusicDetail = () => {
 
   const [searchParams] = useSearchParams();
   const fromSection = searchParams.get('section') || location.state?.fromSection;
+  const mixGenre = searchParams.get('mix') || '';
   const music = ensureArray(allMusic).find((m) => matchId(m.id, id));
+  const { mixes, isLoading: mixesLoading } = useMusicMixes({ enabled: Boolean(mixGenre) });
+  const narrowMix = useNarrowLayout();
 
   const pageArtist = useMemo(() => {
     if (!music) return null;
@@ -243,8 +249,10 @@ const MusicDetail = () => {
     }) || null;
   };
 
-  const sectionConfig = fromSection ? sectionById[fromSection] : (music ? findSectionForMusicId(music.id) : null);
-  const resolvedSection = fromSection || sectionConfig?.id;
+  const sectionConfig = mixGenre
+    ? (music ? findSectionForMusicId(music.id) : null)
+    : (fromSection ? sectionById[fromSection] : (music ? findSectionForMusicId(music.id) : null));
+  const resolvedSection = mixGenre ? sectionConfig?.id : (fromSection || sectionConfig?.id);
 
   const detailRecRequests = useMemo(() => {
     const category = sectionConfig?.categoryNameMusic;
@@ -268,6 +276,20 @@ const MusicDetail = () => {
     }
     return ensureArray(allMusic);
   }, [music, sectionConfig, getMusicByCategory, allMusic]);
+
+  const mixTracks = useMemo(() => {
+    if (!mixGenre) return [];
+    const mix = (mixes || []).find((row) => row.genre === mixGenre);
+    if (!mix) return [];
+    const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
+    const out = [];
+    for (const row of mix.tracks || []) {
+      const track = byId.get(String(row.contentId));
+      if (!track || matchId(track.id, music?.id)) continue;
+      out.push(track);
+    }
+    return out;
+  }, [allMusic, mixGenre, mixes, music?.id]);
 
   const trendList = useMemo(() => {
     const contentType = wishlistTypeToContentType(
@@ -582,6 +604,93 @@ const MusicDetail = () => {
 
   const pageBusy = showHeroDataSkeleton || undefined;
 
+  const showMixColumn = Boolean(mixGenre) && (mixesLoading || mixTracks.length > 0);
+  const mixBusy = mixesLoading && mixTracks.length === 0;
+
+  const renderMixCards = () =>
+    (mixBusy ? trendSkeletonItems : mixTracks).map((item) => {
+      if (item._skeleton) {
+        return <MusicDetailTrendCardSkeleton key={item.id} />;
+      }
+      const itemArtist = getArtistById(item.artistId);
+      return (
+        <MusicDetailTrendCard
+          key={item.id}
+          item={item}
+          itemArtist={itemArtist}
+          isPlayingTrack={false}
+          cardDominantColor={null}
+          getTitle={getTitle}
+          isInWishlist={isInWishlist}
+          onWishlistClick={(e, itemId) => {
+            e.stopPropagation();
+            toggleWishlist(itemId, 'music');
+          }}
+          onOpen={(itemId) => {
+            navigate(`/music/${itemId}?mix=${encodeURIComponent(mixGenre)}`);
+          }}
+          analyserRef={analyserRef}
+          isPlaying={isPlaying}
+          audioGraphReady={audioGraphReady}
+          blockClick={mixBusy}
+        />
+      );
+    });
+
+  const renderSectionList = () => (
+    <>
+      {showTrendSectionSkeleton ? (
+        <SkeletonLoader
+          variant="music-detail-trend-title"
+          className="music-detail-trend-title-skeleton"
+        />
+      ) : (
+        <h3 className="music-detail-trend-title">{sectionTitle}</h3>
+      )}
+      <div
+        className="music-detail-trend-grid"
+        aria-busy={showTrendSectionSkeleton || undefined}
+      >
+        {trendItemsToRender.map((item) => {
+          if (item._skeleton) {
+            return <MusicDetailTrendCardSkeleton key={item.id} />;
+          }
+          const itemArtist = getArtistById(item.artistId);
+          const isPlayingTrack = item.id === currentMusic?.id;
+          const cardDominantColor = isPlayingTrack
+            ? pageDominantColor || dominantColor
+            : null;
+          return (
+            <MusicDetailTrendCard
+              key={item.id}
+              item={item}
+              itemArtist={itemArtist}
+              isPlayingTrack={isPlayingTrack}
+              cardDominantColor={cardDominantColor}
+              getTitle={getTitle}
+              isInWishlist={isInWishlist}
+              onWishlistClick={(e, itemId) => {
+                e.stopPropagation();
+                toggleWishlist(itemId, 'music');
+              }}
+              onOpen={(itemId) => {
+                const params = new URLSearchParams();
+                if (resolvedSection) params.set('section', resolvedSection);
+                if (mixGenre) params.set('mix', mixGenre);
+                const query = params.toString();
+                navigate(`/music/${itemId}${query ? `?${query}` : ''}`);
+              }}
+              analyserRef={analyserRef}
+              isPlaying={isPlaying}
+              audioGraphReady={audioGraphReady}
+              blockClick={showTrendSectionSkeleton}
+            />
+          );
+        })}
+      </div>
+    </>
+  );
+
   return (
     <div className="music-detail" aria-busy={pageBusy}>
       <div className="music-detail-container">
@@ -871,61 +980,26 @@ const MusicDetail = () => {
             <AlbumsForYou music={music} forceSkeleton={showHeroDataSkeleton} />
             <RecommendedClips music={music} forceSkeleton={showHeroDataSkeleton} />
           </div>
-          <div className="music-detail-right-scroll">
-            {showTrendSectionSkeleton ? (
-              <SkeletonLoader
-                variant="music-detail-trend-title"
-                className="music-detail-trend-title-skeleton"
-              />
-            ) : (
-              <h3 className="music-detail-trend-title">{sectionTitle}</h3>
-            )}
-            <div
-              className="music-detail-trend-grid"
-              aria-busy={showTrendSectionSkeleton || undefined}
-            >
-              {trendItemsToRender.map((item) => {
-                if (item._skeleton) {
-                  return <MusicDetailTrendCardSkeleton key={item.id} />;
-                }
-                const itemArtist = getArtistById(item.artistId);
-                const isPlayingTrack = item.id === currentMusic?.id;
-                const cardDominantColor = isPlayingTrack
-                  ? pageDominantColor || dominantColor
-                  : null;
-                return (
-                  <MusicDetailTrendCard
-                    key={item.id}
-                    item={item}
-                    itemArtist={itemArtist}
-                    isPlayingTrack={isPlayingTrack}
-                    cardDominantColor={cardDominantColor}
-                    getTitle={getTitle}
-                    isInWishlist={isInWishlist}
-                    onWishlistClick={(e, itemId) => {
-                      e.stopPropagation();
-                      toggleWishlist(itemId, 'music');
-                    }}
-                    onOpen={(itemId) =>
-                      navigate(
-                        `/music/${itemId}${
-                          resolvedSection
-                            ? `?section=${encodeURIComponent(resolvedSection)}`
-                            : ''
-                        }`
-                      )
-                    }
-                    analyserRef={analyserRef}
-                    isPlaying={isPlaying}
-                    audioGraphReady={audioGraphReady}
-                    blockClick={showTrendSectionSkeleton}
-                  />
-                );
-              })}
+          {showMixColumn ? (
+            <div className="music-detail-side">
+              {!narrowMix && (
+                <MusicDetailMixList genre={mixGenre} busy={mixBusy}>
+                  {renderMixCards()}
+                </MusicDetailMixList>
+              )}
+              <div className="music-detail-right-scroll">{renderSectionList()}</div>
             </div>
-          </div>
+          ) : (
+            <div className="music-detail-right-scroll">{renderSectionList()}</div>
+          )}
         </div>
       </div>
+
+      {showMixColumn && narrowMix && (
+        <MusicDetailMixSheet genre={mixGenre} busy={mixBusy}>
+          {renderMixCards()}
+        </MusicDetailMixSheet>
+      )}
 
       {lyricsModalOpen && music?.lyricsText && getLyricsText(music.lyricsText)?.trim() && (
         <div

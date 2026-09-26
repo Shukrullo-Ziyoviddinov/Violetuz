@@ -42,6 +42,12 @@ const startServer = async () => {
       coListen: { runImmediately: true, initialDelayMs: 30_000 },
     });
 
+    const { startMusicMixPrecomputeScheduler } = require('./music-mixes/jobs');
+    startMusicMixPrecomputeScheduler({
+      runImmediately: true,
+      initialDelayMs: 35_000,
+    });
+
     app.listen(PORT, () => {
       console.log(`Movie server running on http://localhost:${PORT}`);
     });
