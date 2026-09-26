@@ -168,7 +168,9 @@ const MusicDetailMixSheet = ({
           >
             <span />
           </div>
-          <h3 className="music-mix-sheet-title">{title}</h3>
+          <h3 className="music-mix-sheet-title" onPointerDown={onGripDown}>
+            {title}
+          </h3>
           {!busy && (
             <MusicMixControls
               repeat={repeat}
