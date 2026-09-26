@@ -14,7 +14,7 @@
   }
 
   body.mini-player-visible .music-mix-sheet-dock {
-    --music-mix-chrome: calc(155px + env(safe-area-inset-bottom, 0px));
+        --music-mix-chrome: calc(140px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -99,17 +99,15 @@
 }
 
 .music-mix-sheet-dock.music-detail-trend-card-active {
-  background: rgba(
-    var(--card-dominant-r, 192),
-    var(--card-dominant-g, 78),
-    var(--card-dominant-b, 221),
-    0.25
+  background: rgb(
+    var(--card-dominant-r, 28),
+    var(--card-dominant-g, 28),
+    var(--card-dominant-b, 28)
   );
-  border-color: rgba(
-    var(--card-dominant-r, 192),
-    var(--card-dominant-g, 78),
-    var(--card-dominant-b, 221),
-    0.5
+  border-color: rgb(
+    var(--card-dominant-r, 28),
+    var(--card-dominant-g, 28),
+    var(--card-dominant-b, 28)
   );
 }
 
