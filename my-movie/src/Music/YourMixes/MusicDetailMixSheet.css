@@ -92,6 +92,12 @@
   padding: 0 0.75rem 0.85rem;
 }
 
+@media (max-width: 640px) {
+  .music-mix-sheet-list {
+    gap: 0.2rem;
+  }
+}
+
 .music-mix-sheet-dock {
   position: fixed;
   left: 10px;
