@@ -996,7 +996,11 @@ const MusicDetail = () => {
       </div>
 
       {showMixColumn && narrowMix && (
-        <MusicDetailMixSheet genre={mixGenre} busy={mixBusy}>
+        <MusicDetailMixSheet
+          genre={mixGenre}
+          busy={mixBusy}
+          dominantColor={pageDominantColor || (isCurrentTrack ? dominantColor : null)}
+        >
           {renderMixCards()}
         </MusicDetailMixSheet>
       )}

@@ -1,22 +1,18 @@
-.music-mix-sheet,
 .music-mix-sheet-dock {
   --music-mix-chrome: 0px;
 }
 
 @media (max-width: 900px) {
-  body.mini-player-visible .music-mix-sheet,
   body.mini-player-visible .music-mix-sheet-dock {
     --music-mix-chrome: 88px;
   }
 }
 
 @media (max-width: 768px) {
-  .music-mix-sheet,
   .music-mix-sheet-dock {
     --music-mix-chrome: calc(80px + env(safe-area-inset-bottom, 0px));
   }
 
-  body.mini-player-visible .music-mix-sheet,
   body.mini-player-visible .music-mix-sheet-dock {
     --music-mix-chrome: calc(155px + env(safe-area-inset-bottom, 0px));
   }
@@ -27,8 +23,9 @@
   left: 0;
   right: 0;
   top: 50vh;
-  bottom: var(--music-mix-chrome);
-  z-index: 990;
+  bottom: 0;
+  z-index: 1200;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   display: flex;
   flex-direction: column;
   background: #141414;
@@ -99,6 +96,21 @@
   padding: 0.65rem 1rem;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
   cursor: pointer;
+}
+
+.music-mix-sheet-dock.music-detail-trend-card-active {
+  background: rgba(
+    var(--card-dominant-r, 192),
+    var(--card-dominant-g, 78),
+    var(--card-dominant-b, 221),
+    0.25
+  );
+  border-color: rgba(
+    var(--card-dominant-r, 192),
+    var(--card-dominant-g, 78),
+    var(--card-dominant-b, 221),
+    0.5
+  );
 }
 
 .music-mix-sheet-dock-title {

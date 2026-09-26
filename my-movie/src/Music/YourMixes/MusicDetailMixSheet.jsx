@@ -33,7 +33,7 @@ export const useNarrowLayout = () => {
  * Tutqichdan pastga varaq balandligining ~30% i yopadi.
  * Yopilganda pastda mix nomi qoladi.
  */
-const MusicDetailMixSheet = ({ genre, busy, children }) => {
+const MusicDetailMixSheet = ({ genre, busy, dominantColor, children }) => {
   const { t } = useTranslation();
   const panelRef = useRef(null);
   const dragRef = useRef(null);
@@ -120,7 +120,23 @@ const MusicDetailMixSheet = ({ genre, busy, children }) => {
   return createPortal(
     <div className="music-mix-sheet-host">
       {phase === 'dock' ? (
-        <button type="button" className="music-mix-sheet-dock" onClick={openSheet}>
+        <button
+          type="button"
+          className={[
+            'music-mix-sheet-dock',
+            dominantColor ? 'music-detail-trend-card-active' : '',
+          ].filter(Boolean).join(' ')}
+          style={
+            dominantColor
+              ? {
+                  '--card-dominant-r': dominantColor.r,
+                  '--card-dominant-g': dominantColor.g,
+                  '--card-dominant-b': dominantColor.b,
+                }
+              : undefined
+          }
+          onClick={openSheet}
+        >
           <span className="music-mix-sheet-dock-title">{title}</span>
         </button>
       ) : (
