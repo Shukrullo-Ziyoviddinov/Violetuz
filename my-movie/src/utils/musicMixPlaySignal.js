@@ -1,12 +1,16 @@
 /**
  * Mix uchun bitta signal. Progress reporterdan alohida.
- * Sessiya davomiylikning 80% iga yetganda bir marta ketadi.
- * Server shu 80% ni yana o'zi tekshiradi.
+ * Bar surilishi o‘zi marta emas. Pleer yurib qo‘shiqning 80% joyiga
+ * yetganda bir marta ketadi. Orqaga qaytsa keyingi 80% yangi marta.
+ * Server shu 80% ni yana o‘zi tekshiradi.
  */
 import { postMixPlay } from '../api/musicMixApi';
 
 /** music-mixes config dagi minListenRatio bilan bir xil. */
 export const MIX_LISTEN_RATIO = 0.8;
+
+const SEEK_FORWARD_SEC = 1.5;
+const SEEK_BACK_SEC = 0.4;
 
 /**
  * @param {number} listenedSeconds
@@ -27,66 +31,104 @@ const nextSessionId = (contentId) =>
 export function createMusicMixPlaySignal() {
   let sessionId = null;
   let contentId = null;
-  let baseline = 0;
   let sent = false;
   let pending = false;
-  let gateDuration = null;
   let retryAt = 0;
+  let lastTime = null;
+  let armed = true;
+  let hold = false;
 
-  const begin = (id, listenedNow = 0) => {
+  const begin = (id) => {
     const next = id == null || id === '' ? '' : String(id);
     pending = false;
-    gateDuration = null;
     retryAt = 0;
+    lastTime = null;
+    armed = true;
+    hold = false;
     if (!next) {
       sessionId = null;
       contentId = null;
-      baseline = 0;
       sent = false;
       return;
     }
     sessionId = nextSessionId(next);
     contentId = next;
-    baseline = Math.max(0, Number(listenedNow) || 0);
     sent = false;
   };
 
   const clear = () => begin(null);
 
+  const openNextPlay = () => {
+    if (!contentId) return;
+    sessionId = nextSessionId(contentId);
+    sent = false;
+    pending = false;
+    retryAt = 0;
+    armed = true;
+    hold = false;
+  };
+
   /**
-   * Katalog davomiyligi bo‘lsa shu olinadi. Server ham shu raqamga qaraydi.
-   * Rad etilsa signal qayta ochiladi. Tinglandi yuborishiga tegmaydi.
-   * @param {{ isLoggedIn?: boolean, listenedSeconds?: number, durationSec?: number }} input
+   * @param {{ isLoggedIn?: boolean, currentTime?: number, durationSec?: number, isPlaying?: boolean }} input
    */
-  const note = ({ isLoggedIn = false, listenedSeconds = 0, durationSec = 0 } = {}) => {
-    if (!isLoggedIn || !sessionId || !contentId || sent || pending) return;
-    if (Date.now() < retryAt) return;
-    const gained = Math.max(0, (Number(listenedSeconds) || 0) - baseline);
-    const gate = gateDuration || durationSec;
-    if (!isMixListenReached(gained, gate)) return;
+  const note = ({
+    isLoggedIn = false,
+    currentTime = 0,
+    durationSec = 0,
+    isPlaying = false,
+  } = {}) => {
+    const time = Number(currentTime);
+    const duration = Number(durationSec);
+    if (!Number.isFinite(time) || time < 0 || !Number.isFinite(duration) || duration <= 0) {
+      return;
+    }
+
+    const prev = lastTime;
+    const jumped =
+      prev != null && (time - prev > SEEK_FORWARD_SEC || prev - time > SEEK_BACK_SEC);
+    lastTime = time;
+
+    if (!isLoggedIn || !sessionId || !contentId) return;
+
+    const reached = isMixListenReached(time, duration);
+    if (!reached) {
+      if (sent && !pending) openNextPlay();
+      armed = true;
+      hold = false;
+      return;
+    }
+
+    if (jumped) {
+      hold = true;
+      return;
+    }
+    if (!isPlaying || sent || pending || Date.now() < retryAt) return;
+    if (!armed && !hold) return;
+
+    armed = false;
+    hold = false;
     pending = true;
-    const payload = {
+    postMixPlay({
       contentId,
       sessionId,
-      listenedSeconds: gained,
-      durationSec: Number(gate) || 0,
-    };
-    postMixPlay(payload)
+      listenedSeconds: time,
+      durationSec: duration,
+    })
       .then((data) => {
         pending = false;
         if (data?.queued) {
           sent = true;
           return;
         }
-        const catalogDuration = Number(data?.durationSec);
-        if (data?.reason === 'below_ratio' && Number.isFinite(catalogDuration) && catalogDuration > 0) {
-          gateDuration = catalogDuration;
+        if (data?.reason === 'below_ratio') {
+          armed = true;
           return;
         }
         sent = true;
       })
       .catch(() => {
         pending = false;
+        armed = true;
         retryAt = Date.now() + 5000;
       });
   };

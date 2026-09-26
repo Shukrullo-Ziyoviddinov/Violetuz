@@ -640,12 +640,11 @@ export const MusicPlayerProvider = ({ children }) => {
       ALBUM_TRACK_ID_OFFSET
     );
     if (mixTarget?.contentType === 'music') {
-      const catalogDur = Number(currentMusicRef.current?.durationSec);
       mixPlayRef.current.note({
         isLoggedIn: isLoggedInRef.current,
-        listenedSeconds: listenProgressRef.current.getAccumulated(),
-        durationSec:
-          Number.isFinite(catalogDur) && catalogDur > 0 ? catalogDur : el.duration,
+        currentTime: el.currentTime,
+        durationSec: el.duration,
+        isPlaying: !el.paused && !el.ended,
       });
     }
     void flushListenProgress();
