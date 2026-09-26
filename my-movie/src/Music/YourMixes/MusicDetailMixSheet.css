@@ -22,7 +22,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  top: 50vh;
+  top: 0;
   bottom: 0;
   z-index: 1200;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -32,9 +32,13 @@
   color: #fff;
   border-radius: 18px 18px 0 0;
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
-  transform: translateY(0);
-  transition: transform 280ms ease;
+  transform: translateY(50vh);
+  transition: transform 280ms ease, border-radius 280ms ease;
   overflow: hidden;
+}
+
+.music-mix-sheet.is-full {
+  border-radius: 0;
 }
 
 .music-mix-sheet.is-dragging {

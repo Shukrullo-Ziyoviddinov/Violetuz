@@ -5,7 +5,11 @@ import MusicMixControls from './MusicMixControls';
 import './MusicDetailMixSheet.css';
 
 const CLOSE_RATIO = 0.3;
+const EXPAND_RATIO = 0.1;
 const NARROW_QUERY = '(max-width: 900px)';
+
+const viewportHeight = () => (typeof window === 'undefined' ? 0 : window.innerHeight);
+const halfOffset = () => Math.round(viewportHeight() * 0.5);
 
 export const useNarrowLayout = () => {
   const [matches, setMatches] = useState(() =>
@@ -24,9 +28,10 @@ export const useNarrowLayout = () => {
 };
 
 /**
- * Mobil: mix varag‘i sahifaning yarmigacha.
- * Tutqichdan pastga varaq balandligining ~30% i yopadi.
- * Yopilganda pastda mix nomi qoladi.
+ * Mobil: mix varag‘i avval sahifaning yarmida.
+ * Yuqoriga ~10% tortilsa butun ekranga chiqadi.
+ * To‘liq holatdan pastga tortilsa yopilmaydi, o‘rtaga tushadi.
+ * O‘rtadan pastga ~30% tortilsa yopiladi.
  */
 const MusicDetailMixSheet = ({
   label,
@@ -41,8 +46,8 @@ const MusicDetailMixSheet = ({
   const { t } = useTranslation();
   const panelRef = useRef(null);
   const dragRef = useRef(null);
-  const [phase, setPhase] = useState('open');
-  const [shift, setShift] = useState(0);
+  const [phase, setPhase] = useState('half');
+  const [offset, setOffset] = useState(halfOffset);
   const [dragging, setDragging] = useState(false);
 
   const title = t('music.mixGenreLine', {
@@ -56,11 +61,11 @@ const MusicDetailMixSheet = ({
   }, []);
 
   const openSheet = () => {
-    const height = Math.round(window.innerHeight * 0.5);
-    setPhase('open');
-    setShift(height);
+    const viewport = viewportHeight();
+    setPhase('half');
+    setOffset(viewport);
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => setShift(0));
+      requestAnimationFrame(() => setOffset(halfOffset()));
     });
   };
 
@@ -69,21 +74,40 @@ const MusicDetailMixSheet = ({
     dragRef.current = null;
     setDragging(false);
     if (!start) return;
-    const height = panelRef.current?.getBoundingClientRect().height || window.innerHeight * 0.5;
-    const traveled = Math.max(0, clientY - start.y);
-    if (traveled >= height * CLOSE_RATIO) {
-      setShift(height);
-      setPhase('closing');
+    const viewport = viewportHeight();
+    const middle = halfOffset();
+    const next = Math.min(viewport, Math.max(0, start.origin + (clientY - start.y)));
+    const expandDistance = viewport * EXPAND_RATIO;
+
+    if (start.snap === 'full') {
+      if (next >= expandDistance) {
+        setPhase('half');
+        setOffset(middle);
+        return;
+      }
+      setPhase('full');
+      setOffset(0);
       return;
     }
-    setShift(0);
+
+    if (next <= middle - expandDistance) {
+      setPhase('full');
+      setOffset(0);
+      return;
+    }
+    if (next >= middle + middle * CLOSE_RATIO) {
+      setPhase('closing');
+      setOffset(viewport);
+      return;
+    }
+    setPhase('half');
+    setOffset(middle);
   };
 
   useEffect(() => {
     if (phase !== 'closing') return undefined;
     const timer = window.setTimeout(() => {
       setPhase('dock');
-      setShift(0);
     }, 320);
     return () => window.clearTimeout(timer);
   }, [phase]);
@@ -93,7 +117,9 @@ const MusicDetailMixSheet = ({
     const onMove = (event) => {
       const start = dragRef.current;
       if (!start || event.pointerId !== start.id) return;
-      setShift(Math.max(0, event.clientY - start.y));
+      const viewport = viewportHeight();
+      const next = start.origin + (event.clientY - start.y);
+      setOffset(Math.min(viewport, Math.max(0, next)));
     };
     const onUp = (event) => {
       const start = dragRef.current;
@@ -111,15 +137,20 @@ const MusicDetailMixSheet = ({
   }, [dragging]);
 
   const onGripDown = (event) => {
-    if (phase !== 'open' || event.button > 0) return;
-    dragRef.current = { y: event.clientY, id: event.pointerId };
+    if (phase === 'dock' || phase === 'closing' || event.button > 0) return;
+    dragRef.current = {
+      y: event.clientY,
+      id: event.pointerId,
+      origin: offset,
+      snap: phase,
+    };
     setDragging(true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   if (typeof document === 'undefined') return null;
 
-  const panelStyle = { transform: `translateY(${shift}px)` };
+  const panelStyle = { transform: `translateY(${offset}px)` };
 
   return createPortal(
     <div className="music-mix-sheet-host">
@@ -151,6 +182,7 @@ const MusicDetailMixSheet = ({
           ref={panelRef}
           className={[
             'music-mix-sheet',
+            phase === 'full' ? 'is-full' : '',
             dragging ? 'is-dragging' : '',
             busy ? 'is-busy' : '',
           ].filter(Boolean).join(' ')}
