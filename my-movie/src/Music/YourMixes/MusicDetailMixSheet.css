@@ -32,8 +32,7 @@
   color: #fff;
   border-radius: 18px 18px 0 0;
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
-  transform: translateY(50vh);
-  transition: transform 280ms ease, border-radius 280ms ease;
+  transition: top 280ms ease, border-radius 280ms ease;
   overflow: hidden;
 }
 
@@ -63,6 +62,7 @@
 }
 
 .music-mix-sheet-title {
+  flex: 0 0 auto;
   margin: 0;
   padding: 0.35rem 1rem 0.15rem;
   font-size: 1rem;
@@ -74,6 +74,7 @@
 }
 
 .music-mix-sheet .music-mix-controls {
+  flex: 0 0 auto;
   padding: 0 0.55rem;
   margin-bottom: 0.65rem;
 }
@@ -83,6 +84,8 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;

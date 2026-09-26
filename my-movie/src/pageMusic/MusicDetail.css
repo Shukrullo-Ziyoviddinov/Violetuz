@@ -1199,13 +1199,12 @@
   }
 
   .music-detail {
-  padding: 1rem 0;
-}
+    padding: 0;
+  }
 
-.music-detail-container {
-  padding: 0 0.7rem;
-}
-
+  .music-detail-container {
+    padding: 0 0.7rem;
+  }
 }
 
 @media (max-width: 640px) {

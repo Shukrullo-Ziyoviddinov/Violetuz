@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import MusicMixControls from './MusicMixControls';
@@ -9,7 +9,17 @@ const EXPAND_RATIO = 0.1;
 const NARROW_QUERY = '(max-width: 900px)';
 
 const viewportHeight = () => (typeof window === 'undefined' ? 0 : window.innerHeight);
-const halfOffset = () => Math.round(viewportHeight() * 0.5);
+const halfOffset = () => {
+  const viewport = viewportHeight();
+  const fallback = Math.round(viewport * 0.5);
+  const img = document.querySelector('.music-detail-left .music-detail-image');
+  if (!img) return fallback;
+  const rect = img.getBoundingClientRect();
+  if (rect.height < 40) return fallback;
+  const top = Math.round(rect.bottom);
+  if (top < 80 || top > viewport * 0.85) return fallback;
+  return top;
+};
 
 export const useNarrowLayout = () => {
   const [matches, setMatches] = useState(() =>
@@ -55,6 +65,11 @@ const MusicDetailMixSheet = ({
     defaultValue: '{{genre}} janerdagi mixlar',
   });
 
+  useLayoutEffect(() => {
+    if (phase !== 'half' || dragging) return;
+    setOffset(halfOffset());
+  }, [phase, dragging]);
+
   useEffect(() => {
     document.body.classList.add('music-mix-sheet-active');
     return () => document.body.classList.remove('music-mix-sheet-active');
@@ -95,7 +110,8 @@ const MusicDetailMixSheet = ({
       setOffset(0);
       return;
     }
-    if (next >= middle + middle * CLOSE_RATIO) {
+    const visible = Math.max(viewport - middle, middle);
+    if (next >= middle + visible * CLOSE_RATIO) {
       setPhase('closing');
       setOffset(viewport);
       return;
@@ -150,7 +166,7 @@ const MusicDetailMixSheet = ({
 
   if (typeof document === 'undefined') return null;
 
-  const panelStyle = { transform: `translateY(${offset}px)` };
+  const panelStyle = { top: `${offset}px` };
 
   return createPortal(
     <div className="music-mix-sheet-host">
