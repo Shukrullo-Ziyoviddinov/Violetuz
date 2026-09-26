@@ -8,6 +8,8 @@
 'use strict';
 
 const { recordMixPlay } = require('../services/recordPlay.service');
+const { buildUserMixes } = require('../services/mixEngine');
+const { replaceUserMixes } = require('../repositories/musicMix.repository');
 
 const JOB_NAME = 'music-mix-play';
 
@@ -44,7 +46,11 @@ const drain = async () => {
     while (pending.length) {
       const job = pending.shift();
       try {
-        await recordMixPlay(job.payload);
+        const saved = await recordMixPlay(job.payload);
+        if (saved?.counted) {
+          const mixes = await buildUserMixes(job.payload.userId);
+          await replaceUserMixes(job.payload.userId, mixes);
+        }
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(`[${JOB_NAME}] failed:`, err?.message || err);

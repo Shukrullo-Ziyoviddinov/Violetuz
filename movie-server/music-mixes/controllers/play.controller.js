@@ -18,6 +18,8 @@ const postMixPlay = asyncHandler(async (req, res) => {
   const contentId = String(req.body?.contentId ?? '').trim();
   const sessionId = String(req.body?.sessionId ?? '').trim();
   const listenedSeconds = Number(req.body?.listenedSeconds);
+  const reportedDuration = Number(req.body?.durationSec);
+  const durationSec = Number.isFinite(reportedDuration) && reportedDuration > 0 ? reportedDuration : null;
 
   if (!contentId || !sessionId || !Number.isFinite(listenedSeconds) || listenedSeconds < 0) {
     throw badRequest('contentId, sessionId va listenedSeconds kerak');
@@ -28,6 +30,7 @@ const postMixPlay = asyncHandler(async (req, res) => {
     contentId,
     listenedSeconds,
     sessionId,
+    durationSec,
   });
   if (!assessed.accept) {
     return sendSuccess(res, {
@@ -44,6 +47,7 @@ const postMixPlay = asyncHandler(async (req, res) => {
     contentId,
     sessionId,
     listenedSeconds,
+    durationSec: assessed.durationSec,
   });
 
   return sendSuccess(res, { data: { queued: true } });

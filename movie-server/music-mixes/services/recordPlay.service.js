@@ -12,13 +12,22 @@ const { incrementMixPlayCount } = require('../repositories/playCount.repository'
 const { parseUserId } = require('../repositories/parseUserId');
 const { isQualifiedMixPlay } = require('./qualifyPlay');
 
+const positiveDuration = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+/** Katalogda uzunlik bo‘lsa shu. Bo‘lmasa pleer aytgan qo‘shiq uzunligi. */
+const resolveDuration = (catalogDuration, reportedDuration) =>
+  positiveDuration(catalogDuration) || positiveDuration(reportedDuration);
+
 /**
- * Yozishdan oldin. 80% katalog davomiyligiga qarab. Navbatga qo‘yilmaydi.
+ * Yozishdan oldin. 80% qo‘shiq uzunligiga qarab. Navbatga qo‘yilmaydi.
  *
- * @param {{ userId: string|import('mongoose').Types.ObjectId, contentId: string|number, listenedSeconds: number, sessionId: string }} input
+ * @param {{ userId: string|import('mongoose').Types.ObjectId, contentId: string|number, listenedSeconds: number, sessionId: string, durationSec?: number }} input
  * @returns {Promise<{ accept: boolean, reason: string|null, durationSec: number|null }>}
  */
-const assessMixPlay = async ({ userId, contentId, listenedSeconds, sessionId }) => {
+const assessMixPlay = async ({ userId, contentId, listenedSeconds, sessionId, durationSec }) => {
   const uid = parseUserId(userId);
   const id = String(contentId ?? '').trim();
   const session = String(sessionId || '').trim();
@@ -31,14 +40,15 @@ const assessMixPlay = async ({ userId, contentId, listenedSeconds, sessionId }) 
   if (!song) {
     return { accept: false, reason: 'not_song', durationSec: null };
   }
-  if (!isQualifiedMixPlay(listenedSeconds, song.durationSec)) {
-    return { accept: false, reason: 'below_ratio', durationSec: song.durationSec };
+  const duration = resolveDuration(song.durationSec, durationSec);
+  if (!isQualifiedMixPlay(listenedSeconds, duration)) {
+    return { accept: false, reason: 'below_ratio', durationSec: duration };
   }
-  return { accept: true, reason: null, durationSec: song.durationSec };
+  return { accept: true, reason: null, durationSec: duration };
 };
 
 /**
- * @param {{ userId: string|import('mongoose').Types.ObjectId, contentId: string|number, listenedSeconds: number, sessionId: string, playedAt?: Date }} input
+ * @param {{ userId: string|import('mongoose').Types.ObjectId, contentId: string|number, listenedSeconds: number, sessionId: string, durationSec?: number, playedAt?: Date }} input
  * @returns {Promise<{ counted: boolean, reason?: string, playCount?: number, genre?: string, contentId?: string }>}
  */
 const recordMixPlay = async ({
@@ -46,6 +56,7 @@ const recordMixPlay = async ({
   contentId,
   listenedSeconds,
   sessionId,
+  durationSec,
   playedAt = new Date(),
 }) => {
   const uid = parseUserId(userId);
@@ -61,7 +72,7 @@ const recordMixPlay = async ({
     return { counted: false, reason: 'not_song' };
   }
 
-  if (!isQualifiedMixPlay(listenedSeconds, song.durationSec)) {
+  if (!isQualifiedMixPlay(listenedSeconds, resolveDuration(song.durationSec, durationSec))) {
     return { counted: false, reason: 'below_ratio' };
   }
 

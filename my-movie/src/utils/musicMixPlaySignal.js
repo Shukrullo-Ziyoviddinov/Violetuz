@@ -69,6 +69,7 @@ export function createMusicMixPlaySignal() {
       contentId,
       sessionId,
       listenedSeconds: gained,
+      durationSec: Number(gate) || 0,
     };
     postMixPlay(payload)
       .then((data) => {
