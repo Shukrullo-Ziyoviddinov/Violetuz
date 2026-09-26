@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import MusicMixControls from './MusicMixControls';
 import './MusicDetailMixSheet.css';
 
 const CLOSE_RATIO = 0.3;
@@ -27,7 +28,16 @@ export const useNarrowLayout = () => {
  * Tutqichdan pastga varaq balandligining ~30% i yopadi.
  * Yopilganda pastda mix nomi qoladi.
  */
-const MusicDetailMixSheet = ({ label, busy, dominantColor, children }) => {
+const MusicDetailMixSheet = ({
+  label,
+  busy,
+  dominantColor,
+  repeat,
+  shuffle,
+  onToggleRepeat,
+  onToggleShuffle,
+  children,
+}) => {
   const { t } = useTranslation();
   const panelRef = useRef(null);
   const dragRef = useRef(null);
@@ -159,6 +169,14 @@ const MusicDetailMixSheet = ({ label, busy, dominantColor, children }) => {
             <span />
           </div>
           <h3 className="music-mix-sheet-title">{title}</h3>
+          {!busy && (
+            <MusicMixControls
+              repeat={repeat}
+              shuffle={shuffle}
+              onToggleRepeat={onToggleRepeat}
+              onToggleShuffle={onToggleShuffle}
+            />
+          )}
           <div className="music-mix-sheet-list" aria-busy={busy || undefined}>
             {children}
           </div>

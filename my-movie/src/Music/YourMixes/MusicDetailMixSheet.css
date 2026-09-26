@@ -60,10 +60,15 @@
 
 .music-mix-sheet-title {
   margin: 0;
-  padding: 0.35rem 1rem 0.75rem;
+  padding: 0.35rem 1rem 0.15rem;
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
+}
+
+.music-mix-sheet .music-mix-controls {
+  padding: 0 0.55rem;
+  margin-bottom: 0.65rem;
 }
 
 .music-mix-sheet-list {

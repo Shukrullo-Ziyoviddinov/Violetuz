@@ -303,6 +303,22 @@ const MusicDetail = () => {
     });
   }, [allMusic, mixGenre, mixes, sections, t]);
 
+  const mixPlayTracks = useMemo(() => {
+    if (!mixGenre) return [];
+    const mix = (mixes || []).find((row) => row.genre === mixGenre);
+    if (!mix) return [];
+    const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
+    const out = [];
+    for (const row of mix.tracks || []) {
+      const track = byId.get(String(row.contentId));
+      if (track) out.push(track);
+    }
+    return out;
+  }, [allMusic, mixGenre, mixes]);
+
+  const [mixRepeat, setMixRepeat] = useState(false);
+  const [mixShuffle, setMixShuffle] = useState(false);
+
   const trendList = useMemo(() => {
     const contentType = wishlistTypeToContentType(
       sectionConfig?.wishlistType || 'music'
@@ -337,6 +353,7 @@ const MusicDetail = () => {
     loadTrack,
     loadAndPlayTrack,
     setPlaylistFromPage,
+    setMixPlayback,
     togglePlay,
     handleProgressClick,
     handleVolumeChange,
@@ -451,6 +468,24 @@ const MusicDetail = () => {
     }
     return () => setPlaylistFromPage(null);
   }, [trendList, sectionConfig, setPlaylistFromPage]);
+
+  useEffect(() => {
+    setMixRepeat(false);
+    setMixShuffle(false);
+  }, [mixGenre]);
+
+  useEffect(() => {
+    if (!mixGenre || (!mixRepeat && !mixShuffle)) {
+      setMixPlayback(null);
+      return undefined;
+    }
+    setMixPlayback({
+      repeat: mixRepeat,
+      shuffle: mixShuffle,
+      tracks: mixPlayTracks,
+    });
+    return () => setMixPlayback(null);
+  }, [mixGenre, mixPlayTracks, mixRepeat, mixShuffle, setMixPlayback]);
 
   // Lyrics tugmasi - sahifa o'zgaganda yoki openLyrics state kelganda
   useEffect(() => {
@@ -999,6 +1034,10 @@ const MusicDetail = () => {
                   label={mixLabel}
                   busy={mixBusy}
                   dominantColor={pageDominantColor || (isCurrentTrack ? dominantColor : null)}
+                  repeat={mixRepeat}
+                  shuffle={mixShuffle}
+                  onToggleRepeat={() => setMixRepeat((on) => !on)}
+                  onToggleShuffle={() => setMixShuffle((on) => !on)}
                 >
                   {renderMixCards()}
                 </MusicDetailMixList>
@@ -1016,6 +1055,10 @@ const MusicDetail = () => {
           label={mixLabel}
           busy={mixBusy}
           dominantColor={pageDominantColor || (isCurrentTrack ? dominantColor : null)}
+          repeat={mixRepeat}
+          shuffle={mixShuffle}
+          onToggleRepeat={() => setMixRepeat((on) => !on)}
+          onToggleShuffle={() => setMixShuffle((on) => !on)}
         >
           {renderMixCards()}
         </MusicDetailMixSheet>

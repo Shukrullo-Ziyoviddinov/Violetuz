@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
+import MusicMixControls from './MusicMixControls';
 import './MusicDetailMixList.css';
 
 /**
  * Desktop: mix qatori o'ng bo'lim blokining ustida.
  * X bosilsa shu joyda yig'iladi, qayta bossangiz pastga ochiladi.
  */
-const MusicDetailMixList = ({ label, busy, dominantColor, children }) => {
+const MusicDetailMixList = ({
+  label,
+  busy,
+  dominantColor,
+  repeat,
+  shuffle,
+  onToggleRepeat,
+  onToggleShuffle,
+  children,
+}) => {
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
   const title = t('music.mixGenreLine', {
@@ -69,6 +79,14 @@ const MusicDetailMixList = ({ label, busy, dominantColor, children }) => {
       )}
       <div className="music-detail-mix-body">
         <div className="music-detail-mix-body-inner">
+          {!busy && (
+            <MusicMixControls
+              repeat={repeat}
+              shuffle={shuffle}
+              onToggleRepeat={onToggleRepeat}
+              onToggleShuffle={onToggleShuffle}
+            />
+          )}
           <div className="music-detail-trend-grid" aria-busy={busy || undefined}>
             {children}
           </div>

@@ -15,7 +15,7 @@
 }
 
 .music-detail-mix-scroll:not(.is-collapsed) .music-detail-mix-head {
-  margin-bottom: 1rem;
+  margin-bottom: 0.35rem;
 }
 
 .music-detail-mix-head .music-detail-trend-title,
@@ -59,6 +59,13 @@
 }
 
 .music-detail-mix-body-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.music-detail-mix-body-inner .music-detail-trend-grid {
   min-height: 0;
   overflow: auto;
 }

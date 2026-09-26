@@ -11,6 +11,7 @@ import {
   resolveAudioListenTarget,
 } from '../utils/musicListenProgressReporter';
 import { createMusicMixPlaySignal } from '../utils/musicMixPlaySignal';
+import { takeMixTrack } from '../Music/YourMixes/mixPlaybackQueue';
 import { albumSongToTrack, ALBUM_TRACK_ID_OFFSET } from '../utils/albumSongToTrack';
 import MusicMiniPlayer from '../Music/MusicMiniPlayer/MusicMiniPlayer';
 import MusicPlayerModal from '../Music/MusicPlayerModal/MusicPlayerModal';
@@ -39,6 +40,8 @@ export const MusicPlayerProvider = ({ children }) => {
   const prevVolumeRef = useRef(0.7);
   const lastMusicRef = useRef(null);
   const playlistRef = useRef(null);
+  const mixPlaybackRef = useRef(null);
+  const mixQueueMemoryRef = useRef({ signature: '', queue: [], history: [], cycleReady: false });
   const pendingNavigateRef = useRef(null);
   const pendingAutoplayRef = useRef(false);
   const tryAutoplayRef = useRef(null);
@@ -450,6 +453,10 @@ export const MusicPlayerProvider = ({ children }) => {
     playlistRef.current = Array.isArray(playlist) && playlist.length ? playlist : null;
   }, []);
 
+  const setMixPlayback = useCallback((config) => {
+    mixPlaybackRef.current = config && (config.repeat || config.shuffle) ? config : null;
+  }, []);
+
   const handleCanPlay = useCallback(() => {
     if (pendingAutoplayRef.current && audioRef.current) {
       tryAutoplay();
@@ -492,6 +499,20 @@ export const MusicPlayerProvider = ({ children }) => {
       }
     }
   }, [loadTrack, location.pathname, location.search, navigate, tryAutoplay]);
+
+  const playMixStep = useCallback((direction, autoplay) => {
+    const music = currentMusicRef.current;
+    if (!music) return false;
+    const track = takeMixTrack(mixPlaybackRef.current, mixQueueMemoryRef.current, music.id, direction);
+    if (track === undefined) return false;
+    if (!track) return true;
+    loadAndPlayTrack(track.id, {
+      autoplay,
+      syncMusicDetail: isOnMusicDetailPage,
+      playlist: playlistRef.current || undefined,
+    });
+    return true;
+  }, [isOnMusicDetailPage, loadAndPlayTrack]);
 
   /* currentMusic yangilangandan keyin navigatsiya – oldinga bosganda player va rang yo'qolmasin */
   useEffect(() => {
@@ -670,6 +691,8 @@ export const MusicPlayerProvider = ({ children }) => {
 
     void flushListenProgress({ force: true });
 
+    if (playMixStep('next', true)) return;
+
     if (isRepeat) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
@@ -717,10 +740,11 @@ export const MusicPlayerProvider = ({ children }) => {
         }
       }
     }
-  }, [currentMusic, isRepeat, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic, topAlbums, flushListenProgress]);
+  }, [currentMusic, isRepeat, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic, topAlbums, flushListenProgress, playMixStep]);
 
   const handlePrevTrack = useCallback(() => {
     if (!currentMusic) return;
+    if (playMixStep('prev', isPlaying)) return;
     const list = playlistRef.current?.length ? playlistRef.current : allMusic;
     const isAlbumPlaylist = list.length && list[0]?.albumId != null;
     const syncDetail = isAlbumPlaylist ? !playlistRef.current?.length : isOnMusicDetailPage;
@@ -742,10 +766,11 @@ export const MusicPlayerProvider = ({ children }) => {
         loadAndPlayTrack(prev.id, { autoplay: isPlaying, syncMusicDetail: syncDetail, playlist: playlistRef.current || undefined });
       }
     }
-  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, isOnMusicDetailPage, allMusic]);
+  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, isOnMusicDetailPage, allMusic, playMixStep]);
 
   const handleNextTrack = useCallback(() => {
     if (!currentMusic) return;
+    if (playMixStep('next', isPlaying)) return;
     const list = playlistRef.current?.length ? playlistRef.current : allMusic;
     const isAlbumPlaylist = list.length && list[0]?.albumId != null;
     const syncDetail = isAlbumPlaylist ? !playlistRef.current?.length : isOnMusicDetailPage;
@@ -785,7 +810,7 @@ export const MusicPlayerProvider = ({ children }) => {
         loadAndPlayTrack(next.id, { autoplay: isPlaying, syncMusicDetail: syncDetail, playlist: playlistRef.current || undefined });
       }
     }
-  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic]);
+  }, [currentMusic, isPlaying, isShuffle, loadAndPlayTrack, loadAndPlayTrackByTrack, navigate, isOnMusicDetailPage, allMusic, playMixStep]);
 
   const toggleRepeat = useCallback(() => {
     const next = !isRepeat;
@@ -923,6 +948,7 @@ export const MusicPlayerProvider = ({ children }) => {
     playerModalOpen,
     setPlayerModalOpen,
     setPlaylistFromPage,
+    setMixPlayback,
   };
 
   return (
