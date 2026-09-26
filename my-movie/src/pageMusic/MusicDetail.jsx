@@ -26,6 +26,7 @@ import { useAuth } from '../context/AuthContext';
 import { useMusicMixes } from '../hooks/useMusicMixes';
 import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
 import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
+import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import { recordViewRequest } from '../api/viewsApi';
 import './MusicDetail.css';
 
@@ -290,6 +291,17 @@ const MusicDetail = () => {
     }
     return out;
   }, [allMusic, mixGenre, mixes, music?.id]);
+
+  const mixLabel = useMemo(() => {
+    const mix = (mixes || []).find((row) => row.genre === mixGenre);
+    return mixSectionLabel({
+      genre: mixGenre,
+      tracks: mix?.tracks,
+      allMusic,
+      sections,
+      t,
+    });
+  }, [allMusic, mixGenre, mixes, sections, t]);
 
   const trendList = useMemo(() => {
     const contentType = wishlistTypeToContentType(
@@ -983,7 +995,7 @@ const MusicDetail = () => {
           {showMixColumn ? (
             <div className="music-detail-side">
               {!narrowMix && (
-                <MusicDetailMixList genre={mixGenre} busy={mixBusy}>
+                <MusicDetailMixList label={mixLabel} busy={mixBusy}>
                   {renderMixCards()}
                 </MusicDetailMixList>
               )}
@@ -997,7 +1009,7 @@ const MusicDetail = () => {
 
       {showMixColumn && narrowMix && (
         <MusicDetailMixSheet
-          genre={mixGenre}
+          label={mixLabel}
           busy={mixBusy}
           dominantColor={pageDominantColor || (isCurrentTrack ? dominantColor : null)}
         >

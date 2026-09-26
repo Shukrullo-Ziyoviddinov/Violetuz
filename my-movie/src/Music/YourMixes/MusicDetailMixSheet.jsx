@@ -6,12 +6,6 @@ import './MusicDetailMixSheet.css';
 const CLOSE_RATIO = 0.3;
 const NARROW_QUERY = '(max-width: 900px)';
 
-const genreLabel = (genre) => {
-  const name = String(genre || '').trim();
-  if (!name) return '';
-  return name.charAt(0).toUpperCase() + name.slice(1);
-};
-
 export const useNarrowLayout = () => {
   const [matches, setMatches] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia(NARROW_QUERY).matches : false
@@ -33,7 +27,7 @@ export const useNarrowLayout = () => {
  * Tutqichdan pastga varaq balandligining ~30% i yopadi.
  * Yopilganda pastda mix nomi qoladi.
  */
-const MusicDetailMixSheet = ({ genre, busy, dominantColor, children }) => {
+const MusicDetailMixSheet = ({ label, busy, dominantColor, children }) => {
   const { t } = useTranslation();
   const panelRef = useRef(null);
   const dragRef = useRef(null);
@@ -42,7 +36,7 @@ const MusicDetailMixSheet = ({ genre, busy, dominantColor, children }) => {
   const [dragging, setDragging] = useState(false);
 
   const title = t('music.mixGenreLine', {
-    genre: genreLabel(genre),
+    genre: label,
     defaultValue: '{{genre}} janerdagi mixlar',
   });
 
@@ -137,6 +131,9 @@ const MusicDetailMixSheet = ({ genre, busy, dominantColor, children }) => {
           }
           onClick={openSheet}
         >
+          <svg className="music-mix-sheet-dock-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M4 6h12v2H4V6zm0 5h12v2H4v-2zm0 5h8v2H4v-2zm12 1.5 5-3.5-5-3.5v7z" />
+          </svg>
           <span className="music-mix-sheet-dock-title">{title}</span>
         </button>
       ) : (

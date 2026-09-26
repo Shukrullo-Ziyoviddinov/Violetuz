@@ -93,6 +93,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   padding: 0.65rem 1rem;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
   cursor: pointer;
@@ -109,6 +110,11 @@
     var(--card-dominant-g, 28),
     var(--card-dominant-b, 28)
   );
+}
+
+.music-mix-sheet-dock-icon {
+  flex: 0 0 auto;
+  color: #fff;
 }
 
 .music-mix-sheet-dock-title {

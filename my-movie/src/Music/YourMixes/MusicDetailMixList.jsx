@@ -2,20 +2,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 
-const genreLabel = (genre) => {
-  const name = String(genre || '').trim();
-  if (!name) return '';
-  return name.charAt(0).toUpperCase() + name.slice(1);
-};
-
 /**
  * Desktop: mix qatori o'ng bo'lim blokining ustida.
  * Ko'rinish va scroll shu blok bilan bir xil.
  */
-const MusicDetailMixList = ({ genre, busy, children }) => {
+const MusicDetailMixList = ({ label, busy, children }) => {
   const { t } = useTranslation();
   const title = t('music.mixGenreLine', {
-    genre: genreLabel(genre),
+    genre: label,
     defaultValue: '{{genre}} janerdagi mixlar',
   });
 
