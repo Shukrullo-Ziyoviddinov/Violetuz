@@ -1,6 +1,6 @@
 .your-mixes-card {
   flex-shrink: 0;
-  width: 200px;
+  width: 240px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -56,44 +56,44 @@
 }
 
 .your-mixes-cover--2 {
-  --mix-cover-width: 80%;
+  --mix-cover-width: 72%;
 }
 
 .your-mixes-cover--2 img:nth-child(2) {
-  left: 20%;
+  left: 28%;
 }
 
 .your-mixes-cover--3 {
-  --mix-cover-width: 74%;
+  --mix-cover-width: 61%;
 }
 
 .your-mixes-cover--3 img:nth-child(2) {
-  left: 15%;
+  left: 22%;
 }
 
 .your-mixes-cover--3 img:nth-child(3) {
-  left: 26%;
+  left: 39%;
 }
 
 .your-mixes-cover--4 {
-  --mix-cover-width: 66%;
+  --mix-cover-width: 48%;
 }
 
 .your-mixes-cover--4 img:nth-child(2) {
-  left: 15%;
+  left: 22%;
 }
 
 .your-mixes-cover--4 img:nth-child(3) {
-  left: 26%;
+  left: 39%;
 }
 
 .your-mixes-cover--4 img:nth-child(4) {
-  left: 34%;
+  left: 52%;
 }
 
-@media (max-width: 390px) {
+@media (max-width: 768px) {
   .your-mixes-card {
-    width: 168px;
+    width: 200px;
   }
 }
 
