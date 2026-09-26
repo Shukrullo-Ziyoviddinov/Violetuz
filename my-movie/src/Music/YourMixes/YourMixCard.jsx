@@ -33,9 +33,17 @@ export const YourMixCard = ({ mix, covers }) => {
 
   return (
     <button type="button" className="your-mixes-card" onClick={open}>
-      <div className={`your-mixes-cover your-mixes-cover--${Math.max(images.length, 1)}`}>
-        {images.map((src) => (
-          <img key={src} src={src} alt="" />
+      <div
+        className={`your-mixes-cover your-mixes-cover--${Math.max(images.length, 1)}`}
+        style={{ '--mix-cover-count': Math.max(images.length, 1) }}
+      >
+        {images.map((src, index) => (
+          <img
+            key={`${src}-${index}`}
+            src={src}
+            alt=""
+            style={{ '--mix-cover-index': index }}
+          />
         ))}
       </div>
       <p className="your-mixes-genre">
