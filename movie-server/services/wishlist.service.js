@@ -9,6 +9,7 @@ const ShortVideo = require('../models/ShortVideo.model');
 const MusicShort = require('../models/MusicShort.model');
 const Triller = require('../models/Triller.model');
 const MusicMix = require('../music-mixes/models/MusicMix.model');
+const { normalizeMixContentType } = require('../music-mixes/contentType');
 const { badRequest, notFound } = require('../utils/errors');
 
 const stripMongoMeta = (doc) => {
@@ -49,18 +50,43 @@ const normalizeItemId = (id) => {
   return String(id).trim();
 };
 
+const parseMixWishlistId = (itemId) => {
+  const raw = normalizeItemId(itemId);
+  const match = /^(music|klip|clip):(.+)$/i.exec(raw);
+  if (!match) return { contentType: 'music', genre: raw };
+  const genre = match[2].trim();
+  if (!genre) throw badRequest('id majburiy');
+  return { contentType: normalizeMixContentType(match[1]), genre };
+};
+
+const canonicalMixItemId = (itemId) => {
+  const { contentType, genre } = parseMixWishlistId(itemId);
+  return `${contentType}:${genre}`;
+};
+
+const mixItemIdAliases = (itemId) => {
+  const { contentType, genre } = parseMixWishlistId(itemId);
+  if (contentType === 'klip') return [`klip:${genre}`, `clip:${genre}`];
+  return [`music:${genre}`, genre];
+};
+
 /** Katalogdan entity topish + snapshot. Mix — shu foydalanuvchining music_mixes qatori. */
 const resolveCatalogSnapshot = async (type, itemId, userId) => {
   if (type === 'mix') {
-    const genre = normalizeItemId(itemId);
-    const rows = await MusicMix.find({ userId, genre })
-      .sort({ position: 1 })
-      .lean();
+    const { contentType, genre } = parseMixWishlistId(itemId);
+    const query = { userId, genre };
+    if (contentType === 'klip') {
+      query.contentType = 'klip';
+    } else {
+      query.$or = [{ contentType: 'music' }, { contentType: { $exists: false } }];
+    }
+    const rows = await MusicMix.find(query).sort({ position: 1 }).lean();
     if (!rows.length) {
       throw notFound(`mix topilmadi: ${genre}`);
     }
     return {
       genre,
+      contentType,
       tracks: rows.map((row) => ({
         contentId: String(row.contentId),
         position: row.position,
@@ -155,7 +181,30 @@ const toClientItemFrontend = (row) => ({
   createdAt: row.createdAt,
 });
 
+const BARE_MIX_ID = { $not: /^(music|klip|clip):/i };
+
+/** Eski mix kaliti faqat janr edi. Endi music:janr. */
+const migrateBareMixWishlistIds = async (userId) => {
+  const rows = await Wishlist.find({
+    userId,
+    type: 'mix',
+    itemId: BARE_MIX_ID,
+  })
+    .select('_id itemId')
+    .lean();
+  for (const row of rows) {
+    const nextId = `music:${String(row.itemId)}`;
+    const clash = await Wishlist.exists({ userId, type: 'mix', itemId: nextId });
+    if (clash) {
+      await Wishlist.deleteOne({ _id: row._id });
+      continue;
+    }
+    await Wishlist.updateOne({ _id: row._id }, { $set: { itemId: nextId } });
+  }
+};
+
 const listWishlist = async (userId, { type } = {}) => {
+  await migrateBareMixWishlistIds(userId);
   const query = { userId };
   if (type) {
     query.type = assertType(type);
@@ -166,7 +215,7 @@ const listWishlist = async (userId, { type } = {}) => {
 
 const addItem = async (userId, { id, type }) => {
   const safeType = assertType(type);
-  const itemId = normalizeItemId(id);
+  const itemId = safeType === 'mix' ? canonicalMixItemId(id) : normalizeItemId(id);
   const snapshot = await resolveCatalogSnapshot(safeType, itemId, userId);
 
   const row = await Wishlist.findOneAndUpdate(
@@ -183,11 +232,11 @@ const addItem = async (userId, { id, type }) => {
 
 const removeItem = async (userId, { id, type }) => {
   const safeType = assertType(type);
-  const itemId = normalizeItemId(id);
+  const itemId = safeType === 'mix' ? canonicalMixItemId(id) : normalizeItemId(id);
   const deleted = await Wishlist.findOneAndDelete({
     userId,
     type: safeType,
-    itemId,
+    itemId: safeType === 'mix' ? { $in: mixItemIdAliases(id) } : itemId,
   }).lean();
 
   if (!deleted) {
@@ -203,12 +252,12 @@ const removeItem = async (userId, { id, type }) => {
  */
 const toggleItem = async (userId, { id, type }) => {
   const safeType = assertType(type || 'movie');
-  const itemId = normalizeItemId(id);
+  const itemId = safeType === 'mix' ? canonicalMixItemId(id) : normalizeItemId(id);
 
   const existing = await Wishlist.findOne({
     userId,
     type: safeType,
-    itemId,
+    itemId: safeType === 'mix' ? { $in: mixItemIdAliases(id) } : itemId,
   }).lean();
 
   if (existing) {
@@ -236,7 +285,7 @@ const replaceWishlist = async (userId, itemsInput = []) => {
   for (const raw of itemsInput) {
     if (!raw || raw.id == null) continue;
     const safeType = assertType(raw.type || 'movie');
-    const itemId = normalizeItemId(raw.id);
+    const itemId = safeType === 'mix' ? canonicalMixItemId(raw.id) : normalizeItemId(raw.id);
     const key = `${safeType}:${itemId}`;
     if (seen.has(key)) continue;
     seen.add(key);

@@ -10,6 +10,7 @@ const MusicMixControls = ({
   label,
   musicId,
   mixGenre,
+  contentType = 'music',
 }) => {
   const [moreOpen, setMoreOpen] = useState(false);
 
@@ -60,6 +61,7 @@ const MusicMixControls = ({
       label={label}
       musicId={musicId}
       mixGenre={mixGenre}
+      contentType={contentType}
     />
   </div>
   );

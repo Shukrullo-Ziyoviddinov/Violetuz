@@ -91,6 +91,48 @@
   left: 52%;
 }
 
+.your-mixes-cover--klip.your-mixes-cover--2 img:nth-child(1) {
+  width: 74%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--2 img:nth-child(2) {
+  left: 18%;
+  width: 82%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--3 img:nth-child(1) {
+  width: 68%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--3 img:nth-child(2) {
+  left: 36%;
+  width: 56%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--3 img:nth-child(3) {
+  left: 68%;
+  width: 32%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(1) {
+  width: 56%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(2) {
+  left: 34%;
+  width: 48%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(3) {
+  left: 58%;
+  width: 34%;
+}
+
+.your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(4) {
+  left: 70%;
+  width: 30%;
+}
+
 @media (max-width: 768px) {
   .your-mixes-card {
     width: 200px;

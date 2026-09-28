@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { MIX_CONTENT_TYPES } = require('../contentType');
 
 /**
  * Tayyor janr mixi. Sahifa ochilganda shu yerda o'qiladi.
@@ -15,6 +16,14 @@ const musicMixSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    /** music — qo'shiq mixi. klip — video mixi. Eski qator music. */
+    contentType: {
+      type: String,
+      required: true,
+      enum: MIX_CONTENT_TYPES,
+      default: 'music',
+      trim: true,
     },
     genre: {
       type: String,
@@ -55,7 +64,7 @@ const musicMixSchema = new mongoose.Schema(
   }
 );
 
-musicMixSchema.index({ userId: 1, genre: 1, contentId: 1 }, { unique: true });
-musicMixSchema.index({ userId: 1, genre: 1, position: 1 });
+musicMixSchema.index({ userId: 1, contentType: 1, genre: 1, contentId: 1 }, { unique: true });
+musicMixSchema.index({ userId: 1, contentType: 1, genre: 1, position: 1 });
 
 module.exports = mongoose.model('MusicMix', musicMixSchema);

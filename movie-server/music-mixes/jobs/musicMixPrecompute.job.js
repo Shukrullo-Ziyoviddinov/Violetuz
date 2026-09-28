@@ -8,6 +8,7 @@
 'use strict';
 
 const { musicMixWeights } = require('../config/musicMixWeights');
+const { MIX_CONTENT_TYPES } = require('../contentType');
 const { MusicMix, MusicMixPlayCount } = require('../models');
 const { parseUserId } = require('../repositories/parseUserId');
 const { replaceUserMixes } = require('../repositories/musicMix.repository');
@@ -49,9 +50,11 @@ const refreshMusicMixes = async () => {
   let written = 0;
 
   for (const userId of userIds) {
-    const mixes = await buildUserMixes(userId);
-    const saved = await replaceUserMixes(userId, mixes);
-    written += saved.written;
+    for (const contentType of MIX_CONTENT_TYPES) {
+      const mixes = await buildUserMixes(userId, contentType);
+      const saved = await replaceUserMixes(userId, mixes, contentType);
+      written += saved.written;
+    }
   }
 
   return { users: userIds.length, written };

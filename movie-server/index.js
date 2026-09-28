@@ -42,6 +42,9 @@ const startServer = async () => {
       coListen: { runImmediately: true, initialDelayMs: 30_000 },
     });
 
+    const { ensureMixContentType } = require('./music-mixes/models/ensureMixContentType');
+    await ensureMixContentType();
+
     const { startMusicMixPrecomputeScheduler } = require('./music-mixes/jobs');
     startMusicMixPrecomputeScheduler({
       runImmediately: true,

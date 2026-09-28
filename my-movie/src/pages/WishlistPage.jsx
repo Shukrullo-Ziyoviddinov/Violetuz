@@ -154,6 +154,17 @@ const WishlistPage = () => {
     return '';
   };
 
+  const parseMixWishlistId = (id) => {
+    const raw = String(id || '').trim();
+    const match = /^(music|klip|clip):(.+)$/i.exec(raw);
+    if (!match) return { contentType: 'music', genre: raw };
+    const type = match[1].toLowerCase();
+    return {
+      contentType: type === 'klip' || type === 'clip' ? 'klip' : 'music',
+      genre: match[2].trim(),
+    };
+  };
+
   const matchWishlist = (itemId, type) =>
     wishlistItems.some((x) => x.id == itemId && normalizeType(x.type) === normalizeType(type));
 
@@ -166,13 +177,23 @@ const WishlistPage = () => {
   const wishlistTrillers = allTrillers.filter((item) => matchWishlist(item.id, 'triller'));
 
   const wishlistMixes = useMemo(() => {
-    const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
+    const musicById = new Map((allMusic || []).map((track) => [String(track.id), track]));
+    const clipById = new Map((allClips || []).map((clip) => [String(clip.id), clip]));
     return wishlistItems
       .filter((row) => normalizeType(row.type) === 'mix')
       .map((row) => {
-        const genreKey = String(row.id);
-        const live = (mixes || []).find((mix) => mix.genre === genreKey);
+        const parsed = parseMixWishlistId(row.id);
+        const snapType = String(row.snapshot?.contentType || '').trim().toLowerCase();
+        const contentType =
+          parsed.contentType === 'klip' || snapType === 'klip' || snapType === 'clip'
+            ? 'klip'
+            : 'music';
+        const genre = String(row.snapshot?.genre || parsed.genre || '').trim();
+        const live = (mixes || []).find(
+          (mix) => mix.genre === genre && (mix.contentType || 'music') === contentType
+        );
         const tracks = live?.tracks?.length ? live.tracks : row.snapshot?.tracks || [];
+        const byId = contentType === 'klip' ? clipById : musicById;
         const covers = [];
         for (const trackRow of tracks) {
           if (covers.length >= 4) break;
@@ -180,13 +201,17 @@ const WishlistPage = () => {
           if (src && !covers.includes(src)) covers.push(src);
         }
         return {
-          id: genreKey,
-          genre: genreKey,
-          mix: { genre: genreKey, tracks },
+          id: `${contentType}:${genre}`,
+          genre,
+          mix: {
+            genre,
+            contentType,
+            tracks,
+          },
           covers,
         };
       });
-  }, [allMusic, mixes, wishlistItems]);
+  }, [allClips, allMusic, mixes, wishlistItems]);
 
   const movieShortsCatalog = useMemo(
     () =>

@@ -13,20 +13,28 @@ export const YourMixCard = ({ mix, covers }) => {
   const count = Array.isArray(mix?.tracks) ? mix.tracks.length : 0;
   const genre = String(mix?.genre || '').trim().toLowerCase();
   const leadId = mix?.tracks?.[0]?.contentId;
+  const contentType = String(mix?.contentType || 'music').trim().toLowerCase();
+  const isClip = contentType === 'klip' || contentType === 'clip';
+  const coverCount = Math.max(images.length, 1);
 
   const open = () => {
-    if (!leadId) return;
+    if (leadId == null || leadId === '') return;
     const params = new URLSearchParams();
     if (mix?.genre) params.set('mix', mix.genre);
     const query = params.toString();
-    navigate(`/music/${leadId}${query ? `?${query}` : ''}`);
+    const path = isClip ? `/music/video/${leadId}` : `/music/${leadId}`;
+    navigate(`${path}${query ? `?${query}` : ''}`);
   };
 
   return (
     <button type="button" className="your-mixes-card" onClick={open}>
       <div
-        className={`your-mixes-cover your-mixes-cover--${Math.max(images.length, 1)}`}
-        style={{ '--mix-cover-count': Math.max(images.length, 1) }}
+        className={[
+          'your-mixes-cover',
+          `your-mixes-cover--${coverCount}`,
+          isClip ? 'your-mixes-cover--klip' : '',
+        ].filter(Boolean).join(' ')}
+        style={{ '--mix-cover-count': coverCount }}
       >
         {images.map((src, index) => (
           <img
@@ -44,10 +52,15 @@ export const YourMixCard = ({ mix, covers }) => {
         })}
       </p>
       <p className="your-mixes-count">
-        {t('music.mixTrackCount', {
-          count,
-          defaultValue: '{{count}} ta musiqa',
-        })}
+        {isClip
+          ? t('music.mixClipCount', {
+              count,
+              defaultValue: '{{count}} ta klip',
+            })
+          : t('music.mixTrackCount', {
+              count,
+              defaultValue: '{{count}} ta musiqa',
+            })}
       </p>
     </button>
   );

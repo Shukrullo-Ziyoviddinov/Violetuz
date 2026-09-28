@@ -7,6 +7,7 @@
 'use strict';
 
 const { MusicMix } = require('../models');
+const { normalizeMixContentType } = require('../contentType');
 const { parseUserId } = require('../repositories/parseUserId');
 
 /**
@@ -19,6 +20,7 @@ const listReadyMixes = async (userId) => {
 
   const rows = await MusicMix.find({ userId: uid })
     .select({
+      contentType: 1,
       genre: 1,
       contentId: 1,
       position: 1,
@@ -33,9 +35,17 @@ const listReadyMixes = async (userId) => {
   for (const row of rows || []) {
     const genre = String(row.genre || '').trim();
     const contentId = String(row.contentId || '').trim();
+    const contentType = normalizeMixContentType(row.contentType);
     if (!genre || !contentId) continue;
-    if (!groups.has(genre)) groups.set(genre, { genre, tracks: [] });
-    groups.get(genre).tracks.push({
+    const groupKey = `${contentType}:${genre}`;
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, {
+        genre,
+        contentType,
+        tracks: [],
+      });
+    }
+    groups.get(groupKey).tracks.push({
       contentId,
       genre,
       position: Number(row.position) || 0,
@@ -50,6 +60,8 @@ const listReadyMixes = async (userId) => {
   mixes.sort((a, b) => {
     const countDiff = (b.tracks[0]?.playCount || 0) - (a.tracks[0]?.playCount || 0);
     if (countDiff !== 0) return countDiff;
+    const typeDiff = String(a.contentType).localeCompare(String(b.contentType));
+    if (typeDiff !== 0) return typeDiff;
     return a.genre.localeCompare(b.genre);
   });
   return mixes;

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
@@ -21,7 +21,13 @@ import SimilarSongs from '../Music/SimilarSongs/SimilarSongs';
 import AlbumsForYou from '../Music/AlbumsForYou/AlbumsForYou';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
+import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
+import { useMusicMixes } from '../hooks/useMusicMixes';
+import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
+import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
+import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
+import { takeMixTrack } from '../Music/YourMixes/mixPlaybackQueue';
 import useImmersiveSheetDrag from '../hooks/useImmersiveSheetDrag';
 import {
   useHomeMusicCategoryRecommendations,
@@ -61,6 +67,8 @@ const VideoTrendCardSkeleton = () => (
 const VideoPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mixGenre = searchParams.get('mix') || '';
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
@@ -78,6 +86,7 @@ const VideoPage = () => {
     artistsLoading,
   } = useMusicApi();
   const videoRef = useRef(null);
+  const mixQueueMemoryRef = useRef({});
   const commentsRef = useRef(null);
   const mainScrollRef = useRef(null);
   const filterPinnedRef = useRef(false);
@@ -108,6 +117,12 @@ const VideoPage = () => {
 
   const video = allVideoData.find((v) => matchId(v.id, id));
   const isConcertVideo = String(video?.type || '').toLowerCase() === 'konsert' || String(video?.type || '').toLowerCase() === 'concert';
+  const clipMixGenre = isConcertVideo ? '' : mixGenre;
+  const { mixes, isLoading: mixesLoading } = useMusicMixes({ enabled: Boolean(clipMixGenre) });
+  const narrowMix = useNarrowLayout();
+  const pageDominantColor = useDominantColor(typeof video?.img === 'string' ? video.img : null);
+  const [mixRepeat, setMixRepeat] = useState(false);
+  const [mixShuffle, setMixShuffle] = useState(false);
   const videoLikeQuery = useQuery({
     queryKey: ['catalog-like-counts', isConcertVideo ? 'konsert' : 'klip', video?.id],
     queryFn: () =>
@@ -311,16 +326,89 @@ const VideoPage = () => {
     }
   }, [id, video?.video]);
 
+  const activeClipMix = useMemo(() => {
+    if (!clipMixGenre) return null;
+    return (mixes || []).find(
+      (row) => row.genre === clipMixGenre && (row.contentType || 'music') === 'klip'
+    ) || null;
+  }, [clipMixGenre, mixes]);
+
+  const mixTracks = useMemo(() => {
+    if (!activeClipMix) return [];
+    const byId = new Map((allClips || []).map((clip) => [String(clip.id), clip]));
+    const out = [];
+    for (const row of activeClipMix.tracks || []) {
+      const clip = byId.get(String(row.contentId));
+      if (!clip || matchId(clip.id, video?.id)) continue;
+      out.push(clip);
+    }
+    return out;
+  }, [activeClipMix, allClips, video?.id]);
+
+  const mixPlayTracks = useMemo(() => {
+    if (!activeClipMix) return [];
+    const byId = new Map((allClips || []).map((clip) => [String(clip.id), clip]));
+    const out = [];
+    for (const row of activeClipMix.tracks || []) {
+      const clip = byId.get(String(row.contentId));
+      if (clip) out.push(clip);
+    }
+    return out;
+  }, [activeClipMix, allClips]);
+
+  const mixLabel = useMemo(
+    () => mixSectionLabel({
+      genre: clipMixGenre,
+      tracks: activeClipMix?.tracks,
+      allMusic: allClips,
+      sections: clipSections,
+      t,
+    }),
+    [activeClipMix, allClips, clipMixGenre, clipSections, t]
+  );
+
+  const mixBusy = Boolean(clipMixGenre) && (mixesLoading || clipsLoading) && mixTracks.length === 0;
+  const showMixColumn = Boolean(clipMixGenre) && (mixBusy || mixTracks.length > 0);
+
+  useEffect(() => {
+    setMixRepeat(false);
+    setMixShuffle(false);
+    mixQueueMemoryRef.current = {};
+  }, [clipMixGenre]);
+
+  const openMixVideo = (clipId) => {
+    if (clipId == null || clipId === '') return;
+    const params = new URLSearchParams();
+    if (clipMixGenre) params.set('mix', clipMixGenre);
+    const query = params.toString();
+    navigate(`/music/video/${clipId}${query ? `?${query}` : ''}`);
+  };
+
   const handleVideoEnded = () => {
+    if (clipMixGenre && (mixRepeat || mixShuffle) && video?.id != null) {
+      const next = takeMixTrack(
+        { repeat: mixRepeat, shuffle: mixShuffle, tracks: mixPlayTracks },
+        mixQueueMemoryRef.current,
+        video.id,
+        'next'
+      );
+      if (next?.id != null) {
+        openMixVideo(next.id);
+        return;
+      }
+      if (next === null) return;
+    }
     const idx = relatedList.findIndex((v) => v.id === video?.id);
     if (idx >= 0 && idx < relatedList.length - 1) {
       const next = relatedList[idx + 1];
-      navigate(`/music/video/${next.id}`);
+      if (clipMixGenre) openMixVideo(next.id);
+      else navigate(`/music/video/${next.id}`);
     }
   };
 
   const handleCardClick = (clipId) => {
-    navigate(`/music/video/${clipId}`);
+    if (clipMixGenre) openMixVideo(clipId);
+    else navigate(`/music/video/${clipId}`);
   };
 
   const getArtistName = (artistId) => {
@@ -338,6 +426,50 @@ const VideoPage = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  const renderMixCards = () => (
+    mixBusy
+      ? trendSkeletonItems.map((item) => <VideoTrendCardSkeleton key={item.id} />)
+      : mixTracks.map((item) => (
+          <VideoDetailTrendCard
+            key={item.id}
+            item={item}
+            isActive={false}
+            onClick={() => openMixVideo(item.id)}
+            getArtistName={getArtistName}
+          />
+        ))
+  );
+
+  const renderRelatedColumn = () => (
+    <>
+      {showTrendSectionSkeleton ? (
+        <SkeletonLoader
+          variant="video-detail-trend-title"
+          className="video-detail-trend-title video-detail-trend-title--side video-detail-trend-title-skeleton"
+        />
+      ) : (
+        <h3 className="video-detail-trend-title video-detail-trend-title--side">
+          {t(relatedTitleKey, relatedTitleDefault)}
+        </h3>
+      )}
+      <div className="video-detail-trend-grid">
+        {showTrendSectionSkeleton
+          ? trendItemsToRender.map((item) => (
+              <VideoTrendCardSkeleton key={item.id} />
+            ))
+          : trendItemsToRender.map((item) => (
+              <VideoDetailTrendCard
+                key={item.id}
+                item={item}
+                isActive={item.id === video?.id}
+                onClick={() => handleCardClick(item.id)}
+                getArtistName={getArtistName}
+              />
+            ))}
+      </div>
+    </>
+  );
 
   if (!video && !videosLoading) {
     return (
@@ -604,36 +736,51 @@ const VideoPage = () => {
               </div>
             </div>
 
-            <div className="video-detail-right-scroll">
-              {showTrendSectionSkeleton ? (
-                <SkeletonLoader
-                  variant="video-detail-trend-title"
-                  className="video-detail-trend-title video-detail-trend-title--side video-detail-trend-title-skeleton"
-                />
-              ) : (
-                <h3 className="video-detail-trend-title video-detail-trend-title--side">
-                  {t(relatedTitleKey, relatedTitleDefault)}
-                </h3>
-              )}
-              <div className="video-detail-trend-grid">
-                {showTrendSectionSkeleton
-                  ? trendItemsToRender.map((item) => (
-                      <VideoTrendCardSkeleton key={item.id} />
-                    ))
-                  : trendItemsToRender.map((item) => (
-                      <VideoDetailTrendCard
-                        key={item.id}
-                        item={item}
-                        isActive={item.id === video?.id}
-                        onClick={() => handleCardClick(item.id)}
-                        getArtistName={getArtistName}
-                      />
-                    ))}
+            {showMixColumn && !narrowMix ? (
+              <div className="video-detail-side">
+                <MusicDetailMixList
+                  label={mixLabel}
+                  busy={mixBusy}
+                  dominantColor={pageDominantColor}
+                  repeat={mixRepeat}
+                  shuffle={mixShuffle}
+                  onToggleRepeat={() => setMixRepeat((on) => !on)}
+                  onToggleShuffle={() => setMixShuffle((on) => !on)}
+                  musicId={video?.id}
+                  mixGenre={clipMixGenre}
+                  contentType="klip"
+                >
+                  {renderMixCards()}
+                </MusicDetailMixList>
+                <div className="video-detail-right-scroll">
+                  {renderRelatedColumn()}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="video-detail-right-scroll">
+                {renderRelatedColumn()}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {showMixColumn && narrowMix && (
+        <MusicDetailMixSheet
+          label={mixLabel}
+          busy={mixBusy}
+          dominantColor={pageDominantColor}
+          repeat={mixRepeat}
+          shuffle={mixShuffle}
+          onToggleRepeat={() => setMixRepeat((on) => !on)}
+          onToggleShuffle={() => setMixShuffle((on) => !on)}
+          musicId={video?.id}
+          mixGenre={clipMixGenre}
+          contentType="klip"
+        >
+          {renderMixCards()}
+        </MusicDetailMixSheet>
+      )}
     </div>
   );
 };

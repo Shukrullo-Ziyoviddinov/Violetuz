@@ -9,6 +9,8 @@
 const {
   resolveMixGenre,
   findMixSongsByIds,
+  findMixClipsByIds,
+  findMixCatalogByIds,
 } = require('./catalog.read');
 const { incrementMixPlayCount, listMixPlayCounts } = require('./playCount.repository');
 const { replaceUserMixes } = require('./musicMix.repository');
@@ -16,6 +18,8 @@ const { replaceUserMixes } = require('./musicMix.repository');
 module.exports = {
   resolveMixGenre,
   findMixSongsByIds,
+  findMixClipsByIds,
+  findMixCatalogByIds,
   incrementMixPlayCount,
   listMixPlayCounts,
   replaceUserMixes,

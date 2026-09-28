@@ -9,6 +9,7 @@
 
 const crypto = require('crypto');
 const { MusicMix } = require('../models');
+const { normalizeMixContentType } = require('../contentType');
 const { parseUserId } = require('./parseUserId');
 
 /**
@@ -17,10 +18,12 @@ const { parseUserId } = require('./parseUserId');
  *
  * @param {string|import('mongoose').Types.ObjectId} userId
  * @param {Array<{ genre: string, tracks: Array<{ contentId: string, position: number, playCount: number }> }>} mixes
+ * @param {'music'|'klip'} [contentType]
  * @returns {Promise<{ written: number, batchId: string|null }>}
  */
-const replaceUserMixes = async (userId, mixes) => {
+const replaceUserMixes = async (userId, mixes, contentType = 'music') => {
   const uid = parseUserId(userId);
+  const type = normalizeMixContentType(contentType);
   if (!uid) return { written: 0, batchId: null };
 
   const items = [];
@@ -40,7 +43,10 @@ const replaceUserMixes = async (userId, mixes) => {
   }
 
   if (!items.length) {
-    await MusicMix.deleteMany({ userId: uid });
+    await MusicMix.deleteMany({ userId: uid, contentType: type });
+    if (type === 'music') {
+      await MusicMix.deleteMany({ userId: uid, contentType: { $exists: false } });
+    }
     return { written: 0, batchId: null };
   }
 
@@ -50,11 +56,13 @@ const replaceUserMixes = async (userId, mixes) => {
     updateOne: {
       filter: {
         userId: uid,
+        contentType: type,
         genre: item.genre,
         contentId: item.contentId,
       },
       update: {
         $set: {
+          contentType: type,
           position: item.position,
           playCount: item.playCount,
           generatedAt: now,
@@ -62,6 +70,7 @@ const replaceUserMixes = async (userId, mixes) => {
         },
         $setOnInsert: {
           userId: uid,
+          contentType: type,
           genre: item.genre,
           contentId: item.contentId,
         },
@@ -73,8 +82,12 @@ const replaceUserMixes = async (userId, mixes) => {
   await MusicMix.bulkWrite(ops, { ordered: false });
   await MusicMix.deleteMany({
     userId: uid,
+    contentType: type,
     batchId: { $ne: batchId },
   });
+  if (type === 'music') {
+    await MusicMix.deleteMany({ userId: uid, contentType: { $exists: false } });
+  }
 
   return { written: items.length, batchId };
 };

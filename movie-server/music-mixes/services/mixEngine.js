@@ -73,8 +73,8 @@ const assembleMixes = (rows) => {
  * @param {string|import('mongoose').Types.ObjectId} userId
  * @returns {Promise<ReturnType<typeof assembleMixes>>}
  */
-const buildUserMixes = async (userId) => {
-  const rows = await listMixPlayCounts(userId);
+const buildUserMixes = async (userId, contentType = 'music') => {
+  const rows = await listMixPlayCounts(userId, contentType);
   return assembleMixes(rows);
 };
 

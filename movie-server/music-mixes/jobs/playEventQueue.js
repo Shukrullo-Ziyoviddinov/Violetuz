@@ -7,6 +7,7 @@
 
 'use strict';
 
+const { normalizeMixContentType } = require('../contentType');
 const { recordMixPlay } = require('../services/recordPlay.service');
 const { buildUserMixes } = require('../services/mixEngine');
 const { replaceUserMixes } = require('../repositories/musicMix.repository');
@@ -22,7 +23,7 @@ let idle = null;
 let idleResolve = null;
 
 const jobKey = (payload) =>
-  `${payload.userId}:${payload.contentId}:${payload.sessionId}`;
+  `${payload.userId}:${normalizeMixContentType(payload.contentType)}:${payload.contentId}:${payload.sessionId}`;
 
 const ensureIdle = () => {
   if (!idle) {
@@ -48,8 +49,9 @@ const drain = async () => {
       try {
         const saved = await recordMixPlay(job.payload);
         if (saved?.counted) {
-          const mixes = await buildUserMixes(job.payload.userId);
-          await replaceUserMixes(job.payload.userId, mixes);
+          const contentType = normalizeMixContentType(saved.contentType || job.payload.contentType);
+          const mixes = await buildUserMixes(job.payload.userId, contentType);
+          await replaceUserMixes(job.payload.userId, mixes, contentType);
         }
       } catch (err) {
         // eslint-disable-next-line no-console

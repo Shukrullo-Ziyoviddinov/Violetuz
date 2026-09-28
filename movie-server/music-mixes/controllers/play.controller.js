@@ -11,6 +11,7 @@
 const asyncHandler = require('../../middleware/asyncHandler');
 const { badRequest } = require('../../utils/errors');
 const { sendSuccess } = require('../../utils/response');
+const { normalizeMixContentType } = require('../contentType');
 const { enqueueMixPlay } = require('../jobs/playEventQueue');
 const { assessMixPlay } = require('../services/recordPlay.service');
 
@@ -20,6 +21,7 @@ const postMixPlay = asyncHandler(async (req, res) => {
   const listenedSeconds = Number(req.body?.listenedSeconds);
   const reportedDuration = Number(req.body?.durationSec);
   const durationSec = Number.isFinite(reportedDuration) && reportedDuration > 0 ? reportedDuration : null;
+  const contentType = normalizeMixContentType(req.body?.contentType);
 
   if (!contentId || !sessionId || !Number.isFinite(listenedSeconds) || listenedSeconds < 0) {
     throw badRequest('contentId, sessionId va listenedSeconds kerak');
@@ -31,6 +33,7 @@ const postMixPlay = asyncHandler(async (req, res) => {
     listenedSeconds,
     sessionId,
     durationSec,
+    contentType,
   });
   if (!assessed.accept) {
     return sendSuccess(res, {
@@ -48,6 +51,7 @@ const postMixPlay = asyncHandler(async (req, res) => {
     sessionId,
     listenedSeconds,
     durationSec: assessed.durationSec,
+    contentType,
   });
 
   return sendSuccess(res, { data: { queued: true } });

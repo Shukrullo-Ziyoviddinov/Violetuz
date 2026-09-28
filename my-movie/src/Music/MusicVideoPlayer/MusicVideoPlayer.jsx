@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { createMusicListenProgressReporter } from '../../utils/musicListenProgressReporter';
+import { createClipMixWatchSignal } from './clipMixWatchSignal';
 import MusicSettingsModal from './MusicSettingsModal';
 import './MusicVideoPlayer.css';
 
@@ -25,8 +26,12 @@ const MusicVideoPlayer = forwardRef(({
   const videoWrapperRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const listenProgressRef = useRef(null);
+  const clipWatchRef = useRef(null);
   if (!listenProgressRef.current) {
     listenProgressRef.current = createMusicListenProgressReporter();
+  }
+  if (!clipWatchRef.current) {
+    clipWatchRef.current = createClipMixWatchSignal();
   }
   const isLoggedInRef = useRef(isLoggedIn);
   isLoggedInRef.current = isLoggedIn;
@@ -77,14 +82,19 @@ const MusicVideoPlayer = forwardRef(({
   useEffect(() => {
     const type = contentType ? String(contentType).trim() : '';
     const id = contentId;
+    const isClip = type === 'clip' || type === 'klip';
     if (!type || id == null || id === '') {
       listenProgressRef.current.reset(null, null);
+      clipWatchRef.current.clear();
       return undefined;
     }
 
     listenProgressRef.current.reset(type, id);
+    if (isClip) clipWatchRef.current.begin(id);
+    else clipWatchRef.current.clear();
 
     return () => {
+      clipWatchRef.current.clear();
       const cat = String(categoryNameMusic || '').trim();
       if (!cat) return;
       const el = videoRef.current;
@@ -257,11 +267,21 @@ const MusicVideoPlayer = forwardRef(({
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+      const el = videoRef.current;
+      setCurrentTime(el.currentTime);
       listenProgressRef.current.accumulate({
         isPlaying: isPlayingRef.current,
         playbackRate: playbackSpeedRef.current || 1,
       });
+      const type = String(contentType || '').trim().toLowerCase();
+      if (type === 'clip' || type === 'klip') {
+        clipWatchRef.current.note({
+          isLoggedIn: isLoggedInRef.current,
+          currentTime: el.currentTime,
+          durationSec: el.duration,
+          isPlaying: !el.paused && !el.ended,
+        });
+      }
       flushListenProgress();
     }
   };

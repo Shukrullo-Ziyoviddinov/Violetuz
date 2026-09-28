@@ -291,7 +291,9 @@ const MusicDetail = () => {
 
   const mixTracks = useMemo(() => {
     if (!mixGenre) return [];
-    const mix = (mixes || []).find((row) => row.genre === mixGenre);
+    const mix = (mixes || []).find(
+      (row) => row.genre === mixGenre && (row.contentType || 'music') === 'music'
+    );
     if (!mix) return [];
     const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
     const out = [];
@@ -304,7 +306,9 @@ const MusicDetail = () => {
   }, [allMusic, mixGenre, mixes, music?.id]);
 
   const mixLabel = useMemo(() => {
-    const mix = (mixes || []).find((row) => row.genre === mixGenre);
+    const mix = (mixes || []).find(
+      (row) => row.genre === mixGenre && (row.contentType || 'music') === 'music'
+    );
     return mixSectionLabel({
       genre: mixGenre,
       tracks: mix?.tracks,
@@ -316,7 +320,9 @@ const MusicDetail = () => {
 
   const mixPlayTracks = useMemo(() => {
     if (!mixGenre) return [];
-    const mix = (mixes || []).find((row) => row.genre === mixGenre);
+    const mix = (mixes || []).find(
+      (row) => row.genre === mixGenre && (row.contentType || 'music') === 'music'
+    );
     if (!mix) return [];
     const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
     const out = [];
@@ -1052,6 +1058,7 @@ const MusicDetail = () => {
                   onToggleShuffle={() => setMixShuffle((on) => !on)}
                   musicId={music?.id}
                   mixGenre={mixGenre}
+                  contentType="music"
                 >
                   {renderMixCards()}
                 </MusicDetailMixList>
@@ -1075,6 +1082,7 @@ const MusicDetail = () => {
           onToggleShuffle={() => setMixShuffle((on) => !on)}
           musicId={music?.id}
           mixGenre={mixGenre}
+          contentType="music"
         >
           {renderMixCards()}
         </MusicDetailMixSheet>

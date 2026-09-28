@@ -12,7 +12,9 @@ const viewportHeight = () => (typeof window === 'undefined' ? 0 : window.innerHe
 const halfOffset = () => {
   const viewport = viewportHeight();
   const fallback = Math.round(viewport * 0.5);
-  const img = document.querySelector('.music-detail-left .music-detail-image');
+  const img = document.querySelector(
+    '.music-detail-left .music-detail-image, .video-detail-player-wrap'
+  );
   if (!img) return fallback;
   const rect = img.getBoundingClientRect();
   if (rect.height < 40) return fallback;
@@ -53,6 +55,7 @@ const MusicDetailMixSheet = ({
   onToggleShuffle,
   musicId,
   mixGenre,
+  contentType = 'music',
   children,
 }) => {
   const { t } = useTranslation();
@@ -230,6 +233,7 @@ const MusicDetailMixSheet = ({
               label={label}
               musicId={musicId}
               mixGenre={mixGenre}
+              contentType={contentType}
             />
           )}
           <div className="music-mix-sheet-list" aria-busy={busy || undefined}>

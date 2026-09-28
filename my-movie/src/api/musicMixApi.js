@@ -7,9 +7,15 @@ import { resolveApiBaseUrl } from './apiBase';
 const API_BASE_URL = resolveApiBaseUrl();
 
 /**
- * @param {{ contentId: string|number, listenedSeconds: number, sessionId: string, durationSec?: number }} body
+ * @param {{ contentId: string|number, listenedSeconds: number, sessionId: string, durationSec?: number, contentType?: string }} body
  */
-export const postMixPlay = async ({ contentId, listenedSeconds, sessionId, durationSec }) => {
+export const postMixPlay = async ({
+  contentId,
+  listenedSeconds,
+  sessionId,
+  durationSec,
+  contentType,
+}) => {
   const response = await fetch(`${API_BASE_URL}/music/mixes/play`, {
     method: 'POST',
     credentials: 'include',
@@ -19,6 +25,7 @@ export const postMixPlay = async ({ contentId, listenedSeconds, sessionId, durat
       listenedSeconds,
       sessionId,
       durationSec,
+      ...(contentType ? { contentType } : {}),
     }),
   });
 

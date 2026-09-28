@@ -9,7 +9,9 @@
 'use strict';
 
 const Music = require('../../models/Music.model');
+const Clip = require('../../models/Clip.model');
 const { musicMixWeights } = require('../config/musicMixWeights');
+const { normalizeMixContentType } = require('../contentType');
 
 const SONG_TYPE = 'music';
 const EXCLUDED_TYPES = Object.freeze(['album', 'clip', 'concert']);
@@ -98,8 +100,73 @@ const findMixSongsByIds = async (contentIds) => {
   return out;
 };
 
+/**
+ * clips kolleksiyasi. Janr — genre.
+ * @returns {Object}
+ */
+const catalogClipMatch = () => ({
+  $or: [
+    { type: 'klip' },
+    { type: 'clip' },
+    { type: { $exists: false } },
+    { type: null },
+    { type: '' },
+  ],
+});
+
+/**
+ * @param {Object} row
+ * @returns {{ contentId: string, genre: string, durationSec: number|null, section: string }|null}
+ */
+const toMixClip = (row) => {
+  const type = String(row?.type || 'klip').trim().toLowerCase();
+  if (type && type !== 'klip' && type !== 'clip') return null;
+  const contentId = String(row?.id ?? '').trim();
+  if (!contentId) return null;
+  const duration = Number(row.durationSec);
+  return {
+    contentId,
+    genre: resolveMixGenre(row.genre),
+    durationSec: Number.isFinite(duration) && duration > 0 ? duration : null,
+    section: String(row.categoryNameMusic || '').trim(),
+  };
+};
+
+/**
+ * @param {Array<string|number>} contentIds
+ * @returns {Promise<Array<{ contentId: string, genre: string, durationSec: number|null, section: string }>>}
+ */
+const findMixClipsByIds = async (contentIds) => {
+  const ids = numericIds(contentIds);
+  if (!ids.length) return [];
+
+  const rows = await Clip.find({ id: { $in: ids }, ...catalogClipMatch() })
+    .select(CATALOG_SELECT)
+    .lean();
+
+  const out = [];
+  for (const row of rows || []) {
+    const clip = toMixClip(row);
+    if (clip) out.push(clip);
+  }
+  return out;
+};
+
+/**
+ * Tur bo'yicha katalog. Musiqa — qo'shiq filtri. Klip — clips.
+ * @param {Array<string|number>} contentIds
+ * @param {'music'|'klip'} [contentType]
+ */
+const findMixCatalogByIds = async (contentIds, contentType = 'music') => {
+  const type = normalizeMixContentType(contentType);
+  if (type === 'klip') return findMixClipsByIds(contentIds);
+  return findMixSongsByIds(contentIds);
+};
+
 module.exports = {
   resolveMixGenre,
   catalogSongMatch,
   findMixSongsByIds,
+  findMixClipsByIds,
+  findMixCatalogByIds,
 };

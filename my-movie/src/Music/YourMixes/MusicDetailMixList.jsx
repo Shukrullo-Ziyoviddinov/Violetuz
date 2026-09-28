@@ -18,6 +18,7 @@ const MusicDetailMixList = ({
   onToggleShuffle,
   musicId,
   mixGenre,
+  contentType = 'music',
   children,
 }) => {
   const { t } = useTranslation();
@@ -90,6 +91,7 @@ const MusicDetailMixList = ({
               label={label}
               musicId={musicId}
               mixGenre={mixGenre}
+              contentType={contentType}
             />
           )}
           <div className="music-detail-trend-grid" aria-busy={busy || undefined}>

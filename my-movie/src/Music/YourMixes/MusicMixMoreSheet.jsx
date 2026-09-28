@@ -14,10 +14,18 @@ const MOTION_MS = 480;
  * Mix ⋯ menyusi.
  * Desktop: o‘rtadan. Mobil: pastdan, pastga ~30% tortilsa yopiladi.
  */
-const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
+const mixContentType = (value) => {
+  const type = String(value || 'music').trim().toLowerCase();
+  if (type === 'clip' || type === 'klip') return 'klip';
+  return 'music';
+};
+
+const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre, contentType = 'music' }) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const saved = Boolean(mixGenre) && isInWishlist(mixGenre, 'mix');
+  const mixType = mixContentType(contentType);
+  const wishlistId = mixGenre ? `${mixType}:${mixGenre}` : '';
+  const saved = Boolean(wishlistId) && isInWishlist(wishlistId, 'mix');
   const narrow = useNarrowLayout();
   const panelRef = useRef(null);
   const dragRef = useRef(null);
@@ -34,7 +42,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
     defaultValue: '{{genre}} janerdagi mixlar',
   });
   const sharePath = musicId != null && mixGenre
-    ? `/music/${musicId}?mix=${encodeURIComponent(mixGenre)}`
+    ? `${mixType === 'klip' ? `/music/video/${musicId}` : `/music/${musicId}`}?mix=${encodeURIComponent(mixGenre)}`
     : '';
 
   const finishClose = () => {
@@ -214,8 +222,8 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
             className={`music-mix-more-action music-mix-more-save${saved ? ' is-saved' : ''}`}
             aria-pressed={saved}
             onClick={() => {
-              if (!mixGenre) return;
-              toggleWishlist(mixGenre, 'mix');
+              if (!wishlistId) return;
+              toggleWishlist(wishlistId, 'mix');
             }}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">

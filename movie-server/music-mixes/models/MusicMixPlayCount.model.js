@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+const { MIX_CONTENT_TYPES } = require('../contentType');
 
 /**
- * Mix martasi. Bitta user va bitta qo'shiq — bitta qator.
+ * Mix martasi. Bitta user, bitta tur va bitta kontent — bitta qator.
  * Collection: music_mix_play_counts
  *
  * music katalogi, tinglash progressi va "Siz uchun" keshidan alohida.
@@ -16,6 +17,14 @@ const musicMixPlayCountSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    /** music — qo'shiq. klip — video. Eski qator music. */
+    contentType: {
+      type: String,
+      required: true,
+      enum: MIX_CONTENT_TYPES,
+      default: 'music',
+      trim: true,
     },
     contentId: {
       type: String,
@@ -51,7 +60,7 @@ const musicMixPlayCountSchema = new mongoose.Schema(
   }
 );
 
-musicMixPlayCountSchema.index({ userId: 1, contentId: 1 }, { unique: true });
-musicMixPlayCountSchema.index({ userId: 1, genre: 1, playCount: -1 });
+musicMixPlayCountSchema.index({ userId: 1, contentType: 1, contentId: 1 }, { unique: true });
+musicMixPlayCountSchema.index({ userId: 1, contentType: 1, genre: 1, playCount: -1 });
 
 module.exports = mongoose.model('MusicMixPlayCount', musicMixPlayCountSchema);
