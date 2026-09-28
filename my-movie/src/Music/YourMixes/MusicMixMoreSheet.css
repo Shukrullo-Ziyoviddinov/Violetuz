@@ -126,11 +126,23 @@ body.music-mix-more-open {
   box-shadow: none;
 }
 
-.music-mix-more-panel .share-button.music-mix-more-action:hover,
-.music-mix-more-save:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border: 0;
-  transform: none;
+@media (hover: hover) and (pointer: fine) {
+  .music-mix-more-panel .share-button.music-mix-more-action:hover,
+  .music-mix-more-save:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border: 0;
+    transform: none;
+  }
+}
+
+@media (hover: none) {
+  .music-mix-more-panel .share-button.music-mix-more-action:hover,
+  .music-mix-more-save:hover {
+    background: transparent;
+    border: 0;
+    transform: none;
+    color: #fff;
+  }
 }
 
 .music-mix-more-panel .share-button.music-mix-more-action svg,
