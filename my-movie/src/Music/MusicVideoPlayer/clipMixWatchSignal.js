@@ -69,13 +69,14 @@ export function createClipMixWatchSignal() {
   };
 
   /**
-   * @param {{ isLoggedIn?: boolean, currentTime?: number, durationSec?: number, isPlaying?: boolean }} input
+   * @param {{ isLoggedIn?: boolean, currentTime?: number, durationSec?: number, isPlaying?: boolean, ended?: boolean }} input
    */
   const note = ({
     isLoggedIn = false,
     currentTime = 0,
     durationSec = 0,
     isPlaying = false,
+    ended = false,
   } = {}) => {
     const time = Number(currentTime);
     const duration = Number(durationSec);
@@ -100,9 +101,10 @@ export function createClipMixWatchSignal() {
 
     if (jumped) {
       hold = true;
-      return;
+      // Oxiriga surib video ended bo'lsa keyingi tick kelmaydi — shu yerda yoziladi.
+      if (!ended) return;
     }
-    if (!isPlaying || sent || pending || Date.now() < retryAt) return;
+    if ((!isPlaying && !ended) || sent || pending || Date.now() < retryAt) return;
     if (!armed && !hold) return;
 
     armed = false;
