@@ -67,7 +67,7 @@ const incrementMixPlayCount = async (
   const updated = await MusicMixPlayCount.findOneAndUpdate(
     { ...identity, lastSessionId: { $ne: session } },
     { $inc: { playCount: 1 }, $set: stamp },
-    { returnDocument: 'after' }
+    { new: true, returnDocument: 'after' }
   ).lean();
   if (updated) return toPlayRow(updated, false);
 
@@ -75,7 +75,7 @@ const incrementMixPlayCount = async (
     const legacy = await MusicMixPlayCount.findOneAndUpdate(
       { ...legacyMusicFilter(uid, id), lastSessionId: { $ne: session } },
       { $inc: { playCount: 1 }, $set: stamp },
-      { returnDocument: 'after' }
+      { new: true, returnDocument: 'after' }
     ).lean();
     if (legacy) return toPlayRow(legacy, false);
   }
@@ -101,9 +101,20 @@ const incrementMixPlayCount = async (
     const raced = await MusicMixPlayCount.findOneAndUpdate(
       { ...identity, lastSessionId: { $ne: session } },
       { $inc: { playCount: 1 }, $set: stamp },
-      { returnDocument: 'after' }
+      { new: true, returnDocument: 'after' }
     ).lean();
     if (raced) return toPlayRow(raced, false);
+    // Eski unique indeks (contentType siz) urishishi mumkin — legacy qatorni yangilash
+    if (type === 'music') {
+      const legacyRace = await MusicMixPlayCount.findOneAndUpdate(
+        { ...legacyMusicFilter(uid, id), lastSessionId: { $ne: session } },
+        { $inc: { playCount: 1 }, $set: stamp },
+        { new: true, returnDocument: 'after' }
+      ).lean();
+      if (legacyRace) return toPlayRow(legacyRace, false);
+      const legacyHeld = await MusicMixPlayCount.findOne(legacyMusicFilter(uid, id)).lean();
+      if (legacyHeld) return toPlayRow(legacyHeld, true);
+    }
     const held = await MusicMixPlayCount.findOne(identity).lean();
     return held ? toPlayRow(held, true) : null;
   }

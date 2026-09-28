@@ -124,7 +124,9 @@ export function createMusicMixPlaySignal() {
           armed = true;
           return;
         }
-        sent = true;
+        // not_song / invalid — yopilmasin, qayta urinadi
+        armed = true;
+        retryAt = Date.now() + 1500;
       })
       .catch(() => {
         pending = false;

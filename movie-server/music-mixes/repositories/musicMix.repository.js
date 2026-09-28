@@ -60,19 +60,14 @@ const replaceUserMixes = async (userId, mixes, contentType = 'music') => {
         genre: item.genre,
         contentId: item.contentId,
       },
+      // contentType/genre/contentId faqat filterda — $set va $setOnInsert da
+      // birga qo'yilsa MongoDB conflict beradi, butun yozuv yiqiladi.
       update: {
         $set: {
-          contentType: type,
           position: item.position,
           playCount: item.playCount,
           generatedAt: now,
           batchId,
-        },
-        $setOnInsert: {
-          userId: uid,
-          contentType: type,
-          genre: item.genre,
-          contentId: item.contentId,
         },
       },
       upsert: true,
