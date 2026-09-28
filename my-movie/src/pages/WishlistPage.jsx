@@ -28,7 +28,6 @@ import {
 import { useImageReady } from '../utils/useImageReady';
 import { useMusicMixes } from '../hooks/useMusicMixes';
 import { YourMixCard } from '../Music/YourMixes/YourMixCard';
-import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import './WishlistPage.css';
 import '../components/WishlistPageFilter/WishlistFilterModal.css';
 import '../components/ShortsVideos/ShortsVideos.css';
@@ -114,7 +113,6 @@ const WishlistPage = () => {
     allClips,
     allConcerts,
     getArtistById,
-    sections,
     musicLoading,
     albumsLoading,
     clipsLoading,
@@ -181,21 +179,14 @@ const WishlistPage = () => {
           const src = byId.get(String(trackRow.contentId))?.img || '';
           if (src && !covers.includes(src)) covers.push(src);
         }
-        const label = mixSectionLabel({
-          genre: genreKey,
-          tracks,
-          allMusic,
-          sections,
-          t,
-        });
         return {
           id: genreKey,
-          genre: label,
+          genre: genreKey,
           mix: { genre: genreKey, tracks },
           covers,
         };
       });
-  }, [allMusic, mixes, sections, t, wishlistItems]);
+  }, [allMusic, mixes, wishlistItems]);
 
   const movieShortsCatalog = useMemo(
     () =>

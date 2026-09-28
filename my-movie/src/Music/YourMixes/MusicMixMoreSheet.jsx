@@ -7,6 +7,7 @@ import { useNarrowLayout } from './MusicDetailMixSheet';
 import './MusicMixMoreSheet.css';
 
 const CLOSE_RATIO = 0.3;
+const DRAG_START_PX = 10;
 const MOTION_MS = 480;
 
 /**
@@ -21,6 +22,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
   const panelRef = useRef(null);
   const dragRef = useRef(null);
   const closeTimerRef = useRef(null);
+  const suppressClickRef = useRef(false);
   const [present, setPresent] = useState(false);
   const [entered, setEntered] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -95,19 +97,39 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [open, narrow, closing]);
 
-  useEffect(() => {
-    if (!pressed) return undefined;
-    const onMove = (event) => {
-      const start = dragRef.current;
-      if (!start || event.pointerId !== start.id) return;
-      setDragY(Math.max(0, event.clientY - start.y));
+  const onSheetDown = (event) => {
+    if (!narrow || closing || event.button > 0) return;
+    const startY = event.clientY;
+    const pointerId = event.pointerId;
+    dragRef.current = { y: startY, id: pointerId, dragging: false };
+
+    const onMove = (moveEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
+      const dy = moveEvent.clientY - startY;
+      if (dy < DRAG_START_PX) return;
+      if (!dragRef.current?.dragging) {
+        dragRef.current.dragging = true;
+        suppressClickRef.current = true;
+        try {
+          panelRef.current?.setPointerCapture?.(pointerId);
+        } catch {
+          /* barmoq allaqachon qo‘yib yuborilgan bo‘lishi mumkin */
+        }
+        setPressed(true);
+      }
+      setDragY(dy);
+      moveEvent.preventDefault();
     };
-    const onUp = (event) => {
-      const start = dragRef.current;
-      if (!start || event.pointerId !== start.id) return;
+    const onUp = (upEvent) => {
+      if (upEvent.pointerId !== pointerId) return;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      const traveled = Math.max(0, upEvent.clientY - startY);
+      const wasDragging = Boolean(dragRef.current?.dragging);
       dragRef.current = null;
+      if (!wasDragging) return;
       const height = panelRef.current?.offsetHeight || 240;
-      const traveled = Math.max(0, event.clientY - start.y);
       setPressed(false);
       if (traveled >= height * CLOSE_RATIO) {
         requestAnimationFrame(() => {
@@ -121,22 +143,9 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
       }
       requestAnimationFrame(() => setDragY(null));
     };
-    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointermove', onMove, { passive: false });
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
-    };
-  }, [pressed]);
-
-  const onGripDown = (event) => {
-    if (!narrow || closing || event.button > 0) return;
-    dragRef.current = { y: event.clientY, id: event.pointerId };
-    setPressed(true);
-    setDragY(0);
-    event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   if ((!open && !closing && !present) || typeof document === 'undefined') return null;
@@ -163,12 +172,18 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        onPointerDown={narrow ? onSheetDown : undefined}
+        onClickCapture={(event) => {
+          if (!suppressClickRef.current) return;
+          suppressClickRef.current = false;
+          event.preventDefault();
+          event.stopPropagation();
+        }}
         onClick={(event) => event.stopPropagation()}
       >
         {narrow && (
           <div
             className="music-mix-more-grip"
-            onPointerDown={onGripDown}
             role="separator"
             aria-orientation="horizontal"
           >
