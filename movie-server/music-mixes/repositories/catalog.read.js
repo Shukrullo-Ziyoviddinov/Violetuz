@@ -102,27 +102,14 @@ const findMixSongsByIds = async (contentIds) => {
 
 /**
  * clips kolleksiyasi. Janr — genre.
- * @returns {Object}
- */
-const catalogClipMatch = () => ({
-  $or: [
-    { type: 'klip' },
-    { type: 'clip' },
-    { type: { $exists: false } },
-    { type: null },
-    { type: '' },
-  ],
-});
-
-/**
- * @param {Object} row
- * @returns {{ contentId: string, genre: string, durationSec: number|null, section: string }|null}
+ * Collection allaqachon faqat klip — type filtri kerak emas
+ * (eski yozuvlarda type boshqacha bo'lishi mumkin).
  */
 const toMixClip = (row) => {
-  const type = String(row?.type || 'klip').trim().toLowerCase();
-  if (type && type !== 'klip' && type !== 'clip') return null;
   const contentId = String(row?.id ?? '').trim();
   if (!contentId) return null;
+  const kind = String(row?.type || 'klip').trim().toLowerCase();
+  if (kind === 'konsert' || kind === 'concert') return null;
   const duration = Number(row.durationSec);
   return {
     contentId,
@@ -140,7 +127,7 @@ const findMixClipsByIds = async (contentIds) => {
   const ids = numericIds(contentIds);
   if (!ids.length) return [];
 
-  const rows = await Clip.find({ id: { $in: ids }, ...catalogClipMatch() })
+  const rows = await Clip.find({ id: { $in: ids } })
     .select(CATALOG_SELECT)
     .lean();
 

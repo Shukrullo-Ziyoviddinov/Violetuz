@@ -265,16 +265,16 @@ const MusicVideoPlayer = forwardRef(({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const noteClipWatch = (el, { ended = false } = {}) => {
+  const noteClipWatch = (el) => {
     if (!el) return;
     const type = String(contentType || '').trim().toLowerCase();
     if (type !== 'clip' && type !== 'klip') return;
+    const duration = Number(el.duration);
+    if (!Number.isFinite(duration) || duration <= 0) return;
     clipWatchRef.current.note({
       isLoggedIn: isLoggedInRef.current,
       currentTime: el.currentTime,
-      durationSec: el.duration,
-      isPlaying: !el.paused && !el.ended,
-      ended: ended || Boolean(el.ended),
+      durationSec: duration,
     });
   };
 
@@ -578,7 +578,7 @@ const MusicVideoPlayer = forwardRef(({
         onCanPlay={handleLoadedMetadata}
         onClick={handleVideoClick}
         onEnded={(e) => {
-          noteClipWatch(videoRef.current, { ended: true });
+          noteClipWatch(videoRef.current);
           flushListenProgress({ force: true });
           onEnded?.(e);
         }}

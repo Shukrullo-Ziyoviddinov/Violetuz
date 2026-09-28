@@ -1,16 +1,12 @@
 /**
  * Klip mixi uchun "ko'rildi". Musiqa signalidan va tinglandi hisobidan alohida.
- * Bar surilishi o'zi marta emas. Video yurib davomiylikning 80% joyiga
- * yetganda bir marta ketadi. Orqaga qaytsa keyingi 80% yangi marta.
- * Mehmon yozilmaydi. So'rov hozirgi mix manziliga, tur klip.
+ * Playhead 80% ga yetganda bir marta. Bar bilan yetkazilsa ham (pauzada ham).
+ * 80% dan pastga tushsa yangi sessiya. Mehmon yozilmaydi. Tur: klip.
  */
 import { postMixPlay } from '../../api/musicMixApi';
 
 /** music-mixes config dagi minListenRatio bilan bir xil. */
 export const CLIP_WATCH_RATIO = 0.8;
-
-const SEEK_FORWARD_SEC = 1.5;
-const SEEK_BACK_SEC = 0.4;
 
 /**
  * @param {number} watchedSeconds
@@ -34,17 +30,11 @@ export function createClipMixWatchSignal() {
   let sent = false;
   let pending = false;
   let retryAt = 0;
-  let lastTime = null;
-  let armed = true;
-  let hold = false;
 
   const begin = (id) => {
     const next = id == null || id === '' ? '' : String(id);
     pending = false;
     retryAt = 0;
-    lastTime = null;
-    armed = true;
-    hold = false;
     if (!next) {
       sessionId = null;
       contentId = null;
@@ -64,19 +54,15 @@ export function createClipMixWatchSignal() {
     sent = false;
     pending = false;
     retryAt = 0;
-    armed = true;
-    hold = false;
   };
 
   /**
-   * @param {{ isLoggedIn?: boolean, currentTime?: number, durationSec?: number, isPlaying?: boolean, ended?: boolean }} input
+   * @param {{ isLoggedIn?: boolean, currentTime?: number, durationSec?: number }} input
    */
   const note = ({
     isLoggedIn = false,
     currentTime = 0,
     durationSec = 0,
-    isPlaying = false,
-    ended = false,
   } = {}) => {
     const time = Number(currentTime);
     const duration = Number(durationSec);
@@ -84,55 +70,45 @@ export function createClipMixWatchSignal() {
       return;
     }
 
-    const prev = lastTime;
-    const jumped =
-      prev != null && (time - prev > SEEK_FORWARD_SEC || prev - time > SEEK_BACK_SEC);
-    lastTime = time;
-
     if (!isLoggedIn || !sessionId || !contentId) return;
 
     const reached = isClipWatchReached(time, duration);
     if (!reached) {
       if (sent && !pending) openNextWatch();
-      armed = true;
-      hold = false;
       return;
     }
 
-    if (jumped) {
-      hold = true;
-      // Pleer yurib tursa keyingi tick kutadi (surish o'zi emas).
-      // Pauza yoki ended bo'lsa keyingi tick kelmaydi — shu yerda yoziladi.
-      if (isPlaying && !ended) return;
-    }
     if (sent || pending || Date.now() < retryAt) return;
-    if (!armed && !hold) return;
 
-    armed = false;
-    hold = false;
+    const postSession = sessionId;
+    const postContentId = contentId;
     pending = true;
     postMixPlay({
-      contentId,
-      sessionId,
+      contentId: postContentId,
+      sessionId: postSession,
       listenedSeconds: time,
       durationSec: duration,
       contentType: 'klip',
     })
       .then((data) => {
+        if (sessionId !== postSession || contentId !== postContentId) {
+          pending = false;
+          return;
+        }
         pending = false;
         if (data?.queued) {
           sent = true;
           return;
         }
-        if (data?.reason === 'below_ratio') {
-          armed = true;
-          return;
-        }
-        sent = true;
+        // not_clip / below_ratio / boshqa — sent qilib yopilmasin, qayta urinadi
+        retryAt = Date.now() + 1500;
       })
       .catch(() => {
+        if (sessionId !== postSession || contentId !== postContentId) {
+          pending = false;
+          return;
+        }
         pending = false;
-        armed = true;
         retryAt = Date.now() + 5000;
       });
   };
