@@ -138,6 +138,10 @@ body.music-mix-more-open {
   flex: 0 0 auto;
 }
 
+.music-mix-more-save.is-saved {
+  color: #fff;
+}
+
 .music-mix-more-panel .share-button-label {
   font-size: 1rem;
   font-weight: 600;

@@ -8,6 +8,7 @@ const Concert = require('../models/Concert.model');
 const ShortVideo = require('../models/ShortVideo.model');
 const MusicShort = require('../models/MusicShort.model');
 const Triller = require('../models/Triller.model');
+const MusicMix = require('../music-mixes/models/MusicMix.model');
 const { badRequest, notFound } = require('../utils/errors');
 
 const stripMongoMeta = (doc) => {
@@ -48,8 +49,26 @@ const normalizeItemId = (id) => {
   return String(id).trim();
 };
 
-/** Katalogdan entity topish + snapshot */
-const resolveCatalogSnapshot = async (type, itemId) => {
+/** Katalogdan entity topish + snapshot. Mix — shu foydalanuvchining music_mixes qatori. */
+const resolveCatalogSnapshot = async (type, itemId, userId) => {
+  if (type === 'mix') {
+    const genre = normalizeItemId(itemId);
+    const rows = await MusicMix.find({ userId, genre })
+      .sort({ position: 1 })
+      .lean();
+    if (!rows.length) {
+      throw notFound(`mix topilmadi: ${genre}`);
+    }
+    return {
+      genre,
+      tracks: rows.map((row) => ({
+        contentId: String(row.contentId),
+        position: row.position,
+        playCount: row.playCount,
+      })),
+    };
+  }
+
   const idStr = normalizeItemId(itemId);
   const numericId = Number(idStr);
   const useNumeric = Number.isInteger(numericId) && String(numericId) === idStr;
@@ -148,7 +167,7 @@ const listWishlist = async (userId, { type } = {}) => {
 const addItem = async (userId, { id, type }) => {
   const safeType = assertType(type);
   const itemId = normalizeItemId(id);
-  const snapshot = await resolveCatalogSnapshot(safeType, itemId);
+  const snapshot = await resolveCatalogSnapshot(safeType, itemId, userId);
 
   const row = await Wishlist.findOneAndUpdate(
     { userId, type: safeType, itemId },
@@ -227,7 +246,7 @@ const replaceWishlist = async (userId, itemsInput = []) => {
   const docs = [];
   for (const entry of normalized) {
     try {
-      const snapshot = await resolveCatalogSnapshot(entry.type, entry.itemId);
+      const snapshot = await resolveCatalogSnapshot(entry.type, entry.itemId, userId);
       docs.push({
         userId,
         type: entry.type,

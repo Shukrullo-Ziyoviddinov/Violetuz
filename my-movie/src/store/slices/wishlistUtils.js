@@ -3,8 +3,10 @@ export const WISHLIST_STORAGE_KEY = 'movie_wishlist';
 /** id ni saqlash: raqam bo'lsa raqam, string UUID bo'lsa string (backend/database uchun) */
 export const normalizeId = (id) => {
   if (id == null || id === '') return null;
-  const num = parseInt(id, 10);
-  return Number.isNaN(num) ? String(id) : num;
+  const str = String(id).trim();
+  const num = parseInt(str, 10);
+  if (Number.isNaN(num) || String(num) !== str) return str;
+  return num;
 };
 
 export const migrateFromOldFormat = (parsed) => {

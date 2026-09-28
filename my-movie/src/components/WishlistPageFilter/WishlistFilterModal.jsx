@@ -196,12 +196,13 @@ const WishlistFilterModal = ({
               />
             ) : null}
 
-            {panelKind === 'music' ? (
+            {panelKind === 'music' || panelKind === 'mix' ? (
               <WishlistMusicFilters
                 key={`music-panel-${selectedTab}`}
                 items={catalogs[selectedTab] || []}
                 draft={drafts?.[selectedTab] || EMPTY_MUSIC_DRAFT}
                 onChange={(next) => patchDraft(selectedTab, next)}
+                onlyGenre={panelKind === 'mix'}
               />
             ) : null}
           </div>
@@ -218,7 +219,7 @@ const WishlistFilterModal = ({
                   ...EMPTY_MOVIE_DRAFT,
                   genres: [],
                 });
-              } else if (panelKind === 'music' && selectedTab) {
+              } else if ((panelKind === 'music' || panelKind === 'mix') && selectedTab) {
                 patchDraft(selectedTab, { ...EMPTY_MUSIC_DRAFT });
               }
             }}

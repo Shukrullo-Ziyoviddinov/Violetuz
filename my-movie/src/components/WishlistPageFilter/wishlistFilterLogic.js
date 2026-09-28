@@ -20,9 +20,10 @@ export {
   buildMusicFilterOptions,
 };
 
-/** movie → kino filter; music/album/klip/konsert → musiqa filter; triller → yo‘q */
+/** movie → kino filter; music/album/klip/konsert → musiqa filter; mix → faqat janr */
 export const getFilterPanelKind = (tabId) => {
   if (tabId === 'movie') return 'movie';
+  if (tabId === 'mix') return 'mix';
   if (
     tabId === 'music' ||
     tabId === 'album' ||
@@ -40,6 +41,7 @@ export const createEmptyDrafts = () => ({
   album: { ...EMPTY_MUSIC_DRAFT },
   klip: { ...EMPTY_MUSIC_DRAFT },
   konsert: { ...EMPTY_MUSIC_DRAFT },
+  mix: { ...EMPTY_MUSIC_DRAFT },
   triller: null,
 });
 
@@ -53,6 +55,7 @@ export const cloneDrafts = (drafts) => ({
   album: { ...EMPTY_MUSIC_DRAFT, ...drafts?.album },
   klip: { ...EMPTY_MUSIC_DRAFT, ...drafts?.klip },
   konsert: { ...EMPTY_MUSIC_DRAFT, ...drafts?.konsert },
+  mix: { ...EMPTY_MUSIC_DRAFT, ...drafts?.mix },
   triller: null,
 });
 
@@ -61,7 +64,7 @@ export const applyWishlistTabFilters = (tabId, items, drafts) => {
   if (kind === 'movie') {
     return applyMovieDraftFilters(items, drafts?.movie || EMPTY_MOVIE_DRAFT, false);
   }
-  if (kind === 'music') {
+  if (kind === 'music' || kind === 'mix') {
     return applyMusicDraftFilters(items, drafts?.[tabId] || EMPTY_MUSIC_DRAFT);
   }
   return items;

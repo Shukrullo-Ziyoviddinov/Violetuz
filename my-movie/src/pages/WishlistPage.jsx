@@ -26,6 +26,9 @@ import {
   applyWishlistTabFilters,
 } from '../components/WishlistPageFilter';
 import { useImageReady } from '../utils/useImageReady';
+import { useMusicMixes } from '../hooks/useMusicMixes';
+import { YourMixCard } from '../Music/YourMixes/YourMixCard';
+import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import './WishlistPage.css';
 import '../components/WishlistPageFilter/WishlistFilterModal.css';
 import '../components/ShortsVideos/ShortsVideos.css';
@@ -111,6 +114,7 @@ const WishlistPage = () => {
     allClips,
     allConcerts,
     getArtistById,
+    sections,
     musicLoading,
     albumsLoading,
     clipsLoading,
@@ -118,6 +122,7 @@ const WishlistPage = () => {
     musicShortsCatalog,
     musicShortsLoading,
   } = useMusicApi();
+  const { mixes } = useMusicMixes();
   const { data: allTrillers = [], isPending: trillersLoading } = useQuery({
     queryKey: ['trillers', 'with-description'],
     queryFn: fetchAllTrillers,
@@ -146,6 +151,7 @@ const WishlistPage = () => {
     if (v === 'klip' || v === 'clip') return 'klip';
     if (v === 'konsert' || v === 'concert') return 'konsert';
     if (v === 'triller' || v === 'trailer') return 'triller';
+    if (v === 'mix') return 'mix';
     if (v === 'shorts' || v === 'movieshorts' || v === 'musicshorts') return 'shorts';
     return '';
   };
@@ -160,6 +166,36 @@ const WishlistPage = () => {
   const wishlistClips = allClips.filter((c) => matchWishlist(c.id, normalizeType(c.type) || 'klip'));
   const wishlistConcerts = allConcerts.filter((c) => matchWishlist(c.id, normalizeType(c.type) || 'konsert'));
   const wishlistTrillers = allTrillers.filter((item) => matchWishlist(item.id, 'triller'));
+
+  const wishlistMixes = useMemo(() => {
+    const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
+    return wishlistItems
+      .filter((row) => normalizeType(row.type) === 'mix')
+      .map((row) => {
+        const genreKey = String(row.id);
+        const live = (mixes || []).find((mix) => mix.genre === genreKey);
+        const tracks = live?.tracks?.length ? live.tracks : row.snapshot?.tracks || [];
+        const covers = [];
+        for (const trackRow of tracks) {
+          if (covers.length >= 4) break;
+          const src = byId.get(String(trackRow.contentId))?.img || '';
+          if (src && !covers.includes(src)) covers.push(src);
+        }
+        const label = mixSectionLabel({
+          genre: genreKey,
+          tracks,
+          allMusic,
+          sections,
+          t,
+        });
+        return {
+          id: genreKey,
+          genre: label,
+          mix: { genre: genreKey, tracks },
+          covers,
+        };
+      });
+  }, [allMusic, mixes, sections, t, wishlistItems]);
 
   const movieShortsCatalog = useMemo(
     () =>
@@ -189,6 +225,7 @@ const WishlistPage = () => {
   const hasConcerts = wishlistConcerts.length > 0;
   const hasTrillers = wishlistTrillers.length > 0;
   const hasShorts = wishlistShorts.length > 0;
+  const hasMixes = wishlistMixes.length > 0;
   const isEmpty =
     !hasMovies &&
     !hasMusic &&
@@ -196,7 +233,8 @@ const WishlistPage = () => {
     !hasClips &&
     !hasConcerts &&
     !hasTrillers &&
-    !hasShorts;
+    !hasShorts &&
+    !hasMixes;
   const showTabs =
     (hasMovies ? 1 : 0) +
       (hasMusic ? 1 : 0) +
@@ -204,12 +242,15 @@ const WishlistPage = () => {
       (hasClips ? 1 : 0) +
       (hasConcerts ? 1 : 0) +
       (hasTrillers ? 1 : 0) +
-      (hasShorts ? 1 : 0) >=
-    2;
+      (hasShorts ? 1 : 0) +
+      (hasMixes ? 1 : 0) >=
+      2 ||
+    hasMixes;
 
   const getDefaultTab = () => {
     if (hasMovies) return 'movie';
     if (hasMusic) return 'music';
+    if (hasMixes) return 'mix';
     if (hasAlbums) return 'album';
     if (hasClips) return 'klip';
     if (hasConcerts) return 'konsert';
@@ -283,7 +324,8 @@ const WishlistPage = () => {
     (activeTab === 'klip' && hasClips) ||
     (activeTab === 'konsert' && hasConcerts) ||
     (activeTab === 'triller' && hasTrillers) ||
-    (activeTab === 'shorts' && hasShorts);
+    (activeTab === 'shorts' && hasShorts) ||
+    (activeTab === 'mix' && hasMixes);
 
   const effectiveTab = showTabs
     ? tabIsValid
@@ -293,6 +335,8 @@ const WishlistPage = () => {
       ? 'movie'
       : hasMusic
         ? 'music'
+        : hasMixes
+          ? 'mix'
         : hasAlbums
           ? 'album'
           : hasClips
@@ -309,6 +353,9 @@ const WishlistPage = () => {
   }
   if (hasMusic) {
     availableTabs.push({ id: 'music', label: t('wishlist.tabMusic', 'Musiqa') });
+  }
+  if (hasMixes) {
+    availableTabs.push({ id: 'mix', label: t('wishlist.tabMix', 'Mix') });
   }
   if (hasAlbums) {
     availableTabs.push({ id: 'album', label: t('wishlist.tabAlbums', 'Albom') });
@@ -355,7 +402,10 @@ const WishlistPage = () => {
     konsert: wishlistConcerts,
     triller: wishlistTrillers,
     shorts: wishlistShorts,
+    mix: wishlistMixes,
   };
+
+  const visibleMixes = applyWishlistTabFilters('mix', wishlistMixes, appliedFilters);
 
   const visibleMovies = applyWishlistTabFilters(
     'movie',
@@ -406,6 +456,16 @@ const WishlistPage = () => {
               >
                 <span className="wishlist-tab-icon">{WishlistTabIcons.music}</span>
                 {t('wishlist.tabMusic', 'Musiqa')}
+              </button>
+            )}
+            {hasMixes && (
+              <button
+                type="button"
+                className={`wishlist-tab ${effectiveTab === 'mix' ? 'active' : ''}`}
+                onClick={() => setActiveTab('mix')}
+              >
+                <span className="wishlist-tab-icon">{WishlistTabIcons.mix}</span>
+                {t('wishlist.tabMix', 'Mix')}
               </button>
             )}
             {hasAlbums && (
@@ -510,6 +570,18 @@ const WishlistPage = () => {
           hideHeader
           isLoading={false}
         />
+      )}
+
+      {effectiveTab === 'mix' && (
+        <div className="wishlist-music">
+          <div className="wishlist-music-container">
+            <div className="wishlist-mix-grid">
+              {visibleMixes.map((item) => (
+                <YourMixCard key={`mix-${item.id}`} mix={item.mix} covers={item.covers} />
+              ))}
+            </div>
+          </div>
+        </div>
       )}
 
       {effectiveTab === 'album' && (

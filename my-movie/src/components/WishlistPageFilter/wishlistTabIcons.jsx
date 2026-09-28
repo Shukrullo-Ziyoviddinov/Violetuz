@@ -15,6 +15,12 @@ export const WishlistTabIcons = {
       <line x1="17" y1="7" x2="22" y2="7" />
     </svg>
   ),
+  mix: (
+    <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="7" width="13" height="13" rx="2" />
+      <path d="M8 7V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+    </svg>
+  ),
   music: (
     <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M9 18V5l12-2v13" />

@@ -8,8 +8,8 @@ import {
 
 const BODY = '.wishlist-filter-modal-body';
 
-/** Musiqa / albom / klip / konsert — MusicFilter selectlari (yosh yo‘q) */
-const WishlistMusicFilters = ({ items = [], draft, onChange }) => {
+/** Musiqa / albom / klip / konsert — MusicFilter selectlari. Mixda faqat janr. */
+const WishlistMusicFilters = ({ items = [], draft, onChange, onlyGenre = false }) => {
   const { t } = useTranslation();
   const [openSection, setOpenSection] = useState(null);
   const safeDraft = draft || EMPTY_MUSIC_DRAFT;
@@ -30,32 +30,35 @@ const WishlistMusicFilters = ({ items = [], draft, onChange }) => {
     country: t('music.filterCountry', 'Davlat'),
   };
 
-  const sections = [
-    {
-      key: 'year',
-      title: labels.year,
-      opts: options.yearOpts,
-      format: (v) => `${v}-${yearLabel}`,
-    },
-    {
-      key: 'genre',
-      title: labels.genre,
-      opts: options.genreOpts,
-      format: (v) => String(v),
-    },
-    {
-      key: 'language',
-      title: labels.language,
-      opts: options.languageOpts,
-      format: (v) => String(v),
-    },
-    {
-      key: 'country',
-      title: labels.country,
-      opts: options.countryOpts,
-      format: (v) => String(v),
-    },
-  ];
+  const genreSection = {
+    key: 'genre',
+    title: labels.genre,
+    opts: options.genreOpts,
+    format: (v) => String(v),
+  };
+  const sections = onlyGenre
+    ? [genreSection]
+    : [
+        {
+          key: 'year',
+          title: labels.year,
+          opts: options.yearOpts,
+          format: (v) => `${v}-${yearLabel}`,
+        },
+        genreSection,
+        {
+          key: 'language',
+          title: labels.language,
+          opts: options.languageOpts,
+          format: (v) => String(v),
+        },
+        {
+          key: 'country',
+          title: labels.country,
+          opts: options.countryOpts,
+          format: (v) => String(v),
+        },
+      ];
 
   return (
     <div className="wishlist-filter-panel wishlist-filter-panel--music">

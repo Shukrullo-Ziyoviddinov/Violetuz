@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import ShareButton from '../../components/ShareButton/ShareButton';
+import { useWishlist } from '../../context/WishlistContext';
 import { useNarrowLayout } from './MusicDetailMixSheet';
 import './MusicMixMoreSheet.css';
 
@@ -14,6 +15,8 @@ const MOTION_MS = 480;
  */
 const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
   const { t } = useTranslation();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const saved = Boolean(mixGenre) && isInWishlist(mixGenre, 'mix');
   const narrow = useNarrowLayout();
   const panelRef = useRef(null);
   const dragRef = useRef(null);
@@ -182,10 +185,18 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
             className="music-mix-more-share"
             buttonClassName="music-mix-more-action"
           />
-          <button type="button" className="music-mix-more-action music-mix-more-save">
+          <button
+            type="button"
+            className={`music-mix-more-action music-mix-more-save${saved ? ' is-saved' : ''}`}
+            aria-pressed={saved}
+            onClick={() => {
+              if (!mixGenre) return;
+              toggleWishlist(mixGenre, 'mix');
+            }}
+          >
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
               <path
-                fill="none"
+                fill={saved ? 'currentColor' : 'none'}
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"

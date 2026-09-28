@@ -14,6 +14,7 @@ const WISHLIST_TYPES = Object.freeze([
   'movieShorts',
   'musicshorts',
   'triller',
+  'mix',
 ]);
 
 const wishlistSchema = new mongoose.Schema(
