@@ -1,0 +1,131 @@
+.music-mix-more-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1600;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.music-mix-more-overlay.is-open,
+.music-mix-more-overlay.is-closing {
+  opacity: 1;
+}
+
+.music-mix-more-overlay.is-closing {
+  opacity: 0;
+}
+
+.music-mix-more-panel {
+  background: #1c1c1c;
+  color: #fff;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+.music-mix-more-panel.is-center {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(360px, calc(100vw - 2rem));
+  border-radius: 16px;
+  padding: 0.85rem 0.35rem;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.96);
+  transition: transform 280ms ease, opacity 280ms ease;
+}
+
+.music-mix-more-overlay.is-open .music-mix-more-panel.is-center {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.music-mix-more-overlay.is-closing .music-mix-more-panel.is-center {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.music-mix-more-panel.is-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 18px 18px 0 0;
+  padding: 0 0.35rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
+  transition: transform 280ms ease;
+}
+
+.music-mix-more-panel.is-sheet.is-dragging {
+  transition: none;
+}
+
+.music-mix-more-grip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0 6px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.music-mix-more-grip span {
+  width: 42px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.music-mix-more-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.music-mix-more-panel .music-mix-more-share.share-button-wrapper {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+  width: 100%;
+}
+
+.music-mix-more-panel .share-button.music-mix-more-action,
+.music-mix-more-save {
+  width: 100%;
+  height: auto;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.music-mix-more-panel .share-button.music-mix-more-action:hover,
+.music-mix-more-save:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 0;
+  transform: none;
+}
+
+.music-mix-more-panel .share-button.music-mix-more-action svg,
+.music-mix-more-save svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+}
+
+.music-mix-more-panel .share-button-label {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}

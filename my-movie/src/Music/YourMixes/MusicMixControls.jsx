@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
+import MusicMixMoreSheet from './MusicMixMoreSheet';
 import './MusicMixControls.css';
 
-const MusicMixControls = ({ repeat, shuffle, onToggleRepeat, onToggleShuffle }) => (
+const MusicMixControls = ({
+  repeat,
+  shuffle,
+  onToggleRepeat,
+  onToggleShuffle,
+  label,
+  musicId,
+  mixGenre,
+}) => {
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  return (
   <div className="music-mix-controls">
     <button
       type="button"
@@ -28,7 +40,13 @@ const MusicMixControls = ({ repeat, shuffle, onToggleRepeat, onToggleShuffle }) 
         />
       </svg>
     </button>
-    <button type="button" className="music-mix-controls-more" aria-label="Yana">
+    <button
+      type="button"
+      className="music-mix-controls-more"
+      aria-label="Yana"
+      aria-expanded={moreOpen}
+      onClick={() => setMoreOpen(true)}
+    >
       <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
         <path
           fill="currentColor"
@@ -36,7 +54,15 @@ const MusicMixControls = ({ repeat, shuffle, onToggleRepeat, onToggleShuffle }) 
         />
       </svg>
     </button>
+    <MusicMixMoreSheet
+      open={moreOpen}
+      onClose={() => setMoreOpen(false)}
+      label={label}
+      musicId={musicId}
+      mixGenre={mixGenre}
+    />
   </div>
-);
+  );
+};
 
 export default MusicMixControls;

@@ -1050,6 +1050,8 @@ const MusicDetail = () => {
                   shuffle={mixShuffle}
                   onToggleRepeat={() => setMixRepeat((on) => !on)}
                   onToggleShuffle={() => setMixShuffle((on) => !on)}
+                  musicId={music?.id}
+                  mixGenre={mixGenre}
                 >
                   {renderMixCards()}
                 </MusicDetailMixList>
@@ -1071,6 +1073,8 @@ const MusicDetail = () => {
           shuffle={mixShuffle}
           onToggleRepeat={() => setMixRepeat((on) => !on)}
           onToggleShuffle={() => setMixShuffle((on) => !on)}
+          musicId={music?.id}
+          mixGenre={mixGenre}
         >
           {renderMixCards()}
         </MusicDetailMixSheet>

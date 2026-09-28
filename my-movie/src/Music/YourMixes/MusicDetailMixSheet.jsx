@@ -51,6 +51,8 @@ const MusicDetailMixSheet = ({
   shuffle,
   onToggleRepeat,
   onToggleShuffle,
+  musicId,
+  mixGenre,
   children,
 }) => {
   const { t } = useTranslation();
@@ -225,6 +227,9 @@ const MusicDetailMixSheet = ({
               shuffle={shuffle}
               onToggleRepeat={onToggleRepeat}
               onToggleShuffle={onToggleShuffle}
+              label={label}
+              musicId={musicId}
+              mixGenre={mixGenre}
             />
           )}
           <div className="music-mix-sheet-list" aria-busy={busy || undefined}>
