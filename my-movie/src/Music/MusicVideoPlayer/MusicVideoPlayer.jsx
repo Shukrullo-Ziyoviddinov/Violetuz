@@ -35,6 +35,8 @@ const MusicVideoPlayer = forwardRef(({
   }
   const isLoggedInRef = useRef(isLoggedIn);
   isLoggedInRef.current = isLoggedIn;
+  const categoryNameMusicRef = useRef(categoryNameMusic);
+  categoryNameMusicRef.current = categoryNameMusic;
   const playbackSpeedRef = useRef(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -95,7 +97,7 @@ const MusicVideoPlayer = forwardRef(({
 
     return () => {
       clipWatchRef.current.clear();
-      const cat = String(categoryNameMusic || '').trim();
+      const cat = String(categoryNameMusicRef.current || '').trim();
       if (!cat) return;
       const el = videoRef.current;
       const dur = el?.duration;
@@ -108,7 +110,7 @@ const MusicVideoPlayer = forwardRef(({
         durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
       });
     };
-  }, [contentType, contentId, categoryNameMusic]);
+  }, [contentType, contentId]);
 
   const flushListenProgress = ({ force = false } = {}) => {
     const type = contentType ? String(contentType).trim() : '';
@@ -123,6 +125,24 @@ const MusicVideoPlayer = forwardRef(({
       contentId,
       category: cat,
       durationSec: Number.isFinite(dur) && dur > 0 ? dur : undefined,
+    });
+  };
+
+  const noteClipWatch = (el, timeOverride) => {
+    if (!el) return;
+    const type = String(contentType || '').trim().toLowerCase();
+    if (type !== 'clip' && type !== 'klip') return;
+    const duration = Number(el.duration);
+    if (!Number.isFinite(duration) || duration <= 0) return;
+    const time =
+      timeOverride != null && Number.isFinite(Number(timeOverride))
+        ? Number(timeOverride)
+        : Number(el.currentTime);
+    if (!Number.isFinite(time) || time < 0) return;
+    clipWatchRef.current.note({
+      isLoggedIn: isLoggedInRef.current,
+      currentTime: time,
+      durationSec: duration,
     });
   };
 
@@ -156,17 +176,27 @@ const MusicVideoPlayer = forwardRef(({
 
   const handleBack10 = () => {
     if (videoRef.current) {
-      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
+      const el = videoRef.current;
+      const next = Math.max(0, el.currentTime - 10);
+      el.currentTime = next;
+      setCurrentTime(next);
+      noteClipWatch(el, next);
     }
     showControlsWithDelay();
   };
 
   const handleForward10 = () => {
     if (videoRef.current) {
-      videoRef.current.currentTime = Math.min(
-        videoRef.current.duration,
-        videoRef.current.currentTime + 10
-      );
+      const el = videoRef.current;
+      const dur = Number(el.duration);
+      if (!Number.isFinite(dur) || dur <= 0) {
+        showControlsWithDelay();
+        return;
+      }
+      const next = Math.min(dur, el.currentTime + 10);
+      el.currentTime = next;
+      setCurrentTime(next);
+      noteClipWatch(el, next);
     }
     showControlsWithDelay();
   };
@@ -263,24 +293,6 @@ const MusicVideoPlayer = forwardRef(({
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const noteClipWatch = (el, timeOverride) => {
-    if (!el) return;
-    const type = String(contentType || '').trim().toLowerCase();
-    if (type !== 'clip' && type !== 'klip') return;
-    const duration = Number(el.duration);
-    if (!Number.isFinite(duration) || duration <= 0) return;
-    const time =
-      timeOverride != null && Number.isFinite(Number(timeOverride))
-        ? Number(timeOverride)
-        : Number(el.currentTime);
-    if (!Number.isFinite(time) || time < 0) return;
-    clipWatchRef.current.note({
-      isLoggedIn: isLoggedInRef.current,
-      currentTime: time,
-      durationSec: duration,
-    });
   };
 
   const handleTimeUpdate = () => {
