@@ -237,6 +237,13 @@ const ShareButton = ({
       setTouchStart(null);
       setTouchEnd(null);
       touchStartRef.current = null;
+      const swallow = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.removeEventListener('click', swallow, true);
+      };
+      window.addEventListener('click', swallow, true);
+      window.setTimeout(() => window.removeEventListener('click', swallow, true), 500);
       closeModal();
       return;
     }

@@ -22,7 +22,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
   const panelRef = useRef(null);
   const dragRef = useRef(null);
   const closeTimerRef = useRef(null);
-  const suppressClickRef = useRef(false);
+  const ignoreClickUntilRef = useRef(0);
   const [present, setPresent] = useState(false);
   const [entered, setEntered] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -62,6 +62,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
 
   useLayoutEffect(() => {
     if (!open) return;
+    ignoreClickUntilRef.current = 0;
     setClosing(false);
     setEntered(false);
     setDragY(null);
@@ -109,7 +110,6 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
       if (dy < DRAG_START_PX) return;
       if (!dragRef.current?.dragging) {
         dragRef.current.dragging = true;
-        suppressClickRef.current = true;
         try {
           panelRef.current?.setPointerCapture?.(pointerId);
         } catch {
@@ -128,6 +128,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
       const traveled = Math.max(0, upEvent.clientY - startY);
       const wasDragging = Boolean(dragRef.current?.dragging);
       dragRef.current = null;
+      if (wasDragging) ignoreClickUntilRef.current = Date.now() + 450;
       if (!wasDragging) return;
       const height = panelRef.current?.offsetHeight || 240;
       setPressed(false);
@@ -148,6 +149,12 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
     window.addEventListener('pointercancel', onUp);
   };
 
+  const ignoreGhostClick = (event) => {
+    if (Date.now() >= ignoreClickUntilRef.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   if ((!open && !closing && !present) || typeof document === 'undefined') return null;
 
   const panelStyle = dragY != null ? { transform: `translateY(${dragY}px)` } : undefined;
@@ -159,7 +166,11 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
         entered && !closing ? 'is-open' : '',
         closing ? 'is-closing' : '',
       ].filter(Boolean).join(' ')}
-      onClick={requestClose}
+      onClick={(event) => {
+        ignoreGhostClick(event);
+        if (event.defaultPrevented) return;
+        requestClose();
+      }}
     >
       <div
         ref={panelRef}
@@ -173,12 +184,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
         aria-modal="true"
         aria-label={title}
         onPointerDown={narrow ? onSheetDown : undefined}
-        onClickCapture={(event) => {
-          if (!suppressClickRef.current) return;
-          suppressClickRef.current = false;
-          event.preventDefault();
-          event.stopPropagation();
-        }}
+        onClickCapture={ignoreGhostClick}
         onClick={(event) => event.stopPropagation()}
       >
         {narrow && (
