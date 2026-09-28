@@ -28,6 +28,8 @@ const MODAL_SELECTOR = [
   '.music-detail-lyrics-modal',
   '.music-mix-sheet',
   '.music-mix-sheet-dock',
+  '.music-mix-more-overlay',
+  '.music-mix-more-panel',
   '.artist-music-story-modal-overlay',
   '.artist-music-story-modal',
   '.music-filter-modal-overlay',
