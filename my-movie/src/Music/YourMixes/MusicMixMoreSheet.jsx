@@ -100,6 +100,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
 
   const onSheetDown = (event) => {
     if (!narrow || closing || event.button > 0) return;
+    if (event.target?.closest?.('.share-modal-overlay, .share-modal-content')) return;
     const startY = event.clientY;
     const pointerId = event.pointerId;
     dragRef.current = { y: startY, id: pointerId, dragging: false };

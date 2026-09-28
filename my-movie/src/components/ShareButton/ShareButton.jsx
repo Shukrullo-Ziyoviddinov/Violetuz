@@ -271,8 +271,13 @@ const ShareButton = ({
   };
 
   const handleOverlayClick = (e) => {
+    e.stopPropagation();
     if (Date.now() < blockOverlayClickUntilRef.current) return;
     if (e.target === e.currentTarget) closeModal();
+  };
+
+  const keepShareGesture = (event) => {
+    event.stopPropagation();
   };
 
   const toggleOpen = () => {
@@ -342,6 +347,8 @@ const ShareButton = ({
             <div
               className={`share-modal-overlay${sheetOpen && !isClosing ? ' share-modal-overlay--open' : ''}${isClosing ? ' share-modal-overlay--closing' : ''}`}
               onClick={handleOverlayClick}
+              onPointerDown={keepShareGesture}
+              onTouchStart={keepShareGesture}
             >
               <div
                 ref={modalRef}
@@ -353,9 +360,13 @@ const ShareButton = ({
                   isClosing ? 'share-modal-content--closing' : '',
                 ].filter(Boolean).join(' ')}
                 onClick={(e) => e.stopPropagation()}
-                style={modalTranslateY ? { transform: `translateY(${modalTranslateY}px)` } : undefined}
-                onTouchStart={handleTouchStart}
+                onPointerDown={keepShareGesture}
+                onTouchStart={(event) => {
+                  keepShareGesture(event);
+                  handleTouchStart(event);
+                }}
                 onTouchEnd={handleTouchEnd}
+                style={modalTranslateY ? { transform: `translateY(${modalTranslateY}px)` } : undefined}
               >
                 {renderContent()}
               </div>
