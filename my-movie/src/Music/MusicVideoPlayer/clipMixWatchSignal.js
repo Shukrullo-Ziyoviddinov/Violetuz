@@ -101,14 +101,20 @@ export function createClipMixWatchSignal() {
           return;
         }
         // not_clip / below_ratio / boshqa — sent qilib yopilmasin, qayta urinadi
+        if (typeof console !== 'undefined' && console.warn) {
+          console.warn('[clip-mix] play not queued', data?.reason || data);
+        }
         retryAt = Date.now() + 1500;
       })
-      .catch(() => {
+      .catch((err) => {
         if (sessionId !== postSession || contentId !== postContentId) {
           pending = false;
           return;
         }
         pending = false;
+        if (typeof console !== 'undefined' && console.warn) {
+          console.warn('[clip-mix] play request failed', err?.status || err?.message || err);
+        }
         retryAt = Date.now() + 5000;
       });
   };

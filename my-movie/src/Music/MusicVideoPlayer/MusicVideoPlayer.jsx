@@ -265,15 +265,20 @@ const MusicVideoPlayer = forwardRef(({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const noteClipWatch = (el) => {
+  const noteClipWatch = (el, timeOverride) => {
     if (!el) return;
     const type = String(contentType || '').trim().toLowerCase();
     if (type !== 'clip' && type !== 'klip') return;
     const duration = Number(el.duration);
     if (!Number.isFinite(duration) || duration <= 0) return;
+    const time =
+      timeOverride != null && Number.isFinite(Number(timeOverride))
+        ? Number(timeOverride)
+        : Number(el.currentTime);
+    if (!Number.isFinite(time) || time < 0) return;
     clipWatchRef.current.note({
       isLoggedIn: isLoggedInRef.current,
-      currentTime: el.currentTime,
+      currentTime: time,
       durationSec: duration,
     });
   };
@@ -323,7 +328,8 @@ const MusicVideoPlayer = forwardRef(({
       videoRef.current.currentTime = newTime;
       setCurrentTime(newTime);
       setPreviewTime(0);
-      noteClipWatch(videoRef.current);
+      // currentTime async — surilgan vaqtni to'g'ridan-to'g'ri yuboramiz
+      noteClipWatch(videoRef.current, newTime);
     }
   };
 
@@ -345,8 +351,7 @@ const MusicVideoPlayer = forwardRef(({
       setCurrentTime(pt);
       setPreviewTime(0);
       previewTimeRef.current = 0;
-      // Pauzada timeupdate kelmasligi mumkin — bar qo'yilgach darhol tekshirish.
-      noteClipWatch(videoRef.current);
+      noteClipWatch(videoRef.current, pt);
     }
   };
 
