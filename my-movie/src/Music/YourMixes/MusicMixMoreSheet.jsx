@@ -167,6 +167,8 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre }) => {
         closing ? 'is-closing' : '',
       ].filter(Boolean).join(' ')}
       onClick={(event) => {
+        if (document.body.dataset.mixShareGuard) return;
+        if (document.querySelector('.share-modal-overlay')) return;
         ignoreGhostClick(event);
         if (event.defaultPrevented) return;
         requestClose();

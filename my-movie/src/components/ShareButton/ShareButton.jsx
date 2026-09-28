@@ -144,6 +144,8 @@ const ShareButton = ({
 
   useEffect(() => () => {
     if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+    window.clearTimeout(guardTimerRef.current);
+    delete document.body.dataset.mixShareGuard;
   }, []);
 
   useEffect(() => {
@@ -194,6 +196,19 @@ const ShareButton = ({
   }, [isOpen, isMobileView, dropdownInPortal]);
 
   const touchStartRef = useRef(null);
+  const touchPointRef = useRef(null);
+  const blockOverlayClickUntilRef = useRef(0);
+  const guardTimerRef = useRef(null);
+
+  const armShareGuard = () => {
+    blockOverlayClickUntilRef.current = Date.now() + 700;
+    document.body.dataset.mixShareGuard = '1';
+    window.clearTimeout(guardTimerRef.current);
+    guardTimerRef.current = window.setTimeout(() => {
+      delete document.body.dataset.mixShareGuard;
+      blockOverlayClickUntilRef.current = 0;
+    }, 700);
+  };
 
   const handleTouchStart = (e) => {
     if (!isMobileView || closingRef.current) return;
@@ -201,57 +216,45 @@ const ShareButton = ({
     setTouchStart(y);
     setTouchEnd(y);
     touchStartRef.current = y;
+    touchPointRef.current = y;
   };
 
   const handleTouchMove = useCallback((e) => {
     if (!isMobileView || closingRef.current || touchStartRef.current === null) return;
     const currentY = e.touches[0].clientY;
     const diff = currentY - touchStartRef.current;
+    touchPointRef.current = currentY;
     if (diff > DRAG_THRESHOLD) {
       e.preventDefault();
+      armShareGuard();
       setIsDragging(true);
       setModalTranslateY(diff);
       setTouchEnd(currentY);
-    } else {
-      setIsDragging(false);
-      setModalTranslateY(0);
-      setTouchStart(null);
-      setTouchEnd(null);
-      touchStartRef.current = null;
     }
   }, [isMobileView]);
 
   const handleTouchEnd = () => {
     if (!isMobileView || closingRef.current || touchStartRef.current === null) return;
-    const distance = touchEnd !== null ? touchEnd - touchStartRef.current : 0;
+    const endY = touchPointRef.current ?? touchStartRef.current;
+    const distance = endY - touchStartRef.current;
+    setTouchStart(null);
+    setTouchEnd(null);
+    touchStartRef.current = null;
+    touchPointRef.current = null;
     if (distance <= DRAG_THRESHOLD) {
       setIsDragging(false);
       setModalTranslateY(0);
-      setTouchStart(null);
-      setTouchEnd(null);
       return;
     }
+    armShareGuard();
     const modalHeight = modalRef.current ? modalRef.current.offsetHeight : 300;
     const closeThreshold = modalHeight * 0.35;
     if (distance > closeThreshold) {
-      setTouchStart(null);
-      setTouchEnd(null);
-      touchStartRef.current = null;
-      const swallow = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        window.removeEventListener('click', swallow, true);
-      };
-      window.addEventListener('click', swallow, true);
-      window.setTimeout(() => window.removeEventListener('click', swallow, true), 500);
       closeModal();
       return;
     }
     setIsDragging(false);
     setModalTranslateY(0);
-    setTouchStart(null);
-    setTouchEnd(null);
-    touchStartRef.current = null;
   };
 
   // Touch handlers with passive: false to allow preventDefault (fixes console warning)
@@ -268,6 +271,7 @@ const ShareButton = ({
   };
 
   const handleOverlayClick = (e) => {
+    if (Date.now() < blockOverlayClickUntilRef.current) return;
     if (e.target === e.currentTarget) closeModal();
   };
 
