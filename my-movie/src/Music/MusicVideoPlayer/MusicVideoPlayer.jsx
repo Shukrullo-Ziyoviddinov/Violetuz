@@ -265,6 +265,19 @@ const MusicVideoPlayer = forwardRef(({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const noteClipWatch = (el, { ended = false } = {}) => {
+    if (!el) return;
+    const type = String(contentType || '').trim().toLowerCase();
+    if (type !== 'clip' && type !== 'klip') return;
+    clipWatchRef.current.note({
+      isLoggedIn: isLoggedInRef.current,
+      currentTime: el.currentTime,
+      durationSec: el.duration,
+      isPlaying: !el.paused && !el.ended,
+      ended: ended || Boolean(el.ended),
+    });
+  };
+
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       const el = videoRef.current;
@@ -273,16 +286,7 @@ const MusicVideoPlayer = forwardRef(({
         isPlaying: isPlayingRef.current,
         playbackRate: playbackSpeedRef.current || 1,
       });
-      const type = String(contentType || '').trim().toLowerCase();
-      if (type === 'clip' || type === 'klip') {
-        clipWatchRef.current.note({
-          isLoggedIn: isLoggedInRef.current,
-          currentTime: el.currentTime,
-          durationSec: el.duration,
-          isPlaying: !el.paused && !el.ended,
-          ended: Boolean(el.ended),
-        });
-      }
+      noteClipWatch(el);
       flushListenProgress();
     }
   };
@@ -319,6 +323,7 @@ const MusicVideoPlayer = forwardRef(({
       videoRef.current.currentTime = newTime;
       setCurrentTime(newTime);
       setPreviewTime(0);
+      noteClipWatch(videoRef.current);
     }
   };
 
@@ -340,6 +345,8 @@ const MusicVideoPlayer = forwardRef(({
       setCurrentTime(pt);
       setPreviewTime(0);
       previewTimeRef.current = 0;
+      // Pauzada timeupdate kelmasligi mumkin — bar qo'yilgach darhol tekshirish.
+      noteClipWatch(videoRef.current);
     }
   };
 
@@ -571,19 +578,12 @@ const MusicVideoPlayer = forwardRef(({
         onCanPlay={handleLoadedMetadata}
         onClick={handleVideoClick}
         onEnded={(e) => {
-          const el = videoRef.current;
-          const type = String(contentType || '').trim().toLowerCase();
-          if (el && (type === 'clip' || type === 'klip')) {
-            clipWatchRef.current.note({
-              isLoggedIn: isLoggedInRef.current,
-              currentTime: el.currentTime,
-              durationSec: el.duration,
-              isPlaying: false,
-              ended: true,
-            });
-          }
+          noteClipWatch(videoRef.current, { ended: true });
           flushListenProgress({ force: true });
           onEnded?.(e);
+        }}
+        onSeeked={() => {
+          noteClipWatch(videoRef.current);
         }}
       />
 

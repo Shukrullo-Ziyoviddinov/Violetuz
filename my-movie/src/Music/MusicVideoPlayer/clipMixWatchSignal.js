@@ -101,10 +101,11 @@ export function createClipMixWatchSignal() {
 
     if (jumped) {
       hold = true;
-      // Oxiriga surib video ended bo'lsa keyingi tick kelmaydi — shu yerda yoziladi.
-      if (!ended) return;
+      // Pleer yurib tursa keyingi tick kutadi (surish o'zi emas).
+      // Pauza yoki ended bo'lsa keyingi tick kelmaydi — shu yerda yoziladi.
+      if (isPlaying && !ended) return;
     }
-    if ((!isPlaying && !ended) || sent || pending || Date.now() < retryAt) return;
+    if (sent || pending || Date.now() < retryAt) return;
     if (!armed && !hold) return;
 
     armed = false;
