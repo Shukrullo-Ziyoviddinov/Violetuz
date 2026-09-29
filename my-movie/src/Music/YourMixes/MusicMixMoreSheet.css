@@ -33,19 +33,18 @@ body.music-mix-more-open {
   width: min(360px, calc(100vw - 2rem));
   min-height: 120px;
   border-radius: 16px;
-  padding: 2.35rem 0.35rem 0.85rem;
+  padding: 0.55rem 0.35rem 0.85rem;
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.96);
   transition: transform 480ms ease, opacity 480ms ease;
 }
 
 .music-mix-more-close {
-  position: absolute;
-  top: 0.55rem;
-  right: 0.55rem;
+  position: relative;
   z-index: 2;
   width: 32px;
   height: 32px;
+  margin: 0 0.2rem 0.55rem auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,6 +55,7 @@ body.music-mix-more-open {
   color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .music-mix-more-close:hover {
