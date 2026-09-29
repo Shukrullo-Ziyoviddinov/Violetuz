@@ -56,6 +56,9 @@ const MusicDetailMixSheet = ({
   musicId,
   mixGenre,
   contentType = 'music',
+  existingShareToken = '',
+  existingShareCover = '',
+  hideMoreActions = false,
   children,
 }) => {
   const { t } = useTranslation();
@@ -234,6 +237,9 @@ const MusicDetailMixSheet = ({
               musicId={musicId}
               mixGenre={mixGenre}
               contentType={contentType}
+              existingShareToken={existingShareToken}
+              existingShareCover={existingShareCover}
+              hideMoreActions={hideMoreActions}
             />
           )}
           <div className="music-mix-sheet-list" aria-busy={busy || undefined}>

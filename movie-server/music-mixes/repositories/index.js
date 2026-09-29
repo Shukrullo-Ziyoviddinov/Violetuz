@@ -14,6 +14,7 @@ const {
 } = require('./catalog.read');
 const { incrementMixPlayCount, listMixPlayCounts } = require('./playCount.repository');
 const { replaceUserMixes } = require('./musicMix.repository');
+const { createMixShare, createOrRefreshMixShare, findMixShareByToken, refreshMixShareDocument } = require('./mixShare.repository');
 
 module.exports = {
   resolveMixGenre,
@@ -23,4 +24,8 @@ module.exports = {
   incrementMixPlayCount,
   listMixPlayCounts,
   replaceUserMixes,
+  createMixShare,
+  createOrRefreshMixShare,
+  findMixShareByToken,
+  refreshMixShareDocument,
 };

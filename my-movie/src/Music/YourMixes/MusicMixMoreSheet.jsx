@@ -2,6 +2,8 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import ShareButton from '../../components/ShareButton/ShareButton';
+import { createMixShare } from '../../api/musicMixApi';
+import { resolveApiBaseUrl } from '../../api/apiBase';
 import { useWishlist } from '../../context/WishlistContext';
 import { useNarrowLayout } from './MusicDetailMixSheet';
 import './MusicMixMoreSheet.css';
@@ -13,6 +15,7 @@ const MOTION_MS = 480;
 /**
  * Mix ⋯ menyusi.
  * Desktop: o‘rtadan. Mobil: pastdan, pastga ~30% tortilsa yopiladi.
+ * Share: POST /share → ?ms=token (qabul qiluvchi bazasiga yozilmaydi).
  */
 const mixContentType = (value) => {
   const type = String(value || 'music').trim().toLowerCase();
@@ -20,7 +23,16 @@ const mixContentType = (value) => {
   return 'music';
 };
 
-const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre, contentType = 'music' }) => {
+const MusicMixMoreSheet = ({
+  open,
+  onClose,
+  label,
+  musicId,
+  mixGenre,
+  contentType = 'music',
+  existingShareToken = '',
+  existingShareCover = '',
+}) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const mixType = mixContentType(contentType);
@@ -36,14 +48,78 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre, contentTyp
   const [closing, setClosing] = useState(false);
   const [dragY, setDragY] = useState(null);
   const [pressed, setPressed] = useState(false);
+  const [shareMeta, setShareMeta] = useState(null);
+  const [shareBusy, setShareBusy] = useState(false);
 
   const title = t('music.mixGenreLine', {
     genre: label,
     defaultValue: '{{genre}} janerdagi mixlar',
   });
-  const sharePath = musicId != null && mixGenre
-    ? `${mixType === 'klip' ? `/music/video/${musicId}` : `/music/${musicId}`}?mix=${encodeURIComponent(mixGenre)}`
+
+  const fallbackToken = String(existingShareToken || '').trim();
+  const leadId = shareMeta?.leadId || musicId;
+  const coverImg = String(shareMeta?.coverImg || existingShareCover || '').trim();
+  const activeToken = String(shareMeta?.token || fallbackToken || '').trim();
+  const sharePath =
+    activeToken && leadId != null && leadId !== ''
+      ? `${mixType === 'klip' ? `/music/video/${leadId}` : `/music/${leadId}`}?ms=${encodeURIComponent(activeToken)}`
+      : '';
+  const shareCardUrl = activeToken
+    ? `${resolveApiBaseUrl()}/music/mixes/share/${encodeURIComponent(activeToken)}/card`
     : '';
+
+  useEffect(() => {
+    if (!open) {
+      setShareMeta(null);
+      setShareBusy(false);
+      return undefined;
+    }
+
+    const applyFallback = () => {
+      if (!fallbackToken) {
+        setShareMeta(null);
+        return;
+      }
+      setShareMeta({
+        token: fallbackToken,
+        leadId: String(musicId || '').trim(),
+        coverImg: String(existingShareCover || '').trim(),
+      });
+    };
+
+    if (!mixGenre) {
+      applyFallback();
+      setShareBusy(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    setShareBusy(true);
+    setShareMeta(null);
+    createMixShare({ genre: mixGenre, contentType: mixType })
+      .then((data) => {
+        if (cancelled) return;
+        if (!data?.token) {
+          applyFallback();
+          return;
+        }
+        setShareMeta({
+          token: String(data.token),
+          leadId: String(data.leadId || musicId || '').trim(),
+          coverImg: String(data.coverImg || existingShareCover || '').trim(),
+        });
+      })
+      .catch(() => {
+        if (!cancelled) applyFallback();
+      })
+      .finally(() => {
+        if (!cancelled) setShareBusy(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, mixGenre, mixType, musicId, fallbackToken, existingShareCover]);
 
   const finishClose = () => {
     setClosing(false);
@@ -167,6 +243,7 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre, contentTyp
   if ((!open && !closing && !present) || typeof document === 'undefined') return null;
 
   const panelStyle = dragY != null ? { transform: `translateY(${dragY}px)` } : undefined;
+  const shareReady = Boolean(sharePath);
 
   return createPortal(
     <div
@@ -208,15 +285,49 @@ const MusicMixMoreSheet = ({ open, onClose, label, musicId, mixGenre, contentTyp
           </div>
         )}
         <div className="music-mix-more-actions">
-          <ShareButton
-            movie={{ id: musicId, title }}
-            sharePath={sharePath || undefined}
-            dropdownInPortal
-            icon="send"
-            label={t('music.mixSharePlaylist', 'Playlistni ulashish')}
-            className="music-mix-more-share"
-            buttonClassName="music-mix-more-action"
-          />
+          {shareReady ? (
+            <ShareButton
+              movie={{ id: leadId, title, img: coverImg }}
+              sharePath={sharePath}
+              absoluteUrl={shareCardUrl || undefined}
+              dropdownInPortal
+              icon="send"
+              label={t('music.mixSharePlaylist', 'Playlistni ulashish')}
+              className="music-mix-more-share"
+              buttonClassName="music-mix-more-action"
+            />
+          ) : (
+            <button
+              type="button"
+              className="music-mix-more-action"
+              disabled
+              aria-busy={shareBusy || undefined}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M22 2 11 13"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M22 2 15 22 11 13 2 9 22 2z"
+                />
+              </svg>
+              <span>
+                {shareBusy
+                  ? t('music.mixSharePreparing', 'Tayyorlanmoqda…')
+                  : t('music.mixSharePlaylist', 'Playlistni ulashish')}
+              </span>
+            </button>
+          )}
           <button
             type="button"
             className={`music-mix-more-action music-mix-more-save${saved ? ' is-saved' : ''}`}

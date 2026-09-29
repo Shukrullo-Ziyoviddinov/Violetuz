@@ -19,6 +19,9 @@ const MusicDetailMixList = ({
   musicId,
   mixGenre,
   contentType = 'music',
+  existingShareToken = '',
+  existingShareCover = '',
+  hideMoreActions = false,
   children,
 }) => {
   const { t } = useTranslation();
@@ -92,6 +95,9 @@ const MusicDetailMixList = ({
               musicId={musicId}
               mixGenre={mixGenre}
               contentType={contentType}
+              existingShareToken={existingShareToken}
+              existingShareCover={existingShareCover}
+              hideMoreActions={hideMoreActions}
             />
           )}
           <div className="music-detail-trend-grid" aria-busy={busy || undefined}>

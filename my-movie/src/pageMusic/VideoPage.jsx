@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
+import { useAuth } from '../context/AuthContext';
 import { matchId } from '../utils/musicDataUtils';
 import ShareButton from '../components/ShareButton/ShareButton';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
@@ -24,11 +25,14 @@ import { useImageReady } from '../utils/useImageReady';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
 import { useMusicMixes } from '../hooks/useMusicMixes';
+import { useSharedMix } from '../hooks/useSharedMix';
 import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
 import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
 import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import { takeMixTrack } from '../Music/YourMixes/mixPlaybackQueue';
 import useImmersiveSheetDrag from '../hooks/useImmersiveSheetDrag';
+import { requestOpenAuthModal } from '../authModalBridge';
+import '../Music/YourMixes/YourMixes.css';
 import {
   useHomeMusicCategoryRecommendations,
   musicHomeRecKey,
@@ -68,8 +72,10 @@ const VideoPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const mixGenre = searchParams.get('mix') || '';
+  const mixShareTokenRaw = String(searchParams.get('ms') || '').trim();
+  const mixGenreParamRaw = searchParams.get('mix') || '';
   const { t } = useTranslation();
+  const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
     allClips,
@@ -117,9 +123,26 @@ const VideoPage = () => {
 
   const video = allVideoData.find((v) => matchId(v.id, id));
   const isConcertVideo = String(video?.type || '').toLowerCase() === 'konsert' || String(video?.type || '').toLowerCase() === 'concert';
-  const clipMixGenre = isConcertVideo ? '' : mixGenre;
-  const { mixes, isLoading: mixesLoading } = useMusicMixes({ enabled: Boolean(clipMixGenre) });
+  const mixShareToken = isConcertVideo ? '' : mixShareTokenRaw;
+  const mixGenreParam = isConcertVideo ? '' : mixGenreParamRaw;
+  const {
+    share: sharedMix,
+    isLoading: shareLoading,
+    error: shareError,
+    expired: shareExpired,
+  } = useSharedMix({ token: mixShareToken, enabled: Boolean(mixShareToken) });
+  const { mixes, isLoading: mixesLoading } = useMusicMixes({
+    enabled: Boolean(mixGenreParam) && !mixShareToken,
+  });
   const narrowMix = useNarrowLayout();
+  const sharedClipOk =
+    Boolean(sharedMix) &&
+    ['klip', 'clip'].includes(String(sharedMix.contentType || '').trim().toLowerCase());
+  const isSharedMix = Boolean(mixShareToken);
+  const clipMixGenre = isSharedMix
+    ? String(sharedMix?.genre || '').trim()
+    : mixGenreParam;
+  const mixMode = isSharedMix || Boolean(mixGenreParam);
   const pageDominantColor = useDominantColor(typeof video?.img === 'string' ? video.img : null);
   const [mixRepeat, setMixRepeat] = useState(false);
   const [mixShuffle, setMixShuffle] = useState(false);
@@ -326,66 +349,119 @@ const VideoPage = () => {
     }
   }, [id, video?.video]);
 
-  const activeClipMix = useMemo(() => {
-    if (!clipMixGenre) return null;
-    return (mixes || []).find(
-      (row) => row.genre === clipMixGenre && (row.contentType || 'music') === 'klip'
-    ) || null;
-  }, [clipMixGenre, mixes]);
+  const activeMixTracks = useMemo(() => {
+    if (isSharedMix) {
+      if (!sharedClipOk) return [];
+      return sharedMix.tracks || [];
+    }
+    if (!mixGenreParam) return [];
+    const mix = (mixes || []).find(
+      (row) => row.genre === mixGenreParam && (row.contentType || 'music') === 'klip'
+    );
+    return mix?.tracks || [];
+  }, [isSharedMix, mixGenreParam, mixes, sharedClipOk, sharedMix]);
 
   const mixTracks = useMemo(() => {
-    if (!activeClipMix) return [];
+    if (!activeMixTracks.length) return [];
     const byId = new Map((allClips || []).map((clip) => [String(clip.id), clip]));
     const out = [];
-    for (const row of activeClipMix.tracks || []) {
+    for (const row of activeMixTracks) {
       const clip = byId.get(String(row.contentId));
       if (!clip || matchId(clip.id, video?.id)) continue;
       out.push(clip);
     }
     return out;
-  }, [activeClipMix, allClips, video?.id]);
+  }, [activeMixTracks, allClips, video?.id]);
 
   const mixPlayTracks = useMemo(() => {
-    if (!activeClipMix) return [];
+    if (!activeMixTracks.length) return [];
     const byId = new Map((allClips || []).map((clip) => [String(clip.id), clip]));
     const out = [];
-    for (const row of activeClipMix.tracks || []) {
+    for (const row of activeMixTracks) {
       const clip = byId.get(String(row.contentId));
       if (clip) out.push(clip);
     }
     return out;
-  }, [activeClipMix, allClips]);
+  }, [activeMixTracks, allClips]);
 
   const mixLabel = useMemo(
-    () => mixSectionLabel({
-      genre: clipMixGenre,
-      tracks: activeClipMix?.tracks,
-      allMusic: allClips,
-      sections: clipSections,
-      t,
-    }),
-    [activeClipMix, allClips, clipMixGenre, clipSections, t]
+    () =>
+      mixSectionLabel({
+        genre: clipMixGenre || mixGenreParam,
+        tracks: activeMixTracks,
+        allMusic: allClips,
+        sections: clipSections,
+        t,
+      }),
+    [activeMixTracks, allClips, clipMixGenre, clipSections, mixGenreParam, t]
   );
 
-  const mixBusy = Boolean(clipMixGenre) && (mixesLoading || clipsLoading) && mixTracks.length === 0;
-  const showMixColumn = Boolean(clipMixGenre) && (mixBusy || mixTracks.length > 0);
+  const mixBusy = isSharedMix
+    ? shareLoading || (sharedClipOk && activeMixTracks.length > 0 && mixPlayTracks.length === 0)
+    : Boolean(mixGenreParam) && (mixesLoading || clipsLoading) && mixTracks.length === 0;
+  const showMixColumn = isSharedMix
+    ? !shareError && (shareLoading || sharedClipOk)
+    : Boolean(mixGenreParam) && (mixBusy || mixTracks.length > 0);
 
   useEffect(() => {
     setMixRepeat(false);
     setMixShuffle(false);
     mixQueueMemoryRef.current = {};
-  }, [clipMixGenre]);
+  }, [mixGenreParam, mixShareToken]);
+
+  useEffect(() => {
+    if (!isSharedMix || shareLoading || !sharedMix) return;
+    const type = String(sharedMix.contentType || 'music').trim().toLowerCase();
+    if (type === 'klip' || type === 'clip') return;
+    const lead = sharedMix.leadId || id;
+    if (lead == null || lead === '') return;
+    navigate(`/music/${lead}?ms=${encodeURIComponent(mixShareToken)}`, { replace: true });
+  }, [id, isSharedMix, mixShareToken, navigate, shareLoading, sharedMix]);
+
+  useEffect(() => {
+    if (!isSharedMix || !sharedMix || !sharedClipOk) return undefined;
+
+    const setMeta = (name, content, isProperty = false) => {
+      const attr = isProperty ? 'property' : 'name';
+      let el = document.querySelector(`meta[${attr}="${name}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content || '');
+    };
+
+    const title = mixLabel || `${sharedMix.genre || 'Mix'} janerdagi mixlar`;
+    const imgRaw = String(sharedMix.coverImg || '').trim();
+    const img = imgRaw
+      ? (/^https?:\/\//i.test(imgRaw) ? imgRaw : `${window.location.origin}${imgRaw.startsWith('/') ? imgRaw : `/${imgRaw}`}`)
+      : '';
+
+    document.title = `${title} | Violet`;
+    setMeta('og:title', title, true);
+    setMeta('og:description', `${sharedMix.tracks?.length || 0} ta klip — Violet Mix`, true);
+    setMeta('og:url', window.location.href, true);
+    setMeta('og:type', 'video.other', true);
+    if (img) setMeta('og:image', img, true);
+    setMeta('twitter:card', 'summary_large_image');
+    setMeta('twitter:title', title);
+    if (img) setMeta('twitter:image', img);
+
+    return undefined;
+  }, [isSharedMix, mixLabel, sharedClipOk, sharedMix]);
 
   const openMixVideo = (clipId) => {
     if (clipId == null || clipId === '') return;
     const params = new URLSearchParams();
-    if (clipMixGenre) params.set('mix', clipMixGenre);
+    if (mixShareToken) params.set('ms', mixShareToken);
+    else if (mixGenreParam) params.set('mix', mixGenreParam);
     const query = params.toString();
     navigate(`/music/video/${clipId}${query ? `?${query}` : ''}`);
   };
 
   const handleVideoEnded = () => {
-    if (clipMixGenre && (mixRepeat || mixShuffle) && video?.id != null) {
+    if (mixMode && (mixRepeat || mixShuffle) && video?.id != null) {
       const next = takeMixTrack(
         { repeat: mixRepeat, shuffle: mixShuffle, tracks: mixPlayTracks },
         mixQueueMemoryRef.current,
@@ -401,13 +477,13 @@ const VideoPage = () => {
     const idx = relatedList.findIndex((v) => v.id === video?.id);
     if (idx >= 0 && idx < relatedList.length - 1) {
       const next = relatedList[idx + 1];
-      if (clipMixGenre) openMixVideo(next.id);
+      if (mixMode) openMixVideo(next.id);
       else navigate(`/music/video/${next.id}`);
     }
   };
 
   const handleCardClick = (clipId) => {
-    if (clipMixGenre) openMixVideo(clipId);
+    if (mixMode) openMixVideo(clipId);
     else navigate(`/music/video/${clipId}`);
   };
 
@@ -486,6 +562,29 @@ const VideoPage = () => {
       aria-busy={showHeroDataSkeleton || undefined}
     >
       <div className="video-detail-container">
+        {isSharedMix && shareExpired ? (
+          <div className="mix-share-guest-banner" role="alert">
+            <p>
+              {t(
+                'music.mixShareExpired',
+                'Bu mix havolasining muddati tugagan. Egasi qayta ulashishi mumkin.'
+              )}
+            </p>
+          </div>
+        ) : null}
+        {isSharedMix && !isLoggedIn && !shareExpired ? (
+          <div className="mix-share-guest-banner" role="status">
+            <p>
+              {t(
+                'music.mixShareGuestHint',
+                'Mixni ko‘rish uchun kiring — 80% / 3 marta formulasi shaxsiy mixga yoziladi.'
+              )}
+            </p>
+            <button type="button" onClick={() => requestOpenAuthModal('login')}>
+              {t('auth.login', 'Kirish')}
+            </button>
+          </div>
+        ) : null}
         <div className="video-detail-layout">
           <div
             className="video-detail-pin"
@@ -749,6 +848,9 @@ const VideoPage = () => {
                   musicId={video?.id}
                   mixGenre={clipMixGenre}
                   contentType="klip"
+                  existingShareToken={isSharedMix ? mixShareToken : ''}
+                  existingShareCover={isSharedMix ? String(sharedMix?.coverImg || '') : ''}
+                  hideMoreActions={isSharedMix}
                 >
                   {renderMixCards()}
                 </MusicDetailMixList>
@@ -777,6 +879,9 @@ const VideoPage = () => {
           musicId={video?.id}
           mixGenre={clipMixGenre}
           contentType="klip"
+          existingShareToken={isSharedMix ? mixShareToken : ''}
+          existingShareCover={isSharedMix ? String(sharedMix?.coverImg || '') : ''}
+          hideMoreActions={isSharedMix}
         >
           {renderMixCards()}
         </MusicDetailMixSheet>

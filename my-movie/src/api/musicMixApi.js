@@ -62,3 +62,60 @@ export const fetchMusicMixes = async () => {
   const mixes = payload?.data?.mixes;
   return Array.isArray(mixes) ? mixes : [];
 };
+
+/**
+ * Egasining mixidan share token.
+ * POST /api/music/mixes/share (auth).
+ * @param {{ genre: string, contentType?: string }} body
+ */
+export const createMixShare = async ({ genre, contentType }) => {
+  const response = await fetch(`${API_BASE_URL}/music/mixes/share`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      genre,
+      ...(contentType ? { contentType } : {}),
+    }),
+  });
+
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+  if (!response.ok || payload?.success === false) {
+    const err = new Error(payload?.message || 'Mix share create failed');
+    err.status = response.status;
+    throw err;
+  }
+  return payload?.data ?? null;
+};
+
+/**
+ * Share snapshot. GET /api/music/mixes/share/:token
+ * Public — mehmon ham o'qiydi. Bazaga yozilmaydi.
+ * @param {string} token
+ */
+export const fetchMixShare = async (token) => {
+  const key = String(token || '').trim();
+  if (!key) return null;
+
+  const response = await fetch(
+    `${API_BASE_URL}/music/mixes/share/${encodeURIComponent(key)}`,
+    { credentials: 'include' }
+  );
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+  if (!response.ok || payload?.success === false) {
+    const err = new Error(payload?.message || 'Mix share not found');
+    err.status = response.status;
+    throw err;
+  }
+  return payload?.data ?? null;
+};

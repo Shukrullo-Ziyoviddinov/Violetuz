@@ -9,8 +9,10 @@
 
 const MusicMixPlayCount = require('./MusicMixPlayCount.model');
 const MusicMix = require('./MusicMix.model');
+const MusicMixShare = require('./MusicMixShare.model');
 
 module.exports = {
   MusicMixPlayCount,
   MusicMix,
+  MusicMixShare,
 };

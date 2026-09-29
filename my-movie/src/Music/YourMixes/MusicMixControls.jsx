@@ -11,8 +11,13 @@ const MusicMixControls = ({
   musicId,
   mixGenre,
   contentType = 'music',
+  existingShareToken = '',
+  existingShareCover = '',
+  /** Boshqa odamning shared mixi — ⋯ / share / saqlash yo'q */
+  hideMoreActions = false,
 }) => {
   const [moreOpen, setMoreOpen] = useState(false);
+  const allowMore = !hideMoreActions;
 
   return (
   <div className="music-mix-controls">
@@ -41,28 +46,34 @@ const MusicMixControls = ({
         />
       </svg>
     </button>
-    <button
-      type="button"
-      className="music-mix-controls-more"
-      aria-label="Yana"
-      aria-expanded={moreOpen}
-      onClick={() => setMoreOpen(true)}
-    >
-      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"
+    {allowMore ? (
+      <>
+        <button
+          type="button"
+          className="music-mix-controls-more"
+          aria-label="Yana"
+          aria-expanded={moreOpen}
+          onClick={() => setMoreOpen(true)}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"
+            />
+          </svg>
+        </button>
+        <MusicMixMoreSheet
+          open={moreOpen}
+          onClose={() => setMoreOpen(false)}
+          label={label}
+          musicId={musicId}
+          mixGenre={mixGenre}
+          contentType={contentType}
+          existingShareToken={existingShareToken}
+          existingShareCover={existingShareCover}
         />
-      </svg>
-    </button>
-    <MusicMixMoreSheet
-      open={moreOpen}
-      onClose={() => setMoreOpen(false)}
-      label={label}
-      musicId={musicId}
-      mixGenre={mixGenre}
-      contentType={contentType}
-    />
+      </>
+    ) : null}
   </div>
   );
 };

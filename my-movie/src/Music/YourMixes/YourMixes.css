@@ -200,3 +200,35 @@
 .your-mixes-card--skeleton {
   pointer-events: none;
 }
+
+.mix-share-guest-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.mix-share-guest-banner p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.mix-share-guest-banner button {
+  flex-shrink: 0;
+  padding: 0.4rem 0.85rem;
+  border: none;
+  border-radius: 999px;
+  background: #9b4fe7;
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}

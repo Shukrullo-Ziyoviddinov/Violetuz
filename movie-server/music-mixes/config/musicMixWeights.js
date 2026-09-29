@@ -42,6 +42,12 @@ const musicMixWeights = {
 
   /** Tayyor mixni qayta yig'ish oralig'i (ms). */
   precomputeIntervalMs: 6 * 60 * 60 * 1000,
+
+  /**
+   * Share snapshot TTL (ms). Muddat o'tgach GET 404.
+   * Qabul qiluvchi bazasiga yozilmaydi — faqat o'qish.
+   */
+  shareTtlMs: 90 * 24 * 60 * 60 * 1000,
 };
 
 module.exports = {

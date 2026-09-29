@@ -19,6 +19,7 @@ const ShareButton = ({
   buttonClassName = '',
   icon = 'nodes', // 'nodes' | 'send' (yuborish)
   sharePath = null, // ixtiyoriy: joriy pathname o‘rniga
+  absoluteUrl = null, // ixtiyoriy: to'liq URL (OG card va h.k.)
 }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
@@ -51,7 +52,8 @@ const ShareButton = ({
     return movie?.title || '';
   };
 
-  const shareUrl = getShareUrl(sharePath || location.pathname);
+  const abs = String(absoluteUrl || '').trim();
+  const shareUrl = abs || getShareUrl(sharePath || location.pathname);
   const shareText = getMovieTitle();
 
   const shareLinks = [

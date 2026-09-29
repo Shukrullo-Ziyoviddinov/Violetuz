@@ -24,10 +24,13 @@ import {
 import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import { useAuth } from '../context/AuthContext';
 import { useMusicMixes } from '../hooks/useMusicMixes';
+import { useSharedMix } from '../hooks/useSharedMix';
 import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
 import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
 import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import { recordViewRequest } from '../api/viewsApi';
+import { requestOpenAuthModal } from '../authModalBridge';
+import '../Music/YourMixes/YourMixes.css';
 import './MusicDetail.css';
 
 const TREND_SKELETON_COUNT = 8;
@@ -241,10 +244,24 @@ const MusicDetail = () => {
 
   const [searchParams] = useSearchParams();
   const fromSection = searchParams.get('section') || location.state?.fromSection;
-  const mixGenre = searchParams.get('mix') || '';
+  const mixShareToken = String(searchParams.get('ms') || '').trim();
+  const mixGenreParam = searchParams.get('mix') || '';
   const music = ensureArray(allMusic).find((m) => matchId(m.id, id));
-  const { mixes, isLoading: mixesLoading } = useMusicMixes({ enabled: Boolean(mixGenre) });
+  const {
+    share: sharedMix,
+    isLoading: shareLoading,
+    error: shareError,
+    expired: shareExpired,
+  } = useSharedMix({ token: mixShareToken, enabled: Boolean(mixShareToken) });
+  const { mixes, isLoading: mixesLoading } = useMusicMixes({
+    enabled: Boolean(mixGenreParam) && !mixShareToken,
+  });
   const narrowMix = useNarrowLayout();
+  const isSharedMix = Boolean(mixShareToken);
+  const mixGenre = isSharedMix
+    ? String(sharedMix?.genre || '').trim()
+    : mixGenreParam;
+  const mixMode = isSharedMix || Boolean(mixGenreParam);
 
   const pageArtist = useMemo(() => {
     if (!music) return null;
@@ -261,10 +278,10 @@ const MusicDetail = () => {
     }) || null;
   };
 
-  const sectionConfig = mixGenre
+  const sectionConfig = mixMode
     ? (music ? findSectionForMusicId(music.id) : null)
     : (fromSection ? sectionById[fromSection] : (music ? findSectionForMusicId(music.id) : null));
-  const resolvedSection = mixGenre ? sectionConfig?.id : (fromSection || sectionConfig?.id);
+  const resolvedSection = mixMode ? sectionConfig?.id : (fromSection || sectionConfig?.id);
 
   const detailRecRequests = useMemo(() => {
     const category = sectionConfig?.categoryNameMusic;
@@ -289,49 +306,52 @@ const MusicDetail = () => {
     return ensureArray(allMusic);
   }, [music, sectionConfig, getMusicByCategory, allMusic]);
 
-  const mixTracks = useMemo(() => {
-    if (!mixGenre) return [];
+  const activeMixTracks = useMemo(() => {
+    if (isSharedMix) {
+      if (!sharedMix?.tracks?.length) return [];
+      return sharedMix.tracks;
+    }
+    if (!mixGenreParam) return [];
     const mix = (mixes || []).find(
-      (row) => row.genre === mixGenre && (row.contentType || 'music') === 'music'
+      (row) => row.genre === mixGenreParam && (row.contentType || 'music') === 'music'
     );
-    if (!mix) return [];
+    return mix?.tracks || [];
+  }, [isSharedMix, mixGenreParam, mixes, sharedMix]);
+
+  const mixTracks = useMemo(() => {
+    if (!activeMixTracks.length) return [];
     const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
     const out = [];
-    for (const row of mix.tracks || []) {
+    for (const row of activeMixTracks) {
       const track = byId.get(String(row.contentId));
       if (!track || matchId(track.id, music?.id)) continue;
       out.push(track);
     }
     return out;
-  }, [allMusic, mixGenre, mixes, music?.id]);
+  }, [activeMixTracks, allMusic, music?.id]);
 
-  const mixLabel = useMemo(() => {
-    const mix = (mixes || []).find(
-      (row) => row.genre === mixGenre && (row.contentType || 'music') === 'music'
-    );
-    return mixSectionLabel({
-      genre: mixGenre,
-      tracks: mix?.tracks,
-      allMusic,
-      sections,
-      t,
-    });
-  }, [allMusic, mixGenre, mixes, sections, t]);
+  const mixLabel = useMemo(
+    () =>
+      mixSectionLabel({
+        genre: mixGenre || mixGenreParam,
+        tracks: activeMixTracks,
+        allMusic,
+        sections,
+        t,
+      }),
+    [activeMixTracks, allMusic, mixGenre, mixGenreParam, sections, t]
+  );
 
   const mixPlayTracks = useMemo(() => {
-    if (!mixGenre) return [];
-    const mix = (mixes || []).find(
-      (row) => row.genre === mixGenre && (row.contentType || 'music') === 'music'
-    );
-    if (!mix) return [];
+    if (!activeMixTracks.length) return [];
     const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
     const out = [];
-    for (const row of mix.tracks || []) {
+    for (const row of activeMixTracks) {
       const track = byId.get(String(row.contentId));
       if (track) out.push(track);
     }
     return out;
-  }, [allMusic, mixGenre, mixes]);
+  }, [activeMixTracks, allMusic]);
 
   const [mixRepeat, setMixRepeat] = useState(false);
   const [mixShuffle, setMixShuffle] = useState(false);
@@ -487,12 +507,55 @@ const MusicDetail = () => {
   }, [trendList, sectionConfig, setPlaylistFromPage]);
 
   useEffect(() => {
-    setMixRepeat(false);
-    setMixShuffle(false);
-  }, [mixGenre]);
+    if (!isSharedMix || shareLoading || !sharedMix) return;
+    const type = String(sharedMix.contentType || 'music').trim().toLowerCase();
+    if (type !== 'klip' && type !== 'clip') return;
+    const lead = sharedMix.leadId || id;
+    if (lead == null || lead === '') return;
+    navigate(`/music/video/${lead}?ms=${encodeURIComponent(mixShareToken)}`, { replace: true });
+  }, [id, isSharedMix, mixShareToken, navigate, shareLoading, sharedMix]);
 
   useEffect(() => {
-    if (!mixGenre || (!mixRepeat && !mixShuffle)) {
+    setMixRepeat(false);
+    setMixShuffle(false);
+  }, [mixGenreParam, mixShareToken]);
+
+  useEffect(() => {
+    if (!isSharedMix || !sharedMix) return undefined;
+
+    const setMeta = (name, content, isProperty = false) => {
+      const attr = isProperty ? 'property' : 'name';
+      let el = document.querySelector(`meta[${attr}="${name}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content || '');
+    };
+
+    const title = mixLabel || `${sharedMix.genre || 'Mix'} janerdagi mixlar`;
+    const imgRaw = String(sharedMix.coverImg || '').trim();
+    const img = imgRaw
+      ? (/^https?:\/\//i.test(imgRaw) ? imgRaw : `${window.location.origin}${imgRaw.startsWith('/') ? imgRaw : `/${imgRaw}`}`)
+      : '';
+    const pageUrl = window.location.href;
+
+    document.title = `${title} | Violet`;
+    setMeta('og:title', title, true);
+    setMeta('og:description', `${sharedMix.tracks?.length || 0} ta trek — Violet Mix`, true);
+    setMeta('og:url', pageUrl, true);
+    setMeta('og:type', 'music.playlist', true);
+    if (img) setMeta('og:image', img, true);
+    setMeta('twitter:card', 'summary_large_image');
+    setMeta('twitter:title', title);
+    if (img) setMeta('twitter:image', img);
+
+    return undefined;
+  }, [isSharedMix, mixLabel, sharedMix]);
+
+  useEffect(() => {
+    if (!mixMode || (!mixRepeat && !mixShuffle)) {
       setMixPlayback(null);
       return undefined;
     }
@@ -502,7 +565,7 @@ const MusicDetail = () => {
       tracks: mixPlayTracks,
     });
     return () => setMixPlayback(null);
-  }, [mixGenre, mixPlayTracks, mixRepeat, mixShuffle, setMixPlayback]);
+  }, [mixMode, mixPlayTracks, mixRepeat, mixShuffle, setMixPlayback]);
 
   // Lyrics tugmasi - sahifa o'zgaganda yoki openLyrics state kelganda
   useEffect(() => {
@@ -668,8 +731,19 @@ const MusicDetail = () => {
 
   const pageBusy = showHeroDataSkeleton || undefined;
 
-  const showMixColumn = Boolean(mixGenre) && (mixesLoading || mixTracks.length > 0);
-  const mixBusy = mixesLoading && mixTracks.length === 0;
+  const showMixColumn = isSharedMix
+    ? !shareError && (shareLoading || Boolean(sharedMix?.tracks?.length))
+    : Boolean(mixGenreParam) && (mixesLoading || mixTracks.length > 0);
+  const mixBusy = isSharedMix
+    ? shareLoading || (Boolean(sharedMix?.tracks?.length) && mixPlayTracks.length === 0)
+    : mixesLoading && mixTracks.length === 0;
+
+  const mixQueryForNav = () => {
+    const params = new URLSearchParams();
+    if (mixShareToken) params.set('ms', mixShareToken);
+    else if (mixGenreParam) params.set('mix', mixGenreParam);
+    return params.toString();
+  };
 
   const renderMixCards = () =>
     (mixBusy ? trendSkeletonItems : mixTracks).map((item) => {
@@ -692,7 +766,8 @@ const MusicDetail = () => {
             toggleWishlist(itemId, 'music');
           }}
           onOpen={(itemId) => {
-            navigate(`/music/${itemId}?mix=${encodeURIComponent(mixGenre)}`);
+            const query = mixQueryForNav();
+            navigate(`/music/${itemId}${query ? `?${query}` : ''}`);
           }}
           analyserRef={analyserRef}
           isPlaying={isPlaying}
@@ -741,7 +816,8 @@ const MusicDetail = () => {
               onOpen={(itemId) => {
                 const params = new URLSearchParams();
                 if (resolvedSection) params.set('section', resolvedSection);
-                if (mixGenre) params.set('mix', mixGenre);
+                if (mixShareToken) params.set('ms', mixShareToken);
+                else if (mixGenreParam) params.set('mix', mixGenreParam);
                 const query = params.toString();
                 navigate(`/music/${itemId}${query ? `?${query}` : ''}`);
               }}
@@ -759,6 +835,29 @@ const MusicDetail = () => {
   return (
     <div className="music-detail" aria-busy={pageBusy}>
       <div className="music-detail-container">
+        {isSharedMix && shareExpired ? (
+          <div className="mix-share-guest-banner" role="alert">
+            <p>
+              {t(
+                'music.mixShareExpired',
+                'Bu mix havolasining muddati tugagan. Egasi qayta ulashishi mumkin.'
+              )}
+            </p>
+          </div>
+        ) : null}
+        {isSharedMix && !isLoggedIn && !shareExpired ? (
+          <div className="mix-share-guest-banner" role="status">
+            <p>
+              {t(
+                'music.mixShareGuestHint',
+                'Mixni tinglash uchun kiring — 80% / 3 marta formulasi shaxsiy mixga yoziladi.'
+              )}
+            </p>
+            <button type="button" onClick={() => requestOpenAuthModal('login')}>
+              {t('auth.login', 'Kirish')}
+            </button>
+          </div>
+        ) : null}
         <div className="music-detail-layout">
           <div className="music-detail-left-scroll">
             <div className="music-detail-top" style={topStyle}>
@@ -1059,6 +1158,9 @@ const MusicDetail = () => {
                   musicId={music?.id}
                   mixGenre={mixGenre}
                   contentType="music"
+                  existingShareToken={isSharedMix ? mixShareToken : ''}
+                  existingShareCover={isSharedMix ? String(sharedMix?.coverImg || '') : ''}
+                  hideMoreActions={isSharedMix}
                 >
                   {renderMixCards()}
                 </MusicDetailMixList>
@@ -1083,6 +1185,9 @@ const MusicDetail = () => {
           musicId={music?.id}
           mixGenre={mixGenre}
           contentType="music"
+          existingShareToken={isSharedMix ? mixShareToken : ''}
+          existingShareCover={isSharedMix ? String(sharedMix?.coverImg || '') : ''}
+          hideMoreActions={isSharedMix}
         >
           {renderMixCards()}
         </MusicDetailMixSheet>
