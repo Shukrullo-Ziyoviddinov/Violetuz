@@ -14,6 +14,7 @@ import { markNeedsAvatar, clearNeedsAvatar } from '../../authModalBridge';
 import { clearWatchHistory as clearGuestMovieWatchHistory } from '../../utils/localStorage/guestHistory/movieGuestHistory';
 import { clearListenHistory as clearGuestMusicListenHistory } from '../../utils/localStorage/guestHistory/musicGuestHistory';
 import { clearViewedMoviesHistory } from '../../context/ViewedMoviesContext';
+import { useModalHardwareBack } from '../../useModalHardwareBack';
 import '../Profile/ProfileEditModal.css';
 import './AuthModal.css';
 
@@ -56,6 +57,40 @@ const AuthModal = ({
   const avatarInputRef = useRef(null);
   const pendingFileRef = useRef(null);
   const previewUrlRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  const onStepChangeRef = useRef(onStepChange);
+  const stepRef = useRef(step);
+  onCloseRef.current = onClose;
+  onStepChangeRef.current = onStepChange;
+  stepRef.current = step;
+
+  const beginCloseFromHardware = useCallback(() => {
+    if (stepRef.current === 'avatar') return;
+    onCloseRef.current?.();
+  }, []);
+
+  const { releaseHistory, abandonHistory } = useModalHardwareBack({
+    historyKey: 'violetAuthModal',
+    isOpen: true,
+    onCloseFromHardware: beginCloseFromHardware,
+    hasNested: step === 'verify' || step === 'avatar',
+    onNestedBack: () => {
+      if (stepRef.current === 'verify') {
+        onStepChangeRef.current?.('form');
+      }
+    },
+  });
+
+  const requestClose = useCallback(() => {
+    if (stepRef.current === 'avatar') return;
+    releaseHistory();
+    onCloseRef.current?.();
+  }, [releaseHistory]);
+
+  const closeAfterSuccess = useCallback(() => {
+    abandonHistory();
+    onCloseRef.current?.();
+  }, [abandonHistory]);
 
   const revokePreviewUrl = useCallback(() => {
     if (previewUrlRef.current) {
@@ -206,7 +241,7 @@ const AuthModal = ({
           password,
         });
         setAuthSession({ user: data.user });
-        onClose?.();
+        closeAfterSuccess();
       }
     } catch (err) {
       setError(err.message || 'Xatolik yuz berdi');
@@ -242,7 +277,7 @@ const AuthModal = ({
         resetAvatarPick();
       } else {
         setAuthSession({ user: data.user });
-        onClose?.();
+        closeAfterSuccess();
       }
     } catch (err) {
       setError(err.message || 'Kod noto‘g‘ri');
@@ -304,7 +339,7 @@ const AuthModal = ({
       clearNeedsAvatar();
       revokePreviewUrl();
       pendingFileRef.current = null;
-      onClose?.();
+      closeAfterSuccess();
     } catch (err) {
       setError(err.message || 'Rasm yuklanmadi');
     } finally {
@@ -339,7 +374,7 @@ const AuthModal = ({
         <button
           type="button"
           className="auth-modal-close"
-          onClick={onClose}
+          onClick={requestClose}
           aria-label="Yopish"
         >
           ×
