@@ -71,9 +71,20 @@
 }
 
 .wishlist-mix-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
+}
+
+.wishlist-mix-grid .your-mixes-card {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 500px) {
+  .wishlist-mix-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .wishlist-music-item {
