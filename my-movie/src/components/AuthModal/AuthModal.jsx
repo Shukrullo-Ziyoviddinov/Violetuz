@@ -29,6 +29,48 @@ const AVATAR_MIME = new Set([
   'image/gif',
 ]);
 
+const IconPerson = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2h19.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z"
+    />
+  </svg>
+);
+
+const IconLock = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M18 8.4h-1.2V6c0-2.65-2.15-4.8-4.8-4.8S7.2 3.35 7.2 6v2.4H6c-1.32 0-2.4 1.08-2.4 2.4v9.6c0 1.32 1.08 2.4 2.4 2.4h12c1.32 0 2.4-1.08 2.4-2.4v-9.6c0-1.32-1.08-2.4-2.4-2.4zM12 17.4c-1.32 0-2.4-1.08-2.4-2.4S10.68 12.6 12 12.6s2.4 1.08 2.4 2.4-1.08 2.4-2.4 2.4zm3.72-9H8.28V6c0-2.05 1.67-3.72 3.72-3.72S15.72 3.95 15.72 6v2.4z"
+    />
+  </svg>
+);
+
+const IconMail = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5L4 8V6l8 5 8-5v2z"
+    />
+  </svg>
+);
+
+const IconArrowForward = () => (
+  <svg
+    className="auth-modal-submit-icon"
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    aria-hidden="true"
+  >
+    <path
+      fill="currentColor"
+      d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+    />
+  </svg>
+);
+
 const AuthModal = ({
   mode = 'register',
   step = 'form',
@@ -349,6 +391,7 @@ const AuthModal = ({
 
   const usernameInputClass = [
     'auth-modal-input',
+    'auth-modal-input--with-leading',
     'auth-modal-input--with-icon',
     usernameStatus === 'taken' || usernameStatus === 'invalid'
       ? 'auth-modal-input--invalid'
@@ -412,21 +455,29 @@ const AuthModal = ({
                   <label className="auth-modal-label" htmlFor="auth-name">
                     Ism yoki Tahallus
                   </label>
-                  <input
-                    id="auth-name"
-                    className="auth-modal-input profile-edit-input"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    placeholder="Bekzodbek yoki Akasi"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
+                  <div className="auth-modal-input-wrap">
+                    <span className="auth-modal-input-leading" aria-hidden="true">
+                      <IconPerson />
+                    </span>
+                    <input
+                      id="auth-name"
+                      className="auth-modal-input auth-modal-input--with-leading profile-edit-input"
+                      name="name"
+                      type="text"
+                      autoComplete="name"
+                      placeholder="Bekzodbek yoki Akasi"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
 
                   <label className="auth-modal-label" htmlFor="auth-username">
                     Username (Login)
                   </label>
                   <div className="auth-modal-input-wrap">
+                    <span className="auth-modal-input-leading" aria-hidden="true">
+                      <IconPerson />
+                    </span>
                     <input
                       id="auth-username"
                       className={usernameInputClass}
@@ -477,9 +528,12 @@ const AuthModal = ({
                     Parol
                   </label>
                   <div className="auth-modal-input-wrap">
+                    <span className="auth-modal-input-leading" aria-hidden="true">
+                      <IconLock />
+                    </span>
                     <input
                       id="auth-password"
-                      className="auth-modal-input auth-modal-input--with-icon"
+                      className="auth-modal-input auth-modal-input--with-leading auth-modal-input--with-icon"
                       name="password"
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="new-password"
@@ -558,42 +612,55 @@ const AuthModal = ({
                       <label className="auth-modal-label" htmlFor="auth-login-email">
                         Gmail manzil
                       </label>
-                      <input
-                        id="auth-login-email"
-                        className="auth-modal-input"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        placeholder="example@gmail.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
+                      <div className="auth-modal-input-wrap">
+                        <span className="auth-modal-input-leading" aria-hidden="true">
+                          <IconMail />
+                        </span>
+                        <input
+                          id="auth-login-email"
+                          className="auth-modal-input auth-modal-input--with-leading"
+                          name="email"
+                          type="email"
+                          autoComplete="email"
+                          placeholder="example@gmail.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
                     </>
                   ) : (
                     <>
                       <label className="auth-modal-label" htmlFor="auth-login-username">
                         Username
                       </label>
-                      <input
-                        id="auth-login-username"
-                        className="auth-modal-input"
-                        name="username"
-                        type="text"
-                        autoComplete="username"
-                        placeholder="username_01"
-                        value={username}
-                        onChange={(e) =>
-                          setUsername(e.target.value.replace(/^@+/, '').replace(/\s/g, ''))
-                        }
-                      />
+                      <div className="auth-modal-input-wrap">
+                        <span className="auth-modal-input-leading" aria-hidden="true">
+                          <IconPerson />
+                        </span>
+                        <input
+                          id="auth-login-username"
+                          className="auth-modal-input auth-modal-input--with-leading"
+                          name="username"
+                          type="text"
+                          autoComplete="username"
+                          placeholder="username_01"
+                          value={username}
+                          onChange={(e) =>
+                            setUsername(e.target.value.replace(/^@+/, '').replace(/\s/g, ''))
+                          }
+                        />
+                      </div>
 
                       <label className="auth-modal-label" htmlFor="auth-login-password">
                         Parol
                       </label>
                       <div className="auth-modal-input-wrap">
+                        <span className="auth-modal-input-leading" aria-hidden="true">
+                          <IconLock />
+                        </span>
                         <input
                           id="auth-login-password"
-                          className="auth-modal-input auth-modal-input--with-icon"
+                          className="auth-modal-input auth-modal-input--with-leading auth-modal-input--with-icon"
                           name="password"
                           type={showPassword ? 'text' : 'password'}
                           autoComplete="current-password"
@@ -634,16 +701,21 @@ const AuthModal = ({
                   <label className="auth-modal-label" htmlFor="auth-email">
                     Gmail manzil
                   </label>
-                  <input
-                    id="auth-email"
-                    className="auth-modal-input"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="example@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+                  <div className="auth-modal-input-wrap">
+                    <span className="auth-modal-input-leading" aria-hidden="true">
+                      <IconMail />
+                    </span>
+                    <input
+                      id="auth-email"
+                      className="auth-modal-input auth-modal-input--with-leading"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="example@gmail.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                 </>
               )}
 
@@ -659,6 +731,7 @@ const AuthModal = ({
                     : loginMethod === 'username'
                       ? 'Hisobga kirish'
                       : 'Davom etish'}
+                {!busy ? <IconArrowForward /> : null}
               </button>
             </form>
 
@@ -733,6 +806,7 @@ const AuthModal = ({
                 disabled={busy || code.length !== 6}
               >
                 {busy ? 'Tekshirilmoqda...' : 'Tasdiqlash'}
+                {!busy ? <IconArrowForward /> : null}
               </button>
 
               <button
@@ -869,6 +943,7 @@ const AuthModal = ({
                 disabled={busy || !avatarReady}
               >
                 {busy ? 'Yuklanmoqda...' : 'Davom etish'}
+                {!busy && avatarReady ? <IconArrowForward /> : null}
               </button>
             </form>
           </>
