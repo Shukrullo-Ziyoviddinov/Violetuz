@@ -157,6 +157,9 @@ const MusicMixMoreSheet = ({
     setEntered(false);
     setDragY(null);
     setPressed(false);
+    setShareMeta(null);
+    setShareFailed(false);
+    setShareBusy(true);
     setPresent(true);
   }, [open]);
 
@@ -250,6 +253,9 @@ const MusicMixMoreSheet = ({
 
   const panelStyle = dragY != null ? { transform: `translateY(${dragY}px)` } : undefined;
   const shareReady = Boolean(sharePath);
+  // Desktop center panel opacity 0→1 (~480ms): API tez bo'lsa loading ko'rinmasdan o'tib ketardi.
+  // Modal ochilishi tugaguncha yuklanmoqda qoladi.
+  const showActions = shareReady && !shareBusy && (entered || closing);
 
   return createPortal(
     <div
@@ -290,9 +296,27 @@ const MusicMixMoreSheet = ({
             <span />
           </div>
         )}
+        {!narrow && (
+          <button
+            type="button"
+            className="music-mix-more-close"
+            aria-label={t('common.close', 'Yopish')}
+            onClick={requestClose}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                d="M18 6L6 18M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
         <div className="music-mix-more-actions">
-          {!shareReady ? (
-            <p className="music-mix-more-loading" aria-live="polite" aria-busy={shareBusy || undefined}>
+          {!showActions ? (
+            <p className="music-mix-more-loading" aria-live="polite" aria-busy={!shareFailed || undefined}>
               {shareFailed && !shareBusy
                 ? t('music.mixShareUnavailable', 'Ulashish hozir mumkin emas')
                 : t('music.mixShareLoading', 'Yuklanmoqda…')}
