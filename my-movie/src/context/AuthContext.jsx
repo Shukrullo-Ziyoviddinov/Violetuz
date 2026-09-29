@@ -22,6 +22,7 @@ import {
 } from '../accounts/accountsStorage';
 import { clearWatchHistory as clearGuestMovieWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
 import { clearListenHistory as clearGuestMusicListenHistory } from '../utils/localStorage/guestHistory/musicGuestHistory';
+import { clearMixPlayCounts as clearGuestMixPlayCounts } from '../utils/localStorage/guestHistory/musicMixGuestPlayCounts';
 import { clearViewedMoviesHistory } from './ViewedMoviesContext';
 
 /** @deprecated Redux Provider yetarli — eski importlar buzilmasligi uchun qoldirilgan */
@@ -62,6 +63,8 @@ export const useAuth = () => {
       const user = payload?.user;
       if (user) {
         upsertAccountFromSession(user);
+        // Mix guest ledger: login/register/session — DB sync yo‘q, faqat wipe
+        clearGuestMixPlayCounts();
       }
     },
     [dispatch]
@@ -103,6 +106,7 @@ export const useAuth = () => {
     // tozalangan bo‘lishi mumkin; login oldidan qolgan bo‘lsa ham revive yo‘q).
     clearGuestMovieWatchHistory();
     clearGuestMusicListenHistory();
+    clearGuestMixPlayCounts();
     clearViewedMoviesHistory();
   }, [dispatch, profile?.id]);
 

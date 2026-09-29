@@ -2,9 +2,12 @@
  * Mix uchun bitta signal. Progress reporterdan alohida.
  * Bar surilishi o‘zi marta emas. Pleer yurib qo‘shiqning 80% joyiga
  * yetganda bir marta ketadi. Orqaga qaytsa keyingi 80% yangi marta.
- * Server shu 80% ni yana o‘zi tekshiradi.
+ *
+ * Login → POST /music/mixes/play (server qayta tekshiradi).
+ * Mehmon → faqat local violet_guest_music_mix_plays_v1 (serverga so‘rov yo‘q).
  */
 import { postMixPlay } from '../api/musicMixApi';
+import { recordMixPlay as recordGuestMixPlay } from './localStorage/guestHistory/musicMixGuestPlayCounts';
 
 /** music-mixes config dagi minListenRatio bilan bir xil. */
 export const MIX_LISTEN_RATIO = 0.8;
@@ -69,13 +72,20 @@ export function createMusicMixPlaySignal() {
   };
 
   /**
-   * @param {{ isLoggedIn?: boolean, currentTime?: number, durationSec?: number, isPlaying?: boolean }} input
+   * @param {{
+   *   isLoggedIn?: boolean,
+   *   currentTime?: number,
+   *   durationSec?: number,
+   *   isPlaying?: boolean,
+   *   genre?: string,
+   * }} input
    */
   const note = ({
     isLoggedIn = false,
     currentTime = 0,
     durationSec = 0,
     isPlaying = false,
+    genre = '',
   } = {}) => {
     const time = Number(currentTime);
     const duration = Number(durationSec);
@@ -88,7 +98,7 @@ export function createMusicMixPlaySignal() {
       prev != null && (time - prev > SEEK_FORWARD_SEC || prev - time > SEEK_BACK_SEC);
     lastTime = time;
 
-    if (!isLoggedIn || !sessionId || !contentId) return;
+    if (!sessionId || !contentId) return;
 
     const reached = isMixListenReached(time, duration);
     if (!reached) {
@@ -107,6 +117,23 @@ export function createMusicMixPlaySignal() {
 
     armed = false;
     hold = false;
+
+    if (!isLoggedIn) {
+      const result = recordGuestMixPlay({
+        contentId,
+        contentType: 'music',
+        sessionId,
+        genre,
+      });
+      if (result.counted || result.sameSession) {
+        sent = true;
+      } else {
+        armed = true;
+        retryAt = Date.now() + 1500;
+      }
+      return;
+    }
+
     pending = true;
     postMixPlay({
       contentId,
@@ -136,4 +163,4 @@ export function createMusicMixPlaySignal() {
   };
 
   return { begin, clear, note };
-};
+}

@@ -3,6 +3,7 @@ import { fetchMe } from '../api/authApi';
 import { useAppDispatch } from '../store/hooks';
 import { setAuthSession, clearAuthSession, setAuthReady } from '../store/slices/userSlice';
 import { upsertAccountFromSession } from '../accounts/accountsStorage';
+import { clearMixPlayCounts as clearGuestMixPlayCounts } from '../utils/localStorage/guestHistory/musicMixGuestPlayCounts';
 
 /** App ochilganda httpOnly cookie orqali sessiyani tiklaydi */
 const AuthSessionBootstrap = () => {
@@ -18,6 +19,8 @@ const AuthSessionBootstrap = () => {
         if (data?.user) {
           dispatch(setAuthSession({ user: data.user }));
           upsertAccountFromSession(data.user);
+          // Cookie restore AuthContext.setAuthSession o‘tmaydi — mix guest ledger wipe
+          clearGuestMixPlayCounts();
         } else {
           dispatch(clearAuthSession());
         }

@@ -19,6 +19,8 @@ const MusicVideoPlayer = forwardRef(({
   contentType = null,
   contentId = null,
   categoryNameMusic = null,
+  /** Mix janr (catalog genre) — guest local ledger uchun */
+  genre = null,
 }, ref) => {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
@@ -27,6 +29,8 @@ const MusicVideoPlayer = forwardRef(({
   const settingsBtnRef = useRef(null);
   const listenProgressRef = useRef(null);
   const clipWatchRef = useRef(null);
+  const genreRef = useRef(genre);
+  genreRef.current = genre;
   if (!listenProgressRef.current) {
     listenProgressRef.current = createMusicListenProgressReporter();
   }
@@ -143,6 +147,7 @@ const MusicVideoPlayer = forwardRef(({
       isLoggedIn: isLoggedInRef.current,
       currentTime: time,
       durationSec: duration,
+      genre: String(genreRef.current || '').trim(),
     });
   };
 

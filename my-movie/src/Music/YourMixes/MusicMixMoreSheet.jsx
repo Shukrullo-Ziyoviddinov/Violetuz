@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import ShareButton from '../../components/ShareButton/ShareButton';
 import { createMixShare } from '../../api/musicMixApi';
 import { resolveApiBaseUrl } from '../../api/apiBase';
+import { useAuth } from '../../context/AuthContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useNarrowLayout } from './MusicDetailMixSheet';
 import './MusicMixMoreSheet.css';
@@ -34,11 +35,13 @@ const MusicMixMoreSheet = ({
   existingShareCover = '',
 }) => {
   const { t } = useTranslation();
+  const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const mixType = mixContentType(contentType);
   const wishlistId = mixGenre ? `${mixType}:${mixGenre}` : '';
   const saved = Boolean(wishlistId) && isInWishlist(wishlistId, 'mix');
   const narrow = useNarrowLayout();
+  const canShare = Boolean(isLoggedIn);
   const panelRef = useRef(null);
   const dragRef = useRef(null);
   const closeTimerRef = useRef(null);
@@ -71,6 +74,14 @@ const MusicMixMoreSheet = ({
 
   useEffect(() => {
     if (!open) {
+      setShareMeta(null);
+      setShareBusy(false);
+      setShareFailed(false);
+      return undefined;
+    }
+
+    // Mehmon: share token serverda — createMixShare chaqirilmaydi
+    if (!canShare) {
       setShareMeta(null);
       setShareBusy(false);
       setShareFailed(false);
@@ -125,7 +136,7 @@ const MusicMixMoreSheet = ({
     return () => {
       cancelled = true;
     };
-  }, [open, mixGenre, mixType, musicId, fallbackToken, existingShareCover]);
+  }, [open, canShare, mixGenre, mixType, musicId, fallbackToken, existingShareCover]);
 
   const finishClose = () => {
     setClosing(false);
@@ -159,9 +170,9 @@ const MusicMixMoreSheet = ({
     setPressed(false);
     setShareMeta(null);
     setShareFailed(false);
-    setShareBusy(true);
+    setShareBusy(canShare);
     setPresent(true);
-  }, [open]);
+  }, [open, canShare]);
 
   useEffect(() => {
     if (!open || !present) return undefined;
@@ -255,7 +266,10 @@ const MusicMixMoreSheet = ({
   const shareReady = Boolean(sharePath);
   // Desktop center panel opacity 0→1 (~480ms): API tez bo'lsa loading ko'rinmasdan o'tib ketardi.
   // Modal ochilishi tugaguncha yuklanmoqda qoladi.
-  const showActions = shareReady && !shareBusy && (entered || closing);
+  // Mehmon: share yo'q — faqat Saqlash (entered dan keyin).
+  const showActions = canShare
+    ? shareReady && !shareBusy && (entered || closing)
+    : entered || closing;
 
   return createPortal(
     <div
@@ -323,16 +337,18 @@ const MusicMixMoreSheet = ({
             </p>
           ) : (
             <>
-              <ShareButton
-                movie={{ id: leadId, title, img: coverImg }}
-                sharePath={sharePath}
-                absoluteUrl={shareCardUrl || undefined}
-                dropdownInPortal
-                icon="send"
-                label={t('music.mixSharePlaylist', 'Playlistni ulashish')}
-                className="music-mix-more-share"
-                buttonClassName="music-mix-more-action"
-              />
+              {canShare ? (
+                <ShareButton
+                  movie={{ id: leadId, title, img: coverImg }}
+                  sharePath={sharePath}
+                  absoluteUrl={shareCardUrl || undefined}
+                  dropdownInPortal
+                  icon="send"
+                  label={t('music.mixSharePlaylist', 'Playlistni ulashish')}
+                  className="music-mix-more-share"
+                  buttonClassName="music-mix-more-action"
+                />
+              ) : null}
               <button
                 type="button"
                 className={`music-mix-more-action music-mix-more-save${saved ? ' is-saved' : ''}`}

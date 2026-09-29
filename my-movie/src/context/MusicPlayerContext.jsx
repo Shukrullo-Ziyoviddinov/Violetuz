@@ -666,6 +666,7 @@ export const MusicPlayerProvider = ({ children }) => {
         currentTime: el.currentTime,
         durationSec: el.duration,
         isPlaying: !el.paused && !el.ended,
+        genre: String(currentMusicRef.current?.genre || '').trim(),
       });
     }
     void flushListenProgress();

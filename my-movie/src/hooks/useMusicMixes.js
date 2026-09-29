@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { selectAuthReady, selectIsLoggedIn } from '../store/slices/userSlice';
 import { fetchMusicMixes } from '../api/musicMixApi';
+import { getGuestMixes } from '../utils/musicMix/assembleGuestMixes';
+import { GUEST_MUSIC_MIX_PLAYS_CHANGED } from '../utils/localStorage/guestHistory/events';
 
 /**
- * Login: tayyor mix. Mehmon: bo'sh, so'rov yo'q.
+ * Login: GET /music/mixes (server).
+ * Mehmon: local assemble (violet_guest_music_mix_plays_v1) — server so‘rovi yo‘q.
  * @param {{ enabled?: boolean }} [opts]
  */
 export function useMusicMixes({ enabled = true } = {}) {
@@ -12,6 +15,13 @@ export function useMusicMixes({ enabled = true } = {}) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const [mixes, setMixes] = useState([]);
   const [isLoading, setIsLoading] = useState(enabled);
+  const [guestMixEpoch, setGuestMixEpoch] = useState(0);
+
+  useEffect(() => {
+    const onGuestMix = () => setGuestMixEpoch((n) => n + 1);
+    window.addEventListener(GUEST_MUSIC_MIX_PLAYS_CHANGED, onGuestMix);
+    return () => window.removeEventListener(GUEST_MUSIC_MIX_PLAYS_CHANGED, onGuestMix);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,7 +39,7 @@ export function useMusicMixes({ enabled = true } = {}) {
     }
 
     if (!isLoggedIn) {
-      setMixes([]);
+      setMixes(getGuestMixes());
       setIsLoading(false);
       return undefined;
     }
@@ -49,7 +59,7 @@ export function useMusicMixes({ enabled = true } = {}) {
     return () => {
       cancelled = true;
     };
-  }, [authReady, enabled, isLoggedIn]);
+  }, [authReady, enabled, isLoggedIn, guestMixEpoch]);
 
   return { mixes, isLoading };
 }

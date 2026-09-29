@@ -1,6 +1,7 @@
 /**
  * Shared guest history core + domain stores.
  * Movie + music stores (separate keys). UI/API wiring is per-domain steps.
+ * Mix play counts: alohida key — rec listen history bilan aralashmaydi.
  */
 
 export {
@@ -30,3 +31,19 @@ export {
   musicGuestHistoryConfig,
   default as musicGuestHistoryStore,
 } from './musicGuestHistory';
+
+export {
+  MUSIC_MIX_GUEST_PLAYS_STORAGE_KEY,
+  MIX_GUEST_CONTENT_TYPES,
+  recordMixPlay as recordGuestMixPlay,
+  getMixPlayCounts as getGuestMixPlayCounts,
+  clearMixPlayCounts as clearGuestMixPlayCounts,
+  musicMixGuestPlayCountsConfig,
+  default as musicMixGuestPlayCountsStore,
+} from './musicMixGuestPlayCounts';
+
+export {
+  assembleMixes as assembleGuestMixes,
+  buildGuestMixes,
+  getGuestMixes,
+} from '../../musicMix/assembleGuestMixes';

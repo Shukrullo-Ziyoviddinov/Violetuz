@@ -588,6 +588,7 @@ const VideoPage = () => {
                   contentType={isConcertVideo ? 'concert' : 'clip'}
                   contentId={video.id}
                   categoryNameMusic={video.categoryNameMusic}
+                  genre={video.genre}
                 />
               ) : null}
             </div>

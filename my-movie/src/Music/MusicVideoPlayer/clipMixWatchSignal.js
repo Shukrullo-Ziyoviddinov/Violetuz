@@ -1,9 +1,13 @@
 /**
  * Klip mixi uchun "ko'rildi". Musiqa signalidan va tinglandi hisobidan alohida.
  * Playhead 80% ga yetganda bir marta. Bar bilan yetkazilsa ham (pauzada ham).
- * 80% dan pastga tushsa yangi sessiya. Mehmon yozilmaydi. Tur: klip.
+ * 80% dan pastga tushsa yangi sessiya. Tur: klip.
+ *
+ * Login → POST /music/mixes/play (contentType: klip).
+ * Mehmon → faqat local violet_guest_music_mix_plays_v1 (serverga so‘rov yo‘q).
  */
 import { postMixPlay } from '../../api/musicMixApi';
+import { recordMixPlay as recordGuestMixPlay } from '../../utils/localStorage/guestHistory/musicMixGuestPlayCounts';
 
 /** music-mixes config dagi minListenRatio bilan bir xil. */
 export const CLIP_WATCH_RATIO = 0.8;
@@ -57,12 +61,18 @@ export function createClipMixWatchSignal() {
   };
 
   /**
-   * @param {{ isLoggedIn?: boolean, currentTime?: number, durationSec?: number }} input
+   * @param {{
+   *   isLoggedIn?: boolean,
+   *   currentTime?: number,
+   *   durationSec?: number,
+   *   genre?: string,
+   * }} input
    */
   const note = ({
     isLoggedIn = false,
     currentTime = 0,
     durationSec = 0,
+    genre = '',
   } = {}) => {
     const time = Number(currentTime);
     const duration = Number(durationSec);
@@ -70,7 +80,7 @@ export function createClipMixWatchSignal() {
       return;
     }
 
-    if (!isLoggedIn || !sessionId || !contentId) return;
+    if (!sessionId || !contentId) return;
 
     const reached = isClipWatchReached(time, duration);
     if (!reached) {
@@ -82,6 +92,22 @@ export function createClipMixWatchSignal() {
 
     const postSession = sessionId;
     const postContentId = contentId;
+
+    if (!isLoggedIn) {
+      const result = recordGuestMixPlay({
+        contentId: postContentId,
+        contentType: 'klip',
+        sessionId: postSession,
+        genre,
+      });
+      if (result.counted || result.sameSession) {
+        sent = true;
+      } else {
+        retryAt = Date.now() + 1500;
+      }
+      return;
+    }
+
     pending = true;
     postMixPlay({
       contentId: postContentId,
