@@ -50,6 +50,7 @@ const MusicMixMoreSheet = ({
   const [pressed, setPressed] = useState(false);
   const [shareMeta, setShareMeta] = useState(null);
   const [shareBusy, setShareBusy] = useState(false);
+  const [shareFailed, setShareFailed] = useState(false);
 
   const title = t('music.mixGenreLine', {
     genre: label,
@@ -72,14 +73,17 @@ const MusicMixMoreSheet = ({
     if (!open) {
       setShareMeta(null);
       setShareBusy(false);
+      setShareFailed(false);
       return undefined;
     }
 
     const applyFallback = () => {
       if (!fallbackToken) {
         setShareMeta(null);
+        setShareFailed(true);
         return;
       }
+      setShareFailed(false);
       setShareMeta({
         token: fallbackToken,
         leadId: String(musicId || '').trim(),
@@ -95,6 +99,7 @@ const MusicMixMoreSheet = ({
 
     let cancelled = false;
     setShareBusy(true);
+    setShareFailed(false);
     setShareMeta(null);
     createMixShare({ genre: mixGenre, contentType: mixType })
       .then((data) => {
@@ -103,6 +108,7 @@ const MusicMixMoreSheet = ({
           applyFallback();
           return;
         }
+        setShareFailed(false);
         setShareMeta({
           token: String(data.token),
           leadId: String(data.leadId || musicId || '').trim(),
@@ -285,70 +291,47 @@ const MusicMixMoreSheet = ({
           </div>
         )}
         <div className="music-mix-more-actions">
-          {shareReady ? (
-            <ShareButton
-              movie={{ id: leadId, title, img: coverImg }}
-              sharePath={sharePath}
-              absoluteUrl={shareCardUrl || undefined}
-              dropdownInPortal
-              icon="send"
-              label={t('music.mixSharePlaylist', 'Playlistni ulashish')}
-              className="music-mix-more-share"
-              buttonClassName="music-mix-more-action"
-            />
+          {!shareReady ? (
+            <p className="music-mix-more-loading" aria-live="polite" aria-busy={shareBusy || undefined}>
+              {shareFailed && !shareBusy
+                ? t('music.mixShareUnavailable', 'Ulashish hozir mumkin emas')
+                : t('music.mixShareLoading', 'Yuklanmoqda…')}
+            </p>
           ) : (
-            <button
-              type="button"
-              className="music-mix-more-action"
-              disabled
-              aria-busy={shareBusy || undefined}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M22 2 11 13"
-                />
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M22 2 15 22 11 13 2 9 22 2z"
-                />
-              </svg>
-              <span>
-                {shareBusy
-                  ? t('music.mixSharePreparing', 'Tayyorlanmoqda…')
-                  : t('music.mixSharePlaylist', 'Playlistni ulashish')}
-              </span>
-            </button>
-          )}
-          <button
-            type="button"
-            className={`music-mix-more-action music-mix-more-save${saved ? ' is-saved' : ''}`}
-            aria-pressed={saved}
-            onClick={() => {
-              if (!wishlistId) return;
-              toggleWishlist(wishlistId, 'mix');
-            }}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill={saved ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+            <>
+              <ShareButton
+                movie={{ id: leadId, title, img: coverImg }}
+                sharePath={sharePath}
+                absoluteUrl={shareCardUrl || undefined}
+                dropdownInPortal
+                icon="send"
+                label={t('music.mixSharePlaylist', 'Playlistni ulashish')}
+                className="music-mix-more-share"
+                buttonClassName="music-mix-more-action"
               />
-            </svg>
-            <span>{t('music.mixSave', 'Saqlash')}</span>
-          </button>
+              <button
+                type="button"
+                className={`music-mix-more-action music-mix-more-save${saved ? ' is-saved' : ''}`}
+                aria-pressed={saved}
+                onClick={() => {
+                  if (!wishlistId) return;
+                  toggleWishlist(wishlistId, 'mix');
+                }}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill={saved ? 'currentColor' : 'none'}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                  />
+                </svg>
+                <span>{t('music.mixSave', 'Saqlash')}</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>,

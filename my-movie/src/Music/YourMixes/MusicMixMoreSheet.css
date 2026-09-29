@@ -95,6 +95,16 @@ body.music-mix-more-open {
   flex-direction: column;
 }
 
+.music-mix-more-loading {
+  margin: 0;
+  padding: 1.15rem 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 .music-mix-more-panel .music-mix-more-share.share-button-wrapper {
   position: static;
   top: auto;
