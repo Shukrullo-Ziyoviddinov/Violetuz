@@ -115,17 +115,17 @@
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(1) {
-  width: 60%;
+  width: 50%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(2) {
-  left: 32%;
-  width: 40%;
+  left: 28%;
+  width: 36%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(3) {
-  left: 58%;
-  width: 34%;
+  left: 50%;
+  width: 28%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(4) {
