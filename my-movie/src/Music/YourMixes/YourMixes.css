@@ -92,21 +92,21 @@
 }
 
 .your-mixes-cover--klip.your-mixes-cover--2 img:nth-child(1) {
-  width: 74%;
+  width: 78%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--2 img:nth-child(2) {
-  left: 18%;
-  width: 82%;
+  left: 22%;
+  width: 78%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--3 img:nth-child(1) {
-  width: 68%;
+  width: 70%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--3 img:nth-child(2) {
-  left: 36%;
-  width: 56%;
+  left: 38%;
+  width: 50%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--3 img:nth-child(3) {
@@ -115,12 +115,12 @@
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(1) {
-  width: 56%;
+  width: 60%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(2) {
-  left: 34%;
-  width: 48%;
+  left: 32%;
+  width: 40%;
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(3) {
@@ -129,8 +129,8 @@
 }
 
 .your-mixes-cover--klip.your-mixes-cover--4 img:nth-child(4) {
-  left: 70%;
-  width: 30%;
+  left: 78%;
+  width: 22%;
 }
 
 @media (max-width: 768px) {
