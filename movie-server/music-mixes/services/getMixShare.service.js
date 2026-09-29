@@ -12,6 +12,7 @@
 const Music = require('../../models/Music.model');
 const Clip = require('../../models/Clip.model');
 const { notFound } = require('../../utils/errors');
+const { resolveMediaUrl } = require('../../utils/resolveMediaUrl');
 const { musicMixWeights } = require('../config/musicMixWeights');
 const { MusicMix } = require('../models');
 const {
@@ -24,7 +25,7 @@ const resolveCoverImg = async (contentId, contentType) => {
   if (!Number.isInteger(idNum)) return '';
   const Model = contentType === 'klip' ? Clip : Music;
   const row = await Model.findOne({ id: idNum }).select({ img: 1, _id: 0 }).lean();
-  return String(row?.img || '').trim();
+  return resolveMediaUrl(String(row?.img || '').trim());
 };
 
 const loadOwnerLiveTracks = async (share) => {
@@ -76,8 +77,14 @@ const getMixShareByToken = async (token, opts = {}) => {
     return refreshed || { ...share, ...live, expired: false };
   }
 
-  const touched = await refreshMixShareDocument(share.token);
-  return touched || share;
+  const touched = await refreshMixShareDocument(share.token, {
+    coverImg: resolveMediaUrl(share.coverImg),
+  });
+  if (touched) return touched;
+  return {
+    ...share,
+    coverImg: resolveMediaUrl(share.coverImg),
+  };
 };
 
 module.exports = {

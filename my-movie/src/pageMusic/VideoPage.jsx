@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { useAuth } from '../context/AuthContext';
 import { matchId } from '../utils/musicDataUtils';
 import ShareButton from '../components/ShareButton/ShareButton';
 import ScrollTouch from '../components/ScrollTouch/ScrollTouch';
@@ -31,7 +30,6 @@ import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDe
 import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import { takeMixTrack } from '../Music/YourMixes/mixPlaybackQueue';
 import useImmersiveSheetDrag from '../hooks/useImmersiveSheetDrag';
-import { requestOpenAuthModal } from '../authModalBridge';
 import '../Music/YourMixes/YourMixes.css';
 import {
   useHomeMusicCategoryRecommendations,
@@ -75,7 +73,6 @@ const VideoPage = () => {
   const mixShareTokenRaw = String(searchParams.get('ms') || '').trim();
   const mixGenreParamRaw = searchParams.get('mix') || '';
   const { t } = useTranslation();
-  const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
     allClips,
@@ -570,19 +567,6 @@ const VideoPage = () => {
                 'Bu mix havolasining muddati tugagan. Egasi qayta ulashishi mumkin.'
               )}
             </p>
-          </div>
-        ) : null}
-        {isSharedMix && !isLoggedIn && !shareExpired ? (
-          <div className="mix-share-guest-banner" role="status">
-            <p>
-              {t(
-                'music.mixShareGuestHint',
-                'Mixni ko‘rish uchun kiring — 80% / 3 marta formulasi shaxsiy mixga yoziladi.'
-              )}
-            </p>
-            <button type="button" onClick={() => requestOpenAuthModal('login')}>
-              {t('auth.login', 'Kirish')}
-            </button>
           </div>
         ) : null}
         <div className="video-detail-layout">

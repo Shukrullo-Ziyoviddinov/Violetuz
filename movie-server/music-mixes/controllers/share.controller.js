@@ -12,6 +12,7 @@ const asyncHandler = require('../../middleware/asyncHandler');
 const { badRequest, notFound } = require('../../utils/errors');
 const { sendSuccess } = require('../../utils/response');
 const { CLIENT_URL } = require('../../config/env');
+const { resolveMediaUrl } = require('../../utils/resolveMediaUrl');
 const { normalizeMixContentType } = require('../contentType');
 const { createUserMixShare } = require('../services/createMixShare.service');
 const { getMixShareByToken } = require('../services/getMixShare.service');
@@ -24,7 +25,10 @@ const escapeHtml = (value) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
+/** OG / Telegram preview — R2 custom domain (media.violetplay.uz). */
 const absoluteAssetUrl = (src) => {
+  const resolved = resolveMediaUrl(src);
+  if (/^https?:\/\//i.test(resolved)) return resolved;
   const raw = String(src || '').trim();
   if (!raw) return '';
   if (/^https?:\/\//i.test(raw)) return raw;

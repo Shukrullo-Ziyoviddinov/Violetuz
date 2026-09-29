@@ -13,13 +13,15 @@ const halfOffset = () => {
   const viewport = viewportHeight();
   const fallback = Math.round(viewport * 0.5);
   const img = document.querySelector(
-    '.music-detail-left .music-detail-image, .video-detail-player-wrap'
+    '.music-detail-left .music-detail-image, .video-detail-player-wrap video, .video-detail-player-wrap'
   );
   if (!img) return fallback;
   const rect = img.getBoundingClientRect();
   if (rect.height < 40) return fallback;
   const top = Math.round(rect.bottom);
-  if (top < 80 || top > viewport * 0.85) return fallback;
+  // Video/cover pastidan boshlasın; juda pastga tushib ketmasin.
+  if (top < 80) return fallback;
+  if (top > viewport * 0.92) return Math.round(viewport * 0.55);
   return top;
 };
 
@@ -76,7 +78,35 @@ const MusicDetailMixSheet = ({
   useLayoutEffect(() => {
     if (phase !== 'half' || dragging) return;
     setOffset(halfOffset());
-  }, [phase, dragging]);
+  }, [phase, dragging, busy, label]);
+
+  useEffect(() => {
+    if (phase !== 'half' || dragging) return undefined;
+
+    const sync = () => setOffset(halfOffset());
+    sync();
+    const t1 = window.setTimeout(sync, 80);
+    const t2 = window.setTimeout(sync, 320);
+    window.addEventListener('resize', sync);
+    window.addEventListener('orientationchange', sync);
+
+    const player = document.querySelector(
+      '.music-detail-left .music-detail-image, .video-detail-player-wrap'
+    );
+    let ro = null;
+    if (player && typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(sync);
+      ro.observe(player);
+    }
+
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', sync);
+      window.removeEventListener('orientationchange', sync);
+      ro?.disconnect();
+    };
+  }, [phase, dragging, busy]);
 
   useEffect(() => {
     document.body.classList.add('music-mix-sheet-active');

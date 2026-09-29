@@ -29,7 +29,6 @@ import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
 import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
 import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import { recordViewRequest } from '../api/viewsApi';
-import { requestOpenAuthModal } from '../authModalBridge';
 import '../Music/YourMixes/YourMixes.css';
 import './MusicDetail.css';
 
@@ -843,19 +842,6 @@ const MusicDetail = () => {
                 'Bu mix havolasining muddati tugagan. Egasi qayta ulashishi mumkin.'
               )}
             </p>
-          </div>
-        ) : null}
-        {isSharedMix && !isLoggedIn && !shareExpired ? (
-          <div className="mix-share-guest-banner" role="status">
-            <p>
-              {t(
-                'music.mixShareGuestHint',
-                'Mixni tinglash uchun kiring — 80% / 3 marta formulasi shaxsiy mixga yoziladi.'
-              )}
-            </p>
-            <button type="button" onClick={() => requestOpenAuthModal('login')}>
-              {t('auth.login', 'Kirish')}
-            </button>
           </div>
         ) : null}
         <div className="music-detail-layout">
