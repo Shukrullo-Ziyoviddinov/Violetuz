@@ -28,6 +28,12 @@ const musicMixWeights = {
   /** Mixga kirish uchun shu qo'shiq necha marta 80% eshitilgan bo'lishi kerak. */
   minPlays: 3,
 
+  /**
+   * Bir janr mixi ko'rinishi uchun kamida shuncha element (qo'shiq/klip).
+   * 80% va minPlays formulasi o'zgarmaydi — faqat yetarli element bo'lsa mix chiqadi.
+   */
+  minMixSize: 4,
+
   /** Bir janr mixidagi qo'shiqlar chegarasi. */
   mixSize: 25,
 

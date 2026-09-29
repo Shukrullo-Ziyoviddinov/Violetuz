@@ -1,6 +1,7 @@
 /**
  * Mix yig'ish. music_mixes ga yozilmaydi.
- * 3 martadan kam tashlanadi. Janr ichida ko'p tinglangan yuqorida, 25 tadan oshmaydi.
+ * 3 martadan kam tashlanadi. Janrda kamida 4 element bo'lmasa mix chiqmaydi.
+ * Janr ichida ko'p tinglangan yuqorida, 25 tadan oshmaydi.
  *
  * @module music-mixes/services/mixEngine
  */
@@ -30,6 +31,7 @@ const byMostPlayed = (a, b) => {
  */
 const assembleMixes = (rows) => {
   const minPlays = Math.max(1, Number(musicMixWeights.minPlays) || 3);
+  const minMixSize = Math.max(1, Number(musicMixWeights.minMixSize) || 4);
   const mixSize = Math.max(1, Number(musicMixWeights.mixSize) || 25);
   /** @type {Map<string, Object[]>} */
   const groups = new Map();
@@ -52,8 +54,10 @@ const assembleMixes = (rows) => {
   /** @type {Array<{ genre: string, tracks: Object[] }>} */
   const mixes = [];
   for (const [genre, tracks] of groups) {
+    if (tracks.length < minMixSize) continue;
     tracks.sort(byMostPlayed);
     const kept = tracks.slice(0, mixSize);
+    if (kept.length < minMixSize) continue;
     mixes.push({
       genre,
       tracks: kept.map((track, index) => ({

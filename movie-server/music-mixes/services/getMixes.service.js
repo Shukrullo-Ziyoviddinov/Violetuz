@@ -6,6 +6,7 @@
 
 'use strict';
 
+const { musicMixWeights } = require('../config/musicMixWeights');
 const { MusicMix } = require('../models');
 const { normalizeMixContentType } = require('../contentType');
 const { parseUserId } = require('../repositories/parseUserId');
@@ -53,7 +54,8 @@ const listReadyMixes = async (userId) => {
     });
   }
 
-  const mixes = [...groups.values()];
+  const minMixSize = Math.max(1, Number(musicMixWeights.minMixSize) || 4);
+  const mixes = [...groups.values()].filter((mix) => (mix.tracks || []).length >= minMixSize);
   for (const mix of mixes) {
     mix.tracks.sort((a, b) => a.position - b.position || a.contentId.localeCompare(b.contentId));
   }
