@@ -347,6 +347,13 @@ const AuthModal = ({
       ) : null}
 
       <div className={`auth-modal-card${step === 'avatar' ? ' auth-modal-card--avatar' : ''}`}>
+        <div className="auth-modal-logo">
+          <img
+            src="/img/vl logo_preview_rev_1.png"
+            alt="Violet"
+            className="auth-modal-logo-img"
+          />
+        </div>
         {step === 'form' ? (
           <>
             <h2 className="auth-modal-title">

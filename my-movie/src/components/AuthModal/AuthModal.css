@@ -56,6 +56,19 @@
   -webkit-backdrop-filter: blur(18px);
 }
 
+.auth-modal-logo {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 1rem;
+}
+
+.auth-modal-logo-img {
+  display: block;
+  width: min(180px, 70%);
+  height: auto;
+  object-fit: contain;
+}
+
 .auth-modal-title {
   margin: 0 0 0.4rem;
   font-size: 1.85rem;
