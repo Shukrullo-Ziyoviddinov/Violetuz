@@ -46,6 +46,7 @@ const musicMixRoutes = require('../music-mixes/routes');
 const musicRecommendationRoutes = require('../recommendation-music/routes');
 const recommendedActorsRoutes = require('../recommendation-actors/routes');
 const recommendedArtistsRoutes = require('../recommendation-artists/routes');
+const movieSimilarRoutes = require('../movie-similar/routes');
 // Register affinity/precompute handlers at boot (not only on first watch/like).
 require('../recommendation/jobs');
 require('../recommendation-music/jobs');
@@ -67,6 +68,8 @@ router.use('/short-shares', shortShareRoutes);
 router.use('/short-downloads', shortDownloadRoutes);
 router.use('/views', viewRoutes);
 router.use('/feed', feedRoutes);
+// similar: GET /movies/:movieId/similar — movie.routes /:id dan oldin
+router.use('/movies', movieSimilarRoutes);
 router.use('/movies', movieRoutes);
 router.use('/actors', actorRoutes);
 router.use('/actor-page-labels', actorPageLabelRoutes);

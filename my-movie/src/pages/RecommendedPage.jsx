@@ -13,6 +13,7 @@ import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
 import { useHomeFeed } from '../hooks/useHomeFeed';
+import { useSimilarMovies } from '../hooks/useSimilarMovies';
 import './RecommendedPage.css';
 
 const getRatingFilter = (movie, selectedRatingType, selectedRating) => {
@@ -35,7 +36,7 @@ const filterMoviesByNavCategory = (movies, categoryConfig) => {
 };
 
 const RecommendedPage = () => {
-  const { categoryId } = useParams();
+  const { categoryId, movieId } = useParams();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const genreFromUrl = searchParams.get('genre');
@@ -43,6 +44,13 @@ const RecommendedPage = () => {
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const profile = useAppSelector(selectProfile);
+  const isSimilarMoviesPage = location.pathname.startsWith('/similar-movies/');
+  const { movies: similarApiMovies, isLoading: similarLoading } = useSimilarMovies({
+    movieId,
+    enabled: isSimilarMoviesPage && movieId != null && movieId !== '',
+    limit: 100,
+  });
+
 
   const getGenresFromUrl = useCallback((g) => {
     if (!g) return [];
@@ -77,7 +85,6 @@ const RecommendedPage = () => {
     }
   }, [genreFromUrl, getGenresFromUrl]);
 
-  const isSimilarMoviesPage = location.pathname.startsWith('/similar-movies/');
   const isForYouPage = location.pathname === '/recommended';
   const { items: feedItems, isLoading: feedLoading } = useHomeFeed({
     enabled: isForYouPage && !genreFromUrl,
@@ -99,8 +106,8 @@ const RecommendedPage = () => {
   }, [allMovies, feedItems, isForYouPage, useAllMoviesForGenre]);
 
   const localCategoryMovies = useMemo(() => {
-    // Front similar algoritm olib tashlandi — keyin server cache API ulanadi
-    if (isSimilarMoviesPage) return [];
+    // Similar — faqat server cache API (front filter yo'q)
+    if (isSimilarMoviesPage) return similarApiMovies;
     if (genreFromUrl || useAllMoviesForGenre) return allMovies;
     if (isForYouPage) return forYouMovies;
     if (categoryId === 'topRated') return getTopRatedMovies(allMovies);
@@ -123,6 +130,7 @@ const RecommendedPage = () => {
     isNavCategory,
     isSimilarMoviesPage,
     navCategory,
+    similarApiMovies,
     useAllMoviesForGenre,
   ]);
 
@@ -233,8 +241,11 @@ const RecommendedPage = () => {
     filteredMovies = filteredMovies.filter(movie => movie.ageRestriction === selectedAge);
   }
 
-  const listLoading =
-    moviesLoading || recommendationsLoading || (isForYouPage && !useAllMoviesForGenre && feedLoading);
+  const listLoading = isSimilarMoviesPage
+    ? similarLoading
+    : moviesLoading ||
+      recommendationsLoading ||
+      (isForYouPage && !useAllMoviesForGenre && feedLoading);
 
   return (
     <div className="recommended-page">

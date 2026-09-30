@@ -158,6 +158,14 @@ const movieSchema = new mongoose.Schema(
         message: 'actors must contain only number or string values',
       },
     },
+    /**
+     * Franshiza / "Davomiy" kinolar (movie-similar QATLAM 1).
+     * Tartib: arrayda birinchi id — eng yuqori. Admin keyin shu maydonga yozadi.
+     */
+    franchiseMovieIds: {
+      type: [Number],
+      default: [],
+    },
     category: {
       type: String,
       trim: true,

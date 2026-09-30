@@ -51,6 +51,14 @@ const startServer = async () => {
       initialDelayMs: 35_000,
     });
 
+    const {
+      startMovieSimilarityPrecomputeScheduler,
+    } = require('./movie-similar/jobs');
+    startMovieSimilarityPrecomputeScheduler({
+      runImmediately: true,
+      initialDelayMs: 45_000,
+    });
+
     app.listen(PORT, () => {
       console.log(`Movie server running on http://localhost:${PORT}`);
     });

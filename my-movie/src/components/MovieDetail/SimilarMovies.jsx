@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useSimilarMovies } from '../../hooks/useSimilarMovies';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton, { getDisplayItems, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
@@ -180,9 +181,11 @@ const SimilarMovies = ({ currentMovie }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-
-  // Front similar algoritm olib tashlandi — keyin server cache API ulanadi
-  const similarMovies = [];
+  const movieId = currentMovie?.id;
+  const { movies: similarMovies, isLoading } = useSimilarMovies({
+    movieId,
+    enabled: movieId != null && movieId !== '',
+  });
 
   const skeletonItems = useMemo(
     () =>
@@ -193,7 +196,7 @@ const SimilarMovies = ({ currentMovie }) => {
     []
   );
 
-  const showSectionSkeleton = !currentMovie;
+  const showSectionSkeleton = !currentMovie || isLoading;
   const displayMovies = showSectionSkeleton
     ? skeletonItems
     : getDisplayItems(similarMovies, DEFAULT_LIMIT);
