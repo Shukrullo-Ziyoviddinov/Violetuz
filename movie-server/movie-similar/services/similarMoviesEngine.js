@@ -34,26 +34,19 @@ const toMovieId = (value) => {
 const movieIdOf = (movie) => toMovieId(movie?.id);
 
 /**
- * Janrlar — filterGenre yoki genre.uz / genre.ru.
+ * Janrlar — faqat filterGenre (katalog filter manbai).
  * @param {unknown} movie
  * @returns {string[]}
  */
 const genresOf = (movie) => {
   const out = new Set();
-  const push = (list) => {
-    if (!Array.isArray(list)) return;
-    for (const item of list) {
-      const g = String(item || '')
-        .trim()
-        .toLowerCase();
-      if (g) out.add(g);
-    }
-  };
-  push(movie?.filterGenre);
-  push(movie?.genre?.uz);
-  push(movie?.genre?.ru);
-  push(movie?.description?.uz?.genre);
-  push(movie?.description?.ru?.genre);
+  if (!Array.isArray(movie?.filterGenre)) return [];
+  for (const item of movie.filterGenre) {
+    const g = String(item || '')
+      .trim()
+      .toLowerCase();
+    if (g) out.add(g);
+  }
   return [...out];
 };
 
@@ -69,24 +62,15 @@ const actorsOf = (movie) => {
 };
 
 /**
+ * Davlat — faqat filterCountry.
  * @param {unknown} movie
  * @returns {string[]}
  */
 const countriesOf = (movie) => {
-  const out = new Set();
-  if (movie?.filterCountry) {
-    const c = String(movie.filterCountry).trim().toLowerCase();
-    if (c) out.add(c);
-  }
-  if (Array.isArray(movie?.specs?.countries)) {
-    for (const item of movie.specs.countries) {
-      const c = String(item || '')
-        .trim()
-        .toLowerCase();
-      if (c) out.add(c);
-    }
-  }
-  return [...out];
+  const c = String(movie?.filterCountry || '')
+    .trim()
+    .toLowerCase();
+  return c ? [c] : [];
 };
 
 /**
