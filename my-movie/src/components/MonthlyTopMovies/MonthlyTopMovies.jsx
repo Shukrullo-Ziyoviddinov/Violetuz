@@ -3,19 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Movies from '../Movies/Movies';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMonthlyTopMovies } from '../../hooks/useMonthlyTopMovies';
-
-const MONTHLY_RANK_SRC = {
-  1: '/img/oytop1_preview_rev_1.png',
-  2: '/img/oytop2_preview_rev_1.png',
-  3: '/img/oytop3_preview_rev_1.png',
-  4: '/img/oytop4_preview_rev_1.png',
-  5: '/img/oytop5_preview_rev_1.png',
-  6: '/img/oytop6_preview_rev_1.png',
-  7: '/img/oytop7_preview_rev_1.png',
-  8: '/img/oytop8_preview_rev_1.png',
-  9: '/img/oytop9_preview_rev_1.png',
-  10: '/img/oytop10_preview_rev_1.png',
-};
+import { monthlyTopRankSrc } from '../../utils/topRankPreview';
 
 /**
  * Oyning top filmlari.
@@ -36,7 +24,7 @@ const MonthlyTopMovies = () => {
       const rank = Number(row.rank) || out.length + 1;
       out.push({
         ...movie,
-        weeklyRankSrc: MONTHLY_RANK_SRC[rank] || '',
+        weeklyRankSrc: monthlyTopRankSrc(rank),
       });
     }
     return out;
