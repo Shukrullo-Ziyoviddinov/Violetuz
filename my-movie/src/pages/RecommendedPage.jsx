@@ -34,41 +34,8 @@ const filterMoviesByNavCategory = (movies, categoryConfig) => {
   return movies.filter((movie) => matchesFilterCategory(movie.category, categoryConfig.filterCategory));
 };
 
-const getSimilarMovies = (currentMovie, movies) => {
-  if (!currentMovie) return [];
-  const currentTypeCategory = Array.isArray(currentMovie.typeCategory)
-    ? currentMovie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
-    : currentMovie.typeCategory
-    ? [String(currentMovie.typeCategory).toLowerCase().trim()]
-    : [];
-  const currentFilterCountry = currentMovie.filterCountry
-    ? String(currentMovie.filterCountry).toLowerCase().trim()
-    : '';
-  return movies.filter((movie) => {
-    if (movie.id === currentMovie.id) return false;
-    if (!movie.typeCategory && !movie.filterCountry) return false;
-    const movieTypeCategory = Array.isArray(movie.typeCategory)
-      ? movie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
-      : movie.typeCategory
-      ? [String(movie.typeCategory).toLowerCase().trim()]
-      : [];
-    const movieFilterCountry = movie.filterCountry
-      ? String(movie.filterCountry).toLowerCase().trim()
-      : '';
-    const hasMatchingTypeCategory =
-      currentTypeCategory.length > 0 &&
-      movieTypeCategory.length > 0 &&
-      currentTypeCategory.some((ctc) => movieTypeCategory.includes(ctc));
-    const hasMatchingFilterCountry =
-      currentFilterCountry &&
-      movieFilterCountry &&
-      currentFilterCountry === movieFilterCountry;
-    return hasMatchingTypeCategory || hasMatchingFilterCountry;
-  });
-};
-
 const RecommendedPage = () => {
-  const { categoryId, movieId } = useParams();
+  const { categoryId } = useParams();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const genreFromUrl = searchParams.get('genre');
@@ -132,10 +99,8 @@ const RecommendedPage = () => {
   }, [allMovies, feedItems, isForYouPage, useAllMoviesForGenre]);
 
   const localCategoryMovies = useMemo(() => {
-    if (isSimilarMoviesPage && movieId) {
-      const currentMovie = allMovies.find((m) => String(m.id) === String(movieId));
-      return getSimilarMovies(currentMovie, allMovies);
-    }
+    // Front similar algoritm olib tashlandi — keyin server cache API ulanadi
+    if (isSimilarMoviesPage) return [];
     if (genreFromUrl || useAllMoviesForGenre) return allMovies;
     if (isForYouPage) return forYouMovies;
     if (categoryId === 'topRated') return getTopRatedMovies(allMovies);
@@ -157,8 +122,6 @@ const RecommendedPage = () => {
     isForYouPage,
     isNavCategory,
     isSimilarMoviesPage,
-    location.pathname,
-    movieId,
     navCategory,
     useAllMoviesForGenre,
   ]);

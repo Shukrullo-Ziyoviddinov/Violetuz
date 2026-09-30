@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { useMoviesApi } from '../../context/MoviesApiContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ShowMoreButton, { getDisplayItems, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
@@ -181,49 +180,9 @@ const SimilarMovies = ({ currentMovie }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { allMovies, moviesLoading } = useMoviesApi();
 
-  const currentTypeCategory = currentMovie
-    ? Array.isArray(currentMovie.typeCategory)
-      ? currentMovie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
-      : currentMovie.typeCategory
-        ? [String(currentMovie.typeCategory).toLowerCase().trim()]
-        : []
-    : [];
-
-  const currentFilterCountry = currentMovie?.filterCountry
-    ? String(currentMovie.filterCountry).toLowerCase().trim()
-    : '';
-
-  const similarMovies =
-    !currentMovie || moviesLoading
-      ? []
-      : allMovies.filter((movie) => {
-          if (movie.id === currentMovie.id) return false;
-          if (!movie.typeCategory && !movie.filterCountry) return false;
-
-          const movieTypeCategory = Array.isArray(movie.typeCategory)
-            ? movie.typeCategory.map((tc) => String(tc).toLowerCase().trim())
-            : movie.typeCategory
-              ? [String(movie.typeCategory).toLowerCase().trim()]
-              : [];
-
-          const movieFilterCountry = movie.filterCountry
-            ? String(movie.filterCountry).toLowerCase().trim()
-            : '';
-
-          const hasMatchingTypeCategory =
-            currentTypeCategory.length > 0 &&
-            movieTypeCategory.length > 0 &&
-            currentTypeCategory.some((ctc) => movieTypeCategory.includes(ctc));
-
-          const hasMatchingFilterCountry =
-            currentFilterCountry &&
-            movieFilterCountry &&
-            currentFilterCountry === movieFilterCountry;
-
-          return hasMatchingTypeCategory || hasMatchingFilterCountry;
-        });
+  // Front similar algoritm olib tashlandi — keyin server cache API ulanadi
+  const similarMovies = [];
 
   const skeletonItems = useMemo(
     () =>
@@ -234,7 +193,7 @@ const SimilarMovies = ({ currentMovie }) => {
     []
   );
 
-  const showSectionSkeleton = moviesLoading || !currentMovie;
+  const showSectionSkeleton = !currentMovie;
   const displayMovies = showSectionSkeleton
     ? skeletonItems
     : getDisplayItems(similarMovies, DEFAULT_LIMIT);
