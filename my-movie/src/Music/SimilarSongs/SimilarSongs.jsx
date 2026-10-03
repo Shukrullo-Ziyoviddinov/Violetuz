@@ -149,10 +149,12 @@ const SimilarSongs = ({
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getArtistById, musicLoading } = useMusicApi();
+  const { getArtistById } = useMusicApi();
 
   const item = music || album || klip;
-  const { items: similarSongs, isLoading } = useSimilarSongs(item);
+  const { items: similarSongs, isLoading } = useSimilarSongs(
+    music?.type === 'music' ? music : null
+  );
 
   const getTitleText = (song) => {
     if (!song?.title) return '';
@@ -186,17 +188,14 @@ const SimilarSongs = ({
     []
   );
 
-  /* Catalog hali kelmagan yoki force — bo‘lim yo‘qolmasin, image-wrapper skeleton turadi */
-  const awaitingCatalog = Boolean(forceSkeleton) || (Boolean(musicLoading) && !item);
+  /* Faqat music detail similar — album/klip "for you" bu API da yo'q */
+  const awaitingCatalog = Boolean(forceSkeleton) && Boolean(music);
   const showSectionSkeleton =
     awaitingCatalog || (Boolean(isLoading) && similarSongs.length === 0);
   const itemsToRender = showSectionSkeleton ? skeletonItems : similarSongs;
   const showTitleSkeleton = showSectionSkeleton;
 
-  if (music && music.type !== 'music') return null;
-  if (album && album.type !== 'musicAlbom') return null;
-  if (klip && klip.type !== 'klip' && klip.type !== 'konsert') return null;
-  if (!item && !showSectionSkeleton) return null;
+  if (!music || music.type !== 'music') return null;
   if (!showSectionSkeleton && !similarSongs.length) return null;
 
   const renderCard = (song) => {

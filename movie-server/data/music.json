@@ -10,6 +10,7 @@
     "language": "english",
     "country": "usa",
     "type": "music",
+    "franchiseMusicIds": [806, 803],
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
     "lyricsText": "Chuqur bass - jonimga\nDeep bass - titrash\nHar bir beat - hayot"
   },
@@ -24,6 +25,7 @@
     "language": "uzbek",
     "country": "uzbekistan",
     "type": "music",
+    "franchiseMusicIds": [805],
     "audio": "/music/Zivert - Life.mp3",
     "lyricsText": "Subwoofer - yuragim titraydi\nKuchli ovoz - sensiz emas\nBu kecha - bizniki"
   },

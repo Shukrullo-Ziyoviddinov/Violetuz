@@ -59,6 +59,14 @@ const startServer = async () => {
       initialDelayMs: 45_000,
     });
 
+    const {
+      startMusicSimilarityPrecomputeScheduler,
+    } = require('./music-similar/jobs');
+    startMusicSimilarityPrecomputeScheduler({
+      runImmediately: true,
+      initialDelayMs: 50_000,
+    });
+
     app.listen(PORT, () => {
       console.log(`Movie server running on http://localhost:${PORT}`);
     });

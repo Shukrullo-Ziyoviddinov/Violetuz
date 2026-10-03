@@ -10,6 +10,7 @@
     "language": "english",
     "country": "usa",
     "type": "klip",
+    "franchiseClipIds": [1103, 1104],
     "video": "/video/Lady_Gaga,_Bruno_Mars_Die_With_A_Smile_Official_Music_Video.mp4",
     "like": "0",
     "dislike": "0"
@@ -25,6 +26,7 @@
     "language": "english",
     "country": "usa",
     "type": "klip",
+    "franchiseClipIds": [1105],
     "video": "/video/The Amateur _ Official Trailer.mp4",
     "like": "0",
     "dislike": "0"

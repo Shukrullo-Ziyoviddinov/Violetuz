@@ -147,11 +147,10 @@ const AlbumsForYou = ({
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getArtistById, albumsLoading } = useMusicApi();
+  const { getArtistById } = useMusicApi();
 
-  const item = music || album || klip;
   const { items: recommendedAlbums, isLoading } = useRecommendedAlbums(
-    item,
+    album?.type === 'musicAlbom' ? album : null,
     album ? { excludeId: album.id } : {}
   );
 
@@ -194,17 +193,14 @@ const AlbumsForYou = ({
     []
   );
 
-  const awaitingCatalog =
-    Boolean(forceSkeleton) || (Boolean(albumsLoading) && !item);
+  /* Faqat album detail similar — music/klip "for you" bu API da yo'q */
+  const awaitingCatalog = Boolean(forceSkeleton) && Boolean(album);
   const showSectionSkeleton =
     awaitingCatalog || (Boolean(isLoading) && recommendedAlbums.length === 0);
   const itemsToRender = showSectionSkeleton ? skeletonItems : recommendedAlbums;
   const showTitleSkeleton = showSectionSkeleton;
 
-  if (music && music.type !== 'music') return null;
-  if (album && album.type !== 'musicAlbom') return null;
-  if (klip && klip.type !== 'klip' && klip.type !== 'konsert') return null;
-  if (!item && !showSectionSkeleton) return null;
+  if (!album || album.type !== 'musicAlbom') return null;
   if (!showSectionSkeleton && !recommendedAlbums.length) return null;
 
   const renderCard = (albumItem) => {

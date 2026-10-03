@@ -1,16 +1,10 @@
 /**
- * Tavsiya etilgan albomlar servisi.
- * type: 'musicAlbom' va genre bo'yicha music bilan mos albomlar.
- * Backend: GET /api/albums orqali API/DB dan keladi.
+ * O'xshash albomlar — GET /music/:id/similar?type=album (cache).
+ * Local heuristika yo'q. recommendation-music ga ulanmaydi.
  */
 
-import { useMemo } from 'react';
-import { useMusicApi } from '../context/MusicApiContext';
-
-const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
-
-const normalizeGenre = (g) =>
-  typeof g === 'string' ? g.toLowerCase().trim() : null;
+import { useEffect, useState } from 'react';
+import { fetchSimilarMusicItems } from '../api/musicSimilarApi';
 
 const SECTION_BY_CATEGORY = {
   TopAlbums: 'albums',
@@ -19,46 +13,75 @@ const SECTION_BY_CATEGORY = {
   hitCollectionsData: 'hit-collections',
 };
 
-const getRecommendedAlbumsFromList = (item, allAlbums, options = {}) => {
-  const { limit = 12, excludeId } = options;
-  if (!item) return [];
-
-  const skipId = excludeId != null ? excludeId : item.id;
-  const currentGenre = normalizeGenre(item.genre);
-  const pool = ensureArray(allAlbums)
-    .filter((album) => album?.type === 'musicAlbom' || Array.isArray(album?.songs))
-    .filter((album) => String(album.id) !== String(skipId))
-    .map((album) => ({
-      ...album,
-      sectionId: SECTION_BY_CATEGORY[album.categoryNameMusic] || 'albums',
-    }));
-
-  const sameGenre = currentGenre
-    ? pool.filter((album) => normalizeGenre(album.genre) === currentGenre)
-    : [];
-
-  const sorted = [...sameGenre, ...pool.filter((album) => !sameGenre.includes(album))];
-  return sorted.slice(0, limit);
+const isAlbumType = (type) => {
+  const t = String(type || '').toLowerCase();
+  return t === 'musicalbom' || t === 'album' || t === 'music_album';
 };
 
-export const fetchRecommendedAlbums = async (item, options = {}, allAlbums = []) =>
-  Promise.resolve(getRecommendedAlbumsFromList(item, allAlbums, options));
+const withSectionId = (items) =>
+  (Array.isArray(items) ? items : []).map((item) => ({
+    ...item,
+    sectionId: SECTION_BY_CATEGORY[item.categoryNameMusic] || 'albums',
+  }));
 
 /**
+ * Faqat album type. Music/klip — bo'sh (cross-type yo'q).
+ * @param {object|null|undefined} item
+ * @param {{ limit?: number, excludeId?: string|number }} [options]
+ */
+export const fetchRecommendedAlbums = async (item, options = {}) => {
+  if (!item?.id || !isAlbumType(item.type)) return [];
+  const rows = await fetchSimilarMusicItems(item.id, {
+    type: 'album',
+    limit: options.limit,
+  });
+  const exclude =
+    options.excludeId != null ? String(options.excludeId) : null;
+  const filtered = exclude
+    ? rows.filter((row) => String(row.id) !== exclude)
+    : rows;
+  return withSectionId(filtered);
+};
+
+/**
+ * @param {object|null|undefined} item
+ * @param {{ limit?: number, excludeId?: string|number }} [options]
  * @returns {{ items: Array, isLoading: boolean }}
  */
 export const useRecommendedAlbums = (item, options = {}) => {
-  const { allAlbums, albumsLoading } = useMusicApi();
   const itemId = item?.id;
+  const isAlbum = isAlbumType(item?.type);
   const limit = options?.limit;
   const excludeId = options?.excludeId;
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(Boolean(itemId && isAlbum));
 
-  const isLoading = Boolean(itemId) && Boolean(albumsLoading);
+  useEffect(() => {
+    let cancelled = false;
+    const id = itemId == null ? '' : String(itemId).trim();
 
-  const items = useMemo(() => {
-    if (!itemId || albumsLoading) return [];
-    return getRecommendedAlbumsFromList(item, allAlbums, { limit, excludeId });
-  }, [itemId, item, allAlbums, albumsLoading, limit, excludeId]);
+    if (!id || !isAlbum) {
+      setItems([]);
+      setIsLoading(false);
+      return undefined;
+    }
+
+    setIsLoading(true);
+    fetchRecommendedAlbums(item, { limit, excludeId })
+      .then((rows) => {
+        if (!cancelled) setItems(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [itemId, isAlbum, item, limit, excludeId]);
 
   return { items, isLoading };
 };

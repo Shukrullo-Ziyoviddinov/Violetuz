@@ -54,6 +54,14 @@ const clipSchema = new mongoose.Schema(
       default: 'klip',
       index: true,
     },
+    /**
+     * Franshiza / seriya kliplar (music-similar QATLAM 1).
+     * Tartib: arrayda birinchi id — eng yuqori. Ba'zi yozuvlarda bo'sh.
+     */
+    franchiseClipIds: {
+      type: [Number],
+      default: [],
+    },
     video: {
       type: String,
       trim: true,

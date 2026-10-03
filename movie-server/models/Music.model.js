@@ -53,6 +53,14 @@ const musicSchema = new mongoose.Schema(
       trim: true,
       default: 'music',
     },
+    /**
+     * Franshiza / seriya treklar (music-similar QATLAM 1).
+     * Tartib: arrayda birinchi id — eng yuqori. Ba'zi yozuvlarda bo'sh.
+     */
+    franchiseMusicIds: {
+      type: [Number],
+      default: [],
+    },
     audio: {
       type: String,
       trim: true,
