@@ -162,14 +162,10 @@ const RecommendedClips = ({
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { getArtistById } = useMusicApi();
 
-  const klipForSimilar = (() => {
-    const t = String(klip?.type || '').toLowerCase();
-    if (t === 'klip' || t === 'clip') return klip;
-    return null;
-  })();
+  const item = music || album || klip;
   const { items: recommendedClips, isLoading } = useRecommendedClips(
-    klipForSimilar,
-    klipForSimilar ? { excludeId: klipForSimilar.id } : {}
+    item,
+    klip ? { excludeId: klip.id } : {}
   );
 
   const getTitleText = (it) => {
@@ -203,15 +199,17 @@ const RecommendedClips = ({
     []
   );
 
-  /* Faqat klip detail similar — music/album/konsert bu API da yo'q */
-  const awaitingCatalog = Boolean(forceSkeleton) && Boolean(klip);
+  const awaitingCatalog =
+    Boolean(forceSkeleton) || (!item && Boolean(isLoading));
   const showSectionSkeleton =
     awaitingCatalog || (Boolean(isLoading) && recommendedClips.length === 0);
   const itemsToRender = showSectionSkeleton ? skeletonItems : recommendedClips;
   const showTitleSkeleton = showSectionSkeleton;
 
-  const klipType = String(klip?.type || '').toLowerCase();
-  if (!klip || (klipType !== 'klip' && klipType !== 'clip')) return null;
+  if (music && music.type !== 'music') return null;
+  if (album && album.type !== 'musicAlbom') return null;
+  if (klip && !isClipOrConcertItem(klip)) return null;
+  if (!item && !showSectionSkeleton) return null;
   if (!showSectionSkeleton && !recommendedClips.length) return null;
 
   const renderCard = (clipItem) => {
