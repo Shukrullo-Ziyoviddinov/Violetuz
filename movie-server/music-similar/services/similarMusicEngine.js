@@ -83,6 +83,7 @@ const getYearProximityScore = (yearA, yearB) => {
 
 /**
  * QATLAM 3 soft formula.
+ * Artist soft YO'Q — bir xil artist Q2 da; Q3 boshqa artistlar uchun.
  * @param {object} a
  * @param {object} b
  * @returns {number}
@@ -91,25 +92,21 @@ const computeGeneralSimilarity = (a, b) => {
   const w = similarityWeights.general;
   const genreA = genreOf(a);
   const genreB = genreOf(b);
-  const artistA = artistIdOf(a);
-  const artistB = artistIdOf(b);
   const countryA = countryOf(a);
   const countryB = countryOf(b);
   const langA = languageOf(a);
   const langB = languageOf(b);
 
   const genreMatch = genreA && genreB && genreA === genreB ? 1 : 0;
-  const artistMatch = artistA && artistB && artistA === artistB ? 1 : 0;
   const countryMatch = countryA && countryB && countryA === countryB ? 1 : 0;
   const languageMatch = langA && langB && langA === langB ? 1 : 0;
   const yearProximity = getYearProximityScore(yearOf(a), yearOf(b));
 
   return (
     w.w1Genre * genreMatch +
-    w.w2Artist * artistMatch +
-    w.w3Year * yearProximity +
-    w.w4Country * countryMatch +
-    w.w5Language * languageMatch
+    w.w2Year * yearProximity +
+    w.w3Country * countryMatch +
+    w.w4Language * languageMatch
   );
 };
 
@@ -206,11 +203,15 @@ const resolveGeneralLayer = (current, pool, usedIds, maxCount) => {
   const cap = Math.max(0, Number(maxCount) || 0);
   if (cap <= 0) return [];
 
+  const currentArtist = artistIdOf(current);
+
   /** @type {Array<{ item: object, score: number }>} */
   const scored = [];
   for (const candidate of pool) {
     const id = itemIdOf(candidate);
     if (id == null || usedIds.has(id)) continue;
+    // Bir xil artist — faqat Q2; Q3 diversifikatsiya
+    if (currentArtist && artistIdOf(candidate) === currentArtist) continue;
     const score = computeGeneralSimilarity(current, candidate);
     if (!(score > 0)) continue;
     scored.push({ item: candidate, score });

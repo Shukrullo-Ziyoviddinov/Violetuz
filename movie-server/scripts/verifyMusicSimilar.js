@@ -195,6 +195,34 @@ if (clipF[0]?.id !== 1103 || clipF[1]?.id !== 1104) {
   fail('clip L1 order');
 } else ok('clip L1 franchise order [1103,1104]');
 
+const q3SameArtist = clipRows.filter(
+  (r) =>
+    r.layer === L.general &&
+    String(r.item?.artistId || '').toLowerCase() ===
+      String(k1101.artistId || '').toLowerCase()
+);
+if (q3SameArtist.length) fail('Q3 includes same artist');
+else ok('Q3 excludes same artist');
+
+const k1102 = klips.find((k) => k.id === 1102);
+const dramaRows = buildSimilarMusicItems(k1102, klips, {
+  contentType: 'klip',
+  limit: 10,
+});
+const dramaQ3 = dramaRows.filter((r) => r.layer === L.general);
+const dramaQ3Other = dramaQ3.filter(
+  (r) =>
+    String(r.item?.artistId || '').toLowerCase() !==
+    String(k1102.artistId || '').toLowerCase()
+);
+if (dramaQ3.length && dramaQ3Other.length !== dramaQ3.length) {
+  fail('drama Q3 same artist leak');
+} else ok('drama Q3 only other artists (' + dramaQ3Other.length + ')');
+
+if (similarityWeights.general.w2Artist != null) {
+  fail('Q3 still has w2Artist');
+} else ok('Q3 weights have no artist soft');
+
 const concertLike = {
   id: 999001,
   type: 'konsert',

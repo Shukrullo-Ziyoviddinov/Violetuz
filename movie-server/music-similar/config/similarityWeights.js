@@ -44,14 +44,14 @@ const similarityWeights = {
 
   /**
    * QATLAM 3 — soft skor vaznlari.
-   * w1 genre, w2 artist soft, w3 year, w4 country, w5 language.
+   * Artist soft YO'Q (artist faqat Q2 hard). Q3 = boshqa artistlar.
+   * w1 genre, w2 year, w3 country, w4 language.
    */
   general: Object.freeze({
-    w1Genre: 0.35,
-    w2Artist: 0.3,
-    w3Year: 0.15,
-    w4Country: 0.1,
-    w5Language: 0.1,
+    w1Genre: 0.5,
+    w2Year: 0.2,
+    w3Country: 0.15,
+    w4Language: 0.15,
   }),
 
   /** To'liq katalog precompute oralig'i (ms). */
