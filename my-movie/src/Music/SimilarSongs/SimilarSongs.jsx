@@ -144,6 +144,8 @@ const SimilarSongs = ({
   klip,
   titleKey = 'music.similarSongs',
   forceSkeleton = false,
+  /** 'homeFeed' — album detail "siz uchun"; default — music similar / klip local */
+  source,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -152,7 +154,9 @@ const SimilarSongs = ({
   const { getArtistById } = useMusicApi();
 
   const item = music || album || klip;
-  const { items: similarSongs, isLoading } = useSimilarSongs(item);
+  const { items: similarSongs, isLoading } = useSimilarSongs(item, {
+    source,
+  });
 
   const getTitleText = (song) => {
     if (!song?.title) return '';
@@ -186,9 +190,10 @@ const SimilarSongs = ({
     []
   );
 
-  const awaitingCatalog = Boolean(forceSkeleton) || (!item && Boolean(isLoading));
+  /* Feed/similar loading → skeleton; tayyor + bo'sh → null */
   const showSectionSkeleton =
-    awaitingCatalog || (Boolean(isLoading) && similarSongs.length === 0);
+    Boolean(forceSkeleton) ||
+    (Boolean(isLoading) && similarSongs.length === 0);
   const itemsToRender = showSectionSkeleton ? skeletonItems : similarSongs;
   const showTitleSkeleton = showSectionSkeleton;
 

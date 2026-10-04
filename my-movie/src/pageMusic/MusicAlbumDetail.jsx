@@ -802,6 +802,7 @@ const MusicAlbumDetail = () => {
             <SimilarSongs
               album={album}
               titleKey="music.songsForYou"
+              source="homeFeed"
               forceSkeleton={showHeroDataSkeleton}
             />
             <RecommendedClips album={album} forceSkeleton={showHeroDataSkeleton} />
