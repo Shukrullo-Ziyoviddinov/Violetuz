@@ -279,7 +279,8 @@ const VideoPage = () => {
   }, [relatedList, selectedGenre]);
 
   const showTrendSectionSkeleton =
-    showHeroDataSkeleton || (Boolean(videosLoading) && relatedList.length === 0);
+    showHeroDataSkeleton ||
+    ((Boolean(videosLoading) || Boolean(recsLoading)) && relatedList.length === 0);
   const trendItemsToRender = showTrendSectionSkeleton
     ? trendSkeletonItems
     : filteredRelatedList;
