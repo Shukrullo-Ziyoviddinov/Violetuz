@@ -197,6 +197,34 @@
   text-overflow: ellipsis;
 }
 
+.trailer-page .similar-trailer-imdb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.trailer-page .similar-trailer-imdb-img {
+  width: 16px;
+  height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: block;
+  background: #111;
+}
+
+.trailer-page .similar-trailer-imdb-value {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
 .trailer-page .similar-trailer-actions {
   display: flex;
   align-items: center;

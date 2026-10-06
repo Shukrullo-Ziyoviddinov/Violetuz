@@ -194,6 +194,31 @@
   text-overflow: ellipsis;
 }
 
+.similar-trailer-imdb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.similar-trailer-imdb-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: block;
+  background: #111;
+}
+
+.similar-trailer-imdb-value {
+  font-size: inherit;
+  font-weight: 500;
+  line-height: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
+
 .similar-trailer-meta-row {
   display: block;
   min-width: 0;

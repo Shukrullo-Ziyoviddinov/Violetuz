@@ -8,9 +8,15 @@ import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import VerticalScroll from './VerticalScroll';
+import { formatMovieRating } from '../Rating/CalculateRating';
 import './SimilarTrailers.css';
 
 const VIDEO_READY_TIMEOUT_MS = 20000;
+
+const hasMovieRating = (value) =>
+  value != null && value !== '' && value !== 'none' && Number.isFinite(Number(value));
+
+const formatImdbLabel = (value) => (hasMovieRating(value) ? formatMovieRating(value) : null);
 
 /**
  * Preview kadrga seek. Tayyor bo‘lganda (seeked) onDone.
@@ -151,6 +157,7 @@ const SimilarTrailerItem = ({
   }, []);
 
   const showSkeleton = Boolean(videoSrc) && !ready && !failed;
+  const imdbLabel = formatImdbLabel(trailer.ratingImdb);
 
   return (
     <div
@@ -211,9 +218,16 @@ const SimilarTrailerItem = ({
             <div className="similar-trailer-title">
               {trailer.title?.[contentLang] || trailer.title?.uz || trailer.title?.ru || ''}
             </div>
-            <div className="similar-trailer-text">
-              {trailer.text?.[contentLang] || trailer.text?.uz || trailer.text?.ru || ''}
-            </div>
+            {imdbLabel != null ? (
+              <div className="similar-trailer-text similar-trailer-imdb" aria-label={`IMDb ${imdbLabel}`}>
+                <img
+                  className="similar-trailer-imdb-img"
+                  src="/img/imdbnew.png"
+                  alt=""
+                />
+                <span className="similar-trailer-imdb-value">{imdbLabel}</span>
+              </div>
+            ) : null}
             <div className="similar-trailer-meta-row">
               <ViewCount
                 itemId={tKey}
@@ -268,6 +282,7 @@ const SimilarTrailers = ({
           ...trailer,
           movieId: movie.id,
           movieTitle: movie.title,
+          ratingImdb: movie.ratingImdb,
         }))
       )
       .filter((trailer) => trailer.typeTrailers === currentTypeTrailers);
