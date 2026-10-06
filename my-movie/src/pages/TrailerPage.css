@@ -76,6 +76,34 @@
   align-self: start;
 }
 
+/* Video: purple border/shadow yo‘q (triller-player-frame kabi) */
+.trailer-page .trailer-modal-pin .trailer-modal-video-wrapper,
+.trailer-page .trailer-modal-pin .video-player-controls {
+  border: none;
+  box-shadow: none;
+}
+
+.trailer-page .trailer-modal-pin .trailer-modal-video-wrapper:hover,
+.trailer-page .trailer-modal-pin .video-player-controls:hover {
+  box-shadow: none;
+}
+
+/* .triller-side-title bilan bir xil */
+.trailer-page .similar-trailers-title {
+  margin: 0 0 0.85rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  text-shadow: none;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #fff;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
 /* Desktop: ichki scrollbar o‘rniga sahifa scroll (triller kabi) */
 @media (min-width: 970px) {
   /* Baland sidebar info qatorini pastga surmasin */
@@ -100,6 +128,7 @@
     height: 100%;
     flex: none;
     min-height: 0;
+    border-radius: 12px;
   }
 
   .trailer-page .trailer-modal-sidebar .similar-trailers-container,
@@ -216,16 +245,49 @@ body.trailer-page-active {
     width: 100%;
   }
 
-  .trailer-page .trailer-modal-sidebar {
+  /* .triller-scroll-area kabi padding — kartochka/info yonlarga yopishmasin */
+  .trailer-page .trailer-modal-scroll-area {
     width: 100%;
-    height: auto;
-    max-height: none;
-    min-height: 0;
-    overflow: visible;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0 0.7rem 1.25rem;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   .trailer-page .trailer-modal-controls-info {
     grid-area: unset;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0.75rem 0 0.35rem;
+    box-sizing: border-box;
+  }
+
+  .trailer-page .trailer-modal-sidebar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: auto;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .trailer-page .trailer-modal-sidebar .similar-trailers-container,
+  .trailer-page .trailer-modal-sidebar .similar-trailers-list {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .trailer-page .trailer-modal-sticky-similar-title {
+    margin: 0 -0.7rem;
+    padding: 0.15rem 0.7rem;
+    box-sizing: border-box;
   }
 }
 
