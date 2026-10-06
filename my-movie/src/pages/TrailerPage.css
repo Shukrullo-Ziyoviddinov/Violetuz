@@ -34,14 +34,37 @@
   animation: none;
   grid-template-columns: minmax(0, 1fr) 402px;
   grid-template-rows: auto auto;
+  grid-template-areas:
+    'video sidebar'
+    'info sidebar';
   align-items: start;
+}
+
+/* Info: .triller-primary-info kabi — video ostida, kartochka chrome yo‘q */
+.trailer-page .trailer-modal-controls-info {
+  grid-area: info;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  flex-shrink: 0;
+  align-self: start;
+  z-index: 1;
 }
 
 /* O‘ng blok ota: kartochkalarga tegmasdan chrome olib tashlash */
 .trailer-page .trailer-modal-sidebar {
+  grid-area: sidebar;
   width: auto;
   max-width: none;
-  height: auto;
   max-height: none;
   overflow: visible;
   background: transparent;
@@ -55,6 +78,12 @@
 
 /* Desktop: ichki scrollbar o‘rniga sahifa scroll (triller kabi) */
 @media (min-width: 970px) {
+  /* Baland sidebar info qatorini pastga surmasin */
+  .trailer-page .trailer-modal-sidebar {
+    height: 0;
+    min-height: 0;
+  }
+
   .trailer-page .trailer-modal-pin {
     position: relative;
     width: 100%;
@@ -191,7 +220,12 @@ body.trailer-page-active {
     width: 100%;
     height: auto;
     max-height: none;
+    min-height: 0;
     overflow: visible;
+  }
+
+  .trailer-page .trailer-modal-controls-info {
+    grid-area: unset;
   }
 }
 
