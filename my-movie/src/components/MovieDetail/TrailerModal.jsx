@@ -10,7 +10,9 @@ import SimilarTrailers from './SimilarTrailers';
 import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import ShareButton from '../ShareButton/ShareButton';
+import TrillerDescription from '../Triller/TrillerDescription';
 import { formatMovieRating } from '../Rating/CalculateRating';
+import { normalizeTrailerDescription } from '../../utils/trailerDescription';
 import './TrailerModal.css';
 
 /** Trailer reytinglari — kinodagi maydonlar (alohida kiritilmaydi) */
@@ -303,6 +305,39 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
       movie: { id: movieId, title },
     };
   }, [selectedTrailer, movie?.id, contentLang, ratingSourceMovie]);
+
+  /** TrillerDescription: nested text + yil/davlat/janr (legacy string ham) */
+  const trailerDescription = useMemo(() => {
+    const base = normalizeTrailerDescription(selectedTrailer?.text);
+    if (!base) return null;
+
+    const fill = (langBlock, lang) => {
+      if (!langBlock) return langBlock;
+      const desc = ratingSourceMovie?.description?.[lang] || {};
+      const genreArr = desc.genre || ratingSourceMovie?.genre?.[lang];
+      const genre =
+        langBlock.genre ||
+        (Array.isArray(genreArr) ? genreArr.join(', ') : genreArr ? String(genreArr) : '') ||
+        '';
+      return {
+        ...langBlock,
+        year:
+          langBlock.year ||
+          (desc.year != null ? String(desc.year) : '') ||
+          (ratingSourceMovie?.specs?.year != null ? String(ratingSourceMovie.specs.year) : ''),
+        country:
+          langBlock.country ||
+          (desc.country != null ? String(desc.country) : '') ||
+          '',
+        genre: genre ? String(genre) : '',
+      };
+    };
+
+    return {
+      uz: fill(base.uz, 'uz'),
+      ru: fill(base.ru, 'ru'),
+    };
+  }, [selectedTrailer?.text, ratingSourceMovie]);
 
   // —— Expand: scroll-area pastga ——
   const handleSheetTouchStart = (e) => {
@@ -606,7 +641,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                         <SkeletonLoader variant="trailer-modal-controls-action" />
                       </div>
                     </div>
-                    <SkeletonLoader variant="trailer-modal-controls-text" />
+                    <TrillerDescription loading className="trailer-modal-controls-text" />
                   </>
                 ) : selectedTrailer ? (
                   <>
@@ -668,9 +703,12 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                         </div>
                       ) : null}
                     </div>
-                    <div className="trailer-modal-controls-text">
-                      {selectedTrailer.text?.[contentLang] || selectedTrailer.text?.uz || selectedTrailer.text?.ru || ''}
-                    </div>
+                    {trailerDescription ? (
+                      <TrillerDescription
+                        description={trailerDescription}
+                        className="trailer-modal-controls-text"
+                      />
+                    ) : null}
                   </>
                 ) : null}
               </div>

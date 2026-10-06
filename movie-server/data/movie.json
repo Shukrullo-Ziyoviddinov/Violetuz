@@ -24,7 +24,7 @@
         }
       }
     },
-    "rating": 4.8, 
+    "rating": 4.8,
     "ratingImdb": 7.7,
     "ratingKinopoisk": 7.5,
     "ageRestriction": 18,
@@ -80,8 +80,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "John Wick 4 - Treyler",
-          "ru": "Джон Уик 4 - Трейлер"
+          "uz": {
+            "text": "John Wick High Tablega qarshi so‘nggi jangga kiradi: Parij va Berlin ko‘chalarida qonli duel, yangi ittifoqlar va kechiktirib bo‘lmas o‘ch. Treyler — epic chase va jang sahnalarining eng kuchli lahzalari.",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Jangari, Triller, Kriminal"
+          },
+          "ru": {
+            "text": "Джон Уик вступает в финальную битву против Высшего стола: кровавые дуэли на улицах Парижа и Берлина, новые союзы и неизбежная месть. Трейлер — самые мощные погони и боевые сцены.",
+            "year": "2023",
+            "country": "США",
+            "genre": "Боевик, Триллер, Криминал"
+          }
         },
         "like": "3200",
         "dislike": "45",
@@ -208,8 +218,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Mission Impossible 7 - Treyler",
-          "ru": "Миссия невыполнима 7 - Трейлер"
+          "uz": {
+            "text": "Ethan Hunt va IMF jamoasi sun’iy intellekt xavfiga qarshi yuguradi. Dunyo qulashi mumkin — sodiqlik, xiyonat va imkonsiz missiya. Treylerda eng zo‘r stunt va suspense lahzalari.",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Jangari, Sarguzasht, Triller"
+          },
+          "ru": {
+            "text": "Итан Хант и команда МВФ против угрозы ИИ. Мир на грани — верность, предательство и невозможная миссия. В трейлере лучшие трюки и моменты саспенса.",
+            "year": "2023",
+            "country": "США",
+            "genre": "Боевик, Приключения, Триллер"
+          }
         },
         "like": "2800",
         "dislike": "38",
@@ -333,8 +353,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Fast X - Treyler",
-          "ru": "Форсаж 10 - Трейлер"
+          "uz": {
+            "text": "Dominic Toretto oilasi Dante — o‘tmishdagi dushman bilan yuzma-yuz. Tezlik, oila va intiqom. Treyler Fast saga’sining eng katta ta’qib va portlash sahnallarini ochadi.",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Jangari, Sarguzasht, Kriminal"
+          },
+          "ru": {
+            "text": "Семья Доминика Торетто против Данте — врага из прошлого. Скорость, семья и месть. Трейлер открывает самые масштабные погони и взрывы саги Fast.",
+            "year": "2023",
+            "country": "США",
+            "genre": "Боевик, Приключения, Криминал"
+          }
         },
         "like": "2100",
         "dislike": "95",
@@ -457,8 +487,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "The Equalizer 3 - Treyler",
-          "ru": "Равный 3 - Трейлер"
+          "uz": {
+            "text": "Robert McCall Italiyada tinchlik izlaydi, lekin mafiya uni yana jangga chorlaydi. Adolat uchun yolg‘iz jangchi. Treyler — sokinlikdan zo‘ravonlikka keskin o‘tish.",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Jangari, Triller, Drama"
+          },
+          "ru": {
+            "text": "Роберт МакКолл ищет покой в Италии, но мафия снова втягивает его в бой. Одинокий воин ради справедливости. Трейлер — резкий переход от тишины к насилию.",
+            "year": "2023",
+            "country": "США",
+            "genre": "Боевик, Триллер, Драма"
+          }
         },
         "like": "1650",
         "dislike": "42",
@@ -581,8 +621,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Extraction 2 - Treyler",
-          "ru": "Экстракция 2 - Трейлер"
+          "uz": {
+            "text": "Tyler Rake yana bir xavfli qutqaruvda: qamoqxona, otishmalar va imkonsiz yo‘l. Treyler Extraction 2 ning eng zo‘r action ketma-ketliklarini ko‘rsatadi.",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Jangari, Triller"
+          },
+          "ru": {
+            "text": "Тайлер Рейк снова в опасной спасательной миссии: тюрьма, перестрелки и невозможный путь. Трейлер показывает лучшие экшен-сцены Extraction 2.",
+            "year": "2023",
+            "country": "США",
+            "genre": "Боевик, Триллер"
+          }
         },
         "like": "2400",
         "dislike": "55",
@@ -709,8 +759,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Sicario - Treyler",
-          "ru": "Убийца - Трейлер"
+          "uz": {
+            "text": "FBI agenti Mexiko–AQSh chegarasida kartellarga qarshi maxsus operatsiyaga kirishadi. Axloqiy chegaralar yo‘qoladi. Treyler — zo‘ravonlik va siyosiy triller ruhida.",
+            "year": "2015",
+            "country": "AQSh",
+            "genre": "Jangari, Triller, Drama"
+          },
+          "ru": {
+            "text": "Агент ФБР в спецоперации против картелей на границе Мексики и США. Моральные границы стираются. Трейлер в духе жестокого политического триллера.",
+            "year": "2015",
+            "country": "США",
+            "genre": "Боевик, Триллер, Драма"
+          }
         },
         "like": "1890",
         "dislike": "28",
@@ -835,8 +895,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Sicario - Treyler",
-          "ru": "Убийца - Трейлер"
+          "uz": {
+            "text": "FBI agenti Mexiko–AQSh chegarasida kartellarga qarshi maxsus operatsiyaga kirishadi. Axloqiy chegaralar yo‘qoladi. Treyler — zo‘ravonlik va siyosiy triller ruhida.",
+            "year": "2015",
+            "country": "AQSh",
+            "genre": "Jangari, Triller, Drama"
+          },
+          "ru": {
+            "text": "Агент ФБР в спецоперации против картелей на границе Мексики и США. Моральные границы стираются. Трейлер в духе жестокого политического триллера.",
+            "year": "2015",
+            "country": "США",
+            "genre": "Боевик, Триллер, Драма"
+          }
         },
         "like": "1890",
         "dislike": "28",
@@ -961,8 +1031,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Indiana Jones - Treyler",
-          "ru": "Индиана Джонс - Трейлер"
+          "uz": {
+            "text": "Indiana Jones so‘nggi sarguzashtida vaqtni o‘zgartira oladigan artefaktni izlaydi. Tarix, xavf va klassik sarguzasht. Treyler — nostalgia va yangi epik lahzalar.",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Jangari, Fantastika"
+          },
+          "ru": {
+            "text": "Индиана Джонс в последнем приключении ищет артефакт, способный изменить время. История, опасность и классика приключений. Трейлер — ностальгия и новые эпические моменты.",
+            "year": "2023",
+            "country": "США",
+            "genre": "Приключения, Боевик, Фэнтези"
+          }
         },
         "like": "2850",
         "dislike": "58",
@@ -1082,8 +1162,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Uncharted - Treyler",
-          "ru": "Анчартед - Трейлер"
+          "uz": {
+            "text": "Nathan Drake va Sully Magellan oltinini izlab xavfli sarguzashtga otlanadi. Do‘stlik, hazil va o‘limga yaqin sakrashlar. Treyler o‘yin ruhidagi actionni ochadi.",
+            "year": "2022",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Jangari"
+          },
+          "ru": {
+            "text": "Нейтан Дрейк и Салли отправляются за золотом Магеллана. Дружба, юмор и прыжки на грани смерти. Трейлер раскрывает экшен в духе игры.",
+            "year": "2022",
+            "country": "США",
+            "genre": "Приключения, Боевик"
+          }
         },
         "like": "2100",
         "dislike": "72",
@@ -1207,8 +1297,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Jungle Cruise - Treyler",
-          "ru": "Джунгли - Трейлер"
+          "uz": {
+            "text": "Doktor Lily Houghton Amazon daryosida sehrli daraxt izlaydi — Frank bilan birga. Tabiat, sarguzasht va romantik hazil. Treyler sayohatning eng yorqin lahzalarini beradi.",
+            "year": "2021",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Komediya, Fantastika"
+          },
+          "ru": {
+            "text": "Доктор Лилли Хоутон вместе с Фрэнком ищет волшебное дерево на Амазонке. Природа, приключения и романтический юмор. Трейлер — ярчайшие моменты путешествия.",
+            "year": "2021",
+            "country": "США",
+            "genre": "Приключения, Комедия, Фэнтези"
+          }
         },
         "like": "1950",
         "dislike": "45",
@@ -1332,8 +1432,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Jumanji - Treyler",
-          "ru": "Джуманджи - Трейлер"
+          "uz": {
+            "text": "To‘rt do‘st yana Jumanji’ga qaytadi — lekin qoidalar o‘zgargan. O‘yin ichidagi yangi xavflar. Treyler kulgili va aksiyon to‘la sahnani va’da qiladi.",
+            "year": "2019",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Komediya, Fantastika"
+          },
+          "ru": {
+            "text": "Четверо друзей снова в Джуманджи — но правила изменились. Новые опасности внутри игры. Трейлер обещает юмор и экшен.",
+            "year": "2019",
+            "country": "США",
+            "genre": "Приключения, Комедия, Фэнтези"
+          }
         },
         "like": "2450",
         "dislike": "62",
@@ -1454,8 +1564,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Tomb Raider - Treyler",
-          "ru": "Томб Райдер - Трейлер"
+          "uz": {
+            "text": "Lara Croft otasining izidan xavfli orolga yo‘l oladi. Tomb Raider yangi boshlanishi — jasorat va omon qolish. Treyler sarguzashtning eng keskin lahzalarini ochadi.",
+            "year": "2018",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Jangari, Oilaviy"
+          },
+          "ru": {
+            "text": "Лара Крофт отправляется на опасный остров по следам отца. Новое начало Tomb Raider — отвага и выживание. Трейлер раскрывает самые напряжённые моменты приключения.",
+            "year": "2018",
+            "country": "США",
+            "genre": "Приключения, Боевик"
+          }
         },
         "like": "1680",
         "dislike": "55",
@@ -1580,8 +1700,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "The Lost City - Treyler",
-          "ru": "Затерянный город - Трейлер"
+          "uz": {
+            "text": "Yozuvchi Loretta Sage o‘g‘irlanadi — model Alan uni qutqarishga otlanadi. Romantik sarguzasht, hazil va ta’qib. Treyler eng yorqin juftlik kimyosini ko‘rsatadi.",
+            "year": "2022",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Komediya, Romantik"
+          },
+          "ru": {
+            "text": "Писательницу Лоретту Сейдж похищают — модель Алан отправляется на спасение. Романтическое приключение, юмор и погони. Трейлер показывает химию этой пары.",
+            "year": "2022",
+            "country": "США",
+            "genre": "Приключения, Комедия, Романтика"
+          }
         },
         "like": "2200",
         "dislike": "48",
@@ -1702,8 +1832,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Uncharted - Treyler",
-          "ru": "Анчартед - Трейлер"
+          "uz": {
+            "text": "Uncharted - Treyler",
+            "year": "2022",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Jangari"
+          },
+          "ru": {
+            "text": "Анчартед - Трейлер",
+            "year": "2022",
+            "country": "США",
+            "genre": "Приключения, Боевик"
+          }
         },
         "like": "2100",
         "dislike": "72",
@@ -1827,8 +1967,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Muz II - Treyler",
-          "ru": "Холодное сердце 2 - Трейлер"
+          "uz": {
+            "text": "Muz II - Treyler",
+            "year": "2019",
+            "country": "AQSh",
+            "genre": "Multfilim, Sarguzasht, Oilaviy"
+          },
+          "ru": {
+            "text": "Холодное сердце 2 - Трейлер",
+            "year": "2019",
+            "country": "США",
+            "genre": "Мультфильм, Приключения, Семейный"
+          }
         },
         "like": "1250",
         "dislike": "15",
@@ -1953,8 +2103,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Toy Story 4 - Treyler",
-          "ru": "История игрушек 4 - Трейлер"
+          "uz": {
+            "text": "Woody, Buzz va do‘stlar yangi sarguzashtda — bolalik xotirasi va do‘stlik sinovi. Treyler Toy Story 4 ning eng ta’sirli va kulgili lahzalarini beradi.",
+            "year": "2019",
+            "country": "AQSh",
+            "genre": "Multfilim, Komediya, Oilaviy"
+          },
+          "ru": {
+            "text": "Вуди, Базз и друзья в новом приключении — испытание дружбы и памяти детства. Трейлер показывает самые трогательные и смешные моменты Toy Story 4.",
+            "year": "2019",
+            "country": "США",
+            "genre": "Мультфильм, Комедия, Семейный"
+          }
         },
         "like": "980",
         "dislike": "22",
@@ -2079,8 +2239,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Shrek 2 - Treyler",
-          "ru": "Шрек 2 - Трейлер"
+          "uz": {
+            "text": "Shrek 2 - Treyler",
+            "year": "2004",
+            "country": "AQSh",
+            "genre": "Multfilim, Komediya, Fantastika"
+          },
+          "ru": {
+            "text": "Шрек 2 - Трейлер",
+            "year": "2004",
+            "country": "США",
+            "genre": "Мультфильм, Комедия, Фэнтези"
+          }
         },
         "like": "2100",
         "dislike": "45",
@@ -2204,8 +2374,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Madagaskar - Treyler",
-          "ru": "Мадагаскар - Трейлер"
+          "uz": {
+            "text": "Madagaskar - Treyler",
+            "year": "2005",
+            "country": "AQSh",
+            "genre": "Multfilim, Komediya, Sarguzasht"
+          },
+          "ru": {
+            "text": "Мадагаскар - Трейлер",
+            "year": "2005",
+            "country": "США",
+            "genre": "Мультфильм, Комедия, Приключения"
+          }
         },
         "like": "890",
         "dislike": "18",
@@ -2329,8 +2509,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Kung Fu Panda 4 - Treyler",
-          "ru": "Кунг-фу Панда 4 - Трейлер"
+          "uz": {
+            "text": "Po yangi raqib va yangi uslub bilan duch keladi. Kung Fu, hazil va oila. Treyler Panda 4 ning eng dinamik janglarini ochadi.",
+            "year": "2024",
+            "country": "AQSh",
+            "genre": "Multfilim, Jangari, Komediya"
+          },
+          "ru": {
+            "text": "По сталкивается с новым соперником и новым стилем. Кунг-фу, юмор и семья. Трейлер открывает самые динамичные бои Панды 4.",
+            "year": "2024",
+            "country": "США",
+            "genre": "Мультфильм, Боевик, Комедия"
+          }
         },
         "like": "1120",
         "dislike": "28",
@@ -2454,8 +2644,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Coco - Treyler",
-          "ru": "Тайна Коко - Трейлер"
+          "uz": {
+            "text": "Coco - Treyler",
+            "year": "2017",
+            "country": "AQSh",
+            "genre": "Multfilim, Drama, Oilaviy"
+          },
+          "ru": {
+            "text": "Тайна Коко - Трейлер",
+            "year": "2017",
+            "country": "США",
+            "genre": "Мультфильм, Драма, Семейный"
+          }
         },
         "like": "2560",
         "dislike": "32",
@@ -2585,8 +2785,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Coco - Treyler",
-          "ru": "Тайна Коко - Трейлер"
+          "uz": {
+            "text": "Coco - Treyler",
+            "year": "2017",
+            "country": "AQSh",
+            "genre": "Multfilim, Drama, Oilaviy"
+          },
+          "ru": {
+            "text": "Тайна Коко - Трейлер",
+            "year": "2017",
+            "country": "США",
+            "genre": "Мультфильм, Драма, Семейный"
+          }
         },
         "like": "2560",
         "dislike": "32",
@@ -2716,8 +2926,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Coco - Treyler",
-          "ru": "Тайна Коко - Трейлер"
+          "uz": {
+            "text": "Coco - Treyler",
+            "year": "2017",
+            "country": "AQSh",
+            "genre": "Multfilim, Drama, Oilaviy"
+          },
+          "ru": {
+            "text": "Тайна Коко - Трейлер",
+            "year": "2017",
+            "country": "США",
+            "genre": "Мультфильм, Драма, Семейный"
+          }
         },
         "like": "2560",
         "dislike": "32",
@@ -2843,8 +3063,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Ruhlar Olib Ketiladi - Treyler",
-          "ru": "Унесённые призраками - Трейлер"
+          "uz": {
+            "text": "Chihiro ruhlar olamiga tushib qoladi — ota-onasini qutqarish uchun jasorat kerak. Sehr, qo‘rquv va o‘sish. Treyler — Studio Ghibli ruhidagi sehrli lahzalar.",
+            "year": "2001",
+            "country": "Yaponiya",
+            "genre": "Anime, Sarguzasht, Fantastika"
+          },
+          "ru": {
+            "text": "Тихиро попадает в мир духов — чтобы спасти родителей, нужна храбрость. Магия, страх и взросление. Трейлер — волшебные моменты в духе Studio Ghibli.",
+            "year": "2001",
+            "country": "Япония",
+            "genre": "Аниме, Приключения, Фэнтези"
+          }
         },
         "like": "5200",
         "dislike": "25",
@@ -2968,8 +3198,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Sening Isming - Treyler",
-          "ru": "Твоё имя - Трейлер"
+          "uz": {
+            "text": "Mitsuha va Taki tanani almashtirish orqali bog‘lanadi. Vaqt, sevgi va taqdir. Treyler eng emotsional va vizual kuchli sahnani ochadi.",
+            "year": "2016",
+            "country": "Yaponiya",
+            "genre": "Anime, Romantik, Drama"
+          },
+          "ru": {
+            "text": "Мицуха и Таки связаны обменом тел. Время, любовь и судьба. Трейлер открывает самые эмоциональные и визуально сильные сцены.",
+            "year": "2016",
+            "country": "Япония",
+            "genre": "Аниме, Романтика, Драма"
+          }
         },
         "like": "6800",
         "dislike": "42",
@@ -3093,8 +3333,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Demon Qotar - Treyler",
-          "ru": "Истребитель демонов - Трейлер"
+          "uz": {
+            "text": "Demon Qotar - Treyler",
+            "year": "2020",
+            "country": "Yaponiya",
+            "genre": "Anime, Jangari, Fantastika"
+          },
+          "ru": {
+            "text": "Истребитель демонов - Трейлер",
+            "year": "2020",
+            "country": "Япония",
+            "genre": "Аниме, Боевик, Фэнтези"
+          }
         },
         "like": "4500",
         "dislike": "55",
@@ -3218,8 +3468,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Howl Qal'asi - Treyler",
-          "ru": "Ходячий замок - Трейлер"
+          "uz": {
+            "text": "Howl Qal'asi - Treyler",
+            "year": "2004",
+            "country": "Yaponiya",
+            "genre": "Anime, Fantastika, Romantik"
+          },
+          "ru": {
+            "text": "Ходячий замок - Трейлер",
+            "year": "2004",
+            "country": "Япония",
+            "genre": "Аниме, Фэнтези, Романтика"
+          }
         },
         "like": "4100",
         "dislike": "38",
@@ -3343,8 +3603,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Spy x Family - Treyler",
-          "ru": "Шпион × Семья - Трейлер"
+          "uz": {
+            "text": "Spy x Family - Treyler",
+            "year": "2023",
+            "country": "Yaponiya",
+            "genre": "Anime, Komediya, Jangari"
+          },
+          "ru": {
+            "text": "Шпион × Семья - Трейлер",
+            "year": "2023",
+            "country": "Япония",
+            "genre": "Аниме, Комедия, Боевик"
+          }
         },
         "like": "3200",
         "dislike": "48",
@@ -3468,8 +3738,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Jodugar Qiz - Treyler",
-          "ru": "Ведьмина служба - Трейлер"
+          "uz": {
+            "text": "Jodugar Qiz - Treyler",
+            "year": "1989",
+            "country": "Yaponiya",
+            "genre": "Anime, Sarguzasht, Oilaviy"
+          },
+          "ru": {
+            "text": "Ведьмина служба - Трейлер",
+            "year": "1989",
+            "country": "Япония",
+            "genre": "Аниме, Приключения, Семейный"
+          }
         },
         "like": "3800",
         "dislike": "32",
@@ -3594,8 +3874,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Spy x Family - Treyler",
-          "ru": "Шпион × Семья - Трейлер"
+          "uz": {
+            "text": "Spy x Family - Treyler",
+            "year": "2023",
+            "country": "Yaponiya",
+            "genre": "Anime, Komediya, Jangari"
+          },
+          "ru": {
+            "text": "Шпион × Семья - Трейлер",
+            "year": "2023",
+            "country": "Япония",
+            "genre": "Аниме, Комедия, Боевик"
+          }
         },
         "like": "3200",
         "dislike": "48",
@@ -3722,8 +4012,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Ruh 2 - Treyler",
-          "ru": "Душа 2 - Трейлер"
+          "uz": {
+            "text": "Ruh 2 - Treyler",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Animatsiya, Drama"
+          },
+          "ru": {
+            "text": "Душа 2 - Трейлер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Анимация, Драма"
+          }
         },
         "like": "1200",
         "dislike": "45",
@@ -3849,8 +4149,18 @@
           "ru": "Тизер"
         },
         "text": {
-          "uz": "Oppenheimer 2 - Teaser",
-          "ru": "Оппенгеймер 2 - Тизер"
+          "uz": {
+            "text": "Oppenheimer 2 - Teaser",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Biografiya, Drama"
+          },
+          "ru": {
+            "text": "Оппенгеймер 2 - Тизер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Биография, Драма"
+          }
         },
         "like": "2100",
         "dislike": "28",
@@ -3974,8 +4284,18 @@
           "ru": "Тизер"
         },
         "text": {
-          "uz": "Romantika - Yangi mavsum",
-          "ru": "Романтика - Новый сезон"
+          "uz": {
+            "text": "Romantika - Yangi mavsum",
+            "year": "2025",
+            "country": "Korea",
+            "genre": "Romantika, Drama"
+          },
+          "ru": {
+            "text": "Романтика - Новый сезон",
+            "year": "2025",
+            "country": "Корея",
+            "genre": "Романтика, Драма"
+          }
         },
         "like": "850",
         "dislike": "12",
@@ -4099,8 +4419,18 @@
           "ru": "Тизер"
         },
         "text": {
-          "uz": "Multfilim 2025",
-          "ru": "Мультфильм 2025"
+          "uz": {
+            "text": "Multfilim 2025",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Multfilim, Sarguzasht"
+          },
+          "ru": {
+            "text": "Мультфильм 2025",
+            "year": "2025",
+            "country": "США",
+            "genre": "Мультфильм, Приключения"
+          }
         },
         "like": "1100",
         "dislike": "22",
@@ -4224,8 +4554,18 @@
           "ru": "Тизер"
         },
         "text": {
-          "uz": "Boevik - Teaser",
-          "ru": "Боевик - Тизер"
+          "uz": {
+            "text": "Boevik - Teaser",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Jangari, Triller"
+          },
+          "ru": {
+            "text": "Боевик - Тизер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Боевик, Триллер"
+          }
         },
         "like": "680",
         "dislike": "18",
@@ -4349,8 +4689,18 @@
           "ru": "Тизер"
         },
         "text": {
-          "uz": "Anime - Yangi seriya",
-          "ru": "Аниме - Новая серия"
+          "uz": {
+            "text": "Anime - Yangi seriya",
+            "year": "2025",
+            "country": "Yaponiya",
+            "genre": "Anime, Sarguzasht"
+          },
+          "ru": {
+            "text": "Аниме - Новая серия",
+            "year": "2025",
+            "country": "Япония",
+            "genre": "Аниме, Приключения"
+          }
         },
         "like": "1350",
         "dislike": "32",
@@ -4474,8 +4824,18 @@
           "ru": "Тизер"
         },
         "text": {
-          "uz": "Sarguzasht - Teaser",
-          "ru": "Приключения - Тизер"
+          "uz": {
+            "text": "Sarguzasht - Teaser",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Sarguzasht, Jangari"
+          },
+          "ru": {
+            "text": "Приключения - Тизер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Приключения, Боевик"
+          }
         },
         "like": "780",
         "dislike": "25",
@@ -4594,8 +4954,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Qichqiriq 6 - Treyler",
-          "ru": "Крик 6 - Трейлер"
+          "uz": {
+            "text": "Qichqiriq 6 - Treyler",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller"
+          },
+          "ru": {
+            "text": "Крик 6 - Трейлер",
+            "year": "2023",
+            "country": "США",
+            "genre": "Ужасы, Триллер"
+          }
         },
         "like": "1850",
         "dislike": "65",
@@ -4715,8 +5085,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Evil Dead Rise - Treyler",
-          "ru": "Зловещие мертвецы - Трейлер"
+          "uz": {
+            "text": "Evil Dead Rise - Treyler",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller"
+          },
+          "ru": {
+            "text": "Зловещие мертвецы - Трейлер",
+            "year": "2023",
+            "country": "США",
+            "genre": "Ужасы, Триллер"
+          }
         },
         "like": "2200",
         "dislike": "78",
@@ -4840,8 +5220,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Smile - Treyler",
-          "ru": "Улыбка - Трейлер"
+          "uz": {
+            "text": "Smile - Treyler",
+            "year": "2022",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller, Drama"
+          },
+          "ru": {
+            "text": "Улыбка - Трейлер",
+            "year": "2022",
+            "country": "США",
+            "genre": "Ужасы, Триллер, Драма"
+          }
         },
         "like": "1980",
         "dislike": "52",
@@ -4962,8 +5352,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Annabel - Treyler",
-          "ru": "Аннабель - Трейлер"
+          "uz": {
+            "text": "Annabel - Treyler",
+            "year": "2014",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller"
+          },
+          "ru": {
+            "text": "Аннабель - Трейлер",
+            "year": "2014",
+            "country": "США",
+            "genre": "Ужасы, Триллер"
+          }
         },
         "like": "2450",
         "dislike": "88",
@@ -5087,8 +5487,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Get Out - Treyler",
-          "ru": "Прочь - Трейлер"
+          "uz": {
+            "text": "Get Out - Treyler",
+            "year": "2017",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller, Drama"
+          },
+          "ru": {
+            "text": "Прочь - Трейлер",
+            "year": "2017",
+            "country": "США",
+            "genre": "Ужасы, Триллер, Драма"
+          }
         },
         "like": "4200",
         "dislike": "95",
@@ -5213,8 +5623,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "A Quiet Place - Treyler",
-          "ru": "Тихое место - Трейлер"
+          "uz": {
+            "text": "A Quiet Place - Treyler",
+            "year": "2018",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller, Drama"
+          },
+          "ru": {
+            "text": "Тихое место - Трейлер",
+            "year": "2018",
+            "country": "США",
+            "genre": "Ужасы, Триллер, Драма"
+          }
         },
         "like": "3650",
         "dislike": "62",
@@ -5339,8 +5759,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "A Quiet Place - Treyler",
-          "ru": "Тихое место - Трейлер"
+          "uz": {
+            "text": "A Quiet Place - Treyler",
+            "year": "2018",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller, Drama"
+          },
+          "ru": {
+            "text": "Тихое место - Трейлер",
+            "year": "2018",
+            "country": "США",
+            "genre": "Ужасы, Триллер, Драма"
+          }
         },
         "like": "3650",
         "dislike": "62",
@@ -5470,8 +5900,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Ruh - Asosiy treyler",
-          "ru": "Душа - Главный трейлер"
+          "uz": {
+            "text": "Ruh - Asosiy treyler",
+            "year": "2020",
+            "country": "AQSh",
+            "genre": "Animatsiya, Drama, Komediya"
+          },
+          "ru": {
+            "text": "Душа - Главный трейлер",
+            "year": "2020",
+            "country": "США",
+            "genre": "Анимация, Драма, Комедия"
+          }
         },
         "like": "1200",
         "dislike": "45",
@@ -5596,8 +6036,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Oppenheimer - Asosiy treyler",
-          "ru": "Оппенгеймер - Главный трейлер"
+          "uz": {
+            "text": "Oppenheimer - Asosiy treyler",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Biografiya, Drama, Tarix"
+          },
+          "ru": {
+            "text": "Оппенгеймер - Главный трейлер",
+            "year": "2023",
+            "country": "США",
+            "genre": "Биография, Драма, История"
+          }
         },
         "like": "2100",
         "dislike": "32",
@@ -5722,8 +6172,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Qon Qarzi Qon - Asosiy treyler",
-          "ru": "Кровь за кровь - Главный трейлер"
+          "uz": {
+            "text": "Qon Qarzi Qon - Asosiy treyler",
+            "year": "2024",
+            "country": "Xitoy",
+            "genre": "Triller, Kriminal, Drama"
+          },
+          "ru": {
+            "text": "Кровь за кровь - Главный трейлер",
+            "year": "2024",
+            "country": "Китай",
+            "genre": "Триллер, Криминал, Драма"
+          }
         },
         "like": "650",
         "dislike": "28",
@@ -5848,8 +6308,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Ajoyib Oilaviy - Asosiy treyler",
-          "ru": "Суперсемейка - Главный трейлер"
+          "uz": {
+            "text": "Ajoyib Oilaviy - Asosiy treyler",
+            "year": "2004",
+            "country": "AQSh",
+            "genre": "Animatsiya, Jangari, Sarguzasht"
+          },
+          "ru": {
+            "text": "Суперсемейка - Главный трейлер",
+            "year": "2004",
+            "country": "США",
+            "genre": "Анимация, Боевик, Приключения"
+          }
         },
         "like": "980",
         "dislike": "15",
@@ -5974,8 +6444,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Uy-joy - Asosiy treyler",
-          "ru": "Хоумстед - Главный трейлер"
+          "uz": {
+            "text": "Uy-joy - Asosiy treyler",
+            "year": "2023",
+            "country": "AQSh",
+            "genre": "Vestern, Triller, Drama"
+          },
+          "ru": {
+            "text": "Хоумстед - Главный трейлер",
+            "year": "2023",
+            "country": "США",
+            "genre": "Вестерн, Триллер, Драма"
+          }
         },
         "like": "420",
         "dislike": "18",
@@ -6100,8 +6580,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "O'rgimchak-odam: Uyga Yo'l Yo'q - Asosiy treyler",
-          "ru": "Человек-паук: Нет пути домой - Главный трейлер"
+          "uz": {
+            "text": "O'rgimchak-odam: Uyga Yo'l Yo'q - Asosiy treyler",
+            "year": "2021",
+            "country": "AQSh",
+            "genre": "Jangari, Sarguzasht, Fantastika"
+          },
+          "ru": {
+            "text": "Человек-паук: Нет пути домой - Главный трейлер",
+            "year": "2021",
+            "country": "США",
+            "genre": "Боевик, Приключения, Фантастика"
+          }
         },
         "like": "3500",
         "dislike": "89",
@@ -6226,8 +6716,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Guzallik va Maxluq - Asosiy treyler",
-          "ru": "Красавица и Чудовище - Главный трейлер"
+          "uz": {
+            "text": "Guzallik va Maxluq - Asosiy treyler",
+            "year": "2017",
+            "country": "AQSh",
+            "genre": "Fantastika, Romantik, Musiqiy"
+          },
+          "ru": {
+            "text": "Красавица и Чудовище - Главный трейлер",
+            "year": "2017",
+            "country": "США",
+            "genre": "Фэнтези, Романтика, Мюзикл"
+          }
         },
         "like": "890",
         "dislike": "22",
@@ -6352,8 +6852,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Dune - Asosiy treyler",
-          "ru": "Дюна - Главный трейлер"
+          "uz": {
+            "text": "Paul Atreides Arrakisda taqdirini kutib oladi. Quvvat, xiyonat va cho‘l urushi. Treyler Duna’ning epik landshaftlari va janglarini ko‘rsatadi.",
+            "year": "2021",
+            "country": "AQSh",
+            "genre": "Fantastika, Sarguzasht, Drama"
+          },
+          "ru": {
+            "text": "Пол Атрейдес принимает свою судьбу на Арракисе. Власть, предательство и война в пустыне. Трейлер показывает эпические пейзажи и битвы Дюны.",
+            "year": "2021",
+            "country": "США",
+            "genre": "Фантастика, Приключения, Драма"
+          }
         },
         "like": "1650",
         "dislike": "41",
@@ -6478,8 +6988,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Betmen - Asosiy treyler",
-          "ru": "Бэтмен - Главный трейлер"
+          "uz": {
+            "text": "Betmen - Asosiy treyler",
+            "year": "2022",
+            "country": "AQSh",
+            "genre": "Jangari, Kriminal, Drama"
+          },
+          "ru": {
+            "text": "Бэтмен - Главный трейлер",
+            "year": "2022",
+            "country": "США",
+            "genre": "Боевик, Криминал, Драма"
+          }
         },
         "like": "1980",
         "dislike": "55",
@@ -6604,8 +7124,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Top Gun: Maverick - Asosiy treyler",
-          "ru": "Топ Ган: Мэверик - Главный трейлер"
+          "uz": {
+            "text": "Top Gun: Maverick - Asosiy treyler",
+            "year": "2022",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Sarguzasht"
+          },
+          "ru": {
+            "text": "Топ Ган: Мэверик - Главный трейлер",
+            "year": "2022",
+            "country": "США",
+            "genre": "Боевик, Драма, Приключения"
+          }
         },
         "like": "2450",
         "dislike": "38",
@@ -6734,8 +7264,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Sevgi Qulashi serialining asosiy treyleri",
-          "ru": "Главный трейлер сериала Краш на тебя"
+          "uz": {
+            "text": "Sevgi Qulashi serialining asosiy treyleri",
+            "year": "2019",
+            "country": "Janubiy Koreya",
+            "genre": "Romantik, Drama, Komediya"
+          },
+          "ru": {
+            "text": "Главный трейлер сериала Краш на тебя",
+            "year": "2019",
+            "country": "Южная Корея",
+            "genre": "Романтика, Драма, Комедия"
+          }
         },
         "like": "892",
         "dislike": "23",
@@ -6890,8 +7430,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Quyoshning Avlodlari serialining treyleri",
-          "ru": "Трейлер сериала Потомки солнца"
+          "uz": {
+            "text": "Quyoshning Avlodlari serialining treyleri",
+            "year": "2016",
+            "country": "Janubiy Koreya",
+            "genre": "Romantik, Jangari, Drama"
+          },
+          "ru": {
+            "text": "Трейлер сериала Потомки солнца",
+            "year": "2016",
+            "country": "Южная Корея",
+            "genre": "Романтика, Боевик, Драма"
+          }
         },
         "like": "756",
         "dislike": "15",
@@ -7039,8 +7589,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Dokki serialining asosiy treyleri",
-          "ru": "Главный трейлер сериала Демон"
+          "uz": {
+            "text": "Dokki serialining asosiy treyleri",
+            "year": "2016",
+            "country": "Janubiy Koreya",
+            "genre": "Fantastika, Romantik, Drama"
+          },
+          "ru": {
+            "text": "Главный трейлер сериала Демон",
+            "year": "2016",
+            "country": "Южная Корея",
+            "genre": "Фэнтези, Романтика, Драма"
+          }
         },
         "like": "1102",
         "dislike": "18",
@@ -7187,8 +7747,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Itaewon Klassi serialining treyleri",
-          "ru": "Трейлер сериала Класс Итэвон"
+          "uz": {
+            "text": "Itaewon Klassi serialining treyleri",
+            "year": "2020",
+            "country": "Janubiy Koreya",
+            "genre": "Drama, Komediya, Biznes"
+          },
+          "ru": {
+            "text": "Трейлер сериала Класс Итэвон",
+            "year": "2020",
+            "country": "Южная Корея",
+            "genre": "Драма, Комедия, Бизнес"
+          }
         },
         "like": "654",
         "dislike": "12",
@@ -7334,8 +7904,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Start-Up serialining treyleri",
-          "ru": "Трейлер сериала Стартап"
+          "uz": {
+            "text": "Start-Up serialining treyleri",
+            "year": "2020",
+            "country": "Janubiy Koreya",
+            "genre": "Romantik, Drama, Biznes"
+          },
+          "ru": {
+            "text": "Трейлер сериала Стартап",
+            "year": "2020",
+            "country": "Южная Корея",
+            "genre": "Романтика, Драма, Бизнес"
+          }
         },
         "like": "523",
         "dislike": "9",
@@ -7481,8 +8061,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Sharafli serialining treyleri",
-          "ru": "Трейлер сериала Слава"
+          "uz": {
+            "text": "Sharafli serialining treyleri",
+            "year": "2022",
+            "country": "Janubiy Koreya",
+            "genre": "Drama, Triller, Intriga"
+          },
+          "ru": {
+            "text": "Трейлер сериала Слава",
+            "year": "2022",
+            "country": "Южная Корея",
+            "genre": "Драма, Триллер, Интрига"
+          }
         },
         "like": "1456",
         "dislike": "31",
@@ -7628,8 +8218,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Sekretar Kim serialining treyleri",
-          "ru": "Трейлер сериала Секретарь Ким"
+          "uz": {
+            "text": "Sekretar Kim serialining treyleri",
+            "year": "2018",
+            "country": "Janubiy Koreya",
+            "genre": "Romantik, Komediya, Drama"
+          },
+          "ru": {
+            "text": "Трейлер сериала Секретарь Ким",
+            "year": "2018",
+            "country": "Южная Корея",
+            "genre": "Романтика, Комедия, Драма"
+          }
         },
         "like": "678",
         "dislike": "11",
@@ -7777,8 +8377,18 @@
           "ru": "Трейлер корейской драмы"
         },
         "text": {
-          "uz": "Mening Amakim serialining treyleri",
-          "ru": "Трейлер сериала Мой дядя"
+          "uz": {
+            "text": "Mening Amakim serialining treyleri",
+            "year": "2018",
+            "country": "Janubiy Koreya",
+            "genre": "Drama, Hayotiy, Psixologik"
+          },
+          "ru": {
+            "text": "Трейлер сериала Мой дядя",
+            "year": "2018",
+            "country": "Южная Корея",
+            "genre": "Драма, Жизненный, Психологический"
+          }
         },
         "like": "1123",
         "dislike": "7",
@@ -7926,8 +8536,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Inception filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма Начало"
+          "uz": {
+            "text": "Inception filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма Начало",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "405",
         "dislike": "11",
@@ -8226,8 +8846,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "O'rgimchakk odam film",
-          "ru": "Главный трейлер фильма Темный рыцарь"
+          "uz": {
+            "text": "O'rgimchakk odam film",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма Темный рыцарь",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "12",
         "dislike": "54",
@@ -8510,8 +9140,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Dilwale filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма Дилвале"
+          "uz": {
+            "text": "Dilwale filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма Дилвале",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -8793,8 +9433,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "3 Ahmoq filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма 3 идиота"
+          "uz": {
+            "text": "3 Ahmoq filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма 3 идиота",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -8918,8 +9568,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Interstellar filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма Интерстеллар"
+          "uz": {
+            "text": "Interstellar filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма Интерстеллар",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9043,8 +9703,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9167,8 +9837,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9290,8 +9970,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9413,8 +10103,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9536,8 +10236,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9659,8 +10369,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9783,8 +10503,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -9907,8 +10637,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10013,8 +10753,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10132,8 +10882,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10256,8 +11016,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10375,8 +11145,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10481,8 +11261,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10605,8 +11395,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10729,8 +11529,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10835,8 +11645,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -10959,8 +11779,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11065,8 +11895,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11189,8 +12029,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11295,8 +12145,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11401,8 +12261,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11525,8 +12395,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11631,8 +12511,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11755,8 +12645,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11861,8 +12761,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "1994",
+            "country": "USA",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "",
         "dislike": "",
@@ -11985,8 +12895,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Filmining asosiy treyleri",
-          "ru": "Главный трейлер фильма"
+          "uz": {
+            "text": "Filmining asosiy treyleri",
+            "year": "2010",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Triller"
+          },
+          "ru": {
+            "text": "Главный трейлер фильма",
+            "year": "2010",
+            "country": "США",
+            "genre": "Боевик, Драма, Триллер"
+          }
         },
         "like": "",
         "dislike": "",
@@ -12106,8 +13026,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Godfather - Treyler",
-          "ru": "Крёстный отец - Трейлер"
+          "uz": {
+            "text": "Godfather - Treyler",
+            "year": "1972",
+            "country": "AQSh",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Крёстный отец - Трейлер",
+            "year": "1972",
+            "country": "США",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "9200",
         "dislike": "85",
@@ -12231,8 +13161,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Back to the Future - Treyler",
-          "ru": "Назад в будущее - Трейлер"
+          "uz": {
+            "text": "Back to the Future - Treyler",
+            "year": "1985",
+            "country": "AQSh",
+            "genre": "Fantastika, Komediya, Sarguzasht"
+          },
+          "ru": {
+            "text": "Назад в будущее - Трейлер",
+            "year": "1985",
+            "country": "США",
+            "genre": "Фантастика, Комедия, Приключения"
+          }
         },
         "like": "6800",
         "dislike": "42",
@@ -12356,8 +13296,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "E.T. - Treyler",
-          "ru": "Инопланетянин - Трейлер"
+          "uz": {
+            "text": "E.T. - Treyler",
+            "year": "1982",
+            "country": "AQSh",
+            "genre": "Fantastika, Oilaviy, Sarguzasht"
+          },
+          "ru": {
+            "text": "Инопланетянин - Трейлер",
+            "year": "1982",
+            "country": "США",
+            "genre": "Фантастика, Семейный, Приключения"
+          }
         },
         "like": "5200",
         "dislike": "38",
@@ -12481,8 +13431,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Terminator - Treyler",
-          "ru": "Терминатор - Трейлер"
+          "uz": {
+            "text": "Terminator - Treyler",
+            "year": "1984",
+            "country": "AQSh",
+            "genre": "Fantastika, Jangari, Triller"
+          },
+          "ru": {
+            "text": "Терминатор - Трейлер",
+            "year": "1984",
+            "country": "США",
+            "genre": "Фантастика, Боевик, Триллер"
+          }
         },
         "like": "7500",
         "dislike": "62",
@@ -12606,8 +13566,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Dirty Dancing - Treyler",
-          "ru": "Грязные танцы - Трейлер"
+          "uz": {
+            "text": "Dirty Dancing - Treyler",
+            "year": "1987",
+            "country": "AQSh",
+            "genre": "Romantik, Drama, Musiqiy"
+          },
+          "ru": {
+            "text": "Грязные танцы - Трейлер",
+            "year": "1987",
+            "country": "США",
+            "genre": "Романтика, Драма, Мюзикл"
+          }
         },
         "like": "4200",
         "dislike": "55",
@@ -12723,8 +13693,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Shawshank - Treyler",
-          "ru": "Побег из Шоушенка - Трейлер"
+          "uz": {
+            "text": "Shawshank - Treyler",
+            "year": "1994",
+            "country": "AQSh",
+            "genre": "Drama"
+          },
+          "ru": {
+            "text": "Побег из Шоушенка - Трейлер",
+            "year": "1994",
+            "country": "США",
+            "genre": "Драма"
+          }
         },
         "like": "8500",
         "dislike": "28",
@@ -12842,8 +13822,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Godfather - Treyler",
-          "ru": "Крёстный отец - Трейлер"
+          "uz": {
+            "text": "Godfather - Treyler",
+            "year": "1972",
+            "country": "AQSh",
+            "genre": "Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Крёстный отец - Трейлер",
+            "year": "1972",
+            "country": "США",
+            "genre": "Драма, Криминал"
+          }
         },
         "like": "9200",
         "dislike": "85",
@@ -12967,8 +13957,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Titanik - Treyler",
-          "ru": "Титаник - Трейлер"
+          "uz": {
+            "text": "Titanik - Treyler",
+            "year": "1997",
+            "country": "AQSh",
+            "genre": "Romantik, Drama, Tarixiy"
+          },
+          "ru": {
+            "text": "Титаник - Трейлер",
+            "year": "1997",
+            "country": "США",
+            "genre": "Романтика, Драма, Исторический"
+          }
         },
         "like": "8500",
         "dislike": "95",
@@ -13088,8 +14088,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Notebook - Treyler",
-          "ru": "Дневник памяти - Трейлер"
+          "uz": {
+            "text": "Notebook - Treyler",
+            "year": "2004",
+            "country": "AQSh",
+            "genre": "Romantik, Drama"
+          },
+          "ru": {
+            "text": "Дневник памяти - Трейлер",
+            "year": "2004",
+            "country": "США",
+            "genre": "Романтика, Драма"
+          }
         },
         "like": "6200",
         "dislike": "48",
@@ -13213,8 +14223,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "La La Land - Treyler",
-          "ru": "Ла-Ла Ленд - Трейлер"
+          "uz": {
+            "text": "La La Land - Treyler",
+            "year": "2016",
+            "country": "AQSh",
+            "genre": "Romantik, Musiqiy, Drama"
+          },
+          "ru": {
+            "text": "Ла-Ла Ленд - Трейлер",
+            "year": "2016",
+            "country": "США",
+            "genre": "Романтика, Мюзикл, Драма"
+          }
         },
         "like": "4800",
         "dislike": "62",
@@ -13334,8 +14354,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "The Fault in Our Stars - Treyler",
-          "ru": "Виноваты звёзды - Трейлер"
+          "uz": {
+            "text": "The Fault in Our Stars - Treyler",
+            "year": "2014",
+            "country": "AQSh",
+            "genre": "Romantik, Drama"
+          },
+          "ru": {
+            "text": "Виноваты звёзды - Трейлер",
+            "year": "2014",
+            "country": "США",
+            "genre": "Романтика, Драма"
+          }
         },
         "like": "4200",
         "dislike": "55",
@@ -13459,8 +14489,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Crazy Rich Asians - Treyler",
-          "ru": "Сумасшедше богатые - Трейлер"
+          "uz": {
+            "text": "Crazy Rich Asians - Treyler",
+            "year": "2018",
+            "country": "AQSh",
+            "genre": "Romantik, Komediya, Drama"
+          },
+          "ru": {
+            "text": "Сумасшедше богатые - Трейлер",
+            "year": "2018",
+            "country": "США",
+            "genre": "Романтика, Комедия, Драма"
+          }
         },
         "like": "3500",
         "dislike": "72",
@@ -13584,8 +14624,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Pride and Prejudice - Treyler",
-          "ru": "Гордость и предубеждение - Трейлер"
+          "uz": {
+            "text": "Pride and Prejudice - Treyler",
+            "year": "2005",
+            "country": "Buyuk Britaniya",
+            "genre": "Romantik, Drama, Tarixiy"
+          },
+          "ru": {
+            "text": "Гордость и предубеждение - Трейлер",
+            "year": "2005",
+            "country": "Великобритания",
+            "genre": "Романтика, Драма, Исторический"
+          }
         },
         "like": "4100",
         "dislike": "38",
@@ -13709,8 +14759,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Titanik - Treyler",
-          "ru": "Титаник - Трейлер"
+          "uz": {
+            "text": "Titanik - Treyler",
+            "year": "1997",
+            "country": "AQSh",
+            "genre": "Romantik, Drama, Tarixiy"
+          },
+          "ru": {
+            "text": "Титаник - Трейлер",
+            "year": "1997",
+            "country": "США",
+            "genre": "Романтика, Драма, Исторический"
+          }
         },
         "like": "8500",
         "dislike": "95",
@@ -13834,8 +14894,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Aka - Treyler",
-          "ru": "Брат - Трейлер"
+          "uz": {
+            "text": "Aka - Treyler",
+            "year": "1997",
+            "country": "Rossiya",
+            "genre": "Jangari, Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Брат - Трейлер",
+            "year": "1997",
+            "country": "Россия",
+            "genre": "Боевик, Драма, Криминал"
+          }
         },
         "like": "4500",
         "dislike": "85",
@@ -13952,8 +15022,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Leviathan - Treyler",
-          "ru": "Левиафан - Трейлер"
+          "uz": {
+            "text": "Leviathan - Treyler",
+            "year": "2014",
+            "country": "Rossiya",
+            "genre": "Drama"
+          },
+          "ru": {
+            "text": "Левиафан - Трейлер",
+            "year": "2014",
+            "country": "Россия",
+            "genre": "Драма"
+          }
         },
         "like": "2100",
         "dislike": "45",
@@ -14075,8 +15155,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Yuqoriga Harakat - Treyler",
-          "ru": "Движение вверх - Трейлер"
+          "uz": {
+            "text": "Yuqoriga Harakat - Treyler",
+            "year": "2017",
+            "country": "Rossiya",
+            "genre": "Sport, Drama, Oilaviy"
+          },
+          "ru": {
+            "text": "Движение вверх - Трейлер",
+            "year": "2017",
+            "country": "Россия",
+            "genre": "Спорт, Драма, Семейный"
+          }
         },
         "like": "3800",
         "dislike": "52",
@@ -14202,8 +15292,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Moskva Yig'lamaydi - Treyler",
-          "ru": "Москва слезам не верит - Трейлер"
+          "uz": {
+            "text": "Moskva Yig'lamaydi - Treyler",
+            "year": "1979",
+            "country": "SSSR",
+            "genre": "Drama, Romantik, Komediya"
+          },
+          "ru": {
+            "text": "Москва слезам не верит - Трейлер",
+            "year": "1979",
+            "country": "СССР",
+            "genre": "Драма, Романтика, Комедия"
+          }
         },
         "like": "2900",
         "dislike": "28",
@@ -14332,8 +15432,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Taqdirning Ironiyasi - Treyler",
-          "ru": "Ирония судьбы - Трейлер"
+          "uz": {
+            "text": "Taqdirning Ironiyasi - Treyler",
+            "year": "1975",
+            "country": "SSSR",
+            "genre": "Romantik, Komediya, Drama"
+          },
+          "ru": {
+            "text": "Ирония судьбы - Трейлер",
+            "year": "1975",
+            "country": "СССР",
+            "genre": "Романтика, Комедия, Драма"
+          }
         },
         "like": "4500",
         "dislike": "35",
@@ -14458,8 +15568,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "T-34 - Treyler",
-          "ru": "Т-34 - Трейлер"
+          "uz": {
+            "text": "T-34 - Treyler",
+            "year": "2018",
+            "country": "Rossiya",
+            "genre": "Jangari, Drama, Tarixiy"
+          },
+          "ru": {
+            "text": "Т-34 - Трейлер",
+            "year": "2018",
+            "country": "Россия",
+            "genre": "Боевик, Драма, Исторический"
+          }
         },
         "like": "3200",
         "dislike": "68",
@@ -14584,8 +15704,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Aka - Treyler",
-          "ru": "Брат - Трейлер"
+          "uz": {
+            "text": "Aka - Treyler",
+            "year": "1997",
+            "country": "Rossiya",
+            "genre": "Jangari, Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Брат - Трейлер",
+            "year": "1997",
+            "country": "Россия",
+            "genre": "Боевик, Драма, Криминал"
+          }
         },
         "like": "4500",
         "dislike": "85",
@@ -14710,8 +15840,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Ajoyib Asr - Treyler",
-          "ru": "Великолепный век - Трейлер"
+          "uz": {
+            "text": "Ajoyib Asr - Treyler",
+            "year": "2011",
+            "country": "Turkiya",
+            "genre": "Drama, Tarixiy, Romantik"
+          },
+          "ru": {
+            "text": "Великолепный век - Трейлер",
+            "year": "2011",
+            "country": "Турция",
+            "genre": "Драма, Исторический, Романтика"
+          }
         },
         "like": "3200",
         "dislike": "45",
@@ -14922,8 +16062,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Ertug'rul Qaytishi - Treyler",
-          "ru": "Воскресший Эртугрул - Трейлер"
+          "uz": {
+            "text": "Ertug'rul Qaytishi - Treyler",
+            "year": "2014",
+            "country": "Turkiya",
+            "genre": "Jangari, Tarixiy, Drama"
+          },
+          "ru": {
+            "text": "Воскресший Эртугрул - Трейлер",
+            "year": "2014",
+            "country": "Турция",
+            "genre": "Боевик, Исторический, Драма"
+          }
         },
         "like": "4100",
         "dislike": "62",
@@ -15114,8 +16264,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Sevgi Havoda - Treyler",
-          "ru": "Любовь в воздухе - Трейлер"
+          "uz": {
+            "text": "Sevgi Havoda - Treyler",
+            "year": "2020",
+            "country": "Turkiya",
+            "genre": "Romantik, Komediya, Drama"
+          },
+          "ru": {
+            "text": "Любовь в воздухе - Трейлер",
+            "year": "2020",
+            "country": "Турция",
+            "genre": "Романтика, Комедия, Драма"
+          }
         },
         "like": "1890",
         "dislike": "28",
@@ -15257,8 +16417,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Taqiq Qilingan Sevgi - Treyler",
-          "ru": "Запретная любовь - Трейлер"
+          "uz": {
+            "text": "Taqiq Qilingan Sevgi - Treyler",
+            "year": "2015",
+            "country": "Turkiya",
+            "genre": "Drama, Romantik, Triller"
+          },
+          "ru": {
+            "text": "Запретная любовь - Трейлер",
+            "year": "2015",
+            "country": "Турция",
+            "genre": "Драма, Романтика, Триллер"
+          }
         },
         "like": "2450",
         "dislike": "35",
@@ -15410,8 +16580,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Qora Gul - Treyler",
-          "ru": "Чёрная роза - Трейлер"
+          "uz": {
+            "text": "Qora Gul - Treyler",
+            "year": "2015",
+            "country": "Turkiya",
+            "genre": "Drama, Romantik, Jangari"
+          },
+          "ru": {
+            "text": "Чёрная роза - Трейлер",
+            "year": "2015",
+            "country": "Турция",
+            "genre": "Драма, Романтика, Боевик"
+          }
         },
         "like": "1580",
         "dislike": "42",
@@ -15563,8 +16743,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Osmonning Qizi - Treyler",
-          "ru": "Дочь неба - Трейлер"
+          "uz": {
+            "text": "Osmonning Qizi - Treyler",
+            "year": "2017",
+            "country": "Turkiya",
+            "genre": "Romantik, Drama, Komediya"
+          },
+          "ru": {
+            "text": "Дочь неба - Трейлер",
+            "year": "2017",
+            "country": "Турция",
+            "genre": "Романтика, Драма, Комедия"
+          }
         },
         "like": "1920",
         "dislike": "38",
@@ -15716,8 +16906,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Osmonning Qizi - Treyler",
-          "ru": "Дочь неба - Трейлер"
+          "uz": {
+            "text": "Osmonning Qizi - Treyler",
+            "year": "2017",
+            "country": "Turkiya",
+            "genre": "Romantik, Drama, Komediya"
+          },
+          "ru": {
+            "text": "Дочь неба - Трейлер",
+            "year": "2017",
+            "country": "Турция",
+            "genre": "Романтика, Драма, Комедия"
+          }
         },
         "like": "1920",
         "dislike": "38",
@@ -15869,8 +17069,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Yomon Kimyoviy - Treyler",
-          "ru": "Во все тяжкие - Трейлер"
+          "uz": {
+            "text": "Yomon Kimyoviy - Treyler",
+            "year": "2008",
+            "country": "AQSh",
+            "genre": "Drama, Triller, Jangari"
+          },
+          "ru": {
+            "text": "Во все тяжкие - Трейлер",
+            "year": "2008",
+            "country": "США",
+            "genre": "Драма, Триллер, Боевик"
+          }
         },
         "like": "5200",
         "dislike": "85",
@@ -16061,8 +17271,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Taxtlar O'yini - Treyler",
-          "ru": "Игра престолов - Трейлер"
+          "uz": {
+            "text": "Taxtlar O'yini - Treyler",
+            "year": "2011",
+            "country": "AQSh",
+            "genre": "Fantastika, Drama, Jangari"
+          },
+          "ru": {
+            "text": "Игра престолов - Трейлер",
+            "year": "2011",
+            "country": "США",
+            "genre": "Фэнтези, Драма, Боевик"
+          }
         },
         "like": "6800",
         "dislike": "120",
@@ -16292,8 +17512,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Jodugar - Treyler",
-          "ru": "Ведьмак - Трейлер"
+          "uz": {
+            "text": "Jodugar - Treyler",
+            "year": "2019",
+            "country": "AQSh",
+            "genre": "Fantastika, Jangari, Sarguzasht"
+          },
+          "ru": {
+            "text": "Ведьмак - Трейлер",
+            "year": "2019",
+            "country": "США",
+            "genre": "Фэнтези, Боевик, Приключения"
+          }
         },
         "like": "4100",
         "dislike": "95",
@@ -16458,8 +17688,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Qora Oyna - Treyler",
-          "ru": "Чёрное зеркало - Трейлер"
+          "uz": {
+            "text": "Qora Oyna - Treyler",
+            "year": "2011",
+            "country": "Buyuk Britaniya",
+            "genre": "Fantastika, Triller, Drama"
+          },
+          "ru": {
+            "text": "Чёрное зеркало - Трейлер",
+            "year": "2011",
+            "country": "Великобритания",
+            "genre": "Фантастика, Триллер, Драма"
+          }
         },
         "like": "3200",
         "dislike": "58",
@@ -16650,8 +17890,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Sherlock - Treyler",
-          "ru": "Шерлок - Трейлер"
+          "uz": {
+            "text": "Sherlock - Treyler",
+            "year": "2010",
+            "country": "Buyuk Britaniya",
+            "genre": "Detektiv, Drama, Triller"
+          },
+          "ru": {
+            "text": "Шерлок - Трейлер",
+            "year": "2010",
+            "country": "Великобритания",
+            "genre": "Детектив, Драма, Триллер"
+          }
         },
         "like": "3900",
         "dislike": "42",
@@ -16829,8 +18079,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Stranger Things - Treyler",
-          "ru": "Очень странные дела - Трейлер"
+          "uz": {
+            "text": "Stranger Things - Treyler",
+            "year": "2016",
+            "country": "AQSh",
+            "genre": "Fantastika, Qo'rqinchli, Sarguzasht"
+          },
+          "ru": {
+            "text": "Очень странные дела - Трейлер",
+            "year": "2016",
+            "country": "США",
+            "genre": "Фантастика, Ужасы, Приключения"
+          }
         },
         "like": "4500",
         "dislike": "78",
@@ -17021,8 +18281,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Stranger Things - Treyler",
-          "ru": "Очень странные дела - Трейлер"
+          "uz": {
+            "text": "Stranger Things - Treyler",
+            "year": "2016",
+            "country": "AQSh",
+            "genre": "Fantastika, Qo'rqinchli, Sarguzasht"
+          },
+          "ru": {
+            "text": "Очень странные дела - Трейлер",
+            "year": "2016",
+            "country": "США",
+            "genre": "Фантастика, Ужасы, Приключения"
+          }
         },
         "like": "4500",
         "dislike": "78",
@@ -17209,8 +18479,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Mahallada duv-duv gap - Treyler",
-          "ru": "Слухи в махалле - Трейлер"
+          "uz": {
+            "text": "Mahallada duv-duv gap - Treyler",
+            "year": "2010",
+            "country": "O'zbekiston",
+            "genre": "Komediya, Drama"
+          },
+          "ru": {
+            "text": "Слухи в махалле - Трейлер",
+            "year": "2010",
+            "country": "Узбекистан",
+            "genre": "Комедия, Драма"
+          }
         },
         "like": "4200",
         "dislike": "35",
@@ -17330,8 +18610,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Kelgindi qiz - Treyler",
-          "ru": "Приезжая девушка - Трейлер"
+          "uz": {
+            "text": "Kelgindi qiz - Treyler",
+            "year": "2012",
+            "country": "O'zbekiston",
+            "genre": "Romantik, Drama"
+          },
+          "ru": {
+            "text": "Приезжая девушка - Трейлер",
+            "year": "2012",
+            "country": "Узбекистан",
+            "genre": "Романтика, Драма"
+          }
         },
         "like": "3500",
         "dislike": "28",
@@ -17451,8 +18741,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Cholpon - Treyler",
-          "ru": "Чолпон - Трейлер"
+          "uz": {
+            "text": "Cholpon - Treyler",
+            "year": "2008",
+            "country": "O'zbekiston",
+            "genre": "Drama, Tarixiy"
+          },
+          "ru": {
+            "text": "Чолпон - Трейлер",
+            "year": "2008",
+            "country": "Узбекистан",
+            "genre": "Драма, Исторический"
+          }
         },
         "like": "2800",
         "dislike": "22",
@@ -17571,8 +18871,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Qora ko'zlar - Treyler",
-          "ru": "Чёрные глаза - Трейлер"
+          "uz": {
+            "text": "Qora ko'zlar - Treyler",
+            "year": "2015",
+            "country": "O'zbekiston",
+            "genre": "Drama, Romantik"
+          },
+          "ru": {
+            "text": "Чёрные глаза - Трейлер",
+            "year": "2015",
+            "country": "Узбекистан",
+            "genre": "Драма, Романтика"
+          }
         },
         "like": "2100",
         "dislike": "18",
@@ -17692,8 +19002,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "O'g'il bolalar - Treyler",
-          "ru": "Мальчишки - Трейлер"
+          "uz": {
+            "text": "O'g'il bolalar - Treyler",
+            "year": "2018",
+            "country": "O'zbekiston",
+            "genre": "Komediya, Oilaviy"
+          },
+          "ru": {
+            "text": "Мальчишки - Трейлер",
+            "year": "2018",
+            "country": "Узбекистан",
+            "genre": "Комедия, Семейный"
+          }
         },
         "like": "3200",
         "dislike": "25",
@@ -17812,8 +19132,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Tilla qadam - Treyler",
-          "ru": "Золотой шаг - Трейлер"
+          "uz": {
+            "text": "Tilla qadam - Treyler",
+            "year": "2019",
+            "country": "O'zbekiston",
+            "genre": "Drama, Sarguzasht"
+          },
+          "ru": {
+            "text": "Золотой шаг - Трейлер",
+            "year": "2019",
+            "country": "Узбекистан",
+            "genre": "Драма, Приключения"
+          }
         },
         "like": "2600",
         "dislike": "20",
@@ -17932,8 +19262,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Qora ko'zlar - Treyler",
-          "ru": "Чёрные глаза - Трейлер"
+          "uz": {
+            "text": "Qora ko'zlar - Treyler",
+            "year": "2015",
+            "country": "O'zbekiston",
+            "genre": "Drama, Romantik"
+          },
+          "ru": {
+            "text": "Чёрные глаза - Трейлер",
+            "year": "2015",
+            "country": "Узбекистан",
+            "genre": "Драма, Романтика"
+          }
         },
         "like": "2100",
         "dislike": "18",
@@ -18057,8 +19397,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Rahmat - Treyler",
-          "ru": "Милосердие - Трейлер"
+          "uz": {
+            "text": "Rahmat - Treyler",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Fantastika, Jangari, Triller"
+          },
+          "ru": {
+            "text": "Милосердие - Трейлер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Фантастика, Боевик, Триллер"
+          }
         },
         "like": "450",
         "dislike": "12",
@@ -18182,8 +19532,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Annaatthe - Treyler",
-          "ru": "Аннаатхе - Трейлер"
+          "uz": {
+            "text": "Annaatthe - Treyler",
+            "year": "2021",
+            "country": "Hindiston",
+            "genre": "Jangari, Drama, Oilaviy"
+          },
+          "ru": {
+            "text": "Аннаатхе - Трейлер",
+            "year": "2021",
+            "country": "Индия",
+            "genre": "Боевик, Драма, Семейный"
+          }
         },
         "like": "680",
         "dislike": "25",
@@ -18304,8 +19664,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "55 - Treyler",
-          "ru": "55 - Трейлер"
+          "uz": {
+            "text": "55 - Treyler",
+            "year": "2024",
+            "country": "AQSh",
+            "genre": "Drama, Hayotiy"
+          },
+          "ru": {
+            "text": "55 - Трейлер",
+            "year": "2024",
+            "country": "США",
+            "genre": "Драма, Жизненный"
+          }
         },
         "like": "320",
         "dislike": "8",
@@ -18423,8 +19793,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Qichqiriq 7 - Treyler",
-          "ru": "Крик 7 - Трейлер"
+          "uz": {
+            "text": "Qichqiriq 7 - Treyler",
+            "year": "2026",
+            "country": "AQSh",
+            "genre": "Qo'rqinchli, Triller"
+          },
+          "ru": {
+            "text": "Крик 7 - Трейлер",
+            "year": "2026",
+            "country": "США",
+            "genre": "Ужасы, Триллер"
+          }
         },
         "like": "920",
         "dislike": "35",
@@ -18548,8 +19928,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "GOAT - Treyler",
-          "ru": "GOAT - Трейлер"
+          "uz": {
+            "text": "GOAT - Treyler",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Animatsiya, Komediya, Sport"
+          },
+          "ru": {
+            "text": "GOAT - Трейлер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Анимация, Комедия, Спорт"
+          }
         },
         "like": "580",
         "dislike": "15",
@@ -18673,8 +20063,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Tishsiz 2 - Treyler",
-          "ru": "Морда 2 - Трейлер"
+          "uz": {
+            "text": "Tishsiz 2 - Treyler",
+            "year": "2024",
+            "country": "AQSh",
+            "genre": "Jangari, Drama, Kriminal"
+          },
+          "ru": {
+            "text": "Морда 2 - Трейлер",
+            "year": "2024",
+            "country": "США",
+            "genre": "Боевик, Драма, Криминал"
+          }
         },
         "like": "420",
         "dislike": "18",
@@ -18794,8 +20194,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Yordam Yuboring - Treyler",
-          "ru": "Отправьте помощь - Трейлер"
+          "uz": {
+            "text": "Yordam Yuboring - Treyler",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Triller, Qo'rqinchli"
+          },
+          "ru": {
+            "text": "Отправьте помощь - Трейлер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Триллер, Ужасы"
+          }
         },
         "like": "550",
         "dislike": "22",
@@ -18919,8 +20329,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Hamnet - Treyler",
-          "ru": "Хамнет - Трейлер"
+          "uz": {
+            "text": "Hamnet - Treyler",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Drama, Romantik, Tarix"
+          },
+          "ru": {
+            "text": "Хамнет - Трейлер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Драма, Романтика, История"
+          }
         },
         "like": "720",
         "dislike": "14",
@@ -19044,8 +20464,18 @@
           "ru": "Главный Трейлер"
         },
         "text": {
-          "uz": "Mushuklar va Itlar - Treyler",
-          "ru": "Кошки и собаки - Трейлер"
+          "uz": {
+            "text": "Mushuklar va Itlar - Treyler",
+            "year": "2025",
+            "country": "AQSh",
+            "genre": "Komediya, Oilaviy, Animatsiya"
+          },
+          "ru": {
+            "text": "Кошки и собаки - Трейлер",
+            "year": "2025",
+            "country": "США",
+            "genre": "Комедия, Семейный, Анимация"
+          }
         },
         "like": "410",
         "dislike": "11",

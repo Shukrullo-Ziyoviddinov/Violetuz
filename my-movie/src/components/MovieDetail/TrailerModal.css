@@ -276,11 +276,14 @@
   background-clip: text;
 }
 
+/* TrillerDescription wrapper — ichki matn triller-description CSS dan */
+.trailer-modal-controls-text.triller-description,
 .trailer-modal-controls-text {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.5;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .trailer-modal-meta-row {
@@ -1195,10 +1198,6 @@ button.trailer-modal-controls-dislike {
     font-size: 1.15rem;
   }
 
-  .trailer-modal-controls-text {
-    font-size: 0.9rem;
-  }
-
   .trailer-modal-sidebar {
     grid-area: unset;
     order: 0;
@@ -1485,10 +1484,6 @@ button.trailer-modal-controls-dislike {
     font-size: 1.2rem;
   }
   
-  .trailer-modal-controls-text {
-    font-size: 1rem;
-  }
-  
   .trailer-modal-controls-actions {
     gap: 1.25rem;
   }
@@ -1661,10 +1656,6 @@ button.trailer-modal-controls-dislike {
   
   .trailer-modal-controls-title {
     font-size: 18px;
-  }
-  
-  .trailer-modal-controls-text {
-    font-size: 0.9rem;
   }
   
   .trailer-modal-main {
