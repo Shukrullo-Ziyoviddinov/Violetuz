@@ -1,94 +1,115 @@
+/* Triller sahifasi kabi: qora fon, desktopda sahifa scroll */
 .trailer-page {
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-  width: 100%;
-  overflow: hidden;
+  min-height: 100vh;
+  background: #000;
 }
 
 .trailer-page-overlay {
   position: relative;
-  height: 100%;
-  min-height: 0;
   width: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.98) 0%,
-    rgba(10, 5, 15, 0.96) 50%,
-    rgba(5, 0, 10, 0.98) 100%
-  );
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  min-height: calc(100vh - 80px);
+  background: #000;
+  display: block;
+  padding: 0;
   box-sizing: border-box;
-  animation: fadeIn 0.3s ease-out;
-  overflow: hidden;
+  overflow: visible;
+  animation: none;
 }
 
+/* Ota blok: modal chrome emas — .triller kabi sahifa layauti */
 .trailer-page .trailer-modal {
-  height: 100%;
-  max-height: 100%;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  height: auto;
+  max-height: none;
   min-height: 0;
+  background: #000;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  padding: 1.5rem 1.5rem 2rem;
+  gap: 1.5rem;
+  overflow: visible;
+  animation: none;
+  grid-template-columns: minmax(0, 1fr) 402px;
+  grid-template-rows: auto auto;
+  align-items: start;
+}
+
+/* O‘ng blok ota: kartochkalarga tegmasdan chrome olib tashlash */
+.trailer-page .trailer-modal-sidebar {
+  width: auto;
+  max-width: none;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  align-self: start;
+}
+
+/* Desktop: ichki scrollbar o‘rniga sahifa scroll (triller kabi) */
+@media (min-width: 970px) {
+  .trailer-page .trailer-modal-pin {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 0;
+    align-self: start;
+  }
+
+  .trailer-page .trailer-modal-pin .trailer-modal-video-wrapper,
+  .trailer-page .trailer-modal-pin .video-player-controls {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    flex: none;
+    min-height: 0;
+  }
+
+  .trailer-page .trailer-modal-sidebar .similar-trailers-container,
+  .trailer-page .trailer-modal-sidebar .similar-trailers-scroll-wrapper,
+  .trailer-page .trailer-modal-sidebar .vertical-scroll-wrapper,
+  .trailer-page .trailer-modal-sidebar .vertical-scroll-container {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    flex: none;
+    min-height: 0;
+  }
+
+  .trailer-page .trailer-modal-sidebar .vertical-scrollbar-track {
+    display: none;
+  }
 }
 
 body.trailer-page-active {
-  overflow: hidden;
   overscroll-behavior: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .trailer-page-overlay {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-}
-
-/* Desktop: navbar ko'rinadi, scroll yo'q — kontent navbar ostida sig'adi */
-@media (min-width: 970px) {
-  body.trailer-page-active .App {
-    height: 100dvh;
-    max-height: 100dvh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  body.trailer-page-active .App-main {
-    flex: 1 1 auto;
-    min-height: 0;
-    height: auto;
-    max-height: calc(100dvh - 72px);
-    overflow: hidden;
-    padding-bottom: 0 !important;
-    margin: 0;
-  }
-
-  .trailer-page {
-    height: 100%;
-    max-height: calc(100dvh - 72px);
-  }
-
-  .trailer-page-overlay {
-    height: 100%;
-    max-height: calc(100dvh - 72px);
-  }
-
+@media (max-width: 1100px) {
   .trailer-page .trailer-modal {
-    height: calc(100dvh - 72px - 4rem);
-    max-height: calc(100dvh - 72px - 4rem);
-    min-height: 480px;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 1rem;
   }
 }
 
-/* Mobil: navbar yashiriladi, to'liq ekran */
+/* ≤969px: body/App scroll yo‘q — faqat .trailer-modal-scroll-area scroll qiladi */
 @media (max-width: 969px) {
+  html.trailer-page-lock,
   body.trailer-page-active {
     position: fixed;
+    inset: 0;
     width: 100%;
     height: 100%;
+    max-height: 100%;
+    overflow: hidden;
   }
 
   body.trailer-page-active .navbar,
@@ -97,51 +118,85 @@ body.trailer-page-active {
   }
 
   body.trailer-page-active .App {
+    height: 100%;
     height: 100dvh;
     max-height: 100dvh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   body.trailer-page-active .App-main {
-    height: 100dvh;
-    max-height: 100dvh;
+    flex: 1 1 0;
     min-height: 0;
+    height: auto;
+    max-height: none;
     overflow: hidden;
     padding-bottom: 0 !important;
     margin: 0;
+    position: relative;
   }
 
   .trailer-page {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 900;
+    width: 100%;
+    max-width: 100%;
     height: 100%;
     max-height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: #000;
+    display: flex;
+    flex-direction: column;
   }
 
   .trailer-page-overlay {
-    padding: 0;
-    align-items: stretch;
-    justify-content: stretch;
-    height: 100%;
+    flex: 1 1 0;
     min-height: 0;
+    height: auto;
+    max-height: none;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .trailer-page .trailer-modal {
-    height: 100%;
-    max-height: 100%;
+    flex: 1 1 0;
     min-height: 0;
+    height: auto;
+    max-height: none;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    gap: 0;
     border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
+    grid-template-rows: unset;
+  }
+
+  .trailer-page .trailer-modal-pin {
+    aspect-ratio: unset;
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .trailer-page .trailer-modal-sidebar {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
   }
 }
 
-@media (min-width: 970px) and (max-width: 1289px) {
+@media (max-width: 360px) {
   .trailer-page-overlay {
-    padding: 1rem;
-  }
-
-  .trailer-page .trailer-modal {
-    height: calc(100dvh - 72px - 2rem);
-    max-height: calc(100dvh - 72px - 2rem);
+    padding: 0;
   }
 }

@@ -17,17 +17,11 @@ const TrailerPage = () => {
   const handleClose = () => navigate(-1);
 
   useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const prevHtmlOverflow = html.style.overflow;
-    const prevBodyOverflow = body.style.overflow;
-    html.style.overflow = 'hidden';
-    body.style.overflow = 'hidden';
-    body.classList.add('trailer-page-active');
+    document.documentElement.classList.add('trailer-page-lock');
+    document.body.classList.add('trailer-page-active');
     return () => {
-      html.style.overflow = prevHtmlOverflow;
-      body.style.overflow = prevBodyOverflow;
-      body.classList.remove('trailer-page-active');
+      document.documentElement.classList.remove('trailer-page-lock');
+      document.body.classList.remove('trailer-page-active');
     };
   }, []);
 
