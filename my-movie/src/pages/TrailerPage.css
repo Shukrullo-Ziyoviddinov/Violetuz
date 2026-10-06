@@ -104,6 +104,140 @@
   border-bottom: none;
 }
 
+/* Similar kartochka = .triller-side-card (triller CSS ga tegilmaydi) */
+.trailer-page .similar-trailers-list {
+  gap: 0.75rem;
+}
+
+.trailer-page .similar-trailer-item {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: none;
+}
+
+.trailer-page .similar-trailer-item.active {
+  background: transparent;
+}
+
+.trailer-page .similar-trailer-video {
+  position: relative;
+  width: 168px;
+  min-width: 168px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  align-self: start;
+}
+
+.trailer-page .similar-trailer-video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.trailer-page .similar-trailer-play {
+  display: none;
+}
+
+.trailer-page .similar-trailer-info {
+  min-width: 0;
+  min-height: 100%;
+  padding-top: 0.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  align-self: stretch;
+  flex: unset;
+}
+
+.trailer-page .similar-trailer-item--skeleton .similar-trailer-info,
+.trailer-page .similar-trailer-item--loading .similar-trailer-info {
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.trailer-page .similar-trailer-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-page .similar-trailer-text {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-page .similar-trailer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0;
+}
+
+.trailer-page .similar-trailer-actions .similar-trailer-like,
+.trailer-page .similar-trailer-actions .similar-trailer-dislike,
+.trailer-page button.similar-trailer-like,
+.trailer-page button.similar-trailer-dislike {
+  min-height: 28px;
+  padding: 0.25rem 0.1rem;
+  font-size: 0.75rem;
+  gap: 0.25rem;
+  background: transparent;
+}
+
+.trailer-page .similar-trailer-actions .similar-trailer-like:hover,
+.trailer-page .similar-trailer-actions .similar-trailer-like.active,
+.trailer-page button.similar-trailer-like:hover,
+.trailer-page button.similar-trailer-like.active,
+.trailer-page .similar-trailer-actions .similar-trailer-dislike:hover,
+.trailer-page .similar-trailer-actions .similar-trailer-dislike.active,
+.trailer-page button.similar-trailer-dislike:hover,
+.trailer-page button.similar-trailer-dislike.active {
+  background: transparent;
+}
+
+.trailer-page .similar-trailer-actions .similar-trailer-like svg,
+.trailer-page .similar-trailer-actions .similar-trailer-dislike svg,
+.trailer-page button.similar-trailer-like svg,
+.trailer-page button.similar-trailer-dislike svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.trailer-page .similar-trailer-actions .similar-trailer-action-count {
+  font-size: 0.75rem;
+}
+
 /* Like/dislike: .triller-meta-likes ichidagi px/padding (triller CSS ga tegilmaydi) */
 .trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-like,
 .trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-dislike {
@@ -124,6 +258,29 @@
 .trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-dislike svg {
   width: 20px;
   height: 20px;
+}
+
+@media (max-width: 900px) {
+  .trailer-page .similar-trailer-item {
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 0.65rem;
+    padding: 0;
+  }
+
+  .trailer-page .similar-trailer-video {
+    width: 160px;
+    min-width: 160px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .trailer-page .similar-trailer-title {
+    font-size: 14px;
+  }
+
+  .trailer-page .similar-trailer-text {
+    font-size: 12px;
+  }
 }
 
 /* Desktop: ichki scrollbar o‘rniga sahifa scroll (triller kabi) */
