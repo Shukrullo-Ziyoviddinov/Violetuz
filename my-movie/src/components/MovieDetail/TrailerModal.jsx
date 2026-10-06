@@ -9,6 +9,7 @@ import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import SimilarTrailers from './SimilarTrailers';
 import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
+import ShareButton from '../ShareButton/ShareButton';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import './TrailerModal.css';
 
@@ -36,26 +37,6 @@ const getTrailerMovieRatings = (sourceMovie) => {
     return list;
   }, []);
 };
-
-export const TrailerCloseButton = ({ onClick, label = 'Close' }) => (
-  <button type="button" className="trailer-modal-close" onClick={onClick} aria-label={label}>
-    <span className="trailer-modal-close-x" aria-hidden="true">×</span>
-    <svg
-      className="trailer-modal-close-back"
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  </button>
-);
 
 const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoading = false }) => {
   const isPage = variant === 'page';
@@ -304,6 +285,25 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     [ratingSourceMovie]
   );
 
+  const trailerShare = useMemo(() => {
+    if (!selectedTrailer) return null;
+    const movieId = selectedTrailer.movieId ?? movie?.id;
+    const trailerId = selectedTrailer.id;
+    if (movieId == null || trailerId == null) return null;
+    const title =
+      selectedTrailer.title?.[contentLang] ||
+      selectedTrailer.title?.uz ||
+      selectedTrailer.title?.ru ||
+      ratingSourceMovie?.title?.[contentLang] ||
+      ratingSourceMovie?.title?.uz ||
+      ratingSourceMovie?.title?.ru ||
+      '';
+    return {
+      sharePath: `/movie/${movieId}/trailer?trailerId=${trailerId}`,
+      movie: { id: movieId, title },
+    };
+  }, [selectedTrailer, movie?.id, contentLang, ratingSourceMovie]);
+
   // —— Expand: scroll-area pastga ——
   const handleSheetTouchStart = (e) => {
     if (!isMobileViewport() || isImmersiveVideoRef.current || sheetSettlingRef.current) return;
@@ -537,7 +537,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     return (
       <div className={overlayClass} onClick={isPage ? undefined : onClose}>
         <div className="trailer-modal" onClick={(e) => e.stopPropagation()}>
-          <TrailerCloseButton onClick={onClose} label={t('common.back', 'Back')} />
           <div className="trailer-modal-no-trailers">
             <p>No trailers available</p>
           </div>
@@ -558,8 +557,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
         style={trailerModalStyle}
         onClick={(e) => e.stopPropagation()}
       >
-        <TrailerCloseButton onClick={onClose} label={t('common.back', 'Back')} />
-
         <div
           className="trailer-modal-pin"
           onTouchStart={handlePinTouchStart}
@@ -657,6 +654,17 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                               <span className="trailer-modal-rating-value">{item.value}</span>
                             </span>
                           ))}
+                        </div>
+                      ) : null}
+                      {trailerShare ? (
+                        <div className="trailer-modal-share-wrap">
+                          <ShareButton
+                            movie={trailerShare.movie}
+                            sharePath={trailerShare.sharePath}
+                            dropdownInPortal
+                            icon="send"
+                            label={t('share.share', 'Ulashish')}
+                          />
                         </div>
                       ) : null}
                     </div>

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../context/MoviesApiContext';
-import TrailerModal, { TrailerCloseButton } from '../components/MovieDetail/TrailerModal';
+import TrailerModal from '../components/MovieDetail/TrailerModal';
 import '../components/MovieDetail/TrailerModal.css';
 import './TrailerPage.css';
 
@@ -30,7 +30,6 @@ const TrailerPage = () => {
       <div className="trailer-page">
         <div className="trailer-page-overlay">
           <div className="trailer-modal">
-            <TrailerCloseButton onClick={handleClose} label={t('common.back', 'Back')} />
             <div className="trailer-modal-no-trailers">
               <p>{t('detail.movieNotFound') || 'Movie not found'}</p>
             </div>

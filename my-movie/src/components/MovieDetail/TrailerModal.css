@@ -375,6 +375,56 @@
   white-space: nowrap;
 }
 
+.trailer-modal-share-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.trailer-modal-share-wrap .share-button-wrapper {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: 2;
+}
+
+.trailer-modal-share-wrap .share-button.share-button--labeled {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: max-content;
+  height: auto;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: none;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.trailer-modal-share-wrap .share-button.share-button--labeled:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  transform: none;
+  border: none;
+}
+
+.trailer-modal-share-wrap .share-button.share-button--labeled svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .trailer-modal-controls-like,
 .trailer-modal-controls-dislike {
   display: flex;
