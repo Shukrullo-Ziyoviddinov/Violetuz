@@ -238,6 +238,47 @@
   font-size: 0.75rem;
 }
 
+/* Like/dislike + reytinglar bir qator (.triller-meta-left kabi) */
+.trailer-page .trailer-modal-controls-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem 1.1rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.trailer-page .trailer-modal-controls-likes {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.trailer-page .trailer-modal-controls-ratings {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.trailer-page .trailer-modal-rating-img {
+  width: 1rem;
+  height: 1rem;
+  max-width: 1rem;
+  max-height: 1rem;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.trailer-page .trailer-modal-rating-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 /* Like/dislike: .triller-meta-likes ichidagi px/padding (triller CSS ga tegilmaydi) */
 .trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-like,
 .trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-dislike {

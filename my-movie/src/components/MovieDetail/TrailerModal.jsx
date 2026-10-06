@@ -2,13 +2,40 @@ import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { formatActionCount } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import SimilarTrailers from './SimilarTrailers';
 import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
+import { formatMovieRating } from '../Rating/CalculateRating';
 import './TrailerModal.css';
+
+/** Trailer reytinglari — kinodagi maydonlar (alohida kiritilmaydi) */
+const TRAILER_MOVIE_RATINGS = [
+  { key: 'rating', src: '/img/vlplay_preview_rev_1.png', label: 'VL' },
+  { key: 'ratingImdb', src: '/img/imdbnew.png', label: 'IMDb' },
+  { key: 'ratingKinopoisk', src: '/img/kinopoisk.jpg', label: 'Kinopoisk' },
+];
+
+const hasMovieRating = (value) =>
+  value != null && value !== '' && value !== 'none' && Number.isFinite(Number(value));
+
+const getTrailerMovieRatings = (sourceMovie) => {
+  if (!sourceMovie) return [];
+  return TRAILER_MOVIE_RATINGS.reduce((list, item) => {
+    const raw = sourceMovie[item.key];
+    if (!hasMovieRating(raw)) return list;
+    list.push({
+      key: item.key,
+      src: item.src,
+      label: item.label,
+      value: formatMovieRating(raw),
+    });
+    return list;
+  }, []);
+};
 
 export const TrailerCloseButton = ({ onClick, label = 'Close' }) => (
   <button type="button" className="trailer-modal-close" onClick={onClick} aria-label={label}>
@@ -35,6 +62,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const overlayClass = isPage ? 'trailer-page-overlay' : 'trailer-modal-overlay';
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
   const trailers = useMemo(() => {
     if (!movie) return [];
     if (movie.trailersVideo && Array.isArray(movie.trailersVideo)) {
@@ -260,6 +288,21 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     setSelectedTrailer(trailer);
     collapseImmersiveVideo({ instant: true });
   };
+
+  /** Reyting: trailerni egasi bo‘lgan kinodan (alohida maydon yo‘q) */
+  const ratingSourceMovie = useMemo(() => {
+    const trailerMovieId = selectedTrailer?.movieId;
+    if (trailerMovieId != null) {
+      const found = allMovies?.find((m) => Number(m.id) === Number(trailerMovieId));
+      if (found) return found;
+    }
+    return movie || null;
+  }, [selectedTrailer, movie, allMovies]);
+
+  const movieRatings = useMemo(
+    () => getTrailerMovieRatings(ratingSourceMovie),
+    [ratingSourceMovie]
+  );
 
   // —— Expand: scroll-area pastga ——
   const handleSheetTouchStart = (e) => {
@@ -557,8 +600,14 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                   <>
                     <SkeletonLoader variant="trailer-modal-controls-title" />
                     <div className="trailer-modal-controls-actions">
-                      <SkeletonLoader variant="trailer-modal-controls-action" />
-                      <SkeletonLoader variant="trailer-modal-controls-action" />
+                      <div className="trailer-modal-controls-likes">
+                        <SkeletonLoader variant="trailer-modal-controls-action" />
+                        <SkeletonLoader variant="trailer-modal-controls-action" />
+                      </div>
+                      <div className="trailer-modal-controls-ratings" aria-hidden="true">
+                        <SkeletonLoader variant="trailer-modal-controls-action" />
+                        <SkeletonLoader variant="trailer-modal-controls-action" />
+                      </div>
                     </div>
                     <SkeletonLoader variant="trailer-modal-controls-text" />
                   </>
@@ -581,15 +630,35 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                       />
                     </div>
                     <div className="trailer-modal-controls-actions">
-                      <LikeButton
-                        key={getTrailerKey(selectedTrailer) || 'trailer'}
-                        variant="trailerModal"
-                        contentId={getTrailerKey(selectedTrailer)}
-                        persistTrailerKey={getTrailerKey(selectedTrailer)}
-                        initialLikeCount={selectedTrailer.like}
-                        initialDislikeCount={selectedTrailer.dislike}
-                        countFormatter={formatActionCount}
-                      />
+                      <div className="trailer-modal-controls-likes">
+                        <LikeButton
+                          key={getTrailerKey(selectedTrailer) || 'trailer'}
+                          variant="trailerModal"
+                          contentId={getTrailerKey(selectedTrailer)}
+                          persistTrailerKey={getTrailerKey(selectedTrailer)}
+                          initialLikeCount={selectedTrailer.like}
+                          initialDislikeCount={selectedTrailer.dislike}
+                          countFormatter={formatActionCount}
+                        />
+                      </div>
+                      {movieRatings.length > 0 ? (
+                        <div className="trailer-modal-controls-ratings" aria-label="Reytinglar">
+                          {movieRatings.map((item) => (
+                            <span
+                              key={item.key}
+                              className="trailer-modal-rating"
+                              aria-label={`${item.label} ${item.value}`}
+                            >
+                              <img
+                                className="trailer-modal-rating-img"
+                                src={item.src}
+                                alt=""
+                              />
+                              <span className="trailer-modal-rating-value">{item.value}</span>
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                     <div className="trailer-modal-controls-text">
                       {selectedTrailer.text?.[contentLang] || selectedTrailer.text?.uz || selectedTrailer.text?.ru || ''}
