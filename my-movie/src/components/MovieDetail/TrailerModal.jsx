@@ -556,11 +556,11 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                 {showLoading ? (
                   <>
                     <SkeletonLoader variant="trailer-modal-controls-title" />
-                    <SkeletonLoader variant="trailer-modal-controls-text" />
                     <div className="trailer-modal-controls-actions">
                       <SkeletonLoader variant="trailer-modal-controls-action" />
                       <SkeletonLoader variant="trailer-modal-controls-action" />
                     </div>
+                    <SkeletonLoader variant="trailer-modal-controls-text" />
                   </>
                 ) : selectedTrailer ? (
                   <>
@@ -580,9 +580,6 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                         className="trailer-modal-uploaded-at"
                       />
                     </div>
-                    <div className="trailer-modal-controls-text">
-                      {selectedTrailer.text?.[contentLang] || selectedTrailer.text?.uz || selectedTrailer.text?.ru || ''}
-                    </div>
                     <div className="trailer-modal-controls-actions">
                       <LikeButton
                         key={getTrailerKey(selectedTrailer) || 'trailer'}
@@ -593,6 +590,9 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                         initialDislikeCount={selectedTrailer.dislike}
                         countFormatter={formatActionCount}
                       />
+                    </div>
+                    <div className="trailer-modal-controls-text">
+                      {selectedTrailer.text?.[contentLang] || selectedTrailer.text?.uz || selectedTrailer.text?.ru || ''}
                     </div>
                   </>
                 ) : null}

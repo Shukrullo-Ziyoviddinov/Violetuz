@@ -104,6 +104,28 @@
   border-bottom: none;
 }
 
+/* Like/dislike: .triller-meta-likes ichidagi px/padding (triller CSS ga tegilmaydi) */
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-like,
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-dislike {
+  padding: 0.25rem 0.1rem;
+  font-size: 0.9rem;
+  gap: 0.5rem;
+  background: transparent;
+}
+
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-like:hover,
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-like.active,
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-dislike:hover,
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-dislike.active {
+  background: transparent;
+}
+
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-like svg,
+.trailer-page .trailer-modal-controls-actions button.trailer-modal-controls-dislike svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* Desktop: ichki scrollbar o‘rniga sahifa scroll (triller kabi) */
 @media (min-width: 970px) {
   /* Baland sidebar info qatorini pastga surmasin */
