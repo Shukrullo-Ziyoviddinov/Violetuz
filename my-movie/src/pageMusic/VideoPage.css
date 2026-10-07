@@ -730,7 +730,7 @@ body.video-detail-page-active {
 .video-detail-trend-card-img-wrap {
   position: relative;
   flex-shrink: 0;
-  width: 168px;
+  width: 160px;
   aspect-ratio: 16/9;
   overflow: hidden;
   border-radius: 10px;
