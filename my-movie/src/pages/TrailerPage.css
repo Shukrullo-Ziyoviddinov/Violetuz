@@ -548,21 +548,10 @@ body.trailer-page-active {
     border-radius: 0;
   }
 
-  /* Drag/expand: bottom bar pastga “qimirlamasın” */
-  .trailer-page .trailer-modal--sheet-dragging .trailer-modal-bottom-controls,
-  .trailer-page .trailer-modal--expanding .trailer-modal-bottom-controls,
-  .trailer-page .trailer-modal--collapsing .trailer-modal-bottom-controls {
-    transition: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transform: none !important;
-  }
-
   .trailer-page .trailer-modal--immersive .trailer-modal-bottom-controls {
     bottom: 0;
     transform: none;
-    padding: 0.85rem 1rem max(0.85rem, env(safe-area-inset-bottom, 0px));
+    transition: opacity 0.25s ease, visibility 0.25s ease;
   }
 
   .trailer-page .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-pin {
