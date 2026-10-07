@@ -23,6 +23,9 @@ const TrillerSideCardMoreModal = ({
   anchorRect = null,
   trillerId,
   title = '',
+  shareOnly = false,
+  sharePath: sharePathProp = null,
+  shareMovie: shareMovieProp = null,
 }) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -44,9 +47,10 @@ const TrillerSideCardMoreModal = ({
   const lastYRef = useRef(null);
   const startTimeRef = useRef(0);
 
-  const saved = trillerId != null && isInWishlist(trillerId, 'triller');
-  const sharePath = trillerId != null ? `/triller/${trillerId}` : '';
-  const shareMovie = { id: trillerId, title: title || '' };
+  const saved = !shareOnly && trillerId != null && isInWishlist(trillerId, 'triller');
+  const sharePath =
+    sharePathProp || (trillerId != null ? `/triller/${trillerId}` : '');
+  const shareMovie = shareMovieProp || { id: trillerId, title: title || '' };
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth <= MOBILE_MAX);
@@ -227,29 +231,31 @@ const TrillerSideCardMoreModal = ({
           buttonClassName="triller-side-more-action triller-side-more-action--share"
         />
       </div>
-      <button
-        type="button"
-        className={`triller-side-more-action triller-side-more-action--save${
-          saved ? ' is-active' : ''
-        }`}
-        onClick={handleSave}
-        aria-pressed={saved}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill={saved ? 'currentColor' : 'none'}
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+      {!shareOnly ? (
+        <button
+          type="button"
+          className={`triller-side-more-action triller-side-more-action--save${
+            saved ? ' is-active' : ''
+          }`}
+          onClick={handleSave}
+          aria-pressed={saved}
         >
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-        </svg>
-        <span>{t('wishlist.save', 'Saqlash')}</span>
-      </button>
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill={saved ? 'currentColor' : 'none'}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>{t('wishlist.save', 'Saqlash')}</span>
+        </button>
+      ) : null}
     </div>
   );
 

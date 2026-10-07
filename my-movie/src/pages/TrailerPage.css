@@ -111,7 +111,7 @@
 
 .trailer-page .similar-trailer-item {
   display: grid;
-  grid-template-columns: 168px minmax(0, 1fr);
+  grid-template-columns: 168px minmax(0, 1fr) 24px;
   gap: 0.65rem;
   align-items: stretch;
   width: 100%;
@@ -131,6 +131,35 @@
 
 .trailer-page .similar-trailer-item.active {
   background: transparent;
+}
+
+/* .triller-side-card-more kabi ⋯ */
+.trailer-page .similar-trailer-more {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  align-self: start;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 0.15rem 0 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.trailer-page .similar-trailer-more svg {
+  width: 22px;
+  height: 22px;
+}
+
+.trailer-page .similar-trailer-more:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.trailer-page .similar-trailer-item--skeleton .similar-trailer-more {
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .trailer-page .similar-trailer-video {
@@ -336,7 +365,7 @@
 
 @media (max-width: 900px) {
   .trailer-page .similar-trailer-item {
-    grid-template-columns: 160px minmax(0, 1fr);
+    grid-template-columns: 160px minmax(0, 1fr) 24px;
     gap: 0.65rem;
     padding: 0;
   }
@@ -541,6 +570,13 @@ body.trailer-page-active {
     margin: 0 -0.7rem;
     padding: 0.15rem 0.7rem;
     box-sizing: border-box;
+    background: #000 !important;
+    background-color: #000 !important;
+    background-image: none !important;
+  }
+
+  .trailer-page .trailer-modal-sticky-similar-title::before {
+    background: #000;
   }
 }
 

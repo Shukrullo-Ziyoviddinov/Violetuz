@@ -735,6 +735,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                 onTrailerSelect={handleTrailerSelect}
                 getTrailerKey={getTrailerKey}
                 hideTitleOnMobile
+                showMoreMenu={isPage}
               />
             </div>
           </div>

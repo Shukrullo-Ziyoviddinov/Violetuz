@@ -9,6 +9,7 @@ import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import VerticalScroll from './VerticalScroll';
 import { formatMovieRating } from '../Rating/CalculateRating';
+import TrillerSideCardMoreModal from '../Triller/TrillerSideCardMoreModal';
 import './SimilarTrailers.css';
 
 const VIDEO_READY_TIMEOUT_MS = 20000;
@@ -84,6 +85,7 @@ const SimilarTrailerItemSkeleton = () => (
         <SkeletonLoader variant="similar-trailer-action" />
       </div>
     </div>
+    <span className="similar-trailer-more" aria-hidden="true" />
   </div>
 );
 
@@ -93,13 +95,18 @@ const SimilarTrailerItem = ({
   onSelect,
   tKey,
   contentLang,
+  showMoreMenu = false,
 }) => {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
+  const moreBtnRef = useRef(null);
   const seekCleanupRef = useRef(null);
   const videoSrc =
     trailer.trailers?.[contentLang] || trailer.trailers?.uz || trailer.trailers?.ru || '';
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [anchorRect, setAnchorRect] = useState(null);
 
   useEffect(() => {
     setReady(false);
@@ -158,105 +165,168 @@ const SimilarTrailerItem = ({
 
   const showSkeleton = Boolean(videoSrc) && !ready && !failed;
   const imdbLabel = formatImdbLabel(trailer.ratingImdb);
+  const trailerTitle =
+    trailer.title?.[contentLang] || trailer.title?.uz || trailer.title?.ru || '';
+  const movieId = trailer.movieId;
+  const sharePath =
+    movieId != null && trailer.id != null
+      ? `/movie/${movieId}/trailer?trailerId=${trailer.id}`
+      : '';
+  const shareMovie = { id: movieId, title: trailerTitle };
+
+  const handleMore = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (showSkeleton) return;
+    if (moreOpen) {
+      setMoreOpen(false);
+      return;
+    }
+    const rect = moreBtnRef.current?.getBoundingClientRect?.() || null;
+    setAnchorRect(
+      rect
+        ? {
+            top: rect.top,
+            bottom: rect.bottom,
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+            height: rect.height,
+          }
+        : null
+    );
+    setMoreOpen(true);
+  };
 
   return (
-    <div
-      className={`similar-trailer-item${isActive ? ' active' : ''}${
-        showSkeleton ? ' similar-trailer-item--loading' : ''
-      }`}
-      onClick={() => !showSkeleton && onSelect?.(trailer)}
-      aria-busy={showSkeleton || undefined}
-    >
+    <>
       <div
-        className={`similar-trailer-video${
-          showSkeleton ? ' similar-trailer-video--loading' : ''
+        className={`similar-trailer-item${isActive ? ' active' : ''}${
+          showSkeleton ? ' similar-trailer-item--loading' : ''
         }`}
+        onClick={() => !showSkeleton && onSelect?.(trailer)}
+        aria-busy={showSkeleton || undefined}
       >
-        {showSkeleton && (
-          <SkeletonLoader
-            variant="similar-trailer-video"
-            className="similar-trailer-video-skeleton"
-          />
-        )}
-        {!failed && videoSrc && (
-          <video
-            ref={videoRef}
-            key={videoSrc}
-            src={videoSrc}
-            muted
-            playsInline
-            preload="auto"
-            className={`similar-trailer-video-element${
-              showSkeleton ? ' similar-trailer-video-element--loading' : ''
-            }`}
-            onLoadedMetadata={startPrime}
-            onLoadedData={startPrime}
-            onCanPlay={startPrime}
-            onError={markFailed}
-          />
-        )}
-        {!showSkeleton && (
-          <div className="similar-trailer-play">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5 3 19 12 5 21 5 3" />
-            </svg>
-          </div>
-        )}
-      </div>
-      <div className="similar-trailer-info">
-        {showSkeleton ? (
-          <>
-            <SkeletonLoader variant="similar-trailer-title" />
-            <SkeletonLoader variant="similar-trailer-text" />
-            <div className="similar-trailer-actions">
-              <SkeletonLoader variant="similar-trailer-action" />
-              <SkeletonLoader variant="similar-trailer-action" />
+        <div
+          className={`similar-trailer-video${
+            showSkeleton ? ' similar-trailer-video--loading' : ''
+          }`}
+        >
+          {showSkeleton && (
+            <SkeletonLoader
+              variant="similar-trailer-video"
+              className="similar-trailer-video-skeleton"
+            />
+          )}
+          {!failed && videoSrc && (
+            <video
+              ref={videoRef}
+              key={videoSrc}
+              src={videoSrc}
+              muted
+              playsInline
+              preload="auto"
+              className={`similar-trailer-video-element${
+                showSkeleton ? ' similar-trailer-video-element--loading' : ''
+              }`}
+              onLoadedMetadata={startPrime}
+              onLoadedData={startPrime}
+              onCanPlay={startPrime}
+              onError={markFailed}
+            />
+          )}
+          {!showSkeleton && (
+            <div className="similar-trailer-play">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
             </div>
-          </>
-        ) : (
-          <>
-            <div className="similar-trailer-title">
-              {trailer.title?.[contentLang] || trailer.title?.uz || trailer.title?.ru || ''}
-            </div>
-            {imdbLabel != null ? (
-              <div className="similar-trailer-text similar-trailer-imdb" aria-label={`IMDb ${imdbLabel}`}>
-                <img
-                  className="similar-trailer-imdb-img"
-                  src="/img/imdbnew.png"
-                  alt=""
-                />
-                <span className="similar-trailer-imdb-value">{imdbLabel}</span>
+          )}
+        </div>
+        <div className="similar-trailer-info">
+          {showSkeleton ? (
+            <>
+              <SkeletonLoader variant="similar-trailer-title" />
+              <SkeletonLoader variant="similar-trailer-text" />
+              <div className="similar-trailer-actions">
+                <SkeletonLoader variant="similar-trailer-action" />
+                <SkeletonLoader variant="similar-trailer-action" />
               </div>
-            ) : null}
-            <div className="similar-trailer-meta-row">
-              <ViewCount
-                itemId={tKey}
-                type="trailer"
-                variant="text"
-                record={false}
-                className="view-count-text similar-trailer-view-count"
-              />
-              <UploadedAtTime
-                at={trailer.createdAt || trailer.uploadedAt}
-                className="similar-trailer-uploaded-at"
-              />
-            </div>
-            <div className="similar-trailer-actions">
-              <LikeButton
-                key={tKey}
-                variant="trailerSimilar"
-                contentId={tKey}
-                persistTrailerKey={tKey}
-                initialLikeCount={trailer.like}
-                initialDislikeCount={trailer.dislike}
-                countFormatter={formatActionCount}
-                stopPropagation
-              />
-            </div>
-          </>
+            </>
+          ) : (
+            <>
+              <div className="similar-trailer-title">{trailerTitle}</div>
+              {imdbLabel != null ? (
+                <div className="similar-trailer-text similar-trailer-imdb" aria-label={`IMDb ${imdbLabel}`}>
+                  <img
+                    className="similar-trailer-imdb-img"
+                    src="/img/imdbnew.png"
+                    alt=""
+                  />
+                  <span className="similar-trailer-imdb-value">{imdbLabel}</span>
+                </div>
+              ) : null}
+              <div className="similar-trailer-meta-row">
+                <ViewCount
+                  itemId={tKey}
+                  type="trailer"
+                  variant="text"
+                  record={false}
+                  className="view-count-text similar-trailer-view-count"
+                />
+                <UploadedAtTime
+                  at={trailer.createdAt || trailer.uploadedAt}
+                  className="similar-trailer-uploaded-at"
+                />
+              </div>
+              <div className="similar-trailer-actions">
+                <LikeButton
+                  key={tKey}
+                  variant="trailerSimilar"
+                  contentId={tKey}
+                  persistTrailerKey={tKey}
+                  initialLikeCount={trailer.like}
+                  initialDislikeCount={trailer.dislike}
+                  countFormatter={formatActionCount}
+                  stopPropagation
+                />
+              </div>
+            </>
+          )}
+        </div>
+        {!showMoreMenu ? null : !showSkeleton ? (
+          <button
+            ref={moreBtnRef}
+            type="button"
+            className="similar-trailer-more"
+            onClick={handleMore}
+            aria-label={t('triller.moreActions', "Ko'proq")}
+            aria-haspopup="menu"
+            aria-expanded={moreOpen}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <circle cx="12" cy="5" r="1.6" />
+              <circle cx="12" cy="12" r="1.6" />
+              <circle cx="12" cy="19" r="1.6" />
+            </svg>
+          </button>
+        ) : (
+          <span className="similar-trailer-more" aria-hidden="true" />
         )}
       </div>
-    </div>
+
+      {showMoreMenu ? (
+        <TrillerSideCardMoreModal
+          open={moreOpen}
+          onClose={() => setMoreOpen(false)}
+          anchorRect={anchorRect}
+          shareOnly
+          sharePath={sharePath}
+          shareMovie={shareMovie}
+          title={trailerTitle}
+        />
+      ) : null}
+    </>
   );
 };
 
@@ -267,6 +337,7 @@ const SimilarTrailers = ({
   getTrailerKey,
   trailerLoading = false,
   hideTitleOnMobile = false,
+  showMoreMenu = false,
 }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
@@ -342,6 +413,7 @@ const SimilarTrailers = ({
                 onSelect={onTrailerSelect}
                 tKey={tKey}
                 contentLang={contentLang}
+                showMoreMenu={showMoreMenu}
               />
             );
           })}
