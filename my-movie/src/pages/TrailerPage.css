@@ -527,6 +527,40 @@ body.trailer-page-active {
     width: 100%;
   }
 
+  /* Immersive: pin to‘liq ekranni egallasin (page flex override buzmasin) */
+  .trailer-page .trailer-modal--immersive .trailer-modal-pin {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+  }
+
+  .trailer-page .trailer-modal--immersive .trailer-modal-pin .trailer-modal-video-wrapper,
+  .trailer-page .trailer-modal--immersive .trailer-modal-pin .video-player-controls {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .trailer-page .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-pin {
+    flex: 0 0 auto;
+  }
+
+  .trailer-page .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-pin .trailer-modal-video-wrapper,
+  .trailer-page .trailer-modal--immersive.trailer-modal--collapsing .trailer-modal-pin .video-player-controls {
+    flex: 0 0 auto;
+    height: calc(
+      100dvh - (100dvh - 56.25vw) * var(--trailer-sheet-progress, 0)
+    );
+    max-height: 100dvh;
+  }
+
   /* .triller-scroll-area kabi padding — kartochka/info yonlarga yopishmasin */
   .trailer-page .trailer-modal-scroll-area {
     width: 100%;
