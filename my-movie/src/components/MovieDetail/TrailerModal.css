@@ -490,9 +490,10 @@ button.trailer-modal-controls-dislike {
     transparent 100%);
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
   z-index: 60;
   pointer-events: none;
+  transform: none;
 }
 
 .trailer-modal-bottom-controls.show {
@@ -1093,8 +1094,24 @@ button.trailer-modal-controls-dislike {
   }
 
   .trailer-modal--expanding .trailer-modal-bottom-controls,
-  .trailer-modal--collapsing .trailer-modal-bottom-controls {
-    transition: none;
+  .trailer-modal--collapsing .trailer-modal-bottom-controls,
+  .trailer-modal--sheet-dragging .trailer-modal-bottom-controls {
+    transition: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .trailer-modal--immersive .trailer-modal-bottom-controls {
+    padding: 0.85rem 1rem max(0.85rem, env(safe-area-inset-bottom, 0px));
+    z-index: 70;
+    transform: none;
+  }
+
+  .trailer-modal--immersive .trailer-modal-bottom-controls.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
   }
 
   .trailer-modal--immersive .trailer-modal-video {
