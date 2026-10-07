@@ -43,6 +43,9 @@ function groupKeyFromRow(row) {
   if (t.kind === 'triller') {
     return t.trillerId != null ? `triller:${t.trillerId}` : row.key;
   }
+  if (t.kind === 'trailer') {
+    return t.trailerKey != null ? `trailer:${t.trailerKey}` : row.key;
+  }
   if (t.kind === 'video') {
     const m = t.route?.match(/\/music\/video\/(\d+)/);
     return m ? `video:${m[1]}` : row.key;
@@ -80,6 +83,9 @@ function getCommentPersistence(target) {
   }
   if (target.kind === 'triller' && target.trillerId != null) {
     return { variant: 'movieVideo', entityKey: `triller:${target.trillerId}` };
+  }
+  if (target.kind === 'trailer' && target.trailerKey != null) {
+    return { variant: 'movieVideo', entityKey: `trailer:${target.trailerKey}` };
   }
   if (target.kind === 'video' && target.videoId != null) {
     return { variant: 'movieVideo', entityKey: `music:${target.videoId}` };
@@ -347,7 +353,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                   go(t.kind === 'shorts' ? getShortsRouteFromHistory(t) : t.route);
 
                 let media = null;
-                if (t.kind === 'movie' || t.kind === 'triller') {
+                if (t.kind === 'movie' || t.kind === 'triller' || t.kind === 'trailer') {
                   media = <ComentariaMovieCard title={t.title} image={t.image} onClick={cardClick} />;
                 } else if (t.kind === 'video') {
                   const badge =
@@ -368,6 +374,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                 const elementTitle =
                   t.kind === 'movie' ||
                   t.kind === 'triller' ||
+                  t.kind === 'trailer' ||
                   t.kind === 'video' ||
                   t.kind === 'shorts'
                     ? t.title || '—'
@@ -376,7 +383,7 @@ const ComentariaHistoryModal = ({ open, onClose }) => {
                 const mediaClass =
                   t.kind === 'video'
                     ? 'comentaria-history-item-media comentaria-history-item-media--video'
-                    : t.kind === 'movie' || t.kind === 'triller'
+                    : t.kind === 'movie' || t.kind === 'triller' || t.kind === 'trailer'
                       ? 'comentaria-history-item-media comentaria-history-item-media--movie'
                       : 'comentaria-history-item-media comentaria-history-item-media--shorts';
 

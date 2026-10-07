@@ -11,6 +11,7 @@ import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import ShareButton from '../ShareButton/ShareButton';
 import TrillerDescription from '../Triller/TrillerDescription';
+import MovieComments from './MovieComments';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import { normalizeTrailerDescription } from '../../utils/trailerDescription';
 import './TrailerModal.css';
@@ -67,6 +68,11 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     const movieId = trailer.movieId || movie?.id;
     return `${movieId}-${trailer.id}`;
   };
+
+  /** Har treyler alohida thread — movie/triller kommentlari bilan aralashmaydi */
+  const commentsEntityKey = selectedTrailer
+    ? `trailer:${getTrailerKey(selectedTrailer)}`
+    : '';
 
   const scrollAreaRef = useRef(null);
   const sheetDragRef = useRef({
@@ -642,6 +648,22 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                       </div>
                     </div>
                     <TrillerDescription loading className="trailer-modal-controls-text" />
+                    <div className="trailer-modal-comments" aria-hidden="true">
+                      <div className="movie-detail-comments">
+                        <SkeletonLoader variant="triller-comments-title" />
+                        <div className="movie-detail-comments-list">
+                          <div className="movie-detail-comment-item">
+                            <div className="movie-detail-comment-main">
+                              <SkeletonLoader variant="movie-detail-comment-avatar" />
+                              <div className="movie-detail-comment-body">
+                                <SkeletonLoader variant="movie-detail-comment-author" />
+                                <SkeletonLoader variant="movie-detail-comment-text" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </>
                 ) : selectedTrailer ? (
                   <>
@@ -708,6 +730,17 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                         description={trailerDescription}
                         className="trailer-modal-controls-text"
                       />
+                    ) : null}
+                    {commentsEntityKey ? (
+                      <div className="trailer-modal-comments">
+                        <MovieComments
+                          key={`trailer-comments-${commentsEntityKey}`}
+                          movieId={commentsEntityKey}
+                          targetType="trailer"
+                          previewLimit={4}
+                          mobileSheetUi
+                        />
+                      </div>
                     ) : null}
                   </>
                 ) : null}

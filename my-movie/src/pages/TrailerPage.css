@@ -60,6 +60,19 @@
   z-index: 1;
 }
 
+/* Kommentlar: .triller-comments parity (har treyler alohida thread) */
+.trailer-page .trailer-modal-comments {
+  margin-top: 0.15rem;
+  margin-bottom: 0.25rem;
+}
+
+.trailer-page .trailer-modal-comments .movie-detail-comments {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem 1rem;
+  border-radius: 15px;
+  margin-bottom: 0;
+}
+
 /* O‘ng blok ota: kartochkalarga tegmasdan chrome olib tashlash */
 .trailer-page .trailer-modal-sidebar {
   grid-area: sidebar;

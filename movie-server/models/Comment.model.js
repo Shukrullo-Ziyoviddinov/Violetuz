@@ -3,7 +3,7 @@ const { COMMENT_TYPES } = require('../constants/comment.constants');
 
 /**
  * Polimorf kommentlar — bitta collection.
- * targetType + targetId → kino / triller / klip / konsert / shorts
+ * targetType + targetId → kino / triller / trailer / klip / konsert / shorts
  * parentId → javob (null = asosiy komment)
  * likedBy → like bosgan userlar; likes = likedBy.length
  */

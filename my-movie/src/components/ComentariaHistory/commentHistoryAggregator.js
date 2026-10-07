@@ -148,6 +148,31 @@ function mapHistoryItemToEntry(item, lang) {
     };
   }
 
+  if (item.targetType === 'trailer' || snap.kind === 'trailer') {
+    const trailerKey = snap.trailerKey ?? item.targetId;
+    const movieId = snap.movieId ?? null;
+    const trailerId = snap.trailerId ?? null;
+    return {
+      key: `trailer-${trailerKey}-${item.id}`,
+      filter: 'trailer',
+      createdAt: item.createdAt || '',
+      comment,
+      target: {
+        kind: 'trailer',
+        trailerKey,
+        movieId,
+        trailerId,
+        title: pickLocalized(snap.title, lang),
+        image: pickLocalized(snap.image, lang) || '/img/movie1.jpg',
+        route:
+          snap.route ||
+          (movieId != null && trailerId != null
+            ? `/movie/${movieId}/trailer?trailerId=${trailerId}`
+            : '/'),
+      },
+    };
+  }
+
   const shortsId = snap.shortsId ?? item.targetId;
   const shortsSource =
     snap.shortsSource ||

@@ -2,6 +2,7 @@
 const COMMENT_TYPES = Object.freeze([
   'movie',
   'triller',
+  'trailer',
   'klip',
   'konsert',
   'shorts',

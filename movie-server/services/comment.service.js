@@ -59,6 +59,17 @@ const toCatalogId = (raw) => {
   return Number.isFinite(n) ? n : null;
 };
 
+/** Movie trailer: targetId = `${movieId}-${trailerId}` (birinchi `-` bo‘yicha) */
+const parseTrailerCompositeId = (targetId) => {
+  const raw = String(targetId || '').trim();
+  const idx = raw.indexOf('-');
+  if (idx <= 0 || idx >= raw.length - 1) return null;
+  return {
+    movieId: raw.slice(0, idx),
+    trailerId: raw.slice(idx + 1),
+  };
+};
+
 /**
  * History uchun yengil snapshot.
  * Topilmasa — create yiqilmasin (minimal snapshot).
@@ -111,6 +122,51 @@ const buildTargetSnapshot = async (targetType, targetId) => {
           title: doc.title || null,
           image: doc.videoImg || null,
           route: `/triller/${doc.id}`,
+        };
+      }
+      case 'trailer': {
+        const parsed = parseTrailerCompositeId(targetId);
+        if (!parsed) {
+          return { ...fallback, kind: 'trailer', trailerKey: targetId };
+        }
+        const { movieId, trailerId } = parsed;
+        const movieNumeric = toCatalogId(movieId);
+        const route = `/movie/${movieId}/trailer?trailerId=${trailerId}`;
+        if (movieNumeric == null) {
+          return {
+            ...fallback,
+            kind: 'trailer',
+            movieId,
+            trailerId,
+            trailerKey: targetId,
+            route,
+          };
+        }
+        const doc = await Movie.findOne({ id: movieNumeric })
+          .select('id title homeImg poster image trailersVideo')
+          .lean();
+        if (!doc) {
+          return {
+            ...fallback,
+            kind: 'trailer',
+            movieId,
+            trailerId,
+            trailerKey: targetId,
+            route,
+          };
+        }
+        const trailers = Array.isArray(doc.trailersVideo) ? doc.trailersVideo : [];
+        const trailer =
+          trailers.find((t) => String(t?.id) === String(trailerId)) || null;
+        const trailerKey = `${doc.id}-${trailer?.id ?? trailerId}`;
+        return {
+          kind: 'trailer',
+          movieId: doc.id,
+          trailerId: trailer?.id ?? trailerId,
+          trailerKey,
+          title: trailer?.title || doc.title || null,
+          image: doc.homeImg || doc.poster || doc.image || null,
+          route: `/movie/${doc.id}/trailer?trailerId=${trailer?.id ?? trailerId}`,
         };
       }
       case 'klip':
@@ -572,7 +628,9 @@ const listMyHistory = async (userId) => {
             ? 'klip'
             : row.targetType === 'triller'
               ? 'triller'
-              : 'shorts',
+              : row.targetType === 'trailer'
+                ? 'trailer'
+                : 'shorts',
   }));
 };
 

@@ -6,6 +6,7 @@ const FILTERS = [
   { id: 'all', uz: 'Hammasi', ru: 'Все' },
   { id: 'movie', uz: 'Kino', ru: 'Кино' },
   { id: 'triller', uz: 'Triller', ru: 'Триллер' },
+  { id: 'trailer', uz: 'Treyler', ru: 'Трейлер' },
   { id: 'klip', uz: 'Klip', ru: 'Клипы' },
   { id: 'konsert', uz: 'Konsert', ru: 'Концерты' },
   { id: 'shorts', uz: 'Shorts', ru: 'Шорты' },

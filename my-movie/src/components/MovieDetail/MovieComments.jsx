@@ -140,7 +140,7 @@ const CAROUSEL_MS = 4000;
  * mobileSheetUi — klip/konsert/triller mobil UX:
  * komment yo‘q → input; bor → list (input yashirin), list bosilsa modal; more-btn yo‘q; titleda son.
  * Desktop o‘zgarmaydi.
- * targetType: movie | triller | klip | konsert (ixtiyoriy; movieId prefiksidan ham aniqlanadi)
+ * targetType: movie | triller | trailer | klip | konsert (ixtiyoriy; movieId prefiksidan ham aniqlanadi)
  * modalOnly — faqat modal (inline preview yo‘q); tashqi tugma orqali openModal()
  */
 const MovieComments = forwardRef(

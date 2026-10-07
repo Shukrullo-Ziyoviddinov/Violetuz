@@ -41,6 +41,9 @@ export const resolveCommentTarget = (entityKey, targetTypeHint) => {
   if (raw.startsWith('triller:')) {
     return { targetType: 'triller', targetId: raw.slice('triller:'.length) };
   }
+  if (raw.startsWith('trailer:')) {
+    return { targetType: 'trailer', targetId: raw.slice('trailer:'.length) };
+  }
   if (raw.startsWith('music:')) {
     const type =
       targetTypeHint === 'konsert' || targetTypeHint === 'klip'
