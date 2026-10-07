@@ -130,6 +130,8 @@ body.video-detail-page-active {
 
 .video-detail-side > .music-detail-mix-scroll.is-collapsed {
   flex: 0 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 /* Mix ichidagi alohida scroll yo‘q — sahifa bilan birga */
