@@ -1,13 +1,16 @@
-/* .triller kabi: qora fon, desktopda sahifa scroll (o‘ng/chap alohida sticky scroll yo‘q) */
 .video-detail {
-  width: 100%;
-  min-height: calc(100vh - 80px);
-  height: auto;
-  padding: 1.5rem 1.5rem 2rem;
+  height: 100vh;
+  padding: 2rem 0;
   box-sizing: border-box;
   background: #000;
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.video-detail::-webkit-scrollbar {
+  display: none;
 }
 
 body.video-detail-page-active {
@@ -15,28 +18,24 @@ body.video-detail-page-active {
 }
 
 .video-detail-container {
-  max-width: 1600px;
+  max-width: 1400px;
   width: 100%;
   height: auto;
-  min-height: 0;
+  min-height: 100%;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 1.25rem;
   box-sizing: border-box;
   overflow: visible;
 }
 
-/* .triller-main bilan bir xil grid — .triller-main ga tegilmaydi */
 .video-detail-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 402px;
+  grid-template-columns: 1fr 420px;
   grid-template-rows: auto auto;
-  gap: 1.5rem;
-  column-gap: 1.5rem;
+  column-gap: 1rem;
   row-gap: 0;
   height: auto;
   min-height: 0;
-  max-width: 1600px;
-  margin: 0 auto;
   align-items: start;
 }
 
@@ -44,10 +43,11 @@ body.video-detail-page-active {
   grid-column: 1;
   grid-row: 1;
   min-width: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  padding: 1.5rem 1.5rem 0;
   box-sizing: border-box;
 }
 
@@ -61,10 +61,11 @@ body.video-detail-page-active {
   min-width: 0;
   min-height: 0;
   overflow: visible;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 1rem 0 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 1rem 1.5rem 1.5rem;
   box-sizing: border-box;
 }
 
@@ -73,16 +74,25 @@ body.video-detail-page-active {
   grid-row: 1 / -1;
   min-width: 0;
   min-height: 0;
-  max-height: none;
-  overflow: visible;
-  position: static;
-  top: auto;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: auto;
+  position: sticky;
+  top: 0;
   align-self: start;
-  background: transparent;
-  border-radius: 0;
-  padding: 0;
-  border: none;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
+}
+
+.video-detail-right-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .video-detail-side {
@@ -90,18 +100,18 @@ body.video-detail-page-active {
   grid-row: 1 / -1;
   min-width: 0;
   min-height: 0;
-  max-height: none;
-  position: static;
-  top: auto;
+  max-height: calc(100vh - 4rem);
+  position: sticky;
+  top: 0;
   align-self: start;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .video-detail-side > .video-detail-right-scroll {
-  flex: 0 0 auto;
+  flex: 1 1 0;
   width: 100%;
   grid-column: auto;
   grid-row: auto;
@@ -109,44 +119,23 @@ body.video-detail-page-active {
   max-height: none;
   top: auto;
   align-self: auto;
-  overflow: visible;
 }
 
 .video-detail-side > .music-detail-mix-scroll {
-  flex: 0 0 auto;
+  flex: 2 1 0;
   width: 100%;
   min-height: 0;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 0;
-  padding: 0;
-  border: none;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
-  overflow: visible;
-}
-
-.video-detail-side > .music-detail-mix-scroll:not(.is-collapsed) {
-  flex: 0 0 auto;
 }
 
 .video-detail-side > .music-detail-mix-scroll.is-collapsed {
   flex: 0 0 auto;
   border-radius: 12px;
   overflow: hidden;
-}
-
-/* Mix ichidagi alohida scroll yo‘q — sahifa bilan birga */
-.video-detail-side .music-detail-mix-body-inner,
-.video-detail-side .music-detail-mix-body-inner .music-detail-trend-grid {
-  overflow: visible;
-  min-height: 0;
-}
-
-@media (max-width: 1100px) {
-  .video-detail-layout {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 1rem;
-    column-gap: 1rem;
-  }
 }
 
 .video-detail-side .music-detail-trend-title {
@@ -161,7 +150,111 @@ body.video-detail-page-active {
   align-items: flex-start;
   gap: 0.75rem;
   width: 100%;
-  padding-bottom: 0;
+  padding-bottom: 1rem;
+}
+
+/*
+ * Desktop (≥901): .triller-main kabi sahifa scroll + chrome yo‘q.
+ * Mobil (≤900) yuqoridagi bazani o‘z media query sida override qiladi — buzilmasin.
+ */
+@media (min-width: 901px) {
+  .video-detail {
+    width: 100%;
+    min-height: calc(100vh - 80px);
+    height: auto;
+    padding: 1.5rem 1.5rem 2rem;
+    background: #000;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  .video-detail-container {
+    max-width: 1600px;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .video-detail-layout {
+    grid-template-columns: minmax(0, 1fr) 402px;
+    gap: 1.5rem;
+    column-gap: 1.5rem;
+    row-gap: 0;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .video-detail-pin {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .video-detail-main-scroll {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 1rem 0 0;
+  }
+
+  .video-detail-right-scroll {
+    max-height: none;
+    overflow: visible;
+    position: static;
+    top: auto;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .video-detail-side {
+    max-height: none;
+    position: static;
+    top: auto;
+    overflow: visible;
+  }
+
+  .video-detail-side > .video-detail-right-scroll {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .video-detail-side > .music-detail-mix-scroll {
+    flex: 0 0 auto;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border: none;
+    overflow: visible;
+  }
+
+  .video-detail-side > .music-detail-mix-scroll:not(.is-collapsed) {
+    flex: 0 0 auto;
+  }
+
+  .video-detail-side > .music-detail-mix-scroll.is-collapsed {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .video-detail-side .music-detail-mix-body-inner,
+  .video-detail-side .music-detail-mix-body-inner .music-detail-trend-grid {
+    overflow: visible;
+    min-height: 0;
+  }
+
+  .video-detail-side .music-detail-trend-grid {
+    padding-bottom: 0;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+  .video-detail-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 1rem;
+    column-gap: 1rem;
+  }
 }
 
 .video-detail-top {
@@ -891,8 +984,14 @@ body.video-detail-page-active {
     flex-direction: column;
     flex: 1 1 0;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
     height: auto;
+    margin: 0;
     gap: 0;
+    column-gap: 0;
+    row-gap: 0;
     overflow: hidden;
     grid-template-columns: unset;
     grid-template-rows: unset;
@@ -932,12 +1031,13 @@ body.video-detail-page-active {
   }
 
   .video-detail-body-scroll {
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     flex: 1 1 0;
     min-height: 0;
     min-width: 0;
     width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -985,6 +1085,14 @@ body.video-detail-page-active {
     max-height: none;
     align-self: auto;
     overflow: visible;
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .video-detail-side > .music-detail-mix-scroll {
+    flex: 0 0 auto;
+    width: 100%;
   }
 
   .video-detail-right-scroll .video-detail-trend-card-img-wrap {
