@@ -1,0 +1,214 @@
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import Repost from '../Repost/Repost';
+import './MovieDetailActionsModal.css';
+
+const MOBILE_MAX = 768;
+const CLOSE_MS = 320;
+
+const isMobileViewport = () =>
+  typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX;
+
+const measureControlsBottom = () => {
+  const controls = document.querySelector('.movie-detail .watch-modal-controls-overlay');
+  if (!controls) return 0;
+  return Math.max(0, Math.round(controls.getBoundingClientRect().bottom));
+};
+
+const MovieDetailActionsModal = ({
+  open,
+  onClose,
+  saved = false,
+  onSave,
+  saveLabel = 'Saqlash',
+  repostItem,
+  repostLabel = 'Repost',
+}) => {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [translateY, setTranslateY] = useState(0);
+  const [sheetTop, setSheetTop] = useState(0);
+
+  const contentRef = useRef(null);
+  const headerRef = useRef(null);
+  const draggingRef = useRef(false);
+  const startYRef = useRef(0);
+  const closingRef = useRef(false);
+  const closeTimerRef = useRef(null);
+
+  const finishClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setSheetOpen(false);
+    setClosing(false);
+    setDragging(false);
+    setTranslateY(0);
+    draggingRef.current = false;
+    closingRef.current = false;
+    onClose?.();
+  }, [onClose]);
+
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    if (!isMobileViewport()) {
+      onClose?.();
+      return;
+    }
+    closingRef.current = true;
+    setDragging(false);
+    draggingRef.current = false;
+    const h = contentRef.current?.offsetHeight || Math.round(window.innerHeight * 0.5);
+    setTranslateY((prev) => (prev > 0 ? Math.max(prev, h + 24) : h + 24));
+    setSheetOpen(false);
+    setClosing(true);
+    closeTimerRef.current = window.setTimeout(finishClose, CLOSE_MS);
+  }, [finishClose, onClose]);
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setSheetOpen(false);
+      setClosing(false);
+      setTranslateY(0);
+      return undefined;
+    }
+    if (!isMobileViewport()) {
+      onClose?.();
+      return undefined;
+    }
+    setSheetTop(measureControlsBottom());
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    closingRef.current = false;
+    setClosing(false);
+    setTranslateY(0);
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setSheetOpen(true));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onResize = () => {
+      if (!isMobileViewport()) {
+        finishClose();
+        return;
+      }
+      setSheetTop(measureControlsBottom());
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [open, finishClose]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  useEffect(() => () => {
+    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isMobileViewport() || !draggingRef.current || closingRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const deltaY = e.touches[0].clientY - startYRef.current;
+    setTranslateY(deltaY > 0 ? deltaY : 0);
+  }, []);
+
+  useEffect(() => {
+    if (!open || !headerRef.current) return undefined;
+    const el = headerRef.current;
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', handleTouchMove);
+  }, [open, handleTouchMove]);
+
+  const handleTouchStart = (e) => {
+    if (!isMobileViewport() || closingRef.current) return;
+    e.stopPropagation();
+    startYRef.current = e.touches[0].clientY;
+    draggingRef.current = true;
+    setDragging(true);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!isMobileViewport() || !dragging || closingRef.current) return;
+    e.stopPropagation();
+    const threshold = window.innerHeight * 0.1;
+    if (translateY > threshold) {
+      requestClose();
+      return;
+    }
+    draggingRef.current = false;
+    setDragging(false);
+    setTranslateY(0);
+  };
+
+  if (!open && !closing) return null;
+
+  const contentStyle = {};
+  if (translateY) contentStyle.transform = `translateY(${translateY}px)`;
+
+  return (
+    <div
+      className={[
+        'movie-detail-actions-modal',
+        dragging ? 'dragging' : '',
+        sheetOpen && !closing ? 'movie-detail-actions-modal--open' : '',
+        closing ? 'movie-detail-actions-modal--closing' : '',
+      ].filter(Boolean).join(' ')}
+      style={{ top: sheetTop }}
+    >
+      <div
+        ref={contentRef}
+        className={[
+          'movie-detail-actions-modal-content',
+          sheetOpen && !closing ? 'movie-detail-actions-modal-content--open' : '',
+          closing ? 'movie-detail-actions-modal-content--closing' : '',
+        ].filter(Boolean).join(' ')}
+        style={Object.keys(contentStyle).length ? contentStyle : undefined}
+        role="dialog"
+        aria-modal="true"
+        aria-label={saveLabel}
+      >
+        <div
+          ref={headerRef}
+          className="movie-detail-actions-modal-header"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        />
+        <div className="movie-detail-actions-modal-body movie-detail-actions">
+          <button
+            type="button"
+            className={`movie-detail-action-btn movie-detail-action-btn-wishlist${saved ? ' active' : ''}`}
+            onClick={onSave}
+            aria-label={saveLabel}
+            aria-pressed={saved}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>{saveLabel}</span>
+          </button>
+          <Repost
+            className="movie-detail-action-btn"
+            label={repostLabel}
+            ariaLabel={repostLabel}
+            item={repostItem}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MovieDetailActionsModal;

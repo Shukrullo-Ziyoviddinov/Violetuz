@@ -17,6 +17,7 @@ import LikeButton from '../../Music/LikeButton/LikeButton';
 import Repost from '../Repost/Repost';
 import ViewCount from '../ViewCount/ViewCount';
 import MovieDetailMoreModal from './MovieDetailMoreModal';
+import MovieDetailActionsModal from './MovieDetailActionsModal';
 import { formatActionCount } from '../../utils/utils';
 import RatingModal from '../Rating/RatingModal';
 import { formatMovieRating } from '../Rating/CalculateRating';
@@ -556,6 +557,7 @@ const MovieDetail = () => {
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
+  const [showActionsModal, setShowActionsModal] = useState(false);
   const [descSheetOpen, setDescSheetOpen] = useState(false);
   const [descClosing, setDescClosing] = useState(false);
   const [modalTranslateY, setModalTranslateY] = useState(0);
@@ -1526,6 +1528,18 @@ const MovieDetail = () => {
                     className="movie-detail-share-wrapper"
                     buttonClassName="movie-detail-action-btn movie-detail-action-btn-share"
                   />
+                  <button
+                    type="button"
+                    className="movie-detail-action-btn movie-detail-actions-more-btn"
+                    onClick={() => setShowActionsModal(true)}
+                    aria-label={i18n.language === 'uz' ? 'Yana' : 'Ещё'}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <circle cx="5" cy="12" r="1.8" />
+                      <circle cx="12" cy="12" r="1.8" />
+                      <circle cx="19" cy="12" r="1.8" />
+                    </svg>
+                  </button>
                 </div>
               </ScrollTouch>
 
@@ -1990,6 +2004,22 @@ const MovieDetail = () => {
         open={showMoreModal}
         onClose={() => setShowMoreModal(false)}
         title={getMovieTitle()}
+      />
+
+      <MovieDetailActionsModal
+        open={showActionsModal}
+        onClose={() => setShowActionsModal(false)}
+        saved={isInWishlist(movie.id, 'movie')}
+        onSave={() => toggleWishlist(movie.id, 'movie')}
+        saveLabel={i18n.language === 'uz' ? 'Saqlash' : 'Сохранить'}
+        repostLabel={i18n.language === 'uz' ? 'Repost' : 'Репост'}
+        repostItem={{
+          id: movie.id,
+          type: 'movie',
+          title: getMovieTitle(),
+          image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '/img/movie1.jpg',
+          route: `/movie/${movie.id}`,
+        }}
       />
 
       {showDescriptionModal && (

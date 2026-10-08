@@ -677,6 +677,10 @@
   background: rgba(155, 79, 231, 0.18);
 }
 
+.movie-detail-meta-right.movie-detail-actions .movie-detail-actions-more-btn {
+  display: none;
+}
+
 .movie-detail-meta-right .movie-detail-rate-icon {
   font-size: 14px;
   line-height: 1;
@@ -2181,6 +2185,17 @@
   .movie-detail-meta-left .movie-detail-rating-item {
     flex: 0 0 auto;
     min-width: max-content;
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-detail-meta-right.movie-detail-actions > .movie-detail-action-btn-wishlist,
+  .movie-detail-meta-right.movie-detail-actions > .repost-btn.movie-detail-action-btn {
+    display: none;
+  }
+
+  .movie-detail-meta-right.movie-detail-actions .movie-detail-actions-more-btn {
+    display: inline-flex;
   }
 }
 
