@@ -154,9 +154,11 @@ const MovieDetailActionsModal = ({
         sheetOpen && !closing ? 'movie-detail-actions-modal--open' : '',
         closing ? 'movie-detail-actions-modal--closing' : '',
       ].filter(Boolean).join(' ')}
+      onClick={requestClose}
     >
       <div
         ref={contentRef}
+        onClick={(e) => e.stopPropagation()}
         className={[
           'movie-detail-actions-modal-content',
           sheetOpen && !closing ? 'movie-detail-actions-modal-content--open' : '',
