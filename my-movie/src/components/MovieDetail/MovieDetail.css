@@ -2153,6 +2153,12 @@
   .movie-detail-image {
     border-radius: 0;
   }
+
+  .movie-detail-info-block,
+  .movie-detail .similar-movies {
+    padding: 0 0.7rem 1.25rem;
+    box-sizing: border-box;
+  }
 }
 
 @media (max-width: 767px) {
