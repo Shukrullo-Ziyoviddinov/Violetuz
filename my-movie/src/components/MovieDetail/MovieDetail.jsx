@@ -598,10 +598,10 @@ const MovieDetail = () => {
     if (!movie) return undefined;
     const logos = [
       movie.category !== 'anonslar' && movie.rating != null && movie.rating !== '' && movie.rating !== 'none'
-        ? { key: 'vl', src: '/img/photo_2026-02-16_20-30-31_preview_rev_1.png' }
+        ? { key: 'vl', src: '/img/vlplay_preview_rev_1.png' }
         : null,
       movie.ratingImdb != null && movie.ratingImdb !== '' && movie.ratingImdb !== 'none'
-        ? { key: 'imdb', src: '/img/imdb.jpg' }
+        ? { key: 'imdb', src: '/img/imdbnew.png' }
         : null,
       movie.ratingKinopoisk != null && movie.ratingKinopoisk !== '' && movie.ratingKinopoisk !== 'none'
         ? { key: 'kp', src: '/img/kinopoisk.jpg' }
@@ -1356,7 +1356,7 @@ const MovieDetail = () => {
                       />
                     )}
                     <img
-                      src="/img/photo_2026-02-16_20-30-31_preview_rev_1.png"
+                      src="/img/vlplay_preview_rev_1.png"
                       alt="Rating"
                       className={`movie-detail-rating-logo${!ratingLogosReady.vl ? ' movie-detail-rating-logo--loading' : ''}`}
                       onLoad={() =>
@@ -1385,7 +1385,7 @@ const MovieDetail = () => {
                       />
                     )}
                     <img
-                      src="/img/imdb.jpg"
+                      src="/img/imdbnew.png"
                       alt="IMDb"
                       className={`movie-detail-rating-logo${!ratingLogosReady.imdb ? ' movie-detail-rating-logo--loading' : ''}`}
                       onLoad={() =>
