@@ -1488,14 +1488,17 @@ const MovieDetail = () => {
                   <button
                     className={`movie-detail-action-btn movie-detail-action-btn-wishlist ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
                     onClick={() => toggleWishlist(movie.id, 'movie')}
-                    aria-label="Sevimlilarga qo'shish"
+                    aria-label={i18n.language === 'uz' ? 'Saqlash' : 'Сохранить'}
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill={isInWishlist(movie.id, 'movie') ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={isInWishlist(movie.id, 'movie') ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                     </svg>
+                    <span>{i18n.language === 'uz' ? 'Saqlash' : 'Сохранить'}</span>
                   </button>
                   <Repost
                     className="movie-detail-action-btn"
+                    label={i18n.language === 'uz' ? 'Repost' : 'Репост'}
+                    ariaLabel={i18n.language === 'uz' ? 'Repost' : 'Репост'}
                     item={{
                       id: movie.id,
                       type: 'movie',
@@ -1508,6 +1511,7 @@ const MovieDetail = () => {
                     movie={movie}
                     icon="send"
                     dropdownInPortal
+                    label={i18n.language === 'uz' ? 'Ulashish' : 'Поделиться'}
                     className="movie-detail-share-wrapper"
                     buttonClassName="movie-detail-action-btn movie-detail-action-btn-share"
                   />

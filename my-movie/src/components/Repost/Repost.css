@@ -30,34 +30,39 @@
   color: #fff;
 }
 
-/* Movie detail action tugmalari — triller like/dislike o‘lchami */
+/* Movie detail — triller ulashish tugmasi foni */
 .movie-detail-actions .repost-btn.movie-detail-action-btn {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
+  gap: 0.3rem;
+  width: max-content;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.8rem;
   font-weight: 500;
-  padding: 0.25rem 0.1rem;
-  border-radius: 6px;
-  background: transparent;
+  line-height: 1;
   border: none;
-  transition: all 0.3s ease;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .movie-detail-actions .repost-btn.movie-detail-action-btn i,
 .movie-detail-actions .repost-btn.movie-detail-action-btn svg {
-  width: 20px;
-  height: 20px;
-  font-size: 20px;
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
   line-height: 1;
   flex-shrink: 0;
 }
 
 .movie-detail-actions .repost-btn.movie-detail-action-btn.active {
   color: #9b4fe7;
+  background: rgba(155, 79, 231, 0.18);
 }
 
 /* Video detail — qolgan action SVG ikonlar bilan bir xil stroke/px */
