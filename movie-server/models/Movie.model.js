@@ -8,17 +8,10 @@ const localizedStringSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const mediaAssetSchema = new mongoose.Schema(
+const trailerTextSchema = new mongoose.Schema(
   {
-    type: { type: String, trim: true, default: '' },
-    src: { type: String, trim: true, default: '' },
-  },
-  { _id: false }
-);
-
-const localizedVideoSchema = new mongoose.Schema(
-  {
-    video: { type: mediaAssetSchema, default: () => ({}) },
+    uz: { type: mongoose.Schema.Types.Mixed, default: '' },
+    ru: { type: mongoose.Schema.Types.Mixed, default: '' },
   },
   { _id: false }
 );
@@ -28,7 +21,7 @@ const trailerItemSchema = new mongoose.Schema(
     id: { type: Number, default: null },
     trailers: { type: localizedStringSchema, default: () => ({}) },
     title: { type: localizedStringSchema, default: () => ({}) },
-    text: { type: localizedStringSchema, default: () => ({}) },
+    text: { type: trailerTextSchema, default: () => ({}) },
     like: { type: String, trim: true, default: '' },
     dislike: { type: String, trim: true, default: '' },
     typeTrailers: { type: String, trim: true, default: '' },
@@ -85,10 +78,6 @@ const movieSchema = new mongoose.Schema(
     homeImg: {
       type: localizedStringSchema,
       default: () => ({}),
-    },
-    movieMedia: {
-      uz: { type: localizedVideoSchema, default: () => ({}) },
-      ru: { type: localizedVideoSchema, default: () => ({}) },
     },
     rating: {
       type: Number,

@@ -180,17 +180,6 @@ const MovieDetailActorsSkeleton = ({ count = ACTORS_SECTION_SKELETON_COUNT }) =>
   </div>
 );
 
-const resolveMovieVideoSrc = (movie, lang) => {
-  if (!movie?.movieMedia || typeof movie.movieMedia !== 'object') return null;
-  const langData = movie.movieMedia[lang] || movie.movieMedia.uz || movie.movieMedia.ru;
-  if (!langData || typeof langData !== 'object') return null;
-  if (langData.video && typeof langData.video === 'object') {
-    const src = langData.video.src;
-    if (src && typeof src === 'string' && src.trim() !== '') return src.trim();
-  }
-  return null;
-};
-
 /** Epizodda shu til videosi bormi */
 const episodeHasLang = (ep, lang) => {
   const src = ep?.[lang];
@@ -560,18 +549,15 @@ const MovieDetail = () => {
   const { t, i18n } = useTranslation();
   const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const [showWatchModal, setShowWatchModal] = useState(false);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState(null);
   const [seasonsLang, setSeasonsLang] = useState(i18n.language === 'uz' ? 'uz' : 'ru');
   const { contentLang } = useContentLanguage();
   const [selectedSeason, setSelectedSeason] = useState(null);
-  const [isMuted, setIsMuted] = useState(true);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [descSheetOpen, setDescSheetOpen] = useState(false);
   const [descClosing, setDescClosing] = useState(false);
   const [modalTranslateY, setModalTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const videoRef = React.useRef(null);
   const modalRef = React.useRef(null);
   const modalContentRef = React.useRef(null);
   const commentsModalRef = useRef(null);
@@ -583,10 +569,6 @@ const MovieDetail = () => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [movieRatingValue, setMovieRatingValue] = useState(0);
   const [userLastVote, setUserLastVote] = useState(null);
-  const [videoReady, setVideoReady] = useState(false);
-  const [videoFailed, setVideoFailed] = useState(false);
-  const [titleImgReady, setTitleImgReady] = useState(false);
-  const [titleImgFailed, setTitleImgFailed] = useState(false);
   const [ratingLogosReady, setRatingLogosReady] = useState({});
   const { allMovies, moviesLoading, fetchMovieByIdRemote } = useMoviesApi();
   const { allActors, actorsLoading } = useActorsApi();
@@ -607,48 +589,9 @@ const MovieDetail = () => {
   });
   const movieLikeCount = movieLikeQuery.data?.like ?? movie?.like;
   const movieDislikeCount = movieLikeQuery.data?.dislike ?? movie?.dislike;
-  const movieVideoSrc = useMemo(
-    () => resolveMovieVideoSrc(movie, contentLang),
-    [movie, contentLang]
-  );
-
-  // New movie / new video src → keep skeleton until media is actually ready
   useEffect(() => {
-    setVideoReady(false);
-    setVideoFailed(false);
-  }, [movie?.id, movieVideoSrc]);
-
-  const titleImgSrc = useMemo(() => {
-    if (!movie?.titleImg) return null;
-    const src =
-      movie.titleImg[contentLang] || movie.titleImg.uz || movie.titleImg.ru || null;
-    const trimmed = src && String(src).trim() ? String(src).trim() : '';
-    return trimmed ? normalizeImagePath(trimmed) : null;
-  }, [movie, contentLang]);
-
-  useEffect(() => {
-    setTitleImgReady(false);
-    setTitleImgFailed(false);
     setRatingLogosReady({});
-  }, [movie?.id, titleImgSrc]);
-
-  // Cached title image may already be complete
-  useEffect(() => {
-    if (!titleImgSrc || titleImgReady || titleImgFailed) return undefined;
-    const img = new Image();
-    img.onload = () => setTitleImgReady(true);
-    img.onerror = () => setTitleImgFailed(true);
-    img.src = titleImgSrc;
-    if (img.complete && img.naturalWidth > 0) {
-      setTitleImgReady(true);
-    }
-    const soft = window.setTimeout(() => setTitleImgReady(true), 1500);
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-      window.clearTimeout(soft);
-    };
-  }, [titleImgSrc, titleImgReady, titleImgFailed]);
+  }, [movie?.id]);
 
   // Rating logolari — keshda onLoad kelmasa ham
   useEffect(() => {
@@ -686,49 +629,6 @@ const MovieDetail = () => {
 
     return () => cleanups.forEach((fn) => fn());
   }, [movie?.id, movie?.rating, movie?.ratingImdb, movie?.ratingKinopoisk, movie?.ratingNetflix, movie?.category]);
-
-  // Safety: if browser never fires canplay, do not leave skeleton forever after hard failure window
-  useEffect(() => {
-    if (!movieVideoSrc || videoReady || videoFailed) return undefined;
-    const timer = window.setTimeout(() => {
-      const el = videoRef.current;
-      if (el && el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-        setVideoReady(true);
-      } else if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-        // Soft fallback after long wait: at least show a frame
-        setVideoReady(true);
-      }
-    }, 20000);
-    return () => window.clearTimeout(timer);
-  }, [movieVideoSrc, videoReady, videoFailed]);
-
-  const markVideoReady = (e) => {
-    const el = e?.currentTarget || videoRef.current;
-    // Clear skeleton only when browser can play (readyState >= HAVE_FUTURE_DATA)
-    if (el && el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-      setVideoReady(true);
-      setVideoFailed(false);
-    }
-  };
-
-  const markVideoFailed = () => {
-    setVideoFailed(true);
-    setVideoReady(false);
-  };
-
-  // Cached / fast load: events may fire before handlers — poll readyState
-  useEffect(() => {
-    if (!movieVideoSrc || videoReady || videoFailed) return undefined;
-    const check = () => {
-      const el = videoRef.current;
-      if (el && el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-        setVideoReady(true);
-      }
-    };
-    check();
-    const id = window.setInterval(check, 200);
-    return () => window.clearInterval(id);
-  }, [movieVideoSrc, videoReady, videoFailed]);
 
   useEffect(() => {
     setCommentsCount(0);
@@ -1078,24 +978,8 @@ const MovieDetail = () => {
           <div className="movie-detail-bg-block">
             <div className="movie-detail-container">
               <div className="movie-detail-content">
-                <div className="movie-detail-image-block">
-                  <div className="movie-detail-image">
-                    <div className="movie-detail-video-wrapper movie-detail-video-wrapper--skeleton">
-                      <SkeletonLoader
-                        variant="movie-detail-video"
-                        className="movie-detail-video-skeleton"
-                      />
-                    </div>
-                  </div>
-                </div>
                 <div className="movie-detail-info-block">
                   <div className="movie-detail-info">
-                    <div className="movie-detail-title-img-wrapper movie-detail-title-img-wrapper--skeleton">
-                      <SkeletonLoader
-                        variant="movie-detail-title-img"
-                        className="movie-detail-title-img-skeleton"
-                      />
-                    </div>
                     <div className="movie-detail-rating movie-detail-rating--skeleton" aria-hidden="true">
                       {Array.from({ length: 4 }, (_, i) => (
                         <div
@@ -1383,15 +1267,6 @@ const MovieDetail = () => {
     return '';
   };
 
-  const getMovieVideo = () => movieVideoSrc;
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
   // Mobile swipe handlers for modal
   const handleModalHeaderTouchStart = (e) => {
     if (window.innerWidth <= 768 && !descClosingRef.current) {
@@ -1417,8 +1292,6 @@ const MovieDetail = () => {
     }
   };
 
-  const movieVideo = getMovieVideo();
-  const showVideoSkeleton = Boolean(movieVideo) && !videoReady && !videoFailed;
   const descriptionText = getDescriptionText();
   const descriptionData = getDescriptionData();
   const descriptionImg = getDescriptionImg();
@@ -1443,94 +1316,31 @@ const MovieDetail = () => {
           <div className="movie-detail-content">
           <div className="movie-detail-image-block">
             <div className="movie-detail-image">
-              {movieVideo && !videoFailed ? (
-                <div
-                  className={`movie-detail-video-wrapper${showVideoSkeleton ? ' movie-detail-video-wrapper--loading' : ''}`}
-                  aria-busy={showVideoSkeleton || undefined}
-                >
-                  {showVideoSkeleton && (
-                    <SkeletonLoader
-                      variant="movie-detail-video"
-                      className="movie-detail-video-skeleton"
-                    />
-                  )}
-                  <video
-                    ref={videoRef}
-                    key={movieVideo}
-                    src={movieVideo}
-                    alt={getMovieTitle()}
-                    className={`movie-detail-video${showVideoSkeleton ? ' movie-detail-video--loading' : ''}`}
-                    playsInline
-                    autoPlay
-                    muted={isMuted}
-                    loop
-                    preload="auto"
-                    onLoadedData={markVideoReady}
-                    onCanPlay={markVideoReady}
-                    onPlaying={markVideoReady}
-                    onError={markVideoFailed}
-                  />
-                  {!showVideoSkeleton && (
-                    <div className="movie-detail-video-controls">
-                      <button
-                        className="video-control-btn mute-btn"
-                        onClick={toggleMute}
-                        aria-label={isMuted ? 'Unmute' : 'Mute'}
-                      >
-                        {isMuted ? (
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
-                            <line x1="23" y1="9" x2="17" y2="15" />
-                            <line x1="17" y1="9" x2="23" y2="15" />
-                          </svg>
-                        ) : (
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="movie-detail-video-placeholder">
-                  <span>Video topilmadi</span>
-                </div>
-              )}
+              <WatchModal movie={movie} videoUrl={selectedVideoUrl} />
             </div>
           </div>
-
           <div className="movie-detail-info-block">
             <div className="movie-detail-info">
-              {titleImgSrc && !titleImgFailed ? (
-                <div
-                  className={`movie-detail-title-img-wrapper${!titleImgReady ? ' movie-detail-title-img-wrapper--loading' : ''}`}
-                  aria-busy={!titleImgReady || undefined}
-                >
-                  {!titleImgReady && (
-                    <SkeletonLoader
-                      variant="movie-detail-title-img"
-                      className="movie-detail-title-img-skeleton"
-                    />
-                  )}
-                  <img
-                    src={titleImgSrc}
-                    alt={getMovieTitle()}
-                    className={`movie-detail-title-img${!titleImgReady ? ' movie-detail-title-img--loading' : ''}`}
-                    onLoad={() => setTitleImgReady(true)}
-                    onError={() => {
-                      setTitleImgFailed(true);
-                      setTitleImgReady(false);
-                    }}
-                  />
-                  <h1 className="movie-detail-title movie-detail-title-sr-only">{getMovieTitle()}</h1>
-                </div>
-              ) : (
-                <h1 className="movie-detail-title">{getMovieTitle()}</h1>
-              )}
+              <h1 className="movie-detail-title">{getMovieTitle()}</h1>
 
-              <div className="movie-detail-rating">
+              <div className="movie-detail-meta-row">
+                <div className="movie-detail-meta-left">
+                  <LikeButton
+                    key={movie.id}
+                    variant="movieDetail"
+                    contentId={String(movie.id)}
+                    persistKey={`movie_${movie.id}`}
+                    likeMeta={{
+                      category: movie.type || 'movie',
+                      title: getMovieTitle(),
+                      image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '',
+                      route: `/movie/${movie.id}`,
+                    }}
+                    initialLikeCount={movieLikeCount}
+                    initialDislikeCount={movieDislikeCount}
+                    countFormatter={formatActionCount}
+                  />
+                  <div className="movie-detail-rating">
                 {movie.category !== 'anonslar' && movie.rating != null && movie.rating !== '' && movie.rating !== 'none' && (
                   <div
                     className={`movie-detail-rating-item${!ratingLogosReady.vl ? ' movie-detail-rating-item--loading' : ''}`}
@@ -1645,6 +1455,61 @@ const MovieDetail = () => {
                     )}
                   </div>
                 )}
+                  </div>
+                </div>
+                <div className="movie-detail-meta-right movie-detail-actions">
+                  <button
+                    className="movie-detail-action-btn movie-detail-action-btn-comment"
+                    onClick={() => commentsModalRef.current?.openModal()}
+                    aria-label={i18n.language === 'uz' ? 'Izohlar' : 'Комментарии'}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span className="movie-detail-action-count">{formatActionCount(commentsCount)}</span>
+                  </button>
+                  <ViewCount itemId={movie.id} type="movie" record={false} />
+                  <button
+                    className="movie-detail-action-btn movie-detail-action-btn-rate"
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        requestOpenAuthModal('register');
+                        return;
+                      }
+                      setShowRatingModal(true);
+                    }}
+                    aria-label={i18n.language === 'uz' ? 'Baholash' : 'Оценить'}
+                  >
+                    <span className="movie-detail-rate-icon">★</span>
+                    <span className="movie-detail-rate-label">{rateLabel}</span>
+                  </button>
+                  <button
+                    className={`movie-detail-action-btn movie-detail-action-btn-wishlist ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
+                    onClick={() => toggleWishlist(movie.id, 'movie')}
+                    aria-label="Sevimlilarga qo'shish"
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill={isInWishlist(movie.id, 'movie') ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                  </button>
+                  <Repost
+                    className="movie-detail-action-btn"
+                    item={{
+                      id: movie.id,
+                      type: 'movie',
+                      title: getMovieTitle(),
+                      image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '/img/movie1.jpg',
+                      route: `/movie/${movie.id}`,
+                    }}
+                  />
+                  <ShareButton
+                    movie={movie}
+                    icon="send"
+                    dropdownInPortal
+                    className="movie-detail-share-wrapper"
+                    buttonClassName="movie-detail-action-btn movie-detail-action-btn-share"
+                  />
+                </div>
               </div>
 
               <div className="movie-detail-specs">
@@ -1741,25 +1606,6 @@ const MovieDetail = () => {
 
               <div className="movie-detail-buttons">
                 <button
-                  className="movie-detail-btn movie-detail-btn-primary"
-                  onClick={() => {
-                    setSelectedVideoUrl(null);
-                    setShowWatchModal(true);
-                  }}
-                >
-                  <svg
-                    className="movie-detail-btn-icon"
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M8 5.5v13l11-6.5L8 5.5z" />
-                  </svg>
-                  <span>{t('detail.watch')}</span>
-                </button>
-                <button
                   className="movie-detail-btn movie-detail-btn-secondary"
                   onClick={() => navigate(`/movie/${movie.id}/trailer`)}
                 >
@@ -1785,79 +1631,6 @@ const MovieDetail = () => {
                   <span>{t('detail.trailer')}</span>
                 </button>
               </div>
-
-              <ScrollTouch className="movie-detail-actions">
-                <LikeButton
-                  key={movie.id}
-                  variant="movieDetail"
-                  contentId={String(movie.id)}
-                  persistKey={`movie_${movie.id}`}
-                  likeMeta={{
-                    category: movie.type || 'movie',
-                    title: getMovieTitle(),
-                    image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '',
-                    route: `/movie/${movie.id}`,
-                  }}
-                  initialLikeCount={movieLikeCount}
-                  initialDislikeCount={movieDislikeCount}
-                  countFormatter={formatActionCount}
-                />
-
-                <button
-                  className="movie-detail-action-btn movie-detail-action-btn-comment"
-                  onClick={() => commentsModalRef.current?.openModal()}
-                  aria-label={i18n.language === 'uz' ? 'Izohlar' : 'Комментарии'}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                  <span className="movie-detail-action-count">{formatActionCount(commentsCount)}</span>
-                </button>
-
-                <ViewCount itemId={movie.id} type="movie" record={false} />
-
-                <button
-                  className="movie-detail-action-btn movie-detail-action-btn-rate"
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      requestOpenAuthModal('register');
-                      return;
-                    }
-                    setShowRatingModal(true);
-                  }}
-                  aria-label={i18n.language === 'uz' ? 'Baholash' : 'Оценить'}
-                >
-                  <span className="movie-detail-rate-icon">★</span>
-                  <span className="movie-detail-rate-label">{rateLabel}</span>
-                </button>
-
-                <button
-                  className={`movie-detail-action-btn movie-detail-action-btn-wishlist ${isInWishlist(movie.id, 'movie') ? 'active' : ''}`}
-                  onClick={() => toggleWishlist(movie.id, 'movie')}
-                  aria-label="Sevimlilarga qo'shish"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill={isInWishlist(movie.id, 'movie') ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                </button>
-                <Repost
-                  className="movie-detail-action-btn"
-                  item={{
-                    id: movie.id,
-                    type: 'movie',
-                    title: getMovieTitle(),
-                    image: movie.homeImg?.[contentLang] || movie.homeImg?.uz || movie.homeImg?.ru || '/img/movie1.jpg',
-                    route: `/movie/${movie.id}`,
-                  }}
-                />
-                <ShareButton
-                  movie={movie}
-                  icon="send"
-                  dropdownInPortal
-                  className="movie-detail-share-wrapper"
-                  buttonClassName="movie-detail-action-btn movie-detail-action-btn-share"
-                />
-              </ScrollTouch>
 
               <div
                 className={`movie-detail-description${
@@ -2027,7 +1800,6 @@ const MovieDetail = () => {
                                   lang={i18n.language === 'ru' ? 'ru' : 'uz'}
                                   onOpen={(src) => {
                                     setSelectedVideoUrl(src);
-                                    setShowWatchModal(true);
                                   }}
                                 />
                               );
@@ -2144,17 +1916,6 @@ const MovieDetail = () => {
       <div className="movie-detail-container movie-detail-similar-wrapper">
         <SimilarMovies currentMovie={movie} />
       </div>
-
-      {showWatchModal && (
-        <WatchModal
-          movie={movie}
-          videoUrl={selectedVideoUrl}
-          onClose={() => {
-            setShowWatchModal(false);
-            setSelectedVideoUrl(null);
-          }}
-        />
-      )}
 
       <ImgModal
         isOpen={imgModalOpen}

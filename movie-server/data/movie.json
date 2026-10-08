@@ -10,20 +10,6 @@
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 7.7,
     "ratingKinopoisk": 7.5,
@@ -148,20 +134,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.8,
     "ratingKinopoisk": 7.6,
@@ -283,20 +255,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 6.2,
     "ratingKinopoisk": 6.5,
@@ -416,20 +374,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 6.9,
@@ -555,20 +499,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7,
     "ratingKinopoisk": 6.9,
@@ -688,20 +618,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.6,
@@ -824,20 +740,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.6,
@@ -961,20 +863,6 @@
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 6.7,
     "ratingKinopoisk": 6.5,
@@ -1096,20 +984,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 6.3,
     "ratingKinopoisk": 6.4,
@@ -1226,20 +1100,6 @@
     "homeImg": {
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.5,
     "ratingImdb": 6.6,
@@ -1362,20 +1222,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 6.7,
     "ratingKinopoisk": 6.6,
@@ -1497,20 +1343,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 6.3,
     "ratingKinopoisk": 6.2,
@@ -1629,20 +1461,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 6.5,
@@ -1766,20 +1584,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 6.3,
     "ratingKinopoisk": 6.4,
@@ -1896,20 +1700,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7,
@@ -2033,20 +1823,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.7,
     "ratingKinopoisk": 7.5,
@@ -2169,20 +1945,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 7.2,
     "ratingKinopoisk": 7.4,
@@ -2303,20 +2065,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.5,
     "ratingImdb": 6.9,
@@ -2439,20 +2187,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.3,
     "ratingKinopoisk": 7.2,
@@ -2573,20 +2307,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.4,
@@ -2715,20 +2435,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 8.4,
     "ratingKinopoisk": 8.2,
@@ -2856,20 +2562,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 8.4,
     "ratingKinopoisk": 8.2,
@@ -2993,20 +2685,6 @@
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 8.6,
     "ratingKinopoisk": 8.5,
@@ -3127,20 +2805,6 @@
     "homeImg": {
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.2,
@@ -3263,20 +2927,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 8.2,
     "ratingKinopoisk": 8,
@@ -3397,20 +3047,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8.2,
@@ -3533,20 +3169,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.5,
     "ratingKinopoisk": 7.4,
@@ -3667,20 +3289,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.8,
@@ -3803,20 +3411,6 @@
     "homeImg": {
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 7.5,
@@ -3943,20 +3537,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 8.1,
     "ratingKinopoisk": 7.9,
@@ -4079,20 +3659,6 @@
     "homeImg": {
       "uz": "/img/movie9.jpg",
       "ru": "/img/movie9.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.3,
@@ -4217,20 +3783,6 @@
       "uz": "/img/movie18.jpg",
       "ru": "/img/movie18.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 7.8,
     "ratingKinopoisk": 7.5,
@@ -4351,20 +3903,6 @@
     "homeImg": {
       "uz": "/img/movie5.jpg",
       "ru": "/img/movie5.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 7.9,
@@ -4487,20 +4025,6 @@
       "uz": "/img/movie3.jpg",
       "ru": "/img/movie3.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 7.5,
     "ratingKinopoisk": 7.2,
@@ -4621,20 +4145,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8.2,
@@ -4757,20 +4267,6 @@
       "uz": "/img/movie9.jpg",
       "ru": "/img/movie9.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 7.7,
     "ratingKinopoisk": 7.4,
@@ -4887,20 +4383,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 6.5,
@@ -5019,20 +4501,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 6.6,
     "ratingKinopoisk": 6.5,
@@ -5149,20 +4617,6 @@
     "homeImg": {
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.5,
     "ratingImdb": 6.7,
@@ -5286,20 +4740,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 6.5,
     "ratingKinopoisk": 6.4,
@@ -5416,20 +4856,6 @@
     "homeImg": {
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.7,
@@ -5553,20 +4979,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.5,
     "ratingKinopoisk": 7.4,
@@ -5688,20 +5100,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 7.5,
@@ -5829,20 +5227,6 @@
       "uz": "/img/movie-4.5-1.avif",
       "ru": "/img/movie-4.5-1.avif"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 8.1,
     "ratingKinopoisk": 7.9,
@@ -5964,20 +5348,6 @@
     "homeImg": {
       "uz": "/img/movie-4.5-2.jpeg",
       "ru": "/img/movie-4.5-2.jpeg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.3,
@@ -6101,20 +5471,6 @@
       "uz": "/img/movie-4.5-3.jpg",
       "ru": "/img/movie-4.5-3.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 7.5,
     "ratingKinopoisk": 7.3,
@@ -6236,20 +5592,6 @@
     "homeImg": {
       "uz": "/img/movie-4.5-4.webp",
       "ru": "/img/movie-4.5-4.webp"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8,
@@ -6373,20 +5715,6 @@
       "uz": "/img/movie-4.5-5.jpg",
       "ru": "/img/movie-4.5-5.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 7.2,
     "ratingKinopoisk": 7,
@@ -6508,20 +5836,6 @@
     "homeImg": {
       "uz": "/img/movie-4.5-6.avif",
       "ru": "/img/movie-4.5-6.avif"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.7,
@@ -6645,20 +5959,6 @@
       "uz": "/img/movie-4.5-7.jpg",
       "ru": "/img/movie-4.5-7.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.1,
     "ratingKinopoisk": 7,
@@ -6780,20 +6080,6 @@
     "homeImg": {
       "uz": "/img/movie-4.5-8.jpg",
       "ru": "/img/movie-4.5-8.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8,
@@ -6917,20 +6203,6 @@
       "uz": "/img/movie-4.5-9.jpg",
       "ru": "/img/movie-4.5-9.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.8,
     "ratingKinopoisk": 7.6,
@@ -7052,20 +6324,6 @@
     "homeImg": {
       "uz": "/img/movie-4.5-10.jpg",
       "ru": "/img/movie-4.5-10.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.3,
@@ -7192,20 +6450,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.7,
@@ -7359,20 +6603,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 8.2,
     "ratingKinopoisk": 8,
@@ -7518,20 +6748,6 @@
       "uz": "/img/movie3.jpg",
       "ru": "/img/movie3.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 8.6,
     "ratingKinopoisk": 8.4,
@@ -7676,20 +6892,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 8.2,
     "ratingKinopoisk": 8.1,
@@ -7832,20 +7034,6 @@
     "homeImg": {
       "uz": "/img/movie5.jpg",
       "ru": "/img/movie5.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 8,
@@ -7990,20 +7178,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 8.9,
     "ratingKinopoisk": 8.7,
@@ -8146,20 +7320,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 8.1,
@@ -8306,20 +7466,6 @@
       "uz": "/img/movie15.jpg",
       "ru": "/img/movie15.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 9,
     "ratingKinopoisk": 8.8,
@@ -8464,20 +7610,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/img/4-5yangi.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8.4,
@@ -8775,20 +7907,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/video_4-5ulcham.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 9,
     "ratingKinopoisk": 8.9,
@@ -9068,20 +8186,6 @@
     "homeImg": {
       "uz": "/img/movie3.jpg",
       "ru": "/img/movie3.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/4-5video.mp4"
-        }
-      }
     },
     "rating": 4.5,
     "ratingImdb": 7.8,
@@ -9364,20 +8468,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 8.2,
     "ratingKinopoisk": 8,
@@ -9500,20 +8590,6 @@
       "uz": "/img/movie5.jpg",
       "ru": "/img/movie5.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ageRestriction": 16,
     "genre": {
@@ -9633,20 +8709,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -9768,20 +8830,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -9900,20 +8948,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -10034,20 +9068,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -10167,20 +9187,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -10299,20 +9305,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -10434,20 +9426,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -10567,20 +9545,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -10702,20 +9666,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -10812,20 +9762,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -10947,20 +9883,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -11075,20 +9997,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -11210,20 +10118,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -11325,20 +10219,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -11460,20 +10340,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -11594,20 +10460,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -11709,20 +10561,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -11844,20 +10682,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -11959,20 +10783,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -12094,20 +10904,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -12210,20 +11006,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -12325,20 +11107,6 @@
     "homeImg": {
       "uz": "/img/movie15.jpg",
       "ru": "/img/movie15.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -12460,20 +11228,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -12575,20 +11329,6 @@
     "homeImg": {
       "uz": "/img/movie5.jpg",
       "ru": "/img/movie5.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -12710,20 +11450,6 @@
       "uz": "/img/movie16.jpg",
       "ru": "/img/movie16.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 5,
     "ratingImdb": 8.5,
     "ratingKinopoisk": 8.3,
@@ -12825,20 +11551,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 5,
     "ratingImdb": 8.5,
@@ -12960,20 +11672,6 @@
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 9.2,
     "ratingKinopoisk": 8.9,
@@ -13090,20 +11788,6 @@
     "homeImg": {
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8.5,
@@ -13226,20 +11910,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 7.9,
     "ratingKinopoisk": 7.8,
@@ -13360,20 +12030,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8,
@@ -13496,20 +12152,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7,
     "ratingKinopoisk": 7.2,
@@ -13631,20 +12273,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 9.3,
     "ratingKinopoisk": 9.1,
@@ -13755,20 +12383,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 9.2,
@@ -13886,20 +12500,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 7.9,
@@ -14022,20 +12622,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 7.8,
     "ratingKinopoisk": 7.7,
@@ -14152,20 +12738,6 @@
     "homeImg": {
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 8,
@@ -14288,20 +12860,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.7,
     "ratingKinopoisk": 7.5,
@@ -14418,20 +12976,6 @@
     "homeImg": {
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 6.9,
@@ -14554,20 +13098,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 7.8,
     "ratingKinopoisk": 7.7,
@@ -14689,20 +13219,6 @@
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 7.9,
     "ratingKinopoisk": 7.9,
@@ -14823,20 +13339,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.9,
@@ -14960,20 +13462,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.6,
     "ratingKinopoisk": 7,
@@ -15084,20 +13572,6 @@
     "homeImg": {
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.2,
@@ -15221,20 +13695,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 8.2,
@@ -15362,20 +13822,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.9,
     "ratingImdb": 8.1,
     "ratingKinopoisk": 8.2,
@@ -15497,20 +13943,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 6.9,
@@ -15634,20 +14066,6 @@
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 7.9,
     "ratingKinopoisk": 8.2,
@@ -15769,20 +14187,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 7.5,
@@ -15992,20 +14396,6 @@
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 7.9,
     "ratingKinopoisk": 7.8,
@@ -16194,20 +14584,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.2,
     "ratingKinopoisk": 7.1,
@@ -16346,20 +14722,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.8,
@@ -16510,20 +14872,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 6.9,
     "ratingKinopoisk": 7,
@@ -16672,20 +15020,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 7.1,
@@ -16836,20 +15170,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.1,
     "ratingKinopoisk": 7.2,
@@ -16998,20 +15318,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.9,
     "ratingImdb": 9.5,
@@ -17200,20 +15506,6 @@
     "homeImg": {
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 9.2,
@@ -17442,20 +15734,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 8.2,
     "ratingKinopoisk": 7.8,
@@ -17617,20 +15895,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 8.7,
@@ -17820,20 +16084,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 9.1,
     "ratingKinopoisk": 8.5,
@@ -18008,20 +16258,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 8.7,
@@ -18211,20 +16447,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 8.7,
     "ratingKinopoisk": 8.1,
@@ -18413,20 +16635,6 @@
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.7,
     "ratingImdb": 7.5,
     "ratingKinopoisk": 7.4,
@@ -18543,20 +16751,6 @@
     "homeImg": {
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 7.2,
@@ -18675,20 +16869,6 @@
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.8,
     "ratingImdb": 7.8,
     "ratingKinopoisk": 7.7,
@@ -18804,20 +16984,6 @@
     "homeImg": {
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.5,
     "ratingImdb": 6.9,
@@ -18936,20 +17102,6 @@
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 7.1,
     "ratingKinopoisk": 7,
@@ -19065,20 +17217,6 @@
     "homeImg": {
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 7.4,
@@ -19196,20 +17334,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 6.9,
     "ratingKinopoisk": 6.8,
@@ -19326,20 +17450,6 @@
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 7.2,
@@ -19461,20 +17571,6 @@
     "homeImg": {
       "uz": "/img/movie4.jpg",
       "ru": "/img/movie4.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.5,
     "ratingImdb": 6.8,
@@ -19598,20 +17694,6 @@
       "uz": "/img/movie6.jpg",
       "ru": "/img/movie6.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.4,
     "ratingImdb": 6.5,
     "ratingKinopoisk": 6.3,
@@ -19726,20 +17808,6 @@
     "homeImg": {
       "uz": "/img/movie8.jpg",
       "ru": "/img/movie8.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.7,
     "ratingImdb": 7.5,
@@ -19857,20 +17925,6 @@
     "homeImg": {
       "uz": "/img/movie10.jpg",
       "ru": "/img/movie10.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.6,
     "ratingImdb": 7,
@@ -19993,20 +18047,6 @@
       "uz": "/img/movie18.jpg",
       "ru": "/img/movie18.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.5,
     "ratingImdb": 6.9,
     "ratingKinopoisk": 6.7,
@@ -20128,20 +18168,6 @@
       "uz": "/img/movie12.jpg",
       "ru": "/img/movie12.jpg"
     },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
-    },
     "rating": 4.6,
     "ratingImdb": 7.1,
     "ratingKinopoisk": 6.9,
@@ -20258,20 +18284,6 @@
     "homeImg": {
       "uz": "/img/movie13.jpg",
       "ru": "/img/movie13.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.8,
     "ratingImdb": 7.8,
@@ -20393,20 +18405,6 @@
     "homeImg": {
       "uz": "/img/movie16.jpg",
       "ru": "/img/movie16.jpg"
-    },
-    "movieMedia": {
-      "uz": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      },
-      "ru": {
-        "video": {
-          "type": "video",
-          "src": "/video/mainDetailvideo.mp4"
-        }
-      }
     },
     "rating": 4.5,
     "ratingImdb": 6.5,

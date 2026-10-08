@@ -35,8 +35,9 @@
 
 .movie-detail-content {
   display: flex;
+  flex-direction: column;
   gap: 2rem;
-  align-items: flex-start;
+  align-items: stretch;
   background: black;
   padding: 2rem 3rem 3rem 3rem;
   border-radius: 20px;
@@ -47,18 +48,19 @@
 
 .movie-detail-image-block {
   flex-shrink: 0;
-  width: 550px;
+  width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  position: sticky;
-  top: 5rem;
-  align-self: flex-start;
+  position: static;
+  top: auto;
+  align-self: stretch;
 }
 
 .movie-detail-image {
   position: relative;
   width: 100%;
-  height: 600px;
+  height: auto;
+  aspect-ratio: 16 / 9;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -72,6 +74,55 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Watch pleer — modal emas, avvalgi video joyida */
+.movie-detail-image .watch-modal--inline {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  min-height: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
+  animation: none;
+  transform: none;
+}
+
+.movie-detail-image .watch-modal--inline::before {
+  display: none;
+}
+
+.movie-detail-image .watch-modal-content {
+  padding: 0;
+  height: 100%;
+}
+
+.movie-detail-image .watch-modal-video-section {
+  height: 100%;
+  gap: 0;
+}
+
+.movie-detail-image .watch-modal-video-wrapper {
+  min-height: 0;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.movie-detail-image .watch-modal-video.movie-detail-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .movie-detail-video-wrapper--skeleton,
@@ -183,7 +234,7 @@
 }
 
 .movie-detail-title {
-  font-size: 2.5rem;
+  font-size: 1.35rem;
   font-weight: bold;
   color: #ffffff;
   margin: 0;
@@ -191,6 +242,61 @@
   overflow-wrap: break-word;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+.movie-detail-meta-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.movie-detail-meta-row::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.movie-detail-meta-left > *,
+.movie-detail-meta-right > * {
+  flex-shrink: 0;
+}
+
+.movie-detail-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.movie-detail-meta-left .movie-detail-rating {
+  width: auto;
+  max-width: none;
+  flex-wrap: nowrap;
+  gap: 0.55rem;
+}
+
+.movie-detail-meta-left .movie-detail-rating-item,
+.movie-detail-meta-left .movie-detail-rating-item--skeleton,
+.movie-detail-meta-left .movie-detail-rating-item--loading {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.movie-detail-meta-right.movie-detail-actions {
+  width: auto;
+  max-width: 100%;
+  margin-left: auto;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
 }
 
 .movie-detail-title-img-wrapper {
@@ -1793,21 +1899,19 @@
 
   .movie-detail-info {
     position: relative;
-    padding-top: 3.25rem; /* title pastroq — rating bilan ustma-ust bo‘lmasin */
+    padding-top: 0;
   }
 
   .movie-detail-title-img-wrapper,
   .movie-detail-info > .movie-detail-title {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 3;
+    position: static;
+    left: auto;
+    top: auto;
+    z-index: auto;
     margin: 0;
     max-width: 100%;
-    transform: translateY(-42%);
-    transform-origin: left bottom;
-    align-self: flex-start;
-    filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.75));
+    transform: none;
+    filter: none;
   }
 
   .movie-detail-title-img-wrapper {
@@ -1833,13 +1937,14 @@
 
   .movie-detail-image-block {
     width: 100%;
-    max-width: 450px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     position: static;
   }
 
   .movie-detail-image {
-    height: 550px;
+    height: auto;
+    aspect-ratio: 16 / 9;
   }
 
   .movie-detail-video-controls {
@@ -1852,7 +1957,7 @@
   }
 
   .movie-detail-title {
-    font-size: 2rem;
+    font-size: 1.35rem;
   }
 
   .movie-detail-title-img {
@@ -1890,18 +1995,17 @@
   .movie-detail-info-block {
     position: relative;
     z-index: 2;
-    margin-top: -3rem;
+    margin-top: 0;
   }
 
   .movie-detail-info {
-    padding-top: 3rem;
+    padding-top: 0;
   }
 
   .movie-detail-title-img-wrapper,
   .movie-detail-info > .movie-detail-title {
     margin: 0;
-    transform: translateY(-42%);
-    transform-origin: left bottom;
+    transform: none;
   }
 
   .movie-detail-image-block {
@@ -1930,7 +2034,7 @@
   }
 
   .movie-detail-title {
-    font-size: 1.75rem;
+    font-size: 1.35rem;
   }
 
   .movie-detail-title-img {
@@ -2182,18 +2286,17 @@
   }
 
   .movie-detail-info-block {
-    margin-top: -2.5rem;
+    margin-top: 0;
   }
 
   .movie-detail-info {
-    padding-top: 2.75rem;
+    padding-top: 0;
   }
 
   .movie-detail-title-img-wrapper,
   .movie-detail-info > .movie-detail-title {
     margin: 0;
-    transform: translateY(-40%);
-    transform-origin: left bottom;
+    transform: none;
   }
 
   .movie-detail-rating {
@@ -2252,7 +2355,7 @@
   }
 
   .movie-detail-title {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 
   .movie-detail-title-img {

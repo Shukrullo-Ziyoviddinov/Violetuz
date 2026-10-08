@@ -616,12 +616,6 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   }, []);
 
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = originalStyle; };
-  }, []);
-
-  useEffect(() => {
     const checkDuration = setInterval(() => {
       if (videoRef.current && videoRef.current.duration && !isNaN(videoRef.current.duration)) {
         setDuration(videoRef.current.duration);
@@ -696,23 +690,12 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   };
 
   return (
-    <div className="watch-modal-overlay" onClick={handleOverlayClick}>
-      <div 
-        ref={modalRef}
-        className="watch-modal" 
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{
-          transform: `translateY(${modalTranslateY}px)`,
-          transition: isDraggingModal ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}
-      >
-        <button className="watch-modal-close" onClick={handleClose} aria-label="Close">×</button>
-        
-        <div className="watch-modal-content">
-          <div className="watch-modal-video-section">
+    <div
+      ref={modalRef}
+      className="watch-modal watch-modal--inline"
+    >
+      <div className="watch-modal-content">
+        <div className="watch-modal-video-section">
             <div 
               ref={videoWrapperRef}
               className="watch-modal-video-wrapper"
@@ -724,7 +707,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
               <video
                 ref={videoRef}
                 src={computedWatchVideoSrc}
-                className="watch-modal-video"
+                className="watch-modal-video movie-detail-video"
                 onPlay={() => {
                   // Ref darhol — timeupdate birinchi ticklarda hisob to'xtamasin
                   isPlayingRef.current = true;
@@ -882,7 +865,6 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
