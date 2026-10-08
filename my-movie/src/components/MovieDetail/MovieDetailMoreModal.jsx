@@ -7,13 +7,10 @@ const CLOSE_MS = 320;
 const isMobileViewport = () =>
   typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX;
 
-const measureSheetHeight = () => {
-  const viewport = window.innerHeight;
-  const video = document.querySelector('.movie-detail .movie-detail-image');
-  if (!video) return Math.round(viewport * 0.9);
-  const { bottom } = video.getBoundingClientRect();
-  const topLimit = Math.max(bottom, 0);
-  return Math.max(160, Math.round(viewport - topLimit));
+const measureControlsBottom = () => {
+  const controls = document.querySelector('.movie-detail .watch-modal-controls-overlay');
+  if (!controls) return 0;
+  return Math.max(0, Math.round(controls.getBoundingClientRect().bottom));
 };
 
 const MovieDetailMoreModal = ({ open, onClose, title }) => {
@@ -21,7 +18,7 @@ const MovieDetailMoreModal = ({ open, onClose, title }) => {
   const [closing, setClosing] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [translateY, setTranslateY] = useState(0);
-  const [sheetHeight, setSheetHeight] = useState(null);
+  const [sheetTop, setSheetTop] = useState(0);
   const [mobile, setMobile] = useState(isMobileViewport);
 
   const contentRef = useRef(null);
@@ -70,7 +67,7 @@ const MovieDetailMoreModal = ({ open, onClose, title }) => {
     }
     const nextMobile = isMobileViewport();
     setMobile(nextMobile);
-    if (nextMobile) setSheetHeight(measureSheetHeight());
+    setSheetTop(measureControlsBottom());
     if (!nextMobile) {
       setSheetOpen(true);
       return undefined;
@@ -93,7 +90,7 @@ const MovieDetailMoreModal = ({ open, onClose, title }) => {
     const onResize = () => {
       const nextMobile = isMobileViewport();
       setMobile(nextMobile);
-      if (nextMobile) setSheetHeight(measureSheetHeight());
+      setSheetTop(measureControlsBottom());
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -151,10 +148,6 @@ const MovieDetailMoreModal = ({ open, onClose, title }) => {
   if (!open && !closing) return null;
 
   const contentStyle = {};
-  if (mobile && sheetHeight) {
-    contentStyle.height = `${sheetHeight}px`;
-    contentStyle.maxHeight = `${sheetHeight}px`;
-  }
   if (translateY) contentStyle.transform = `translateY(${translateY}px)`;
 
   return (
@@ -165,8 +158,8 @@ const MovieDetailMoreModal = ({ open, onClose, title }) => {
         sheetOpen && !closing ? 'movie-detail-more-modal--open' : '',
         closing ? 'movie-detail-more-modal--closing' : '',
       ].filter(Boolean).join(' ')}
+      style={{ top: sheetTop }}
     >
-      <div className="movie-detail-more-modal-overlay" onClick={requestClose} />
       <div
         ref={contentRef}
         className={[
