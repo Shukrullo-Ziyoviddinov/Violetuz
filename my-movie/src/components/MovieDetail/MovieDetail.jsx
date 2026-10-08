@@ -16,6 +16,7 @@ import ShareButton from '../ShareButton/ShareButton';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import Repost from '../Repost/Repost';
 import ViewCount from '../ViewCount/ViewCount';
+import MovieDetailMoreModal from './MovieDetailMoreModal';
 import { formatActionCount } from '../../utils/utils';
 import RatingModal from '../Rating/RatingModal';
 import { formatMovieRating } from '../Rating/CalculateRating';
@@ -554,6 +555,7 @@ const MovieDetail = () => {
   const { contentLang } = useContentLanguage();
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [showMoreModal, setShowMoreModal] = useState(false);
   const [descSheetOpen, setDescSheetOpen] = useState(false);
   const [descClosing, setDescClosing] = useState(false);
   const [modalTranslateY, setModalTranslateY] = useState(0);
@@ -1315,13 +1317,22 @@ const MovieDetail = () => {
             <div className="movie-detail-info">
               <div className="view-count-heading">
                 <h1 className="movie-detail-title">{getMovieTitle()}</h1>
-                <ViewCount
-                  itemId={movie.id}
-                  type="movie"
-                  record={false}
-                  variant="text"
-                  className="view-count-text triller-view-count"
-                />
+                <div className="movie-detail-views-row">
+                  <ViewCount
+                    itemId={movie.id}
+                    type="movie"
+                    record={false}
+                    variant="text"
+                    className="view-count-text triller-view-count"
+                  />
+                  <button
+                    type="button"
+                    className="movie-detail-more-btn"
+                    onClick={() => setShowMoreModal(true)}
+                  >
+                    {i18n.language === 'uz' ? 'Yana' : 'Ещё'}
+                  </button>
+                </div>
               </div>
 
               <div className="movie-detail-meta-row">
@@ -1973,6 +1984,12 @@ const MovieDetail = () => {
             data?.userVote != null ? Math.floor(Number(data.userVote)) : value
           );
         }}
+      />
+
+      <MovieDetailMoreModal
+        open={showMoreModal}
+        onClose={() => setShowMoreModal(false)}
+        title={getMovieTitle()}
       />
 
       {showDescriptionModal && (

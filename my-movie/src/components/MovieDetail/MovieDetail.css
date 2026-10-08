@@ -224,6 +224,32 @@
   overflow: hidden;
 }
 
+.movie-detail-views-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.movie-detail-views-row .view-count-text {
+  min-width: 0;
+}
+
+.movie-detail-more-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
 .movie-detail-title {
   font-size: 1.35rem;
   font-weight: bold;
