@@ -30,26 +30,30 @@
   color: #fff;
 }
 
-/* Movie detail action tugmalari bilan bir xil ko'rinish */
+/* Movie detail action tugmalari — triller like/dislike o‘lchami */
 .movie-detail-actions .repost-btn.movie-detail-action-btn {
-  background: rgba(45, 45, 50, 0.3);
-  border: 1px solid rgba(70, 65, 80, 0.238);
-  color: #ffffff;
-  padding: 0.75rem 1rem;
-  border-radius: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  transition: all 0.3s;
-  font-size: 1.125rem;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
   font-weight: 500;
+  padding: 0.25rem 0.1rem;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  transition: all 0.3s ease;
 }
 
-.movie-detail-actions .repost-btn.movie-detail-action-btn i {
-  font-size: 24px;
+.movie-detail-actions .repost-btn.movie-detail-action-btn i,
+.movie-detail-actions .repost-btn.movie-detail-action-btn svg {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .movie-detail-actions .repost-btn.movie-detail-action-btn.active {

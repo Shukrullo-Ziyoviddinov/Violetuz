@@ -1313,10 +1313,20 @@ const MovieDetail = () => {
           </div>
           <div className="movie-detail-info-block">
             <div className="movie-detail-info">
-              <h1 className="movie-detail-title">{getMovieTitle()}</h1>
+              <div className="view-count-heading">
+                <h1 className="movie-detail-title">{getMovieTitle()}</h1>
+                <ViewCount
+                  itemId={movie.id}
+                  type="movie"
+                  record={false}
+                  variant="text"
+                  className="view-count-text triller-view-count"
+                />
+              </div>
 
               <div className="movie-detail-meta-row">
                 <div className="movie-detail-meta-left">
+                  <div className="movie-detail-meta-likes">
                   <LikeButton
                     key={movie.id}
                     variant="movieDetail"
@@ -1332,6 +1342,7 @@ const MovieDetail = () => {
                     initialDislikeCount={movieDislikeCount}
                     countFormatter={formatActionCount}
                   />
+                  </div>
                   <div className="movie-detail-rating">
                 {movie.category !== 'anonslar' && movie.rating != null && movie.rating !== '' && movie.rating !== 'none' && (
                   <div
@@ -1460,7 +1471,6 @@ const MovieDetail = () => {
                     </svg>
                     <span className="movie-detail-action-count">{formatActionCount(commentsCount)}</span>
                   </button>
-                  <ViewCount itemId={movie.id} type="movie" record={false} />
                   <button
                     className="movie-detail-action-btn movie-detail-action-btn-rate"
                     onClick={() => {

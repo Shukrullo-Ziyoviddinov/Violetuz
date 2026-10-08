@@ -258,26 +258,29 @@
   flex-shrink: 0;
 }
 
+.movie-detail-meta-likes,
+.movie-detail-meta-left .movie-detail-rating,
+.movie-detail-meta-right.movie-detail-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
 .movie-detail-meta-left {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.55rem;
   min-width: 0;
   flex: 0 1 auto;
+  flex-shrink: 0;
 }
 
 .movie-detail-meta-left .movie-detail-rating {
   width: auto;
   max-width: none;
-  flex-wrap: nowrap;
-  gap: 0.55rem;
-}
-
-.movie-detail-meta-left .movie-detail-rating-item,
-.movie-detail-meta-left .movie-detail-rating-item--skeleton,
-.movie-detail-meta-left .movie-detail-rating-item--loading {
-  flex: 0 0 auto;
-  min-width: 0;
 }
 
 .movie-detail-meta-right.movie-detail-actions {
@@ -285,9 +288,59 @@
   max-width: 100%;
   margin-left: auto;
   flex: 0 1 auto;
-  flex-wrap: nowrap;
   justify-content: flex-end;
+}
+
+.movie-detail-meta-left .movie-detail-rating-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   gap: 0.4rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  min-height: 0;
+  flex: 0 0 auto;
+  min-width: 0;
+  user-select: none;
+}
+
+.movie-detail-meta-left .movie-detail-rating-item--skeleton,
+.movie-detail-meta-left .movie-detail-rating-item--loading {
+  min-width: calc(1rem + 0.4rem + 1.5em);
+  flex: 0 0 auto;
+}
+
+.movie-detail-meta-left .movie-detail-rating-logo {
+  width: 1rem;
+  height: 1rem;
+  max-width: 1rem;
+  max-height: 1rem;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: block;
+  background: #111;
+}
+
+.movie-detail-meta-left .movie-detail-rating-logo--loading {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  max-width: 1px;
+  max-height: 1px;
+}
+
+.movie-detail-meta-left .movie-detail-rating-value {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  min-width: 1.5em;
+  white-space: nowrap;
 }
 
 .movie-detail-title-img-wrapper {
@@ -510,26 +563,30 @@
 .movie-detail-actions .share-button.movie-detail-action-btn-share {
   width: auto;
   height: auto;
-  min-height: calc(0.75rem * 2 + 1.125rem * 1.2);
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  border: 1px solid rgba(70, 65, 80, 0.238);
-  background: rgba(45, 45, 50, 0.3);
-  color: #ffffff;
+  min-height: 0;
+  padding: 0.25rem 0.1rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
   backdrop-filter: none;
   transform: none;
 }
 
 .movie-detail-actions .share-button.movie-detail-action-btn-share:hover {
-  background: rgba(45, 45, 50, 0.45);
-  border-color: rgba(155, 79, 231, 0.45);
+  background: transparent;
+  border: none;
   color: #fff;
   transform: none;
 }
 
-.movie-detail-actions .share-button.movie-detail-action-btn-share svg {
-  width: 24px;
-  height: 24px;
+.movie-detail-actions .share-button.movie-detail-action-btn-share svg,
+.movie-detail-action-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .movie-detail-actions.scroll-touch {
@@ -543,23 +600,21 @@
 }
 
 .movie-detail-action-btn {
-  background: rgba(45, 45, 50, 0.3);
-  border: 1px solid rgba(70, 65, 80, 0.238);
-  /* border: none; */
-  color: #ffffff;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  cursor: pointer;
-  display: inline-flex;
-  flex-direction: row;
+  display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.35rem;
-  transition: all 0.3s;
-  font-size: 1.125rem;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.25rem 0.1rem;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
   box-sizing: border-box;
-  min-height: calc(0.75rem * 2 + 1.125rem * 1.2);
+  min-height: 0;
+  line-height: 1.2;
 }
 
 .movie-detail-actions--skeleton {
@@ -592,25 +647,38 @@
 }
 
 .movie-detail-action-count {
-  font-weight: bold;
-  min-width: 1.5rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  min-width: 0;
   text-align: center;
 }
 
+.movie-detail-meta-likes .movie-detail-action-btn:first-child:hover,
+.movie-detail-meta-likes .movie-detail-action-btn:first-child.active {
+  color: #4caf50;
+  background: transparent;
+}
+
+.movie-detail-meta-likes .movie-detail-action-btn:last-child:hover,
+.movie-detail-meta-likes .movie-detail-action-btn:last-child.active {
+  color: #f44336;
+  background: transparent;
+}
+
 .movie-detail-action-btn-rate {
-  min-width: 90px;
+  min-width: 0;
 }
 
 .movie-detail-rate-icon {
   color: #ffd447;
-  font-size: 1.85rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
 .movie-detail-rate-label {
   font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.2px;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .movie-detail-rating {
@@ -2522,21 +2590,16 @@
     height: 48px;
   }
 
-  .movie-detail-action-btn {
-    padding: 0.3rem 0.5rem;
-    border-radius: 10px;
-    min-height: calc(0.3rem * 2 + 1.125rem * 1.2);
-  }
-
-  .movie-detail-actions .share-button.movie-detail-action-btn-share {
-    padding: 0.3rem 0.5rem;
-    border-radius: 10px;
-    min-height: calc(0.3rem * 2 + 1.125rem * 1.2);
-  }
-
+  .movie-detail-action-btn,
+  .movie-detail-actions .share-button.movie-detail-action-btn-share,
   .movie-detail-actions .repost-btn.movie-detail-action-btn {
-    padding: 0.3rem 0.5rem;
-    border-radius: 10px;
+    padding: 0.25rem 0.1rem;
+    border-radius: 6px;
+    min-height: 0;
+    font-size: 0.9rem;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
   }
 
   .movie-detail-genre-badge {
@@ -2554,56 +2617,25 @@
 
 /* Action tugmalar + specs — 450px dan kichik (480px dan keyin, ustun keladi) */
 @media (max-width: 450px) {
-  .movie-detail-action-btn {
-    padding: 0.3rem 0.5rem;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    min-height: 0;
-    line-height: 1.2;
-    gap: 0.3rem;
-  }
-
-  .movie-detail-actions .movie-detail-action-btn svg {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-
-  .movie-detail-actions .share-button.movie-detail-action-btn-share {
-    padding: 0.3rem 0.5rem;
-    min-height: 0;
-    font-size: 0.9rem;
-  }
-
-  .movie-detail-actions .share-button.movie-detail-action-btn-share svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .movie-detail-rate-icon {
-    font-size: 1.2rem;
-  }
-
-  .movie-detail-action-count {
-    min-width: 1.2rem;
-    font-size: 0.9rem;
-  }
-
+  .movie-detail-action-btn,
+  .movie-detail-actions .share-button.movie-detail-action-btn-share,
   .movie-detail-actions .repost-btn.movie-detail-action-btn {
-    padding: 0.3rem 0.5rem;
-    border-radius: 10px;
+    padding: 0.25rem 0.1rem;
+    border-radius: 6px;
     font-size: 0.9rem;
     min-height: 0;
     line-height: 1.2;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
   }
 
-  .movie-detail-actions .repost-btn.movie-detail-action-btn i {
-    font-size: 18px;
-  }
-
+  .movie-detail-actions .movie-detail-action-btn svg,
+  .movie-detail-actions .share-button.movie-detail-action-btn-share svg,
   .movie-detail-actions .repost-btn.movie-detail-action-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
   }
 
   .movie-detail-action-btn-skeleton,
@@ -2622,7 +2654,7 @@
   }
 
   .movie-detail-action-btn-rate {
-    min-width: 76px;
+    min-width: 0;
   }
 
   .movie-detail-spec-item {
