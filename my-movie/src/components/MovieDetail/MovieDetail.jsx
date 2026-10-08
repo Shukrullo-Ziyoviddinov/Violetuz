@@ -611,7 +611,7 @@ const MovieDetail = () => {
         ? { key: 'kp', src: '/img/kinopoisk.jpg' }
         : null,
       movie.ratingNetflix != null && movie.ratingNetflix !== '' && movie.ratingNetflix !== 'none'
-        ? { key: 'netflix', src: '/img/netflix.jpg' }
+        ? { key: 'netflix', src: '/img/nettttflixxx.webp' }
         : null,
     ].filter(Boolean);
 
@@ -1452,7 +1452,7 @@ const MovieDetail = () => {
                       />
                     )}
                     <img
-                      src="/img/netflix.jpg"
+                      src="/img/nettttflixxx.webp"
                       alt="Netflix"
                       className={`movie-detail-rating-logo${!ratingLogosReady.netflix ? ' movie-detail-rating-logo--loading' : ''}`}
                       onLoad={() =>
