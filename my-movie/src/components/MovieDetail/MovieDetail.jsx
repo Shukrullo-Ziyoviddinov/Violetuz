@@ -1301,17 +1301,9 @@ const MovieDetail = () => {
     ? (i18n.language === 'uz' ? `Baho: ${userLastVote}` : `Оценка: ${userLastVote}`)
     : (i18n.language === 'uz' ? 'Baholash' : 'Оценить');
 
-  const bgImageUrl = `${process.env.PUBLIC_URL || ''}/img/photo_2026-02-19_21-28-29.jpg`;
-
   return (
     <div className="movie-detail">
       <div className="movie-detail-bg-block">
-        <div
-          className="movie-detail-bg"
-          style={{
-            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.9) 80%, rgba(0, 0, 0, 1) 100%), url("${bgImageUrl}")`,
-          }}
-        />
         <div className="movie-detail-container">
           <div className="movie-detail-content">
           <div className="movie-detail-image-block">
