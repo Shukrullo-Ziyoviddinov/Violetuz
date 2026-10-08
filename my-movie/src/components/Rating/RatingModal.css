@@ -21,6 +21,8 @@
   position: relative;
   text-align: center;
   transition: transform 0.2s ease-out;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 .rating-modal-content.dragging {
@@ -82,9 +84,13 @@
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   align-items: center;
+  justify-items: stretch;
   gap: 0.35rem;
-  margin-bottom: 1rem;
+  margin: 0 0 1rem;
+  box-sizing: border-box;
 }
 
 .rating-modal-star-btn {
@@ -94,9 +100,12 @@
   color: #c3c0c7;
   font-size: 1.1rem;
   height: 34px;
-  min-width: 34px;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .rating-modal-star-btn.active {
@@ -160,7 +169,8 @@
     border-bottom: none;
     padding: 0.9rem 1rem 1.2rem;
     animation: ratingModalSlideUp 0.28s ease-out;
-    touch-action: manipulation;
+    overscroll-behavior: none;
+    touch-action: none;
   }
 
   .rating-modal-drag-zone {
@@ -193,6 +203,14 @@
 
   .rating-modal-main-star-value {
     top: 41px;
+  }
+
+  .rating-modal-stars {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    gap: 0.25rem;
   }
 
   .rating-modal-title {

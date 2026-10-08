@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './RatingModal.css';
 
 const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, initialRating = null }) => {
@@ -8,6 +8,7 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
   const [isDragging, setIsDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const contentRef = useRef(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -29,6 +30,16 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
       document.body.style.overflow = '';
     };
   }, [isOpen, initialRating]);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!isOpen || !el) return undefined;
+    const blockRefresh = (event) => {
+      if (event.cancelable) event.preventDefault();
+    };
+    el.addEventListener('touchmove', blockRefresh, { passive: false });
+    return () => el.removeEventListener('touchmove', blockRefresh);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -91,6 +102,7 @@ const RatingModal = ({ isOpen, onClose, movieTitle, language = 'uz', onSubmit, i
       }}
     >
       <div
+        ref={contentRef}
         className={`rating-modal-content ${isDragging ? 'dragging' : ''}`}
         onClick={(e) => e.stopPropagation()}
         style={
