@@ -2159,6 +2159,29 @@
     padding: 0 0.7rem 1.25rem;
     box-sizing: border-box;
   }
+
+  .movie-detail-meta-row.scroll-touch {
+    justify-content: flex-start;
+    gap: 0.45rem;
+    max-width: 100%;
+  }
+
+  .movie-detail-meta-left,
+  .movie-detail-meta-right.movie-detail-actions,
+  .movie-detail-meta-likes,
+  .movie-detail-meta-left .movie-detail-rating {
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: none;
+    margin-left: 0;
+    justify-content: flex-start;
+    gap: 0.45rem;
+  }
+
+  .movie-detail-meta-left .movie-detail-rating-item {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
 }
 
 @media (max-width: 767px) {

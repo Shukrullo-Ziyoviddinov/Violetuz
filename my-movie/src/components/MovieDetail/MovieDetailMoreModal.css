@@ -121,8 +121,8 @@
 
   .movie-detail-more-modal-header {
     cursor: grab;
+    padding: 1rem 1rem;
     touch-action: none;
-    padding: 1.85rem 1.5rem;
   }
 
   .movie-detail-more-modal-header:active {

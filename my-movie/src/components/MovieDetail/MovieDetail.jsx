@@ -1335,7 +1335,7 @@ const MovieDetail = () => {
                 </div>
               </div>
 
-              <div className="movie-detail-meta-row">
+              <ScrollTouch className="movie-detail-meta-row">
                 <div className="movie-detail-meta-left">
                   <div className="movie-detail-meta-likes">
                   <LikeButton
@@ -1527,7 +1527,7 @@ const MovieDetail = () => {
                     buttonClassName="movie-detail-action-btn movie-detail-action-btn-share"
                   />
                 </div>
-              </div>
+              </ScrollTouch>
 
               <div className="movie-detail-specs">
                 {movie.specs && (
