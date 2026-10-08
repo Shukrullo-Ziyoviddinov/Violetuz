@@ -37,6 +37,7 @@ const MODAL_SELECTOR = [
   '.video-modal--sheet',
   '.video-modal--desktop',
   '.share-modal-content',
+  '.rating-modal-content',
   '.navbar-mobile-search-overlay',
   '.watch-modal-overlay',
   '.trailer-modal-overlay',

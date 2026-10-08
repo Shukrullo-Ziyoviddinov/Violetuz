@@ -21,8 +21,6 @@
   position: relative;
   text-align: center;
   transition: transform 0.2s ease-out;
-  overscroll-behavior: none;
-  touch-action: none;
 }
 
 .rating-modal-content.dragging {
@@ -169,8 +167,7 @@
     border-bottom: none;
     padding: 0.9rem 1rem 1.2rem;
     animation: ratingModalSlideUp 0.28s ease-out;
-    overscroll-behavior: none;
-    touch-action: none;
+    touch-action: manipulation;
   }
 
   .rating-modal-drag-zone {
