@@ -8,12 +8,6 @@ const CLOSE_MS = 320;
 const isMobileViewport = () =>
   typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX;
 
-const measureControlsBottom = () => {
-  const controls = document.querySelector('.movie-detail .watch-modal-controls-overlay');
-  if (!controls) return 0;
-  return Math.max(0, Math.round(controls.getBoundingClientRect().bottom));
-};
-
 const MovieDetailActionsModal = ({
   open,
   onClose,
@@ -27,7 +21,6 @@ const MovieDetailActionsModal = ({
   const [closing, setClosing] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [translateY, setTranslateY] = useState(0);
-  const [sheetTop, setSheetTop] = useState(0);
 
   const contentRef = useRef(null);
   const headerRef = useRef(null);
@@ -77,7 +70,6 @@ const MovieDetailActionsModal = ({
       onClose?.();
       return undefined;
     }
-    setSheetTop(measureControlsBottom());
     if (closeTimerRef.current) {
       window.clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
@@ -94,11 +86,7 @@ const MovieDetailActionsModal = ({
   useEffect(() => {
     if (!open) return undefined;
     const onResize = () => {
-      if (!isMobileViewport()) {
-        finishClose();
-        return;
-      }
-      setSheetTop(measureControlsBottom());
+      if (!isMobileViewport()) finishClose();
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -166,7 +154,6 @@ const MovieDetailActionsModal = ({
         sheetOpen && !closing ? 'movie-detail-actions-modal--open' : '',
         closing ? 'movie-detail-actions-modal--closing' : '',
       ].filter(Boolean).join(' ')}
-      style={{ top: sheetTop }}
     >
       <div
         ref={contentRef}
