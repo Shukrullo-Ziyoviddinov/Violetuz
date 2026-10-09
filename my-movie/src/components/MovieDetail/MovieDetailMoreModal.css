@@ -85,6 +85,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  padding: 0 2rem 1.25rem;
 }
 
 @media (max-width: 768px) {
@@ -143,6 +144,10 @@
 
   .movie-detail-more-modal-header h3 {
     font-size: 1.25rem;
+  }
+
+  .movie-detail-more-modal-body {
+    padding: 0 1rem 1.25rem;
   }
 
   .movie-detail-more-modal-close {

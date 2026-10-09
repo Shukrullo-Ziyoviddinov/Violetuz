@@ -997,22 +997,6 @@ const MovieDetail = () => {
                         </div>
                       ))}
                     </div>
-                    <div className="movie-detail-specs">
-                      <div className="movie-detail-specs-container">
-                        {Array.from({ length: 4 }, (_, i) => (
-                          <div
-                            key={`spec-sk-${i}`}
-                            className="movie-detail-spec-item movie-detail-spec-item--skeleton"
-                            aria-hidden="true"
-                          >
-                            <SkeletonLoader
-                              variant="movie-detail-spec"
-                              className="movie-detail-spec-item-skeleton"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                     <div className="movie-detail-genre">
                       <div className="movie-detail-genres">
                         {Array.from({ length: 3 }, (_, i) => (
@@ -1543,88 +1527,6 @@ const MovieDetail = () => {
                 </div>
               </ScrollTouch>
 
-              <div className="movie-detail-specs">
-                {movie.specs && (
-                  <ScrollTouch className="movie-detail-specs-container">
-                    <div
-                      className="movie-detail-spec-item"
-                      title={t('detail.duration')}
-                      aria-label={`${t('detail.duration')}: ${movie.specs.duration} min`}
-                    >
-                      <span className="movie-detail-spec-icon" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10" />
-                          <polyline points="12 6 12 12 16 14" />
-                        </svg>
-                      </span>
-                      <span className="movie-detail-spec-value">{movie.specs.duration} min</span>
-                    </div>
-                    <div
-                      className="movie-detail-spec-item"
-                      title={t('detail.ageRating')}
-                      aria-label={`${t('detail.ageRating')}: ${movie.specs.ageRating}`}
-                    >
-                      <span className="movie-detail-spec-icon" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg>
-                      </span>
-                      <span className="movie-detail-spec-value">{movie.specs.ageRating}</span>
-                    </div>
-                    <div
-                      className="movie-detail-spec-item"
-                      title={t('detail.year')}
-                      aria-label={`${t('detail.year')}: ${movie.specs.year}`}
-                    >
-                      <span className="movie-detail-spec-icon" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                          <line x1="16" y1="2" x2="16" y2="6" />
-                          <line x1="8" y1="2" x2="8" y2="6" />
-                          <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
-                      </span>
-                      <span className="movie-detail-spec-value">{movie.specs.year}</span>
-                    </div>
-                    {movie.specs.countries && movie.specs.countries.length > 0 && (
-                      <div
-                        className="movie-detail-spec-item"
-                        title={t('detail.countries')}
-                        aria-label={`${t('detail.countries')}: ${movie.specs.countries.join(', ')}`}
-                      >
-                        <span className="movie-detail-spec-icon" aria-hidden="true">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="2" y1="12" x2="22" y2="12" />
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                          </svg>
-                        </span>
-                        <span className="movie-detail-spec-value">{movie.specs.countries.join(', ')}</span>
-                      </div>
-                    )}
-                    {movie.specs.languages && movie.specs.languages.length > 0 && (
-                      <div
-                        className="movie-detail-spec-item"
-                        title={t('detail.languages')}
-                        aria-label={`${t('detail.languages')}: ${movie.specs.languages.join(', ')}`}
-                      >
-                        <span className="movie-detail-spec-icon" aria-hidden="true">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m5 8 6 6" />
-                            <path d="m4 14 6-6 2-3" />
-                            <path d="M2 5h12" />
-                            <path d="M7 2h1" />
-                            <path d="m22 22-5-10-5 10" />
-                            <path d="M14 18h6" />
-                          </svg>
-                        </span>
-                        <span className="movie-detail-spec-value">{movie.specs.languages.join(', ')}</span>
-                      </div>
-                    )}
-                  </ScrollTouch>
-                )}
-              </div>
-
               <div className="movie-detail-genre">
                 <div className="movie-detail-genres">
                   {getMovieGenres().map((genre, index) => (
@@ -2006,7 +1908,89 @@ const MovieDetail = () => {
         open={showMoreModal}
         onClose={() => setShowMoreModal(false)}
         title={getMovieTitle()}
-      />
+      >
+        {movie.specs ? (
+          <div className="movie-detail-specs">
+            <ScrollTouch className="movie-detail-specs-container">
+              <div
+                className="movie-detail-spec-item"
+                title={t('detail.duration')}
+                aria-label={`${t('detail.duration')}: ${movie.specs.duration} min`}
+              >
+                <span className="movie-detail-spec-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </span>
+                <span className="movie-detail-spec-value">{movie.specs.duration} min</span>
+              </div>
+              <div
+                className="movie-detail-spec-item"
+                title={t('detail.ageRating')}
+                aria-label={`${t('detail.ageRating')}: ${movie.specs.ageRating}`}
+              >
+                <span className="movie-detail-spec-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </span>
+                <span className="movie-detail-spec-value">{movie.specs.ageRating}</span>
+              </div>
+              <div
+                className="movie-detail-spec-item"
+                title={t('detail.year')}
+                aria-label={`${t('detail.year')}: ${movie.specs.year}`}
+              >
+                <span className="movie-detail-spec-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </span>
+                <span className="movie-detail-spec-value">{movie.specs.year}</span>
+              </div>
+              {movie.specs.countries && movie.specs.countries.length > 0 && (
+                <div
+                  className="movie-detail-spec-item"
+                  title={t('detail.countries')}
+                  aria-label={`${t('detail.countries')}: ${movie.specs.countries.join(', ')}`}
+                >
+                  <span className="movie-detail-spec-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                  </span>
+                  <span className="movie-detail-spec-value">{movie.specs.countries.join(', ')}</span>
+                </div>
+              )}
+              {movie.specs.languages && movie.specs.languages.length > 0 && (
+                <div
+                  className="movie-detail-spec-item"
+                  title={t('detail.languages')}
+                  aria-label={`${t('detail.languages')}: ${movie.specs.languages.join(', ')}`}
+                >
+                  <span className="movie-detail-spec-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m5 8 6 6" />
+                      <path d="m4 14 6-6 2-3" />
+                      <path d="M2 5h12" />
+                      <path d="M7 2h1" />
+                      <path d="m22 22-5-10-5 10" />
+                      <path d="M14 18h6" />
+                    </svg>
+                  </span>
+                  <span className="movie-detail-spec-value">{movie.specs.languages.join(', ')}</span>
+                </div>
+              )}
+            </ScrollTouch>
+          </div>
+        ) : null}
+      </MovieDetailMoreModal>
 
       <MovieDetailActionsModal
         open={showActionsModal}

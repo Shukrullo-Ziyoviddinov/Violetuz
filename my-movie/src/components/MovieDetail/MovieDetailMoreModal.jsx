@@ -13,7 +13,7 @@ const measureControlsBottom = () => {
   return Math.max(0, Math.round(controls.getBoundingClientRect().bottom));
 };
 
-const MovieDetailMoreModal = ({ open, onClose, title }) => {
+const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -191,7 +191,7 @@ const MovieDetailMoreModal = ({ open, onClose, title }) => {
           </button>
           <h3>{title}</h3>
         </div>
-        <div className="movie-detail-more-modal-body" />
+        <div className="movie-detail-more-modal-body">{children}</div>
       </div>
     </div>
   );
