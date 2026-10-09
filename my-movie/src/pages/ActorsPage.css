@@ -780,8 +780,6 @@
   align-self: stretch;
   justify-content: flex-start;
   min-height: 0;
-  background: rgba(45, 45, 50, 0.3);
-  border: 1px solid rgba(70, 65, 80, 0.4);
   padding: 1.5rem 1.1rem;
   border-radius: 20px;
   box-sizing: border-box;
@@ -793,9 +791,6 @@
   max-width: min(25rem, 46%);
   align-self: stretch;
   min-height: 0;
-  background: rgba(45, 45, 50, 0.3);
-  border: 1px solid rgba(70, 65, 80, 0.4);
-  padding: 1rem 1rem;
   border-radius: 20px;
   box-sizing: border-box;
   display: flex;

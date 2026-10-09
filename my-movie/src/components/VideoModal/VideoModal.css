@@ -276,7 +276,6 @@
   width: 100%;
   min-width: 0;
   padding: 0.35rem 0 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .video-modal-content-wrap--desktop .video-modal-related {
@@ -317,6 +316,7 @@
   min-height: 0;
   min-width: 0;
   width: 100%;
+  margin-top: -0.5rem;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -344,8 +344,14 @@
   top: 0;
   z-index: 15;
   margin: 0;
-  padding: 0.65rem 0 0.55rem;
-  background: rgb(14, 12, 18);
+  padding: 0.6rem 0 0.1rem;
+  background: linear-gradient(145deg, #16121c, #0c0a10);
+}
+
+.video-modal--sheet .video-modal-body,
+.video-modal--sheet .video-modal-music-shell .music-vp-video-wrapper {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .video-modal--sheet .video-modal-related-draphy-block.actors-page-video-draphy-block {
@@ -491,8 +497,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
-  padding: 0.65rem 0.25rem 0.15rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
 }
 
 .video-modal-footer-actions {
@@ -685,7 +690,6 @@
     max-width: none;
     min-width: 0;
     border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-left: 0;
     padding-top: 0.5rem;
     contain: none;
@@ -728,7 +732,6 @@
     max-width: none;
     min-width: 0;
     border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-left: 0;
     padding-top: 0.5rem;
     contain: none;
