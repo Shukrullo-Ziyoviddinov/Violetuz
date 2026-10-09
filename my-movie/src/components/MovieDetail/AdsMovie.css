@@ -180,17 +180,25 @@ video.ads-movie-video {
     min-width: 38px;
     font-size: 12px;
   }
+}
 
+@media (max-width: 768px) {
   .ads-movie-playback {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .ads-movie-playback svg {
+    width: 26px;
+    height: 26px;
   }
 
   .ads-movie-skip {
     right: 12px;
     bottom: 42px;
-    min-height: 36px;
-    padding: 7px 12px;
-    font-size: 13px;
+    gap: 6px;
+    min-height: 30px;
+    padding: 5px 9px;
+    font-size: 12px;
   }
 }
