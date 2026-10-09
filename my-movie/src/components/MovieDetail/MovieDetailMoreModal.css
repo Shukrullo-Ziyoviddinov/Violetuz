@@ -88,6 +88,10 @@
   padding: 0 2rem 1.25rem;
 }
 
+.movie-detail-more-modal-body .movie-detail-genre {
+  margin-top: 0.85rem;
+}
+
 @media (max-width: 768px) {
   .movie-detail-more-modal {
     align-items: flex-end;

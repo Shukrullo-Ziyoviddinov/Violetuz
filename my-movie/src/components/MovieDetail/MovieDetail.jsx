@@ -997,17 +997,6 @@ const MovieDetail = () => {
                         </div>
                       ))}
                     </div>
-                    <div className="movie-detail-genre">
-                      <div className="movie-detail-genres">
-                        {Array.from({ length: 3 }, (_, i) => (
-                          <SkeletonLoader
-                            key={`genre-sk-${i}`}
-                            variant="movie-detail-genre-badge"
-                            className="movie-detail-genre-badge-skeleton"
-                          />
-                        ))}
-                      </div>
-                    </div>
                     <div className="movie-detail-buttons movie-detail-buttons--skeleton" aria-hidden="true">
                       <SkeletonLoader
                         variant="movie-detail-btn"
@@ -1527,16 +1516,6 @@ const MovieDetail = () => {
                 </div>
               </ScrollTouch>
 
-              <div className="movie-detail-genre">
-                <div className="movie-detail-genres">
-                  {getMovieGenres().map((genre, index) => (
-                    <span key={index} className="movie-detail-genre-badge">
-                      {genre}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
               <div className="movie-detail-buttons">
                 <button
                   className="movie-detail-btn movie-detail-btn-secondary"
@@ -1988,6 +1967,17 @@ const MovieDetail = () => {
                 </div>
               )}
             </ScrollTouch>
+          </div>
+        ) : null}
+        {getMovieGenres().filter(Boolean).length > 0 ? (
+          <div className="movie-detail-genre">
+            <div className="movie-detail-genres">
+              {getMovieGenres().filter(Boolean).map((genre, index) => (
+                <span key={index} className="movie-detail-genre-badge">
+                  {genre}
+                </span>
+              ))}
+            </div>
           </div>
         ) : null}
       </MovieDetailMoreModal>
