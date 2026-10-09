@@ -449,17 +449,17 @@
 
 .movie-detail-spec-item {
   display: inline-flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.7rem;
+  padding: 0.55rem 0.75rem;
   background: rgba(45, 45, 50, 0.3);
   border: 1px solid rgba(70, 65, 80, 0.4);
   border-radius: 10px;
   min-width: 0;
   flex-shrink: 0;
-  gap: 0.4rem;
-  text-align: left;
+  gap: 0.35rem;
+  text-align: center;
   box-sizing: border-box;
   white-space: nowrap;
 }
@@ -486,13 +486,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.42);
   line-height: 0;
 }
 
 .movie-detail-spec-icon svg {
-  width: 15px;
-  height: 15px;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
@@ -501,10 +501,10 @@
 }
 
 .movie-detail-spec-value {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  text-align: left;
+  font-size: 0.95rem;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
   line-height: 1.2;
 }
 
@@ -2626,29 +2626,30 @@
 
   .movie-detail-spec-item {
     min-width: 0;
-    padding: 0.35rem 0.55rem;
-    gap: 0.35rem;
+    padding: 0.5rem 0.6rem;
+    gap: 0.3rem;
   }
 
-  /* Real: padding + max(14px icon, 0.8rem*1.2 text) + gap + ~3.2em value */
   .movie-detail-spec-item--skeleton {
-    min-width: calc(0.55rem * 2 + 14px + 0.35rem + 0.8rem * 3.2);
-    height: calc(0.35rem * 2 + max(14px, 0.8rem * 1.2));
+    min-width: 4.5rem;
+    height: calc(0.5rem * 2 + 18px + 0.3rem + 0.9rem * 1.2);
   }
 
   .movie-detail-spec-item-skeleton,
   .skeleton-loader--movie-detail-spec {
-    min-width: calc(0.55rem * 2 + 14px + 0.35rem + 0.8rem * 3.2);
-    width: calc(0.55rem * 2 + 14px + 0.35rem + 0.8rem * 3.2) !important;
+    min-width: 4.5rem;
+    width: 4.5rem !important;
   }
 
   .movie-detail-spec-icon svg {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
   }
 
   .movie-detail-spec-value {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
   }
 
   .movie-detail-description {
@@ -2828,31 +2829,32 @@
 
   .movie-detail-spec-item {
     min-width: 0;
-    padding: 0.3rem 0.5rem;
-    gap: 0.3rem;
+    padding: 0.45rem 0.55rem;
+    gap: 0.28rem;
     border-radius: 10px;
   }
 
-  /* Real: padding + max(13px icon, 0.7rem*1.15 text) + gap + ~3.2em value */
   .movie-detail-spec-item--skeleton {
-    min-width: calc(0.5rem * 2 + 13px + 0.3rem + 0.7rem * 3.2);
-    height: calc(0.3rem * 2 + max(13px, 0.7rem * 1.15));
+    min-width: 4.2rem;
+    height: calc(0.45rem * 2 + 18px + 0.28rem + 0.85rem * 1.2);
   }
 
   .movie-detail-spec-item-skeleton,
   .skeleton-loader--movie-detail-spec {
-    min-width: calc(0.5rem * 2 + 13px + 0.3rem + 0.7rem * 3.2);
-    width: calc(0.5rem * 2 + 13px + 0.3rem + 0.7rem * 3.2) !important;
+    min-width: 4.2rem;
+    width: 4.2rem !important;
     border-radius: 10px !important;
   }
 
   .movie-detail-spec-icon svg {
-    width: 13px;
-    height: 13px;
+    width: 18px;
+    height: 18px;
   }
 
   .movie-detail-spec-value {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
     line-height: 1.15;
   }
 }
