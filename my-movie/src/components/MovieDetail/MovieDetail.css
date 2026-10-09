@@ -2134,6 +2134,22 @@
   }
 }
 
+.movie-detail .movie-detail-comments {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem 1rem;
+  border-radius: 15px;
+  margin-bottom: 0.5rem;
+}
+
+.movie-detail .movie-detail-comments-input-wrap {
+  background: rgba(45, 45, 50, 0.71);
+  border: 1px solid rgba(70, 65, 80, 0.4);
+}
+
+.movie-detail .movie-detail-comments-list {
+  margin-bottom: 0;
+}
+
 /* Mobile — triller sahifasi kabi to‘liq kenglik, qora fon */
 @media (max-width: 900px) {
   .movie-detail {
@@ -2162,6 +2178,11 @@
   .movie-detail .similar-movies {
     padding: 0 0.7rem 1.25rem;
     box-sizing: border-box;
+  }
+
+  .movie-detail .movie-detail-comments {
+    margin-top: 0.35rem;
+    margin-bottom: 0.5rem;
   }
 
   .movie-detail-meta-row.scroll-touch {

@@ -1937,6 +1937,8 @@ const MovieDetail = () => {
                 ref={commentsModalRef}
                 movieId={movie.id}
                 targetType="movie"
+                previewLimit={4}
+                mobileSheetUi
                 onCountChange={setCommentsCount}
               />
             </div>
