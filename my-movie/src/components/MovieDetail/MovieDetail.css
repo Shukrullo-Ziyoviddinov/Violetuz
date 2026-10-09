@@ -449,19 +449,19 @@
 
 .movie-detail-spec-item {
   display: inline-flex;
-  flex: 1 1 0;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 0.5rem;
+  padding: 0.3rem 0.55rem;
   background: rgba(45, 45, 50, 0.3);
   border: 1px solid rgba(70, 65, 80, 0.4);
   border-radius: 10px;
   min-width: 0;
-  width: 0;
-  gap: 0.4rem;
-  text-align: center;
+  flex-shrink: 0;
+  gap: 0.3rem;
+  text-align: left;
   box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .movie-detail-spec-item--skeleton {
@@ -486,13 +486,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.55);
   line-height: 0;
 }
 
 .movie-detail-spec-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 13px;
+  height: 13px;
   display: block;
 }
 
@@ -501,13 +501,11 @@
 }
 
 .movie-detail-spec-value {
-  font-size: 1.05rem;
-  color: #fff;
-  font-weight: 700;
-  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  text-align: left;
   line-height: 1.2;
-  max-width: 100%;
-  overflow-wrap: anywhere;
 }
 
 .movie-detail-genre {
@@ -2627,33 +2625,29 @@
   }
 
   .movie-detail-spec-item {
-    flex: 1 1 0;
     min-width: 0;
-    width: 0;
-    padding: 0.55rem 0.4rem;
-    gap: 0.35rem;
+    padding: 0.28rem 0.45rem;
+    gap: 0.25rem;
   }
 
   .movie-detail-spec-item--skeleton {
-    min-width: 4.5rem;
-    height: calc(0.5rem * 2 + 18px + 0.3rem + 0.9rem * 1.2);
+    min-width: calc(0.45rem * 2 + 12px + 0.25rem + 0.72rem * 3.2);
+    height: calc(0.28rem * 2 + max(12px, 0.72rem * 1.2));
   }
 
   .movie-detail-spec-item-skeleton,
   .skeleton-loader--movie-detail-spec {
-    min-width: 4.5rem;
-    width: 4.5rem !important;
+    min-width: calc(0.45rem * 2 + 12px + 0.25rem + 0.72rem * 3.2);
+    width: calc(0.45rem * 2 + 12px + 0.25rem + 0.72rem * 3.2) !important;
   }
 
   .movie-detail-spec-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 12px;
+    height: 12px;
   }
 
   .movie-detail-spec-value {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
+    font-size: 0.72rem;
   }
 
   .movie-detail-description {
@@ -2832,35 +2826,31 @@
   }
 
   .movie-detail-spec-item {
-    flex: 1 1 0;
     min-width: 0;
-    width: 0;
-    padding: 0.5rem 0.35rem;
-    gap: 0.32rem;
+    padding: 0.25rem 0.4rem;
+    gap: 0.22rem;
     border-radius: 10px;
   }
 
   .movie-detail-spec-item--skeleton {
-    min-width: 4.2rem;
-    height: calc(0.45rem * 2 + 18px + 0.28rem + 0.85rem * 1.2);
+    min-width: calc(0.4rem * 2 + 12px + 0.22rem + 0.68rem * 3.2);
+    height: calc(0.25rem * 2 + max(12px, 0.68rem * 1.15));
   }
 
   .movie-detail-spec-item-skeleton,
   .skeleton-loader--movie-detail-spec {
-    min-width: 4.2rem;
-    width: 4.2rem !important;
+    min-width: calc(0.4rem * 2 + 12px + 0.22rem + 0.68rem * 3.2);
+    width: calc(0.4rem * 2 + 12px + 0.22rem + 0.68rem * 3.2) !important;
     border-radius: 10px !important;
   }
 
   .movie-detail-spec-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 12px;
+    height: 12px;
   }
 
   .movie-detail-spec-value {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #fff;
+    font-size: 0.68rem;
     line-height: 1.15;
   }
 }
