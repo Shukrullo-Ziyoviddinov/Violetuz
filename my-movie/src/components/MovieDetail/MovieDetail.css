@@ -2871,11 +2871,35 @@
     display: none !important;
   }
 
+  body.movie-detail-page-active .App {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body.movie-detail-page-active .navbar {
+    flex: 0 0 auto;
+  }
+
+  body.movie-detail-page-active .App-main {
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+    padding-bottom: 0 !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
   .movie-detail:not(.movie-detail--loading) {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 80px);
-    max-height: calc(100dvh - 80px);
+    flex: 1 1 0;
+    height: auto;
+    max-height: none;
     min-height: 0;
     overflow: hidden;
     padding: 0;
@@ -2928,11 +2952,7 @@
     touch-action: pan-y;
     background: #000;
     opacity: calc(1 - var(--movie-detail-sheet-progress, 0) * 0.92);
-    transform: translate3d(0, calc(var(--movie-detail-sheet-progress, 0) * 43.75vh), 0);
-    will-change: transform, opacity;
-    transition:
-      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .movie-detail-image .watch-modal-video-wrapper,
@@ -2946,24 +2966,24 @@
 
   .movie-detail-image .watch-modal-video.movie-detail-video {
     background: #000;
+    object-fit: contain;
   }
 
-  .movie-detail--sheet-dragging .movie-detail-image {
-    aspect-ratio: 16 / 9;
-    height: auto;
-    max-height: 100dvh;
-    width: 100%;
-  }
-
-  .movie-detail--expanding .movie-detail-image {
+  .movie-detail:not(.movie-detail--immersive).movie-detail--sheet-dragging .movie-detail-image,
+  .movie-detail:not(.movie-detail--immersive).movie-detail--expanding .movie-detail-image {
     aspect-ratio: auto;
     border-radius: 0;
-    height: calc(56.25vw + (100dvh - 80px - 56.25vw) * var(--movie-detail-sheet-progress, 0));
-    max-height: calc(100dvh - 80px);
+    height: calc(
+      56.25vw + (var(--movie-detail-stage, 100dvh) - 56.25vw) * var(--movie-detail-sheet-progress, 0)
+    );
+    max-height: var(--movie-detail-stage, 100dvh);
   }
 
   .movie-detail--sheet-dragging .movie-detail-image,
-  .movie-detail--sheet-dragging .movie-detail-sheet {
+  .movie-detail--sheet-dragging .movie-detail-sheet,
+  .movie-detail--sheet-dragging .movie-detail-image .watch-modal-controls-overlay.show,
+  .movie-detail--sheet-dragging .movie-detail-image .watch-modal-video.movie-detail-video,
+  .movie-detail--sheet-dragging .movie-detail-image .watch-modal-video-wrapper {
     transition: none;
   }
 
@@ -3027,7 +3047,6 @@
     max-height: none;
     min-height: 0;
     opacity: clamp(0.15, var(--movie-detail-sheet-progress, 0), 1);
-    transform: translate3d(0, calc((1 - var(--movie-detail-sheet-progress, 0)) * 43.75vh), 0);
     overflow: hidden;
     pointer-events: none;
   }
@@ -3037,9 +3056,7 @@
   }
 
   .movie-detail--immersive.movie-detail--collapsing:not(.movie-detail--sheet-dragging) .movie-detail-sheet {
-    transition:
-      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .movie-detail--immersive.movie-detail--collapsing .movie-detail-image-block {
@@ -3047,14 +3064,19 @@
   }
 
   .movie-detail--immersive.movie-detail--collapsing .movie-detail-image {
-    height: calc((100dvh - 80px) - ((100dvh - 80px) - 56.25vw) * var(--movie-detail-sheet-progress, 0));
-    max-height: calc(100dvh - 80px);
+    height: calc(
+      var(--movie-detail-stage, 100dvh) - (var(--movie-detail-stage, 100dvh) - 56.25vw) * var(--movie-detail-sheet-progress, 0)
+    );
+    max-height: var(--movie-detail-stage, 100dvh);
     flex: 0 0 auto;
     aspect-ratio: auto;
     border-radius: 0;
   }
 
-  .movie-detail--immersive.movie-detail--collapsing.movie-detail--sheet-dragging .movie-detail-image {
+  .movie-detail--immersive.movie-detail--collapsing.movie-detail--sheet-dragging .movie-detail-image,
+  .movie-detail--immersive.movie-detail--collapsing.movie-detail--sheet-dragging .movie-detail-image .watch-modal-controls-overlay.show,
+  .movie-detail--immersive.movie-detail--collapsing.movie-detail--sheet-dragging .movie-detail-image .watch-modal-video.movie-detail-video,
+  .movie-detail--immersive.movie-detail--collapsing.movie-detail--sheet-dragging .movie-detail-image .watch-modal-video-wrapper {
     transition: none;
   }
 

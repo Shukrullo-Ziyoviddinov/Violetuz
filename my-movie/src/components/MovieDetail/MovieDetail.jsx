@@ -979,6 +979,7 @@ const MovieDetail = () => {
     return () => el.removeEventListener('touchmove', handler);
   }, [showDescriptionModal]);
 
+  const detailRef = useRef(null);
   const sheetRef = useRef(null);
   const pinRef = useRef(null);
   const sheetDragRef = useRef({
@@ -1286,6 +1287,27 @@ const MovieDetail = () => {
     },
     []
   );
+
+  useEffect(() => {
+    const root = detailRef.current;
+    if (!root) return undefined;
+    const syncStage = () => {
+      if (window.innerWidth > 900) {
+        root.style.removeProperty('--movie-detail-stage');
+        return;
+      }
+      const height = root.getBoundingClientRect().height;
+      if (height > 0) root.style.setProperty('--movie-detail-stage', `${Math.round(height)}px`);
+    };
+    syncStage();
+    const observer = new ResizeObserver(syncStage);
+    observer.observe(root);
+    window.addEventListener('resize', syncStage);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', syncStage);
+    };
+  }, [movie?.id]);
 
   useEffect(() => {
     const scrollEl = sheetRef.current;
@@ -1597,6 +1619,7 @@ const MovieDetail = () => {
 
   return (
     <div
+      ref={detailRef}
       className={[
         'movie-detail',
         isImmersive ? 'movie-detail--immersive' : '',
