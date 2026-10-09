@@ -1295,7 +1295,7 @@ const MovieDetail = () => {
                     className="movie-detail-more-btn"
                     onClick={() => setShowMoreModal(true)}
                   >
-                    {i18n.language === 'uz' ? 'Yana' : 'Ещё'}
+                    {i18n.language === 'uz' ? 'Yana....' : 'Ещё....'}
                   </button>
                 </div>
               </div>
