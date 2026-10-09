@@ -34,7 +34,6 @@
   z-index: 1401;
   box-sizing: border-box;
   background: linear-gradient(145deg, rgb(22, 18, 28) 0%, rgb(12, 10, 16) 100%);
-  border: 1px solid rgba(80, 70, 95, 0.45);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
 }
 
