@@ -151,9 +151,7 @@
   -webkit-backface-visibility: hidden;
   transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
   will-change: transform;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 .video-modal--sheet.video-modal--sheet-active {
@@ -313,39 +311,38 @@
   overflow: visible;
 }
 
-.video-modal--sheet .video-modal-body {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-  background: rgb(14, 12, 18);
+.video-modal--sheet .video-modal-sheet-scroll {
+  display: block;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }
 
 .video-modal--sheet .video-modal-related-row.actors-page-media-row--split {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  display: block;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   min-height: auto;
-  gap: 0;
   overflow: visible;
 }
 
 .video-modal--sheet .video-modal-related {
-  flex: none;
+  display: block;
   min-height: auto;
-  display: flex;
-  flex-direction: column;
   overflow: visible;
 }
 
 .video-modal--sheet .video-modal-related-heading {
   position: sticky;
-  top: calc((100vw - 1.5rem - 2px) * 9 / 16);
-  z-index: 5;
-  flex-shrink: 0;
+  top: 0;
+  z-index: 15;
   margin: 0;
   padding: 0.65rem 0 0.55rem;
   background: rgb(14, 12, 18);

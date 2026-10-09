@@ -429,10 +429,12 @@ const VideoModal = ({
                     <MusicVideoPlayer ref={videoRef} src={src} poster={poster} autoPlay />
                   </div>
                 </div>
-                {footerBlock}
               </div>
             </div>
-            {relatedBlock}
+            <div className="video-modal-sheet-scroll">
+              {footerBlock}
+              {relatedBlock}
+            </div>
           </>
         ) : (
           <div className="video-modal-content-wrap video-modal-content-wrap--desktop">
