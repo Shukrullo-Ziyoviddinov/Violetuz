@@ -92,6 +92,17 @@
   margin-top: 0.85rem;
 }
 
+.movie-detail-more-modal-body .movie-detail-buttons {
+  width: 100%;
+  margin-top: 0.85rem;
+}
+
+.movie-detail-more-modal-body .movie-detail-btn {
+  flex: none;
+  width: 100%;
+  max-width: none;
+}
+
 @media (max-width: 768px) {
   .movie-detail-more-modal {
     align-items: flex-end;
