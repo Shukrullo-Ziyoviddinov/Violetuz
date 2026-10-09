@@ -2854,3 +2854,181 @@
     line-height: 1.15;
   }
 }
+
+@media (min-width: 901px) {
+  .movie-detail-sheet {
+    display: contents;
+  }
+
+  .movie-detail-sheet > .movie-detail-similar-wrapper {
+    margin-top: -1rem;
+  }
+}
+
+/* Mobil: video joyida qoladi, info triller-scroll-area kabi aylanadi va sudraladi */
+@media (max-width: 900px) {
+  .movie-detail:not(.movie-detail--loading) {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 80px);
+    max-height: calc(100dvh - 80px);
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .movie-detail:not(.movie-detail--loading) .movie-detail-bg-block,
+  .movie-detail:not(.movie-detail--loading) .movie-detail-container:not(.movie-detail-similar-wrapper),
+  .movie-detail:not(.movie-detail--loading) .movie-detail-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    gap: 0;
+    padding: 0;
+  }
+
+  .movie-detail-image-block {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 6;
+    background: #000;
+    touch-action: manipulation;
+  }
+
+  .movie-detail-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    max-height: 100dvh;
+    border-radius: 0;
+    overflow: hidden;
+    transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .movie-detail-sheet {
+    display: block;
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    background: #000;
+    opacity: calc(1 - var(--movie-detail-sheet-progress, 0) * 0.92);
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .movie-detail--sheet-dragging .movie-detail-image,
+  .movie-detail--expanding .movie-detail-image {
+    aspect-ratio: auto;
+    border-radius: 0;
+    height: calc(56.25vw + (100dvh - 56.25vw) * var(--movie-detail-sheet-progress, 0));
+    max-height: 100dvh;
+  }
+
+  .movie-detail--sheet-dragging .movie-detail-image,
+  .movie-detail--sheet-dragging .movie-detail-sheet {
+    transition: none;
+  }
+
+  .movie-detail--sheet-dragging .movie-detail-sheet {
+    touch-action: none;
+  }
+
+  .movie-detail--expanding .movie-detail-sheet {
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .movie-detail--snap .movie-detail-sheet,
+  .movie-detail--snap .movie-detail-image-block,
+  .movie-detail--snap .movie-detail-image {
+    transition: none !important;
+  }
+
+  .movie-detail--immersive .movie-detail-content {
+    min-height: 0;
+  }
+
+  .movie-detail--immersive .movie-detail-image-block {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .movie-detail--immersive .movie-detail-image {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: unset;
+    border-radius: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    transition: none;
+  }
+
+  .movie-detail--immersive .movie-detail-image .watch-modal-video.movie-detail-video {
+    object-fit: contain;
+  }
+
+  .movie-detail--immersive .movie-detail-sheet {
+    flex: 0 0 0;
+    max-height: 0;
+    min-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .movie-detail--immersive.movie-detail--collapsing .movie-detail-sheet {
+    flex: 1 1 auto;
+    max-height: none;
+    min-height: 0;
+    opacity: clamp(0.15, var(--movie-detail-sheet-progress, 0), 1);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .movie-detail--immersive.movie-detail--collapsing.movie-detail--sheet-dragging .movie-detail-sheet {
+    transition: none;
+  }
+
+  .movie-detail--immersive.movie-detail--collapsing:not(.movie-detail--sheet-dragging) .movie-detail-sheet {
+    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .movie-detail--immersive.movie-detail--collapsing .movie-detail-image-block {
+    flex: 0 0 auto;
+  }
+
+  .movie-detail--immersive.movie-detail--collapsing .movie-detail-image {
+    height: calc(100dvh - (100dvh - 56.25vw) * var(--movie-detail-sheet-progress, 0));
+    max-height: 100dvh;
+    flex: 0 0 auto;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+
+  .movie-detail--immersive.movie-detail--collapsing.movie-detail--sheet-dragging .movie-detail-image {
+    transition: none;
+  }
+
+  .movie-detail--immersive.movie-detail--collapsing:not(.movie-detail--sheet-dragging) .movie-detail-image {
+    transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}

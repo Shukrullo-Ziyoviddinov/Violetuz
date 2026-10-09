@@ -53,6 +53,8 @@ const MODAL_SELECTOR = [
   '.triller-scroll-area',
   '.triller-pin',
   '.triller-player-frame',
+  '.movie-detail-sheet',
+  '.movie-detail-image-block',
   '.video-detail',
   '.video-detail-pin',
   '.video-detail-body-scroll',

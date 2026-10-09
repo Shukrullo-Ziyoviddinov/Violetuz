@@ -974,6 +974,328 @@ const MovieDetail = () => {
     return () => el.removeEventListener('touchmove', handler);
   }, [showDescriptionModal]);
 
+  const sheetRef = useRef(null);
+  const pinRef = useRef(null);
+  const sheetDragRef = useRef({
+    active: false,
+    mode: null,
+    startY: 0,
+    startX: 0,
+    canDrag: false,
+    locked: false,
+    rawDy: 0,
+    lastY: 0,
+    lastT: 0,
+    velocity: 0,
+  });
+  const isImmersiveRef = useRef(false);
+  const sheetSettlingRef = useRef(null);
+  const settleTimerRef = useRef(null);
+  const [isImmersive, setIsImmersive] = useState(false);
+  const [sheetDragProgress, setSheetDragProgress] = useState(0);
+  const [isSheetDragging, setIsSheetDragging] = useState(false);
+  const [sheetGesture, setSheetGesture] = useState(null);
+  const [sheetSettling, setSheetSettling] = useState(null);
+  const [sheetSnap, setSheetSnap] = useState(false);
+
+  const emptySheetDrag = () => ({
+    active: false,
+    mode: null,
+    startY: 0,
+    startX: 0,
+    canDrag: false,
+    locked: false,
+    rawDy: 0,
+    lastY: 0,
+    lastT: 0,
+    velocity: 0,
+  });
+
+  const isDetailMobile = () =>
+    typeof window !== 'undefined' && window.innerWidth <= 900;
+
+  const sheetThreshold = () =>
+    (typeof window !== 'undefined' ? window.innerHeight : 800) * 0.35;
+
+  const setSheetProgress = (progress) => {
+    setSheetDragProgress(Math.max(0, Math.min(1, progress)));
+  };
+
+  const clearSettleTimer = () => {
+    if (settleTimerRef.current) {
+      clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = null;
+    }
+  };
+
+  const resetSheetVisual = () => {
+    setSheetProgress(0);
+    setIsSheetDragging(false);
+    setSheetGesture(null);
+    setSheetSettling(null);
+    sheetSettlingRef.current = null;
+    sheetDragRef.current = emptySheetDrag();
+  };
+
+  const snapThenClearMotion = (apply) => {
+    setSheetSnap(true);
+    apply();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setSheetSnap(false));
+    });
+  };
+
+  const animateCommitExpand = () => {
+    if (sheetSettlingRef.current === 'expand') return;
+    clearSettleTimer();
+    setIsSheetDragging(false);
+    setSheetGesture('expand');
+    setSheetSettling('expand');
+    sheetSettlingRef.current = 'expand';
+    requestAnimationFrame(() => setSheetProgress(1));
+    settleTimerRef.current = setTimeout(() => {
+      sheetSettlingRef.current = null;
+      snapThenClearMotion(() => {
+        isImmersiveRef.current = true;
+        setIsImmersive(true);
+        setSheetSettling(null);
+        setSheetGesture(null);
+        setSheetProgress(0);
+      });
+    }, 420);
+  };
+
+  const animateCommitCollapse = () => {
+    if (sheetSettlingRef.current === 'collapse') return;
+    clearSettleTimer();
+    setIsSheetDragging(false);
+    setSheetGesture('collapse');
+    setSheetSettling('collapse');
+    sheetSettlingRef.current = 'collapse';
+    requestAnimationFrame(() => setSheetProgress(1));
+    settleTimerRef.current = setTimeout(() => {
+      sheetSettlingRef.current = null;
+      snapThenClearMotion(() => {
+        isImmersiveRef.current = false;
+        setIsImmersive(false);
+        setSheetSettling(null);
+        setSheetGesture(null);
+        setSheetProgress(0);
+      });
+    }, 420);
+  };
+
+  const updateSheetVelocity = (clientY) => {
+    const now = performance.now();
+    const prev = sheetDragRef.current;
+    const dt = Math.max(now - (prev.lastT || now), 1);
+    const vy = (clientY - (prev.lastY || clientY)) / dt;
+    sheetDragRef.current.lastY = clientY;
+    sheetDragRef.current.lastT = now;
+    sheetDragRef.current.velocity = prev.velocity * 0.65 + vy * 0.35;
+  };
+
+  const shouldCommitSheet = (rawAbs, velocitySigned, direction) => {
+    const threshold = sheetThreshold();
+    if (rawAbs >= threshold) return true;
+    const flingOk = direction === 'expand' ? velocitySigned >= 0.72 : velocitySigned <= -0.72;
+    return flingOk && rawAbs >= threshold * 0.18;
+  };
+
+  const handleSheetTouchStart = (e) => {
+    if (!isDetailMobile() || isImmersiveRef.current || sheetSettlingRef.current) return;
+    const scrollEl = sheetRef.current;
+    if (!scrollEl || scrollEl.scrollTop > 2) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const now = performance.now();
+    sheetDragRef.current = {
+      active: true,
+      mode: 'expand',
+      startY: touch.clientY,
+      startX: touch.clientX,
+      canDrag: true,
+      locked: false,
+      rawDy: 0,
+      lastY: touch.clientY,
+      lastT: now,
+      velocity: 0,
+    };
+  };
+
+  const handleSheetTouchMove = (e) => {
+    const drag = sheetDragRef.current;
+    if (
+      !drag.active ||
+      drag.mode !== 'expand' ||
+      !drag.canDrag ||
+      isImmersiveRef.current ||
+      sheetSettlingRef.current
+    ) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rawDy = touch.clientY - drag.startY;
+    const dx = Math.abs(touch.clientX - drag.startX);
+
+    if (rawDy < -18 && !drag.locked) {
+      sheetDragRef.current.canDrag = false;
+      resetSheetVisual();
+      return;
+    }
+    if (rawDy <= 0) return;
+    if (!drag.locked) {
+      if (rawDy < 18 || rawDy < dx * 1.15) return;
+      sheetDragRef.current.locked = true;
+      setSheetGesture('expand');
+      setIsSheetDragging(true);
+    }
+    if (e.cancelable) e.preventDefault();
+    updateSheetVelocity(touch.clientY);
+    sheetDragRef.current.rawDy = rawDy;
+    setSheetProgress(Math.min(rawDy / (sheetThreshold() * 1.25), 1));
+  };
+
+  const handleSheetTouchEnd = () => {
+    const drag = sheetDragRef.current;
+    if (!drag.active || drag.mode !== 'expand') return;
+    const rawDy = drag.rawDy;
+    const velocity = drag.velocity;
+    const wasLocked = drag.locked;
+    sheetDragRef.current = emptySheetDrag();
+    setIsSheetDragging(false);
+    if (wasLocked && shouldCommitSheet(rawDy, velocity, 'expand')) {
+      animateCommitExpand();
+    } else {
+      setSheetGesture(null);
+      requestAnimationFrame(() => setSheetProgress(0));
+    }
+  };
+
+  const isCollapseIgnoreTarget = (target) => {
+    if (!(target instanceof Element)) return false;
+    return Boolean(
+      target.closest('.watch-modal-control-btn') ||
+        target.closest('.watch-modal-bottom-controls') ||
+        target.closest('.watch-modal-progress-container') ||
+        target.closest('input') ||
+        target.closest('button')
+    );
+  };
+
+  const handleCollapseTouchStart = (e) => {
+    if (!isDetailMobile() || !isImmersiveRef.current || sheetSettlingRef.current) return;
+    if (isCollapseIgnoreTarget(e.target)) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const now = performance.now();
+    sheetDragRef.current = {
+      active: true,
+      mode: 'collapse',
+      startY: touch.clientY,
+      startX: touch.clientX,
+      canDrag: true,
+      locked: false,
+      rawDy: 0,
+      lastY: touch.clientY,
+      lastT: now,
+      velocity: 0,
+    };
+  };
+
+  const handleCollapseTouchMove = (e) => {
+    const drag = sheetDragRef.current;
+    if (
+      !drag.active ||
+      drag.mode !== 'collapse' ||
+      !drag.canDrag ||
+      !isImmersiveRef.current ||
+      sheetSettlingRef.current
+    ) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rawDy = touch.clientY - drag.startY;
+    const upDy = -rawDy;
+    const dx = Math.abs(touch.clientX - drag.startX);
+    if (rawDy > 18 && !drag.locked) {
+      sheetDragRef.current.canDrag = false;
+      resetSheetVisual();
+      return;
+    }
+    if (upDy <= 0) return;
+    if (!drag.locked) {
+      if (upDy < 18 || upDy < dx * 1.15) return;
+      sheetDragRef.current.locked = true;
+      setSheetGesture('collapse');
+      setIsSheetDragging(true);
+    }
+    if (e.cancelable) e.preventDefault();
+    updateSheetVelocity(touch.clientY);
+    sheetDragRef.current.rawDy = rawDy;
+    setSheetProgress(Math.min(upDy / (sheetThreshold() * 1.25), 1));
+  };
+
+  const handleCollapseTouchEnd = () => {
+    const drag = sheetDragRef.current;
+    if (!drag.active || drag.mode !== 'collapse') return;
+    const upDy = Math.max(-drag.rawDy, 0);
+    const velocity = drag.velocity;
+    const wasLocked = drag.locked;
+    const progressSnapshot = Math.min(upDy / (sheetThreshold() * 1.25), 1);
+    sheetDragRef.current = emptySheetDrag();
+    setIsSheetDragging(false);
+    if (wasLocked && shouldCommitSheet(upDy, velocity, 'collapse')) {
+      animateCommitCollapse();
+    } else if (wasLocked && progressSnapshot > 0.02) {
+      requestAnimationFrame(() => {
+        setSheetProgress(0);
+        requestAnimationFrame(() => setSheetGesture(null));
+      });
+    } else {
+      setSheetGesture(null);
+      setSheetProgress(0);
+    }
+  };
+
+  const sheetHandlersRef = useRef({
+    onExpandMove: handleSheetTouchMove,
+    onCollapseMove: handleCollapseTouchMove,
+  });
+  sheetHandlersRef.current.onExpandMove = handleSheetTouchMove;
+  sheetHandlersRef.current.onCollapseMove = handleCollapseTouchMove;
+
+  useEffect(() => {
+    if (sheetRef.current) sheetRef.current.scrollTop = 0;
+    isImmersiveRef.current = false;
+    setIsImmersive(false);
+    resetSheetVisual();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(
+    () => () => {
+      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
+    },
+    []
+  );
+
+  useEffect(() => {
+    const scrollEl = sheetRef.current;
+    const pinEl = pinRef.current;
+    if (!scrollEl && !pinEl) return undefined;
+    const onScrollMove = (e) => sheetHandlersRef.current.onExpandMove(e);
+    const onPinMove = (e) => sheetHandlersRef.current.onCollapseMove(e);
+    scrollEl?.addEventListener('touchmove', onScrollMove, { passive: false });
+    pinEl?.addEventListener('touchmove', onPinMove, { passive: false });
+    return () => {
+      scrollEl?.removeEventListener('touchmove', onScrollMove);
+      pinEl?.removeEventListener('touchmove', onPinMove);
+    };
+  }, [movie?.id]);
+
   if (!movie) {
     if (moviesLoading) {
       return (
@@ -1269,15 +1591,38 @@ const MovieDetail = () => {
     : (i18n.language === 'uz' ? 'Baholash' : 'Оценить');
 
   return (
-    <div className="movie-detail">
+    <div
+      className={[
+        'movie-detail',
+        isImmersive ? 'movie-detail--immersive' : '',
+        isSheetDragging ? 'movie-detail--sheet-dragging' : '',
+        sheetGesture === 'collapse' || sheetSettling === 'collapse' ? 'movie-detail--collapsing' : '',
+        sheetSettling === 'expand' ? 'movie-detail--expanding' : '',
+        sheetSnap ? 'movie-detail--snap' : '',
+      ].filter(Boolean).join(' ')}
+      style={isDetailMobile() ? { '--movie-detail-sheet-progress': sheetDragProgress } : undefined}
+    >
       <div className="movie-detail-bg-block">
         <div className="movie-detail-container">
           <div className="movie-detail-content">
-          <div className="movie-detail-image-block">
+          <div
+            className="movie-detail-image-block"
+            ref={pinRef}
+            onTouchStart={handleCollapseTouchStart}
+            onTouchEnd={handleCollapseTouchEnd}
+            onTouchCancel={handleCollapseTouchEnd}
+          >
             <div className="movie-detail-image">
               <WatchModal movie={movie} videoUrl={selectedVideoUrl} />
             </div>
           </div>
+          <div
+            className="movie-detail-sheet"
+            ref={sheetRef}
+            onTouchStart={handleSheetTouchStart}
+            onTouchEnd={handleSheetTouchEnd}
+            onTouchCancel={handleSheetTouchEnd}
+          >
           <div className="movie-detail-info-block">
             <div className="movie-detail-info">
               <div className="view-count-heading">
@@ -1786,11 +2131,12 @@ const MovieDetail = () => {
               />
             </div>
           </div>
+          <div className="movie-detail-container movie-detail-similar-wrapper">
+            <SimilarMovies currentMovie={movie} />
+          </div>
+          </div>
         </div>
       </div>
-      </div>
-      <div className="movie-detail-container movie-detail-similar-wrapper">
-        <SimilarMovies currentMovie={movie} />
       </div>
 
       <ImgModal
