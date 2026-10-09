@@ -327,13 +327,13 @@
   }
 
   .similar-movies-title {
-    font-size: 1.5rem;
-    min-height: calc(1.5rem * 1.2);
+    font-size: 1.1rem;
+    min-height: calc(1.1rem * 1.2);
   }
 
   .similar-movies-title-skeleton,
   .skeleton-loader--similar-movies-title {
-    height: calc(1.5rem * 1.2) !important;
+    height: calc(1.1rem * 1.2) !important;
   }
 }
 
@@ -362,14 +362,14 @@
   }
 
   .similar-movies-title {
-    font-size: 1.2rem;
-    min-height: calc(1.2rem * 1.2);
+    font-size: 1.1rem;
+    min-height: calc(1.1rem * 1.2);
   }
 
   .similar-movies-title-skeleton,
   .skeleton-loader--similar-movies-title {
     width: min(11rem, 75%) !important;
-    height: calc(1.2rem * 1.2) !important;
+    height: calc(1.1rem * 1.2) !important;
   }
 
   .similar-movies-item-image-wrapper {
