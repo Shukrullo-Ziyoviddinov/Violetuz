@@ -1633,12 +1633,16 @@
   margin: 0 0 1rem 0 !important;
 }
 
-@media (max-width: 768px) {
-  .movie-detail-actors-title {
+@media (max-width: 900px) {
+  .movie-detail-section-title,
+  .movie-detail-actors-title,
+  .movie-detail .similar-movies-title {
     font-size: 1.1rem;
     min-height: calc(1.1rem * 1.2);
   }
 
+  .movie-detail-section-title-skeleton,
+  .skeleton-loader--movie-detail-section-title,
   .movie-detail-actors-title-skeleton,
   .skeleton-loader--movie-detail-actors-title {
     height: calc(1.1rem * 1.2) !important;
