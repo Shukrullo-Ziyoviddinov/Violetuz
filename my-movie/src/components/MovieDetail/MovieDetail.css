@@ -2867,6 +2867,10 @@
 
 /* Mobil: video joyida qoladi, info triller-scroll-area kabi aylanadi va sudraladi */
 @media (max-width: 900px) {
+  body.movie-detail-page-active .navbar-mobile {
+    display: none !important;
+  }
+
   .movie-detail:not(.movie-detail--loading) {
     display: flex;
     flex-direction: column;
@@ -2924,7 +2928,11 @@
     touch-action: pan-y;
     background: #000;
     opacity: calc(1 - var(--movie-detail-sheet-progress, 0) * 0.92);
-    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translate3d(0, calc(var(--movie-detail-sheet-progress, 0) * 43.75vh), 0);
+    will-change: transform, opacity;
+    transition:
+      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .movie-detail-image .watch-modal-video-wrapper,
@@ -3019,6 +3027,7 @@
     max-height: none;
     min-height: 0;
     opacity: clamp(0.15, var(--movie-detail-sheet-progress, 0), 1);
+    transform: translate3d(0, calc((1 - var(--movie-detail-sheet-progress, 0)) * 43.75vh), 0);
     overflow: hidden;
     pointer-events: none;
   }
@@ -3028,7 +3037,9 @@
   }
 
   .movie-detail--immersive.movie-detail--collapsing:not(.movie-detail--sheet-dragging) .movie-detail-sheet {
-    transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transition:
+      opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .movie-detail--immersive.movie-detail--collapsing .movie-detail-image-block {

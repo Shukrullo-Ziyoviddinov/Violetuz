@@ -597,6 +597,11 @@ const MovieDetail = () => {
     setRatingLogosReady({});
   }, [movie?.id]);
 
+  useEffect(() => {
+    document.body.classList.add('movie-detail-page-active');
+    return () => document.body.classList.remove('movie-detail-page-active');
+  }, []);
+
   // Rating logolari — keshda onLoad kelmasa ham
   useEffect(() => {
     if (!movie) return undefined;
