@@ -97,16 +97,16 @@ const MovieDetailForYouCard = ({ movie, contentLang }) => {
             <span className="movie-detail-for-you-imdb-value">{movie.ratingImdb}</span>
           </div>
         ) : null}
-      </div>
-      <div className="movie-detail-for-you-votes">
-        <span className="movie-detail-for-you-vote">
-          <LikeIcon />
-          <span>{formatActionCount(movie.like)}</span>
-        </span>
-        <span className="movie-detail-for-you-vote">
-          <DislikeIcon />
-          <span>{formatActionCount(movie.dislike)}</span>
-        </span>
+        <div className="movie-detail-for-you-votes">
+          <span className="movie-detail-for-you-vote">
+            <LikeIcon />
+            <span>{formatActionCount(movie.like)}</span>
+          </span>
+          <span className="movie-detail-for-you-vote">
+            <DislikeIcon />
+            <span>{formatActionCount(movie.dislike)}</span>
+          </span>
+        </div>
       </div>
     </Link>
   );
