@@ -169,3 +169,32 @@
     display: none;
   }
 }
+
+@media (min-width: 769px) {
+  .movie-detail-more-modal {
+    top: 0;
+    align-items: center;
+    justify-content: center;
+    z-index: 1300;
+    background: rgba(0, 0, 0, 0.72);
+    pointer-events: auto;
+  }
+
+  .movie-detail-more-modal-content {
+    width: min(32rem, calc(100% - 3rem));
+    max-width: 32rem;
+    height: auto;
+    max-height: min(80vh, 40rem);
+    border-radius: 16px;
+    background: #121212;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .movie-detail-more-modal-content--open {
+    opacity: 1;
+    transform: none;
+  }
+}

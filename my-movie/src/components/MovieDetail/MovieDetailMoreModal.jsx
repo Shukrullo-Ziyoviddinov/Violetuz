@@ -158,10 +158,12 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
         sheetOpen && !closing ? 'movie-detail-more-modal--open' : '',
         closing ? 'movie-detail-more-modal--closing' : '',
       ].filter(Boolean).join(' ')}
-      style={{ top: sheetTop }}
+      style={mobile ? { top: sheetTop } : undefined}
+      onClick={mobile ? undefined : requestClose}
     >
       <div
         ref={contentRef}
+        onClick={mobile ? undefined : (e) => e.stopPropagation()}
         className={[
           'movie-detail-more-modal-content',
           sheetOpen && !closing ? 'movie-detail-more-modal-content--open' : '',
