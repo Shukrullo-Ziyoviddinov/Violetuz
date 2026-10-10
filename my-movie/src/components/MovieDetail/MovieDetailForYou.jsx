@@ -35,15 +35,6 @@ const useDesktopRail = () => {
   return desktop;
 };
 
-const filterGenresOf = (movie) => {
-  const genre = movie?.filterGenre;
-  if (Array.isArray(genre)) {
-    return genre.map((item) => String(item).trim()).filter(Boolean);
-  }
-  if (genre != null && String(genre).trim()) return [String(genre).trim()];
-  return [];
-};
-
 const MovieDetailForYou = ({ movieId }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
@@ -65,10 +56,14 @@ const MovieDetailForYou = ({ movieId }) => {
   const [pendingCount, setPendingCount] = useState(0);
   const [moreKey, setMoreKey] = useState(0);
   const [selectedGenre, setSelectedGenre] = useState('all');
+  const [genreOptions, setGenreOptions] = useState([]);
+  const [replacing, setReplacing] = useState(false);
   const [showGenreFilter, setShowGenreFilter] = useState(false);
   const revealTimerRef = useRef(0);
   const headingBarRef = useRef(null);
   const filterPinnedRef = useRef(false);
+  const loadTokenRef = useRef(0);
+  const selectedGenreRef = useRef('all');
 
   const excludeIds = useMemo(() => {
     const ids = [];
@@ -93,6 +88,11 @@ const MovieDetailForYou = ({ movieId }) => {
     if (similarLoading || moviesLoading) return undefined;
 
     let cancelled = false;
+    const token = ++loadTokenRef.current;
+    selectedGenreRef.current = 'all';
+    setSelectedGenre('all');
+    setGenreOptions([]);
+    setReplacing(false);
     setInitialLoading(true);
     setPhase('idle');
     setPendingCount(0);
@@ -109,7 +109,8 @@ const MovieDetailForYou = ({ movieId }) => {
       excludeIds,
     })
       .then((result) => {
-        if (cancelled) return;
+        if (cancelled || token !== loadTokenRef.current) return;
+        setGenreOptions(result.genres);
         setPageMovies(resolveMovies(result.movies));
         setPageOffset(result.movies.length);
         setHasMore(result.hasMore);
@@ -120,7 +121,7 @@ const MovieDetailForYou = ({ movieId }) => {
         setHasMore(false);
       })
       .finally(() => {
-        if (!cancelled) setInitialLoading(false);
+        if (!cancelled && token === loadTokenRef.current) setInitialLoading(false);
       });
 
     return () => {
@@ -131,7 +132,9 @@ const MovieDetailForYou = ({ movieId }) => {
   }, [isDesktop, firstPage, similarLoading, moviesLoading, excludeKey, isLoggedIn, getMovieByIdLocal]);
 
   const handleMore = () => {
-    if (phase !== 'idle' || !hasMore || initialLoading) return;
+    if (phase !== 'idle' || !hasMore || initialLoading || replacing) return;
+    const token = ++loadTokenRef.current;
+    const genre = selectedGenreRef.current;
     setPhase('arc');
     fetchViewerHomeFeedPage({
       isLoggedIn,
@@ -139,9 +142,12 @@ const MovieDetailForYou = ({ movieId }) => {
       offset: pageOffset,
       limit: nextPage,
       excludeIds,
+      genre,
     })
       .then((result) => {
+        if (token !== loadTokenRef.current) return;
         const next = resolveMovies(result.movies);
+        setGenreOptions(result.genres);
         setPageOffset((current) => current + result.movies.length);
         setHasMore(result.hasMore);
         if (!next.length) {
@@ -152,6 +158,7 @@ const MovieDetailForYou = ({ movieId }) => {
         setPhase('skeleton');
         window.clearTimeout(revealTimerRef.current);
         revealTimerRef.current = window.setTimeout(() => {
+          if (token !== loadTokenRef.current) return;
           setPageMovies((current) => [...current, ...next]);
           setPendingCount(0);
           setPhase('idle');
@@ -159,38 +166,57 @@ const MovieDetailForYou = ({ movieId }) => {
         }, SKELETON_REVEAL_MS);
       })
       .catch(() => {
+        if (token !== loadTokenRef.current) return;
         setPhase('idle');
       });
   };
 
-  const genreOptions = useMemo(() => {
-    const seen = new Set();
-    const options = [];
-    for (const movie of pageMovies) {
-      for (const genre of filterGenresOf(movie)) {
-        if (seen.has(genre)) continue;
-        seen.add(genre);
-        options.push(genre);
+  const handleGenreSelect = (genre) => {
+    if (genre === selectedGenreRef.current || initialLoading) return;
+    selectedGenreRef.current = genre;
+    setSelectedGenre(genre);
+    if (!isDesktop) {
+      const bar = headingBarRef.current;
+      const sheet = bar?.closest('.movie-detail-sheet');
+      if (bar && sheet) {
+        const delta = bar.getBoundingClientRect().top - sheet.getBoundingClientRect().top;
+        if (delta > 1) sheet.scrollTop += delta;
+        filterPinnedRef.current = true;
+        setShowGenreFilter(true);
       }
     }
-    return options;
-  }, [pageMovies]);
 
-  const visibleMovies = useMemo(() => {
-    if (selectedGenre === 'all') return pageMovies;
-    return pageMovies.filter((movie) => filterGenresOf(movie).includes(selectedGenre));
-  }, [pageMovies, selectedGenre]);
-
-  const handleGenreSelect = (genre) => {
-    setSelectedGenre(genre);
-    if (isDesktop) return;
-    const bar = headingBarRef.current;
-    const sheet = bar?.closest('.movie-detail-sheet');
-    if (!bar || !sheet) return;
-    const delta = bar.getBoundingClientRect().top - sheet.getBoundingClientRect().top;
-    if (delta > 1) sheet.scrollTop += delta;
-    filterPinnedRef.current = true;
-    setShowGenreFilter(true);
+    const token = ++loadTokenRef.current;
+    window.clearTimeout(revealTimerRef.current);
+    setPhase('idle');
+    setPendingCount(0);
+    setPageOffset(0);
+    setHasMore(false);
+    setReplacing(true);
+    fetchViewerHomeFeedPage({
+      isLoggedIn,
+      localHistory: isLoggedIn ? undefined : getWatchHistory(),
+      offset: 0,
+      limit: firstPage,
+      excludeIds,
+      genre,
+    })
+      .then((result) => {
+        if (token !== loadTokenRef.current) return;
+        setGenreOptions(result.genres);
+        setPageMovies(resolveMovies(result.movies));
+        setPageOffset(result.movies.length);
+        setHasMore(result.hasMore);
+      })
+      .catch(() => {
+        if (token !== loadTokenRef.current) return;
+        setPageMovies([]);
+        setPageOffset(0);
+        setHasMore(false);
+      })
+      .finally(() => {
+        if (token === loadTokenRef.current) setReplacing(false);
+      });
   };
 
   const waiting = similarLoading || moviesLoading || initialLoading;
@@ -217,17 +243,13 @@ const MovieDetailForYou = ({ movieId }) => {
     return () => sheet.removeEventListener('scroll', onScroll);
   }, [isDesktop, waiting, pageMovies.length]);
 
-  useEffect(() => {
-    if (selectedGenre === 'all' || waiting || phase !== 'idle' || !hasMore) return;
-    if (visibleMovies.length >= nextPage) return;
-    handleMore();
-  }, [selectedGenre, visibleMovies.length, hasMore, phase, waiting, nextPage]);
-
-  const showMoreButton = !waiting && phase === 'idle' && hasMore;
+  const showMoreButton = !waiting && !replacing && phase === 'idle' && hasMore;
   const showArc = phase === 'arc';
   const showListShadow = hasMore || phase !== 'idle';
 
-  if (!waiting && pageMovies.length === 0 && pendingCount === 0) return null;
+  if (!waiting && !replacing && selectedGenre === 'all' && pageMovies.length === 0 && pendingCount === 0) {
+    return null;
+  }
 
   return (
     <aside className="movie-detail-for-you" aria-busy={waiting || phase !== 'idle' || undefined}>
@@ -266,11 +288,11 @@ const MovieDetailForYou = ({ movieId }) => {
           </div>
         )}
         <div className={`movie-detail-for-you-list${showListShadow ? ' movie-detail-for-you-list--more' : ''}`}>
-          {waiting
+          {waiting || replacing
             ? Array.from({ length: firstPage }, (_, index) => (
                 <MovieDetailForYouCardSkeleton key={`movie-detail-for-you-skeleton-${index}`} />
               ))
-            : visibleMovies.map((movie) => (
+            : pageMovies.map((movie) => (
                 <MovieDetailForYouCard
                   key={movie.id}
                   movie={movie}

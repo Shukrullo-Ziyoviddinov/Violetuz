@@ -20,10 +20,12 @@ const parsePage = (source) => {
   const excludeIds = Array.isArray(excludeRaw)
     ? excludeRaw
     : String(excludeRaw || '').split(',');
+  const genre = String(source?.genre || '').trim();
   return {
     limit,
     offset,
     excludeIds: excludeIds.map((id) => String(id).trim()).filter(Boolean),
+    genre: genre === 'all' ? '' : genre,
   };
 };
 

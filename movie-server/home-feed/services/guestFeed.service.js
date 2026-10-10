@@ -17,6 +17,7 @@ const { listExplorationSource } = require('../sources/exploration.source');
 const { listCollaborativeFromSeeds } = require('../sources/collaborative.source');
 const { assembleHomeFeed } = require('../rank/buildFeed');
 const { homeFeedWeights } = require('../config/homeFeedWeights');
+const { sliceFeedPage } = require('./feedPage');
 
 /**
  * @param {{ localHistory?: unknown, nowMs?: number }} [opts]
@@ -64,26 +65,23 @@ const buildGuestHomeFeed = async ({ localHistory = null, nowMs = Date.now() } = 
 /**
  * Mehmon lentasidan sahifa. Javobda faqat so'ralgan bo'lak.
  *
- * @param {{ localHistory?: unknown, offset?: number, limit?: number, excludeIds?: string[], nowMs?: number }} [opts]
- * @returns {Promise<{ movies: Object[], hasMore: boolean, source: 'guest' }>}
+ * @param {{ localHistory?: unknown, offset?: number, limit?: number, excludeIds?: string[], genre?: string, nowMs?: number }} [opts]
+ * @returns {Promise<{ movies: Object[], hasMore: boolean, genres: string[], source: 'guest' }>}
  */
 const buildGuestHomeFeedPage = async ({
   localHistory = null,
   offset = 0,
   limit = 10,
   excludeIds = [],
+  genre = '',
   nowMs = Date.now(),
 } = {}) => {
   const feed = await buildGuestHomeFeed({ localHistory, nowMs });
-  const exclude = new Set(
-    (Array.isArray(excludeIds) ? excludeIds : []).map((id) => String(id).trim()).filter(Boolean)
-  );
-  const filtered = feed.movies.filter((row) => !exclude.has(String(row.movieId)));
-  const skip = Math.max(0, Number(offset) || 0);
-  const take = Math.min(40, Math.max(1, Number(limit) || 10));
+  const page = await sliceFeedPage(feed.movies, { offset, limit, excludeIds, genre });
   return {
-    movies: filtered.slice(skip, skip + take),
-    hasMore: skip + take < filtered.length,
+    movies: page.movies,
+    hasMore: page.hasMore,
+    genres: page.genres,
     source: 'guest',
   };
 };

@@ -17,12 +17,14 @@ const postGuestHomeFeed = asyncHandler(async (req, res) => {
   const excludeIds = Array.isArray(excludeRaw)
     ? excludeRaw
     : String(excludeRaw || '').split(',');
+  const genre = String(req.body?.genre || '').trim();
   const result = paged
     ? await buildGuestHomeFeedPage({
       localHistory: req.body?.localHistory,
       offset: req.body?.offset,
       limit: limitRaw,
       excludeIds: excludeIds.map((id) => String(id).trim()).filter(Boolean),
+      genre: genre === 'all' ? '' : genre,
     })
     : await buildGuestHomeFeed({
       localHistory: req.body?.localHistory,

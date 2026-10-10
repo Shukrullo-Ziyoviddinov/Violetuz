@@ -12,10 +12,9 @@ const { homeFeedWeights } = require('../config/homeFeedWeights');
 const { buildHomeFeed } = require('../rank/buildFeed');
 const {
   listHomeFeedCache,
-  getHomeFeedCacheStamp,
-  listHomeFeedCachePage,
   replaceHomeFeedCache,
 } = require('../repositories/homeFeedCache.repository');
+const { sliceFeedPage } = require('./feedPage');
 const { parseUserId } = require('../repositories/parseUserId');
 
 /**
@@ -69,10 +68,13 @@ const getLoginHomeFeed = async (userId, nowMs = Date.now()) => {
  * Cache eskirgan bo'lsa avval yangilanadi, keyin faqat sahifa o'qiladi.
  *
  * @param {string|import('mongoose').Types.ObjectId} userId
- * @param {{ offset?: number, limit?: number, excludeIds?: string[], nowMs?: number }} [page]
- * @returns {Promise<{ movies: Object[], hasMore: boolean, source: 'cache'|'computed' }>}
+ * @param {{ offset?: number, limit?: number, excludeIds?: string[], genre?: string, nowMs?: number }} [page]
+ * @returns {Promise<{ movies: Object[], hasMore: boolean, genres: string[], source: 'cache'|'computed' }>}
  */
-const getLoginHomeFeedPage = async (userId, { offset = 0, limit = 10, excludeIds = [], nowMs = Date.now() } = {}) => {
+const getLoginHomeFeedPage = async (
+  userId,
+  { offset = 0, limit = 10, excludeIds = [], genre = '', nowMs = Date.now() } = {}
+) => {
   const uid = parseUserId(userId);
   if (!uid) {
     const err = new Error('userId majburiy (auth)');
@@ -80,21 +82,26 @@ const getLoginHomeFeedPage = async (userId, { offset = 0, limit = 10, excludeIds
     throw err;
   }
 
-  const stamp = await getHomeFeedCacheStamp(uid);
-  const generatedMs = toEpochMs(stamp);
-  const fresh = generatedMs != null && nowMs - generatedMs < homeFeedWeights.precomputeIntervalMs;
-  let source = 'cache';
+  const cached = await listHomeFeedCache(uid);
+  const generatedMs = toEpochMs(cached[0]?.generatedAt);
+  const fresh = cached.length > 0
+    && generatedMs != null
+    && nowMs - generatedMs < homeFeedWeights.precomputeIntervalMs;
 
+  let movies = cached.map(({ generatedAt, ...row }) => row);
+  let source = 'cache';
   if (!fresh) {
     const built = await buildHomeFeed({ userId: uid, nowMs });
     await replaceHomeFeedCache(uid, built.movies);
+    movies = built.movies;
     source = 'computed';
   }
 
-  const page = await listHomeFeedCachePage(uid, { offset, limit, excludeIds });
+  const page = await sliceFeedPage(movies, { offset, limit, excludeIds, genre });
   return {
     movies: page.movies,
     hasMore: page.hasMore,
+    genres: page.genres,
     source,
   };
 };

@@ -65,6 +65,9 @@ export const fetchViewerHomeFeed = async ({ isLoggedIn, localHistory } = {}) => 
 const normalizePage = (data) => ({
   movies: Array.isArray(data?.movies) ? data.movies : [],
   hasMore: Boolean(data?.hasMore),
+  genres: Array.isArray(data?.genres)
+    ? data.genres.map((item) => String(item).trim()).filter(Boolean)
+    : [],
   source: data?.source || 'computed',
 });
 
@@ -83,13 +86,17 @@ export const fetchViewerHomeFeedPage = async ({
   offset = 0,
   limit = 10,
   excludeIds = [],
+  genre = '',
 } = {}) => {
   const exclude = excludeParam(excludeIds);
+  const selectedGenre = String(genre || '').trim();
+  const genreValue = selectedGenre && selectedGenre !== 'all' ? selectedGenre : '';
   if (isLoggedIn) {
     const params = new URLSearchParams();
     params.set('offset', String(Math.max(0, Number(offset) || 0)));
     params.set('limit', String(Math.max(1, Number(limit) || 10)));
     if (exclude.length) params.set('exclude', exclude.join(','));
+    if (genreValue) params.set('genre', genreValue);
     const res = await homeFeedFetch(`/home-feed?${params.toString()}`);
     return normalizePage(await parseJson(res));
   }
@@ -102,6 +109,7 @@ export const fetchViewerHomeFeedPage = async ({
       offset: Math.max(0, Number(offset) || 0),
       limit: Math.max(1, Number(limit) || 10),
       exclude,
+      ...(genreValue ? { genre: genreValue } : {}),
     }),
   });
   return normalizePage(await parseJson(res));
