@@ -75,9 +75,9 @@
   padding-top: 0.05rem;
 }
 
-.movie-detail-for-you-views {
+.movie-detail-for-you .movie-detail-for-you-views.view-count-text {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.2;
