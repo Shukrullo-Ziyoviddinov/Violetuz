@@ -37,6 +37,7 @@ const MovieDetailForYou = ({ movieId }) => {
 
   return (
     <aside className="movie-detail-for-you" aria-busy={waiting || undefined}>
+      <div className="movie-detail-for-you-sticky">
       {waiting ? (
         <SkeletonLoader variant="movies-title" className="movie-detail-for-you-heading-skeleton" />
       ) : (
@@ -56,6 +57,7 @@ const MovieDetailForYou = ({ movieId }) => {
                 contentLang={contentLang}
               />
             ))}
+      </div>
       </div>
     </aside>
   );
