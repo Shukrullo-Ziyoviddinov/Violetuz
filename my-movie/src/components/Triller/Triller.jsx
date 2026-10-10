@@ -472,6 +472,7 @@ const Triller = ({ activeId }) => {
     const threshold = Math.max(titleEl.offsetHeight - 2, 0);
     const top = root.scrollTop;
 
+    // Video tagiga yopishganda filter. Video filtrdan pastga tushsa title.
     if (top >= threshold) {
       if (!filterPinnedRef.current) {
         filterPinnedRef.current = true;
@@ -480,11 +481,9 @@ const Triller = ({ activeId }) => {
       return;
     }
 
-    if (top <= 8) {
-      if (filterPinnedRef.current) {
-        filterPinnedRef.current = false;
-        setShowGenreFilter(false);
-      }
+    if (filterPinnedRef.current) {
+      filterPinnedRef.current = false;
+      setShowGenreFilter(false);
     }
   };
 
