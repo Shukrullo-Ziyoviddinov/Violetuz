@@ -9,6 +9,7 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import WatchModal from './WatchModal';
 import MovieComments from './MovieComments';
 import SimilarMovies from './SimilarMovies';
+import MovieDetailForYou from './MovieDetailForYou';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import ImgModal from '../ImgModal/ImgModal';
 import VideoModal from '../VideoModal/VideoModal';
@@ -2159,6 +2160,7 @@ const MovieDetail = () => {
               />
             </div>
           </div>
+          <MovieDetailForYou movieId={movie.id} />
           <div className="movie-detail-container movie-detail-similar-wrapper">
             <SimilarMovies currentMovie={movie} />
           </div>

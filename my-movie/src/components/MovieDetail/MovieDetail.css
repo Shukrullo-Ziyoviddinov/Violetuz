@@ -2194,7 +2194,8 @@
   }
 
   .movie-detail-info-block,
-  .movie-detail .similar-movies {
+  .movie-detail .similar-movies,
+  .movie-detail-for-you {
     padding: 0 0.7rem 1.25rem;
     box-sizing: border-box;
   }
@@ -2883,6 +2884,21 @@
 }
 
 @media (min-width: 901px) {
+  .movie-detail-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    column-gap: 1.5rem;
+    row-gap: 1rem;
+    align-items: start;
+  }
+
+  .movie-detail-image-block,
+  .movie-detail-info-block,
+  .movie-detail-sheet > .movie-detail-similar-wrapper {
+    grid-column: 1;
+    min-width: 0;
+  }
+
   .movie-detail-sheet {
     display: contents;
   }
