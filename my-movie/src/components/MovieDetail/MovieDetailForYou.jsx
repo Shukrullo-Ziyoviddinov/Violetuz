@@ -16,7 +16,7 @@ const DESKTOP_QUERY = '(min-width: 901px)';
 const DESKTOP_FIRST_PAGE = 10;
 const DESKTOP_NEXT_PAGE = 5;
 const MOBILE_PAGE = 4;
-const SKELETON_REVEAL_MS = 480;
+const SKELETON_REVEAL_MS = 700;
 
 const useDesktopRail = () => {
   const [desktop, setDesktop] = useState(
@@ -184,7 +184,7 @@ const MovieDetailForYou = ({ movieId }) => {
               ))
             : null}
         </div>
-        {showArc || showMoreButton ? (
+        {showArc || showMoreButton || phase === 'skeleton' ? (
           <div className="movie-detail-for-you-more-wrap">
             {showArc ? (
               <SemicircleLoader />

@@ -42,7 +42,9 @@ const DislikeIcon = () => (
 
 export const MovieDetailForYouCardSkeleton = () => (
   <div className="movie-detail-for-you-card movie-detail-for-you-card--skeleton" aria-hidden="true">
-    <SkeletonLoader variant="movie-image" className="movie-detail-for-you-poster-skeleton" />
+    <div className="movie-detail-for-you-poster-wrap">
+      <SkeletonLoader variant="movie-image" className="movie-detail-for-you-poster-skeleton" />
+    </div>
     <div className="movie-detail-for-you-body">
       <SkeletonLoader variant="movies-title" className="movie-detail-for-you-line-skeleton" />
       <SkeletonLoader variant="movies-title" className="movie-detail-for-you-line-skeleton movie-detail-for-you-line-skeleton--short" />
