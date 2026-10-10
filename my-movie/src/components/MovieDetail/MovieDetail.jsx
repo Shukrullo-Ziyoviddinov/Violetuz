@@ -2160,10 +2160,10 @@ const MovieDetail = () => {
               />
             </div>
           </div>
-          <MovieDetailForYou movieId={movie.id} />
           <div className="movie-detail-container movie-detail-similar-wrapper">
             <SimilarMovies currentMovie={movie} />
           </div>
+          <MovieDetailForYou movieId={movie.id} />
           </div>
         </div>
       </div>
