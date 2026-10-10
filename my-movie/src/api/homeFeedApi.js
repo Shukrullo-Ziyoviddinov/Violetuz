@@ -61,3 +61,48 @@ export const fetchViewerHomeFeed = async ({ isLoggedIn, localHistory } = {}) => 
   const history = localHistory != null ? localHistory : getMovieGuestWatchHistory();
   return fetchGuestHomeFeed(history);
 };
+
+const normalizePage = (data) => ({
+  movies: Array.isArray(data?.movies) ? data.movies : [],
+  hasMore: Boolean(data?.hasMore),
+  source: data?.source || 'computed',
+});
+
+const excludeParam = (excludeIds) =>
+  (Array.isArray(excludeIds) ? excludeIds : [])
+    .map((id) => String(id).trim())
+    .filter(Boolean);
+
+/**
+ * Movie detail sahifasi. Home lenta chaqiruvi bu funksiyadan o'tmaydi.
+ * offset/limit berilmasa to'liq lenta qaytmaydi — sahifa majburiy.
+ */
+export const fetchViewerHomeFeedPage = async ({
+  isLoggedIn,
+  localHistory,
+  offset = 0,
+  limit = 10,
+  excludeIds = [],
+} = {}) => {
+  const exclude = excludeParam(excludeIds);
+  if (isLoggedIn) {
+    const params = new URLSearchParams();
+    params.set('offset', String(Math.max(0, Number(offset) || 0)));
+    params.set('limit', String(Math.max(1, Number(limit) || 10)));
+    if (exclude.length) params.set('exclude', exclude.join(','));
+    const res = await homeFeedFetch(`/home-feed?${params.toString()}`);
+    return normalizePage(await parseJson(res));
+  }
+
+  const history = localHistory != null ? localHistory : getMovieGuestWatchHistory();
+  const res = await homeFeedFetch('/home-feed/guest', {
+    method: 'POST',
+    body: JSON.stringify({
+      localHistory: Array.isArray(history) ? history : [],
+      offset: Math.max(0, Number(offset) || 0),
+      limit: Math.max(1, Number(limit) || 10),
+      exclude,
+    }),
+  });
+  return normalizePage(await parseJson(res));
+};

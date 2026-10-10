@@ -8,12 +8,25 @@
 
 const asyncHandler = require('../../middleware/asyncHandler');
 const { sendSuccess } = require('../../utils/response');
-const { buildGuestHomeFeed } = require('../services/guestFeed.service');
+const { buildGuestHomeFeed, buildGuestHomeFeedPage } = require('../services/guestFeed.service');
 
 const postGuestHomeFeed = asyncHandler(async (req, res) => {
-  const result = await buildGuestHomeFeed({
-    localHistory: req.body?.localHistory,
-  });
+  const limitRaw = req.body?.limit;
+  const paged = limitRaw != null && limitRaw !== '';
+  const excludeRaw = req.body?.exclude;
+  const excludeIds = Array.isArray(excludeRaw)
+    ? excludeRaw
+    : String(excludeRaw || '').split(',');
+  const result = paged
+    ? await buildGuestHomeFeedPage({
+      localHistory: req.body?.localHistory,
+      offset: req.body?.offset,
+      limit: limitRaw,
+      excludeIds: excludeIds.map((id) => String(id).trim()).filter(Boolean),
+    })
+    : await buildGuestHomeFeed({
+      localHistory: req.body?.localHistory,
+    });
 
   return sendSuccess(res, { data: result });
 });

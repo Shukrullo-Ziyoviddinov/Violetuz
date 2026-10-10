@@ -61,6 +61,34 @@ const buildGuestHomeFeed = async ({ localHistory = null, nowMs = Date.now() } = 
   };
 };
 
+/**
+ * Mehmon lentasidan sahifa. Javobda faqat so'ralgan bo'lak.
+ *
+ * @param {{ localHistory?: unknown, offset?: number, limit?: number, excludeIds?: string[], nowMs?: number }} [opts]
+ * @returns {Promise<{ movies: Object[], hasMore: boolean, source: 'guest' }>}
+ */
+const buildGuestHomeFeedPage = async ({
+  localHistory = null,
+  offset = 0,
+  limit = 10,
+  excludeIds = [],
+  nowMs = Date.now(),
+} = {}) => {
+  const feed = await buildGuestHomeFeed({ localHistory, nowMs });
+  const exclude = new Set(
+    (Array.isArray(excludeIds) ? excludeIds : []).map((id) => String(id).trim()).filter(Boolean)
+  );
+  const filtered = feed.movies.filter((row) => !exclude.has(String(row.movieId)));
+  const skip = Math.max(0, Number(offset) || 0);
+  const take = Math.min(40, Math.max(1, Number(limit) || 10));
+  return {
+    movies: filtered.slice(skip, skip + take),
+    hasMore: skip + take < filtered.length,
+    source: 'guest',
+  };
+};
+
 module.exports = {
   buildGuestHomeFeed,
+  buildGuestHomeFeedPage,
 };
