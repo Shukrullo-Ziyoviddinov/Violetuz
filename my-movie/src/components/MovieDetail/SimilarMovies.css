@@ -385,3 +385,9 @@
     height: 28px;
   }
 }
+
+@media (max-width: 900px) {
+  .similar-movies {
+    margin-bottom: 1rem;
+  }
+}
