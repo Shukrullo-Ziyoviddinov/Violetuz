@@ -4,7 +4,6 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAppSelector } from '../../store/hooks';
 import { selectIsLoggedIn } from '../../store/slices/userSlice';
-import { useHomeFeed } from '../../hooks/useHomeFeed';
 import { useSimilarMovies } from '../../hooks/useSimilarMovies';
 import { fetchViewerHomeFeedPage } from '../../api/homeFeedApi';
 import { getWatchHistory } from '../../utils/localStorage/guestHistory/movieGuestHistory';
@@ -14,9 +13,9 @@ import MovieDetailForYouCard, { MovieDetailForYouCardSkeleton } from './MovieDet
 import './MovieDetailForYou.css';
 
 const DESKTOP_QUERY = '(min-width: 901px)';
-const FIRST_PAGE = 10;
-const NEXT_PAGE = 5;
-const SKELETON_COUNT = 5;
+const DESKTOP_FIRST_PAGE = 10;
+const DESKTOP_NEXT_PAGE = 5;
+const MOBILE_PAGE = 4;
 const SKELETON_REVEAL_MS = 480;
 
 const useDesktopRail = () => {
@@ -41,7 +40,8 @@ const MovieDetailForYou = ({ movieId }) => {
   const { getMovieByIdLocal, moviesLoading } = useMoviesApi();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const isDesktop = useDesktopRail();
-  const { items, isLoading: feedLoading } = useHomeFeed({ enabled: !isDesktop });
+  const firstPage = isDesktop ? DESKTOP_FIRST_PAGE : MOBILE_PAGE;
+  const nextPage = isDesktop ? DESKTOP_NEXT_PAGE : MOBILE_PAGE;
   const { movies: similarMovies, isLoading: similarLoading } = useSimilarMovies({
     movieId,
     enabled: movieId != null && movieId !== '',
@@ -76,7 +76,6 @@ const MovieDetailForYou = ({ movieId }) => {
   useEffect(() => () => window.clearTimeout(revealTimerRef.current), []);
 
   useEffect(() => {
-    if (!isDesktop) return undefined;
     if (similarLoading || moviesLoading) return undefined;
 
     let cancelled = false;
@@ -92,7 +91,7 @@ const MovieDetailForYou = ({ movieId }) => {
       isLoggedIn,
       localHistory: isLoggedIn ? undefined : getWatchHistory(),
       offset: 0,
-      limit: FIRST_PAGE,
+      limit: firstPage,
       excludeIds,
     })
       .then((result) => {
@@ -115,23 +114,16 @@ const MovieDetailForYou = ({ movieId }) => {
     };
     // resolveMovies yopilishi har renderda yangilanadi; katalog funksiyasi yetarli.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDesktop, similarLoading, moviesLoading, excludeKey, isLoggedIn, getMovieByIdLocal]);
-
-  const mobileMovies = useMemo(() => {
-    const excluded = new Set(excludeIds);
-    return (items || [])
-      .map((item) => getMovieByIdLocal(item.movieId))
-      .filter((movie) => movie?.id != null && !excluded.has(String(movie.id)));
-  }, [excludeIds, getMovieByIdLocal, items]);
+  }, [isDesktop, firstPage, similarLoading, moviesLoading, excludeKey, isLoggedIn, getMovieByIdLocal]);
 
   const handleMore = () => {
-    if (!isDesktop || phase !== 'idle' || !hasMore || initialLoading) return;
+    if (phase !== 'idle' || !hasMore || initialLoading) return;
     setPhase('arc');
     fetchViewerHomeFeedPage({
       isLoggedIn,
       localHistory: isLoggedIn ? undefined : getWatchHistory(),
       offset: pageOffset,
-      limit: NEXT_PAGE,
+      limit: nextPage,
       excludeIds,
     })
       .then((result) => {
@@ -157,15 +149,12 @@ const MovieDetailForYou = ({ movieId }) => {
       });
   };
 
-  const waiting = isDesktop
-    ? similarLoading || moviesLoading || initialLoading
-    : similarLoading || ((feedLoading || moviesLoading) && mobileMovies.length === 0);
-  const movies = isDesktop ? pageMovies : mobileMovies;
-  const showMoreButton = isDesktop && !waiting && phase === 'idle' && hasMore;
-  const showArc = isDesktop && phase === 'arc';
-  const showListShadow = isDesktop && (hasMore || phase !== 'idle');
+  const waiting = similarLoading || moviesLoading || initialLoading;
+  const showMoreButton = !waiting && phase === 'idle' && hasMore;
+  const showArc = phase === 'arc';
+  const showListShadow = hasMore || phase !== 'idle';
 
-  if (!waiting && movies.length === 0 && pendingCount === 0) return null;
+  if (!waiting && pageMovies.length === 0 && pendingCount === 0) return null;
 
   return (
     <aside className="movie-detail-for-you" aria-busy={waiting || phase !== 'idle' || undefined}>
@@ -179,10 +168,10 @@ const MovieDetailForYou = ({ movieId }) => {
         )}
         <div className={`movie-detail-for-you-list${showListShadow ? ' movie-detail-for-you-list--more' : ''}`}>
           {waiting
-            ? Array.from({ length: SKELETON_COUNT }, (_, index) => (
+            ? Array.from({ length: firstPage }, (_, index) => (
                 <MovieDetailForYouCardSkeleton key={`movie-detail-for-you-skeleton-${index}`} />
               ))
-            : movies.map((movie) => (
+            : pageMovies.map((movie) => (
                 <MovieDetailForYouCard
                   key={movie.id}
                   movie={movie}
