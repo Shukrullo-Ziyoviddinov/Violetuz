@@ -2897,6 +2897,17 @@
   .movie-detail-sheet > .movie-detail-similar-wrapper {
     grid-column: 1;
     min-width: 0;
+    align-self: start;
+    height: auto;
+  }
+
+  .movie-detail-image-block {
+    align-self: start;
+  }
+
+  .movie-detail-image {
+    height: auto;
+    aspect-ratio: 16 / 9;
   }
 
   .movie-detail-sheet {

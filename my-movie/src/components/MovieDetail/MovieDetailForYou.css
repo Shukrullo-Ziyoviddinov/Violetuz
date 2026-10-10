@@ -166,7 +166,10 @@
     position: sticky;
     top: 72px;
     align-self: start;
+    justify-self: end;
     width: 300px;
+    height: calc(100vh - 84px);
+    min-height: 0;
     max-height: calc(100vh - 84px);
     overflow-x: hidden;
     overflow-y: auto;
