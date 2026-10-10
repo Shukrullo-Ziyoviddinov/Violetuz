@@ -8,6 +8,7 @@ import { useSimilarMovies } from '../../hooks/useSimilarMovies';
 import { fetchViewerHomeFeedPage } from '../../api/homeFeedApi';
 import { getWatchHistory } from '../../utils/localStorage/guestHistory/movieGuestHistory';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import SemicircleLoader from '../SemicircleLoader/SemicircleLoader';
 import MovieDetailForYouCard, { MovieDetailForYouCardSkeleton } from './MovieDetailForYouCard';
 import './MovieDetailForYou.css';
@@ -34,6 +35,15 @@ const useDesktopRail = () => {
   return desktop;
 };
 
+const filterGenresOf = (movie) => {
+  const genre = movie?.filterGenre;
+  if (Array.isArray(genre)) {
+    return genre.map((item) => String(item).trim()).filter(Boolean);
+  }
+  if (genre != null && String(genre).trim()) return [String(genre).trim()];
+  return [];
+};
+
 const MovieDetailForYou = ({ movieId }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
@@ -54,7 +64,11 @@ const MovieDetailForYou = ({ movieId }) => {
   const [phase, setPhase] = useState('idle');
   const [pendingCount, setPendingCount] = useState(0);
   const [moreKey, setMoreKey] = useState(0);
+  const [selectedGenre, setSelectedGenre] = useState('all');
+  const [showGenreFilter, setShowGenreFilter] = useState(false);
   const revealTimerRef = useRef(0);
+  const headingBarRef = useRef(null);
+  const filterPinnedRef = useRef(false);
 
   const excludeIds = useMemo(() => {
     const ids = [];
@@ -149,7 +163,66 @@ const MovieDetailForYou = ({ movieId }) => {
       });
   };
 
+  const genreOptions = useMemo(() => {
+    const seen = new Set();
+    const options = [];
+    for (const movie of pageMovies) {
+      for (const genre of filterGenresOf(movie)) {
+        if (seen.has(genre)) continue;
+        seen.add(genre);
+        options.push(genre);
+      }
+    }
+    return options;
+  }, [pageMovies]);
+
+  const visibleMovies = useMemo(() => {
+    if (selectedGenre === 'all') return pageMovies;
+    return pageMovies.filter((movie) => filterGenresOf(movie).includes(selectedGenre));
+  }, [pageMovies, selectedGenre]);
+
+  const handleGenreSelect = (genre) => {
+    setSelectedGenre(genre);
+    if (isDesktop) return;
+    const bar = headingBarRef.current;
+    const sheet = bar?.closest('.movie-detail-sheet');
+    if (!bar || !sheet) return;
+    const delta = bar.getBoundingClientRect().top - sheet.getBoundingClientRect().top;
+    if (delta > 1) sheet.scrollTop += delta;
+    filterPinnedRef.current = true;
+    setShowGenreFilter(true);
+  };
+
   const waiting = similarLoading || moviesLoading || initialLoading;
+
+  useEffect(() => {
+    if (isDesktop) {
+      filterPinnedRef.current = false;
+      setShowGenreFilter(false);
+      return undefined;
+    }
+    const bar = headingBarRef.current;
+    const sheet = bar?.closest('.movie-detail-sheet');
+    if (!bar || !sheet) return undefined;
+
+    const onScroll = () => {
+      const stuck = bar.getBoundingClientRect().top <= sheet.getBoundingClientRect().top + 1;
+      if (stuck === filterPinnedRef.current) return;
+      filterPinnedRef.current = stuck;
+      setShowGenreFilter(stuck);
+    };
+
+    onScroll();
+    sheet.addEventListener('scroll', onScroll, { passive: true });
+    return () => sheet.removeEventListener('scroll', onScroll);
+  }, [isDesktop, waiting, pageMovies.length]);
+
+  useEffect(() => {
+    if (selectedGenre === 'all' || waiting || phase !== 'idle' || !hasMore) return;
+    if (visibleMovies.length >= nextPage) return;
+    handleMore();
+  }, [selectedGenre, visibleMovies.length, hasMore, phase, waiting, nextPage]);
+
   const showMoreButton = !waiting && phase === 'idle' && hasMore;
   const showArc = phase === 'arc';
   const showListShadow = hasMore || phase !== 'idle';
@@ -162,16 +235,42 @@ const MovieDetailForYou = ({ movieId }) => {
         {waiting ? (
           <SkeletonLoader variant="movies-title" className="movie-detail-for-you-heading-skeleton" />
         ) : (
-          <h2 className="movie-detail-for-you-heading">
-            {t('movies.forYou', 'Siz uchun tavsiyalar')}
-          </h2>
+          <div
+            ref={headingBarRef}
+            className={`movie-detail-for-you-heading-bar${showGenreFilter ? ' is-filter' : ''}`}
+          >
+            <h2 className="movie-detail-for-you-heading">
+              {t('movies.forYou', 'Siz uchun tavsiyalar')}
+            </h2>
+            <div className="movie-detail-for-you-heading-filter" aria-hidden={!showGenreFilter}>
+              <ScrollTouch className="movie-detail-for-you-filter">
+                <button
+                  type="button"
+                  className={`movie-detail-for-you-filter-chip${selectedGenre === 'all' ? ' is-active' : ''}`}
+                  onClick={() => handleGenreSelect('all')}
+                >
+                  {t('movies.filterAll', 'Hammasi')}
+                </button>
+                {genreOptions.map((genre) => (
+                  <button
+                    key={genre}
+                    type="button"
+                    className={`movie-detail-for-you-filter-chip${selectedGenre === genre ? ' is-active' : ''}`}
+                    onClick={() => handleGenreSelect(genre)}
+                  >
+                    {genre}
+                  </button>
+                ))}
+              </ScrollTouch>
+            </div>
+          </div>
         )}
         <div className={`movie-detail-for-you-list${showListShadow ? ' movie-detail-for-you-list--more' : ''}`}>
           {waiting
             ? Array.from({ length: firstPage }, (_, index) => (
                 <MovieDetailForYouCardSkeleton key={`movie-detail-for-you-skeleton-${index}`} />
               ))
-            : pageMovies.map((movie) => (
+            : visibleMovies.map((movie) => (
                 <MovieDetailForYouCard
                   key={movie.id}
                   movie={movie}

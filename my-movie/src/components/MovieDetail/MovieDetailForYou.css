@@ -21,6 +21,10 @@
   border-radius: 6px !important;
 }
 
+.movie-detail-for-you-heading-filter {
+  display: none;
+}
+
 .movie-detail-for-you-list {
   display: flex;
   flex-direction: column;
@@ -269,5 +273,89 @@
 
   .movie-detail-for-you-heading-skeleton {
     height: calc(1.1rem * 1.2) !important;
+  }
+
+  .movie-detail-for-you-heading-bar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin: 0 -0.7rem;
+    padding: 0.35rem 0.7rem 0.45rem;
+    background: #000;
+    min-height: 2.1rem;
+  }
+
+  .movie-detail-for-you-heading,
+  .movie-detail-for-you-heading-filter {
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .movie-detail-for-you-heading-filter,
+  .movie-detail-for-you-filter {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .movie-detail-for-you-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.1rem 0;
+  }
+
+  .movie-detail-for-you-filter-chip {
+    flex: 0 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.88);
+    border-radius: 999px;
+    padding: 0.28rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .movie-detail-for-you-filter-chip.is-active {
+    background: rgba(30, 3, 210, 0.3);
+    border-color: rgba(31, 22, 204, 0.6);
+    color: #fff;
+  }
+
+  .movie-detail-for-you-heading-bar:not(.is-filter) .movie-detail-for-you-heading {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .movie-detail-for-you-heading-bar:not(.is-filter) .movie-detail-for-you-heading-filter {
+    position: absolute;
+    left: 0.7rem;
+    right: 0.7rem;
+    top: 0.35rem;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+  }
+
+  .movie-detail-for-you-heading-bar.is-filter .movie-detail-for-you-heading {
+    position: absolute;
+    left: 0.7rem;
+    right: 0.7rem;
+    top: 0.35rem;
+    margin: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+
+  .movie-detail-for-you-heading-bar.is-filter .movie-detail-for-you-heading-filter {
+    position: relative;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
   }
 }
