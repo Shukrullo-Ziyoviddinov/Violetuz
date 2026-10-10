@@ -2885,9 +2885,10 @@
 
 @media (min-width: 901px) {
   .movie-detail-content {
+    --movie-detail-for-you-width: clamp(240px, 26vw, 380px);
     display: block;
     position: relative;
-    padding-right: calc(300px + 1.5rem);
+    padding-right: calc(var(--movie-detail-for-you-width) + 1.5rem);
   }
 
   .movie-detail-image-block {
@@ -2905,6 +2906,10 @@
 
   .movie-detail-sheet > .movie-detail-similar-wrapper {
     margin-top: -1rem;
+  }
+
+  .movie-detail .similar-movies-header {
+    margin-top: 1.5rem;
   }
 }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import ViewCount from '../ViewCount/ViewCount';
 import { useImageReady } from '../../utils/useImageReady';
 import { formatActionCount } from '../../utils/utils';
 
@@ -82,6 +83,13 @@ const MovieDetailForYouCard = ({ movie, contentLang }) => {
       </div>
       <div className="movie-detail-for-you-body">
         <h3 className="movie-detail-for-you-name">{title}</h3>
+        <ViewCount
+          itemId={movie.id}
+          type="movie"
+          record={false}
+          variant="text"
+          className="view-count-text movie-detail-for-you-views"
+        />
         {genres ? <p className="movie-detail-for-you-genres">{genres}</p> : null}
         {showImdb ? (
           <div className="movie-detail-for-you-imdb">

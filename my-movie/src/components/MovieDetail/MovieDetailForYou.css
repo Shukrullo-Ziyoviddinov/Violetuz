@@ -43,9 +43,9 @@
 
 .movie-detail-for-you-poster-wrap {
   position: relative;
-  flex: 0 0 58px;
-  width: 58px;
-  height: 86px;
+  flex: 0 0 84px;
+  width: 84px;
+  height: 124px;
   border-radius: 8px;
   overflow: hidden;
   background: #161616;
@@ -53,8 +53,8 @@
 
 .movie-detail-for-you-poster,
 .movie-detail-for-you-poster-skeleton {
-  width: 58px;
-  height: 86px;
+  width: 84px;
+  height: 124px;
   border-radius: 8px;
   object-fit: cover;
   display: block;
@@ -73,6 +73,14 @@
   flex-direction: column;
   gap: 0.2rem;
   padding-top: 0.05rem;
+}
+
+.movie-detail-for-you-views {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.2;
 }
 
 .movie-detail-for-you-name {
@@ -165,7 +173,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 300px;
+    width: var(--movie-detail-for-you-width, clamp(240px, 26vw, 380px));
     height: auto;
     max-height: none;
     margin: 0;
