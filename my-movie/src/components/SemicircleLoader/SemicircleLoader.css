@@ -1,13 +1,20 @@
 .semicircle-loader {
   display: inline-block;
-  width: 28px;
-  height: 14px;
+  width: 26px;
+  height: 26px;
   box-sizing: border-box;
-  border: 2.5px solid rgba(255, 255, 255, 0.92);
-  border-bottom: 0;
-  border-radius: 28px 28px 0 0;
-  animation: semicircle-loader-spin 0.75s linear infinite;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.16);
+  border-top-color: #fff;
+  animation: semicircle-loader-spin 0.7s linear infinite;
   flex-shrink: 0;
+  transform-origin: center;
+}
+
+@keyframes semicircle-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes semicircle-loader-spin {
