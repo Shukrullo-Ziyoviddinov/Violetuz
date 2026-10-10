@@ -41,9 +41,17 @@
   pointer-events: none;
 }
 
+.movie-detail-for-you-poster-col {
+  flex: 0 0 84px;
+  width: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .movie-detail-for-you-poster-wrap {
   position: relative;
-  flex: 0 0 84px;
   width: 84px;
   height: 124px;
   border-radius: 8px;
@@ -132,10 +140,13 @@
 .movie-detail-for-you-votes {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.45rem;
+  width: 100%;
+  margin: 0;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   line-height: 1;
 }
 

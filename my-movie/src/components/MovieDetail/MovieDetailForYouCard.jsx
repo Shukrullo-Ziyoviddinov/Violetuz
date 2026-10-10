@@ -66,20 +66,32 @@ const MovieDetailForYouCard = ({ movie, contentLang }) => {
       className={`movie-detail-for-you-card${showSkeleton ? ' movie-detail-for-you-card--loading' : ''}`}
       aria-busy={showSkeleton || undefined}
     >
-      <div className="movie-detail-for-you-poster-wrap">
-        {showSkeleton && (
-          <SkeletonLoader variant="movie-image" className="movie-detail-for-you-poster-skeleton" />
-        )}
-        {!failed && imgSrc && (
-          <img
-            ref={imgRef}
-            src={imgSrc}
-            alt={title}
-            className={`movie-detail-for-you-poster${showSkeleton ? ' movie-detail-for-you-poster--loading' : ''}`}
-            onLoad={onLoad}
-            onError={onError}
-          />
-        )}
+      <div className="movie-detail-for-you-poster-col">
+        <div className="movie-detail-for-you-poster-wrap">
+          {showSkeleton && (
+            <SkeletonLoader variant="movie-image" className="movie-detail-for-you-poster-skeleton" />
+          )}
+          {!failed && imgSrc && (
+            <img
+              ref={imgRef}
+              src={imgSrc}
+              alt={title}
+              className={`movie-detail-for-you-poster${showSkeleton ? ' movie-detail-for-you-poster--loading' : ''}`}
+              onLoad={onLoad}
+              onError={onError}
+            />
+          )}
+        </div>
+        <div className="movie-detail-for-you-votes">
+          <span className="movie-detail-for-you-vote">
+            <LikeIcon />
+            <span>{formatActionCount(movie.like)}</span>
+          </span>
+          <span className="movie-detail-for-you-vote">
+            <DislikeIcon />
+            <span>{formatActionCount(movie.dislike)}</span>
+          </span>
+        </div>
       </div>
       <div className="movie-detail-for-you-body">
         <h3 className="movie-detail-for-you-name">{title}</h3>
@@ -97,16 +109,6 @@ const MovieDetailForYouCard = ({ movie, contentLang }) => {
             <span className="movie-detail-for-you-imdb-value">{movie.ratingImdb}</span>
           </div>
         ) : null}
-        <div className="movie-detail-for-you-votes">
-          <span className="movie-detail-for-you-vote">
-            <LikeIcon />
-            <span>{formatActionCount(movie.like)}</span>
-          </span>
-          <span className="movie-detail-for-you-vote">
-            <DislikeIcon />
-            <span>{formatActionCount(movie.dislike)}</span>
-          </span>
-        </div>
       </div>
     </Link>
   );
