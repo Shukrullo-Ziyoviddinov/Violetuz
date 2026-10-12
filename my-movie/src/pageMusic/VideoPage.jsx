@@ -45,6 +45,7 @@ const formatGenreLabel = (genre) => {
 
 const TREND_SKELETON_COUNT = 8;
 const ACTION_SKELETON_COUNT = 5;
+const GENRE_RESET_SKELETON_MS = 700;
 
 const trendSkeletonItems = Array.from({ length: TREND_SKELETON_COUNT }, (_, i) => ({
   id: `video-trend-skel-${i}`,
@@ -93,8 +94,10 @@ const VideoPage = () => {
   const commentsRef = useRef(null);
   const mainScrollRef = useRef(null);
   const filterPinnedRef = useRef(false);
+  const resetTimerRef = useRef(0);
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [showGenreFilter, setShowGenreFilter] = useState(false);
+  const [listResetting, setListResetting] = useState(false);
 
   const {
     scrollRef,
@@ -281,15 +284,19 @@ const VideoPage = () => {
   const showTrendSectionSkeleton =
     showHeroDataSkeleton ||
     ((Boolean(videosLoading) || Boolean(recsLoading)) && relatedList.length === 0);
-  const trendItemsToRender = showTrendSectionSkeleton
+  const trendItemsToRender = showTrendSectionSkeleton || listResetting
     ? trendSkeletonItems
     : filteredRelatedList;
 
   useEffect(() => {
     setSelectedGenre('all');
     setShowGenreFilter(false);
+    setListResetting(false);
+    window.clearTimeout(resetTimerRef.current);
     filterPinnedRef.current = false;
   }, [id]);
+
+  useEffect(() => () => window.clearTimeout(resetTimerRef.current), []);
 
   const handleBodyScroll = () => {
     if (isImmersive) return;
@@ -320,6 +327,16 @@ const VideoPage = () => {
     filterPinnedRef.current = true;
     setShowGenreFilter(true);
     setSelectedGenre(genreId);
+  };
+
+  const handleResetGenre = () => {
+    if (selectedGenre === 'all' || listResetting) return;
+    filterPinnedRef.current = false;
+    setShowGenreFilter(false);
+    setSelectedGenre('all');
+    setListResetting(true);
+    window.clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = window.setTimeout(() => setListResetting(false), GENRE_RESET_SKELETON_MS);
   };
 
   useLayoutEffect(() => {
@@ -528,7 +545,7 @@ const VideoPage = () => {
         </h3>
       )}
       <div className="video-detail-trend-grid">
-        {showTrendSectionSkeleton
+        {showTrendSectionSkeleton || listResetting
           ? trendItemsToRender.map((item) => (
               <VideoTrendCardSkeleton key={item.id} />
             ))
@@ -806,7 +823,24 @@ const VideoPage = () => {
                 />
               ) : (
                 <h3 className="video-detail-sticky-title">
-                  {t(relatedTitleKey, relatedTitleDefault)}
+                  <span className="video-detail-sticky-title-text">
+                    {t(relatedTitleKey, relatedTitleDefault)}
+                  </span>
+                  {selectedGenre !== 'all' ? (
+                    <button
+                      type="button"
+                      className="video-detail-sticky-title-reset"
+                      aria-label={t('triller.filterAll', 'Barchasi')}
+                      onClick={handleResetGenre}
+                    >
+                      <svg viewBox="4 4 16 16" aria-hidden="true">
+                        <path
+                          fill="currentColor"
+                          d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                        />
+                      </svg>
+                    </button>
+                  ) : null}
                 </h3>
               )}
               <div

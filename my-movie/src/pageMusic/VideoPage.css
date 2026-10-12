@@ -1132,18 +1132,50 @@ body.video-detail-page-active {
   }
 
   .video-detail-sticky-title {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     position: static;
     margin: 0;
     padding: 0.2rem 0;
     font-size: 1.15rem;
     font-weight: 700;
+    line-height: 1;
     color: #fff;
     background: transparent;
     max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .video-detail-sticky-title-text {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    line-height: 1;
+  }
+
+  .video-detail-sticky-title-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 1em;
+    height: 1em;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .video-detail-sticky-title-reset svg {
+    width: 1em;
+    height: 1em;
+    display: block;
   }
 
   .video-detail-sticky-filter {
