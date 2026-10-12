@@ -21,6 +21,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1;
 }
 
 .movie-detail-for-you-heading-reset {
@@ -28,8 +29,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1em;
+  height: 1em;
   margin: 0;
   padding: 0;
   border: 0;
@@ -40,8 +41,8 @@
 }
 
 .movie-detail-for-you-heading-reset svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1em;
+  height: 1em;
   display: block;
 }
 
