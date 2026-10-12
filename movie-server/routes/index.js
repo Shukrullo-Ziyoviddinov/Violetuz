@@ -49,6 +49,7 @@ const recommendedActorsRoutes = require('../recommendation-actors/routes');
 const recommendedArtistsRoutes = require('../recommendation-artists/routes');
 const movieSimilarRoutes = require('../movie-similar/routes');
 const musicSimilarRoutes = require('../music-similar/routes');
+const detailRecommendRoutes = require('../detail-recommend/routes');
 // Register affinity/precompute handlers at boot (not only on first watch/like).
 require('../recommendation/jobs');
 require('../recommendation-music/jobs');
@@ -104,6 +105,7 @@ router.use('/recommendations', recommendationRoutes);
 router.use('/home-feed', homeFeedRoutes);
 router.use('/music-home-feed', musicHomeFeedRoutes);
 router.use('/album-home-feed', albumHomeFeedRoutes);
+router.use('/detail-recommend', detailRecommendRoutes);
 router.use('/music-recommendations', musicRecommendationRoutes);
 router.use('/recommended-actors', recommendedActorsRoutes);
 router.use('/recommended-artists', recommendedArtistsRoutes);

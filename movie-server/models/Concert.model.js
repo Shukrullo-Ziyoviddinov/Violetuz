@@ -54,6 +54,11 @@ const concertSchema = new mongoose.Schema(
       default: 'konsert',
       index: true,
     },
+    /** Shu konsertning asosiy qo'shig'i. Bo'sh bo'lsa bog'lanish yo'q. albumId yo'q. */
+    musicId: {
+      type: Number,
+      default: null,
+    },
     video: {
       type: String,
       trim: true,

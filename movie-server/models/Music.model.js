@@ -53,6 +53,11 @@ const musicSchema = new mongoose.Schema(
       trim: true,
       default: 'music',
     },
+    /** Shu qo'shiqning klipi. Bo'sh bo'lsa bog'lanish yo'q. */
+    clipId: {
+      type: Number,
+      default: null,
+    },
     /**
      * Franshiza / seriya treklar (music-similar QATLAM 1).
      * Tartib: arrayda birinchi id — eng yuqori. Ba'zi yozuvlarda bo'sh.

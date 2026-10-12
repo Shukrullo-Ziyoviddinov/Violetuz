@@ -5,6 +5,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import { useSimilarSongs } from '../../services/similarSongsService';
+import { useDetailRecommendSongs } from '../../hooks/useDetailRecommendSongs';
 import { useMusicApi } from '../../context/MusicApiContext';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
@@ -144,7 +145,7 @@ const SimilarSongs = ({
   klip,
   titleKey = 'music.similarSongs',
   forceSkeleton = false,
-  /** 'homeFeed' — album detail "siz uchun"; default — music similar / klip local */
+  /** 'homeFeed' — album detail. 'detailRecommend' — video klip va konsert qo'shiqlari. */
   source,
 }) => {
   const { t } = useTranslation();
@@ -154,9 +155,18 @@ const SimilarSongs = ({
   const { getArtistById } = useMusicApi();
 
   const item = music || album || klip;
-  const { items: similarSongs, isLoading } = useSimilarSongs(item, {
-    source,
+  const detailRecommend = source === 'detailRecommend';
+  const { items: similarSongs, isLoading: similarLoading } = useSimilarSongs(
+    detailRecommend ? null : item,
+    { source }
+  );
+  const { items: recommendedSongs, isLoading: recommendLoading } = useDetailRecommendSongs({
+    enabled: detailRecommend,
+    pageType: klip?.type,
+    pageId: klip?.id,
   });
+  const songs = detailRecommend ? recommendedSongs : similarSongs;
+  const isLoading = detailRecommend ? recommendLoading : similarLoading;
 
   const getTitleText = (song) => {
     if (!song?.title) return '';
@@ -193,15 +203,15 @@ const SimilarSongs = ({
   /* Feed/similar loading → skeleton; tayyor + bo'sh → null */
   const showSectionSkeleton =
     Boolean(forceSkeleton) ||
-    (Boolean(isLoading) && similarSongs.length === 0);
-  const itemsToRender = showSectionSkeleton ? skeletonItems : similarSongs;
+    (Boolean(isLoading) && songs.length === 0);
+  const itemsToRender = showSectionSkeleton ? skeletonItems : songs;
   const showTitleSkeleton = showSectionSkeleton;
 
   if (music && music.type !== 'music') return null;
   if (album && album.type !== 'musicAlbom') return null;
   if (klip && klip.type !== 'klip' && klip.type !== 'konsert') return null;
   if (!item && !showSectionSkeleton) return null;
-  if (!showSectionSkeleton && !similarSongs.length) return null;
+  if (!showSectionSkeleton && !songs.length) return null;
 
   const renderCard = (song) => {
     if (song._skeleton) {

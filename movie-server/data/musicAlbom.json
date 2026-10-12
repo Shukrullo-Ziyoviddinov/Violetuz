@@ -16,13 +16,15 @@
         "id": 1,
         "title": "Hit One",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Hit Two",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -43,13 +45,15 @@
         "id": 1,
         "title": "Sun",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Beach",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -70,7 +74,8 @@
         "id": 1,
         "title": "Midnight",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -91,13 +96,15 @@
         "id": 1,
         "title": "Mix",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Top",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -118,7 +125,8 @@
         "id": 1,
         "title": "Golden",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -139,13 +147,15 @@
         "id": 1,
         "title": "Urban",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Sound",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -166,7 +176,8 @@
         "id": 1,
         "title": "Chart",
         "artist": "Jonny",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -187,13 +198,15 @@
         "id": 1,
         "title": "Electric",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Pulse",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -214,7 +227,8 @@
         "id": 1,
         "title": "Rhythm",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -235,13 +249,15 @@
         "id": 1,
         "title": "Ultimate",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Hits",
         "artist": "Jonny",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -262,13 +278,15 @@
         "id": 1,
         "title": "Star",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Collection",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -289,19 +307,22 @@
         "id": 1,
         "title": "Kometa",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Alleya",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       },
       {
         "id": 3,
         "title": "Kamin",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -322,13 +343,15 @@
         "id": 1,
         "title": "Sunset",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Ocean",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -349,13 +372,15 @@
         "id": 1,
         "title": "Moonlight",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Stars",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -376,7 +401,8 @@
         "id": 1,
         "title": "Melody",
         "artist": "Artist C",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -397,13 +423,15 @@
         "id": 1,
         "title": "Soul",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Electric",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -424,13 +452,15 @@
         "id": 1,
         "title": "Neon",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Hearts",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -451,7 +481,8 @@
         "id": 1,
         "title": "Golden",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -472,13 +503,15 @@
         "id": 1,
         "title": "City",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Lights",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -499,7 +532,8 @@
         "id": 1,
         "title": "Ocean",
         "artist": "Jonny",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -520,13 +554,15 @@
         "id": 1,
         "title": "Star",
         "artist": "Artist B",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Light",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -547,13 +583,15 @@
         "id": 1,
         "title": "Dream",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "State",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -574,19 +612,22 @@
         "id": 1,
         "title": "First Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Forever Yours",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       },
       {
         "id": 3,
         "title": "Heartbeat",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -607,13 +648,15 @@
         "id": 1,
         "title": "Moonlight",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Stargazing",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -634,13 +677,15 @@
         "id": 1,
         "title": "Soul",
         "artist": "Jonny",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Connection",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -661,7 +706,8 @@
         "id": 1,
         "title": "Sweet",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -682,13 +728,15 @@
         "id": 1,
         "title": "Eternal",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -709,13 +757,15 @@
         "id": 1,
         "title": "Eternal",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -736,13 +786,15 @@
         "id": 1,
         "title": "Eternal",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -763,13 +815,15 @@
         "id": 1,
         "title": "Eternal",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -790,13 +844,15 @@
         "id": 1,
         "title": "Eternal",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -817,13 +873,15 @@
         "id": 1,
         "title": "Eternal",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -844,13 +902,15 @@
         "id": 1,
         "title": "Eternal",
         "artist": "Artist B",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Love",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -871,19 +931,22 @@
         "id": 1,
         "title": "Kometa",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Alleya",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       },
       {
         "id": 3,
         "title": "Kamin",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -904,13 +967,15 @@
         "id": 1,
         "title": "Sunset",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Ocean",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -931,13 +996,15 @@
         "id": 1,
         "title": "Moonlight",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Stars",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -958,7 +1025,8 @@
         "id": 1,
         "title": "Melody",
         "artist": "Artist C",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -979,19 +1047,22 @@
         "id": 1,
         "title": "Kometa",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Alleya",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       },
       {
         "id": 3,
         "title": "Kamin",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -1013,14 +1084,16 @@
         "title": "Sunset",
         "artist": "Artist B",
         "audio": "/music/Zivert - Life.mp3",
-        "lyricsText": "Leyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman \n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman"
+        "lyricsText": "Leyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman \n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Ocean",
         "artist": "Artist B",
         "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+        "clipIds": []
       }
     ]
   },
@@ -1042,14 +1115,16 @@
         "title": "Moonlight",
         "artist": "Jonny",
         "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Stars",
         "artist": "Jonny",
         "audio": "/music/Zivert - Life.mp3",
-        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+        "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+        "clipIds": []
       }
     ]
   },
@@ -1070,7 +1145,8 @@
         "id": 1,
         "title": "Melody",
         "artist": "Artist C",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -1091,19 +1167,22 @@
         "id": 1,
         "title": "Kometa",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Alleya",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       },
       {
         "id": 3,
         "title": "Kamin",
         "artist": "Jonny",
-        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3"
+        "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
+        "clipIds": []
       }
     ]
   },
@@ -1124,13 +1203,15 @@
         "id": 1,
         "title": "Sunset",
         "artist": "Artist B",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Ocean",
         "artist": "Artist B",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -1151,13 +1232,15 @@
         "id": 1,
         "title": "Moonlight",
         "artist": "Jonny",
-        "audio": "/music/Reed Wonder - When I Dream Of You.mp3"
+        "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
+        "clipIds": []
       },
       {
         "id": 2,
         "title": "Stars",
         "artist": "Jonny",
-        "audio": "/music/Zivert - Life.mp3"
+        "audio": "/music/Zivert - Life.mp3",
+        "clipIds": []
       }
     ]
   },
@@ -1178,7 +1261,8 @@
         "id": 1,
         "title": "Melody",
         "artist": "Artist C",
-        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3"
+        "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
+        "clipIds": []
       }
     ]
   }

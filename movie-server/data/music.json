@@ -12,7 +12,8 @@
     "type": "music",
     "franchiseMusicIds": [806, 803],
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Chuqur bass - jonimga\nDeep bass - titrash\nHar bir beat - hayot"
+    "lyricsText": "Chuqur bass - jonimga\nDeep bass - titrash\nHar bir beat - hayot",
+    "clipId": null
   },
   { 
     "id": 802,
@@ -27,7 +28,8 @@
     "type": "music",
     "franchiseMusicIds": [805],
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Subwoofer - yuragim titraydi\nKuchli ovoz - sensiz emas\nBu kecha - bizniki"
+    "lyricsText": "Subwoofer - yuragim titraydi\nKuchli ovoz - sensiz emas\nBu kecha - bizniki",
+    "clipId": null
   },
   { 
     "id": 803,
@@ -41,7 +43,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Bass drop - moment\nHar bir drop - hayajon\nAbadiy kecha"
+    "lyricsText": "Bass drop - moment\nHar bir drop - hayajon\nAbadiy kecha",
+    "clipId": null
   }, 
   {
     "id": 804,
@@ -55,7 +58,8 @@
     "country": "russia",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Past chastota - titrash\nLow frequency - sensiz emas\nShahar kechasi"
+    "lyricsText": "Past chastota - titrash\nLow frequency - sensiz emas\nShahar kechasi",
+    "clipId": null
   },
   {
     "id": 805,
@@ -69,7 +73,8 @@
     "country": "britaniya",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Og'ir bass - kuchli\nHeavy bass - menga yo'ldosh\nHar kecha"
+    "lyricsText": "Og'ir bass - kuchli\nHeavy bass - menga yo'ldosh\nHar kecha",
+    "clipId": null
   },
   {
     "id": 806,
@@ -83,7 +88,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Bass chizig'i - ritm\nBassline - hayot\nBu dunyo - bizniki"
+    "lyricsText": "Bass chizig'i - ritm\nBassline - hayot\nBu dunyo - bizniki",
+    "clipId": null
   },
   {
     "id": 807,
@@ -97,7 +103,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Zilzila - bass ostida\nEarthquake - titrash\nAbadiy moment"
+    "lyricsText": "Zilzila - bass ostida\nEarthquake - titrash\nAbadiy moment",
+    "clipId": null
   },
   {
     "id": 808,
@@ -111,7 +118,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Bass to'pi - kuchli\nBass cannon - sensiz emas\nHar bir kecha"
+    "lyricsText": "Bass to'pi - kuchli\nBass cannon - sensiz emas\nHar bir kecha",
+    "clipId": null
   },
   {
     "id": 809,
@@ -125,7 +133,8 @@
     "country": "kanada",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Sub bass - chuqur\nYuragim titraydi\nSen bilan"
+    "lyricsText": "Sub bass - chuqur\nYuragim titraydi\nSen bilan",
+    "clipId": null
   },
   {
     "id": 810,
@@ -139,7 +148,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Bass kuchaytirish - hayajon\nBass boost - kecha\nAbadiy"
+    "lyricsText": "Bass kuchaytirish - hayajon\nBass boost - kecha\nAbadiy",
+    "clipId": null
   },
   {
     "id": 811,
@@ -153,7 +163,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "G'ovur - bass ostida\nRumble - titrash\nBu kecha - sensiz emas"
+    "lyricsText": "G'ovur - bass ostida\nRumble - titrash\nBu kecha - sensiz emas",
+    "clipId": null
   },
   {
     "id": 501,
@@ -167,7 +178,8 @@
     "country": "korea",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman",
+    "clipId": null
   },
   {
     "id": 502,
@@ -181,7 +193,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Yozning har bir kuni yorug'\nSensiz bo'lmasa ham yorug'\nOq tunlar va yulduzlar\nSenga qarab kutaman"
+    "lyricsText": "Yozning har bir kuni yorug'\nSensiz bo'lmasa ham yorug'\nOq tunlar va yulduzlar\nSenga qarab kutaman",
+    "clipId": null
   },
   {
     "id": 503,
@@ -195,7 +208,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Tungi yo'llarda hayoling\nBarcha narsani unutding\nMashina tez, yulduzlar sez\nBu kecha - bizniki"
+    "lyricsText": "Tungi yo'llarda hayoling\nBarcha narsani unutding\nMashina tez, yulduzlar sez\nBu kecha - bizniki",
+    "clipId": null
   },
   {
     "id": 504,
@@ -209,7 +223,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Oydin kechada yolg'iz\nSening so'zlaringni eslayman\nMoonlight - sening ko'zlaring\nMen uchun yorug'lik"
+    "lyricsText": "Oydin kechada yolg'iz\nSening so'zlaringni eslayman\nMoonlight - sening ko'zlaring\nMen uchun yorug'lik",
+    "clipId": null
   },
   {
     "id": 505,
@@ -223,7 +238,8 @@
     "country": "britaniya",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Tushda ko'rdim seni\nUyg'onib qoldim yolg'iz\nDream state - haqiqat emas\nLekin sensiz emas"
+    "lyricsText": "Tushda ko'rdim seni\nUyg'onib qoldim yolg'iz\nDream state - haqiqat emas\nLekin sensiz emas",
+    "clipId": null
   },
   {
     "id": 506,
@@ -237,7 +253,8 @@
     "country": "russia",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Shahar chiroqlari yoniq\nHar bir ko'cha - yangi dunyo\nCity lights - sening yo'ling\nMen ham boraman"
+    "lyricsText": "Shahar chiroqlari yoniq\nHar bir ko'cha - yangi dunyo\nCity lights - sening yo'ling\nMen ham boraman",
+    "clipId": null
   },
   {
     "id": 507,
@@ -251,7 +268,8 @@
     "country": "kanada",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Okean oldida turibman\nTolqinlar - sening ovozing\nOcean view - abadiy\nSenga qarab yashayman"
+    "lyricsText": "Okean oldida turibman\nTolqinlar - sening ovozing\nOcean view - abadiy\nSenga qarab yashayman",
+    "clipId": null
   },
   {
     "id": 508,
@@ -265,7 +283,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Oltin soat - quyosh botish\nEng chiroyli vaqt - sen bilan\nGolden hour - abadiy\nXotirangda qolaman"
+    "lyricsText": "Oltin soat - quyosh botish\nEng chiroyli vaqt - sen bilan\nGolden hour - abadiy\nXotirangda qolaman",
+    "clipId": null
   },
   {
     "id": 509,
@@ -279,7 +298,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Yomg'irli kunlar - sensiz\nHar bir tomchi - xotira\nRainy days - o'tib ketadi\nSen qolasan yuragimda"
+    "lyricsText": "Yomg'irli kunlar - sensiz\nHar bir tomchi - xotira\nRainy days - o'tib ketadi\nSen qolasan yuragimda",
+    "clipId": null
   },
   {
     "id": 510,
@@ -293,7 +313,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Yulduzli tun - sening so'nging\nStarlight - menga yo'ldosh\nOlamning narigi tomonida\nSen bilan bo'laman"
+    "lyricsText": "Yulduzli tun - sening so'nging\nStarlight - menga yo'ldosh\nOlamning narigi tomonida\nSen bilan bo'laman",
+    "clipId": null
   },
   {
     "id": 701,
@@ -307,7 +328,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Binafsha tushlar - menga yo'ldosh\nViolet dreams - abadiy\nHar kecha sen bilan"
+    "lyricsText": "Binafsha tushlar - menga yo'ldosh\nViolet dreams - abadiy\nHar kecha sen bilan",
+    "clipId": null
   },
   {
     "id": 702,
@@ -321,7 +343,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Shahar ruhi - har bir ko'chada\nCity soul - sen bilan\nBu dunyo - bizniki"
+    "lyricsText": "Shahar ruhi - har bir ko'chada\nCity soul - sen bilan\nBu dunyo - bizniki",
+    "clipId": null
   },
   {
     "id": 703,
@@ -335,7 +358,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Yarim tun ritmi - yulduzlar ostida\nMidnight groove - raqsga tush\nAbadiy kecha"
+    "lyricsText": "Yarim tun ritmi - yulduzlar ostida\nMidnight groove - raqsga tush\nAbadiy kecha",
+    "clipId": null
   },
   {
     "id": 704,
@@ -349,7 +373,8 @@
     "country": "russia",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Quyosh botish bulvari\nHar bir kun - yangi\nSunset boulevard - hayot"
+    "lyricsText": "Quyosh botish bulvari\nHar bir kun - yangi\nSunset boulevard - hayot",
+    "clipId": null
   },
   {
     "id": 705,
@@ -363,7 +388,8 @@
     "country": "britaniya",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Echo valley - ovozing\nHar bir echo - xotira\nValley - abadiy"
+    "lyricsText": "Echo valley - ovozing\nHar bir echo - xotira\nValley - abadiy",
+    "clipId": null
   },
   {
     "id": 706,
@@ -377,7 +403,8 @@
     "country": "korea",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Neon chiroqlari - kechasi\nShahar yoniq - sensiz emas\nNeon lights - bizniki"
+    "lyricsText": "Neon chiroqlari - kechasi\nShahar yoniq - sensiz emas\nNeon lights - bizniki",
+    "clipId": null
   },
   {
     "id": 707,
@@ -391,7 +418,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Smooth operator - sen\nHar bir harakat - san'at\nOperator - hayot"
+    "lyricsText": "Smooth operator - sen\nHar bir harakat - san'at\nOperator - hayot",
+    "clipId": null
   },
   {
     "id": 708,
@@ -405,7 +433,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Daryo oqimi - abadiy\nRiver flow - sensiz emas\nHar tomchi - xotira"
+    "lyricsText": "Daryo oqimi - abadiy\nRiver flow - sensiz emas\nHar tomchi - xotira",
+    "clipId": null
   },
   {
     "id": 709,
@@ -419,7 +448,8 @@
     "country": "kanada",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Osmon baland - sen bilan\nSky high - muhabbat\nAbadiy parvoz"
+    "lyricsText": "Osmon baland - sen bilan\nSky high - muhabbat\nAbadiy parvoz",
+    "clipId": null
   },
   {
     "id": 710,
@@ -433,7 +463,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Momaqaldiroq bo'roni - kuchli\nThunder storm - sensiz emas\nHar bir chaqmoq - senga"
+    "lyricsText": "Momaqaldiroq bo'roni - kuchli\nThunder storm - sensiz emas\nHar bir chaqmoq - senga",
+    "clipId": null
   },
   {
     "id": 711,
@@ -447,7 +478,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Cho'l shamoli - issiq\nDesert wind - menga yo'ldosh\nSahro - bizniki"
+    "lyricsText": "Cho'l shamoli - issiq\nDesert wind - menga yo'ldosh\nSahro - bizniki",
+    "clipId": null
   },
   {
     "id": 601,
@@ -461,7 +493,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Jim tun - sen bilan\nYulduzlar - bizning guvohimiz\nSilent night - abadiy\nXotirangda qolaman"
+    "lyricsText": "Jim tun - sen bilan\nYulduzlar - bizning guvohimiz\nSilent night - abadiy\nXotirangda qolaman",
+    "clipId": null
   },
   {
     "id": 602,
@@ -475,7 +508,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Eski shahar yo'li\nHar bir qadam - tarix\nOld town road - menga yo'ldosh\nBorga boraman"
+    "lyricsText": "Eski shahar yo'li\nHar bir qadam - tarix\nOld town road - menga yo'ldosh\nBorga boraman",
+    "clipId": null
   },
   {
     "id": 603,
@@ -489,7 +523,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Raqs qilayotgan yulduzlar\nOsmon senga qarab\nDancing stars - kecha\nSen bilan raqs"
+    "lyricsText": "Raqs qilayotgan yulduzlar\nOsmon senga qarab\nDancing stars - kecha\nSen bilan raqs",
+    "clipId": null
   },
   {
     "id": 604,
@@ -503,7 +538,8 @@
     "country": "britaniya",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Ko'k osmonlar - sening ko'zlaring\nBlue skies - menga yorug'lik\nHar kuni yangi boshlash\nSensiz emas"
+    "lyricsText": "Ko'k osmonlar - sening ko'zlaring\nBlue skies - menga yorug'lik\nHar kuni yangi boshlash\nSensiz emas",
+    "clipId": null
   },
   {
     "id": 605,
@@ -517,7 +553,8 @@
     "country": "russia",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Qish tushlari - oppoq\nWinter dreams - senga atalgan\nHar qor tomchi - xotira\nSen qolding"
+    "lyricsText": "Qish tushlari - oppoq\nWinter dreams - senga atalgan\nHar qor tomchi - xotira\nSen qolding",
+    "clipId": null
   },
   {
     "id": 606,
@@ -531,7 +568,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Quyosh botish bulvari\nSunset boulevard - bizniki\nQizil osmon ostida\nYana bir kecha"
+    "lyricsText": "Quyosh botish bulvari\nSunset boulevard - bizniki\nQizil osmon ostida\nYana bir kecha",
+    "clipId": null
   },
   {
     "id": 607,
@@ -545,7 +583,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Elektrik ruh - sening ovozing\nElectric soul - menga yo'ldosh\nHar bir nota - hayot\nSen ijro etding"
+    "lyricsText": "Elektrik ruh - sening ovozing\nElectric soul - menga yo'ldosh\nHar bir nota - hayot\nSen ijro etding",
+    "clipId": null
   },
   {
     "id": 608,
@@ -559,7 +598,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Ertalabki nur - sening tabassuming\nMorning light - yangi boshlash\nHar kuni - sovg'a\nSensiz emas"
+    "lyricsText": "Ertalabki nur - sening tabassuming\nMorning light - yangi boshlash\nHar kuni - sovg'a\nSensiz emas",
+    "clipId": null
   },
   {
     "id": 609,
@@ -573,7 +613,8 @@
     "country": "kanada",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Neon yuraklar - shahar kechasi\nNeon hearts - bizniki\nChiroqlar yonadi\nSen bilan"
+    "lyricsText": "Neon yuraklar - shahar kechasi\nNeon hearts - bizniki\nChiroqlar yonadi\nSen bilan",
+    "clipId": null
   },
   {
     "id": 610,
@@ -587,7 +628,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Yo'qolgan jannat - sening qo'llaring\nParadise lost - topiladi\nQachon qaytsang\nMen kutaman"
+    "lyricsText": "Yo'qolgan jannat - sening qo'llaring\nParadise lost - topiladi\nQachon qaytsang\nMen kutaman",
+    "clipId": null
   },
   {
     "id": 901,
@@ -601,7 +643,8 @@
     "country": "saudi",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Bismillah ar-Rahman ar-Rahim\nHar bir ishni Uning nomi bilan boshlaymiz"
+    "lyricsText": "Bismillah ar-Rahman ar-Rahim\nHar bir ishni Uning nomi bilan boshlaymiz",
+    "clipId": null
   },
   {
     "id": 902,
@@ -615,7 +658,8 @@
     "country": "saudi",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Al-Quran Al-Kareem - ilohiy so'z\nUmmat uchun rahmat"
+    "lyricsText": "Al-Quran Al-Kareem - ilohiy so'z\nUmmat uchun rahmat",
+    "clipId": null
   },
   {
     "id": 903,
@@ -629,7 +673,8 @@
     "country": "egypt",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Nasheed - ilohiy qo'shiq\nYuragimni tinchlantiradi"
+    "lyricsText": "Nasheed - ilohiy qo'shiq\nYuragimni tinchlantiradi",
+    "clipId": null
   },
   {
     "id": 904,
@@ -643,7 +688,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Oydin tun - masjid oldida\nDua va ilohiy ohang"
+    "lyricsText": "Oydin tun - masjid oldida\nDua va ilohiy ohang",
+    "clipId": null
   },
   {
     "id": 905,
@@ -657,7 +703,8 @@
     "country": "uae",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Cho'l va oy - tinchlik\nIlohiy muhabbat"
+    "lyricsText": "Cho'l va oy - tinchlik\nIlohiy muhabbat",
+    "clipId": null
   },
   {
     "id": 906,
@@ -671,7 +718,8 @@
     "country": "britaniya",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Masjid va fonus - ramazon\nIlohiy nur"
+    "lyricsText": "Masjid va fonus - ramazon\nIlohiy nur",
+    "clipId": null
   },
   {
     "id": 907,
@@ -685,7 +733,8 @@
     "country": "saudi",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Eid Mubarak - bayram kutibi\nUmmat bilan birga"
+    "lyricsText": "Eid Mubarak - bayram kutibi\nUmmat bilan birga",
+    "clipId": null
   },
   {
     "id": 908,
@@ -699,7 +748,8 @@
     "country": "egypt",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Qur'on va suv - tinchlik\nIlohiy soz aks etadi"
+    "lyricsText": "Qur'on va suv - tinchlik\nIlohiy soz aks etadi",
+    "clipId": null
   },
   {
     "id": 909,
@@ -713,7 +763,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Dua qollari - iltijo\nAllohga yuzlanamiz"
+    "lyricsText": "Dua qollari - iltijo\nAllohga yuzlanamiz",
+    "clipId": null
   },
   {
     "id": 910,
@@ -727,7 +778,8 @@
     "country": "saudi",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Bismillah - har bir ishda\nMasjid - Alloh uyi"
+    "lyricsText": "Bismillah - har bir ishda\nMasjid - Alloh uyi",
+    "clipId": null
   },
   {
     "id": 911,
@@ -741,7 +793,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Ummat birdamligi - kuch\nDua va muhabbat"
+    "lyricsText": "Ummat birdamligi - kuch\nDua va muhabbat",
+    "clipId": null
   },
   {
     "id": 101,
@@ -755,7 +808,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Zivert - Life.mp3",
-    "lyricsText": "Leyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman \n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman"
+    "lyricsText": "Leyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman \n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman.\n\nLeyla, Leyla, senga qarab yashayman\nOq tunlarni sensiz o'tkazaman\nLeyla, Leyla, yuragimni olib ketding\nQaytib kelishingni kutaman\n\nHar bir daqiqa sensiz o'tmas ekan\nKo'zlarim yoshlarga to'lib ketdi\nLeyla, sen menga kerak ekansan\nYana bir bor ko'rishni xohlayman",
+    "clipId": null
   },
   {
     "id": 103,
@@ -769,7 +823,8 @@
     "country": "Russia",
     "type": "music",
     "audio": "/music/Chris Grey - WRONG (Official Lyric Video).mp3",
-    "lyricsText": "Sevgi – bu nima? Bilmayman hali\nFaqat sensiz yashab ko'rdim\nSevgi – bu sening ko'zlaring\nSevgi – bu sening so'zlaring\n\nQachon tushunsam, sevsam seni\nDunyoning eng baxtlisi bo'laman\nSevgi – bu menga yangi his\nSevgi – bu senga berilgan hayot"
+    "lyricsText": "Sevgi – bu nima? Bilmayman hali\nFaqat sensiz yashab ko'rdim\nSevgi – bu sening ko'zlaring\nSevgi – bu sening so'zlaring\n\nQachon tushunsam, sevsam seni\nDunyoning eng baxtlisi bo'laman\nSevgi – bu menga yangi his\nSevgi – bu senga berilgan hayot",
+    "clipId": null
   },
   {
     "id": 104,
@@ -783,7 +838,8 @@
     "country": "kanada",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": "Sariq devona, sen kim eding?\nMeni qayerlarga olib ketding\nSariq devona, tushunmadim\nNima uchun sensiz qoldim\n\nQaytib kel, sariq devona\nYana bir bor ko'rayin seni\nSariq devona, menga kerak sensan\nOlamni birga kezaylik"
+    "lyricsText": "Sariq devona, sen kim eding?\nMeni qayerlarga olib ketding\nSariq devona, tushunmadim\nNima uchun sensiz qoldim\n\nQaytib kel, sariq devona\nYana bir bor ko'rayin seni\nSariq devona, menga kerak sensan\nOlamni birga kezaylik",
+    "clipId": null
   },
   {
     "id": 105,
@@ -797,7 +853,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Sariq devona, sen kim eding?\nMeni qayerlarga olib ketding\nSariq devona, tushunmadim\nNima uchun sensiz qoldim\n\nQaytib kel, sariq devona\nYana bir bor ko'rayin seni\nSariq devona, menga kerak sensan\nOlamni birga kezaylik"
+    "lyricsText": "Sariq devona, sen kim eding?\nMeni qayerlarga olib ketding\nSariq devona, tushunmadim\nNima uchun sensiz qoldim\n\nQaytib kel, sariq devona\nYana bir bor ko'rayin seni\nSariq devona, menga kerak sensan\nOlamni birga kezaylik",
+    "clipId": null
   },
   {
     "id": 106,
@@ -811,7 +868,8 @@
     "country": "britaniya",
     "type": "music",
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
-    "lyricsText": ""
+    "lyricsText": "",
+    "clipId": null
   },
   {
     "id": 107,
@@ -825,7 +883,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 108,
@@ -839,7 +898,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 109,
@@ -853,7 +913,8 @@
     "country": "uzbekistan",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1010,
@@ -867,7 +928,8 @@
     "country": "Turkey",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1011,
@@ -881,7 +943,8 @@
     "country": "Turkey",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1012,
@@ -895,7 +958,8 @@
     "country": "japan",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1013,
@@ -909,7 +973,8 @@
     "country": "korea",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1014,
@@ -923,7 +988,8 @@
     "country": "usa",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1015,
@@ -937,7 +1003,8 @@
     "country": "britaniya",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1016,
@@ -951,7 +1018,8 @@
     "country": "qozogiston",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1017,
@@ -965,7 +1033,8 @@
     "country": "qozogiston",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   },
   {
     "id": 1018,
@@ -979,6 +1048,7 @@
     "country": "qozogiston",
     "type": "music",
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
-    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz"
+    "lyricsText": "Medina, Medina, seni topmoqchiman\nShahar bo'ylab izlayman seni\nMedina, yuragimda yashaysan\nQachon ko'rishni istayman\n\nTungi yo'llarda yuringanman\nSening ovozingni eshitaman\nMedina, keling, qaytamiz\nBirlikda yashaymiz biz",
+    "clipId": null
   }
 ]

@@ -7,6 +7,8 @@ const albumSongSchema = new mongoose.Schema(
     artist: { type: String, trim: true, default: '' },
     audio: { type: String, trim: true, default: '' },
     lyricsText: { type: String, default: '' },
+    /** Shu qo‘shiqning kliplari: oddiy klip va mood-klip. Bo‘sh bo‘lsa bog‘lanish yo‘q. */
+    clipIds: { type: [Number], default: [] },
   },
   { _id: false }
 );

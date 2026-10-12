@@ -805,7 +805,11 @@ const MusicAlbumDetail = () => {
               source="homeFeed"
               forceSkeleton={showHeroDataSkeleton}
             />
-            <RecommendedClips album={album} forceSkeleton={showHeroDataSkeleton} />
+            <RecommendedClips
+              album={album}
+              source="detailRecommend"
+              forceSkeleton={showHeroDataSkeleton}
+            />
           </div>
           <div className="music-detail-right-scroll">
             {showTrendSectionSkeleton ? (

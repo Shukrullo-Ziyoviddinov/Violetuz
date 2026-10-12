@@ -1132,7 +1132,11 @@ const MusicDetail = () => {
               source="albumHomeFeed"
               forceSkeleton={showHeroDataSkeleton}
             />
-            <RecommendedClips music={music} forceSkeleton={showHeroDataSkeleton} />
+            <RecommendedClips
+              music={music}
+              source="detailRecommend"
+              forceSkeleton={showHeroDataSkeleton}
+            />
           </div>
           {showMixColumn ? (
             <div className="music-detail-side">

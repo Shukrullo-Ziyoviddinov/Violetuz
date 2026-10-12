@@ -5,6 +5,7 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import { useRecommendedClips } from '../../services/recommendedClipsService';
+import { useDetailRecommendClips } from '../../hooks/useDetailRecommendClips';
 import { useMusicApi } from '../../context/MusicApiContext';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
@@ -155,6 +156,8 @@ const RecommendedClips = ({
   klip,
   titleKey = 'music.recommendedClips',
   forceSkeleton = false,
+  /** 'detailRecommend' — musiqa va albom sahifasidagi kliplar. */
+  source,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -163,10 +166,19 @@ const RecommendedClips = ({
   const { getArtistById } = useMusicApi();
 
   const item = music || album || klip;
-  const { items: recommendedClips, isLoading } = useRecommendedClips(
-    item,
+  const detailRecommend = source === 'detailRecommend';
+  const page = music || album;
+  const { items: localClips, isLoading: localLoading } = useRecommendedClips(
+    detailRecommend ? null : item,
     klip ? { excludeId: klip.id } : {}
   );
+  const { items: routeClips, isLoading: routeLoading } = useDetailRecommendClips({
+    enabled: detailRecommend,
+    pageType: page?.type,
+    pageId: page?.id,
+  });
+  const recommendedClips = detailRecommend ? routeClips : localClips;
+  const isLoading = detailRecommend ? routeLoading : localLoading;
 
   const getTitleText = (it) => {
     if (!it?.title) return '';

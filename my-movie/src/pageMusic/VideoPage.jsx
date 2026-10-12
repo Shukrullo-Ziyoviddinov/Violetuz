@@ -808,6 +808,7 @@ const VideoPage = () => {
             <SimilarSongs
               klip={video}
               titleKey="music.recommendedMusic"
+              source="detailRecommend"
               forceSkeleton={showHeroDataSkeleton}
             />
             <AlbumsForYou
