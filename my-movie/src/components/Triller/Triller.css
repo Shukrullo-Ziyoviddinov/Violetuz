@@ -669,7 +669,7 @@
     display: block;
     position: static !important;
     top: auto !important;
-    font-size: 1.15rem;
+    font-size: 1.35rem;
     margin: 0;
     padding: 0.75rem 0 0;
     background: #000;
@@ -715,17 +715,50 @@
   }
 
   .triller-side-title--pin {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     position: static;
     margin: 0;
     padding: 0;
+    font-size: 1.1rem;
+    line-height: 1;
     background: transparent;
     border-bottom: none;
     box-shadow: none;
     max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .triller-side-title-text {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    line-height: 1;
+  }
+
+  .triller-side-title-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 1em;
+    height: 1em;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .triller-side-title-reset svg {
+    width: 1em;
+    height: 1em;
+    display: block;
   }
 
   .triller-sticky-filter {
@@ -806,11 +839,6 @@
 }
 
 @media (max-width: 450px) {
-  .triller-player-title--mobile,
-  .triller-side-title--pin {
-    font-size: 18px;
-  }
-
   .triller-sticky-bar {
     min-height: 1.9rem;
   }

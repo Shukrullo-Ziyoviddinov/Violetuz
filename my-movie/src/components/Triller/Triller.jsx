@@ -22,6 +22,7 @@ const SHEET_FLING_VELOCITY = 0.72;
 const SHEET_FLING_MIN_RATIO = 0.18;
 const SHEET_SETTLE_MS = 420;
 const SIDE_SKELETON_COUNT = 6;
+const GENRE_RESET_SKELETON_MS = 700;
 
 const TrillerCommentsSkeleton = ({ className = '', count = 4 }) => (
   <div className={`triller-comments${className ? ` ${className}` : ''}`} aria-hidden="true">
@@ -75,9 +76,11 @@ const Triller = ({ activeId }) => {
   const isImmersiveVideoRef = useRef(false);
   const sheetSettlingRef = useRef(null);
   const settleTimerRef = useRef(null);
+  const resetTimerRef = useRef(0);
 
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [showGenreFilter, setShowGenreFilter] = useState(false);
+  const [listResetting, setListResetting] = useState(false);
   const [isImmersiveVideo, setIsImmersiveVideo] = useState(false);
   const [sheetDragProgress, setSheetDragProgress] = useState(0);
   const [isSheetDragging, setIsSheetDragging] = useState(false);
@@ -423,11 +426,15 @@ const Triller = ({ activeId }) => {
   useEffect(() => {
     setSelectedGenre('all');
     setShowGenreFilter(false);
+    setListResetting(false);
+    window.clearTimeout(resetTimerRef.current);
     filterPinnedRef.current = false;
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
     collapseImmersiveVideo({ instant: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTriller?.id]);
+
+  useEffect(() => () => window.clearTimeout(resetTimerRef.current), []);
 
   useEffect(() => {
     isImmersiveVideoRef.current = isImmersiveVideo;
@@ -504,6 +511,16 @@ const Triller = ({ activeId }) => {
     setSelectedGenre(id);
   };
 
+  const handleResetGenre = () => {
+    if (selectedGenre === 'all' || listResetting) return;
+    filterPinnedRef.current = false;
+    setShowGenreFilter(false);
+    setSelectedGenre('all');
+    setListResetting(true);
+    window.clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = window.setTimeout(() => setListResetting(false), GENRE_RESET_SKELETON_MS);
+  };
+
   const handleSelect = (item) => {
     if (!item?.id) return;
     navigate(`/triller/${item.id}`, { replace: true });
@@ -535,7 +552,7 @@ const Triller = ({ activeId }) => {
     ? { '--triller-sheet-progress': sheetDragProgress }
     : undefined;
 
-  const sideItems = showLoading
+  const sideItems = showLoading || listResetting
     ? Array.from({ length: SIDE_SKELETON_COUNT }, (_, i) => ({ id: `sk-side-${i}` }))
     : filteredSideTrillers;
 
@@ -688,7 +705,22 @@ const Triller = ({ activeId }) => {
               />
             ) : (
               <h2 className="triller-side-title triller-side-title--pin triller-sticky-title">
-                {forYouTitle}
+                {selectedGenre !== 'all' ? (
+                  <button
+                    type="button"
+                    className="triller-side-title-reset"
+                    aria-label={t('triller.filterAll', 'Barchasi')}
+                    onClick={handleResetGenre}
+                  >
+                    <svg viewBox="4 4 16 16" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                      />
+                    </svg>
+                  </button>
+                ) : null}
+                <span className="triller-side-title-text">{forYouTitle}</span>
               </h2>
             )}
             <div className="triller-sticky-filter" aria-hidden={!showGenreFilter}>
@@ -713,7 +745,7 @@ const Triller = ({ activeId }) => {
             )}
             <div className="triller-side-list">
               {sideItems.map((item) =>
-                showLoading ? (
+                showLoading || listResetting ? (
                   <TrillerSideCard key={item.id} loading />
                 ) : (
                   <TrillerSideCard key={item.id} triller={item} onSelect={handleSelect} />
