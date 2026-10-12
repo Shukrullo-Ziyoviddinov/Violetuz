@@ -705,6 +705,7 @@ const Triller = ({ activeId }) => {
               />
             ) : (
               <h2 className="triller-side-title triller-side-title--pin triller-sticky-title">
+                <span className="triller-side-title-text">{forYouTitle}</span>
                 {selectedGenre !== 'all' ? (
                   <button
                     type="button"
@@ -720,7 +721,6 @@ const Triller = ({ activeId }) => {
                     </svg>
                   </button>
                 ) : null}
-                <span className="triller-side-title-text">{forYouTitle}</span>
               </h2>
             )}
             <div className="triller-sticky-filter" aria-hidden={!showGenreFilter}>
