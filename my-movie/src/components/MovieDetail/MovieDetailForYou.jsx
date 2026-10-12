@@ -171,11 +171,11 @@ const MovieDetailForYou = ({ movieId }) => {
       });
   };
 
-  const handleGenreSelect = (genre) => {
-    if (genre === selectedGenreRef.current || initialLoading) return;
+  const handleGenreSelect = (genre, { pin = true } = {}) => {
+    if (genre === selectedGenreRef.current || initialLoading || replacing) return;
     selectedGenreRef.current = genre;
     setSelectedGenre(genre);
-    if (!isDesktop) {
+    if (pin && !isDesktop) {
       const bar = headingBarRef.current;
       const sheet = bar?.closest('.movie-detail-sheet');
       if (bar && sheet) {
@@ -262,7 +262,24 @@ const MovieDetailForYou = ({ movieId }) => {
             className={`movie-detail-for-you-heading-bar${showGenreFilter ? ' is-filter' : ''}`}
           >
             <h2 className="movie-detail-for-you-heading">
-              {t('movies.forYou', 'Siz uchun tavsiyalar')}
+              <span className="movie-detail-for-you-heading-text">
+                {t('movies.forYou', 'Siz uchun tavsiyalar')}
+              </span>
+              {selectedGenre !== 'all' ? (
+                <button
+                  type="button"
+                  className="movie-detail-for-you-heading-reset"
+                  aria-label={t('movies.filterAll', 'Hammasi')}
+                  onClick={() => handleGenreSelect('all', { pin: false })}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fill="currentColor"
+                      d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                    />
+                  </svg>
+                </button>
+              ) : null}
             </h2>
             <div className="movie-detail-for-you-heading-filter" aria-hidden={!showGenreFilter}>
               <ScrollTouch className="movie-detail-for-you-filter">

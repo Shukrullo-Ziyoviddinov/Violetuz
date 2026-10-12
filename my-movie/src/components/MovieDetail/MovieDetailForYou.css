@@ -5,12 +5,44 @@
 }
 
 .movie-detail-for-you-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin: 0 0 0.7rem;
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.2;
   min-height: calc(1.25rem * 1.2);
   color: #fff;
+}
+
+.movie-detail-for-you-heading-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.movie-detail-for-you-heading-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.movie-detail-for-you-heading-reset svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  display: block;
 }
 
 .movie-detail-for-you-heading-skeleton {
