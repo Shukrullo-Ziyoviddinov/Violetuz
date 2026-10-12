@@ -369,7 +369,7 @@ body.video-detail-page-active {
 
 .video-detail-info .video-detail-title,
 .video-detail-artist-name {
-  font-size: 18px;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #fff;
   line-height: 1.3;
@@ -680,7 +680,7 @@ body.video-detail-page-active {
 }
 
 .video-detail-artist-name {
-  font-size: 18px;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #fff;
   line-height: 1.3;
