@@ -180,6 +180,83 @@ if (guestMarkMatches('music', 'album') || guestMarkMatches('klip', 'konsert')) {
   fail('album or concert counted as a song or clip');
 } else ok('album and concert marks are not songs or clips');
 
+const popClip = (id, artistId, year, language = 'en') => clip(id, {
+  artistId,
+  genre: 'pop',
+  language,
+  country: 'us',
+  year,
+});
+
+const spacedIds = idsOf(assembleDetailRecommend({
+  page: { type: 'music', artistId: 'a', genre: 'pop', language: 'en', country: 'us' },
+  catalog: [
+    popClip(1, 'a', 2026),
+    popClip(2, 'a', 2025),
+    popClip(3, 'a', 2024),
+    popClip(4, 'a', 2023),
+    popClip(5, 'a', 2022),
+    popClip(6, 'a', 2021),
+    popClip(7, 'a', 2020),
+    popClip(8, 'a', 2019),
+    popClip(10, 'b', 2018),
+    popClip(11, 'c', 2017),
+    popClip(12, 'd', 2016),
+    popClip(13, 'e', 2015),
+  ],
+  seenIds: [],
+}));
+
+const runsOf = (ids, activeIds) => {
+  const runs = [];
+  let run = 0;
+  for (const id of ids) {
+    if (activeIds.has(id)) {
+      run += 1;
+    } else if (run) {
+      runs.push(run);
+      run = 0;
+    }
+  }
+  if (run) runs.push(run);
+  return runs;
+};
+
+if (spacedIds.slice(0, 3).join(',') !== '1,2,3') {
+  fail('artist block is not the three newest: ' + spacedIds.join(','));
+} else if (spacedIds.includes('7') || spacedIds.includes('8')) {
+  fail('genre step kept more than 3 active artist clips');
+} else if (runsOf(spacedIds.slice(3), new Set(['4', '5', '6'])).some((run) => run > 2)) {
+  fail('active artist runs past 2 inside the genre step: ' + spacedIds.join(','));
+} else if (spacedIds.join(',') !== '1,2,3,10,4,5,11,6,12,13') {
+  fail('genre mix order: ' + spacedIds.join(','));
+} else ok('genre step mixes the active artist inside itself');
+
+const otherIds = idsOf(assembleDetailRecommend({
+  page: { type: 'music', artistId: 'a', genre: 'pop', language: 'en', country: 'us' },
+  catalog: [
+    popClip(1, 'a', 2026),
+    popClip(2, 'a', 2025),
+    popClip(3, 'a', 2024),
+    popClip(10, 'b', 2023),
+    popClip(11, 'c', 2022),
+    popClip(4, 'a', 2021, 'uz'),
+    popClip(5, 'a', 2020, 'uz'),
+    popClip(6, 'a', 2019, 'uz'),
+    popClip(7, 'a', 2018, 'uz'),
+    popClip(12, 'b', 2017, 'uz'),
+  ],
+  seenIds: [],
+}));
+
+if (otherIds.slice(0, 5).join(',') !== '1,2,3,10,11') {
+  fail('other language mixed into the genre step: ' + otherIds.join(','));
+} else if (otherIds.includes('7')) {
+  fail('other-language step kept more than 3 active artist clips');
+} else if (otherIds.slice(5).join(',') !== '4,5,12,6') {
+  fail('other-language mix order: ' + otherIds.join(','));
+} else ok('other-language step mixes inside itself');
+
 if (errors.length) {
   console.log('FAILED ' + errors.length);
   process.exit(1);

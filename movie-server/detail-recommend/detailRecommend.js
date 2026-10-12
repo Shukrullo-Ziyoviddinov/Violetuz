@@ -11,9 +11,8 @@
  * Katalog shu faylda: video sahifa — qo'shiq, musiqa va albom sahifa — klip.
  * Konsert klip qatoriga kirmaydi.
  *
- * Yig'ish shu faylda: bog'langan element birinchi, keyin ijrochi,
- * keyin janr va til. Tarix faqat shu hovuz ichida tartibni almashtiradi.
- * Qator qisqa bo'lsa shu janr, boshqa til. Katalog qolgani qo'shilmaydi.
+ * Yig'ish shu faylda: bog'langan element birinchi, keyin ijrochi bloki.
+ * 3-qadam va qisqa qator qadami o'z ichida aralashadi, bir-biriga qo'shilmaydi.
  *
  * @module detail-recommend/detailRecommend
  */
@@ -52,6 +51,15 @@ const detailRecommendWeights = {
 
   /** Shu ijrochidan, bog'langan elementdan tashqari, ko'pi bilan shuncha. Yangiroq yil yuqoriroq. */
   artistMax: 3,
+
+  /**
+   * 3-qadam ichida, va alohida qisqa qator qadami ichida, aktiv ijrochidan ko'pi bilan shuncha.
+   * 2-qadam blokiga qo'shilmaydi.
+   */
+  activeArtistStepMax: 3,
+
+  /** Shu qadam ichida aktiv ijrochi yonma-yon shunchadan oshmaydi. Boshqa ijrochi qolgan bo'lsa. */
+  activeArtistRunMax: 2,
 
   /** 3-qadam: janr va til birga mos keladi. */
   matchGenreWithLanguage: true,
@@ -387,6 +395,103 @@ const toSeenSet = (seenIds) => {
 };
 
 /**
+ * @param {Object} row
+ * @param {string} artistId
+ * @returns {boolean}
+ */
+const isActiveArtist = (row, artistId) => Boolean(artistId) && asText(row?.artistId) === artistId;
+
+/**
+ * @param {Object[]} rows
+ * @param {string} artistId
+ * @returns {number}
+ */
+const trailingActiveRun = (rows, artistId) => {
+  let run = 0;
+  for (let index = rows.length - 1; index >= 0; index -= 1) {
+    if (!isActiveArtist(rows[index], artistId)) break;
+    run += 1;
+  }
+  return run;
+};
+
+/**
+ * Kuchliroq aktiv ijrochi qoladi. Limitdan oshgani tushadi.
+ *
+ * @param {Object[]} rows
+ * @param {string} artistId
+ * @param {number} max
+ * @returns {Object[]}
+ */
+const capActiveArtist = (rows, artistId, max) => {
+  if (!artistId || !Number.isFinite(max) || max < 0) return rows;
+  let kept = 0;
+  const out = [];
+  for (const row of rows) {
+    if (isActiveArtist(row, artistId)) {
+      if (kept >= max) continue;
+      kept += 1;
+    }
+    out.push(row);
+  }
+  return out;
+};
+
+/**
+ * Aktiv ijrochi yonma-yon runMax tadan oshmaydi.
+ * Boshqa ijrochi qolmagan bo'lsa, qolgani o'z joyida turadi.
+ *
+ * @param {Object[]} rows
+ * @param {string} artistId
+ * @param {number} runMax
+ * @param {number} [initialRun]
+ * @returns {Object[]}
+ */
+const spaceActiveArtist = (rows, artistId, runMax, initialRun = 0) => {
+  if (!artistId || !Number.isFinite(runMax) || runMax <= 0) return rows.slice();
+  const pending = rows.slice();
+  const out = [];
+  let run = initialRun > 0 ? initialRun : 0;
+  while (pending.length) {
+    const active = isActiveArtist(pending[0], artistId);
+    if (!active || run < runMax) {
+      out.push(pending.shift());
+      run = active ? run + 1 : 0;
+      continue;
+    }
+    const otherIndex = pending.findIndex((row) => !isActiveArtist(row, artistId));
+    if (otherIndex === -1) {
+      out.push(pending.shift());
+      run += 1;
+      continue;
+    }
+    out.push(pending.splice(otherIndex, 1)[0]);
+    run = 0;
+  }
+  return out;
+};
+
+/**
+ * Qadam ichida: eshitilmagan oldin, keyin aktiv ijrochi limiti va aralashish.
+ *
+ * @param {Object[]} rows
+ * @param {string} artistId
+ * @param {Set<string>} seen
+ * @param {number} initialRun
+ * @returns {Object[]}
+ */
+const mixInsideStep = (rows, artistId, seen, initialRun) => {
+  const ordered = unseenFirst(rows, seen);
+  const capped = capActiveArtist(ordered, artistId, detailRecommendWeights.activeArtistStepMax);
+  return spaceActiveArtist(
+    capped,
+    artistId,
+    detailRecommendWeights.activeArtistRunMax,
+    initialRun
+  );
+};
+
+/**
  * Hovuz ichida eshitilmagan yoki ko'rilmagan oldinda. O'zaro tartib saqlanadi.
  *
  * @param {Object[]} rows
@@ -463,10 +568,17 @@ const assembleDetailRecommend = ({ page, catalog, seenIds } = {}) => {
   }
 
   const seen = toSeenSet(seenIds);
-  const pool = [...artistPicks, ...genrePool];
-  const ordered = detailRecommendWeights.linkedStaysFirst
-    ? [...linked, ...unseenFirst(pool, seen)]
-    : unseenFirst([...linked, ...pool], seen);
+  const artistOrdered = unseenFirst(artistPicks, seen);
+  const head = detailRecommendWeights.linkedStaysFirst
+    ? [...linked, ...artistOrdered]
+    : unseenFirst([...linked, ...artistOrdered], seen);
+  const genreOrdered = mixInsideStep(
+    genrePool,
+    artistId,
+    seen,
+    trailingActiveRun(head, artistId)
+  );
+  const ordered = [...head, ...genreOrdered];
 
   const result = ordered.slice(0, limit);
   if (!detailRecommendWeights.allowOtherLanguageIfShort || result.length >= limit) {
@@ -485,9 +597,15 @@ const assembleDetailRecommend = ({ page, catalog, seenIds } = {}) => {
     otherLanguage.push(row);
   }
   otherLanguage.sort(compareNewerYear(page));
+  const otherOrdered = mixInsideStep(
+    otherLanguage,
+    artistId,
+    seen,
+    trailingActiveRun(result, artistId)
+  );
 
   const filled = result.slice();
-  for (const row of unseenFirst(otherLanguage, seen)) {
+  for (const row of otherOrdered) {
     if (filled.length >= limit) break;
     filled.push(row);
   }
