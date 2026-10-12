@@ -1127,7 +1127,11 @@ const MusicDetail = () => {
             )}
             {/* forceSkeleton: refreshda music kelguncha image-wrapper skeletonlar turadi, bo‘lim yo‘qolmaydi */}
             <SimilarSongs music={music} forceSkeleton={showHeroDataSkeleton} />
-            <AlbumsForYou music={music} forceSkeleton={showHeroDataSkeleton} />
+            <AlbumsForYou
+              music={music}
+              source="albumHomeFeed"
+              forceSkeleton={showHeroDataSkeleton}
+            />
             <RecommendedClips music={music} forceSkeleton={showHeroDataSkeleton} />
           </div>
           {showMixColumn ? (

@@ -5,12 +5,20 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../../components/HorizontalScroll/HorizontalScroll';
 import { useRecommendedAlbums } from '../../services/recommendedAlbumsService';
+import { useAlbumHomeFeed } from '../../hooks/useAlbumHomeFeed';
 import { useMusicApi } from '../../context/MusicApiContext';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import './AlbumsForYou.css';
 
 const DEFAULT_SKELETON_COUNT = 8;
+
+const SECTION_BY_CATEGORY = {
+  TopAlbums: 'albums',
+  musicDropsData: 'music-drops',
+  sevgiVaMusiqaData: 'sevgi-va-musiqa',
+  hitCollectionsData: 'hit-collections',
+};
 
 const AlbumsForYouSkeletonCard = ({ id }) => (
   <div
@@ -132,7 +140,9 @@ const AlbumsForYouItem = ({
 
 /**
  * Siz uchun albomlar / O'xshash albomlar bo'limi.
- * music: type 'music'. album: type 'musicAlbom'. klip: type 'klip' yoki 'konsert' (VideoPage).
+ * music va klip + source albumHomeFeed: useAlbumHomeFeed.
+ * Konsert va albom detail o'xshash albomlar o'z yo'lida qoladi.
+ * album: type 'musicAlbom'. klip: type 'klip' yoki 'konsert' (VideoPage).
  *
  * forceSkeleton — parent hali music topmagan (refresh); image-wrapper skeletonlar darhol turadi.
  */
@@ -140,6 +150,7 @@ const AlbumsForYou = ({
   music,
   album,
   klip,
+  source,
   titleKey = 'music.albumsForYou',
   forceSkeleton = false,
 }) => {
@@ -147,13 +158,39 @@ const AlbumsForYou = ({
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getArtistById } = useMusicApi();
+  const { getArtistById, allAlbums, albumsLoading } = useMusicApi();
 
+  const fromAlbumHomeFeed = source === 'albumHomeFeed';
   const item = music || album || klip;
-  const { items: recommendedAlbums, isLoading } = useRecommendedAlbums(
-    item,
+  const { items: feedRows, isLoading: feedLoading } = useAlbumHomeFeed({
+    enabled: fromAlbumHomeFeed,
+  });
+  const { items: recommendedAlbums, isLoading: localLoading } = useRecommendedAlbums(
+    fromAlbumHomeFeed ? null : item,
     album ? { excludeId: album.id } : {}
   );
+
+  const homeFeedAlbums = useMemo(() => {
+    if (!fromAlbumHomeFeed) return [];
+    const byId = new Map((allAlbums || []).map((row) => [String(row.id), row]));
+    const out = [];
+    for (const row of feedRows) {
+      const albumItem = byId.get(String(row.contentId));
+      if (!albumItem) continue;
+      const type = String(albumItem.type || '');
+      if (type && type !== 'musicAlbom' && type !== 'album' && type !== 'music_album') continue;
+      out.push({
+        ...albumItem,
+        sectionId: SECTION_BY_CATEGORY[albumItem.categoryNameMusic] || 'albums',
+      });
+    }
+    return out;
+  }, [fromAlbumHomeFeed, allAlbums, feedRows]);
+
+  const displayAlbums = fromAlbumHomeFeed ? homeFeedAlbums : recommendedAlbums;
+  const isLoading = fromAlbumHomeFeed
+    ? feedLoading || (feedRows.length > 0 && albumsLoading && homeFeedAlbums.length === 0)
+    : localLoading;
 
   const getTitleText = (albumItem) => {
     if (!albumItem?.title) return '';
@@ -197,15 +234,15 @@ const AlbumsForYou = ({
   const awaitingCatalog =
     Boolean(forceSkeleton) || (!item && Boolean(isLoading));
   const showSectionSkeleton =
-    awaitingCatalog || (Boolean(isLoading) && recommendedAlbums.length === 0);
-  const itemsToRender = showSectionSkeleton ? skeletonItems : recommendedAlbums;
+    awaitingCatalog || (Boolean(isLoading) && displayAlbums.length === 0);
+  const itemsToRender = showSectionSkeleton ? skeletonItems : displayAlbums;
   const showTitleSkeleton = showSectionSkeleton;
 
   if (music && music.type !== 'music') return null;
   if (album && album.type !== 'musicAlbom') return null;
   if (klip && klip.type !== 'klip' && klip.type !== 'konsert') return null;
   if (!item && !showSectionSkeleton) return null;
-  if (!showSectionSkeleton && !recommendedAlbums.length) return null;
+  if (!showSectionSkeleton && !displayAlbums.length) return null;
 
   const renderCard = (albumItem) => {
     if (albumItem._skeleton) {

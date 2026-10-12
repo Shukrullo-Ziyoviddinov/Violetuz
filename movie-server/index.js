@@ -42,6 +42,12 @@ const startServer = async () => {
       coListen: { runImmediately: true, initialDelayMs: 30_000 },
     });
 
+    const { startAlbumHomeFeedSchedulers } = require('./album-home-feed/jobs');
+    startAlbumHomeFeedSchedulers({
+      feed: { runImmediately: true, initialDelayMs: 55_000 },
+      coListen: { runImmediately: true, initialDelayMs: 60_000 },
+    });
+
     const { ensureMixContentType } = require('./music-mixes/models/ensureMixContentType');
     await ensureMixContentType();
 

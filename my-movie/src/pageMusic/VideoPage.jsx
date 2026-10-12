@@ -810,7 +810,11 @@ const VideoPage = () => {
               titleKey="music.recommendedMusic"
               forceSkeleton={showHeroDataSkeleton}
             />
-            <AlbumsForYou klip={video} forceSkeleton={showHeroDataSkeleton} />
+            <AlbumsForYou
+              klip={video}
+              source={String(video?.type || '') === 'klip' ? 'albumHomeFeed' : undefined}
+              forceSkeleton={showHeroDataSkeleton}
+            />
             </div>
 
             <div
