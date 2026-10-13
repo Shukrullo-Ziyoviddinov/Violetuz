@@ -96,6 +96,18 @@ const ViewCount = ({
         aria-label={label}
       >
         {label}
+    </div>
+  );
+  }
+
+  if (loading) {
+    return (
+      <div
+        className={`${className || 'movie-detail-action-btn movie-detail-action-btn-views'} view-count-icon--loading`}
+        aria-busy="true"
+        aria-hidden="true"
+      >
+        <SkeletonLoader variant="view-count-icon" />
       </div>
     );
   }

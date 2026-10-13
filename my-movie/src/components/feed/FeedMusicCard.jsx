@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ViewCount from '../ViewCount/ViewCount';
 import './FeedMusicCard.css';
 
 const activateKey = (e) => e.key === 'Enter' || e.key === ' ';
@@ -106,6 +107,18 @@ const FeedMusicCard = ({ item }) => {
           </svg>
         </div>
       </div>
+
+      {(item.trackId != null || item.albumId != null) && (
+        <div className="feed-music-card-views-row">
+          <ViewCount
+            itemId={item.trackId != null ? item.trackId : item.albumId}
+            type={item.trackId != null ? 'music' : 'album'}
+            variant="icon"
+            record={false}
+            className="feed-music-card-views"
+          />
+        </div>
+      )}
     </div>
   );
 };
