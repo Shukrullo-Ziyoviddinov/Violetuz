@@ -295,6 +295,10 @@
   height: 0.66rem;
 }
 
+.feed-music-card--skeleton .skeleton-loader--feed-music-card-duration {
+  height: 8px;
+}
+
 .feed-music-card--skeleton .feed-music-card-type .skeleton-loader--feed-card-type {
   height: calc(0.79rem * 1.2);
 }
