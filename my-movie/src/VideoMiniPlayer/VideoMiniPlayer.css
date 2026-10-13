@@ -56,7 +56,7 @@ body.mini-player-visible .video-mini-player {
 .video-mini-player-progress span {
   display: block;
   height: 100%;
-  background: #ff0033;
+  background: linear-gradient(135deg, #bd02bd 0%, #9b4fe7 100%);
 }
 
 .video-mini-player-chrome {
@@ -180,14 +180,6 @@ body.mini-player-visible .video-mini-player {
   }
 
   .video-mini-player-meta {
-    padding: 0.4rem 0.5rem 0.5rem;
-  }
-
-  .video-mini-player-title {
-    font-size: 0.72rem;
-  }
-
-  .video-mini-player-artist {
-    font-size: 0.66rem;
+    display: none;
   }
 }
