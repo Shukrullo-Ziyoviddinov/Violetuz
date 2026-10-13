@@ -875,11 +875,8 @@
   width: 100%;
   margin-top: 1rem;
   padding: 0 0 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: transparent;
-  border-left: none;
-  border-right: none;
-  border-top: none;
+  border: none;
   cursor: pointer;
   color: inherit;
   text-align: left;
@@ -1205,6 +1202,16 @@
   .music-detail-trend-card {
     width: 100%;
   }
+
+  .music-detail-artist-card {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .load-more-lyrics {
+    padding: 0 0 0.5rem;
+    margin-top: 0.3rem;
+  }
 }
 
 @media (max-width: 580px) {
@@ -1325,6 +1332,6 @@
   }
   .music-detail-left {
     flex-shrink: 0;
-    width: 340px;
+    width: 344px;
   }
 }
