@@ -971,6 +971,14 @@
   border-radius: 4px;
 }
 
+.skeleton-loader--view-count-text {
+  width: 7.5rem;
+  max-width: 100%;
+  height: calc(0.9rem * 1.2);
+  border-radius: 4px;
+  margin: 0;
+}
+
 /* Video detail */
 .skeleton-loader--video-detail-info-artist {
   width: 7rem;

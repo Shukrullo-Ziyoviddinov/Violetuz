@@ -339,6 +339,16 @@
   text-overflow: ellipsis;
 }
 
+.music-detail-artist-row .view-count-text--loading .skeleton-loader--view-count-text {
+  width: 7.5rem;
+  height: calc(0.9rem * 1.2);
+}
+
+.music-detail-trend-card .view-count-text--loading .skeleton-loader--view-count-text {
+  width: 5.5rem;
+  height: calc(0.78rem * 1.2);
+}
+
 .music-detail-top {
   display: flex;
   flex-direction: column;

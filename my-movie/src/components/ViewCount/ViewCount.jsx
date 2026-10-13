@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { fetchViewCount, recordViewRequest } from '../../api/viewsApi';
 import { formatActionCount } from '../../utils/utils';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './ViewCount.css';
 
 /**
@@ -32,11 +33,13 @@ const ViewCount = ({
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
   const [viewCount, setViewCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (itemId == null || itemId === '' || !type) return undefined;
 
     let cancelled = false;
+    setLoading(true);
 
     const run = async () => {
       try {
@@ -46,14 +49,18 @@ const ViewCount = ({
           : await fetchViewCount({ id: itemId, type });
         if (!cancelled) {
           setViewCount(Number(data?.viewCount) || 0);
+          setLoading(false);
         }
       } catch {
         if (cancelled) return;
         try {
           const data = await fetchViewCount({ id: itemId, type });
-          if (!cancelled) setViewCount(Number(data?.viewCount) || 0);
+          if (!cancelled) {
+            setViewCount(Number(data?.viewCount) || 0);
+            setLoading(false);
+          }
         } catch {
-          /* ignore */
+          if (!cancelled) setLoading(false);
         }
       }
     };
@@ -69,6 +76,18 @@ const ViewCount = ({
   const formatted = countFormatter(viewCount);
 
   if (variant === 'text') {
+    if (loading) {
+      return (
+        <div
+          className={`${className || 'view-count-text'} view-count-text--loading`}
+          aria-busy="true"
+          aria-hidden="true"
+        >
+          <SkeletonLoader variant="view-count-text" />
+        </div>
+      );
+    }
+
     const label = t('views.times', { count: formatted });
     return (
       <div

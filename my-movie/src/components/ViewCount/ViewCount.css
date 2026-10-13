@@ -27,3 +27,9 @@
   line-height: 1.2;
   user-select: none;
 }
+
+.view-count-text--loading {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
