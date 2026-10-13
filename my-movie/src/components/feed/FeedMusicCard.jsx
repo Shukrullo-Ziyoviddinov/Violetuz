@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ViewCount from '../ViewCount/ViewCount';
+import ShareButton from '../ShareButton/ShareButton';
 import './FeedMusicCard.css';
 
 const activateKey = (e) => e.key === 'Enter' || e.key === ' ';
@@ -42,15 +43,16 @@ const FeedMusicCard = ({ item }) => {
 
   const openArtist = () => navigate(`/music/artist/${item.artistId}`);
 
+  const section = item.musicSectionId ? `?section=${encodeURIComponent(item.musicSectionId)}` : '';
+  const sharePath =
+    item.trackId != null
+      ? `/music/${item.trackId}${section}`
+      : item.albumId != null
+        ? `/music/album/${item.albumId}${section}`
+        : '';
+
   const openMusicDetail = () => {
-    const section = item.musicSectionId ? `?section=${encodeURIComponent(item.musicSectionId)}` : '';
-    if (item.trackId != null) {
-      navigate(`/music/${item.trackId}${section}`);
-      return;
-    }
-    if (item.albumId != null) {
-      navigate(`/music/album/${item.albumId}${section}`);
-    }
+    if (sharePath) navigate(sharePath);
   };
 
   return (
@@ -116,6 +118,14 @@ const FeedMusicCard = ({ item }) => {
             variant="icon"
             record={false}
             className="feed-music-card-views"
+          />
+          <ShareButton
+            movie={{ title: item.trackTitle || item.title || '' }}
+            sharePath={sharePath}
+            icon="send"
+            dropdownInPortal
+            className="feed-music-card-share-wrap"
+            buttonClassName="feed-music-card-share-button"
           />
         </div>
       )}
