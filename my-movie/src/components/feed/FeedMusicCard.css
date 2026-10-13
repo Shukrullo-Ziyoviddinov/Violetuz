@@ -272,6 +272,29 @@
   white-space: normal;
 }
 
+.feed-music-card--skeleton .feed-music-card-artist,
+.feed-music-card--skeleton .feed-music-card-track-name {
+  display: flex;
+  align-items: center;
+}
+
+.feed-music-card--skeleton .feed-music-card-artist {
+  height: calc(0.88rem * 1.2);
+  margin-bottom: 0.28rem;
+}
+
+.feed-music-card--skeleton .feed-music-card-track-name {
+  height: calc(0.79rem * 1.2);
+}
+
+.feed-music-card--skeleton .skeleton-loader--feed-music-card-artist {
+  height: 0.72rem;
+}
+
+.feed-music-card--skeleton .skeleton-loader--feed-music-card-track-name {
+  height: 0.66rem;
+}
+
 .feed-music-card--skeleton .feed-music-card-type .skeleton-loader--feed-card-type {
   height: calc(0.79rem * 1.2);
 }
