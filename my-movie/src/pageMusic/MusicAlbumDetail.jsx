@@ -134,7 +134,12 @@ const AlbumTrendCard = ({
         ) : (
           <>
             <span className="music-detail-trend-card-title">{item.title}</span>
-            <span className="music-detail-trend-card-artist">{item.artist}</span>
+            <div className="music-detail-trend-card-artist-wrap">
+              <span className="music-detail-trend-card-artist">{item.artist}</span>
+              {item?.id != null && (
+                <ViewCount itemId={item.id} type="album" variant="text" record={false} />
+              )}
+            </div>
             {item.year && (
               <span className="music-detail-trend-card-year">{item.year}</span>
             )}

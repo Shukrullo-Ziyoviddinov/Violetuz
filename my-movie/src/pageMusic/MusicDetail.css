@@ -317,9 +317,23 @@
   text-overflow: ellipsis;
 }
 
+.music-detail-trend-card-artist-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .music-detail-trend-card-artist {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-detail-trend-card .view-count-text {
+  font-size: 0.78rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

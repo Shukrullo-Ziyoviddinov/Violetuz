@@ -188,9 +188,14 @@ const MusicDetailTrendCard = ({
         ) : (
           <>
             <span className="music-detail-trend-card-title">{getTitle(item)}</span>
-            <span className="music-detail-trend-card-artist">
-              {itemArtist?.name || ''}
-            </span>
+            <div className="music-detail-trend-card-artist-wrap">
+              <span className="music-detail-trend-card-artist">
+                {itemArtist?.name || ''}
+              </span>
+              {item?.id != null && (
+                <ViewCount itemId={item.id} type="music" variant="text" record={false} />
+              )}
+            </div>
             <span className="music-detail-trend-card-meta">
               {item.year && (
                 <span className="music-detail-trend-card-year">{item.year}</span>
