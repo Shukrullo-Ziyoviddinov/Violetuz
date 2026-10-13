@@ -170,12 +170,15 @@ const MusicVideoPlayer = forwardRef(({
   };
 
   const handlePlayPause = () => {
-    if (videoRef.current) {
+    const el = videoRef.current;
+    if (el) {
       if (isPlayingRef.current) {
-        videoRef.current.pause();
+        el.__markWantPlay?.(false);
+        el.pause();
         flushListenProgress({ force: true });
       } else {
-        videoRef.current.play().catch(() => {});
+        el.__markWantPlay?.(true);
+        el.play().catch(() => {});
       }
     }
     showControlsWithDelay();

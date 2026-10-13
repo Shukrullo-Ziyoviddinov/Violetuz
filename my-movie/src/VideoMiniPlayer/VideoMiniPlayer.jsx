@@ -95,6 +95,17 @@ const VideoMiniPlayer = ({
           </button>
           <button
             type="button"
+            className="video-mini-player-btn video-mini-player-play"
+            aria-label={playing ? 'Pauza' : 'Ijro'}
+            onClick={(event) => {
+              event.stopPropagation();
+              onTogglePlay();
+            }}
+          >
+            {playing ? <PauseIcon /> : <PlayIcon />}
+          </button>
+          <button
+            type="button"
             className="video-mini-player-btn video-mini-player-close"
             aria-label="Videoni yopish"
             onClick={(event) => {

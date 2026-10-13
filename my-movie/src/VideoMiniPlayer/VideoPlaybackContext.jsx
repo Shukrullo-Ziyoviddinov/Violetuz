@@ -138,7 +138,7 @@ export const VideoPlaybackProvider = ({ children }) => {
     if (mode === 'hold') holdInView(park);
     else clearHold(park);
 
-    resumeIfNeeded();
+    if (mode !== 'detail') resumeIfNeeded();
   }, []);
 
   const registerDetailSlot = useCallback((node) => {
@@ -204,6 +204,14 @@ export const VideoPlaybackProvider = ({ children }) => {
   useEffect(() => {
     const video = mediaRef.current;
     if (!video) return undefined;
+
+    video.__markWantPlay = (next) => {
+      wantPlayRef.current = Boolean(next);
+      if (next) {
+        activatedRef.current = true;
+        setActivated(true);
+      }
+    };
 
     const onPlay = () => {
       wantPlayRef.current = true;
