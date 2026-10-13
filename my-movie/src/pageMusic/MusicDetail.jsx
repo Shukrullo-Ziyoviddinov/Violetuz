@@ -22,13 +22,12 @@ import {
   musicHomeRecKey,
 } from '../hooks/useHomeMusicCategoryRecommendations';
 import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
-import { useAuth } from '../context/AuthContext';
 import { useMusicMixes } from '../hooks/useMusicMixes';
 import { useSharedMix } from '../hooks/useSharedMix';
 import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
 import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
 import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
-import { recordViewRequest } from '../api/viewsApi';
+import ViewCount from '../components/ViewCount/ViewCount';
 import '../Music/YourMixes/YourMixes.css';
 import './MusicDetail.css';
 
@@ -213,7 +212,6 @@ const MusicDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const {
     allMusic,
@@ -449,18 +447,6 @@ const MusicDetail = () => {
 
   /** Sahifada ko'rsatilgan trekning rasmidan rang â€“ prev/next bilan navigatsiya qilganda ham to'g'ri ishlaydi */
   const pageDominantColor = useDominantColor(typeof music?.img === 'string' ? music.img : null);
-
-  // Login: ContentView yozuvi (UI yo‘q — son weekly-top-music-card da)
-  useEffect(() => {
-    if (!isLoggedIn || music?.id == null) return undefined;
-    let cancelled = false;
-    recordViewRequest({ id: music.id, type: 'music' }).catch(() => {
-      if (cancelled) return;
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [isLoggedIn, music?.id]);
 
   // On mount: load track and handle initial state (autoplay, keepModalOpen, syncFromPlayer)
   useEffect(() => {
@@ -879,6 +865,7 @@ const MusicDetail = () => {
                   ) : (
                     <h1 className="music-detail-title">{getTitle(music)}</h1>
                   )}
+                  <div className="music-detail-artist-row">
                   {(showArtistDataSkeleton || pageArtist) && (
                     <div
                       className={`music-detail-artist-block${
@@ -950,6 +937,10 @@ const MusicDetail = () => {
                       )}
                     </div>
                   )}
+                  {music?.id != null && (
+                    <ViewCount itemId={music.id} type="music" variant="text" />
+                  )}
+                  </div>
                 </div>
               </div>
               {music && isCurrentTrack && (

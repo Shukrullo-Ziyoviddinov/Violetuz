@@ -431,6 +431,25 @@
   }
 }
 
+.music-detail-artist-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1rem;
+  min-width: 0;
+}
+
+.music-detail-artist-row .music-detail-artist-block {
+  margin-top: 0;
+  min-width: 0;
+}
+
+.music-detail-artist-row .view-count-text {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .music-detail-artist-block {
   display: flex;
   align-items: center;

@@ -7,6 +7,7 @@ const Concert = require('../models/Concert.model');
 const Triller = require('../models/Triller.model');
 const ShortVideo = require('../models/ShortVideo.model');
 const MusicShort = require('../models/MusicShort.model');
+const Album = require('../models/Album.model');
 const { badRequest, notFound } = require('../utils/errors');
 
 const TYPE_ALIASES = Object.freeze({
@@ -18,6 +19,7 @@ const TYPE_ALIASES = Object.freeze({
   concert: 'konsert',
   triller: 'triller',
   trailer: 'trailer',
+  album: 'album',
   movietrailer: 'trailer',
   movieshorts: 'movieShorts',
   movieshort: 'movieShorts',
@@ -75,6 +77,11 @@ const assertItemExists = async (type, itemId) => {
     case 'music':
       doc = useNumeric
         ? await Music.findOne({ id: numericId }).select({ id: 1 }).lean()
+        : null;
+      break;
+    case 'album':
+      doc = useNumeric
+        ? await Album.findOne({ id: numericId }).select({ id: 1 }).lean()
         : null;
       break;
     case 'klip':

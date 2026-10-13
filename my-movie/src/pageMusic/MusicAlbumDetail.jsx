@@ -21,6 +21,7 @@ import {
   musicHomeRecKey,
 } from '../hooks/useHomeMusicCategoryRecommendations';
 import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
+import ViewCount from '../components/ViewCount/ViewCount';
 import './MusicDetail.css';
 import './MusicAlbumDetail.css';
 
@@ -520,6 +521,7 @@ const MusicAlbumDetail = () => {
                   ) : (
                     <h1 className="music-detail-title">{album.title}</h1>
                   )}
+                  <div className="music-detail-artist-row">
                   {(showArtistDataSkeleton || album) && (
                     <div
                       className={`music-detail-artist-block music-album-artist-block${
@@ -617,6 +619,10 @@ const MusicAlbumDetail = () => {
                       )}
                     </div>
                   )}
+                  {album?.id != null && (
+                    <ViewCount itemId={album.id} type="album" variant="text" />
+                  )}
+                  </div>
                 </div>
               </div>
               {album && (
