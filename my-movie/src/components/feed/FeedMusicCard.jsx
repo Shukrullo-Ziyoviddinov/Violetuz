@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ViewCount from '../ViewCount/ViewCount';
 import ShareButton from '../ShareButton/ShareButton';
+import { useWishlist } from '../../context/WishlistContext';
 import './FeedMusicCard.css';
 
 const activateKey = (e) => e.key === 'Enter' || e.key === ' ';
@@ -40,6 +41,7 @@ const FeedMusicDuration = ({ audioUrl }) => {
 
 const FeedMusicCard = ({ item }) => {
   const navigate = useNavigate();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const openArtist = () => navigate(`/music/artist/${item.artistId}`);
 
@@ -54,6 +56,10 @@ const FeedMusicCard = ({ item }) => {
   const openMusicDetail = () => {
     if (sharePath) navigate(sharePath);
   };
+
+  const wishlistId = item.trackId != null ? item.trackId : item.albumId;
+  const wishlistType = item.trackId != null ? 'music' : 'album';
+  const saved = wishlistId != null && isInWishlist(wishlistId, wishlistType);
 
   return (
     <div className="feed-music-card">
@@ -129,6 +135,30 @@ const FeedMusicCard = ({ item }) => {
             className="feed-music-card-share-wrap"
             buttonClassName="feed-music-card-share-button"
           />
+          <button
+            type="button"
+            className={`feed-music-card-save${saved ? ' active' : ''}`}
+            aria-label={saved ? "Sevimlilardan olib tashlash" : 'Saqlash'}
+            aria-pressed={saved}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleWishlist(wishlistId, wishlistType);
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill={saved ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
