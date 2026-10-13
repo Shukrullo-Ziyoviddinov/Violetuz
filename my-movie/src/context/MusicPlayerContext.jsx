@@ -14,6 +14,7 @@ import { createMusicMixPlaySignal } from '../utils/musicMixPlaySignal';
 import { takeMixTrack } from '../Music/YourMixes/mixPlaybackQueue';
 import { albumSongToTrack, ALBUM_TRACK_ID_OFFSET } from '../utils/albumSongToTrack';
 import MusicMiniPlayer from '../Music/MusicMiniPlayer/MusicMiniPlayer';
+import { registerMusicPause, requestPauseVideo } from '../VideoMiniPlayer/mediaPlaybackGate';
 import MusicPlayerModal from '../Music/MusicPlayerModal/MusicPlayerModal';
 import '../pageMusic/MusicDetail.css';
 
@@ -870,6 +871,18 @@ export const MusicPlayerProvider = ({ children }) => {
   }, [currentMusic]);
 
   const displayMusicForModal = currentMusic || lastMusicRef.current;
+
+  useEffect(() => registerMusicPause(() => {
+    const el = audioRef.current;
+    if (!el || el.paused) return;
+    el.pause();
+    setIsPlaying(false);
+    void flushListenProgress({ force: true });
+  }), [flushListenProgress]);
+
+  useEffect(() => {
+    if (isPlaying) requestPauseVideo();
+  }, [isPlaying]);
 
   /* Taqiqlangan sahifalarga kirganda musiqa avtomatik pauza */
   useEffect(() => {

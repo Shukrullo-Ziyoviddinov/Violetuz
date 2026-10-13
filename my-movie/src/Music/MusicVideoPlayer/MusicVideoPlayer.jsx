@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, forwardRef } from 'react';
+import React, { useRef, useState, useEffect, useCallback, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { createMusicListenProgressReporter } from '../../utils/musicListenProgressReporter';
@@ -21,6 +21,8 @@ const MusicVideoPlayer = forwardRef(({
   categoryNameMusic = null,
   /** Mix janr (catalog genre) — guest local ledger uchun */
   genre = null,
+  sharedMediaRef = null,
+  onMediaSlot = null,
 }, ref) => {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
@@ -569,6 +571,68 @@ const MusicVideoPlayer = forwardRef(({
     handlePlayPause();
   };
 
+  const sharedHandlersRef = useRef({});
+  sharedHandlersRef.current = {
+    handleTimeUpdate,
+    handleLoadedMetadata,
+    handleVideoClick,
+    flushListenProgress,
+    noteClipWatch,
+    onEnded,
+  };
+
+  useEffect(() => {
+    if (!sharedMediaRef) return undefined;
+    const el = sharedMediaRef.current;
+    if (!el) return undefined;
+    videoRef.current = el;
+    if (typeof ref === 'function') ref(el);
+    else if (ref) ref.current = el;
+    setIsPlaying(!el.paused && !el.ended);
+    setCurrentTime(el.currentTime || 0);
+    if (Number.isFinite(el.duration)) setDuration(el.duration);
+
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => {
+      setIsPlaying(false);
+      sharedHandlersRef.current.flushListenProgress({ force: true });
+    };
+    const onTime = () => sharedHandlersRef.current.handleTimeUpdate();
+    const onMeta = () => sharedHandlersRef.current.handleLoadedMetadata();
+    const onClick = (event) => sharedHandlersRef.current.handleVideoClick(event);
+    const onEndedEvent = (event) => {
+      sharedHandlersRef.current.noteClipWatch(el);
+      sharedHandlersRef.current.flushListenProgress({ force: true });
+      sharedHandlersRef.current.onEnded?.(event);
+    };
+    const onSeeked = () => sharedHandlersRef.current.noteClipWatch(el);
+
+    el.addEventListener('play', onPlay);
+    el.addEventListener('pause', onPause);
+    el.addEventListener('timeupdate', onTime);
+    el.addEventListener('loadedmetadata', onMeta);
+    el.addEventListener('loadeddata', onMeta);
+    el.addEventListener('canplay', onMeta);
+    el.addEventListener('click', onClick);
+    el.addEventListener('ended', onEndedEvent);
+    el.addEventListener('seeked', onSeeked);
+    return () => {
+      el.removeEventListener('play', onPlay);
+      el.removeEventListener('pause', onPause);
+      el.removeEventListener('timeupdate', onTime);
+      el.removeEventListener('loadedmetadata', onMeta);
+      el.removeEventListener('loadeddata', onMeta);
+      el.removeEventListener('canplay', onMeta);
+      el.removeEventListener('click', onClick);
+      el.removeEventListener('ended', onEndedEvent);
+      el.removeEventListener('seeked', onSeeked);
+    };
+  }, [sharedMediaRef, ref, contentId]);
+
+  const handleMediaSlot = useCallback((node) => {
+    onMediaSlot?.(node);
+  }, [onMediaSlot]);
+
   return (
     <div
       ref={videoWrapperRef}
@@ -582,32 +646,36 @@ const MusicVideoPlayer = forwardRef(({
       onTouchStart={handleVideoWrapperTouchStart}
       onTouchEnd={handleVideoWrapperTouchEnd}
     >
-      <video
-        ref={mergedVideoRef}
-        src={src}
-        className="music-vp-video"
-        poster={poster}
-        autoPlay={autoPlay}
-        playsInline
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => {
-          setIsPlaying(false);
-          flushListenProgress({ force: true });
-        }}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onLoadedData={handleLoadedMetadata}
-        onCanPlay={handleLoadedMetadata}
-        onClick={handleVideoClick}
-        onEnded={(e) => {
-          noteClipWatch(videoRef.current);
-          flushListenProgress({ force: true });
-          onEnded?.(e);
-        }}
-        onSeeked={() => {
-          noteClipWatch(videoRef.current);
-        }}
-      />
+      {sharedMediaRef ? (
+        <div ref={handleMediaSlot} className="music-vp-media-slot" />
+      ) : (
+        <video
+          ref={mergedVideoRef}
+          src={src}
+          className="music-vp-video"
+          poster={poster}
+          autoPlay={autoPlay}
+          playsInline
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => {
+            setIsPlaying(false);
+            flushListenProgress({ force: true });
+          }}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onLoadedData={handleLoadedMetadata}
+          onCanPlay={handleLoadedMetadata}
+          onClick={handleVideoClick}
+          onEnded={(e) => {
+            noteClipWatch(videoRef.current);
+            flushListenProgress({ force: true });
+            onEnded?.(e);
+          }}
+          onSeeked={() => {
+            noteClipWatch(videoRef.current);
+          }}
+        />
+      )}
 
       <div
         className={`music-vp-controls-overlay ${showControls ? 'show' : ''}`}

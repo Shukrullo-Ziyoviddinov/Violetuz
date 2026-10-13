@@ -13,6 +13,7 @@ import Repost from '../components/Repost/Repost';
 import ViewCount from '../components/ViewCount/ViewCount';
 import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
+import { useVideoPlayback } from '../VideoMiniPlayer/VideoPlaybackContext';
 import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenreFilter';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
 import MovieComments from '../components/MovieDetail/MovieComments';
@@ -90,6 +91,7 @@ const VideoPage = () => {
     artistsLoading,
   } = useMusicApi();
   const videoRef = useRef(null);
+  const { mediaRef, bindSession, registerDetailSlot } = useVideoPlayback();
   const mixQueueMemoryRef = useRef({});
   const commentsRef = useRef(null);
   const mainScrollRef = useRef(null);
@@ -359,10 +361,24 @@ const VideoPage = () => {
   }, []);
 
   useEffect(() => {
-    if (videoRef.current && video?.video) {
-      videoRef.current.load();
-    }
-  }, [id, video?.video]);
+    if (!video?.video || video.id == null) return;
+    const query = searchParams.toString();
+    bindSession({
+      id: video.id,
+      kind: isConcertVideo ? 'konsert' : 'klip',
+      title: video.title || '',
+      artistName: artist?.name || '',
+      cover: typeof video.img === 'string' ? video.img : '',
+      src: video.video,
+      route: `/music/video/${video.id}${query ? `?${query}` : ''}`,
+    });
+  }, [
+    video,
+    isConcertVideo,
+    artist?.name,
+    searchParams,
+    bindSession,
+  ]);
 
   const activeMixTracks = useMemo(() => {
     if (isSharedMix) {
@@ -597,6 +613,8 @@ const VideoPage = () => {
               {video?.video ? (
                 <MusicVideoPlayer
                   ref={videoRef}
+                  sharedMediaRef={mediaRef}
+                  onMediaSlot={registerDetailSlot}
                   src={video.video}
                   poster={video.img}
                   autoPlay
