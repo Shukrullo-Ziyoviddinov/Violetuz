@@ -1335,3 +1335,13 @@
     width: 344px;
   }
 }
+
+@media (max-width: 768px) {
+  body:has(.music-detail) .navbar-mobile {
+    display: none !important;
+  }
+
+  body:has(.music-detail) .App-main {
+    padding-bottom: 0 !important;
+  }
+}
