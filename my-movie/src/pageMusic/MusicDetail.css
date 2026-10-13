@@ -1,51 +1,46 @@
 .music-detail {
-  height: 100vh;
-  padding: 2rem 0;
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  height: auto;
+  padding: 1.5rem 1.5rem 2rem;
   box-sizing: border-box;
-  background: linear-gradient(to bottom, rgba(10, 10, 10, 0.95), #0a0a0a);
-  overflow: hidden;
-}
-
-@media (max-width: 650px) {
-  .music-detail {
-    background: #000;
-  }
+  background: #000;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .music-detail-container {
-  max-width: 1400px;
+  max-width: 1600px;
   width: 100%;
-  height: 100%;
+  height: auto;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .music-detail-layout {
-  display: flex;
-  gap: 1rem;
-  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 402px;
+  gap: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  align-items: start;
+  height: auto;
   min-height: 0;
 }
 
 .music-detail-left-scroll {
-  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   min-width: 0;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: auto;
-  transform: translateZ(0);
-  will-change: scroll-position;
-  contain: paint;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: visible;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  border: none;
 }
 
 .music-detail-left-scroll::-webkit-scrollbar {
@@ -53,22 +48,14 @@
 }
 
 .music-detail-right-scroll {
-  flex: 0 0 350px;
+  width: 100%;
   min-width: 0;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: auto;
-  transform: translateZ(0);
-  will-change: scroll-position;
-  contain: paint;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: visible;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  border: none;
 }
 
 .music-detail-right-scroll::-webkit-scrollbar {
@@ -76,16 +63,16 @@
 }
 
 .music-detail-side {
-  flex: 0 0 350px;
   min-width: 0;
   min-height: 0;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
 .music-detail-side > .music-detail-right-scroll {
-  flex: 1 1 0;
+  flex: 0 0 auto;
   width: 100%;
 }
 
@@ -342,7 +329,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  margin: -1.5rem -1.5rem 0 -1.5rem;
+  margin: 0;
   padding: 1.5rem 1.5rem 0 1.5rem;
   border-radius: 16px 16px 0 0;
 }
@@ -1143,33 +1130,60 @@
   }
 }
 
+@media (max-width: 1100px) and (min-width: 901px) {
+  .music-detail-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 1rem;
+  }
+}
+
 @media (max-width: 900px) {
   .music-detail {
+    min-height: 0;
     height: auto;
-    min-height: 100vh;
-    overflow: visible;
+    padding: 0;
+    background: #000;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 
   .music-detail-container {
     height: auto;
     overflow: visible;
+    padding: 0 0.7rem 1.25rem;
   }
 
   .music-detail-layout {
+    display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0;
+    width: 100%;
+    max-width: 100%;
     height: auto;
+    min-width: 0;
     min-height: 0;
+    grid-template-columns: unset;
+    align-items: stretch;
   }
 
   .music-detail-left-scroll,
   .music-detail-right-scroll {
     flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    align-self: stretch;
     min-height: 0;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: visible;
     will-change: auto;
     contain: none;
     transform: none;
+  }
+
+  .music-detail-left-scroll > * {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .music-detail-mix-scroll {
@@ -1200,10 +1214,11 @@
 
   .music-detail {
     padding: 0;
+    background: #000;
   }
 
   .music-detail-container {
-    padding: 0 0.7rem;
+    padding: 0 0.7rem 1.25rem;
   }
 }
 
