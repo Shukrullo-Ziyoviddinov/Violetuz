@@ -91,6 +91,11 @@
   );
 }
 
+.music-detail-side > .music-detail-mix-scroll.is-collapsed {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .music-detail-mix-scroll.is-collapsed .music-detail-mix-body {
   grid-template-rows: 0fr;
 }

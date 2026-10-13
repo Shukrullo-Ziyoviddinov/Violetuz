@@ -14,7 +14,7 @@
   }
 
   body.mini-player-visible .music-mix-sheet-dock {
-        --music-mix-chrome: calc(140px + env(safe-area-inset-bottom, 0px));
+        --music-mix-chrome: calc(81px + env(safe-area-inset-bottom, 0px));
   }
 }
 
