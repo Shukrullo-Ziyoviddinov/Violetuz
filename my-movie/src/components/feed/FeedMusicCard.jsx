@@ -111,14 +111,16 @@ const FeedMusicCard = ({ item }) => {
       </div>
 
       {(item.trackId != null || item.albumId != null) && (
-        <div className="feed-music-card-views-row">
-          <ViewCount
-            itemId={item.trackId != null ? item.trackId : item.albumId}
-            type={item.trackId != null ? 'music' : 'album'}
-            variant="icon"
-            record={false}
-            className="feed-music-card-views"
-          />
+        <div className="feed-music-card-actions">
+          <div className="feed-music-card-views-row">
+            <ViewCount
+              itemId={item.trackId != null ? item.trackId : item.albumId}
+              type={item.trackId != null ? 'music' : 'album'}
+              variant="icon"
+              record={false}
+              className="feed-music-card-views"
+            />
+          </div>
           <ShareButton
             movie={{ title: item.trackTitle || item.title || '' }}
             sharePath={sharePath}
