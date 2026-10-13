@@ -272,6 +272,40 @@
   color: rgba(155, 79, 231, 1);
 }
 
+.feed-movie-card--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.feed-movie-card-avatar--skeleton,
+.feed-movie-card-cover--skeleton,
+.feed-movie-card-name-verified--skeleton {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.feed-movie-card-name-verified--skeleton {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.feed-movie-card--skeleton .feed-movie-card-name-text,
+.feed-movie-card--skeleton .feed-movie-card-title,
+.feed-movie-card--skeleton .feed-movie-card-movie-meta,
+.feed-movie-card--skeleton .feed-movie-card-type {
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+}
+
+.feed-movie-card--skeleton .feed-movie-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow: visible;
+  white-space: normal;
+}
+
 @media (max-width: 700px) {
   .feed-movie-card-title {
     font-size: 16px;

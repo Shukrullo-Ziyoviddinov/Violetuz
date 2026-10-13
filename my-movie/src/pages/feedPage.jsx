@@ -104,7 +104,11 @@ const FeedPage = () => {
         onChangeCategory={setActiveCategory}
         onOpenMessages={openMessages}
       />
-      <FeedList items={feedItems} loading={feedLoading} />
+      <FeedList
+        items={feedItems}
+        loading={!authReady || feedLoading}
+        category={activeCategory}
+      />
       {isLoggedIn && hasMore ? (
         <div ref={sentinelRef} className="feed-page-sentinel" aria-hidden="true" />
       ) : null}

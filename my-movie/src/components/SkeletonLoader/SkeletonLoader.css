@@ -1322,6 +1322,104 @@
   border-radius: 10px;
 }
 
+.skeleton-loader--feed-card-avatar,
+.skeleton-loader--feed-card-verified,
+.skeleton-loader--feed-movie-card-cover,
+.skeleton-loader--feed-video-card-cover,
+.skeleton-loader--feed-video-card-badge,
+.skeleton-loader--feed-music-card-cover,
+.skeleton-loader--feed-music-card-play {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.skeleton-loader--feed-card-name {
+  width: 7.2rem;
+  max-width: 100%;
+  height: calc(0.88rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-card-type {
+  width: 4.6rem;
+  max-width: 100%;
+  height: calc(0.72rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-movie-card-title {
+  width: 78%;
+  height: calc(17px * 1.3);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-movie-card-movie-meta {
+  width: 52%;
+  height: calc(14px * 1.3);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-card-view-count {
+  width: 5.6rem;
+  height: calc(12px * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-card-uploaded-at {
+  width: 4.4rem;
+  height: calc(12px * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-card-chip {
+  width: 4.4rem;
+  height: 25px;
+  border-radius: 999px;
+}
+
+.skeleton-loader--feed-card-chip-short {
+  width: 2.7rem;
+  height: 25px;
+  border-radius: 999px;
+}
+
+.skeleton-loader--feed-card-fav {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.skeleton-loader--feed-video-card-title {
+  width: 82%;
+  height: calc(0.88rem * 1.3);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-video-card-artist {
+  width: 48%;
+  height: calc(0.88rem * 1.3);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-music-card-artist {
+  width: 72%;
+  height: calc(0.88rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-music-card-track-name {
+  width: 90%;
+  height: calc(0.79rem * 1.2);
+  border-radius: 4px;
+}
+
+.skeleton-loader--feed-music-card-duration {
+  width: 3.4rem;
+  height: calc(0.78rem * 1.2);
+  border-radius: 4px;
+}
+
 .skeleton-loader--profile-page-repost-empty-img {
   width: 100%;
   height: 100%;

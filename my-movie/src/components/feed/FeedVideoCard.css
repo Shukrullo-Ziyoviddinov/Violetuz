@@ -315,3 +315,48 @@
   width: 1.2rem;
   height: 1.2rem;
 }
+
+.feed-video-card--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.feed-video-card-avatar--skeleton,
+.feed-video-card-cover--skeleton,
+.feed-artist-name-verified--skeleton,
+.feed-video-card-badge--skeleton {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.feed-artist-name-verified--skeleton {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.feed-video-card-badge--skeleton {
+  background: none;
+  padding: 0;
+  width: 3.4rem;
+  height: 1.15rem;
+}
+
+.feed-video-card--skeleton .feed-video-card-name-text,
+.feed-video-card--skeleton .feed-video-card-type,
+.feed-video-card--skeleton .feed-video-card-info .video-detail-title,
+.feed-video-card--skeleton .feed-video-card-info .video-detail-artist-name {
+  display: block;
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+
+.feed-video-card--skeleton .feed-video-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow: visible;
+  white-space: normal;
+}

@@ -235,6 +235,51 @@
   display: block;
 }
 
+.feed-music-card--skeleton {
+  pointer-events: none;
+}
+
+.feed-music-card-avatar--skeleton,
+.feed-music-card-cover--skeleton,
+.feed-music-card-play--skeleton,
+.feed-artist-name-verified--skeleton {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.feed-music-card-cover--skeleton {
+  width: 50px;
+  height: 50px;
+}
+
+.feed-music-card-play--skeleton {
+  background: transparent;
+}
+
+.feed-music-card-views-row--skeleton {
+  background: none;
+  padding: 0;
+  height: auto;
+}
+
+.feed-music-card--skeleton .feed-music-card-name-text,
+.feed-music-card--skeleton .feed-music-card-type,
+.feed-music-card--skeleton .feed-music-card-artist,
+.feed-music-card--skeleton .feed-music-card-track-name,
+.feed-music-card--skeleton .feed-music-card-duration {
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+}
+
+.feed-music-card--skeleton .feed-music-card-type .skeleton-loader--feed-card-type {
+  height: calc(0.79rem * 1.2);
+}
+
+.feed-music-card--skeleton .feed-music-card-actions > .skeleton-loader--feed-card-fav {
+  margin-left: auto;
+}
+
 @media (min-width: 900px) {
   .feed-music-card {
     min-height: 0;
