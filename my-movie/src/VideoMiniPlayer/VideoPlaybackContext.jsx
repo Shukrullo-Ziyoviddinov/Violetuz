@@ -11,7 +11,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import VideoMiniPlayer from './VideoMiniPlayer';
-import { registerVideoPause, requestPauseMusic } from './mediaPlaybackGate';
+import { registerVideoPause, requestPauseMovie, requestPauseMusic } from './mediaPlaybackGate';
 import './VideoMiniPlayer.css';
 
 const VideoPlaybackContext = createContext(null);
@@ -188,6 +188,7 @@ export const VideoPlaybackProvider = ({ children }) => {
       activatedRef.current = true;
       setActivated(true);
       requestPauseMusic();
+      requestPauseMovie();
       video.play().catch(() => {});
       return;
     }
@@ -219,6 +220,7 @@ export const VideoPlaybackProvider = ({ children }) => {
       setPlaying(true);
       setActivated(true);
       requestPauseMusic();
+      requestPauseMovie();
     };
     const onPause = () => setPlaying(false);
     const onTime = () => {

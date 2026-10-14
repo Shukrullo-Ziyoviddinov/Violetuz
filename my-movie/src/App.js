@@ -36,6 +36,7 @@ import { ViewedMoviesProvider } from './context/ViewedMoviesContext';
 import { ContentLanguageProvider } from './context/ContentLanguageContext';
 import { MusicPlayerProvider } from './context/MusicPlayerContext';
 import { VideoPlaybackProvider } from './VideoMiniPlayer/VideoPlaybackContext';
+import { MoviePlaybackProvider } from './MovieMiniPlayer/MoviePlaybackContext';
 import { LoadingProvider } from './context/LoadingContext';
 import { MoviesApiProvider } from './context/MoviesApiContext';
 import { ActorsApiProvider } from './context/ActorsApiContext';
@@ -130,9 +131,11 @@ function App() {
                   <ContentLanguageProvider>
                     <MusicPlayerProvider>
                       <VideoPlaybackProvider>
-                        <LoadingProvider>
-                          <AppShell />
-                        </LoadingProvider>
+                        <MoviePlaybackProvider>
+                          <LoadingProvider>
+                            <AppShell />
+                          </LoadingProvider>
+                        </MoviePlaybackProvider>
                       </VideoPlaybackProvider>
                     </MusicPlayerProvider>
                   </ContentLanguageProvider>

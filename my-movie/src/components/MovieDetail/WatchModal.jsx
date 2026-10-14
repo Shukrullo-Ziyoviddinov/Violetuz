@@ -6,11 +6,19 @@ import { useAuth } from '../../context/AuthContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { reportMovieProgress, fetchProgressConfig, DEFAULT_PROGRESS_CONFIG } from '../../api/recommendationsApi';
 import { addWatchEvent as addGuestMovieWatchEvent } from '../../utils/localStorage/guestHistory/movieGuestHistory';
+import { useMoviePlayback } from '../../MovieMiniPlayer/MoviePlaybackContext';
 import AdsMovie from './AdsMovie';
 import WatchSettingsModal from './WatchSettingsModal';
 import './WatchModal.css';
 
 const AD_INTERVAL_SECONDS = 900; // 15 daqiqa
+
+const continuingMedia = (mediaRef) => {
+  const el = mediaRef?.current;
+  if (!el?.currentSrc) return null;
+  if (el.currentTime <= 0.05 && el.paused) return null;
+  return el;
+};
 /** Progress serverga yuborish minimal oralig'i */
 const PROGRESS_REPORT_INTERVAL_MS = 30_000;
 
@@ -45,17 +53,21 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   }, [movie.id]);
 
   const videoRef = useRef(null);
+  const { mediaRef, bindSession, registerDetailSlot } = useMoviePlayback();
   const videoWrapperRef = useRef(null);
   const modalRef = useRef(null);
   const adsRef = useRef(null);
   const settingsBtnRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(() => {
+    const el = continuingMedia(mediaRef);
+    return Boolean(el && !el.paused && !el.ended);
+  });
   const [showControls, setShowControls] = useState(true);
 
   // Reklama state
   const [showAdOverlay, setShowAdOverlay] = useState(false);
   const showAdOverlayRef = useRef(false);
-  const hasUserStartedWatchingRef = useRef(false);
+  const hasUserStartedWatchingRef = useRef(Boolean(continuingMedia(mediaRef)));
   const lastAdAtVideoTimeRef = useRef(-1); // -1 = birinchi reklama hali ko'rsatilmagan
 
   // "Ko'rildi" + progress — ijro va oldinga o'tkazish. Orqaga ayirilmaydi.
@@ -71,7 +83,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
 
   // useRef - stale closure muammosini hal qilish uchun
   const hideControlsTimeoutRef = useRef(null);
-  const isPlayingRef = useRef(false);
+  const isPlayingRef = useRef(Boolean(continuingMedia(mediaRef) && !continuingMedia(mediaRef).paused));
   const showControlsRef = useRef(true);
 
   const handleWatchLangChange = (lang) => {
@@ -83,15 +95,18 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     setWatchVideoLang(lang);
   };
 
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(() => continuingMedia(mediaRef)?.currentTime || 0);
+  const [duration, setDuration] = useState(() => {
+    const dur = continuingMedia(mediaRef)?.duration;
+    return Number.isFinite(dur) ? dur : 0;
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [previewTime, setPreviewTime] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const playbackSpeedRef = useRef(1);
+  const [volume, setVolume] = useState(() => continuingMedia(mediaRef)?.volume ?? 1);
+  const [isMuted, setIsMuted] = useState(() => Boolean(continuingMedia(mediaRef)?.muted));
+  const [playbackSpeed, setPlaybackSpeed] = useState(() => continuingMedia(mediaRef)?.playbackRate || 1);
+  const playbackSpeedRef = useRef(playbackSpeed);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   
   const [touchStart, setTouchStart] = useState(null);
@@ -114,6 +129,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     if (showAdOverlay) return;
     if (videoRef.current) {
       if (isPlayingRef.current) {
+        videoRef.current.__markWantPlay?.(false);
         videoRef.current.pause();
       } else {
         if (!hasUserStartedWatchingRef.current && activeAd?.isActive) {
@@ -123,6 +139,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
         if (!hasUserStartedWatchingRef.current) {
           hasUserStartedWatchingRef.current = true;
         }
+        videoRef.current.__markWantPlay?.(true);
         videoRef.current.play().catch(() => {});
       }
     }
@@ -166,16 +183,30 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
 
   // Film almashganda view hisoblagichni reset
   useEffect(() => {
+    const el = mediaRef.current;
+    const sameMovie = Boolean(
+      el
+      && String(el.dataset.movieId) === String(movie?.id)
+      && continuingMedia(mediaRef)
+    );
+    if (sameMovie) {
+      hasUserStartedWatchingRef.current = true;
+      lastAdAtVideoTimeRef.current = Math.floor((el.currentTime || 0) / AD_INTERVAL_SECONDS);
+      mediaTimeRef.current = el.currentTime || 0;
+    } else {
+      hasUserStartedWatchingRef.current = false;
+      lastAdAtVideoTimeRef.current = -1;
+      mediaTimeRef.current = 0;
+    }
     viewMarkedRef.current = false;
     localViewedMarkedRef.current = false;
     accumulatedWatchSecRef.current = 0;
     watchHighWaterRef.current = 0;
-    mediaTimeRef.current = 0;
     lastWatchTickWallRef.current = null;
     lastReportedCompletionRef.current = null;
     lastReportAtRef.current = 0;
     progressInFlightRef.current = false;
-  }, [movie?.id]);
+  }, [mediaRef, movie?.id]);
 
   // Haqiqiy film progressi: watched / duration (threshold bilan chalkashtirilmasin).
   const buildCompletionRate = useCallback((watched, dur) => {
@@ -514,6 +545,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       const v = videoRef.current;
       const maxT = isFinite(v.duration) && v.duration > 0 ? v.duration : pending.time;
       v.currentTime = Math.min(pending.time, maxT);
+      v.__markWantPlay?.(Boolean(pending.play));
       if (pending.play) v.play().catch(() => {});
       seekAfterLangChangeRef.current = null;
     }
@@ -689,6 +721,96 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     handlePlayPause();
   };
 
+  const sharedHandlersRef = useRef({});
+  sharedHandlersRef.current = {
+    handleTimeUpdate,
+    handleLoadedMetadata,
+    handleVideoClick,
+    onPlay: () => {
+      isPlayingRef.current = true;
+      setIsPlaying(true);
+      lastWatchTickWallRef.current =
+        typeof performance !== 'undefined' ? performance.now() : Date.now();
+    },
+    onPause: () => {
+      isPlayingRef.current = false;
+      setIsPlaying(false);
+      lastWatchTickWallRef.current = null;
+      syncWatchProgress({ force: true });
+    },
+    onRateChange: (event) => {
+      if (event.target.playbackRate !== playbackSpeed) {
+        console.log('Rate mismatch! Expected:', playbackSpeed, 'Got:', event.target.playbackRate);
+      }
+    },
+  };
+
+  useEffect(() => {
+    const el = mediaRef.current;
+    if (!el) return undefined;
+    videoRef.current = el;
+    const continuing = Boolean(continuingMedia(mediaRef));
+    isPlayingRef.current = !el.paused && !el.ended;
+    setIsPlaying(isPlayingRef.current);
+    setCurrentTime(el.currentTime || 0);
+    if (Number.isFinite(el.duration)) setDuration(el.duration);
+    if (continuing) {
+      hasUserStartedWatchingRef.current = true;
+      lastAdAtVideoTimeRef.current = Math.floor((el.currentTime || 0) / AD_INTERVAL_SECONDS);
+      mediaTimeRef.current = el.currentTime || 0;
+      setVolume(el.volume);
+      setIsMuted(el.muted);
+      if (el.playbackRate) setPlaybackSpeed(el.playbackRate);
+    } else {
+      el.volume = volume;
+      el.muted = isMuted;
+      el.playbackRate = playbackSpeedRef.current;
+    }
+
+    const onPlay = () => sharedHandlersRef.current.onPlay();
+    const onPause = () => sharedHandlersRef.current.onPause();
+    const onTime = () => sharedHandlersRef.current.handleTimeUpdate();
+    const onMeta = () => sharedHandlersRef.current.handleLoadedMetadata();
+    const onClick = (event) => sharedHandlersRef.current.handleVideoClick(event);
+    const onRate = (event) => sharedHandlersRef.current.onRateChange(event);
+
+    el.addEventListener('play', onPlay);
+    el.addEventListener('pause', onPause);
+    el.addEventListener('timeupdate', onTime);
+    el.addEventListener('loadedmetadata', onMeta);
+    el.addEventListener('loadeddata', onMeta);
+    el.addEventListener('canplay', onMeta);
+    el.addEventListener('click', onClick);
+    el.addEventListener('ratechange', onRate);
+    return () => {
+      el.removeEventListener('play', onPlay);
+      el.removeEventListener('pause', onPause);
+      el.removeEventListener('timeupdate', onTime);
+      el.removeEventListener('loadedmetadata', onMeta);
+      el.removeEventListener('loadeddata', onMeta);
+      el.removeEventListener('canplay', onMeta);
+      el.removeEventListener('click', onClick);
+      el.removeEventListener('ratechange', onRate);
+    };
+  }, [mediaRef, volume, isMuted]);
+
+  useEffect(() => {
+    if (!movie?.id || !computedWatchVideoSrc) return;
+    const title = movie.title && typeof movie.title === 'object'
+      ? (movie.title[contentLang] || movie.title.uz || movie.title.ru || '')
+      : (movie.title || '');
+    bindSession({
+      id: movie.id,
+      title,
+      src: computedWatchVideoSrc,
+      route: `/movie/${movie.id}`,
+    });
+  }, [bindSession, computedWatchVideoSrc, contentLang, movie]);
+
+  const handleMediaSlot = useCallback((node) => {
+    registerDetailSlot(node);
+  }, [registerDetailSlot]);
+
   return (
     <div
       ref={modalRef}
@@ -704,32 +826,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
               onTouchStart={handleVideoWrapperTouchStart}
               onTouchEnd={handleVideoWrapperTouchEnd}
             >
-              <video
-                ref={videoRef}
-                src={computedWatchVideoSrc}
-                className="watch-modal-video movie-detail-video"
-                onPlay={() => {
-                  // Ref darhol — timeupdate birinchi ticklarda hisob to'xtamasin
-                  isPlayingRef.current = true;
-                  setIsPlaying(true);
-                  lastWatchTickWallRef.current =
-                    typeof performance !== 'undefined' ? performance.now() : Date.now();
-                }}
-                onPause={() => {
-                  isPlayingRef.current = false;
-                  setIsPlaying(false);
-                  lastWatchTickWallRef.current = null;
-                  syncWatchProgress({ force: true });
-                }}
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onLoadedData={handleLoadedMetadata}
-                onCanPlay={handleLoadedMetadata}
-                onClick={handleVideoClick}
-                onRateChange={(e) => {
-                  if (e.target.playbackRate !== playbackSpeed) console.log('Rate mismatch! Expected:', playbackSpeed, 'Got:', e.target.playbackRate);
-                }}
-              />
+              <div ref={handleMediaSlot} className="watch-modal-media-slot" />
               
               <AdsMovie
                 ref={adsRef}
