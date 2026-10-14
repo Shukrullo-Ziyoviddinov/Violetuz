@@ -7,7 +7,13 @@ const THRESHOLD = 80;
 const MOBILE_MAX_WIDTH = 768;
 const MAX_DROP_RATIO = 0.22;
 
-const DISABLED_ROUTES = ['/shorts', '/music/shorts'];
+const BLOCKED_PATHS = [
+  /^\/shorts$/,
+  /^\/music\/shorts$/,
+  /^\/movie\/[^/]+$/,
+  /^\/movie\/[^/]+\/trailer$/,
+  /^\/triller(?:\/[^/]+)?$/,
+];
 
 const MODAL_SELECTOR = [
   '.movie-detail-comments-modal',
@@ -53,8 +59,15 @@ const MODAL_SELECTOR = [
   '.triller-scroll-area',
   '.triller-pin',
   '.triller-player-frame',
+  '.movie-detail',
   '.movie-detail-sheet',
   '.movie-detail-image-block',
+  '.trailer-page',
+  '.trailer-modal',
+  '.trailer-modal-pin',
+  '.video-mini-player',
+  '.movie-mini-player',
+  '.video-mini-player-slot',
   '.video-detail',
   '.video-detail-pin',
   '.video-detail-body-scroll',
@@ -108,7 +121,7 @@ const PullToRefresh = ({ children }) => {
   const pullDistanceRef = useRef(0);
   const refreshingRef = useRef(false);
 
-  const isDisabled = DISABLED_ROUTES.includes(location.pathname);
+  const isDisabled = BLOCKED_PATHS.some((pattern) => pattern.test(location.pathname));
 
   const resetPull = useCallback(() => {
     pullingRef.current = false;
