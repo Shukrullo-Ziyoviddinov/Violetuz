@@ -87,6 +87,7 @@ const MovieMiniPlayer = ({
 
     const onDown = (event) => {
       if (event.button != null && event.button !== 0) return;
+      draggedRef.current = false;
       if (event.target.closest('.video-mini-player-btn')) return;
       const rect = el.getBoundingClientRect();
       dragRef.current = {
