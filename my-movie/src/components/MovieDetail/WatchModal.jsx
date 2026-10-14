@@ -8,7 +8,7 @@ import { reportMovieProgress, fetchProgressConfig, DEFAULT_PROGRESS_CONFIG } fro
 import { addWatchEvent as addGuestMovieWatchEvent } from '../../utils/localStorage/guestHistory/movieGuestHistory';
 import { MINI_VIDEO_KIND } from '../../MiniVideo/miniVideoSession';
 import { useMiniVideoPlayback } from '../../MiniVideo/MiniVideoPlaybackContext';
-import { requestPauseVideos } from '../../VideoMiniPlayer/mediaPlaybackGate';
+import { requestPauseVideos } from '../../MiniVideo/mediaPlaybackGate';
 import AdsMovie from './AdsMovie';
 import WatchSettingsModal from './WatchSettingsModal';
 import './WatchModal.css';

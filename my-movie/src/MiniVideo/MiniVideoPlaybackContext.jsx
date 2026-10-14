@@ -11,7 +11,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MiniVideoWindow from './MiniVideoWindow';
-import { claimVideoPlayback, registerVideoEngine } from '../VideoMiniPlayer/mediaPlaybackGate';
+import { claimVideoPlayback, registerVideoEngine } from './mediaPlaybackGate';
 import {
   MINI_VIDEO_KIND,
   mergeMiniVideoSession,
