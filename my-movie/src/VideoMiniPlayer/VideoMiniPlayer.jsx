@@ -47,7 +47,9 @@ const readDockBounds = (el) => {
   const musicOpen = document.body.classList.contains('mini-player-visible');
   const nav = document.querySelector('.navbar-container');
   const navBottom = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
-  const minTop = Math.max(77, navBottom);
+  const minTop = isMobile
+    ? (navBottom > 0 ? navBottom + 12 : 12)
+    : Math.max(77, navBottom);
   const bottomInset = isMobile
     ? (musicOpen ? 84 + 76 : 77)
     : (musicOpen ? 104 : 16);
