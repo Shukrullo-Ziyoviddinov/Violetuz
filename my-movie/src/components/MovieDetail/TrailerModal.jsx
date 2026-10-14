@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { formatActionCount } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -14,6 +14,8 @@ import TrillerDescription from '../Triller/TrillerDescription';
 import MovieComments from './MovieComments';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import { normalizeTrailerDescription } from '../../utils/trailerDescription';
+import { MINI_VIDEO_KIND } from '../../MiniVideo/miniVideoSession';
+import { useMiniVideoPlayback } from '../../MiniVideo/MiniVideoPlaybackContext';
 import './TrailerModal.css';
 
 /** Trailer reytinglari — kinodagi maydonlar (alohida kiritilmaydi) */
@@ -25,6 +27,13 @@ const TRAILER_MOVIE_RATINGS = [
 
 const hasMovieRating = (value) =>
   value != null && value !== '' && value !== 'none' && Number.isFinite(Number(value));
+
+const ownsTrailer = (el, trailerKey) => Boolean(
+  el
+  && trailerKey
+  && el.dataset.miniVideoKind === MINI_VIDEO_KIND.TREYLER
+  && String(el.dataset.miniVideoId) === String(trailerKey)
+);
 
 const getTrailerMovieRatings = (sourceMovie) => {
   if (!sourceMovie) return [];
@@ -47,6 +56,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { allMovies } = useMoviesApi();
+  const { mediaRef, session, bindSession, activateSession, registerDetailSlot, registerDetailKey } = useMiniVideoPlayback();
   const trailers = useMemo(() => {
     if (!movie) return [];
     if (movie.trailersVideo && Array.isArray(movie.trailersVideo)) {
@@ -105,8 +115,12 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
       setSelectedTrailer(null);
       return;
     }
-    setSelectedTrailer(trailers[0] || null);
-    // faqat film almashganda birinchi trailerni tanlash
+    const route = `/movie/${movie.id}/trailer`;
+    const active = session?.kind === MINI_VIDEO_KIND.TREYLER && session.route === route
+      ? trailers.find((trailer) => `${trailer.movieId || movie.id}-${trailer.id}` === String(session.id))
+      : null;
+    setSelectedTrailer(active || trailers[0] || null);
+    // faqat film almashganda aktiv treylerni yoki birinchisini tanlash
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movie?.id]);
 
@@ -574,6 +588,49 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     handleCollapseTouchEnd();
   };
 
+  const trailerSession = useMemo(() => {
+    if (!movie?.id || !selectedTrailer) return null;
+    const src = selectedTrailer.trailers?.[contentLang]
+      || selectedTrailer.trailers?.uz
+      || selectedTrailer.trailers?.ru
+      || '';
+    if (!src) return null;
+    const title = selectedTrailer.title?.[contentLang]
+      || selectedTrailer.title?.uz
+      || selectedTrailer.title?.ru
+      || '';
+    const movieTitle = movie.title && typeof movie.title === 'object'
+      ? (movie.title[contentLang] || movie.title.uz || movie.title.ru || '')
+      : (movie.title || '');
+    return {
+      kind: MINI_VIDEO_KIND.TREYLER,
+      id: getTrailerKey(selectedTrailer),
+      title,
+      subtitle: movieTitle,
+      src,
+      route: `/movie/${movie.id}/trailer`,
+    };
+  }, [contentLang, movie, selectedTrailer]);
+
+  const mediaActive = Boolean(
+    trailerSession
+    && session?.kind === MINI_VIDEO_KIND.TREYLER
+    && String(session.id) === String(trailerSession.id)
+  );
+
+  useLayoutEffect(() => {
+    registerDetailKey(isPage ? trailerSession?.id || null : null);
+  }, [isPage, registerDetailKey, trailerSession?.id]);
+
+  useLayoutEffect(() => () => registerDetailKey(null), [registerDetailKey]);
+
+  useEffect(() => {
+    if (!trailerSession) return;
+    const el = mediaRef.current;
+    if (!ownsTrailer(el, trailerSession.id)) return;
+    bindSession(trailerSession);
+  }, [bindSession, mediaRef, trailerSession]);
+
   if (!showLoading && (!trailers || trailers.length === 0)) {
     return (
       <div className={overlayClass} onClick={isPage ? undefined : onClose}>
@@ -607,19 +664,18 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
         >
             {(selectedTrailer || showLoading) && (
               <VideoPlayerControls
-                loading={showLoading}
-                src={
-                  selectedTrailer?.trailers?.[contentLang] ||
-                  selectedTrailer?.trailers?.uz ||
-                  selectedTrailer?.trailers?.ru ||
-                  ''
-                }
+                loading={showLoading && !mediaActive}
+                src={trailerSession?.src || ''}
                 resetKey={getTrailerKey(selectedTrailer)}
                 className=""
                 videoClassName="trailer-modal-video"
                 objectFit="contain"
                 onExpandToggle={isMobileViewport() ? handleExpandToggle : undefined}
                 expanded={isImmersiveVideo}
+                sharedMediaRef={isPage ? mediaRef : null}
+                onMediaSlot={isPage ? registerDetailSlot : null}
+                mediaActive={isPage && mediaActive}
+                onActivate={isPage && trailerSession ? () => activateSession(trailerSession) : null}
               />
             )}
           </div>

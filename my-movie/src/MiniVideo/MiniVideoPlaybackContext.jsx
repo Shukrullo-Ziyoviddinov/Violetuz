@@ -10,13 +10,23 @@ import React, {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
-import VideoMiniPlayer from './VideoMiniPlayer';
-import { registerVideoPause, requestPauseMovie, requestPauseMusic } from './mediaPlaybackGate';
-import './VideoMiniPlayer.css';
+import MiniVideoWindow from './MiniVideoWindow';
+import { claimVideoPlayback, registerVideoEngine } from '../VideoMiniPlayer/mediaPlaybackGate';
+import {
+  MINI_VIDEO_KIND,
+  mergeMiniVideoSession,
+  sessionMatchesDetailPath,
+} from './miniVideoSession';
+import './MiniVideoWindow.css';
 
-const VideoPlaybackContext = createContext(null);
+const MiniVideoPlaybackContext = createContext(null);
 
-const VIDEO_DETAIL_PATH = /^\/music\/video\/[^/]+$/;
+const DETAIL_CLASS = {
+  [MINI_VIDEO_KIND.KLIP]: 'music-vp-video video-persistent-media',
+  [MINI_VIDEO_KIND.KONSERT]: 'music-vp-video video-persistent-media',
+  [MINI_VIDEO_KIND.KINO]: 'watch-modal-video movie-detail-video movie-persistent-media',
+  [MINI_VIDEO_KIND.TREYLER]: 'trailer-modal-video video-persistent-media',
+};
 
 const createMediaElement = () => {
   const el = document.createElement('video');
@@ -34,7 +44,32 @@ const sameSource = (el, src) => {
   return el.currentSrc === absolute || el.src === absolute;
 };
 
-export const VideoPlaybackProvider = ({ children }) => {
+const windowLabels = (kind) => {
+  if (kind === MINI_VIDEO_KIND.KINO) {
+    return {
+      variant: 'movie',
+      ariaLabel: 'Faol kino',
+      openLabel: "Kino sahifasiga o'tish",
+      closeLabel: 'Kinoni yopish',
+    };
+  }
+  if (kind === MINI_VIDEO_KIND.TREYLER) {
+    return {
+      variant: 'movie',
+      ariaLabel: 'Faol treyler',
+      openLabel: "Treyler sahifasiga o'tish",
+      closeLabel: 'Treylerni yopish',
+    };
+  }
+  return {
+    variant: 'video',
+    ariaLabel: 'Faol video',
+    openLabel: "Video sahifasiga o'tish",
+    closeLabel: 'Videoni yopish',
+  };
+};
+
+export const MiniVideoPlaybackProvider = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const mediaRef = useRef(null);
@@ -47,6 +82,8 @@ export const VideoPlaybackProvider = ({ children }) => {
   const wantPlayRef = useRef(false);
   const playbackTimeRef = useRef(0);
   const lastRectRef = useRef(null);
+  const engineRef = useRef(null);
+  const detailKeyRef = useRef(null);
 
   if (mediaRef.current == null && typeof document !== 'undefined') {
     mediaRef.current = createMediaElement();
@@ -57,6 +94,8 @@ export const VideoPlaybackProvider = ({ children }) => {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [suppressed, setSuppressed] = useState(false);
+  const [detailKey, setDetailKey] = useState(null);
 
   locationRef.current = location;
   sessionRef.current = session;
@@ -108,8 +147,11 @@ export const VideoPlaybackProvider = ({ children }) => {
     if (!video.isConnected) park.appendChild(video);
 
     const path = locationRef.current.pathname;
-    const onVideoPage = VIDEO_DETAIL_PATH.test(path);
     const current = sessionRef.current;
+    const trailerMatches = !current
+      || current.kind !== MINI_VIDEO_KIND.TREYLER
+      || (detailKeyRef.current != null && String(detailKeyRef.current) === String(current.id));
+    const onDetailPage = sessionMatchesDetailPath(current, path) && trailerMatches;
     const detail = detailSlotRef.current;
     const mini = miniSlotRef.current;
     const keep = Boolean(
@@ -118,21 +160,21 @@ export const VideoPlaybackProvider = ({ children }) => {
     let target = park;
     let mode = 'park';
 
-    if (onVideoPage && detail) {
+    if (onDetailPage && detail) {
       rememberRect(detail);
       target = detail;
       mode = 'detail';
-    } else if (keep && !onVideoPage && mini) {
+    } else if (keep && !onDetailPage && mini) {
       target = mini;
       mode = 'mini';
-    } else if (keep && !onVideoPage) {
+    } else if (keep && !onDetailPage) {
       rememberRect(detail);
       mode = 'hold';
     }
 
     if (video.parentNode !== target) target.appendChild(video);
     video.className = mode === 'detail'
-      ? 'music-vp-video video-persistent-media'
+      ? (DETAIL_CLASS[current?.kind] || 'video-persistent-media')
       : 'video-mini-player-video video-persistent-media';
 
     if (mode === 'hold') holdInView(park);
@@ -146,19 +188,42 @@ export const VideoPlaybackProvider = ({ children }) => {
     placeVideo();
   }, [placeVideo]);
 
+  const registerDetailKey = useCallback((key) => {
+    const next = key == null || key === '' ? null : String(key);
+    if (detailKeyRef.current === next) {
+      placeVideo();
+      return;
+    }
+    detailKeyRef.current = next;
+    setDetailKey(next);
+    placeVideo();
+  }, [placeVideo]);
+
   const registerMiniSlot = useCallback((node) => {
     miniSlotRef.current = node;
     placeVideo();
   }, [placeVideo]);
 
   const bindSession = useCallback((next) => {
-    if (!next?.src || next.id == null) return;
-    setSession((prev) => {
-      if (prev && String(prev.id) === String(next.id) && prev.src === next.src) {
-        return { ...prev, ...next, src: prev.src };
-      }
-      return next;
-    });
+    setSession((prev) => mergeMiniVideoSession(prev, next));
+  }, []);
+
+  const activateSession = useCallback((next) => {
+    const video = mediaRef.current;
+    const session = mergeMiniVideoSession(null, next);
+    if (!video || !session) return;
+    setSession((prev) => mergeMiniVideoSession(prev, session));
+    video.dataset.miniVideoKind = session.kind;
+    video.dataset.miniVideoId = String(session.id);
+    if (!sameSource(video, session.src)) {
+      video.pause();
+      video.poster = session.cover || '';
+      video.src = session.src;
+    }
+    wantPlayRef.current = true;
+    activatedRef.current = true;
+    setActivated(true);
+    video.play().catch(() => {});
   }, []);
 
   const close = useCallback(() => {
@@ -166,6 +231,8 @@ export const VideoPlaybackProvider = ({ children }) => {
     if (video) {
       video.pause();
       video.removeAttribute('src');
+      delete video.dataset.miniVideoKind;
+      delete video.dataset.miniVideoId;
       video.load();
     }
     detailSlotRef.current = null;
@@ -187,8 +254,7 @@ export const VideoPlaybackProvider = ({ children }) => {
       wantPlayRef.current = true;
       activatedRef.current = true;
       setActivated(true);
-      requestPauseMusic();
-      requestPauseMovie();
+      claimVideoPlayback(engineRef.current);
       video.play().catch(() => {});
       return;
     }
@@ -198,8 +264,8 @@ export const VideoPlaybackProvider = ({ children }) => {
 
   const openDetail = useCallback(() => {
     const current = sessionRef.current;
-    if (!current) return;
-    navigate(current.route || `/music/video/${current.id}`);
+    if (!current?.route) return;
+    navigate(current.route);
   }, [navigate]);
 
   useEffect(() => {
@@ -219,8 +285,7 @@ export const VideoPlaybackProvider = ({ children }) => {
       activatedRef.current = true;
       setPlaying(true);
       setActivated(true);
-      requestPauseMusic();
-      requestPauseMovie();
+      claimVideoPlayback(engineRef.current);
     };
     const onPause = () => setPlaying(false);
     const onTime = () => {
@@ -248,20 +313,37 @@ export const VideoPlaybackProvider = ({ children }) => {
     };
   }, []);
 
-  useEffect(() => registerVideoPause(() => {
-    wantPlayRef.current = false;
-    const video = mediaRef.current;
-    if (!video || video.paused) return;
-    video.pause();
-    setPlaying(false);
-  }), []);
+  useEffect(() => {
+    const engine = {
+      pause: () => {
+        wantPlayRef.current = false;
+        const video = mediaRef.current;
+        if (video && !video.paused) video.pause();
+        setPlaying(false);
+      },
+      yield: () => {
+        engine.pause();
+        setSuppressed(true);
+      },
+      release: () => setSuppressed(false),
+    };
+    engineRef.current = engine;
+    return registerVideoEngine(engine);
+  }, []);
 
   useEffect(() => {
     const video = mediaRef.current;
     if (!video || !session?.src) return;
+    video.dataset.miniVideoKind = session.kind;
+    video.dataset.miniVideoId = String(session.id);
     if (sameSource(video, session.src)) return;
+    const autoplay = sessionMatchesDetailPath(session, locationRef.current.pathname)
+      && (session.kind === MINI_VIDEO_KIND.KLIP || session.kind === MINI_VIDEO_KIND.KONSERT);
+    if (!autoplay) wantPlayRef.current = false;
+    video.pause();
     video.poster = session.cover || '';
     video.src = session.src;
+    if (!autoplay) return;
     const pending = video.play();
     if (pending && typeof pending.then === 'function') {
       pending.then(() => {
@@ -277,7 +359,9 @@ export const VideoPlaybackProvider = ({ children }) => {
     placeVideo();
   });
 
-  const onVideoPage = VIDEO_DETAIL_PATH.test(location.pathname);
+  const trailerOnPage = session?.kind !== MINI_VIDEO_KIND.TREYLER
+    || (detailKey != null && String(detailKey) === String(session.id));
+  const onDetailPage = sessionMatchesDetailPath(session, location.pathname) && trailerOnPage;
   const media = mediaRef.current;
   const progressed = Boolean(
     activated
@@ -285,45 +369,53 @@ export const VideoPlaybackProvider = ({ children }) => {
     || playbackTimeRef.current > 0.05
     || (media && (media.currentTime > 0.05 || (!media.paused && media.currentSrc)))
   );
-  const showMini = Boolean(session && progressed && !onVideoPage);
+  const showMini = Boolean(session && progressed && !onDetailPage && !suppressed);
   const progress = duration > 0 ? currentTime / duration : 0;
+  const labels = windowLabels(session?.kind);
 
   const api = useMemo(
     () => ({
       mediaRef,
+      session,
       bindSession,
+      activateSession,
       registerDetailSlot,
+      registerDetailKey,
     }),
-    [bindSession, registerDetailSlot]
+    [session, bindSession, activateSession, registerDetailSlot, registerDetailKey]
   );
 
   return (
-    <VideoPlaybackContext.Provider value={api}>
+    <MiniVideoPlaybackContext.Provider value={api}>
       {children}
       <div ref={parkRef} className="video-persistent-park" />
       {showMini
         ? createPortal(
-          <VideoMiniPlayer
+          <MiniVideoWindow
             title={session.title || ''}
-            artistName={session.artistName || ''}
+            artistName={session.subtitle || ''}
             playing={playing}
             progress={progress}
             onRegisterSlot={registerMiniSlot}
             onClose={close}
             onOpenDetail={openDetail}
             onTogglePlay={togglePlay}
+            variant={labels.variant}
+            ariaLabel={labels.ariaLabel}
+            openLabel={labels.openLabel}
+            closeLabel={labels.closeLabel}
           />,
           document.body
         )
         : null}
-    </VideoPlaybackContext.Provider>
+    </MiniVideoPlaybackContext.Provider>
   );
 };
 
-export const useVideoPlayback = () => {
-  const value = useContext(VideoPlaybackContext);
+export const useMiniVideoPlayback = () => {
+  const value = useContext(MiniVideoPlaybackContext);
   if (!value) {
-    throw new Error('useVideoPlayback VideoPlaybackProvider ichida ishlatiladi');
+    throw new Error('useMiniVideoPlayback MiniVideoPlaybackProvider ichida ishlatiladi');
   }
   return value;
 };

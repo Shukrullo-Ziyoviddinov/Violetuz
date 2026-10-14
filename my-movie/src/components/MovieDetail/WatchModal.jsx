@@ -6,16 +6,27 @@ import { useAuth } from '../../context/AuthContext';
 import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { reportMovieProgress, fetchProgressConfig, DEFAULT_PROGRESS_CONFIG } from '../../api/recommendationsApi';
 import { addWatchEvent as addGuestMovieWatchEvent } from '../../utils/localStorage/guestHistory/movieGuestHistory';
-import { useMoviePlayback } from '../../MovieMiniPlayer/MoviePlaybackContext';
+import { MINI_VIDEO_KIND } from '../../MiniVideo/miniVideoSession';
+import { useMiniVideoPlayback } from '../../MiniVideo/MiniVideoPlaybackContext';
+import { requestPauseVideos } from '../../VideoMiniPlayer/mediaPlaybackGate';
 import AdsMovie from './AdsMovie';
 import WatchSettingsModal from './WatchSettingsModal';
 import './WatchModal.css';
 
 const AD_INTERVAL_SECONDS = 900; // 15 daqiqa
 
-const continuingMedia = (mediaRef) => {
+const ownsMovie = (el, movieId) => Boolean(
+  el
+  && movieId != null
+  && el.dataset.miniVideoKind === MINI_VIDEO_KIND.KINO
+  && String(el.dataset.miniVideoId) === String(movieId)
+);
+
+const continuingMedia = (mediaRef, movieId) => {
   const el = mediaRef?.current;
   if (!el?.currentSrc) return null;
+  if (el.dataset.miniVideoKind !== MINI_VIDEO_KIND.KINO) return null;
+  if (movieId != null && String(el.dataset.miniVideoId) !== String(movieId)) return null;
   if (el.currentTime <= 0.05 && el.paused) return null;
   return el;
 };
@@ -40,6 +51,20 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     return '';
   }, [videoUrl, movie.watchVideo, movie.watchUrl, watchVideoLang]);
 
+  const movieSession = useMemo(() => {
+    if (!movie?.id || !computedWatchVideoSrc) return null;
+    const title = movie.title && typeof movie.title === 'object'
+      ? (movie.title[contentLang] || movie.title.uz || movie.title.ru || '')
+      : (movie.title || '');
+    return {
+      kind: MINI_VIDEO_KIND.KINO,
+      id: movie.id,
+      title,
+      src: computedWatchVideoSrc,
+      route: `/movie/${movie.id}`,
+    };
+  }, [computedWatchVideoSrc, contentLang, movie]);
+
   const hasWatchVideoLangSwitch =
     !videoUrl &&
     movie.watchVideo &&
@@ -53,13 +78,13 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   }, [movie.id]);
 
   const videoRef = useRef(null);
-  const { mediaRef, bindSession, registerDetailSlot } = useMoviePlayback();
+  const { mediaRef, session, bindSession, activateSession, registerDetailSlot } = useMiniVideoPlayback();
   const videoWrapperRef = useRef(null);
   const modalRef = useRef(null);
   const adsRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(() => {
-    const el = continuingMedia(mediaRef);
+    const el = continuingMedia(mediaRef, movie?.id);
     return Boolean(el && !el.paused && !el.ended);
   });
   const [showControls, setShowControls] = useState(true);
@@ -67,7 +92,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   // Reklama state
   const [showAdOverlay, setShowAdOverlay] = useState(false);
   const showAdOverlayRef = useRef(false);
-  const hasUserStartedWatchingRef = useRef(Boolean(continuingMedia(mediaRef)));
+  const hasUserStartedWatchingRef = useRef(Boolean(continuingMedia(mediaRef, movie?.id)));
   const lastAdAtVideoTimeRef = useRef(-1); // -1 = birinchi reklama hali ko'rsatilmagan
 
   // "Ko'rildi" + progress — ijro va oldinga o'tkazish. Orqaga ayirilmaydi.
@@ -83,7 +108,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
 
   // useRef - stale closure muammosini hal qilish uchun
   const hideControlsTimeoutRef = useRef(null);
-  const isPlayingRef = useRef(Boolean(continuingMedia(mediaRef) && !continuingMedia(mediaRef).paused));
+  const isPlayingRef = useRef(Boolean(continuingMedia(mediaRef, movie?.id) && !continuingMedia(mediaRef, movie?.id).paused));
   const showControlsRef = useRef(true);
 
   const handleWatchLangChange = (lang) => {
@@ -95,17 +120,17 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     setWatchVideoLang(lang);
   };
 
-  const [currentTime, setCurrentTime] = useState(() => continuingMedia(mediaRef)?.currentTime || 0);
+  const [currentTime, setCurrentTime] = useState(() => continuingMedia(mediaRef, movie?.id)?.currentTime || 0);
   const [duration, setDuration] = useState(() => {
-    const dur = continuingMedia(mediaRef)?.duration;
+    const dur = continuingMedia(mediaRef, movie?.id)?.duration;
     return Number.isFinite(dur) ? dur : 0;
   });
   const [isDragging, setIsDragging] = useState(false);
   const [previewTime, setPreviewTime] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [volume, setVolume] = useState(() => continuingMedia(mediaRef)?.volume ?? 1);
-  const [isMuted, setIsMuted] = useState(() => Boolean(continuingMedia(mediaRef)?.muted));
-  const [playbackSpeed, setPlaybackSpeed] = useState(() => continuingMedia(mediaRef)?.playbackRate || 1);
+  const [volume, setVolume] = useState(() => continuingMedia(mediaRef, movie?.id)?.volume ?? 1);
+  const [isMuted, setIsMuted] = useState(() => Boolean(continuingMedia(mediaRef, movie?.id)?.muted));
+  const [playbackSpeed, setPlaybackSpeed] = useState(() => continuingMedia(mediaRef, movie?.id)?.playbackRate || 1);
   const playbackSpeedRef = useRef(playbackSpeed);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   
@@ -123,26 +148,28 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       hasUserStartedWatchingRef.current = true;
       lastAdAtVideoTimeRef.current = 0;
     }
+    if (movieSession) activateSession(movieSession);
   };
 
   const handlePlayPause = () => {
     if (showAdOverlay) return;
-    if (videoRef.current) {
-      if (isPlayingRef.current) {
-        videoRef.current.__markWantPlay?.(false);
-        videoRef.current.pause();
-      } else {
-        if (!hasUserStartedWatchingRef.current && activeAd?.isActive) {
-          adsRef.current?.showAd();
-          return;
-        }
-        if (!hasUserStartedWatchingRef.current) {
-          hasUserStartedWatchingRef.current = true;
-        }
-        videoRef.current.__markWantPlay?.(true);
-        videoRef.current.play().catch(() => {});
-      }
+    const el = mediaRef.current;
+    const owner = ownsMovie(el, movie?.id);
+    if (owner && isPlayingRef.current) {
+      el.__markWantPlay?.(false);
+      el.pause();
+      showControlsWithDelay();
+      return;
     }
+    if (!hasUserStartedWatchingRef.current && activeAd?.isActive) {
+      if (!owner) requestPauseVideos();
+      adsRef.current?.showAd();
+      return;
+    }
+    if (!hasUserStartedWatchingRef.current) {
+      hasUserStartedWatchingRef.current = true;
+    }
+    if (movieSession) activateSession(movieSession);
     showControlsWithDelay();
   };
 
@@ -185,9 +212,8 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
   useEffect(() => {
     const el = mediaRef.current;
     const sameMovie = Boolean(
-      el
-      && String(el.dataset.movieId) === String(movie?.id)
-      && continuingMedia(mediaRef)
+      ownsMovie(el, movie?.id)
+      && continuingMedia(mediaRef, movie?.id)
     );
     if (sameMovie) {
       hasUserStartedWatchingRef.current = true;
@@ -747,9 +773,15 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
 
   useEffect(() => {
     const el = mediaRef.current;
-    if (!el) return undefined;
+    const owner = ownsMovie(el, movie?.id);
+    if (!el || !owner) {
+      videoRef.current = null;
+      isPlayingRef.current = false;
+      setIsPlaying(false);
+      return undefined;
+    }
     videoRef.current = el;
-    const continuing = Boolean(continuingMedia(mediaRef));
+    const continuing = Boolean(continuingMedia(mediaRef, movie?.id));
     isPlayingRef.current = !el.paused && !el.ended;
     setIsPlaying(isPlayingRef.current);
     setCurrentTime(el.currentTime || 0);
@@ -792,20 +824,14 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
       el.removeEventListener('click', onClick);
       el.removeEventListener('ratechange', onRate);
     };
-  }, [mediaRef, volume, isMuted]);
+  }, [mediaRef, volume, isMuted, movie?.id, session?.kind, session?.id, session?.src]);
 
   useEffect(() => {
-    if (!movie?.id || !computedWatchVideoSrc) return;
-    const title = movie.title && typeof movie.title === 'object'
-      ? (movie.title[contentLang] || movie.title.uz || movie.title.ru || '')
-      : (movie.title || '');
-    bindSession({
-      id: movie.id,
-      title,
-      src: computedWatchVideoSrc,
-      route: `/movie/${movie.id}`,
-    });
-  }, [bindSession, computedWatchVideoSrc, contentLang, movie]);
+    if (!movieSession) return;
+    const el = mediaRef.current;
+    if (!ownsMovie(el, movieSession.id)) return;
+    bindSession(movieSession);
+  }, [bindSession, mediaRef, movieSession]);
 
   const handleMediaSlot = useCallback((node) => {
     registerDetailSlot(node);

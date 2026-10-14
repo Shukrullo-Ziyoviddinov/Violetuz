@@ -35,8 +35,7 @@ import ReactionsBootstrap from './components/ReactionsBootstrap';
 import { ViewedMoviesProvider } from './context/ViewedMoviesContext';
 import { ContentLanguageProvider } from './context/ContentLanguageContext';
 import { MusicPlayerProvider } from './context/MusicPlayerContext';
-import { VideoPlaybackProvider } from './VideoMiniPlayer/VideoPlaybackContext';
-import { MoviePlaybackProvider } from './MovieMiniPlayer/MoviePlaybackContext';
+import { MiniVideoPlaybackProvider } from './MiniVideo/MiniVideoPlaybackContext';
 import { LoadingProvider } from './context/LoadingContext';
 import { MoviesApiProvider } from './context/MoviesApiContext';
 import { ActorsApiProvider } from './context/ActorsApiContext';
@@ -130,13 +129,11 @@ function App() {
                 <Router>
                   <ContentLanguageProvider>
                     <MusicPlayerProvider>
-                      <VideoPlaybackProvider>
-                        <MoviePlaybackProvider>
-                          <LoadingProvider>
-                            <AppShell />
-                          </LoadingProvider>
-                        </MoviePlaybackProvider>
-                      </VideoPlaybackProvider>
+                      <MiniVideoPlaybackProvider>
+                        <LoadingProvider>
+                          <AppShell />
+                        </LoadingProvider>
+                      </MiniVideoPlaybackProvider>
                     </MusicPlayerProvider>
                   </ContentLanguageProvider>
                 </Router>

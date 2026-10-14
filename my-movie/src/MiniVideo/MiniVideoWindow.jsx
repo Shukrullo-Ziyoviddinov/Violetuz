@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import './VideoMiniPlayer.css';
+import './MiniVideoWindow.css';
 
 const OpenIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -59,7 +59,7 @@ const readDockBounds = (el) => {
   return { minTop, maxTop, leftX, rightX };
 };
 
-const VideoMiniPlayer = ({
+const MiniVideoWindow = ({
   title,
   artistName,
   playing,
@@ -68,6 +68,10 @@ const VideoMiniPlayer = ({
   onClose,
   onOpenDetail,
   onTogglePlay,
+  ariaLabel = 'Faol video',
+  openLabel = "Video sahifasiga o'tish",
+  closeLabel = 'Videoni yopish',
+  variant = 'video',
 }) => {
   const shellRef = useRef(null);
   const dragRef = useRef(null);
@@ -167,6 +171,22 @@ const VideoMiniPlayer = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (variant !== 'movie') return undefined;
+    const el = shellRef.current;
+    if (!el) return undefined;
+    const others = [...document.querySelectorAll('.video-mini-player')].filter((node) => node !== el);
+    if (!others.length) return undefined;
+    sideRef.current = 'left';
+    const bounds = readDockBounds(el);
+    const rect = el.getBoundingClientRect();
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+    el.style.left = `${bounds.leftX}px`;
+    el.style.top = `${rect.top}px`;
+    return undefined;
+  }, [variant]);
+
   const openFromStage = (event) => {
     if (draggedRef.current) return;
     if (event.target.closest('button')) return;
@@ -175,9 +195,12 @@ const VideoMiniPlayer = ({
   };
 
   const ratio = Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0;
+  const shellClass = variant === 'movie'
+    ? 'video-mini-player movie-mini-player'
+    : 'video-mini-player';
 
   return (
-    <aside ref={shellRef} className="video-mini-player" aria-label="Faol video">
+    <aside ref={shellRef} className={shellClass} aria-label={ariaLabel}>
       <div className="video-mini-player-stage" onClick={openFromStage}>
         <div ref={setSlot} className="video-mini-player-slot" />
         <div className="video-mini-player-progress" aria-hidden="true">
@@ -187,7 +210,7 @@ const VideoMiniPlayer = ({
           <button
             type="button"
             className="video-mini-player-btn video-mini-player-open"
-            aria-label="Video sahifasiga o'tish"
+            aria-label={openLabel}
             onClick={(event) => {
               event.stopPropagation();
               onOpenDetail();
@@ -220,7 +243,7 @@ const VideoMiniPlayer = ({
           <button
             type="button"
             className="video-mini-player-btn video-mini-player-close"
-            aria-label="Videoni yopish"
+            aria-label={closeLabel}
             onClick={(event) => {
               event.stopPropagation();
               onClose();
@@ -245,4 +268,4 @@ const VideoMiniPlayer = ({
   );
 };
 
-export default VideoMiniPlayer;
+export default MiniVideoWindow;

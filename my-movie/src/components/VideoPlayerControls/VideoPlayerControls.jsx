@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MusicSettingsModal from '../../Music/MusicVideoPlayer/MusicSettingsModal';
 import './VideoPlayerControls.css';
@@ -30,6 +30,10 @@ const VideoPlayerControls = ({
   onExpandToggle,
   expanded = false,
   autoPlay = false,
+  sharedMediaRef = null,
+  onMediaSlot = null,
+  mediaActive = false,
+  onActivate = null,
 }) => {
   const { t } = useTranslation();
   const videoRef = useRef(null);
@@ -130,6 +134,7 @@ const VideoPlayerControls = ({
   }, []);
 
   useEffect(() => {
+    if (sharedMediaRef) return undefined;
     if (loading || !src) return undefined;
     const video = videoRef.current;
     if (!video) return undefined;
@@ -161,9 +166,25 @@ const VideoPlayerControls = ({
       clearInterval(checkDuration);
       if (video) video.pause();
     };
-  }, [src, resetKey, loading, playbackSpeed, autoPlay]);
+  }, [src, resetKey, loading, playbackSpeed, autoPlay, sharedMediaRef]);
 
   const handlePlayPause = () => {
+    if (sharedMediaRef) {
+      const el = mediaActive ? videoRef.current : null;
+      if (el && isPlayingRef.current) {
+        el.__markWantPlay?.(false);
+        el.pause();
+      } else if (!mediaActive) {
+        onActivate?.();
+      } else if (el) {
+        el.__markWantPlay?.(true);
+        el.play().catch(() => {});
+      } else {
+        onActivate?.();
+      }
+      showControlsWithDelay();
+      return;
+    }
     if (videoRef.current) {
       if (isPlayingRef.current) {
         videoRef.current.pause();
@@ -410,6 +431,73 @@ const VideoPlayerControls = ({
     handlePlayPause();
   };
 
+  const sharedHandlersRef = useRef({});
+  sharedHandlersRef.current = {
+    handleTimeUpdate,
+    handleLoadedMetadata,
+    handleVideoClick,
+  };
+
+  useEffect(() => {
+    if (!sharedMediaRef) return undefined;
+    const el = sharedMediaRef.current;
+    if (!mediaActive || !el) {
+      videoRef.current = null;
+      isPlayingRef.current = false;
+      setIsPlaying(false);
+      return undefined;
+    }
+    videoRef.current = el;
+    const playingNow = !el.paused && !el.ended;
+    isPlayingRef.current = playingNow;
+    setIsPlaying(playingNow);
+    setCurrentTime(el.currentTime || 0);
+    if (Number.isFinite(el.duration)) setDuration(el.duration);
+    const continuing = el.currentTime > 0.05 || !el.paused;
+    if (continuing) {
+      setVolume(el.volume);
+      setIsMuted(el.muted);
+      if (el.playbackRate) setPlaybackSpeed(el.playbackRate);
+    } else {
+      el.volume = volume;
+      el.muted = isMuted;
+      el.playbackRate = playbackSpeed;
+    }
+
+    const onPlay = () => {
+      isPlayingRef.current = true;
+      setIsPlaying(true);
+    };
+    const onPause = () => {
+      isPlayingRef.current = false;
+      setIsPlaying(false);
+    };
+    const onTime = () => sharedHandlersRef.current.handleTimeUpdate();
+    const onMeta = () => sharedHandlersRef.current.handleLoadedMetadata();
+    const onClick = (event) => sharedHandlersRef.current.handleVideoClick(event);
+
+    el.addEventListener('play', onPlay);
+    el.addEventListener('pause', onPause);
+    el.addEventListener('timeupdate', onTime);
+    el.addEventListener('loadedmetadata', onMeta);
+    el.addEventListener('loadeddata', onMeta);
+    el.addEventListener('canplay', onMeta);
+    el.addEventListener('click', onClick);
+    return () => {
+      el.removeEventListener('play', onPlay);
+      el.removeEventListener('pause', onPause);
+      el.removeEventListener('timeupdate', onTime);
+      el.removeEventListener('loadedmetadata', onMeta);
+      el.removeEventListener('loadeddata', onMeta);
+      el.removeEventListener('canplay', onMeta);
+      el.removeEventListener('click', onClick);
+    };
+  }, [sharedMediaRef, mediaActive, volume, isMuted, playbackSpeed]);
+
+  const handleMediaSlot = useCallback((node) => {
+    onMediaSlot?.(node);
+  }, [onMediaSlot]);
+
   const wrapperClasses = ['trailer-modal-video-wrapper', 'video-player-controls', className]
     .filter(Boolean)
     .join(' ');
@@ -432,6 +520,8 @@ const VideoPlayerControls = ({
     >
       {loading ? (
         <div className="trailer-modal-video-placeholder" aria-hidden="true" />
+      ) : sharedMediaRef ? (
+        <div ref={handleMediaSlot} className="trailer-modal-media-slot" />
       ) : (
         <video
           ref={videoRef}

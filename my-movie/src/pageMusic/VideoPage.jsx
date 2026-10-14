@@ -13,7 +13,8 @@ import Repost from '../components/Repost/Repost';
 import ViewCount from '../components/ViewCount/ViewCount';
 import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
-import { useVideoPlayback } from '../VideoMiniPlayer/VideoPlaybackContext';
+import { MINI_VIDEO_KIND } from '../MiniVideo/miniVideoSession';
+import { useMiniVideoPlayback } from '../MiniVideo/MiniVideoPlaybackContext';
 import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenreFilter';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
 import MovieComments from '../components/MovieDetail/MovieComments';
@@ -91,7 +92,7 @@ const VideoPage = () => {
     artistsLoading,
   } = useMusicApi();
   const videoRef = useRef(null);
-  const { mediaRef, bindSession, registerDetailSlot } = useVideoPlayback();
+  const { mediaRef, bindSession, registerDetailSlot } = useMiniVideoPlayback();
   const mixQueueMemoryRef = useRef({});
   const commentsRef = useRef(null);
   const mainScrollRef = useRef(null);
@@ -365,9 +366,9 @@ const VideoPage = () => {
     const query = searchParams.toString();
     bindSession({
       id: video.id,
-      kind: isConcertVideo ? 'konsert' : 'klip',
+      kind: isConcertVideo ? MINI_VIDEO_KIND.KONSERT : MINI_VIDEO_KIND.KLIP,
       title: video.title || '',
-      artistName: artist?.name || '',
+      subtitle: artist?.name || '',
       cover: typeof video.img === 'string' ? video.img : '',
       src: video.video,
       route: `/music/video/${video.id}${query ? `?${query}` : ''}`,
