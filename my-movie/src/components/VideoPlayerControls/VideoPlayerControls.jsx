@@ -534,7 +534,12 @@ const VideoPlayerControls = ({
 
   const controlsOpen = showControls && !controlsSuppressed;
 
-  const wrapperClasses = ['trailer-modal-video-wrapper', 'video-player-controls', className]
+  const wrapperClasses = [
+    'trailer-modal-video-wrapper',
+    'video-player-controls',
+    controlsSuppressed ? 'video-player-controls--ads' : '',
+    className,
+  ]
     .filter(Boolean)
     .join(' ');
 

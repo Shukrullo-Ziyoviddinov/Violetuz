@@ -1,5 +1,13 @@
 /* Shared TrailerModal-style video controls (used by TrailerModal + Triller) */
 
+.video-player-controls--ads .trailer-modal-controls-overlay,
+.video-player-controls--ads .trailer-modal-bottom-controls,
+.video-player-controls--ads .trailer-modal-control-btn,
+.video-player-controls--ads .trailer-modal-icon-btn {
+  pointer-events: none !important;
+  visibility: hidden;
+}
+
 .video-player-controls.trailer-modal-video-wrapper {
   position: relative;
   width: 100%;
