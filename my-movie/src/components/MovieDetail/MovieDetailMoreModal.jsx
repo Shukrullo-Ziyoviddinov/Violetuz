@@ -19,6 +19,7 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
   const [dragging, setDragging] = useState(false);
   const [translateY, setTranslateY] = useState(0);
   const [sheetTop, setSheetTop] = useState(0);
+  const [animateTop, setAnimateTop] = useState(false);
   const [mobile, setMobile] = useState(isMobileViewport);
 
   const contentRef = useRef(null);
@@ -70,20 +71,26 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
       setSheetOpen(false);
       setClosing(false);
       setTranslateY(0);
+      setAnimateTop(false);
       translateYRef.current = 0;
       expandedRef.current = false;
       return undefined;
     }
     const nextMobile = isMobileViewport();
     setMobile(nextMobile);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const rest = measureVideoBottom();
     restTopRef.current = rest;
     expandedRef.current = false;
     sheetTopRef.current = rest;
     setSheetTop(rest);
+    setAnimateTop(false);
     if (!nextMobile) {
       setSheetOpen(true);
-      return undefined;
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
     }
     if (closeTimerRef.current) {
       window.clearTimeout(closeTimerRef.current);
@@ -92,10 +99,19 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
     closingRef.current = false;
     setClosing(false);
     setTranslateY(0);
+    translateYRef.current = 0;
+    let inner = 0;
     const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setSheetOpen(true));
+      inner = requestAnimationFrame(() => {
+        setAnimateTop(true);
+        setSheetOpen(true);
+      });
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(inner);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [open]);
 
   useEffect(() => {
@@ -112,15 +128,6 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
   }, [open]);
 
   useEffect(() => () => {
@@ -220,6 +227,7 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
       className={[
         'movie-detail-more-modal',
         dragging ? 'dragging' : '',
+        animateTop && !dragging ? 'movie-detail-more-modal--animate-top' : '',
         sheetOpen && !closing ? 'movie-detail-more-modal--open' : '',
         closing ? 'movie-detail-more-modal--closing' : '',
       ].filter(Boolean).join(' ')}
