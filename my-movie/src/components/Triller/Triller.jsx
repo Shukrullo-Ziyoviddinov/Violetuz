@@ -6,6 +6,8 @@ import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { fetchAllTrillers } from '../../api/trillersApi';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
+import { MINI_VIDEO_KIND } from '../../MiniVideo/miniVideoSession';
+import { useMiniVideoPlayback } from '../../MiniVideo/MiniVideoPlaybackContext';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import TrillerSideCard from './TrillerSideCard';
 import MediaGenreFilter from './MediaGenreFilter';
@@ -68,6 +70,7 @@ const Triller = ({ activeId }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { mediaRef, session, bindSession, activateSession, registerDetailSlot, registerDetailKey } = useMiniVideoPlayback();
   const scrollRef = useRef(null);
   const pinRef = useRef(null);
   const mobileTitleRef = useRef(null);
@@ -526,6 +529,38 @@ const Triller = ({ activeId }) => {
     navigate(`/triller/${item.id}`, { replace: true });
   };
 
+  const trillerSession = useMemo(() => {
+    if (!activeTriller?.id || !videoSrc) return null;
+    return {
+      kind: MINI_VIDEO_KIND.TRILLER,
+      id: activeTriller.id,
+      title: title || '',
+      cover: poster || '',
+      src: encodeURI(videoSrc),
+      route: `/triller/${activeTriller.id}`,
+    };
+  }, [activeTriller?.id, poster, title, videoSrc]);
+
+  const mediaActive = Boolean(
+    trillerSession
+    && session?.kind === MINI_VIDEO_KIND.TRILLER
+    && String(session.id) === String(trillerSession.id)
+  );
+
+  useLayoutEffect(() => {
+    registerDetailKey(trillerSession?.id ?? null);
+  }, [registerDetailKey, trillerSession?.id]);
+
+  useLayoutEffect(() => () => registerDetailKey(null), [registerDetailKey]);
+
+  useEffect(() => {
+    if (!trillerSession) return;
+    const el = mediaRef.current;
+    if (el?.dataset.miniVideoKind !== MINI_VIDEO_KIND.TRILLER) return;
+    if (String(el.dataset.miniVideoId) !== String(trillerSession.id)) return;
+    bindSession(trillerSession);
+  }, [bindSession, mediaRef, trillerSession]);
+
   const showLoading = Boolean(isPending);
 
   if (!showLoading && (isError || !activeTriller)) {
@@ -569,7 +604,7 @@ const Triller = ({ activeId }) => {
           >
             <div className="triller-player-frame">
               <VideoPlayerControls
-                src={videoSrc ? encodeURI(videoSrc) : ''}
+                src={trillerSession?.src || ''}
                 poster={poster || undefined}
                 resetKey={activeTriller?.id ?? 'triller-pending'}
                 videoClassName="trailer-modal-video"
@@ -578,6 +613,10 @@ const Triller = ({ activeId }) => {
                   !showLoading && isMobileViewport() ? handleExpandToggle : undefined
                 }
                 expanded={isImmersiveVideo}
+                sharedMediaRef={mediaRef}
+                onMediaSlot={registerDetailSlot}
+                mediaActive={mediaActive}
+                onActivate={trillerSession ? () => activateSession(trillerSession) : null}
               />
             </div>
           </div>

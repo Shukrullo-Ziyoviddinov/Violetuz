@@ -18,6 +18,12 @@
   background: #000;
 }
 
+.video-player-controls .trailer-modal-media-slot {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .video-player-controls .trailer-modal-video-placeholder {
   position: absolute;
   inset: 0;

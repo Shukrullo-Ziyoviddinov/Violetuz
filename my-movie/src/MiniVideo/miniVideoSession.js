@@ -3,6 +3,7 @@ export const MINI_VIDEO_KIND = {
   KONSERT: 'konsert',
   KINO: 'kino',
   TREYLER: 'treyler',
+  TRILLER: 'triller',
 };
 
 const KINDS = new Set(Object.values(MINI_VIDEO_KIND));
@@ -69,6 +70,10 @@ export const sessionMatchesDetailPath = (session, pathname) => {
   }
   if (session.kind === MINI_VIDEO_KIND.TREYLER) {
     return pathname === path && /^\/movie\/[^/]+\/trailer$/.test(pathname);
+  }
+  if (session.kind === MINI_VIDEO_KIND.TRILLER) {
+    const own = `/triller/${session.id}`;
+    return path === own && (pathname === own || pathname === '/triller');
   }
   if (session.kind === MINI_VIDEO_KIND.KLIP || session.kind === MINI_VIDEO_KIND.KONSERT) {
     return pathname === path && pathname === `/music/video/${session.id}`;

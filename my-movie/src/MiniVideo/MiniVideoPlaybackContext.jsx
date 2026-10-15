@@ -26,6 +26,7 @@ const DETAIL_CLASS = {
   [MINI_VIDEO_KIND.KONSERT]: 'music-vp-video video-persistent-media',
   [MINI_VIDEO_KIND.KINO]: 'watch-modal-video movie-detail-video movie-persistent-media',
   [MINI_VIDEO_KIND.TREYLER]: 'trailer-modal-video video-persistent-media',
+  [MINI_VIDEO_KIND.TRILLER]: 'trailer-modal-video video-persistent-media',
 };
 
 const createMediaElement = () => {
@@ -59,6 +60,14 @@ const windowLabels = (kind) => {
       ariaLabel: 'Faol treyler',
       openLabel: "Treyler sahifasiga o'tish",
       closeLabel: 'Treylerni yopish',
+    };
+  }
+  if (kind === MINI_VIDEO_KIND.TRILLER) {
+    return {
+      variant: 'movie',
+      ariaLabel: 'Faol triller',
+      openLabel: "Triller sahifasiga o'tish",
+      closeLabel: 'Trillerni yopish',
     };
   }
   return {
@@ -148,10 +157,11 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
 
     const path = locationRef.current.pathname;
     const current = sessionRef.current;
-    const trailerMatches = !current
-      || current.kind !== MINI_VIDEO_KIND.TREYLER
+    const needsDetailKey = current?.kind === MINI_VIDEO_KIND.TREYLER
+      || current?.kind === MINI_VIDEO_KIND.TRILLER;
+    const detailMatches = !needsDetailKey
       || (detailKeyRef.current != null && String(detailKeyRef.current) === String(current.id));
-    const onDetailPage = sessionMatchesDetailPath(current, path) && trailerMatches;
+    const onDetailPage = sessionMatchesDetailPath(current, path) && detailMatches;
     const detail = detailSlotRef.current;
     const mini = miniSlotRef.current;
     const keep = Boolean(
@@ -359,9 +369,11 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     placeVideo();
   });
 
-  const trailerOnPage = session?.kind !== MINI_VIDEO_KIND.TREYLER
+  const needsDetailKey = session?.kind === MINI_VIDEO_KIND.TREYLER
+    || session?.kind === MINI_VIDEO_KIND.TRILLER;
+  const detailOnPage = !needsDetailKey
     || (detailKey != null && String(detailKey) === String(session.id));
-  const onDetailPage = sessionMatchesDetailPath(session, location.pathname) && trailerOnPage;
+  const onDetailPage = sessionMatchesDetailPath(session, location.pathname) && detailOnPage;
   const media = mediaRef.current;
   const progressed = Boolean(
     activated
