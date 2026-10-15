@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MusicSettingsModal from '../../Music/MusicVideoPlayer/MusicSettingsModal';
 import FramePreviewPlayer from './FramePreviewPlayer';
+import VideoLoader from '../VideoLoader/VideoLoader';
 import './VideoPlayerControls.css';
 
 const SPEED_OPTIONS = [1, 1.5, 2];
@@ -76,6 +77,7 @@ const VideoPlayerControls = ({
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [frameSrc, setFrameSrc] = useState('');
+  const [mediaNode, setMediaNode] = useState(null);
 
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {
@@ -627,11 +629,13 @@ const VideoPlayerControls = ({
     const el = sharedMediaRef.current;
     if (!mediaActive || !el) {
       videoRef.current = null;
+      setMediaNode(null);
       isPlayingRef.current = false;
       setIsPlaying(false);
       return undefined;
     }
     videoRef.current = el;
+    setMediaNode(el);
     const playingNow = !el.paused && !el.ended;
     isPlayingRef.current = playingNow;
     setIsPlaying(playingNow);
@@ -684,6 +688,7 @@ const VideoPlayerControls = ({
 
   const setLocalVideo = useCallback((node) => {
     videoRef.current = node;
+    setMediaNode(node);
     if (typeof videoElementRef === 'function') videoElementRef(node);
     else if (videoElementRef) videoElementRef.current = node;
   }, [videoElementRef]);
@@ -754,6 +759,8 @@ const VideoPlayerControls = ({
           playsInline
         />
       )}
+
+      <VideoLoader video={mediaNode} />
 
       {!loading && (
         <>

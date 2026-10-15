@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import VideoLoader from '../components/VideoLoader/VideoLoader';
 import './MiniVideoWindow.css';
 
 const OpenIcon = () => (
@@ -68,6 +69,7 @@ const MiniVideoWindow = ({
   onClose,
   onOpenDetail,
   onTogglePlay,
+  mediaRef = null,
   ariaLabel = 'Faol video',
   openLabel = "Video sahifasiga o'tish",
   closeLabel = 'Videoni yopish',
@@ -203,6 +205,7 @@ const MiniVideoWindow = ({
     <aside ref={shellRef} className={shellClass} aria-label={ariaLabel}>
       <div className="video-mini-player-stage" onClick={openFromStage}>
         <div ref={setSlot} className="video-mini-player-slot" />
+        <VideoLoader videoRef={mediaRef} size="sm" />
         <div className="video-mini-player-progress" aria-hidden="true">
           <span style={{ width: `${ratio * 100}%` }} />
         </div>

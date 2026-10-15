@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import VideoLoader from '../VideoLoader/VideoLoader';
 
 const absoluteUrl = (src) => {
   if (!src || typeof window === 'undefined') return '';
@@ -91,15 +92,18 @@ const FramePreviewPlayer = forwardRef(function FramePreviewPlayer({ src }, ref) 
   }, [src]);
 
   return (
-    <video
-      ref={videoRef}
-      className="trailer-modal-frame-preview-video"
-      muted
-      playsInline
-      preload="none"
-      aria-hidden="true"
-      tabIndex={-1}
-    />
+    <>
+      <video
+        ref={videoRef}
+        className="trailer-modal-frame-preview-video"
+        muted
+        playsInline
+        preload="none"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+      <VideoLoader videoRef={videoRef} size="sm" />
+    </>
   );
 });
 

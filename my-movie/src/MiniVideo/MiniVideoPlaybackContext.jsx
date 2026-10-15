@@ -412,6 +412,7 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
             onClose={close}
             onOpenDetail={openDetail}
             onTogglePlay={togglePlay}
+            mediaRef={mediaRef}
             variant={labels.variant}
             ariaLabel={labels.ariaLabel}
             openLabel={labels.openLabel}
