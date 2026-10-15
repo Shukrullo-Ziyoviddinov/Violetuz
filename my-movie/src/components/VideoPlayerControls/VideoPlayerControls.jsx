@@ -66,6 +66,8 @@ const VideoPlayerControls = ({
   const framePointRef = useRef(null);
   const hoverTimerRef = useRef(null);
   const frameLoadTimerRef = useRef(null);
+  const pendingFrameTimeRef = useRef(null);
+  const lastFrameSeekAtRef = useRef(0);
   const controlsSuppressedRef = useRef(false);
   controlsSuppressedRef.current = controlsSuppressed;
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -166,40 +168,37 @@ const VideoPlayerControls = ({
   }, []);
 
   useEffect(() => {
-    const preview = framePreviewRef.current;
     const windowOpen = !controlsSuppressed && (isDragging ? Boolean(framePoint) : Boolean(hoverFrame));
     if (!windowOpen) {
+      pendingFrameTimeRef.current = null;
       if (frameLoadTimerRef.current) {
         clearTimeout(frameLoadTimerRef.current);
         frameLoadTimerRef.current = null;
       }
-      preview?.stop();
+      framePreviewRef.current?.stop();
       return undefined;
     }
 
-    if (!isDragging) {
-      if (frameLoadTimerRef.current) {
-        clearTimeout(frameLoadTimerRef.current);
-        frameLoadTimerRef.current = null;
-      }
-      if (Number.isFinite(hoverFrame?.time)) preview?.seek(hoverFrame.time);
-      return undefined;
-    }
+    const time = isDragging ? framePoint?.time : hoverFrame?.time;
+    if (time == null || !Number.isFinite(time)) return undefined;
+    pendingFrameTimeRef.current = time;
+    if (frameLoadTimerRef.current) return undefined;
 
-    if (frameLoadTimerRef.current) clearTimeout(frameLoadTimerRef.current);
-    frameLoadTimerRef.current = setTimeout(() => {
+    const flush = () => {
       frameLoadTimerRef.current = null;
-      const latest = framePointRef.current?.time;
+      const latest = pendingFrameTimeRef.current;
       if (latest == null || !Number.isFinite(latest)) return;
+      lastFrameSeekAtRef.current = Date.now();
       framePreviewRef.current?.seek(latest);
-    }, 180);
-
-    return () => {
-      if (frameLoadTimerRef.current) {
-        clearTimeout(frameLoadTimerRef.current);
-        frameLoadTimerRef.current = null;
-      }
     };
+
+    const wait = Math.max(0, 100 - (Date.now() - lastFrameSeekAtRef.current));
+    if (wait === 0) {
+      flush();
+      return undefined;
+    }
+    frameLoadTimerRef.current = setTimeout(flush, wait);
+    return undefined;
   }, [hoverFrame, isDragging, controlsSuppressed, framePoint]);
 
   useEffect(() => {
@@ -449,37 +448,29 @@ const VideoPlayerControls = ({
     return true;
   };
 
-  const closeHoverFrame = () => {
+  const closeHoverFrame = ({ stopVideo = false } = {}) => {
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
       hoverTimerRef.current = null;
     }
-    framePreviewRef.current?.stop();
+    if (stopVideo) framePreviewRef.current?.stop();
     setHoverFrame(null);
   };
 
   const clearFramePoint = () => {
-    closeHoverFrame();
+    closeHoverFrame({ stopVideo: true });
     if (framePointRef.current == null) return;
     framePointRef.current = null;
     setFramePoint(null);
   };
 
   const scheduleHoverFrame = () => {
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    setHoverFrame(null);
     const point = framePointRef.current;
     if (!point || controlsSuppressedRef.current) return;
-    hoverTimerRef.current = setTimeout(() => {
-      hoverTimerRef.current = null;
-      const latest = framePointRef.current;
-      if (!latest || controlsSuppressedRef.current) return;
-      if (Math.abs(latest.time - point.time) > 0.2) return;
-      setHoverFrame({
-        time: latest.time,
-        left: latest.left,
-      });
-    }, 180);
+    setHoverFrame({
+      time: point.time,
+      left: point.left,
+    });
   };
 
   const updateProgress = (clientX, progressContainer) => {
