@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import MusicVideoPlayer from '../../Music/MusicVideoPlayer/MusicVideoPlayer';
+import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../../components/ShareButton/ShareButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
@@ -445,7 +446,14 @@ const VideoModal = ({
                   key={videoId != null ? `play-${videoId}` : src}
                   className="video-modal-music-shell video-modal-music-shell--desktop"
                 >
-                  <MusicVideoPlayer ref={videoRef} src={src} poster={poster} autoPlay />
+                  <VideoPlayerControls
+                    src={src}
+                    poster={poster}
+                    autoPlay
+                    resetKey={videoId != null ? String(videoId) : src}
+                    videoElementRef={videoRef}
+                    className="video-modal-desktop-player"
+                  />
                 </div>
               </div>
               {footerBlock}

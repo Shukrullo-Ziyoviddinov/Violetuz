@@ -38,6 +38,7 @@ const VideoPlayerControls = ({
   onSeek = null,
   controlsSuppressed = false,
   renderSettings = null,
+  videoElementRef = null,
 }) => {
   const { t } = useTranslation();
   const videoRef = useRef(null);
@@ -525,6 +526,12 @@ const VideoPlayerControls = ({
     onMediaSlot?.(node);
   }, [onMediaSlot]);
 
+  const setLocalVideo = useCallback((node) => {
+    videoRef.current = node;
+    if (typeof videoElementRef === 'function') videoElementRef(node);
+    else if (videoElementRef) videoElementRef.current = node;
+  }, [videoElementRef]);
+
   const controlsOpen = showControls && !controlsSuppressed;
 
   const wrapperClasses = ['trailer-modal-video-wrapper', 'video-player-controls', className]
@@ -553,7 +560,7 @@ const VideoPlayerControls = ({
         <div ref={handleMediaSlot} className="trailer-modal-media-slot" />
       ) : (
         <video
-          ref={videoRef}
+          ref={setLocalVideo}
           src={src || ''}
           poster={poster || undefined}
           className={videoClassName}

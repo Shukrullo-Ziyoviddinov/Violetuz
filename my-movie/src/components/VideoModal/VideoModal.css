@@ -638,6 +638,29 @@
   box-shadow: none;
 }
 
+.video-modal--desktop .video-modal-music-shell--desktop .video-modal-desktop-player {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  min-height: 0 !important;
+  max-height: min(88vh, 900px);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: none;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.video-modal--desktop .video-modal-music-shell--desktop .video-modal-desktop-player:hover {
+  box-shadow: none;
+}
+
+.video-modal--desktop .video-modal-desktop-player .trailer-modal-video {
+  background-color: transparent;
+}
+
 .video-modal--sheet .video-modal-music-shell .music-vp-video-wrapper {
   width: 100%;
   flex: 0 0 auto;
