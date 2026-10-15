@@ -7,10 +7,10 @@ const CLOSE_MS = 320;
 const isMobileViewport = () =>
   typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX;
 
-const measureControlsBottom = () => {
-  const controls = document.querySelector('.movie-detail .watch-modal-controls-overlay');
-  if (!controls) return 0;
-  return Math.max(0, Math.round(controls.getBoundingClientRect().bottom));
+const measureVideoBottom = () => {
+  const slot = document.querySelector('.movie-detail .video-player-controls .trailer-modal-media-slot');
+  if (!slot) return 0;
+  return Math.max(0, Math.round(slot.getBoundingClientRect().bottom));
 };
 
 const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
@@ -25,8 +25,13 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
   const headerRef = useRef(null);
   const draggingRef = useRef(false);
   const startYRef = useRef(0);
+  const startTopRef = useRef(0);
   const closingRef = useRef(false);
   const closeTimerRef = useRef(null);
+  const restTopRef = useRef(0);
+  const sheetTopRef = useRef(0);
+  const translateYRef = useRef(0);
+  const expandedRef = useRef(false);
 
   const finishClose = useCallback(() => {
     if (closeTimerRef.current) {
@@ -37,6 +42,8 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
     setClosing(false);
     setDragging(false);
     setTranslateY(0);
+    translateYRef.current = 0;
+    expandedRef.current = false;
     draggingRef.current = false;
     closingRef.current = false;
     onClose?.();
@@ -63,11 +70,17 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
       setSheetOpen(false);
       setClosing(false);
       setTranslateY(0);
+      translateYRef.current = 0;
+      expandedRef.current = false;
       return undefined;
     }
     const nextMobile = isMobileViewport();
     setMobile(nextMobile);
-    setSheetTop(measureControlsBottom());
+    const rest = measureVideoBottom();
+    restTopRef.current = rest;
+    expandedRef.current = false;
+    sheetTopRef.current = rest;
+    setSheetTop(rest);
     if (!nextMobile) {
       setSheetOpen(true);
       return undefined;
@@ -90,7 +103,12 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
     const onResize = () => {
       const nextMobile = isMobileViewport();
       setMobile(nextMobile);
-      setSheetTop(measureControlsBottom());
+      const rest = measureVideoBottom();
+      restTopRef.current = rest;
+      if (!expandedRef.current) {
+        sheetTopRef.current = rest;
+        setSheetTop(rest);
+      }
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -109,12 +127,37 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
     if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
   }, []);
 
+  const applyShift = (top, shift) => {
+    sheetTopRef.current = top;
+    translateYRef.current = shift;
+    setSheetTop(top);
+    setTranslateY(shift);
+  };
+
   const handleTouchMove = useCallback((e) => {
     if (!isMobileViewport() || !draggingRef.current || closingRef.current) return;
     e.preventDefault();
     e.stopPropagation();
     const deltaY = e.touches[0].clientY - startYRef.current;
-    setTranslateY(deltaY > 0 ? deltaY : 0);
+    const rest = restTopRef.current;
+    const origin = startTopRef.current;
+    if (expandedRef.current) {
+      if (deltaY <= 0) {
+        applyShift(0, 0);
+        return;
+      }
+      if (deltaY < rest) {
+        applyShift(deltaY, 0);
+        return;
+      }
+      applyShift(rest, deltaY - rest);
+      return;
+    }
+    if (deltaY < 0) {
+      applyShift(Math.max(0, origin + deltaY), 0);
+      return;
+    }
+    applyShift(origin, deltaY);
   }, []);
 
   useEffect(() => {
@@ -128,21 +171,43 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
     if (!isMobileViewport() || closingRef.current) return;
     e.stopPropagation();
     startYRef.current = e.touches[0].clientY;
+    startTopRef.current = expandedRef.current ? 0 : restTopRef.current;
     draggingRef.current = true;
     setDragging(true);
   };
 
   const handleTouchEnd = (e) => {
-    if (!isMobileViewport() || !dragging || closingRef.current) return;
+    if (!isMobileViewport() || !draggingRef.current || closingRef.current) return;
     e.stopPropagation();
-    const threshold = window.innerHeight * 0.1;
-    if (translateY > threshold) {
+    const threshold = Math.max(56, window.innerHeight * 0.1);
+    const rest = restTopRef.current;
+    const top = sheetTopRef.current;
+    const shift = translateYRef.current;
+    draggingRef.current = false;
+    setDragging(false);
+
+    if (shift > threshold) {
       requestClose();
       return;
     }
-    draggingRef.current = false;
-    setDragging(false);
-    setTranslateY(0);
+
+    if (expandedRef.current) {
+      if (top > rest * 0.45) {
+        expandedRef.current = false;
+        applyShift(rest, 0);
+      } else {
+        applyShift(0, 0);
+      }
+      return;
+    }
+
+    const lifted = rest - top;
+    if (rest > 0 && lifted > Math.max(56, rest * 0.28)) {
+      expandedRef.current = true;
+      applyShift(0, 0);
+      return;
+    }
+    applyShift(rest, 0);
   };
 
   if (!open && !closing) return null;

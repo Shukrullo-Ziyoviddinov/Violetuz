@@ -107,6 +107,7 @@
   .movie-detail-more-modal {
     align-items: flex-end;
     background: transparent;
+    transition: top 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .movie-detail-more-modal-content {
