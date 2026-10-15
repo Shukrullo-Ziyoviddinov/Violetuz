@@ -23,6 +23,8 @@ const MusicVideoPlayer = forwardRef(({
   genre = null,
   sharedMediaRef = null,
   onMediaSlot = null,
+  mediaActive = false,
+  onActivate = null,
 }, ref) => {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
@@ -170,6 +172,11 @@ const MusicVideoPlayer = forwardRef(({
   };
 
   const handlePlayPause = () => {
+    if (sharedMediaRef && !mediaActive) {
+      onActivate?.();
+      showControlsWithDelay();
+      return;
+    }
     const el = videoRef.current;
     if (el) {
       if (isPlayingRef.current) {
@@ -585,7 +592,14 @@ const MusicVideoPlayer = forwardRef(({
   };
 
   useEffect(() => {
-    if (!sharedMediaRef) return undefined;
+    if (!sharedMediaRef || !mediaActive) {
+      if (sharedMediaRef) {
+        videoRef.current = null;
+        isPlayingRef.current = false;
+        setIsPlaying(false);
+      }
+      return undefined;
+    }
     const el = sharedMediaRef.current;
     if (!el) return undefined;
     videoRef.current = el;
@@ -630,7 +644,7 @@ const MusicVideoPlayer = forwardRef(({
       el.removeEventListener('ended', onEndedEvent);
       el.removeEventListener('seeked', onSeeked);
     };
-  }, [sharedMediaRef, ref, contentId]);
+  }, [sharedMediaRef, ref, contentId, mediaActive]);
 
   const handleMediaSlot = useCallback((node) => {
     onMediaSlot?.(node);

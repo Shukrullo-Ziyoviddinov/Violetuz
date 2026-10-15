@@ -92,7 +92,7 @@ const VideoPage = () => {
     artistsLoading,
   } = useMusicApi();
   const videoRef = useRef(null);
-  const { mediaRef, bindSession, registerDetailSlot } = useMiniVideoPlayback();
+  const { mediaRef, session, bindSession, activateSession, registerDetailSlot } = useMiniVideoPlayback();
   const mixQueueMemoryRef = useRef({});
   const commentsRef = useRef(null);
   const mainScrollRef = useRef(null);
@@ -361,10 +361,10 @@ const VideoPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!video?.video || video.id == null) return;
+  const clipSession = useMemo(() => {
+    if (!video?.video || video.id == null) return null;
     const query = searchParams.toString();
-    bindSession({
+    return {
       id: video.id,
       kind: isConcertVideo ? MINI_VIDEO_KIND.KONSERT : MINI_VIDEO_KIND.KLIP,
       title: video.title || '',
@@ -372,14 +372,22 @@ const VideoPage = () => {
       cover: typeof video.img === 'string' ? video.img : '',
       src: video.video,
       route: `/music/video/${video.id}${query ? `?${query}` : ''}`,
-    });
-  }, [
-    video,
-    isConcertVideo,
-    artist?.name,
-    searchParams,
-    bindSession,
-  ]);
+    };
+  }, [artist?.name, isConcertVideo, searchParams, video]);
+
+  const clipMediaActive = Boolean(
+    clipSession
+    && session?.kind === clipSession.kind
+    && String(session.id) === String(clipSession.id)
+  );
+
+  useEffect(() => {
+    if (!clipSession) return;
+    const el = mediaRef.current;
+    if (el?.dataset.miniVideoKind !== clipSession.kind) return;
+    if (String(el.dataset.miniVideoId) !== String(clipSession.id)) return;
+    bindSession(clipSession);
+  }, [bindSession, clipSession, mediaRef]);
 
   const activeMixTracks = useMemo(() => {
     if (isSharedMix) {
@@ -616,6 +624,8 @@ const VideoPage = () => {
                   ref={videoRef}
                   sharedMediaRef={mediaRef}
                   onMediaSlot={registerDetailSlot}
+                  mediaActive={clipMediaActive}
+                  onActivate={clipSession ? () => activateSession(clipSession) : null}
                   src={video.video}
                   poster={video.img}
                   autoPlay
