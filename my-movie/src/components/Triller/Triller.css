@@ -838,6 +838,12 @@
   }
 }
 
+@media (max-width: 480px) {
+  .triller-player-title--mobile {
+    font-size: 1.1rem;
+  }
+}
+
 @media (max-width: 450px) {
   .triller-sticky-bar {
     min-height: 1.9rem;

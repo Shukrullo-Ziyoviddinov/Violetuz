@@ -1488,3 +1488,11 @@ body.video-detail-page-active {
     border: none;
   }
 }
+
+@media (max-width: 480px) {
+  .video-detail-layout .video-detail-info .video-detail-title,
+  .video-detail-layout .video-detail-info .video-detail-artist-name,
+  .video-detail-layout .video-detail-info .video-detail-info-sep {
+    font-size: 1.1rem;
+  }
+}
