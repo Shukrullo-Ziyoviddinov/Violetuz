@@ -49,6 +49,7 @@ const VideoPlayerControls = ({
   const wrapperRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const hideControlsTimeoutRef = useRef(null);
+  const barChromeHoldRef = useRef(false);
   const isPlayingRef = useRef(false);
   const showControlsRef = useRef(true);
   const lastMouseMoveRef = useRef(0);
@@ -88,7 +89,9 @@ const VideoPlayerControls = ({
 
   const startHideTimeout = () => {
     clearHideTimeout();
+    if (barChromeHoldRef.current) return;
     hideControlsTimeoutRef.current = setTimeout(() => {
+      if (barChromeHoldRef.current) return;
       setShowControls(false);
       showControlsRef.current = false;
       setShowSettingsModal(false);
@@ -98,6 +101,10 @@ const VideoPlayerControls = ({
   const showControlsWithDelay = () => {
     setShowControls(true);
     showControlsRef.current = true;
+    if (barChromeHoldRef.current) {
+      clearHideTimeout();
+      return;
+    }
     if (isPlayingRef.current) {
       startHideTimeout();
     } else {
@@ -135,6 +142,19 @@ const VideoPlayerControls = ({
       clearHideTimeout();
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    const holding = isDragging || Boolean(hoverFrame);
+    barChromeHoldRef.current = holding;
+    if (holding) {
+      clearHideTimeout();
+      setShowControls(true);
+      showControlsRef.current = true;
+      return undefined;
+    }
+    if (isPlayingRef.current) startHideTimeout();
+    return undefined;
+  }, [isDragging, hoverFrame]);
 
   useEffect(() => {
     if (!expanded) return undefined;
@@ -504,9 +524,17 @@ const VideoPlayerControls = ({
     }
   };
 
+  const holdBarChrome = () => {
+    barChromeHoldRef.current = true;
+    clearHideTimeout();
+    setShowControls(true);
+    showControlsRef.current = true;
+  };
+
   const handleProgressMouseDown = (e) => {
     e.stopPropagation();
     closeHoverFrame();
+    holdBarChrome();
     setIsDragging(true);
     rememberFramePoint(e.clientX, e.currentTarget);
     updateProgress(e.clientX, e.currentTarget);
@@ -515,9 +543,11 @@ const VideoPlayerControls = ({
     e.stopPropagation();
     const moved = rememberFramePoint(e.clientX, e.currentTarget);
     if (isDragging) {
+      holdBarChrome();
       updateProgress(e.clientX, e.currentTarget);
       return;
     }
+    holdBarChrome();
     showControlsWithDelay();
     if (moved) scheduleHoverFrame();
   };
@@ -536,6 +566,7 @@ const VideoPlayerControls = ({
   };
   const handleProgressTouchStart = (e) => {
     e.stopPropagation();
+    holdBarChrome();
     setIsDragging(true);
     rememberFramePoint(e.touches[0].clientX, e.currentTarget);
     updateProgress(e.touches[0].clientX, e.currentTarget);
@@ -733,7 +764,10 @@ const VideoPlayerControls = ({
       className={wrapperClasses}
       ref={wrapperRef}
       onMouseMove={'ontouchstart' in window ? undefined : throttledShowControls}
-      onMouseLeave={'ontouchstart' in window ? undefined : () => isPlaying && setShowControls(false)}
+      onMouseLeave={'ontouchstart' in window ? undefined : () => {
+        if (barChromeHoldRef.current) return;
+        if (isPlaying) setShowControls(false);
+      }}
       onTouchStart={handleVideoWrapperTouchStart}
       onTouchEnd={handleVideoWrapperTouchEnd}
       data-object-fit={objectFit}
@@ -841,7 +875,9 @@ const VideoPlayerControls = ({
               onMouseLeave={(e) => {
                 e.stopPropagation();
                 if (isDragging) return;
+                barChromeHoldRef.current = false;
                 clearFramePoint();
+                if (isPlayingRef.current) startHideTimeout();
               }}
               onTouchStart={(e) => {
                 e.stopPropagation();

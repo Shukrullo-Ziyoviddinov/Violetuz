@@ -51,6 +51,7 @@ const MusicVideoPlayer = forwardRef(({
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const hideControlsTimeoutRef = useRef(null);
+  const barChromeHoldRef = useRef(false);
   const isPlayingRef = useRef(false);
   const showControlsRef = useRef(true);
   const [currentTime, setCurrentTime] = useState(0);
@@ -178,11 +179,20 @@ const MusicVideoPlayer = forwardRef(({
 
   const startHideTimeout = () => {
     clearHideTimeout();
+    if (barChromeHoldRef.current) return;
     hideControlsTimeoutRef.current = setTimeout(() => {
+      if (barChromeHoldRef.current) return;
       setShowControls(false);
       showControlsRef.current = false;
       setShowSettingsModal(false);
     }, 4000);
+  };
+
+  const holdBarChrome = () => {
+    barChromeHoldRef.current = true;
+    clearHideTimeout();
+    setShowControls(true);
+    showControlsRef.current = true;
   };
 
   const handlePlayPause = () => {
@@ -423,6 +433,7 @@ const MusicVideoPlayer = forwardRef(({
   const handleProgressMouseDown = (e) => {
     e.stopPropagation();
     setHoverFrame(null);
+    holdBarChrome();
     isDraggingRef.current = true;
     setIsDragging(true);
     rememberFramePoint(e.clientX, e.currentTarget);
@@ -432,9 +443,11 @@ const MusicVideoPlayer = forwardRef(({
     e.stopPropagation();
     const moved = rememberFramePoint(e.clientX, e.currentTarget);
     if (isDragging) {
+      holdBarChrome();
       updateProgress(e.clientX, e.currentTarget);
       return;
     }
+    holdBarChrome();
     showControlsWithDelay();
     if (moved) scheduleHoverFrame();
   };
@@ -459,6 +472,7 @@ const MusicVideoPlayer = forwardRef(({
   };
   const handleProgressTouchStart = (e) => {
     e.stopPropagation();
+    holdBarChrome();
     isDraggingRef.current = true;
     setIsDragging(true);
     rememberFramePoint(e.touches[0].clientX, e.currentTarget);
@@ -499,6 +513,10 @@ const MusicVideoPlayer = forwardRef(({
   const showControlsWithDelay = () => {
     setShowControls(true);
     showControlsRef.current = true;
+    if (barChromeHoldRef.current) {
+      clearHideTimeout();
+      return;
+    }
     if (isPlayingRef.current) {
       startHideTimeout();
     } else {
@@ -517,6 +535,19 @@ const MusicVideoPlayer = forwardRef(({
       clearHideTimeout();
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    const holding = isDragging || Boolean(hoverFrame);
+    barChromeHoldRef.current = holding;
+    if (holding) {
+      clearHideTimeout();
+      setShowControls(true);
+      showControlsRef.current = true;
+      return undefined;
+    }
+    if (isPlayingRef.current) startHideTimeout();
+    return undefined;
+  }, [isDragging, hoverFrame]);
 
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(!!getFullscreenElement());
@@ -811,7 +842,10 @@ const MusicVideoPlayer = forwardRef(({
         'ontouchstart' in window ? undefined : () => showControlsWithDelay()
       }
       onMouseLeave={
-        'ontouchstart' in window ? undefined : () => isPlaying && setShowControls(false)
+        'ontouchstart' in window ? undefined : () => {
+          if (barChromeHoldRef.current) return;
+          if (isPlaying) setShowControls(false);
+        }
       }
       onTouchStart={handleVideoWrapperTouchStart}
       onTouchEnd={handleVideoWrapperTouchEnd}
@@ -931,7 +965,9 @@ const MusicVideoPlayer = forwardRef(({
           onMouseLeave={(e) => {
             e.stopPropagation();
             if (isDragging) return;
+            barChromeHoldRef.current = false;
             clearFramePoint();
+            if (isPlayingRef.current) startHideTimeout();
           }}
           onTouchStart={(e) => {
             e.stopPropagation();
