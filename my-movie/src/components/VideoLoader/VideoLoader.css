@@ -14,8 +14,14 @@
   box-sizing: border-box;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.2);
-  border-top-color: #fff;
+  border-top-color: #bd02bd;
   animation: video-loader-spin 0.7s linear infinite;
+}
+
+.video-loader--lg .video-loader-arc {
+  width: 72px;
+  height: 72px;
+  border-width: 5px;
 }
 
 .video-loader--sm .video-loader-arc {

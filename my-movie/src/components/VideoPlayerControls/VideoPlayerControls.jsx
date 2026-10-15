@@ -760,7 +760,7 @@ const VideoPlayerControls = ({
         />
       )}
 
-      <VideoLoader video={mediaNode} />
+      <VideoLoader video={mediaNode} size={sharedMediaRef ? 'lg' : 'md'} />
 
       {!loading && (
         <>
