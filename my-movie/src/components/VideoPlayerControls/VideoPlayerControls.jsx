@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MusicSettingsModal from '../../Music/MusicVideoPlayer/MusicSettingsModal';
+import FramePreviewPlayer from './FramePreviewPlayer';
 import './VideoPlayerControls.css';
 
 const SPEED_OPTIONS = [1, 1.5, 2];
@@ -42,6 +43,8 @@ const VideoPlayerControls = ({
 }) => {
   const { t } = useTranslation();
   const videoRef = useRef(null);
+  const framePreviewRef = useRef(null);
+  const progressBarRef = useRef(null);
   const wrapperRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const hideControlsTimeoutRef = useRef(null);
@@ -58,11 +61,19 @@ const VideoPlayerControls = ({
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [previewTime, setPreviewTime] = useState(0);
+  const [framePoint, setFramePoint] = useState(null);
+  const [hoverFrame, setHoverFrame] = useState(null);
+  const framePointRef = useRef(null);
+  const hoverTimerRef = useRef(null);
+  const frameLoadTimerRef = useRef(null);
+  const controlsSuppressedRef = useRef(false);
+  controlsSuppressedRef.current = controlsSuppressed;
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [frameSrc, setFrameSrc] = useState('');
 
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {
@@ -130,6 +141,68 @@ const VideoPlayerControls = ({
   }, [expanded]);
 
   useEffect(() => {
+    if (!isDragging) return undefined;
+    const container = progressBarRef.current?.parentElement;
+    if (!container) return undefined;
+    const onMove = (event) => {
+      rememberFramePoint(event.clientX, container);
+      updateProgress(event.clientX, container);
+    };
+    const onUp = (event) => {
+      if (container.contains(event.target)) return;
+      handleProgressMouseUp(event);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+  }, [isDragging, previewTime]);
+
+  useEffect(() => () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    if (frameLoadTimerRef.current) clearTimeout(frameLoadTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    const preview = framePreviewRef.current;
+    const windowOpen = !controlsSuppressed && (isDragging ? Boolean(framePoint) : Boolean(hoverFrame));
+    if (!windowOpen) {
+      if (frameLoadTimerRef.current) {
+        clearTimeout(frameLoadTimerRef.current);
+        frameLoadTimerRef.current = null;
+      }
+      preview?.stop();
+      return undefined;
+    }
+
+    if (!isDragging) {
+      if (frameLoadTimerRef.current) {
+        clearTimeout(frameLoadTimerRef.current);
+        frameLoadTimerRef.current = null;
+      }
+      if (Number.isFinite(hoverFrame?.time)) preview?.seek(hoverFrame.time);
+      return undefined;
+    }
+
+    if (frameLoadTimerRef.current) clearTimeout(frameLoadTimerRef.current);
+    frameLoadTimerRef.current = setTimeout(() => {
+      frameLoadTimerRef.current = null;
+      const latest = framePointRef.current?.time;
+      if (latest == null || !Number.isFinite(latest)) return;
+      framePreviewRef.current?.seek(latest);
+    }, 180);
+
+    return () => {
+      if (frameLoadTimerRef.current) {
+        clearTimeout(frameLoadTimerRef.current);
+        frameLoadTimerRef.current = null;
+      }
+    };
+  }, [hoverFrame, isDragging, controlsSuppressed, framePoint]);
+
+  useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -178,6 +251,26 @@ const VideoPlayerControls = ({
   const emitSeek = (from, to) => {
     if (typeof onSeek === 'function') onSeek(from, to);
   };
+
+  useEffect(() => {
+    if (!sharedMediaRef) {
+      setFrameSrc(src || '');
+      return undefined;
+    }
+    const el = mediaActive ? sharedMediaRef.current : null;
+    if (!el) {
+      setFrameSrc('');
+      return undefined;
+    }
+    const syncSrc = () => setFrameSrc(el.currentSrc || el.src || '');
+    syncSrc();
+    el.addEventListener('loadedmetadata', syncSrc);
+    el.addEventListener('emptied', syncSrc);
+    return () => {
+      el.removeEventListener('loadedmetadata', syncSrc);
+      el.removeEventListener('emptied', syncSrc);
+    };
+  }, [sharedMediaRef, mediaActive, src]);
 
   const handlePlayPause = () => {
     if (typeof onPlayPause === 'function') {
@@ -328,6 +421,67 @@ const VideoPlayerControls = ({
     }
   };
 
+  const readBarPoint = (clientX, progressContainer) => {
+    const mediaDuration = videoRef.current?.duration;
+    if (!progressContainer || !Number.isFinite(mediaDuration) || mediaDuration <= 0) return null;
+    const rect = progressContainer.getBoundingClientRect();
+    if (rect.width <= 0) return null;
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return {
+      time: percent * mediaDuration,
+      left: percent * 100,
+    };
+  };
+
+  const rememberFramePoint = (clientX, progressContainer) => {
+    const point = readBarPoint(clientX, progressContainer);
+    const prev = framePointRef.current;
+    if (
+      prev
+      && point
+      && Math.abs(prev.left - point.left) < 0.15
+      && Math.abs(prev.time - point.time) < 0.05
+    ) {
+      return false;
+    }
+    framePointRef.current = point;
+    setFramePoint(point);
+    return true;
+  };
+
+  const closeHoverFrame = () => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    framePreviewRef.current?.stop();
+    setHoverFrame(null);
+  };
+
+  const clearFramePoint = () => {
+    closeHoverFrame();
+    if (framePointRef.current == null) return;
+    framePointRef.current = null;
+    setFramePoint(null);
+  };
+
+  const scheduleHoverFrame = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    setHoverFrame(null);
+    const point = framePointRef.current;
+    if (!point || controlsSuppressedRef.current) return;
+    hoverTimerRef.current = setTimeout(() => {
+      hoverTimerRef.current = null;
+      const latest = framePointRef.current;
+      if (!latest || controlsSuppressedRef.current) return;
+      if (Math.abs(latest.time - point.time) > 0.2) return;
+      setHoverFrame({
+        time: latest.time,
+        left: latest.left,
+      });
+    }, 180);
+  };
+
   const updateProgress = (clientX, progressContainer) => {
     if (
       videoRef.current &&
@@ -359,14 +513,20 @@ const VideoPlayerControls = ({
 
   const handleProgressMouseDown = (e) => {
     e.stopPropagation();
+    closeHoverFrame();
     setIsDragging(true);
+    rememberFramePoint(e.clientX, e.currentTarget);
     updateProgress(e.clientX, e.currentTarget);
   };
   const handleProgressMouseMove = (e) => {
+    e.stopPropagation();
+    const moved = rememberFramePoint(e.clientX, e.currentTarget);
     if (isDragging) {
-      e.stopPropagation();
       updateProgress(e.clientX, e.currentTarget);
+      return;
     }
+    showControlsWithDelay();
+    if (moved) scheduleHoverFrame();
   };
   const handleProgressMouseUp = (e) => {
     if (isDragging) {
@@ -384,11 +544,15 @@ const VideoPlayerControls = ({
   const handleProgressTouchStart = (e) => {
     e.stopPropagation();
     setIsDragging(true);
+    rememberFramePoint(e.touches[0].clientX, e.currentTarget);
     updateProgress(e.touches[0].clientX, e.currentTarget);
   };
   const handleProgressTouchMove = (e) => {
     e.stopPropagation();
-    if (isDragging) updateProgress(e.touches[0].clientX, e.currentTarget);
+    const touchX = e.touches[0]?.clientX;
+    if (touchX == null) return;
+    rememberFramePoint(touchX, e.currentTarget);
+    if (isDragging) updateProgress(touchX, e.currentTarget);
   };
   const handleProgressTouchEnd = (e) => {
     e.stopPropagation();
@@ -400,6 +564,7 @@ const VideoPlayerControls = ({
       emitSeek(from, previewTime);
     }
     setIsDragging(false);
+    clearFramePoint();
   };
 
   const getProgressPercent = () => {
@@ -549,6 +714,24 @@ const VideoPlayerControls = ({
       : 0
     : getProgressPercent();
 
+  const frameWindowLeft = (percent) => {
+    const safe = Math.max(0, Math.min(100, percent));
+    const width = progressBarRef.current?.getBoundingClientRect().width || 0;
+    if (width < 32) return safe;
+    const half = (168 / 2 / width) * 100;
+    const limit = Math.min(half, 46);
+    return Math.min(100 - limit, Math.max(limit, safe));
+  };
+
+  const scrubFrame = isDragging && framePoint && !controlsSuppressed
+    ? {
+      time: framePoint.time,
+      left: frameWindowLeft(progressWidth),
+    }
+    : null;
+  const activeFrame = scrubFrame
+    || (hoverFrame && !isDragging && !controlsSuppressed ? { ...hoverFrame, left: frameWindowLeft(hoverFrame.left) } : null);
+
   return (
     <div
       className={wrapperClasses}
@@ -640,7 +823,7 @@ const VideoPlayerControls = ({
             onMouseMove={(e) => e.stopPropagation()}
           >
             <div
-              className="trailer-modal-progress-container"
+              className={`trailer-modal-progress-container${isDragging ? ' is-scrubbing' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleProgressClick(e);
@@ -659,7 +842,8 @@ const VideoPlayerControls = ({
               }}
               onMouseLeave={(e) => {
                 e.stopPropagation();
-                handleProgressMouseUp(e);
+                if (isDragging) return;
+                clearFramePoint();
               }}
               onTouchStart={(e) => {
                 e.stopPropagation();
@@ -674,16 +858,24 @@ const VideoPlayerControls = ({
                 handleProgressTouchEnd(e);
               }}
             >
-              <div className="trailer-modal-progress-bar">
+              <div
+                ref={progressBarRef}
+                className="trailer-modal-progress-bar"
+                data-frame-time={framePoint ? framePoint.time : ''}
+                data-frame-left={framePoint ? framePoint.left : ''}
+              >
                 <div className="trailer-modal-progress-filled" style={{ width: `${progressWidth}%` }}>
                   <div className="trailer-modal-progress-thumb" />
                 </div>
-                {isDragging && (
+                {activeFrame && (
                   <div
-                    className="trailer-modal-preview-tooltip"
-                    style={{ left: `${duration > 0 ? (previewTime / duration) * 100 : 0}%` }}
+                    className="trailer-modal-frame-preview show"
+                    style={{ left: `${activeFrame.left}%` }}
+                    aria-hidden="true"
                   >
-                    {formatTime(previewTime)}
+                    {frameSrc ? (
+                      <FramePreviewPlayer ref={framePreviewRef} src={frameSrc} />
+                    ) : null}
                   </div>
                 )}
               </div>
