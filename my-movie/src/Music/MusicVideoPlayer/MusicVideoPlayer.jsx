@@ -5,6 +5,7 @@ import { createMusicListenProgressReporter } from '../../utils/musicListenProgre
 import { createClipMixWatchSignal } from './clipMixWatchSignal';
 import MusicSettingsModal from './MusicSettingsModal';
 import FramePreviewPlayer from '../../components/VideoPlayerControls/FramePreviewPlayer';
+import VideoLoader from '../../components/VideoLoader/VideoLoader';
 import './MusicVideoPlayer.css';
 
 const speedOptions = [1, 1.5, 2];
@@ -76,11 +77,13 @@ const MusicVideoPlayer = forwardRef(({
   const [framePoint, setFramePoint] = useState(null);
   const [hoverFrame, setHoverFrame] = useState(null);
   const [frameSrc, setFrameSrc] = useState('');
+  const [mediaNode, setMediaNode] = useState(null);
 
   playbackSpeedRef.current = playbackSpeed;
 
   const mergedVideoRef = (node) => {
     videoRef.current = node;
+    setMediaNode(node);
     if (typeof ref === 'function') {
       ref(node);
     } else if (ref) {
@@ -669,6 +672,7 @@ const MusicVideoPlayer = forwardRef(({
     if (!sharedMediaRef || !mediaActive) {
       if (sharedMediaRef) {
         videoRef.current = null;
+        setMediaNode(null);
         isPlayingRef.current = false;
         setIsPlaying(false);
       }
@@ -677,6 +681,7 @@ const MusicVideoPlayer = forwardRef(({
     const el = sharedMediaRef.current;
     if (!el) return undefined;
     videoRef.current = el;
+    setMediaNode(el);
     if (typeof ref === 'function') ref(el);
     else if (ref) ref.current = el;
     setIsPlaying(!el.paused && !el.ended);
@@ -841,6 +846,8 @@ const MusicVideoPlayer = forwardRef(({
           }}
         />
       )}
+
+      <VideoLoader video={mediaNode} size={sharedMediaRef ? 'lg' : 'md'} />
 
       <div
         className={`music-vp-controls-overlay ${showControls ? 'show' : ''}`}

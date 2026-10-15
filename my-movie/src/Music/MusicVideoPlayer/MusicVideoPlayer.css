@@ -38,6 +38,10 @@
   pointer-events: auto;
 }
 
+.music-vp-video-wrapper > .video-loader {
+  z-index: 1;
+}
+
 @media (hover: none) {
   .music-vp-video-wrapper {
     touch-action: manipulation;
