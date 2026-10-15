@@ -25,9 +25,9 @@
 }
 
 .video-loader--sm .video-loader-arc {
-  width: 22px;
-  height: 22px;
-  border-width: 2px;
+  width: 28px;
+  height: 28px;
+  border-width: 2.5px;
 }
 
 @keyframes video-loader-spin {
