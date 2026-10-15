@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { createMusicListenProgressReporter } from '../../utils/musicListenProgressReporter';
 import { createClipMixWatchSignal } from './clipMixWatchSignal';
 import MusicSettingsModal from './MusicSettingsModal';
+import FramePreviewPlayer from '../../components/VideoPlayerControls/FramePreviewPlayer';
 import './MusicVideoPlayer.css';
 
 const speedOptions = [1, 1.5, 2];
@@ -65,6 +66,16 @@ const MusicVideoPlayer = forwardRef(({
   const videoTapRef = useRef({ x: 0, y: 0, time: 0 });
   const previewTimeRef = useRef(0);
   const progressContainerRef = useRef(null);
+  const progressBarRef = useRef(null);
+  const framePreviewRef = useRef(null);
+  const framePointRef = useRef(null);
+  const frameLoadTimerRef = useRef(null);
+  const pendingFrameTimeRef = useRef(null);
+  const lastFrameSeekAtRef = useRef(0);
+  const isDraggingRef = useRef(false);
+  const [framePoint, setFramePoint] = useState(null);
+  const [hoverFrame, setHoverFrame] = useState(null);
+  const [frameSrc, setFrameSrc] = useState('');
 
   playbackSpeedRef.current = playbackSpeed;
 
@@ -362,16 +373,67 @@ const MusicVideoPlayer = forwardRef(({
     }
   };
 
+  const readBarPoint = (clientX, progressContainer) => {
+    const mediaDuration = videoRef.current?.duration;
+    if (!progressContainer || !Number.isFinite(mediaDuration) || mediaDuration <= 0) return null;
+    const rect = progressContainer.getBoundingClientRect();
+    if (rect.width <= 0) return null;
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return { time: percent * mediaDuration, left: percent * 100 };
+  };
+
+  const rememberFramePoint = (clientX, progressContainer) => {
+    const point = readBarPoint(clientX, progressContainer);
+    const prev = framePointRef.current;
+    if (
+      prev
+      && point
+      && Math.abs(prev.left - point.left) < 0.15
+      && Math.abs(prev.time - point.time) < 0.05
+    ) {
+      return false;
+    }
+    framePointRef.current = point;
+    setFramePoint(point);
+    return true;
+  };
+
+  const clearFramePoint = () => {
+    if (frameLoadTimerRef.current) {
+      clearTimeout(frameLoadTimerRef.current);
+      frameLoadTimerRef.current = null;
+    }
+    pendingFrameTimeRef.current = null;
+    framePreviewRef.current?.stop();
+    setHoverFrame(null);
+    if (framePointRef.current == null) return;
+    framePointRef.current = null;
+    setFramePoint(null);
+  };
+
+  const scheduleHoverFrame = () => {
+    const point = framePointRef.current;
+    if (!point) return;
+    setHoverFrame({ time: point.time, left: point.left });
+  };
+
   const handleProgressMouseDown = (e) => {
     e.stopPropagation();
+    setHoverFrame(null);
+    isDraggingRef.current = true;
     setIsDragging(true);
+    rememberFramePoint(e.clientX, e.currentTarget);
     updateProgress(e.clientX, e.currentTarget);
   };
   const handleProgressMouseMove = (e) => {
+    e.stopPropagation();
+    const moved = rememberFramePoint(e.clientX, e.currentTarget);
     if (isDragging) {
-      e.stopPropagation();
       updateProgress(e.clientX, e.currentTarget);
+      return;
     }
+    showControlsWithDelay();
+    if (moved) scheduleHoverFrame();
   };
   const applyProgressFromPreview = () => {
     const pt = previewTimeRef.current;
@@ -388,27 +450,35 @@ const MusicVideoPlayer = forwardRef(({
     if (isDragging) {
       e.stopPropagation();
       applyProgressFromPreview();
+      isDraggingRef.current = false;
       setIsDragging(false);
     }
   };
   const handleProgressTouchStart = (e) => {
     e.stopPropagation();
+    isDraggingRef.current = true;
     setIsDragging(true);
+    rememberFramePoint(e.touches[0].clientX, e.currentTarget);
     updateProgress(e.touches[0].clientX, e.currentTarget);
   };
   const handleProgressTouchMove = (e) => {
     e.stopPropagation();
+    const touchX = e.touches[0]?.clientX;
+    if (touchX == null) return;
+    rememberFramePoint(touchX, e.currentTarget);
     if (isDragging) {
       e.preventDefault();
-      updateProgress(e.touches[0].clientX, e.currentTarget);
+      updateProgress(touchX, e.currentTarget);
     }
   };
   const handleProgressTouchEnd = (e) => {
     e.stopPropagation();
     if (isDragging) {
       applyProgressFromPreview();
+      isDraggingRef.current = false;
       setIsDragging(false);
     }
+    clearFramePoint();
   };
 
   const getProgressPercent = () => {
@@ -487,10 +557,14 @@ const MusicVideoPlayer = forwardRef(({
   useEffect(() => {
     if (!isDragging) return;
     const handleDocMouseMove = (e) => {
-      if (progressContainerRef.current) updateProgress(e.clientX, progressContainerRef.current);
+      const bar = progressContainerRef.current;
+      if (!bar) return;
+      rememberFramePoint(e.clientX, bar);
+      updateProgress(e.clientX, bar);
     };
     const handleDocMouseUp = () => {
       applyProgressFromPreview();
+      isDraggingRef.current = false;
       setIsDragging(false);
     };
     document.addEventListener('mousemove', handleDocMouseMove);
@@ -650,6 +724,80 @@ const MusicVideoPlayer = forwardRef(({
     onMediaSlot?.(node);
   }, [onMediaSlot]);
 
+  useEffect(() => {
+    if (!sharedMediaRef) {
+      setFrameSrc(src || '');
+      return undefined;
+    }
+    const el = mediaActive ? sharedMediaRef.current : null;
+    if (!el) {
+      setFrameSrc('');
+      return undefined;
+    }
+    const syncSrc = () => setFrameSrc(el.currentSrc || el.src || '');
+    syncSrc();
+    el.addEventListener('loadedmetadata', syncSrc);
+    el.addEventListener('emptied', syncSrc);
+    return () => {
+      el.removeEventListener('loadedmetadata', syncSrc);
+      el.removeEventListener('emptied', syncSrc);
+    };
+  }, [sharedMediaRef, mediaActive, src]);
+
+  useEffect(() => () => {
+    if (frameLoadTimerRef.current) clearTimeout(frameLoadTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    const windowOpen = isDragging ? Boolean(framePoint) : Boolean(hoverFrame);
+    if (!windowOpen) {
+      pendingFrameTimeRef.current = null;
+      if (frameLoadTimerRef.current) {
+        clearTimeout(frameLoadTimerRef.current);
+        frameLoadTimerRef.current = null;
+      }
+      framePreviewRef.current?.stop();
+      return undefined;
+    }
+    const time = isDragging ? framePoint?.time : hoverFrame?.time;
+    if (time == null || !Number.isFinite(time)) return undefined;
+    pendingFrameTimeRef.current = time;
+    if (frameLoadTimerRef.current) return undefined;
+    const flush = () => {
+      frameLoadTimerRef.current = null;
+      const latest = pendingFrameTimeRef.current;
+      if (latest == null || !Number.isFinite(latest)) return;
+      lastFrameSeekAtRef.current = Date.now();
+      framePreviewRef.current?.seek(latest);
+    };
+    const wait = Math.max(0, 100 - (Date.now() - lastFrameSeekAtRef.current));
+    if (wait === 0) {
+      flush();
+      return undefined;
+    }
+    frameLoadTimerRef.current = setTimeout(flush, wait);
+    return undefined;
+  }, [hoverFrame, isDragging, framePoint]);
+
+  const progressWidth = isDragging && duration > 0
+    ? (previewTime / duration) * 100
+    : getProgressPercent();
+
+  const frameWindowLeft = (percent) => {
+    const safe = Math.max(0, Math.min(100, percent));
+    const width = progressBarRef.current?.getBoundingClientRect().width || 0;
+    if (width < 32) return safe;
+    const half = (168 / 2 / width) * 100;
+    const limit = Math.min(half, 46);
+    return Math.min(100 - limit, Math.max(limit, safe));
+  };
+
+  const scrubFrame = isDragging && framePoint
+    ? { time: framePoint.time, left: frameWindowLeft(progressWidth) }
+    : null;
+  const activeFrame = scrubFrame
+    || (hoverFrame && !isDragging ? { ...hoverFrame, left: frameWindowLeft(hoverFrame.left) } : null);
+
   return (
     <div
       ref={videoWrapperRef}
@@ -756,7 +904,7 @@ const MusicVideoPlayer = forwardRef(({
       <div className={`music-vp-bottom-controls ${showControls ? 'show' : ''}`}>
         <div
           ref={progressContainerRef}
-          className="music-vp-progress-container"
+          className={`music-vp-progress-container${isDragging ? ' is-scrubbing' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             handleProgressClick(e);
@@ -775,7 +923,8 @@ const MusicVideoPlayer = forwardRef(({
           }}
           onMouseLeave={(e) => {
             e.stopPropagation();
-            handleProgressMouseUp(e);
+            if (isDragging) return;
+            clearFramePoint();
           }}
           onTouchStart={(e) => {
             e.stopPropagation();
@@ -790,25 +939,22 @@ const MusicVideoPlayer = forwardRef(({
             handleProgressTouchEnd(e);
           }}
         >
-          <div className="music-vp-progress-bar">
+          <div className="music-vp-progress-bar" ref={progressBarRef}>
             <div
               className="music-vp-progress-filled"
-              style={{
-                width: `${
-                  isDragging && duration > 0
-                    ? (previewTime / duration) * 100
-                    : getProgressPercent()
-                }%`,
-              }}
+              style={{ width: `${progressWidth}%` }}
             >
               <div className="music-vp-progress-thumb"></div>
             </div>
-            {isDragging && duration > 0 && (
+            {activeFrame && (
               <div
-                className="music-vp-preview-tooltip"
-                style={{ left: `${(previewTime / duration) * 100}%` }}
+                className="music-vp-frame-preview"
+                style={{ left: `${activeFrame.left}%` }}
+                aria-hidden="true"
               >
-                {formatTime(previewTime)}
+                {frameSrc ? (
+                  <FramePreviewPlayer ref={framePreviewRef} src={frameSrc} />
+                ) : null}
               </div>
             )}
           </div>
