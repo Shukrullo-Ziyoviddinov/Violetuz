@@ -28,7 +28,7 @@ const TrillerSection = () => {
           {showSkeleton ? (
             <SkeletonLoader variant="triller-section-title" />
           ) : (
-            <h2 className="triller-section-title">Triller</h2>
+            <h2 className="triller-section-title">Parda ortida</h2>
           )}
         </div>
         <div className="triller-section-scroll">
