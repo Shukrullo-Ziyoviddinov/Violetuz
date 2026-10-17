@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -90,14 +91,20 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
 };
 
 /**
- * Mobil treyler kartochkasi.
- * Video 10 soniyaga yetganda pastdan chiqadi.
- * Video tugaganda pastdagi yopiladi va pleer maydonini to‘ldiradi.
+ * Treyler kartochkasi.
+ * Mobilda video 10 soniyaga yetganda sahifa pastidan chiqadi. X bilan yopiladi.
+ * Video tugaganda pastdagi yo‘qoladi, pleer maydonini to‘ldiradi (mobil va desktop).
  */
-const TrailerMovieCard = ({ movie, video, controlsOpen = false }) => {
+const TrailerMovieCard = ({ movie, video }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [phase, setPhase] = useState('hidden');
   const [dockShown, setDockShown] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    setDismissed(false);
+  }, [movie?.id, video]);
 
   useEffect(() => {
     if (!video || !movie?.id) {
@@ -112,6 +119,10 @@ const TrailerMovieCard = ({ movie, video, controlsOpen = false }) => {
       }
       setPhase(video.currentTime >= SHOW_AFTER_SECONDS ? 'dock' : 'hidden');
     };
+    const onNewSource = () => {
+      setDismissed(false);
+      sync();
+    };
 
     sync();
     video.addEventListener('timeupdate', sync);
@@ -119,25 +130,29 @@ const TrailerMovieCard = ({ movie, video, controlsOpen = false }) => {
     video.addEventListener('ended', sync);
     video.addEventListener('play', sync);
     video.addEventListener('emptied', sync);
+    video.addEventListener('loadstart', onNewSource);
     return () => {
       video.removeEventListener('timeupdate', sync);
       video.removeEventListener('seeked', sync);
       video.removeEventListener('ended', sync);
       video.removeEventListener('play', sync);
       video.removeEventListener('emptied', sync);
+      video.removeEventListener('loadstart', onNewSource);
     };
   }, [video, movie?.id]);
 
+  const dockActive = phase === 'dock' && !dismissed;
+
   useEffect(() => {
-    if (phase !== 'dock') {
+    if (!dockActive) {
       setDockShown(false);
       return undefined;
     }
     const frame = window.requestAnimationFrame(() => setDockShown(true));
     return () => window.cancelAnimationFrame(frame);
-  }, [phase]);
+  }, [dockActive]);
 
-  if (!movie?.id || phase === 'hidden') return null;
+  if (!movie?.id) return null;
 
   const stop = (event) => {
     event.stopPropagation();
@@ -156,21 +171,46 @@ const TrailerMovieCard = ({ movie, video, controlsOpen = false }) => {
     if (play && typeof play.catch === 'function') play.catch(() => {});
   };
 
-  return (
+  const onDismiss = (event) => {
+    stop(event);
+    setDismissed(true);
+  };
+
+  if (phase === 'ended') {
+    return (
+      <div
+        className="trailer-movie-card-host is-ended"
+        onClick={stop}
+        onTouchStart={stop}
+        onTouchEnd={stop}
+      >
+        <TrailerMovieCardView movie={movie} mode="ended" onWatch={onWatch} onReplay={onReplay} />
+      </div>
+    );
+  }
+
+  if (!dockActive || typeof document === 'undefined') return null;
+
+  return createPortal(
     <div
-      className={`trailer-movie-card-host${phase === 'ended' ? ' is-ended' : ''}${controlsOpen ? ' is-controls-open' : ''}`}
+      className={`trailer-movie-card-dock${dockShown ? ' is-visible' : ''}`}
       onClick={stop}
       onTouchStart={stop}
       onTouchEnd={stop}
     >
-      {phase === 'ended' ? (
-        <TrailerMovieCardView movie={movie} mode="ended" onWatch={onWatch} onReplay={onReplay} />
-      ) : (
-        <div className={`trailer-movie-card-dock${dockShown ? ' is-visible' : ''}`}>
-          <TrailerMovieCardView movie={movie} mode="dock" onWatch={onWatch} onReplay={onReplay} />
-        </div>
-      )}
-    </div>
+      <button
+        type="button"
+        className="trailer-movie-card-close"
+        onClick={onDismiss}
+        aria-label={t('common.close', 'Yopish')}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+      <TrailerMovieCardView movie={movie} mode="dock" onWatch={onWatch} onReplay={onReplay} />
+    </div>,
+    document.body
   );
 };
 

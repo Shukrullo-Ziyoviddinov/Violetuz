@@ -1,34 +1,178 @@
-.trailer-movie-card-host {
+/* ==================== Tugaganda: pleer ichida (mobil va desktop) ==================== */
+.trailer-movie-card-host.is-ended {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  container-type: size;
+  --trailer-card-pad: 12px;
+  --trailer-card-poster-h: calc(100cqh - var(--trailer-card-pad) * 2);
+  --trailer-card-poster-w: min(calc(var(--trailer-card-poster-h) * 2 / 3), 42cqw);
+}
+
+.trailer-movie-card-poster {
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: #c4b5fd;
+}
+
+.trailer-movie-card-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.trailer-movie-card-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.trailer-movie-card-title {
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-movie-card-meta {
+  color: #b8b8c2;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-movie-card-btn {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.trailer-movie-card-btn--primary {
+  background: linear-gradient(180deg, #c084fc 0%, #9333ea 100%);
+  color: #fff;
+  font-weight: 700;
+}
+
+.trailer-movie-card-btn--ghost {
+  background: #141414;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.trailer-movie-card--ended {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: var(--trailer-card-pad);
+  background: #000;
+  overflow: hidden;
+}
+
+.trailer-movie-card-poster--ended {
+  height: var(--trailer-card-poster-h);
+  width: var(--trailer-card-poster-w);
+  max-height: 100%;
+  border-radius: 12px;
+}
+
+.trailer-movie-card--ended .trailer-movie-card-copy {
+  flex: 0 1 auto;
+  width: var(--trailer-card-poster-w);
+  max-width: calc(100cqw - var(--trailer-card-poster-w) - var(--trailer-card-pad) * 2 - 12px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.trailer-movie-card--ended .trailer-movie-card-title {
+  font-size: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.trailer-movie-card--ended .trailer-movie-card-meta {
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+
+.trailer-movie-card--ended .trailer-movie-card-btn {
+  width: 100%;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-movie-card--ended .trailer-movie-card-btn svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+}
+
+/* ==================== 10 soniyada: sahifa pasti (faqat mobil) ==================== */
+.trailer-movie-card-dock {
   display: none;
 }
 
 @media (max-width: 969px) {
-  .trailer-movie-card-host {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 70;
-    pointer-events: none;
+  .trailer-movie-card-host.is-ended {
+    --trailer-card-pad: 10px;
   }
 
-  .trailer-movie-card-host.is-ended {
-    z-index: 80;
-    pointer-events: auto;
+  .trailer-movie-card--ended {
+    gap: 10px;
+  }
+
+  .trailer-movie-card-poster--ended {
+    border-radius: 10px;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-copy {
+    gap: 5px;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-title {
+    font-size: 14px;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-meta {
+    font-size: 11px;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-btn {
+    padding: 6px 8px;
+    font-size: 11px;
   }
 
   .trailer-movie-card-dock {
-    position: absolute;
+    display: block;
+    position: fixed;
     left: 10px;
     right: 10px;
-    bottom: 12px;
-    transform: translateY(130%);
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 2600;
+    transform: translateY(calc(100% + 40px));
     opacity: 0;
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease, bottom 0.25s ease;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
     pointer-events: none;
-  }
-
-  .trailer-movie-card-host.is-controls-open .trailer-movie-card-dock {
-    bottom: 68px;
   }
 
   .trailer-movie-card-dock.is-visible {
@@ -37,128 +181,59 @@
     pointer-events: auto;
   }
 
+  .trailer-movie-card-close {
+    position: absolute;
+    right: 0;
+    top: -34px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(18, 10, 28, 0.94);
+    color: #fff;
+    cursor: pointer;
+  }
+
   .trailer-movie-card--dock {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 8px 10px 8px 8px;
     border-radius: 18px;
-    background: rgba(18, 10, 28, 0.94);
+    background: rgba(18, 10, 28, 0.96);
     border: 1px solid rgba(168, 85, 247, 0.45);
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
   }
 
-  .trailer-movie-card-poster {
+  .trailer-movie-card--dock .trailer-movie-card-poster {
     width: 46px;
     height: 62px;
-    flex: 0 0 auto;
     border-radius: 10px;
-    overflow: hidden;
-    background: #c4b5fd;
   }
 
-  .trailer-movie-card-poster img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .trailer-movie-card-copy {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .trailer-movie-card-title {
-    color: #fff;
+  .trailer-movie-card--dock .trailer-movie-card-title {
     font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
-  .trailer-movie-card-meta {
+  .trailer-movie-card--dock .trailer-movie-card-meta {
     margin-top: 3px;
-    color: #b8b8c2;
     font-size: 12px;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
-  .trailer-movie-card-btn {
-    border: 0;
-    cursor: pointer;
-    font: inherit;
-  }
-
-  .trailer-movie-card-btn--primary {
+  .trailer-movie-card--dock .trailer-movie-card-btn--primary {
     flex: 0 0 auto;
     border-radius: 999px;
     padding: 8px 14px;
-    background: linear-gradient(180deg, #c084fc 0%, #9333ea 100%);
-    color: #fff;
     font-size: 14px;
-    font-weight: 700;
-  }
-
-  .trailer-movie-card--ended {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 16px;
-    background: #000;
-    pointer-events: auto;
-  }
-
-  .trailer-movie-card-poster--ended {
-    width: 112px;
-    height: 156px;
-    border-radius: 16px;
-  }
-
-  .trailer-movie-card--ended .trailer-movie-card-copy {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .trailer-movie-card--ended .trailer-movie-card-title {
-    font-size: 22px;
-    white-space: normal;
-  }
-
-  .trailer-movie-card--ended .trailer-movie-card-meta {
-    margin-top: 0;
-    margin-bottom: 6px;
-    font-size: 14px;
-  }
-
-  .trailer-movie-card--ended .trailer-movie-card-btn {
-    width: 100%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border-radius: 999px;
-    padding: 12px 16px;
-    font-size: 16px;
-  }
-
-  .trailer-movie-card-btn--ghost {
-    background: #141414;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.14);
   }
 }
 
-@media (max-width: 969px) and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
   .trailer-movie-card-dock {
     transition: none;
   }

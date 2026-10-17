@@ -799,11 +799,7 @@ const VideoPlayerControls = ({
       <VideoLoader video={mediaNode} size={sharedMediaRef ? 'lg' : 'md'} />
 
       {promoMovie ? (
-        <TrailerMovieCard
-          movie={promoMovie}
-          video={mediaNode}
-          controlsOpen={controlsOpen}
-        />
+        <TrailerMovieCard movie={promoMovie} video={mediaNode} />
       ) : null}
 
       {!loading && (
