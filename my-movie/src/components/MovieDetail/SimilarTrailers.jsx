@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
-import { useMoviesApi } from '../../context/MoviesApiContext';
+import { useSimilarTrailers } from '../../hooks/useSimilarTrailers';
 import { formatActionCount } from '../../utils/utils';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
@@ -341,23 +341,8 @@ const SimilarTrailers = ({
 }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { allMovies } = useMoviesApi();
-
-  const currentTypeTrailers = selectedTrailer?.typeTrailers || '';
-
-  const similarTrailers = useMemo(() => {
-    if (!currentTypeTrailers) return [];
-    return allMovies
-      .flatMap((movie) =>
-        (movie.trailersVideo || []).map((trailer) => ({
-          ...trailer,
-          movieId: movie.id,
-          movieTitle: movie.title,
-          ratingImdb: movie.ratingImdb,
-        }))
-      )
-      .filter((trailer) => trailer.typeTrailers === currentTypeTrailers);
-  }, [allMovies, currentTypeTrailers]);
+  const { data, isPending } = useSimilarTrailers();
+  const similarTrailers = data ?? [];
 
   const selectedKey = selectedTrailer
     ? (getTrailerKey
@@ -367,7 +352,7 @@ const SimilarTrailers = ({
 
   const titleClassName = `similar-trailers-title${hideTitleOnMobile ? ' similar-trailers-title--desktop-only' : ''}`;
 
-  if (trailerLoading) {
+  if (trailerLoading || isPending) {
     return (
       <div className="similar-trailers-container similar-trailers-container--loading">
         <SkeletonLoader
