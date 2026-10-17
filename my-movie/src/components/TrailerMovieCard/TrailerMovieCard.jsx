@@ -72,15 +72,24 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
   const { contentLang } = useContentLanguage();
   const title = localized(movie?.title, contentLang);
   const poster = moviePoster(movie, contentLang);
-  const meta = [movieYear(movie, contentLang), movieGenre(movie, contentLang), movieRating(movie)]
+  const rating = movieRating(movie);
+  const textMeta = [movieYear(movie, contentLang), movieGenre(movie, contentLang)]
     .filter(Boolean)
     .join(' · ');
+  const meta = textMeta || rating ? (
+    <div className="trailer-movie-card-meta">
+      {textMeta}
+      {textMeta && rating ? ' · ' : null}
+      {rating ? (
+        <span className="trailer-movie-card-rating" aria-label={`IMDb ${rating}`}>
+          <img className="trailer-movie-card-imdb" src="/img/imdbnew.png" alt="" />
+          {rating}
+        </span>
+      ) : null}
+    </div>
+  ) : null;
 
   if (mode === 'ended') {
-    const rating = movieRating(movie);
-    const textMeta = [movieYear(movie, contentLang), movieGenre(movie, contentLang)]
-      .filter(Boolean)
-      .join(' · ');
     return (
       <div className="trailer-movie-card trailer-movie-card--ended" role="dialog" aria-label={title}>
         <div className="trailer-movie-card-poster trailer-movie-card-poster--ended">
@@ -89,18 +98,7 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
         <div className="trailer-movie-card-copy">
           <div className="trailer-movie-card-head">
             <div className="trailer-movie-card-title">{title}</div>
-            {textMeta || rating ? (
-              <div className="trailer-movie-card-meta">
-                {textMeta}
-                {textMeta && rating ? ' · ' : null}
-                {rating ? (
-                  <span className="trailer-movie-card-rating" aria-label={`IMDb ${rating}`}>
-                    <img className="trailer-movie-card-imdb" src="/img/imdbnew.png" alt="" />
-                    {rating}
-                  </span>
-                ) : null}
-              </div>
-            ) : null}
+            {meta}
           </div>
           <div className="trailer-movie-card-actions">
           <div className="trailer-movie-card-row">
@@ -131,7 +129,7 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
       </div>
       <div className="trailer-movie-card-copy">
         <div className="trailer-movie-card-title">{title}</div>
-        {meta ? <div className="trailer-movie-card-meta">{meta}</div> : null}
+        {meta}
       </div>
       <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--primary" onClick={onWatch}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
