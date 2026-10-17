@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import { useWishlist } from '../context/WishlistContext';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { fetchAllTrillers } from '../api/trillersApi';
+import { useTrillerList } from '../hooks/useTrillerList';
 import { getLocalizedField } from '../utils/shortsMovieUtils';
 import { resolveShortsWithMovies } from '../utils/resolveShortsWithMovies';
 import {
@@ -121,10 +120,7 @@ const WishlistPage = () => {
     musicShortsLoading,
   } = useMusicApi();
   const { mixes } = useMusicMixes();
-  const { data: allTrillers = [], isPending: trillersLoading } = useQuery({
-    queryKey: ['trillers', 'with-description'],
-    queryFn: fetchAllTrillers,
-  });
+  const { data: allTrillers = [], isPending: trillersLoading } = useTrillerList();
   const [activeTab, setActiveTab] = useState('movie');
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [draftTab, setDraftTab] = useState('movie');

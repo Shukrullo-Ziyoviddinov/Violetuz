@@ -1,10 +1,9 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
-import { fetchAllTrillers } from '../../api/trillersApi';
+import { useTrillerList } from '../../hooks/useTrillerList';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import { MINI_VIDEO_KIND } from '../../MiniVideo/miniVideoSession';
 import { useMiniVideoPlayback } from '../../MiniVideo/MiniVideoPlaybackContext';
@@ -91,10 +90,7 @@ const Triller = ({ activeId }) => {
   const [sheetSettling, setSheetSettling] = useState(null);
   const [sheetSnap, setSheetSnap] = useState(false);
 
-  const { data: list = [], isPending, isError } = useQuery({
-    queryKey: ['trillers', 'with-description'],
-    queryFn: fetchAllTrillers,
-  });
+  const { data: list = [], isPending, isError } = useTrillerList();
 
   const activeTriller = useMemo(() => {
     if (!list.length) return null;

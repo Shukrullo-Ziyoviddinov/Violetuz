@@ -26,6 +26,17 @@ const seedTrillers = async () => {
       video: data.video,
       videoImg: data.videoImg,
       trillerGenre: data.trillerGenre,
+      filterGenre: Array.isArray(data.filterGenre) ? data.filterGenre : [],
+      filterCountry: Array.isArray(data.filterCountry) ? data.filterCountry : [],
+      actors: Array.isArray(data.actors) ? data.actors : [],
+      franchiseMovieId:
+        Number.isInteger(Number(data.franchiseMovieId)) && Number(data.franchiseMovieId) > 0
+          ? Number(data.franchiseMovieId)
+          : null,
+      franchiseOrder:
+        Number.isInteger(Number(data.franchiseOrder)) && Number(data.franchiseOrder) > 0
+          ? Number(data.franchiseOrder)
+          : null,
       ageLimit: Number.isFinite(Number(data.ageLimit)) ? Number(data.ageLimit) : 0,
       like: Number.isFinite(Number(data.like)) ? Number(data.like) : 0,
       dislike: Number.isFinite(Number(data.dislike)) ? Number(data.dislike) : 0,

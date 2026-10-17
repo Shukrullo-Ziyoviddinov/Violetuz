@@ -1,18 +1,14 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import TrillerCard from './TrillerCard';
-import { fetchAllTrillers } from '../../api/trillersApi';
+import { useTrillerList } from '../../hooks/useTrillerList';
 import './TrillerSection.css';
 
 const SKELETON_COUNT = 6;
 
 const TrillerSection = () => {
-  const { data: list = [], isPending } = useQuery({
-    queryKey: ['trillers', 'with-description'],
-    queryFn: fetchAllTrillers,
-  });
+  const { data: list = [], isPending } = useTrillerList();
 
   if (!isPending && !list.length) return null;
 

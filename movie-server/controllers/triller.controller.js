@@ -1,13 +1,34 @@
 const trillerService = require('../services/triller.service');
+const { serveTrillerList } = require('../recommendation-triller/services/serve.service');
 const { sendSuccess } = require('../utils/response');
 
-const getTrillers = async (_req, res) => {
-  const items = await trillerService.getAll();
-
+const sendList = (res, items) => {
   sendSuccess(res, {
     count: items.length,
     data: items,
   });
+};
+
+const getTrillers = async (req, res) => {
+  const items = await serveTrillerList({
+    userId: req.authUser?._id,
+  });
+  sendList(res, items);
+};
+
+const postGuestTrillers = async (req, res) => {
+  if (req.authUser) {
+    const items = await serveTrillerList({ userId: req.authUser._id });
+    sendList(res, items);
+    return;
+  }
+
+  const items = await serveTrillerList({
+    localHistory: req.body?.localHistory,
+    videoProgress: req.body?.videoProgress,
+    userAge: req.body?.userAge,
+  });
+  sendList(res, items);
 };
 
 const getTrillerById = async (req, res) => {
@@ -17,5 +38,6 @@ const getTrillerById = async (req, res) => {
 
 module.exports = {
   getTrillers,
+  postGuestTrillers,
   getTrillerById,
 };

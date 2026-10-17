@@ -4,3 +4,8 @@
  */
 
 export * from './guestHistory';
+export {
+  TRILLER_GUEST_PROGRESS_STORAGE_KEY,
+  getGuestTrillerProgress,
+  recordGuestTrillerProgress,
+} from './trillerGuestProgress';

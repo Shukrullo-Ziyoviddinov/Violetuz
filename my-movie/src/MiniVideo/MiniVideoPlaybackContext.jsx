@@ -17,6 +17,7 @@ import {
   mergeMiniVideoSession,
   sessionMatchesDetailPath,
 } from './miniVideoSession';
+import { useTrillerWatchPercent } from '../hooks/useTrillerWatchPercent';
 import './MiniVideoWindow.css';
 
 const MiniVideoPlaybackContext = createContext(null);
@@ -105,6 +106,13 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
   const [duration, setDuration] = useState(0);
   const [suppressed, setSuppressed] = useState(false);
   const [detailKey, setDetailKey] = useState(null);
+  const { note: noteTrillerWatch, flush: flushTrillerWatch } = useTrillerWatchPercent();
+  const noteTrillerRef = useRef(noteTrillerWatch);
+  const flushTrillerRef = useRef(flushTrillerWatch);
+  const activeTrillerIdRef = useRef(null);
+  const switchingTrillerRef = useRef(false);
+  noteTrillerRef.current = noteTrillerWatch;
+  flushTrillerRef.current = flushTrillerWatch;
 
   locationRef.current = location;
   sessionRef.current = session;
@@ -297,7 +305,16 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
       setActivated(true);
       claimVideoPlayback(engineRef.current);
     };
-    const onPause = () => setPlaying(false);
+    const reportTriller = (force) => {
+      if (switchingTrillerRef.current) return;
+      const current = sessionRef.current;
+      if (!current || current.kind !== MINI_VIDEO_KIND.TRILLER) return;
+      noteTrillerRef.current(current.id, video.currentTime, video.duration, { force });
+    };
+    const onPause = () => {
+      setPlaying(false);
+      reportTriller(true);
+    };
     const onTime = () => {
       const time = video.currentTime || 0;
       playbackTimeRef.current = time;
@@ -308,8 +325,12 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
       setCurrentTime(time);
       const nextDuration = video.duration;
       if (Number.isFinite(nextDuration)) setDuration(nextDuration);
+      reportTriller(false);
     };
-    const onEnded = () => setPlaying(false);
+    const onEnded = () => {
+      setPlaying(false);
+      reportTriller(true);
+    };
 
     video.addEventListener('play', onPlay);
     video.addEventListener('pause', onPause);
@@ -344,15 +365,23 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
   useEffect(() => {
     const video = mediaRef.current;
     if (!video || !session?.src) return;
+    const nextTrillerId = session.kind === MINI_VIDEO_KIND.TRILLER ? session.id : null;
+    const previousTrillerId = activeTrillerIdRef.current;
+    if (previousTrillerId != null && String(previousTrillerId) !== String(nextTrillerId)) {
+      flushTrillerRef.current(previousTrillerId);
+    }
+    activeTrillerIdRef.current = nextTrillerId;
     video.dataset.miniVideoKind = session.kind;
     video.dataset.miniVideoId = String(session.id);
     if (sameSource(video, session.src)) return;
+    switchingTrillerRef.current = true;
     const autoplay = sessionMatchesDetailPath(session, locationRef.current.pathname)
       && (session.kind === MINI_VIDEO_KIND.KLIP || session.kind === MINI_VIDEO_KIND.KONSERT);
     if (!autoplay) wantPlayRef.current = false;
     video.pause();
     video.poster = session.cover || '';
     video.src = session.src;
+    switchingTrillerRef.current = false;
     if (!autoplay) return;
     const pending = video.play();
     if (pending && typeof pending.then === 'function') {

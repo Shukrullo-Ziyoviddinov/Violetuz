@@ -65,6 +65,56 @@ const normalizeDescriptionLang = (value) => {
   };
 };
 
+const normalizeStringList = (value) => {
+  if (value == null || value === '') return [];
+  const source = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const list = [];
+  for (const item of source) {
+    const token = item != null ? String(item).trim() : '';
+    if (!token || seen.has(token)) continue;
+    seen.add(token);
+    list.push(token);
+  }
+  return list;
+};
+
+const normalizeActorIds = (value) => {
+  if (value == null || value === '') return [];
+  const source = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const list = [];
+  for (const item of source) {
+    if (typeof item === 'number' && Number.isInteger(item) && item > 0) {
+      const key = `n:${item}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      list.push(item);
+      continue;
+    }
+    const token = item != null ? String(item).trim() : '';
+    if (!token || seen.has(token)) continue;
+    const asNumber = Number(token);
+    if (Number.isInteger(asNumber) && String(asNumber) === token && asNumber > 0) {
+      const key = `n:${asNumber}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      list.push(asNumber);
+      continue;
+    }
+    seen.add(token);
+    list.push(token);
+  }
+  return list;
+};
+
+const normalizeOptionalPositiveInt = (value) => {
+  if (value == null || value === '') return null;
+  const num = Number(value);
+  if (!Number.isInteger(num) || num <= 0) return null;
+  return num;
+};
+
 const normalizeDescription = (value) => {
   if (!value || typeof value !== 'object') {
     return {
@@ -106,6 +156,11 @@ class TrillerService {
       video: normalizeLocalized(raw.video, 'video'),
       videoImg: normalizeLocalized(raw.videoImg, 'videoImg'),
       trillerGenre: normalizeLocalized(raw.trillerGenre, 'trillerGenre'),
+      filterGenre: normalizeStringList(raw.filterGenre),
+      filterCountry: normalizeStringList(raw.filterCountry),
+      actors: normalizeActorIds(raw.actors),
+      franchiseMovieId: normalizeOptionalPositiveInt(raw.franchiseMovieId),
+      franchiseOrder: normalizeOptionalPositiveInt(raw.franchiseOrder),
       ageLimit: normalizeCount(raw.ageLimit, 'ageLimit', 0),
       like: normalizeCount(raw.like, 'like', 0),
       dislike: normalizeCount(raw.dislike, 'dislike', 0),

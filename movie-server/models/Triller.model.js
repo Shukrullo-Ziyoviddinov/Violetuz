@@ -53,6 +53,54 @@ const trillerSchema = new mongoose.Schema(
       required: true,
       default: () => ({ uz: '', ru: '' }),
     },
+    /**
+     * Kino dididagi filterGenre belgilari. Masalan: Drama, Jangari.
+     * Tavsifdagi matn emas — solishtirish shu massiv bilan ketadi.
+     */
+    filterGenre: {
+      type: [String],
+      default: [],
+    },
+    /**
+     * Kino dididagi filterCountry belgilari. Masalan: USA, UK.
+     * Bir nechta davlat bo‘lishi mumkin.
+     */
+    filterCountry: {
+      type: [String],
+      default: [],
+    },
+    /**
+     * Kino kartochkasidagi aktyor id lari. actors.json dagi id.
+     */
+    actors: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: [],
+      validate: {
+        validator: (values) =>
+          Array.isArray(values) &&
+          values.every((item) => typeof item === 'number' || typeof item === 'string'),
+        message: 'actors must contain only number or string values',
+      },
+    },
+    /**
+     * Video qaysi kinoga biriktirilgani. movie.json dagi id.
+     * Bo‘sh bo‘lsa, video hali kinoga bog‘lanmagan.
+     */
+    franchiseMovieId: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * Shu kinodagi videolar tartibi. 1 — birinchi biriktirilgan, asosiy video.
+     */
+    franchiseOrder: {
+      type: Number,
+      default: null,
+      validate: {
+        validator: (value) => value == null || (Number.isInteger(value) && value >= 1),
+        message: 'franchiseOrder must be a positive integer',
+      },
+    },
     description: {
       type: localizedDescriptionSchema,
       default: () => ({ uz: {}, ru: {} }),
