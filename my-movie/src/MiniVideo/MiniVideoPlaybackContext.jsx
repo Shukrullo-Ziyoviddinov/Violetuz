@@ -273,6 +273,12 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     const video = mediaRef.current;
     const session = mergeMiniVideoSession(null, next);
     if (!video || !session) return;
+    const sameVideo = video.dataset.miniVideoKind === session.kind
+      && video.dataset.miniVideoId === String(session.id);
+    if (!sameVideo) {
+      video.muted = false;
+      video.volume = 1;
+    }
     setSession((prev) => mergeMiniVideoSession(prev, session));
     video.dataset.miniVideoKind = session.kind;
     video.dataset.miniVideoId = String(session.id);
@@ -438,13 +444,7 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     || playbackTimeRef.current > 0.05
     || (media && (media.currentTime > 0.05 || (!media.paused && media.currentSrc)))
   );
-  const switchedInPage = Boolean(
-    session
-    && !onDetailPage
-    && detailPageRef.current
-    && ownerPageRef.current === detailPageRef.current
-  );
-  const showMini = Boolean(session && progressed && !onDetailPage && !switchedInPage && !suppressed);
+  const showMini = Boolean(session && progressed && !onDetailPage && !suppressed);
   const progress = duration > 0 ? currentTime / duration : 0;
   const labels = windowLabels(session?.kind);
 

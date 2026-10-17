@@ -718,6 +718,8 @@ const MusicVideoPlayer = forwardRef(({
     setIsPlaying(!el.paused && !el.ended);
     setCurrentTime(el.currentTime || 0);
     if (Number.isFinite(el.duration)) setDuration(el.duration);
+    setVolume(el.volume);
+    setIsMuted(el.muted);
 
     const onPlay = () => setIsPlaying(true);
     const onPause = () => {
