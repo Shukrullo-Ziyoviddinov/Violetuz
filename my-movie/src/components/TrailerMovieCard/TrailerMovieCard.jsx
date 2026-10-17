@@ -7,6 +7,7 @@ import { formatMovieRating } from '../Rating/CalculateRating';
 import './TrailerMovieCard.css';
 
 const SHOW_AFTER_SECONDS = 10;
+const DOCK_SLIDE_MS = 650;
 
 const localized = (value, lang) => {
   if (!value) return '';
@@ -49,14 +50,32 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
     .join(' · ');
 
   if (mode === 'ended') {
+    const rating = movieRating(movie);
+    const textMeta = [movieYear(movie, contentLang), movieGenre(movie, contentLang)]
+      .filter(Boolean)
+      .join(' · ');
     return (
       <div className="trailer-movie-card trailer-movie-card--ended" role="dialog" aria-label={title}>
         <div className="trailer-movie-card-poster trailer-movie-card-poster--ended">
           {poster ? <img src={poster} alt="" /> : null}
         </div>
         <div className="trailer-movie-card-copy">
-          <div className="trailer-movie-card-title">{title}</div>
-          {meta ? <div className="trailer-movie-card-meta">{meta}</div> : null}
+          <div className="trailer-movie-card-head">
+            <div className="trailer-movie-card-title">{title}</div>
+            {textMeta || rating ? (
+              <div className="trailer-movie-card-meta">
+                {textMeta}
+                {textMeta && rating ? ' · ' : null}
+                {rating ? (
+                  <span className="trailer-movie-card-rating" aria-label={`IMDb ${rating}`}>
+                    <img className="trailer-movie-card-imdb" src="/img/imdbnew.png" alt="" />
+                    {rating}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+          <div className="trailer-movie-card-actions">
           <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--primary" onClick={onWatch}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <polygon points="6 4 20 12 6 20" />
@@ -69,6 +88,7 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
             </svg>
             {t('detail.watchAgain', "Qayta ko'rish")}
           </button>
+          </div>
         </div>
       </div>
     );
@@ -101,9 +121,11 @@ const TrailerMovieCard = ({ movie, video }) => {
   const [phase, setPhase] = useState('hidden');
   const [dockShown, setDockShown] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     setDismissed(false);
+    setClosing(false);
   }, [movie?.id, video]);
 
   useEffect(() => {
@@ -121,6 +143,7 @@ const TrailerMovieCard = ({ movie, video }) => {
     };
     const onNewSource = () => {
       setDismissed(false);
+      setClosing(false);
       sync();
     };
 
@@ -146,11 +169,24 @@ const TrailerMovieCard = ({ movie, video }) => {
   useEffect(() => {
     if (!dockActive) {
       setDockShown(false);
+      setClosing(false);
       return undefined;
     }
-    const frame = window.requestAnimationFrame(() => setDockShown(true));
-    return () => window.cancelAnimationFrame(frame);
+    let second = 0;
+    const first = window.requestAnimationFrame(() => {
+      second = window.requestAnimationFrame(() => setDockShown(true));
+    });
+    return () => {
+      window.cancelAnimationFrame(first);
+      window.cancelAnimationFrame(second);
+    };
   }, [dockActive]);
+
+  useEffect(() => {
+    if (!closing) return undefined;
+    const timer = window.setTimeout(() => setDismissed(true), DOCK_SLIDE_MS);
+    return () => window.clearTimeout(timer);
+  }, [closing]);
 
   if (!movie?.id) return null;
 
@@ -173,7 +209,9 @@ const TrailerMovieCard = ({ movie, video }) => {
 
   const onDismiss = (event) => {
     stop(event);
-    setDismissed(true);
+    if (closing) return;
+    setDockShown(false);
+    setClosing(true);
   };
 
   if (phase === 'ended') {
