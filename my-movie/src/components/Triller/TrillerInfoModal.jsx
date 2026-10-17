@@ -166,11 +166,21 @@ const TrillerInfoModal = ({ open, onClose, description }) => {
     if (e.target === e.currentTarget) requestClose();
   };
 
+  // Portal bo'lsa ham React touch hodisalari ota sahifaga (sheet drag) ko'tariladi
+  const stopTouch = (e) => e.stopPropagation();
+  const handleOverlayTouchEnd = (e) => {
+    e.stopPropagation();
+    closeFromOverlay(e);
+  };
+
   return createPortal(
     <div
       className={`triller-info-modal-overlay${visible ? ' is-visible' : ''}`}
       onClick={closeFromOverlay}
-      onTouchEnd={closeFromOverlay}
+      onTouchStart={stopTouch}
+      onTouchMove={stopTouch}
+      onTouchEnd={handleOverlayTouchEnd}
+      onTouchCancel={stopTouch}
       role="presentation"
     >
       <div

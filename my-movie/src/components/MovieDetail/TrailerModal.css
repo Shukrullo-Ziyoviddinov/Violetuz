@@ -1010,6 +1010,14 @@ button.trailer-modal-controls-dislike {
     max-height: 100dvh;
   }
 
+  /* Tugash kartochkasi video bloki bilan cho'zilmaydi — kadr balandligida markazda qoladi */
+  .trailer-modal .trailer-movie-card-host.is-ended {
+    inset: auto 0;
+    top: 50%;
+    height: min(56.25vw, 100%);
+    transform: translateY(-50%);
+  }
+
   .trailer-modal--sheet-dragging .trailer-modal-scroll-area {
     transition: none;
     touch-action: none;
