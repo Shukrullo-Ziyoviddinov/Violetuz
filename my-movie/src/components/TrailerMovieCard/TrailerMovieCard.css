@@ -277,6 +277,18 @@
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
   }
 
+  /* Poster rangi (useDominantColor) — topilmasa yuqoridagi fon qoladi */
+  .trailer-movie-card-dock.has-tint .trailer-movie-card--dock {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(var(--trailer-card-tint), 0.96) 0%,
+        rgba(var(--trailer-card-tint), 0.72) 100%
+      ),
+      #0e0e10;
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
   .trailer-movie-card--dock .trailer-movie-card-poster {
     width: 46px;
     height: 62px;

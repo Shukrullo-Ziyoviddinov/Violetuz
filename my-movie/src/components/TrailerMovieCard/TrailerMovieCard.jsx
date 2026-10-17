@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useDominantColor } from '../../hooks/useDominantColor';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import './TrailerMovieCard.css';
 
@@ -150,6 +151,8 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
 const TrailerMovieCard = ({ movie, video }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { contentLang } = useContentLanguage();
+  const tint = useDominantColor(moviePoster(movie, contentLang) || null);
   const [phase, setPhase] = useState('hidden');
   const [dockShown, setDockShown] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -263,7 +266,8 @@ const TrailerMovieCard = ({ movie, video }) => {
 
   return createPortal(
     <div
-      className={`trailer-movie-card-dock${dockShown ? ' is-visible' : ''}`}
+      className={`trailer-movie-card-dock${dockShown ? ' is-visible' : ''}${tint ? ' has-tint' : ''}`}
+      style={tint ? { '--trailer-card-tint': `${tint.r}, ${tint.g}, ${tint.b}` } : undefined}
       onClick={stop}
       onTouchStart={stop}
       onTouchEnd={stop}
