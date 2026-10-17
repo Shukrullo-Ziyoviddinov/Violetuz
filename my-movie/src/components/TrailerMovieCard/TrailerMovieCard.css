@@ -1,0 +1,165 @@
+.trailer-movie-card-host {
+  display: none;
+}
+
+@media (max-width: 969px) {
+  .trailer-movie-card-host {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 70;
+    pointer-events: none;
+  }
+
+  .trailer-movie-card-host.is-ended {
+    z-index: 80;
+    pointer-events: auto;
+  }
+
+  .trailer-movie-card-dock {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 12px;
+    transform: translateY(130%);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease, bottom 0.25s ease;
+    pointer-events: none;
+  }
+
+  .trailer-movie-card-host.is-controls-open .trailer-movie-card-dock {
+    bottom: 68px;
+  }
+
+  .trailer-movie-card-dock.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .trailer-movie-card--dock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px 8px 8px;
+    border-radius: 18px;
+    background: rgba(18, 10, 28, 0.94);
+    border: 1px solid rgba(168, 85, 247, 0.45);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  .trailer-movie-card-poster {
+    width: 46px;
+    height: 62px;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #c4b5fd;
+  }
+
+  .trailer-movie-card-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .trailer-movie-card-copy {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .trailer-movie-card-title {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .trailer-movie-card-meta {
+    margin-top: 3px;
+    color: #b8b8c2;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .trailer-movie-card-btn {
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .trailer-movie-card-btn--primary {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: linear-gradient(180deg, #c084fc 0%, #9333ea 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .trailer-movie-card--ended {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 16px;
+    background: #000;
+    pointer-events: auto;
+  }
+
+  .trailer-movie-card-poster--ended {
+    width: 112px;
+    height: 156px;
+    border-radius: 16px;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-title {
+    font-size: 22px;
+    white-space: normal;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-meta {
+    margin-top: 0;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  .trailer-movie-card-btn--ghost {
+    background: #141414;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+}
+
+@media (max-width: 969px) and (prefers-reduced-motion: reduce) {
+  .trailer-movie-card-dock {
+    transition: none;
+  }
+}

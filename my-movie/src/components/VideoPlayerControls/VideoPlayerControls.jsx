@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import MusicSettingsModal from '../../Music/MusicVideoPlayer/MusicSettingsModal';
 import FramePreviewPlayer from './FramePreviewPlayer';
 import VideoLoader from '../VideoLoader/VideoLoader';
+import TrailerMovieCard from '../TrailerMovieCard/TrailerMovieCard';
 import './VideoPlayerControls.css';
 
 const SPEED_OPTIONS = [1, 1.5, 2];
@@ -41,6 +42,7 @@ const VideoPlayerControls = ({
   controlsSuppressed = false,
   renderSettings = null,
   videoElementRef = null,
+  promoMovie = null,
 }) => {
   const { t } = useTranslation();
   const videoRef = useRef(null);
@@ -795,6 +797,14 @@ const VideoPlayerControls = ({
       )}
 
       <VideoLoader video={mediaNode} size={sharedMediaRef ? 'lg' : 'md'} />
+
+      {promoMovie ? (
+        <TrailerMovieCard
+          movie={promoMovie}
+          video={mediaNode}
+          controlsOpen={controlsOpen}
+        />
+      ) : null}
 
       {!loading && (
         <>

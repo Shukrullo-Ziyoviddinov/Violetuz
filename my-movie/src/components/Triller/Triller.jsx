@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { useTrillerList } from '../../hooks/useTrillerList';
+import { useMoviesApi } from '../../context/MoviesApiContext';
 import VideoPlayerControls from '../VideoPlayerControls/VideoPlayerControls';
 import { MINI_VIDEO_KIND } from '../../MiniVideo/miniVideoSession';
 import { useMiniVideoPlayback } from '../../MiniVideo/MiniVideoPlaybackContext';
@@ -69,6 +70,7 @@ const Triller = ({ activeId }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
+  const { allMovies } = useMoviesApi();
   const { mediaRef, session, bindSession, activateSession, registerDetailSlot, registerDetailKey } = useMiniVideoPlayback();
   const scrollRef = useRef(null);
   const pinRef = useRef(null);
@@ -97,6 +99,12 @@ const Triller = ({ activeId }) => {
     const found = list.find((item) => String(item.id) === String(activeId));
     return found || list[0];
   }, [list, activeId]);
+
+  const promoMovie = useMemo(() => {
+    const movieId = activeTriller?.franchiseMovieId;
+    if (movieId == null || movieId === '') return null;
+    return allMovies.find((item) => Number(item.id) === Number(movieId)) || null;
+  }, [activeTriller?.franchiseMovieId, allMovies]);
 
   const sideTrillers = useMemo(() => {
     if (!activeTriller) return list;
@@ -619,6 +627,7 @@ const Triller = ({ activeId }) => {
                 onMediaSlot={registerDetailSlot}
                 mediaActive={mediaActive}
                 onActivate={trillerSession ? () => activateSession(trillerSession) : null}
+                promoMovie={showLoading ? null : promoMovie}
               />
             </div>
           </div>

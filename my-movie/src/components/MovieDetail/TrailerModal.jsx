@@ -676,6 +676,7 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                 onMediaSlot={isPage ? registerDetailSlot : null}
                 mediaActive={isPage && mediaActive}
                 onActivate={isPage && trailerSession ? () => activateSession(trailerSession) : null}
+                promoMovie={showLoading ? null : ratingSourceMovie}
               />
             )}
           </div>
