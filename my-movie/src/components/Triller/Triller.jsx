@@ -105,7 +105,7 @@ const Triller = ({ activeId }) => {
 
   const genreOptions = useMemo(() => {
     const map = new Map();
-    for (const item of list) {
+    for (const item of sideTrillers) {
       const genre = item?.trillerGenre;
       if (!genre || typeof genre !== 'object') continue;
       const id = String(genre.uz || genre.ru || '').trim();
@@ -116,7 +116,13 @@ const Triller = ({ activeId }) => {
       });
     }
     return Array.from(map.values());
-  }, [list, contentLang]);
+  }, [sideTrillers, contentLang]);
+
+  useEffect(() => {
+    if (selectedGenre === 'all') return;
+    if (genreOptions.some((genre) => genre.id === selectedGenre)) return;
+    setSelectedGenre('all');
+  }, [genreOptions, selectedGenre]);
 
   const filteredSideTrillers = useMemo(() => {
     if (selectedGenre === 'all') return sideTrillers;

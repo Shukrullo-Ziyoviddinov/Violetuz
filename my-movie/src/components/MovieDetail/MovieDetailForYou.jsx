@@ -219,7 +219,35 @@ const MovieDetailForYou = ({ movieId }) => {
       });
   };
 
+  const genresOfMovie = (movie) => {
+    const value = movie?.filterGenre;
+    if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
+    if (value != null && String(value).trim()) return [String(value).trim()];
+    return [];
+  };
+
+  const visibleMovies = useMemo(
+    () => pageMovies.filter((movie) => String(movie?.id) !== String(movieId)),
+    [pageMovies, movieId]
+  );
+
+  const visibleGenres = useMemo(() => {
+    if (hasMore) return genreOptions;
+    const present = new Set();
+    for (const movie of visibleMovies) {
+      for (const name of genresOfMovie(movie)) present.add(name);
+    }
+    return genreOptions.filter((genre) => present.has(genre));
+  }, [genreOptions, visibleMovies, hasMore]);
+
   const waiting = similarLoading || moviesLoading || initialLoading;
+
+  useEffect(() => {
+    if (waiting || replacing || hasMore) return;
+    if (selectedGenreRef.current === 'all') return;
+    if (visibleGenres.includes(selectedGenreRef.current)) return;
+    handleGenreSelect('all', { pin: false });
+  }, [waiting, replacing, hasMore, visibleGenres]);
 
   useEffect(() => {
     if (isDesktop) {
@@ -247,7 +275,7 @@ const MovieDetailForYou = ({ movieId }) => {
   const showArc = phase === 'arc';
   const showListShadow = hasMore || phase !== 'idle';
 
-  if (!waiting && !replacing && selectedGenre === 'all' && pageMovies.length === 0 && pendingCount === 0) {
+  if (!waiting && !replacing && selectedGenre === 'all' && visibleMovies.length === 0 && pendingCount === 0 && !hasMore) {
     return null;
   }
 
@@ -290,7 +318,7 @@ const MovieDetailForYou = ({ movieId }) => {
                 >
                   {t('movies.filterAll', 'Hammasi')}
                 </button>
-                {genreOptions.map((genre) => (
+                {visibleGenres.map((genre) => (
                   <button
                     key={genre}
                     type="button"
@@ -309,7 +337,7 @@ const MovieDetailForYou = ({ movieId }) => {
             ? Array.from({ length: firstPage }, (_, index) => (
                 <MovieDetailForYouCardSkeleton key={`movie-detail-for-you-skeleton-${index}`} />
               ))
-            : pageMovies.map((movie) => (
+            : visibleMovies.map((movie) => (
                 <MovieDetailForYouCard
                   key={movie.id}
                   movie={movie}

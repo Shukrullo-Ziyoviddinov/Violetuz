@@ -263,10 +263,14 @@ const VideoPage = () => {
   const relatedTitleKey = relatedMeta.titleKey;
   const relatedTitleDefault = relatedMeta.titleDefault;
   const wishlistType = isConcertVideo ? 'konsert' : 'klip';
+  const otherRelatedList = useMemo(
+    () => relatedList.filter((item) => !matchId(item?.id, video?.id)),
+    [relatedList, video?.id]
+  );
 
   const genreOptions = useMemo(() => {
     const map = new Map();
-    for (const item of relatedList) {
+    for (const item of otherRelatedList) {
       const genreId = String(item?.genre || '').trim();
       if (!genreId || map.has(genreId)) continue;
       map.set(genreId, {
@@ -275,7 +279,13 @@ const VideoPage = () => {
       });
     }
     return Array.from(map.values());
-  }, [relatedList]);
+  }, [otherRelatedList]);
+
+  useEffect(() => {
+    if (selectedGenre === 'all') return;
+    if (genreOptions.some((genre) => genre.id === selectedGenre)) return;
+    setSelectedGenre('all');
+  }, [genreOptions, selectedGenre]);
 
   const filteredRelatedList = useMemo(() => {
     if (selectedGenre === 'all') return relatedList;
