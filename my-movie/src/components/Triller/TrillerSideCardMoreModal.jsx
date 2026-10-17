@@ -12,6 +12,9 @@ const FLICK_MS = 280;
 const FLICK_MIN_PX = 48;
 const BODY_LOCK = 'triller-side-more-open';
 
+// Portal bo'lsa ham React touch hodisalari ota sahifaga (sheet drag) ko'tariladi
+const stopPortalTouch = (e) => e.stopPropagation();
+
 /**
  * Side card ⋯ menyusi:
  * Desktop — icon ostidan dropdown
@@ -279,11 +282,16 @@ const TrillerSideCardMoreModal = ({
     <div
       className={`triller-side-more-overlay${visible ? ' is-visible' : ''}`}
       onClick={(e) => {
+        e.stopPropagation();
         if (e.target === e.currentTarget) requestClose();
       }}
+      onTouchStart={stopPortalTouch}
+      onTouchMove={stopPortalTouch}
       onTouchEnd={(e) => {
+        e.stopPropagation();
         if (e.target === e.currentTarget) requestClose();
       }}
+      onTouchCancel={stopPortalTouch}
       role="presentation"
     >
       <div
