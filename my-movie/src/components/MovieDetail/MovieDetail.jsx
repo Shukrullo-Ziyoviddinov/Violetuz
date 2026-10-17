@@ -7,6 +7,7 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import WatchModal from './WatchModal';
+import { useMiniVideoDetailPage } from '../../MiniVideo/MiniVideoPlaybackContext';
 import MovieComments from './MovieComments';
 import SimilarMovies from './SimilarMovies';
 import MovieDetailForYou from './MovieDetailForYou';
@@ -547,6 +548,7 @@ const MovieDetailDescriptionImg = ({ src }) => {
 };
 
 const MovieDetail = () => {
+  useMiniVideoDetailPage();
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { useWishlist } from '../../context/WishlistContext';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import './TrailerMovieCard.css';
 
@@ -38,6 +39,32 @@ const movieRating = (movie) => {
   const raw = movie?.ratingImdb;
   if (raw == null || raw === '' || raw === 'none' || !Number.isFinite(Number(raw))) return '';
   return formatMovieRating(raw);
+};
+
+const SaveButton = ({ movieId }) => {
+  const { t } = useTranslation();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const saved = isInWishlist(movieId, 'movie');
+  const label = t('detail.save', 'Saqlash');
+
+  const onSave = (event) => {
+    event.stopPropagation();
+    toggleWishlist(movieId, 'movie');
+  };
+
+  return (
+    <button
+      type="button"
+      className={`trailer-movie-card-save${saved ? ' is-saved' : ''}`}
+      onClick={onSave}
+      aria-label={label}
+      aria-pressed={saved}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+      </svg>
+    </button>
+  );
 };
 
 const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
@@ -76,12 +103,15 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
             ) : null}
           </div>
           <div className="trailer-movie-card-actions">
-          <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--primary" onClick={onWatch}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <polygon points="6 4 20 12 6 20" />
-            </svg>
-            {t('detail.watchNow', "Hozir ko'rish")}
-          </button>
+          <div className="trailer-movie-card-row">
+            <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--primary" onClick={onWatch}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="6 4 20 12 6 20" />
+              </svg>
+              {t('detail.watchNow', "Hozir ko'rish")}
+            </button>
+            <SaveButton movieId={movie.id} />
+          </div>
           <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--ghost" onClick={onReplay}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6a6 6 0 0 1-6 6 6 6 0 0 1-5.65-4H4.26A8 8 0 0 0 12 21a8 8 0 0 0 0-16z" />
@@ -104,8 +134,12 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
         {meta ? <div className="trailer-movie-card-meta">{meta}</div> : null}
       </div>
       <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--primary" onClick={onWatch}>
-        {t('detail.watch', "Ko'rish")}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <polygon points="6 4 20 12 6 20" />
+        </svg>
+        {t('detail.watchShort', 'Tomosha')}
       </button>
+      <SaveButton movieId={movie.id} />
     </div>
   );
 };

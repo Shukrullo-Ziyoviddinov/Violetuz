@@ -94,6 +94,8 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
   const lastRectRef = useRef(null);
   const engineRef = useRef(null);
   const detailKeyRef = useRef(null);
+  const detailPageRef = useRef(null);
+  const ownerPageRef = useRef(null);
 
   if (mediaRef.current == null && typeof document !== 'undefined') {
     mediaRef.current = createMediaElement();
@@ -157,6 +159,31 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     video.play().catch(() => {});
   };
 
+  const resetPlayback = useCallback(() => {
+    const video = mediaRef.current;
+    const current = sessionRef.current;
+    if (video) {
+      if (current?.kind === MINI_VIDEO_KIND.TRILLER) {
+        noteTrillerRef.current(current.id, video.currentTime, video.duration, { force: true });
+      }
+      video.pause();
+      video.removeAttribute('src');
+      delete video.dataset.miniVideoKind;
+      delete video.dataset.miniVideoId;
+      video.load();
+    }
+    sessionRef.current = null;
+    ownerPageRef.current = null;
+    wantPlayRef.current = false;
+    playbackTimeRef.current = 0;
+    activatedRef.current = false;
+    setSession(null);
+    setActivated(false);
+    setPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+  }, []);
+
   const placeVideo = useCallback(() => {
     const video = mediaRef.current;
     const park = parkRef.current;
@@ -164,12 +191,19 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     if (!video.isConnected) park.appendChild(video);
 
     const path = locationRef.current.pathname;
-    const current = sessionRef.current;
+    let current = sessionRef.current;
     const needsDetailKey = current?.kind === MINI_VIDEO_KIND.TREYLER
       || current?.kind === MINI_VIDEO_KIND.TRILLER;
     const detailMatches = !needsDetailKey
       || (detailKeyRef.current != null && String(detailKeyRef.current) === String(current.id));
     const onDetailPage = sessionMatchesDetailPath(current, path) && detailMatches;
+    const page = detailPageRef.current;
+    if (onDetailPage) {
+      if (page) ownerPageRef.current = page;
+    } else if (current && page && ownerPageRef.current === page) {
+      resetPlayback();
+      current = null;
+    }
     const detail = detailSlotRef.current;
     const mini = miniSlotRef.current;
     const keep = Boolean(
@@ -199,7 +233,16 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     else clearHold(park);
 
     if (mode !== 'detail') resumeIfNeeded();
-  }, []);
+  }, [resetPlayback]);
+
+  const registerDetailPage = useCallback(() => {
+    const page = {};
+    detailPageRef.current = page;
+    placeVideo();
+    return () => {
+      if (detailPageRef.current === page) detailPageRef.current = null;
+    };
+  }, [placeVideo]);
 
   const registerDetailSlot = useCallback((node) => {
     detailSlotRef.current = node;
@@ -245,25 +288,10 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
   }, []);
 
   const close = useCallback(() => {
-    const video = mediaRef.current;
-    if (video) {
-      video.pause();
-      video.removeAttribute('src');
-      delete video.dataset.miniVideoKind;
-      delete video.dataset.miniVideoId;
-      video.load();
-    }
+    resetPlayback();
     detailSlotRef.current = null;
-    wantPlayRef.current = false;
-    playbackTimeRef.current = 0;
-    activatedRef.current = false;
-    setSession(null);
-    setActivated(false);
-    setPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
     placeVideo();
-  }, [placeVideo]);
+  }, [placeVideo, resetPlayback]);
 
   const togglePlay = useCallback(() => {
     const video = mediaRef.current;
@@ -410,7 +438,13 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     || playbackTimeRef.current > 0.05
     || (media && (media.currentTime > 0.05 || (!media.paused && media.currentSrc)))
   );
-  const showMini = Boolean(session && progressed && !onDetailPage && !suppressed);
+  const switchedInPage = Boolean(
+    session
+    && !onDetailPage
+    && detailPageRef.current
+    && ownerPageRef.current === detailPageRef.current
+  );
+  const showMini = Boolean(session && progressed && !onDetailPage && !switchedInPage && !suppressed);
   const progress = duration > 0 ? currentTime / duration : 0;
   const labels = windowLabels(session?.kind);
 
@@ -422,8 +456,9 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
       activateSession,
       registerDetailSlot,
       registerDetailKey,
+      registerDetailPage,
     }),
-    [session, bindSession, activateSession, registerDetailSlot, registerDetailKey]
+    [session, bindSession, activateSession, registerDetailSlot, registerDetailKey, registerDetailPage]
   );
 
   return (
@@ -460,4 +495,10 @@ export const useMiniVideoPlayback = () => {
     throw new Error('useMiniVideoPlayback MiniVideoPlaybackProvider ichida ishlatiladi');
   }
   return value;
+};
+
+/** Sahifa ichida video almashsa eski video mini oynaga chiqmaydi; faqat sahifadan chiqilganda chiqadi */
+export const useMiniVideoDetailPage = () => {
+  const { registerDetailPage } = useMiniVideoPlayback();
+  useLayoutEffect(() => registerDetailPage(), [registerDetailPage]);
 };

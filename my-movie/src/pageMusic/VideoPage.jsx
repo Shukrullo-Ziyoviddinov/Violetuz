@@ -14,7 +14,7 @@ import ViewCount from '../components/ViewCount/ViewCount';
 import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
 import { MINI_VIDEO_KIND } from '../MiniVideo/miniVideoSession';
-import { useMiniVideoPlayback } from '../MiniVideo/MiniVideoPlaybackContext';
+import { useMiniVideoDetailPage, useMiniVideoPlayback } from '../MiniVideo/MiniVideoPlaybackContext';
 import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenreFilter';
 import VideoDetailTrendCard from './VideoDetailTrendCard';
 import MovieComments from '../components/MovieDetail/MovieComments';
@@ -93,6 +93,7 @@ const VideoPage = () => {
   } = useMusicApi();
   const videoRef = useRef(null);
   const { mediaRef, session, bindSession, activateSession, registerDetailSlot } = useMiniVideoPlayback();
+  useMiniVideoDetailPage();
   const mixQueueMemoryRef = useRef({});
   const commentsRef = useRef(null);
   const mainScrollRef = useRef(null);

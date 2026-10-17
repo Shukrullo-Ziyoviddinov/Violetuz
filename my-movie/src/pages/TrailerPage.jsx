@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import TrailerModal from '../components/MovieDetail/TrailerModal';
+import { useMiniVideoDetailPage } from '../MiniVideo/MiniVideoPlaybackContext';
 import '../components/MovieDetail/TrailerModal.css';
 import './TrailerPage.css';
 
 const TrailerPage = () => {
+  useMiniVideoDetailPage();
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();

@@ -108,6 +108,33 @@
   min-width: 0;
 }
 
+.trailer-movie-card-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.trailer-movie-card-save {
+  flex: 0 0 auto;
+  width: var(--trailer-card-btn-h, 32px);
+  height: var(--trailer-card-btn-h, 32px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #141414;
+  color: #fff;
+  cursor: pointer;
+}
+
+.trailer-movie-card-save.is-saved {
+  color: #c084fc;
+  border-color: rgba(192, 132, 252, 0.55);
+}
+
 .trailer-movie-card-rating {
   display: inline-flex;
   align-items: center;
@@ -132,19 +159,29 @@
   font-size: 12px;
 }
 
+.trailer-movie-card--ended {
+  --trailer-card-btn-h: 30px;
+}
+
 .trailer-movie-card--ended .trailer-movie-card-btn {
   width: 100%;
   min-width: 0;
+  height: var(--trailer-card-btn-h);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   border-radius: 999px;
-  padding: 7px 10px;
+  padding: 0 10px;
   font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.trailer-movie-card--ended .trailer-movie-card-row .trailer-movie-card-btn {
+  flex: 1 1 auto;
+  width: auto;
 }
 
 .trailer-movie-card--ended .trailer-movie-card-btn svg {
@@ -184,8 +221,12 @@
     font-size: 15px;
   }
 
+  .trailer-movie-card--ended {
+    --trailer-card-btn-h: 28px;
+  }
+
   .trailer-movie-card--ended .trailer-movie-card-btn {
-    padding: 6px 8px;
+    padding: 0 8px;
     font-size: 11px;
   }
 
@@ -252,11 +293,23 @@
     font-size: 12px;
   }
 
+  .trailer-movie-card--dock {
+    --trailer-card-btn-h: 34px;
+  }
+
   .trailer-movie-card--dock .trailer-movie-card-btn--primary {
     flex: 0 0 auto;
+    height: var(--trailer-card-btn-h);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     border-radius: 999px;
-    padding: 8px 14px;
+    padding: 0 14px;
     font-size: 14px;
+  }
+
+  .trailer-movie-card--dock .trailer-movie-card-save {
+    margin-left: -4px;
   }
 }
 

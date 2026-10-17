@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Triller from '../components/Triller/Triller';
+import { useMiniVideoDetailPage } from '../MiniVideo/MiniVideoPlaybackContext';
 import './TrillerPage.css';
 
 const TrillerPage = () => {
+  useMiniVideoDetailPage();
   const { id } = useParams();
 
   useEffect(() => {
