@@ -17,6 +17,9 @@ import './MovieComments.css';
 const MOBILE_MAX = 900;
 const PREVIEW_LIMIT_DEFAULT = 4;
 
+// Portal bo'lsa ham React touch hodisalari ota sahifaga (sheet drag) ko'tariladi
+const stopPortalTouch = (e) => e.stopPropagation();
+
 const MovieCommentItemSkeleton = ({ isReply = false, isModal = false }) => (
   <div
     className={`movie-detail-comment-item${isReply ? ' movie-detail-comment-reply' : ''}${
@@ -876,8 +879,16 @@ const MovieComments = forwardRef(
                   e.preventDefault();
                   e.stopPropagation();
                 }}
+                onTouchStart={stopPortalTouch}
+                onTouchMove={stopPortalTouch}
+                onTouchEnd={stopPortalTouch}
+                onTouchCancel={stopPortalTouch}
               />
               <div
+                onTouchStart={stopPortalTouch}
+                onTouchMove={stopPortalTouch}
+                onTouchEnd={stopPortalTouch}
+                onTouchCancel={stopPortalTouch}
                 className={`movie-detail-comments-modal${
                   commentsModalOpen ? ' is-open' : ''
                 }${isDraggingModal ? ' movie-detail-comments-modal-dragging' : ''}${
