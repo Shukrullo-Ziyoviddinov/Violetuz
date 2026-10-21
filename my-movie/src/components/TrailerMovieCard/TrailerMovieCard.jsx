@@ -14,6 +14,21 @@ import './TrailerMovieCard.css';
 
 const SHOW_AFTER_SECONDS = 10;
 const DOCK_SLIDE_MS = 650;
+const MOBILE_QUERY = '(max-width: 969px)';
+
+const useIsMobile = () => {
+  const [mobile, setMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches
+  );
+  useEffect(() => {
+    const query = window.matchMedia(MOBILE_QUERY);
+    const sync = () => setMobile(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+  return mobile;
+};
 
 const localized = (value, lang) => {
   if (!value) return '';
@@ -191,14 +206,15 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
 
 /**
  * Treyler kartochkasi.
- * Mobilda video 10 soniyaga yetganda sahifa pastidan chiqadi. X bilan yopiladi.
- * Video tugaganda pastdagi yo‘qoladi, pleer maydonini to‘ldiradi (mobil va desktop).
+ * Video 10 soniyaga yetganda chiqadi: mobilda sahifa pastidan, desktopda pleyerning o‘ng yuqorisida. X bilan yopiladi.
+ * Video tugaganda: mobilda pleer maydonini to‘ldiradi, desktopda o‘ng yuqorida markaziy tugmalargacha turadi.
  */
 const TrailerMovieCard = ({ movie, video }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const tint = useDominantColor(moviePoster(movie, contentLang) || null);
+  const isMobile = useIsMobile();
   const [phase, setPhase] = useState('hidden');
   const [dockShown, setDockShown] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -313,9 +329,9 @@ const TrailerMovieCard = ({ movie, video }) => {
 
   if (!dockActive || typeof document === 'undefined') return null;
 
-  return createPortal(
+  const dock = (
     <div
-      className={`trailer-movie-card-dock${dockShown ? ' is-visible' : ''}${tint ? ' has-tint' : ''}`}
+      className={`trailer-movie-card-dock${isMobile ? '' : ' is-inline'}${dockShown ? ' is-visible' : ''}${tint ? ' has-tint' : ''}`}
       style={tintStyle}
       onClick={stop}
       onTouchStart={stop}
@@ -332,9 +348,10 @@ const TrailerMovieCard = ({ movie, video }) => {
         </svg>
       </button>
       <TrailerMovieCardView movie={movie} mode="dock" onWatch={onWatch} onReplay={onReplay} />
-    </div>,
-    document.body
+    </div>
   );
+
+  return isMobile ? createPortal(dock, document.body) : dock;
 };
 
 export default TrailerMovieCard;

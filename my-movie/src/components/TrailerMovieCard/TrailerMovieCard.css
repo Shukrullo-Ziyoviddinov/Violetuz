@@ -210,9 +210,138 @@
   flex: 0 0 auto;
 }
 
-/* ==================== 10 soniyada: sahifa pasti (faqat mobil) ==================== */
+/* ==================== 10 soniyada: kartochka (mobil — sahifa pasti, desktop — pleer o'ng yuqorisi) ==================== */
 .trailer-movie-card-dock {
   display: none;
+}
+
+.trailer-movie-card-close {
+  position: absolute;
+  right: 0;
+  top: -34px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(18, 10, 28, 0.94);
+  color: #fff;
+  cursor: pointer;
+}
+
+.trailer-movie-card--dock {
+  --trailer-card-btn-h: 34px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 8px;
+  border-radius: 18px;
+  background: rgba(18, 10, 28, 0.96);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* Poster rangi (useDominantColor) — topilmasa yuqoridagi fon qoladi */
+.trailer-movie-card-dock.has-tint .trailer-movie-card--dock {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--trailer-card-tint), 0.96) 0%,
+      rgba(var(--trailer-card-tint), 0.72) 100%
+    ),
+    #0e0e10;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.trailer-movie-card--dock .trailer-movie-card-poster {
+  width: 46px;
+  height: 62px;
+  border-radius: 10px;
+}
+
+.trailer-movie-card--dock .trailer-movie-card-title {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.trailer-movie-card--dock .trailer-movie-card-meta {
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.trailer-movie-card--dock .trailer-movie-card-btn--primary {
+  flex: 0 0 auto;
+  height: var(--trailer-card-btn-h);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+.trailer-movie-card--dock .trailer-movie-card-save {
+  margin-left: -4px;
+}
+
+/* ==================== Desktop: ikkala kartochka pleyerning o'ng yuqorisida ==================== */
+@media (min-width: 970px) {
+  /* Balandlik markaziy tugmalargacha: play 72px, controls-center margin-bottom 40px */
+  .trailer-movie-card-host.is-ended {
+    inset: auto;
+    top: 16px;
+    right: 16px;
+    height: calc(50% - 92px);
+    min-height: 120px;
+    max-width: calc(100% - 32px);
+    overflow: visible;
+    container-type: normal;
+    --trailer-card-pad: 10px;
+  }
+
+  .trailer-movie-card--ended {
+    position: relative;
+    inset: auto;
+    height: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  .trailer-movie-card-poster--ended {
+    height: 100%;
+    width: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-copy {
+    flex: 0 1 240px;
+    width: 240px;
+    min-width: 0;
+    height: 100%;
+  }
+
+  .trailer-movie-card-dock.is-inline {
+    display: block;
+    position: absolute;
+    top: 50px;
+    right: 16px;
+    width: min(380px, calc(100% - 32px));
+    z-index: 80;
+    transform: translateX(24px);
+    opacity: 0;
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s ease;
+    pointer-events: none;
+  }
+
+  .trailer-movie-card-dock.is-inline.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 @media (max-width: 969px) {
@@ -267,81 +396,6 @@
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
-  }
-
-  .trailer-movie-card-close {
-    position: absolute;
-    right: 0;
-    top: -34px;
-    width: 28px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(18, 10, 28, 0.94);
-    color: #fff;
-    cursor: pointer;
-  }
-
-  .trailer-movie-card--dock {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px 8px 8px;
-    border-radius: 18px;
-    background: rgba(18, 10, 28, 0.96);
-    border: 1px solid rgba(168, 85, 247, 0.45);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-  }
-
-  /* Poster rangi (useDominantColor) — topilmasa yuqoridagi fon qoladi */
-  .trailer-movie-card-dock.has-tint .trailer-movie-card--dock {
-    background:
-      linear-gradient(
-        135deg,
-        rgba(var(--trailer-card-tint), 0.96) 0%,
-        rgba(var(--trailer-card-tint), 0.72) 100%
-      ),
-      #0e0e10;
-    border-color: rgba(255, 255, 255, 0.14);
-  } 
-
-  .trailer-movie-card--dock .trailer-movie-card-poster {
-    width: 46px;
-    height: 62px;
-    border-radius: 10px;
-  }
-
-  .trailer-movie-card--dock .trailer-movie-card-title {
-    font-size: 15px;
-    white-space: nowrap;
-  }
-
-  .trailer-movie-card--dock .trailer-movie-card-meta {
-    margin-top: 3px;
-    font-size: 12px;
-  }
-
-  .trailer-movie-card--dock {
-    --trailer-card-btn-h: 34px;
-  }
-
-  .trailer-movie-card--dock .trailer-movie-card-btn--primary {
-    flex: 0 0 auto;
-    height: var(--trailer-card-btn-h);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border-radius: 999px;
-    padding: 0 14px;
-    font-size: 14px;
-  }
-
-  .trailer-movie-card--dock .trailer-movie-card-save {
-    margin-left: -4px;
   }
 }
 
