@@ -69,14 +69,14 @@ const useWishlistPending = () => {
   return isLoggedIn && status !== 'ready' && status !== 'error';
 };
 
-const SaveButton = ({ movieId, loading = false }) => {
+const SaveButton = ({ movieId }) => {
   const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const wishlistPending = useWishlistPending();
   const saved = isInWishlist(movieId, 'movie');
   const label = t('detail.save', 'Saqlash');
 
-  if (loading || wishlistPending) {
+  if (movieId == null || wishlistPending) {
     return <SkeletonLoader variant="trailer-movie-card-save" />;
   }
 
@@ -109,18 +109,19 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
   const textMeta = [movieYear(movie, contentLang), movieGenre(movie, contentLang)]
     .filter(Boolean)
     .join(' · ');
-  const { showSkeleton: loading, imgRef, onLoad, onError } = useImageReady(poster);
+  const { showSkeleton: posterLoading, imgRef, onLoad, onError } = useImageReady(poster);
+  const loading = !title;
 
   const posterClass = (extra) => [
     'trailer-movie-card-poster',
     extra,
-    loading ? 'is-loading' : '',
+    posterLoading ? 'is-loading' : '',
   ].filter(Boolean).join(' ');
 
   const posterContent = (
     <>
+      {posterLoading ? <SkeletonLoader variant="trailer-movie-card-poster" /> : null}
       {poster ? <img ref={imgRef} src={poster} alt="" onLoad={onLoad} onError={onError} /> : null}
-      {loading ? <SkeletonLoader variant="trailer-movie-card-poster" /> : null}
     </>
   );
 
@@ -166,16 +167,14 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
                 {t('detail.watchNow', "Hozir ko'rish")}
               </button>
             )}
-            <SaveButton movieId={movie.id} loading={loading} />
+            <SaveButton movieId={movie.id} />
           </div>
-          {loading ? btnSkeleton : (
-            <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--ghost" onClick={onReplay}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6a6 6 0 0 1-6 6 6 6 0 0 1-5.65-4H4.26A8 8 0 0 0 12 21a8 8 0 0 0 0-16z" />
-              </svg>
-              {t('detail.watchAgain', "Qayta ko'rish")}
-            </button>
-          )}
+          <button type="button" className="trailer-movie-card-btn trailer-movie-card-btn--ghost" onClick={onReplay}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6a6 6 0 0 1-6 6 6 6 0 0 1-5.65-4H4.26A8 8 0 0 0 12 21a8 8 0 0 0 0-16z" />
+            </svg>
+            {t('detail.watchAgain', "Qayta ko'rish")}
+          </button>
           </div>
         </div>
       </div>
@@ -199,7 +198,7 @@ const TrailerMovieCardView = ({ movie, mode, onWatch, onReplay }) => {
           {t('detail.watchShort', 'Tomosha')}
         </button>
       )}
-      <SaveButton movieId={movie.id} loading={loading} />
+      <SaveButton movieId={movie.id} />
     </div>
   );
 };
