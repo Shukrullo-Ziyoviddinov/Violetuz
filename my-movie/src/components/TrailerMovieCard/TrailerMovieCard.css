@@ -205,9 +205,9 @@
 }
 
 .trailer-movie-card--ended .trailer-movie-card-btn svg {
-  width: 13px;
-  height: 13px;
   flex: 0 0 auto;
+  height: 15px;
+  width: 15px;
 }
 
 /* ==================== 10 soniyada: kartochka (mobil — sahifa pasti, desktop — pleer o'ng yuqorisi) ==================== */
