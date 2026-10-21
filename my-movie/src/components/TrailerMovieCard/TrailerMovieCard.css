@@ -292,8 +292,8 @@
     inset: auto;
     top: 16px;
     right: 16px;
-    height: calc(50% - 92px);
-    min-height: 120px;
+    /* Kamida: padding 20 + sarlavha 18 + meta 15 + bo'shliqlar 12 + 2 tugma 66 */
+    height: max(calc(50% - 92px), 136px);
     max-width: calc(100% - 32px);
     overflow: visible;
     container-type: normal;
@@ -313,6 +313,10 @@
     height: 100%;
     width: auto;
     aspect-ratio: 2 / 3;
+  }
+
+  .trailer-movie-card--ended .trailer-movie-card-title {
+    -webkit-line-clamp: 1;
   }
 
   .trailer-movie-card--ended .trailer-movie-card-copy {
