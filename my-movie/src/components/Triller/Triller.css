@@ -111,6 +111,12 @@
   box-shadow: none;
 }
 
+/* Kino treyleri bilan bir xil TrailerMovieCard — pleyer tugmalari ustida */
+.triller-player-frame .trailer-movie-card-host.is-ended,
+.triller-player-frame .trailer-movie-card-dock.is-inline {
+  z-index: 90;
+}
+
 .triller-player-title {
   margin: 0;
   font-size: 1.35rem;
@@ -425,6 +431,14 @@
   .triller-player-frame .trailer-modal-video,
   .triller-player-frame video {
     object-fit: contain !important;
+  }
+
+  /* Tugash kartochkasi kadr bilan cho'zilmaydi — kino treyleri sahifasidagidek */
+  .triller-player-frame .trailer-movie-card-host.is-ended {
+    inset: auto 0;
+    top: 50%;
+    height: min(56.25vw, 100%);
+    transform: translateY(-50%);
   }
 
   .triller:not(.triller--immersive).triller--expanding .triller-player-frame,

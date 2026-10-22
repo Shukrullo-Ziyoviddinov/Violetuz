@@ -70,7 +70,7 @@ const Triller = ({ activeId }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
-  const { allMovies } = useMoviesApi();
+  const { getMovieByIdLocal } = useMoviesApi();
   const { mediaRef, session, bindSession, activateSession, registerDetailSlot, registerDetailKey } = useMiniVideoPlayback();
   const scrollRef = useRef(null);
   const pinRef = useRef(null);
@@ -103,8 +103,8 @@ const Triller = ({ activeId }) => {
   const promoMovie = useMemo(() => {
     const movieId = activeTriller?.franchiseMovieId;
     if (movieId == null || movieId === '') return null;
-    return allMovies.find((item) => Number(item.id) === Number(movieId)) || null;
-  }, [activeTriller?.franchiseMovieId, allMovies]);
+    return getMovieByIdLocal(movieId) || null;
+  }, [activeTriller?.franchiseMovieId, getMovieByIdLocal]);
 
   const sideTrillers = useMemo(() => {
     if (!activeTriller) return list;
