@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import MovieSoundtracks from './MovieSoundtracks';
 import './MovieDetailMoreModal.css';
 
 const MOBILE_MAX = 768;
@@ -13,7 +14,7 @@ const measureVideoBottom = () => {
   return Math.max(0, Math.round(slot.getBoundingClientRect().bottom));
 };
 
-const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
+const MovieDetailMoreModal = ({ open, onClose, title, movie, children }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -266,7 +267,10 @@ const MovieDetailMoreModal = ({ open, onClose, title, children }) => {
           </button>
           <h3>{title}</h3>
         </div>
-        <div className="movie-detail-more-modal-body">{children}</div>
+        <div className="movie-detail-more-modal-body">
+          {children}
+          {movie ? <MovieSoundtracks movie={movie} title="Saundtrek" /> : null}
+        </div>
       </div>
     </div>
   );

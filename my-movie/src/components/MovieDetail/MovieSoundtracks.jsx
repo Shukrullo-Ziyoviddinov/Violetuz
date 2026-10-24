@@ -78,7 +78,7 @@ const SoundtrackCard = ({ track, artistName, onOpen }) => {
  * Kino saundtreklari. movieSauntrik dagi id larni musiqa katalogidan o‘qiydi.
  * Tartib massiv tartibi. Algoritm yo‘q.
  */
-const MovieSoundtracks = ({ movie }) => {
+const MovieSoundtracks = ({ movie, title }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getMusicByIdLocal, getArtistById } = useMusicApi();
@@ -89,11 +89,12 @@ const MovieSoundtracks = ({ movie }) => {
 
   if (tracks.length === 0) return null;
 
+  const heading = title || t('detail.movieSoundtracks', 'Saundtrek va taronalar');
   const openTrack = (id) => navigate(`/music/${id}`);
 
   return (
-    <section className="movie-soundtracks" aria-label={t('detail.movieSoundtracks', 'Kino saundtreklari')}>
-      <h2 className="movie-soundtracks-title">{t('detail.movieSoundtracks', 'Kino saundtreklari')}</h2>
+    <section className="movie-soundtracks" aria-label={heading}>
+      <h2 className="movie-soundtracks-title">{heading}</h2>
       <HorizontalScroll>
         {tracks.map((track) => (
           <SoundtrackCard

@@ -2229,6 +2229,7 @@ const MovieDetail = () => {
         open={showMoreModal}
         onClose={() => setShowMoreModal(false)}
         title={getMovieTitle()}
+        movie={movie}
       >
         {movie.specs ? (
           <div className="movie-detail-specs">
