@@ -5,7 +5,7 @@ import './RepostShortsCard.css';
 const RepostShortsCard = ({ item, scopeEntries, scopeIndex = 0 }) => {
   const navigate = useNavigate();
   const open = () => {
-    const base = item.type === 'musicshorts' ? '/music/shorts' : '/shorts';
+    const base = '/shorts';
     if (scopeEntries?.length) {
       const params = new URLSearchParams();
       params.set('repostShorts', scopeEntries.map((e) => `${e.type}:${e.id}`).join(','));

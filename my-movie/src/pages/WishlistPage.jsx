@@ -311,15 +311,11 @@ const WishlistPage = () => {
   };
 
   const openWishlistShort = (item) => {
-    const isMusic = item?.type === 'musicshorts';
-    const catalog = isMusic ? musicShortsCatalog : movieShortsCatalog;
-    const startIndex = (catalog || []).findIndex((s) => String(s.id) === String(item.id));
-    const path = isMusic ? '/music/shorts' : '/shorts';
-    if (startIndex < 0) {
-      navigate(path);
+    if (item?.id == null) {
+      navigate('/shorts');
       return;
     }
-    navigate(`${path}?startIndex=${startIndex}`);
+    navigate(`/shorts?shortId=${item.id}`);
   };
 
   if (isEmpty) {

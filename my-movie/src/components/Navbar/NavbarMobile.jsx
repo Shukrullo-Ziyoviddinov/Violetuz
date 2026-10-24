@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchModalBody from '../SearchModalBody/SearchModalBody';
-import ShortsPickerModal from './ShortsPickerModal';
 import VoiceSearchModal from '../VoiceSearch/VoiceSearchModal';
 import { isVoiceSearchAvailable } from '../VoiceSearch/voiceSearchSupport';
 import { requestOpenAuthModal } from '../../authModalBridge';
@@ -28,7 +27,6 @@ const NavbarMobile = () => {
   /** Ochilish slide — mount dan keyin --in class */
   const [searchEntered, setSearchEntered] = useState(false);
   const [searchMode, setSearchMode] = useState(SEARCH_MODE_BROWSE);
-  const [showShortsPicker, setShowShortsPicker] = useState(false);
   const [showVoiceSearch, setShowVoiceSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const inputRef = useRef(null);
@@ -201,18 +199,14 @@ const NavbarMobile = () => {
     const handleEscape = (e) => {
       if (e.key !== 'Escape') return;
       if (showVoiceSearch) return;
-      if (showShortsPicker) {
-        setShowShortsPicker(false);
-        return;
-      }
       if (!showSearch && !searchExiting) return;
       handleSearchBackRef.current();
     };
-    if (searchInDom || showShortsPicker) {
+    if (searchInDom) {
       document.addEventListener('keydown', handleEscape);
     }
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [searchInDom, showSearch, searchExiting, showShortsPicker, showVoiceSearch]);
+  }, [searchInDom, showSearch, searchExiting, showVoiceSearch]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -265,7 +259,7 @@ const NavbarMobile = () => {
 
         <button
           className={`navbar-mobile-item ${isShortsActive ? 'navbar-mobile-item-active' : ''}`}
-          onClick={() => setShowShortsPicker(true)}
+          onClick={() => navigate('/shorts')}
           aria-label={t('navbar.mobileShorts')}
         >
           <i className="fa-solid fa-clapperboard" aria-hidden="true" />
@@ -383,11 +377,6 @@ const NavbarMobile = () => {
         onNavigateAway={leaveSearchForNavigation}
       />
 
-      <ShortsPickerModal
-        isOpen={showShortsPicker}
-        onClose={() => setShowShortsPicker(false)}
-        onPick={(path) => navigate(path)}
-      />
     </>
   );
 };

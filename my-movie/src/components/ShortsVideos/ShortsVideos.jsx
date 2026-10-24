@@ -6,9 +6,8 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
-import { addWatch, getWatchHistory } from '../../api/shortsWatchHistory';
+import { addWatch } from '../../api/shortsWatchHistory';
 import { recordViewRequest } from '../../api/viewsApi';
-import { getShortsRecommendations } from '../../algo/shortsRecommendationAlgo';
 import { useAuth } from '../../context/AuthContext';
 import VertikalDrag from '../VertikalDrag/VertikalDrag';
 import ShortsComments from './ShortsComments';
@@ -176,6 +175,7 @@ const VideoSlide = React.forwardRef(({ item, contentLang, videoState, onVideoCli
 const ShortsVideos = ({
   initialShorts = null,
   startIndex = null,
+  shortId = null,
   onCloseFromHome = null,
   variant = 'movie',
   repostIds = null,
@@ -197,11 +197,15 @@ const ShortsVideos = ({
       resolveShortsWithMovies(allShortsVideos, allMovies, allMusic, allClips, allConcerts),
     [allShortsVideos, allMovies, allMusic, allClips, allConcerts]
   );
-  const baseList = initialShorts || movieShortsCatalog;
+  const mixedCatalog = useMemo(
+    () => [...movieShortsCatalog, ...musicShortsCatalog],
+    [movieShortsCatalog, musicShortsCatalog]
+  );
   const isMusicShorts = variant === 'music';
+  const baseList = initialShorts || (isMusicShorts ? musicShortsCatalog : mixedCatalog);
   const isDataLoading = isMusicShorts
     ? musicShortsLoading
-    : shortsLoading || moviesLoading;
+    : shortsLoading || moviesLoading || musicShortsLoading;
   const showGridSkeleton = !initialShorts && isDataLoading;
   const [shortsList, setShortsList] = useState(() => {
     if (repostShortsEntries?.length) {
@@ -214,25 +218,16 @@ const ShortsVideos = ({
     () => startIndex != null && startIndex >= 0
   );
   const [activeIndex, setActiveIndex] = useState(startIndex ?? 0);
-  const hasLoadedMore = useRef(false);
 
   useEffect(() => {
     if (repostShortsEntries?.length) {
       setShortsList(buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog));
-      hasLoadedMore.current = true;
     } else {
       setShortsList(orderShortsByRepostIds(baseList, repostIds));
-      if (repostIds?.length) hasLoadedMore.current = true;
-      else hasLoadedMore.current = false;
     }
   }, [baseList, repostIds, repostShortsEntries, movieShortsCatalog, musicShortsCatalog]);
 
-  const slideMusic = useMemo(() => {
-    if (repostShortsEntries?.length) {
-      return shortsList[activeIndex]?.type === 'musicshorts';
-    }
-    return isMusicShorts;
-  }, [repostShortsEntries, shortsList, activeIndex, isMusicShorts]);
+  const slideMusic = shortsList[activeIndex]?.type === 'musicshorts';
 
   const repostShareRoute = useMemo(() => {
     const p = new URLSearchParams();
@@ -243,11 +238,8 @@ const ShortsVideos = ({
     }
     p.set('startIndex', String(activeIndex));
     const q = p.toString();
-    const useMusicPath = repostShortsEntries?.length
-      ? shortsList[activeIndex]?.type === 'musicshorts'
-      : isMusicShorts;
-    return useMusicPath ? `/music/shorts?${q}` : `/shorts?${q}`;
-  }, [repostShortsEntries, repostIds, activeIndex, isMusicShorts, shortsList]);
+    return `/shorts?${q}`;
+  }, [repostShortsEntries, repostIds, activeIndex]);
 
   // Desktop slide animation
   // slideState: null | { fromIndex, toIndex, direction: 'up'|'down', phase: 'animating'|'done' }
@@ -272,29 +264,6 @@ const ShortsVideos = ({
   const [musicClipVideoState, setMusicClipVideoState] = useState({ isPlaying: false, currentTime: 0, duration: 0 });
   const [clipControlsVisible, setClipControlsVisible] = useState(false);
   const [clipVideoFullscreen, setClipVideoFullscreen] = useState(false);
-  const gridRef = useRef(null);
-
-  // Grid: ko‘rinishga kelgan video avtomatik ijro
-  useEffect(() => {
-    if (!gridRef.current) return;
-    const cards = gridRef.current.querySelectorAll('.shorts-video-card');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const v = entry.target.querySelector('video');
-          if (!v) return;
-          if (entry.isIntersecting) v.play().catch(() => {});
-          else {
-            v.pause();
-            v.currentTime = 0;
-          }
-        });
-      },
-      { rootMargin: '80px', threshold: 0.2 }
-    );
-    cards.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [shortsList]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobileView(window.innerWidth <= MOBILE_BREAKPOINT);
@@ -309,6 +278,7 @@ const ShortsVideos = ({
 
   // Open modal at startIndex when provided (e.g. from /shorts?startIndex=2)
   useEffect(() => {
+    if (shortId != null && String(shortId) !== '') return;
     if (startIndex != null && startIndex >= 0 && shortsList.length > 0) {
       const safe = Math.min(startIndex, shortsList.length - 1);
       setActiveIndex(safe);
@@ -316,18 +286,20 @@ const ShortsVideos = ({
       setMobilePlayOverlayVisible(false);
       setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
     }
-  }, [startIndex, shortsList.length]);
+  }, [shortId, startIndex, shortsList.length]);
 
-  // Load more recommendations when user scrolls past 12th video (movie shorts only)
+  const openedShortIdRef = useRef(null);
   useEffect(() => {
-    if (repostShortsEntries?.length || repostIds?.length || isMusicShorts || !modalOpen || activeIndex < 11 || hasLoadedMore.current) return;
-    hasLoadedMore.current = true;
-    const history = getWatchHistory();
-    const recs = getShortsRecommendations(movieShortsCatalog, history, 10);
-    const existingIds = new Set(shortsList.map((s) => s.id));
-    const toAdd = recs.filter((s) => !existingIds.has(s.id));
-    if (toAdd.length > 0) setShortsList((prev) => [...prev, ...toAdd]);
-  }, [modalOpen, activeIndex, shortsList, isMusicShorts, repostIds, repostShortsEntries]);
+    if (shortId == null || String(shortId) === '' || shortsList.length === 0) return;
+    if (openedShortIdRef.current === String(shortId)) return;
+    const idx = shortsList.findIndex((item) => String(item.id) === String(shortId));
+    if (idx < 0) return;
+    openedShortIdRef.current = String(shortId);
+    setActiveIndex(idx);
+    setModalOpen(true);
+    setMobilePlayOverlayVisible(false);
+    setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
+  }, [shortId, shortsList]);
 
   // Track watch: addWatch after 2 sec viewing
   useEffect(() => {
@@ -343,8 +315,7 @@ const ShortsVideos = ({
     if (!modalOpen || !isLoggedIn) return undefined;
     const short = shortsList[activeIndex];
     if (short?.id == null) return undefined;
-    const type =
-      short?.type === 'musicshorts' || isMusicShorts ? 'musicshorts' : 'movieShorts';
+    const type = short?.type === 'musicshorts' ? 'musicshorts' : 'movieShorts';
     let cancelled = false;
     recordViewRequest({ id: short.id, type }).catch(() => {
       if (cancelled) return;
@@ -352,7 +323,7 @@ const ShortsVideos = ({
     return () => {
       cancelled = true;
     };
-  }, [modalOpen, activeIndex, shortsList, isLoggedIn, isMusicShorts]);
+  }, [modalOpen, activeIndex, shortsList, isLoggedIn]);
 
   const getVideo = useCallback((item) => item.video?.[contentLang] || item.video?.uz || '', [contentLang]);
 
@@ -792,9 +763,7 @@ const ShortsVideos = ({
   const getTitle = (item) => getLocalizedField(item?.title, contentLang);
   const getDescription = (item) => item.description?.[contentLang] || item.description?.uz || '';
 
-  const isItemMusicSlide = useCallback((item) => (
-    repostShortsEntries?.length ? item?.type === 'musicshorts' : isMusicShorts
-  ), [repostShortsEntries, isMusicShorts]);
+  const isItemMusicSlide = useCallback((item) => item?.type === 'musicshorts', []);
 
   const renderMobileShortSlide = useCallback((item, index, { isCenter = false } = {}) => {
     const itemMusic = isItemMusicSlide(item);
@@ -909,7 +878,7 @@ const ShortsVideos = ({
           <ShortsShare
             shortItem={item}
             shortType={itemMusic ? 'musicshorts' : 'movieShorts'}
-            sharePath={`${itemMusic ? '/music/shorts' : '/shorts'}?shortId=${item?.id}`}
+            sharePath={`/shorts?shortId=${item?.id}`}
           />
           <Repost
             className="shorts-modal-action-btn"
@@ -1211,7 +1180,7 @@ const ShortsVideos = ({
                   <ShortsShare
                     shortItem={shortsList[activeIndex]}
                     shortType={slideMusic ? 'musicshorts' : 'movieShorts'}
-                    sharePath={`${slideMusic ? '/music/shorts' : '/shorts'}?shortId=${shortsList[activeIndex]?.id}`}
+                    sharePath={`/shorts?shortId=${shortsList[activeIndex]?.id}`}
                   />
                   <Repost
                     className="shorts-modal-action-btn"
@@ -1418,7 +1387,7 @@ const ShortsVideos = ({
     <div className="shorts-videos" aria-busy={showGridSkeleton || undefined}>
       {!onCloseFromHome && (
         <div className="shorts-videos-container">
-          <div className="shorts-videos-grid" ref={gridRef}>
+          <div className="shorts-videos-grid">
             {showGridSkeleton
               ? Array.from({ length: GRID_SKELETON_COUNT }, (_, index) => (
                   <div
@@ -1435,19 +1404,16 @@ const ShortsVideos = ({
                   </div>
                 ))
               : shortsList.map((item, index) => (
-              <div key={item.id} className="shorts-video-card">
+              <div key={`${item.type || 'short'}-${item.id}`} className="shorts-video-card">
                 <ShortsVideoThumb
                   videoSrc={getVideo(item)}
+                  still
                   onClick={() => openModal(index)}
                 >
                   {item?.id != null ? (
                     <ViewCount
                       itemId={item.id}
-                      type={
-                        item?.type === 'musicshorts' || isMusicShorts
-                          ? 'musicshorts'
-                          : 'movieShorts'
-                      }
+                      type={item?.type === 'musicshorts' ? 'musicshorts' : 'movieShorts'}
                       variant="icon"
                       record={false}
                       className="shorts-video-card-views"
@@ -1502,7 +1468,7 @@ const IncomingSlide = (props) => {
       />
       <div className="shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop">
         <div className="shorts-modal-info-content">
-          {renderShortsModalTitle(item, contentLang, false, onWatchClick)}
+          {renderShortsModalTitle(item, contentLang, item?.type === 'musicshorts', onWatchClick)}
         </div>
       </div>
     </div>

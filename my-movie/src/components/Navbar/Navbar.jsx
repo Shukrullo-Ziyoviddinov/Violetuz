@@ -14,7 +14,6 @@ import {
 import { useSearchHardwareBack } from '../../useSearchHardwareBack';
 import { useAuth } from '../../context/AuthContext';
 import UserAvatar from '../UserAvatar/UserAvatar';
-import ShortsPickerModal from './ShortsPickerModal';
 import './Navbar.css';
 
 const MOBILE_NAV_MAX = 768;
@@ -40,7 +39,6 @@ const Navbar = () => {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchMode, setSearchMode] = useState(SEARCH_MODE_BROWSE);
-  const [showShortsPicker, setShowShortsPicker] = useState(false);
   const languageWrapperRef = useRef(null);
   const searchInputRef = useRef(null);
   const desktopSearchInputRef = useRef(null);
@@ -135,18 +133,14 @@ const Navbar = () => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key !== 'Escape') return;
-      if (showShortsPicker) {
-        setShowShortsPicker(false);
-        return;
-      }
       if (!showSearchModal) return;
       handleSearchBackRef.current();
     };
-    if (showSearchModal || showShortsPicker) {
+    if (showSearchModal) {
       document.addEventListener('keydown', handleEscape);
     }
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [showSearchModal, showShortsPicker]);
+  }, [showSearchModal]);
 
   useEffect(() => {
     if (!showSearchModal) return;
@@ -341,7 +335,7 @@ const Navbar = () => {
 
           <button
             className={`navbar-icon-btn navbar-desktop-only ${isShortsPage ? 'navbar-icon-active' : ''}`}
-            onClick={() => setShowShortsPicker(true)}
+            onClick={() => navigate('/shorts')}
             aria-label={t('navbar.shorts')}
           >
             <i className="fa-solid fa-clapperboard" aria-hidden="true" />
@@ -535,11 +529,6 @@ const Navbar = () => {
       </div>
     )}
 
-    <ShortsPickerModal
-      isOpen={showShortsPicker}
-      onClose={() => setShowShortsPicker(false)}
-      onPick={(path) => navigate(path)}
-    />
     </>
   );
 };

@@ -47,7 +47,7 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
     return shortItem.title || '';
   };
 
-  const fallbackPath = shortType === 'musicshorts' ? '/music/shorts' : '/shorts';
+  const fallbackPath = '/shorts';
   const shortsSharePath = sharePath || (shortItem ? `${fallbackPath}?shortId=${shortItem.id}` : fallbackPath);
   const shortsShareUrl = getShareUrl(shortsSharePath);
   const shortsShareText = getShortsTitle();

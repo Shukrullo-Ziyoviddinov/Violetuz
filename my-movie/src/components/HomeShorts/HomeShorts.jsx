@@ -40,7 +40,7 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
     [allShortsVideos, allMovies, allMusic, allClips, allConcerts]
   );
   const allShorts = isMusic ? musicShortsCatalog : movieShortsCatalog;
-  const moreTo = isMusic ? '/music/shorts' : '/shorts';
+  const moreTo = '/shorts';
   /* API + bog‘liq kataloglar tugaguncha skeleton */
   const isDataLoading = isMusic
     ? musicShortsLoading
@@ -136,13 +136,11 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
           {showSectionSkeleton
             ? skeletonCards
             : homeShorts.slice(0, 12).map((item, index) => {
-                const startIndex = allShorts.findIndex((s) => s.id === item.id);
-                const safeIndex = startIndex >= 0 ? startIndex : index;
                 const isAutoPlay = shouldAutoPlay(index);
                 return (
                   <Link
-                    key={item.id}
-                    to={`${moreTo}?startIndex=${safeIndex}`}
+                    key={`${item.type || 'short'}-${item.id}`}
+                    to={`/shorts?shortId=${item.id}`}
                     state={{ shortsReturnTo: isMusic ? '/music' : '/' }}
                     className="shorts-video-card home-shorts-card"
                     data-index={index}

@@ -1,49 +1,31 @@
-import React, { useMemo } from 'react';
-import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import { parseRepostShortsParam } from '../components/Repost/repostTypes';
-import MusicShorts from '../Music/MusicShorts';
-import './MusicShortsPage.css';
+import React from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
+import { useMusicApi } from '../context/MusicApiContext';
 
+/** Eski /music/shorts havolalari bitta shorts sahifasiga tushadi. */
 const MusicShortsPage = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const startIndex = searchParams.get('startIndex');
-  const startIndexNum = startIndex != null ? parseInt(startIndex, 10) : null;
-  const repostIdsRaw = searchParams.get('repostIds');
-  const repostIds = useMemo(() => {
-    if (!repostIdsRaw || typeof repostIdsRaw !== 'string' || !repostIdsRaw.trim()) return null;
-    const parts = repostIdsRaw.split(',').map((s) => s.trim()).filter(Boolean);
-    return parts.length ? parts : null;
-  }, [repostIdsRaw]);
-  const repostShortsRaw = searchParams.get('repostShorts');
-  const repostShortsEntries = useMemo(() => parseRepostShortsParam(repostShortsRaw), [repostShortsRaw]);
+  const { musicShortsCatalog, musicShortsLoading } = useMusicApi();
+  const startIndexRaw = searchParams.get('startIndex');
+  const startIndex = startIndexRaw != null ? parseInt(startIndexRaw, 10) : null;
+  const hasRepost = searchParams.has('repostIds') || searchParams.has('repostShorts');
 
-  const fromHomeLink =
-    (startIndex != null && !isNaN(startIndexNum)) ||
-    (repostIds != null && repostIds.length > 0) ||
-    (repostShortsEntries != null && repostShortsEntries.length > 0);
+  if (hasRepost) {
+    return <Navigate to={`/shorts?${searchParams.toString()}`} replace />;
+  }
 
-  const handleCloseFromHome = () => {
-    if (!fromHomeLink) return;
-    const returnTo = location.state?.shortsReturnTo;
-    if (typeof returnTo === 'string' && returnTo) {
-      navigate(returnTo, { replace: true });
-      return;
-    }
-    navigate(-1);
-  };
+  const needsIndex = startIndex != null && !Number.isNaN(startIndex);
+  if (needsIndex && musicShortsLoading && !musicShortsCatalog?.length) {
+    return null;
+  }
 
-  return (
-    <div className="music-shorts-page">
-      <MusicShorts
-        startIndex={isNaN(startIndexNum) ? null : startIndexNum}
-        onCloseFromHome={fromHomeLink ? handleCloseFromHome : undefined}
-        repostIds={repostIds}
-        repostShortsEntries={repostShortsEntries}
-      />
-    </div>
-  );
+  const params = new URLSearchParams();
+  const explicitId = searchParams.get('shortId') || searchParams.get('id');
+  const indexedId = needsIndex ? musicShortsCatalog?.[startIndex]?.id : null;
+  const shortId = explicitId || indexedId;
+  if (shortId != null && shortId !== '') params.set('shortId', String(shortId));
+  const qs = params.toString();
+  return <Navigate to={qs ? `/shorts?${qs}` : '/shorts'} replace />;
 };
 
 export default MusicShortsPage;

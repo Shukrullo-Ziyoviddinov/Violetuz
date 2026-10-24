@@ -10,6 +10,7 @@ const VIDEO_READY_TIMEOUT_MS = 20000;
 const ShortsVideoThumb = ({
   videoSrc = '',
   className = 'shorts-video-thumb',
+  still = false,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -65,6 +66,40 @@ const ShortsVideoThumb = ({
     setReady(false);
   };
 
+  const holdStillFrame = (el) => {
+    if (!still || !el) return;
+    el.pause();
+    if (el.dataset.stillHeld === '1') {
+      setReady(true);
+      setFailed(false);
+      return;
+    }
+    const duration = el.duration;
+    const target = Number.isFinite(duration) && duration > 0.4
+      ? Math.min(0.5, duration * 0.03)
+      : 0;
+    const finish = () => {
+      el.pause();
+      el.dataset.stillHeld = '1';
+      setReady(true);
+      setFailed(false);
+    };
+    if (target > 0.05 && el.currentTime < 0.05) {
+      const onSeeked = () => {
+        el.removeEventListener('seeked', onSeeked);
+        finish();
+      };
+      el.addEventListener('seeked', onSeeked);
+      try {
+        el.currentTime = target;
+        return;
+      } catch {
+        el.removeEventListener('seeked', onSeeked);
+      }
+    }
+    finish();
+  };
+
   const showSkeleton = Boolean(videoSrc) && !ready && !failed;
 
   return (
@@ -87,13 +122,14 @@ const ShortsVideoThumb = ({
           key={videoSrc}
           src={videoSrc}
           muted
-          loop
+          loop={!still}
           playsInline
           preload="auto"
           className={`shorts-video-preview${showSkeleton ? ' shorts-video-loading' : ''}`}
-          onLoadedData={markReady}
-          onLoadedMetadata={markReady}
-          onCanPlay={markReady}
+          onLoadedData={still ? (e) => holdStillFrame(e.currentTarget) : markReady}
+          onLoadedMetadata={still ? (e) => holdStillFrame(e.currentTarget) : markReady}
+          onCanPlay={still ? (e) => holdStillFrame(e.currentTarget) : markReady}
+          onPlay={still ? (e) => e.currentTarget.pause() : undefined}
           onError={markFailed}
         />
       )}

@@ -10,6 +10,7 @@ const ShortsPage = () => {
   const location = useLocation();
   const startIndex = searchParams.get('startIndex');
   const startIndexNum = startIndex != null ? parseInt(startIndex, 10) : null;
+  const shortId = searchParams.get('shortId') || searchParams.get('id');
   const repostIdsRaw = searchParams.get('repostIds');
   const repostIds = useMemo(() => {
     if (!repostIdsRaw || typeof repostIdsRaw !== 'string' || !repostIdsRaw.trim()) return null;
@@ -21,6 +22,7 @@ const ShortsPage = () => {
 
   const fromHomeLink =
     (startIndex != null && !isNaN(startIndexNum)) ||
+    (shortId != null && String(shortId) !== '') ||
     (repostIds != null && repostIds.length > 0) ||
     (repostShortsEntries != null && repostShortsEntries.length > 0);
 
@@ -38,6 +40,7 @@ const ShortsPage = () => {
     <div className="shorts-page">
       <ShortsVideos
         startIndex={isNaN(startIndexNum) ? null : startIndexNum}
+        shortId={shortId}
         onCloseFromHome={fromHomeLink ? handleCloseFromHome : undefined}
         repostIds={repostIds}
         repostShortsEntries={repostShortsEntries}

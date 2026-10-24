@@ -41,7 +41,7 @@ const SearchModalCategory = ({ onCategoryClick }) => {
     if (hasDraggedRef.current) return;
     if (onCategoryClick) onCategoryClick();
     if (category.id === 'shorts') {
-      navigate('/music/shorts');
+      navigate('/shorts');
       return;
     }
     const section = CATEGORY_TO_SECTION[category.id] || 'trend';

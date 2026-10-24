@@ -50,7 +50,7 @@ const ComentariaShortsHeadActions = ({
       title: repostTitle || '',
       image: '/img/movie1.jpg',
       videoUrl: videoSrc || '',
-      route: repostRoute || (slideMusic ? '/music/shorts' : '/shorts'),
+      route: repostRoute || `/shorts?shortId=${shortsId}`,
     }),
     [shortsId, slideMusic, repostTitle, videoSrc, repostRoute]
   );

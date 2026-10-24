@@ -1035,17 +1035,14 @@ const ArtistDetail = () => {
               </HorizontalScroll>
             ) : activeFilter === FILTER_ALL ? (
               <HorizontalScroll scrollAmount={220}>
-                {artistShorts.map((short) => {
-                  const globalIndex = musicShorts.findIndex((s) => s.id === short.id);
-                  const safeIndex = globalIndex >= 0 ? globalIndex : 0;
-                  return (
+                {artistShorts.map((short) => (
                     <div
                       key={short.id}
                       className="artist-detail-shorts-card music-cards-item clips-item"
-                      onClick={() => navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      onClick={() => navigate(`/shorts?shortId=${short.id}`)}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/shorts?shortId=${short.id}`)}
                       aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
                     >
                       <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">
@@ -1063,22 +1060,18 @@ const ArtistDetail = () => {
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                ))}
               </HorizontalScroll>
             ) : (
               <div className="artist-detail-clips-grid artist-detail-shorts-grid">
-                {artistShorts.map((short) => {
-                  const globalIndex = musicShorts.findIndex((s) => s.id === short.id);
-                  const safeIndex = globalIndex >= 0 ? globalIndex : 0;
-                  return (
+                {artistShorts.map((short) => (
                     <div
                       key={short.id}
                       className="artist-detail-shorts-card music-cards-item clips-item"
-                      onClick={() => navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      onClick={() => navigate(`/shorts?shortId=${short.id}`)}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/music/shorts?startIndex=${safeIndex}`)}
+                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/shorts?shortId=${short.id}`)}
                       aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
                     >
                       <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">
@@ -1096,8 +1089,7 @@ const ArtistDetail = () => {
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                ))}
               </div>
             )}
           </div>
