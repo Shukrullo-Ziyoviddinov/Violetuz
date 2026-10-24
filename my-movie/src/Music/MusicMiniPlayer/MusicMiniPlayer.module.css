@@ -241,10 +241,24 @@
   cursor: pointer;
 }
 
-/* Tablet / mobil */
+/* Tablet / mobil: ko'rinadigan blok qatorning o'zi */
 @media (max-width: 800px) {
+  .miniPlayer {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .miniPlayer:not(.hasDominantColor) .miniPlayerRow {
+    background: rgba(15, 15, 15, 0.98);
+    border-radius: 30px;
+    padding: 0.5rem 1rem;
+  }
+
   .miniPlayer.hasDominantColor .miniPlayerRow {
-    background: linear-gradient(
+    background-color: rgba(15, 15, 15, 0.98);
+    background-image: linear-gradient(
       135deg,
       rgba(var(--dominant-r), var(--dominant-g), var(--dominant-b), 0.5) 0%,
       rgba(var(--dominant-r), var(--dominant-g), var(--dominant-b), 0.35) 50%,
@@ -255,10 +269,15 @@
   }
 
   .miniPlayerRow {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 0.3rem;
     align-items: center;
     cursor: pointer;
+  }
+
+  .miniInfo {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .miniPlayerInner {
@@ -279,16 +298,7 @@
   }
 
   .progressWrap {
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: center;
-  }
-
-  .progressBar {
-    flex: 1;
-    min-width: 40px;
+    display: none;
   }
 }
 
@@ -303,9 +313,38 @@
   }
 }
 
+/* Mobil navbar ko'rinadigan sahifada pleer uning ustida turadi */
+@media (max-width: 768px) {
+  .miniPlayer {
+    bottom: calc(7px + 60px + 10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  :global(body:has(.music-detail)) .miniPlayer,
+  :global(body.video-detail-page-active) .miniPlayer,
+  :global(body.movie-detail-page-active) .miniPlayer,
+  :global(body.trailer-page-active) .miniPlayer,
+  :global(body.triller-page-active) .miniPlayer,
+  :global(body:has(.music-more-page)) .miniPlayer {
+    bottom: 10px;
+  }
+}
+
 @media (max-width: 500px) {
-  .miniPlayer.hasDominantColor .miniPlayerRow .progressWrap {
-    display: none;
+  .miniPlayerRow {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    overflow: hidden;
+  }
+
+  .miniInfo {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .miniTitle,
+  .miniArtist {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .controls {
