@@ -1508,12 +1508,15 @@ const MovieDetail = () => {
                     </div>
                   </div>
                 </div>
+                <MovieDetailForYou />
               </div>
             </div>
           </div>
         </div>
         <div className="movie-detail-container movie-detail-similar-wrapper">
           <SimilarMovies currentMovie={null} />
+          <MovieSoundtracks pending title="Saundtrek" />
+          <MovieSoundtrackClips pending title="Saundtrek videolar" />
         </div>
       </>
       );

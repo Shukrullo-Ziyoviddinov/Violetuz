@@ -109,7 +109,9 @@ const SoundtrackClipCardSkeleton = () => (
   </div>
 );
 
-const MovieSoundtrackClips = ({ movie, title }) => {
+const SKELETON_COUNT = 4;
+
+const MovieSoundtrackClips = ({ movie, title, pending = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getClipByIdLocal, getConcertByIdLocal, getArtistById, clipsLoading, concertsLoading } = useMusicApi();
@@ -123,7 +125,8 @@ const MovieSoundtrackClips = ({ movie, title }) => {
     }).filter(Boolean),
     [ids, getClipByIdLocal, getConcertByIdLocal]
   );
-  const showSkeleton = ids.length > 0 && clips.length === 0 && (clipsLoading || concertsLoading);
+  const showSkeleton = pending || (ids.length > 0 && clips.length === 0 && (clipsLoading || concertsLoading));
+  const skeletonKeys = ids.length > 0 ? ids : Array.from({ length: SKELETON_COUNT }, (_, index) => `pending-${index}`);
 
   if (!showSkeleton && clips.length === 0) return null;
 
@@ -137,7 +140,7 @@ const MovieSoundtrackClips = ({ movie, title }) => {
           <SkeletonLoader variant="movie-soundtrack-clips-title" />
         </h2>
         <HorizontalScroll>
-          {ids.map((id) => (
+          {skeletonKeys.map((id) => (
             <SoundtrackClipCardSkeleton key={id} />
           ))}
         </HorizontalScroll>
