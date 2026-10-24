@@ -270,8 +270,8 @@ const MovieDetailMoreModal = ({ open, onClose, title, movie, children }) => {
         </div>
         <div className="movie-detail-more-modal-body">
           {children}
-          {movie ? <MovieSoundtracks movie={movie} title="Saundtrek" /> : null}
-          {movie ? <MovieSoundtrackClips movie={movie} title="Saundtrek videolar" /> : null}
+          {movie ? <MovieSoundtracks movie={movie} title="Saundtrek va taronalar" /> : null}
+          {movie ? <MovieSoundtrackClips movie={movie} title="Saundtrek video va kliplar" /> : null}
         </div>
       </div>
     </div>

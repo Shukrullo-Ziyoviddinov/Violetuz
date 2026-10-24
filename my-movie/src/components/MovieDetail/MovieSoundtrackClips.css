@@ -152,3 +152,14 @@
     height: 28px;
   }
 }
+
+@media (min-width: 769px) {
+  .movie-detail-more-modal-body .movie-soundtrack-clip-card {
+    width: 200px;
+  }
+
+  .movie-detail-more-modal-body .movie-soundtrack-clip-save {
+    width: 28px;
+    height: 28px;
+  }
+}
