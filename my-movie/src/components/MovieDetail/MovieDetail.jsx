@@ -10,6 +10,7 @@ import WatchModal from './WatchModal';
 import { useMiniVideoDetailPage } from '../../MiniVideo/MiniVideoPlaybackContext';
 import MovieComments from './MovieComments';
 import SimilarMovies from './SimilarMovies';
+import MovieSoundtracks from './MovieSoundtracks';
 import MovieDetailForYou from './MovieDetailForYou';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import ImgModal from '../ImgModal/ImgModal';
@@ -2164,6 +2165,7 @@ const MovieDetail = () => {
           </div>
           <div className="movie-detail-container movie-detail-similar-wrapper">
             <SimilarMovies currentMovie={movie} />
+            <MovieSoundtracks movie={movie} />
           </div>
           <MovieDetailForYou movieId={movie.id} />
           </div>

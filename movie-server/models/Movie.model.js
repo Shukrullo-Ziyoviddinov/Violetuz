@@ -155,6 +155,14 @@ const movieSchema = new mongoose.Schema(
       type: [Number],
       default: [],
     },
+    /**
+     * Kino saundtreklari. music.json dagi musiqa id lari.
+     * Tartib: arraydagi tartib chiqish tartibi. Bo‘sh bo‘lsa blok chiqmaydi.
+     */
+    movieSauntrik: {
+      type: [Number],
+      default: [],
+    },
     category: {
       type: String,
       trim: true,
