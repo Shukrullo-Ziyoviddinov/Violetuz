@@ -28,17 +28,23 @@ const clipTitle = (clip) => {
   return String(title);
 };
 
+const videoKind = (item) => {
+  const type = String(item?.type || '').toLowerCase();
+  return type === 'konsert' || type === 'concert' ? 'konsert' : 'klip';
+};
+
 const SoundtrackClipCard = ({ clip, artistName, onOpen }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const imgSrc = typeof clip.img === 'string' ? clip.img : '';
   const { imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
-  const saved = isInWishlist(clip.id, 'klip');
+  const kind = videoKind(clip);
+  const saved = isInWishlist(clip.id, kind);
 
   const open = () => onOpen(clip.id);
 
   const onSave = (event) => {
     event.stopPropagation();
-    toggleWishlist(clip.id, 'klip');
+    toggleWishlist(clip.id, kind);
   };
 
   return (
@@ -81,16 +87,21 @@ const SoundtrackClipCard = ({ clip, artistName, onOpen }) => {
 };
 
 /**
- * Kino kliplari. movieSauntrikVideo dagi id larni klip katalogidan o‘qiydi.
- * Tartib massiv tartibi. Algoritm yo‘q.
+ * Kino videolari. movieSauntrikVideo dagi id ni klip yoki konsert katalogidan o‘qiydi.
+ * Id ikkalasida ham bo‘lsa tushib qoladi. Tartib massiv tartibi. Algoritm yo‘q.
  */
 const MovieSoundtrackClips = ({ movie, title }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { getClipByIdLocal, getArtistById } = useMusicApi();
+  const { getClipByIdLocal, getConcertByIdLocal, getArtistById } = useMusicApi();
   const clips = useMemo(
-    () => clipIds(movie).map((id) => getClipByIdLocal(id)).filter(Boolean),
-    [movie, getClipByIdLocal]
+    () => clipIds(movie).map((id) => {
+      const clip = getClipByIdLocal(id);
+      const concert = getConcertByIdLocal(id);
+      if (clip && concert) return null;
+      return clip || concert || null;
+    }).filter(Boolean),
+    [movie, getClipByIdLocal, getConcertByIdLocal]
   );
 
   if (clips.length === 0) return null;
