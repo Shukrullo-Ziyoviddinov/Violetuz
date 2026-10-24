@@ -122,7 +122,8 @@
       8004,
       8005
     ],
-    "movieSauntrik": [801, 802, 803]
+    "movieSauntrik": [801, 802, 803],
+    "movieSauntrikVideo": [1101, 1102, 1103]
   },
   {
     "id": 8002,
@@ -973,7 +974,8 @@
       ]
     },
     "franchiseMovieIds": [],
-    "movieSauntrik": [801, 802, 803]
+    "movieSauntrik": [801, 802, 803],
+    "movieSauntrikVideo": [1101, 1102, 1103]
   },
   {
     "id": 11002,
@@ -5339,7 +5341,8 @@
       ]
     },
     "franchiseMovieIds": [],
-    "movieSauntrik": [801, 802, 803]
+    "movieSauntrik": [801, 802, 803],
+    "movieSauntrikVideo": [1101, 1102, 1103]
   },
   {
     "id": 2002,

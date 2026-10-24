@@ -2196,6 +2196,7 @@
   .movie-detail-info-block,
   .movie-detail .similar-movies,
   .movie-detail-similar-wrapper .movie-soundtracks,
+  .movie-detail-similar-wrapper .movie-soundtrack-clips,
   .movie-detail-for-you {
     padding: 0 0.7rem 1.25rem;
     box-sizing: border-box;

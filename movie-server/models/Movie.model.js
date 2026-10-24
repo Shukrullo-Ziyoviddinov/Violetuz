@@ -163,6 +163,14 @@ const movieSchema = new mongoose.Schema(
       type: [Number],
       default: [],
     },
+    /**
+     * Kino kliplari. klips.json dagi klip id lari.
+     * Tartib: arraydagi tartib chiqish tartibi. Bo‘sh bo‘lsa blok chiqmaydi.
+     */
+    movieSauntrikVideo: {
+      type: [Number],
+      default: [],
+    },
     category: {
       type: String,
       trim: true,

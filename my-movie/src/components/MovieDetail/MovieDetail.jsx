@@ -11,6 +11,7 @@ import { useMiniVideoDetailPage } from '../../MiniVideo/MiniVideoPlaybackContext
 import MovieComments from './MovieComments';
 import SimilarMovies from './SimilarMovies';
 import MovieSoundtracks from './MovieSoundtracks';
+import MovieSoundtrackClips from './MovieSoundtrackClips';
 import MovieDetailForYou from './MovieDetailForYou';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import ImgModal from '../ImgModal/ImgModal';
@@ -2166,6 +2167,7 @@ const MovieDetail = () => {
           <div className="movie-detail-container movie-detail-similar-wrapper">
             <SimilarMovies currentMovie={movie} />
             <MovieSoundtracks movie={movie} />
+            <MovieSoundtrackClips movie={movie} title="Kliplar" />
           </div>
           <MovieDetailForYou movieId={movie.id} />
           </div>
