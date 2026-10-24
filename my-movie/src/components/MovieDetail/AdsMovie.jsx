@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState, useEffect, useImperativeHandle, useCallback } from 'react';
+import React, { forwardRef, useRef, useState, useEffect, useLayoutEffect, useImperativeHandle, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import './AdsMovie.css';
@@ -14,10 +14,13 @@ const formatAdTime = (seconds) => {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 };
 
-const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) => {
+const AdsMovie = forwardRef(({ movieId, videoRef, onVisibilityChange, onAdEnded }, ref) => {
   const { t } = useTranslation();
   const adVideoRef = useRef(null);
   const playbackIconTimerRef = useRef(null);
+  const playTimerRef = useRef(null);
+  const playTokenRef = useRef(0);
+  const suppressEndRef = useRef(false);
   const touchActionAtRef = useRef(0);
   const [showAdOverlay, setShowAdOverlay] = useState(false);
   const [adCurrentTime, setAdCurrentTime] = useState(0);
@@ -38,6 +41,24 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
     }
   };
 
+  const clearPlayTimer = () => {
+    if (playTimerRef.current) {
+      clearTimeout(playTimerRef.current);
+      playTimerRef.current = null;
+    }
+  };
+
+  const pauseAdVideo = () => {
+    const video = adVideoRef.current;
+    if (!video) return;
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch {
+      /* metadata hali yuklanmagan */
+    }
+  };
+
   const revealPlaybackIcon = (icon) => {
     setPlaybackIcon(icon);
     setShowPlaybackIcon(true);
@@ -50,11 +71,37 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
 
   useEffect(() => () => clearPlaybackIconTimer(), []);
 
+  const stopAd = useCallback(() => {
+    playTokenRef.current += 1;
+    suppressEndRef.current = true;
+    clearPlayTimer();
+    clearPlaybackIconTimer();
+    pauseAdVideo();
+    setShowPlaybackIcon(false);
+    setIsAdPlaying(false);
+    setAdCurrentTime(0);
+    setAdDuration(0);
+    setShowAdOverlay(false);
+    onVisibilityChange?.(false);
+  }, [onVisibilityChange]);
+
+  const stopAdRef = useRef(stopAd);
+  stopAdRef.current = stopAd;
+
+  // Boshqa kinoga o'tilganda shu reklamani to'xtatish. Keyingi play yangi kinoda boshidan ochadi.
+  useLayoutEffect(() => () => {
+    stopAdRef.current();
+  }, [movieId]);
+
   const showAd = useCallback(() => {
     if (!activeAd || !activeAd.isActive) return;
     if (videoRef?.current) {
       videoRef.current.pause();
     }
+    const token = playTokenRef.current + 1;
+    playTokenRef.current = token;
+    suppressEndRef.current = false;
+    clearPlayTimer();
     clearPlaybackIconTimer();
     setShowPlaybackIcon(false);
     setIsAdPlaying(false);
@@ -62,7 +109,9 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
     setAdDuration(0);
     setShowAdOverlay(true);
     onVisibilityChange?.(true);
-    setTimeout(() => {
+    playTimerRef.current = setTimeout(() => {
+      playTimerRef.current = null;
+      if (playTokenRef.current !== token) return;
       if (adVideoRef.current) {
         adVideoRef.current.currentTime = 0;
         adVideoRef.current.play().catch(() => {});
@@ -71,6 +120,8 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
   }, [activeAd, videoRef, onVisibilityChange]);
 
   const handleAdEnded = useCallback(() => {
+    if (suppressEndRef.current) return;
+    clearPlayTimer();
     clearPlaybackIconTimer();
     setShowPlaybackIcon(false);
     setIsAdPlaying(false);
@@ -88,7 +139,7 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
     onAdEnded?.();
   }, [videoRef, onVisibilityChange, onAdEnded]);
 
-  useImperativeHandle(ref, () => ({ showAd }));
+  useImperativeHandle(ref, () => ({ showAd, stopAd }), [showAd, stopAd]);
 
   const stopAdTouch = (e) => {
     e.stopPropagation();
@@ -146,6 +197,7 @@ const AdsMovie = forwardRef(({ videoRef, onVisibilityChange, onAdEnded }, ref) =
       onTouchEnd={stopAdTouch}
     >
       <video
+        key={movieId ?? 'ad'}
         ref={adVideoRef}
         src={activeAd.videoUrl}
         className="ads-movie-video"

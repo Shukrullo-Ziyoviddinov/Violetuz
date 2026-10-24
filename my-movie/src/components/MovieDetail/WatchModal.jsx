@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect, useMemo, useCallback } from 'react';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
@@ -207,8 +207,8 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
     };
   }, []);
 
-  // Film almashganda view hisoblagichni reset
-  useEffect(() => {
+  // Film almashganda view hisoblagichni reset. Layout: play yangi kinoda eski reklamani "ko'rilgan" deb hisoblamasin.
+  useLayoutEffect(() => {
     const el = mediaRef.current;
     const sameMovie = Boolean(
       ownsMovie(el, movie?.id)
@@ -646,6 +646,7 @@ const WatchModal = ({ movie, videoUrl, onClose }) => {
               
               <AdsMovie
                 ref={adsRef}
+                movieId={movie?.id}
                 videoRef={videoRef}
                 onVisibilityChange={setShowAdOverlay}
                 onAdEnded={handleAdEnded}
