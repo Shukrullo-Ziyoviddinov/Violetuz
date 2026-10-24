@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import MovieSoundtracks from './MovieSoundtracks';
+import MovieSoundtrackClips from './MovieSoundtrackClips';
 import './MovieDetailMoreModal.css';
 
 const MOBILE_MAX = 768;
@@ -270,6 +271,7 @@ const MovieDetailMoreModal = ({ open, onClose, title, movie, children }) => {
         <div className="movie-detail-more-modal-body">
           {children}
           {movie ? <MovieSoundtracks movie={movie} title="Saundtrek" /> : null}
+          {movie ? <MovieSoundtrackClips movie={movie} title="Saundtrek videolar" /> : null}
         </div>
       </div>
     </div>
