@@ -86,6 +86,14 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     return first.offsetWidth + gap;
   };
 
+  // Qolgan masofa yarim kartochkadan kichik bo‘lsa, oxir zonasi butun qatorni yutmasin.
+  const getEndZone = () => {
+    const itemWidth = getItemWidth();
+    const maxScroll = getMaxScroll();
+    if (itemWidth <= 0 || maxScroll <= 0) return 0;
+    return Math.min(itemWidth * 0.5, maxScroll * 0.5);
+  };
+
   const getMaxIndex = () => {
     const itemWidth = getItemWidth();
     const maxScroll = getMaxScroll();
@@ -100,8 +108,8 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const maxScroll = getMaxScroll();
     if (maxScroll <= 0) return 0;
 
-    // Oxirgi yarim kartochka ichida — to‘liq oxir (oxirgi element kesilmasin)
-    if (-value >= maxScroll - itemWidth * 0.5) {
+    const endZone = getEndZone();
+    if (endZone > 0 && -value >= maxScroll - endZone) {
       return -maxScroll;
     }
 
@@ -110,7 +118,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
 
     const pos = -index * itemWidth;
     // Qolgan masofa yarim itemdan kam bo‘lsa ham oxirga yopish
-    if (pos <= -maxScroll || maxScroll + pos < itemWidth * 0.5) {
+    if (pos <= -maxScroll || maxScroll + pos < getEndZone()) {
       return -maxScroll;
     }
     return pos;
@@ -122,7 +130,8 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const maxScroll = getMaxScroll();
     if (maxScroll <= 0) return 0;
     const maxIndex = getMaxIndex();
-    if (-value >= maxScroll - itemWidth * 0.5) return maxIndex;
+    const endZone = getEndZone();
+    if (endZone > 0 && -value >= maxScroll - endZone) return maxIndex;
     return Math.max(0, Math.min(Math.round(-value / itemWidth), maxIndex));
   };
 
@@ -136,7 +145,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     if (clamped >= maxIndex) return -maxScroll;
     const pos = -clamped * itemWidth;
     // Oraliq index ham oxirga juda yaqin bo‘lsa — to‘liq oxir
-    if (maxScroll + pos < itemWidth * 0.5) return -maxScroll;
+    if (maxScroll + pos < getEndZone()) return -maxScroll;
     return pos;
   };
 
