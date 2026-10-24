@@ -2163,7 +2163,11 @@
   background: rgba(255, 255, 255, 0.05);
   padding: 1rem 1rem;
   border-radius: 15px;
+  margin-top: 0;
   margin-bottom: 0.5rem;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .movie-detail .movie-detail-comments-input-wrap {
@@ -2210,8 +2214,13 @@
   }
 
   .movie-detail .movie-detail-comments {
-    margin-top: 0.35rem;
+    margin-top: 0;
     margin-bottom: 0.5rem;
+    overflow: visible;
+  }
+
+  .movie-detail .movie-detail-comments-carousel {
+    overflow: hidden;
   }
 
   .movie-detail-meta-row.scroll-touch {
