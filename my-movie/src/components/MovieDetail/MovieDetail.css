@@ -2201,6 +2201,7 @@
 
   .movie-detail-info-block,
   .movie-detail .similar-movies,
+  .movie-detail-similar-wrapper .similar-movies,
   .movie-detail-similar-wrapper .movie-soundtracks,
   .movie-detail-similar-wrapper .movie-soundtrack-clips,
   .movie-detail-for-you {
