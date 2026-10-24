@@ -2167,7 +2167,7 @@ const MovieDetail = () => {
           <div className="movie-detail-container movie-detail-similar-wrapper">
             <SimilarMovies currentMovie={movie} />
             <MovieSoundtracks movie={movie} />
-            <MovieSoundtrackClips movie={movie} title="Saundtrek video va kliplar" />
+            <MovieSoundtrackClips movie={movie} title="Saundtrek videolar" />
           </div>
           <MovieDetailForYou movieId={movie.id} />
           </div>

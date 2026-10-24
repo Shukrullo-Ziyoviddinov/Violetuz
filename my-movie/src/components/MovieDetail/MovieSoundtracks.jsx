@@ -89,7 +89,7 @@ const MovieSoundtracks = ({ movie, title }) => {
 
   if (tracks.length === 0) return null;
 
-  const heading = title || t('detail.movieSoundtracks', 'Saundtrek va taronalar');
+  const heading = title || t('detail.movieSoundtracks', 'Saundtrek');
   const openTrack = (id) => navigate(`/music/${id}`);
 
   return (

@@ -106,7 +106,7 @@ const MovieSoundtrackClips = ({ movie, title }) => {
 
   if (clips.length === 0) return null;
 
-  const heading = title || t('detail.movieSoundtrackClips', 'Saundtrek video va kliplar');
+  const heading = title || t('detail.movieSoundtrackClips', 'Saundtrek videolar');
   const openClip = (id) => navigate(`/music/video/${id}`);
 
   return (
