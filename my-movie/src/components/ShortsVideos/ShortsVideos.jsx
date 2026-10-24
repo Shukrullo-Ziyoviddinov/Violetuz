@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -245,8 +245,11 @@ const ShortsVideos = ({
   // slideState: null | { fromIndex, toIndex, direction: 'up'|'down', phase: 'animating'|'done' }
   const [slideState, setSlideState] = useState(null);
   const slideTimeoutRef = useRef(null);
+  const slideRafRef = useRef(null);
 
   const modalVideoRef = useRef(null);
+  const desktopVideoRefs = useRef(new Map());
+  const mobileVideoRefs = useRef(new Map());
   const mobileVideoTapRef = useRef({ startY: 0, moved: false });
   const shortsCommentsRef = useRef(null);
   const shortsModalHistoryRef = useRef(false);
@@ -272,8 +275,9 @@ const ShortsVideos = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    return () => { if (slideTimeoutRef.current) clearTimeout(slideTimeoutRef.current); };
+  useEffect(() => () => {
+    if (slideTimeoutRef.current) clearTimeout(slideTimeoutRef.current);
+    if (slideRafRef.current) cancelAnimationFrame(slideRafRef.current);
   }, []);
 
   // Open modal at startIndex when provided (e.g. from /shorts?startIndex=2)
@@ -329,19 +333,42 @@ const ShortsVideos = ({
 
   // Desktop: animatsiya bilan o'tish
   const desktopNavigate = useCallback((direction) => {
-    if (slideState || !shortsList.length) return; // animatsiya ketayotsa blok
+    if (slideState || shortsList.length < 2) return;
 
+    const count = shortsList.length;
     const toIndex = direction === 'down'
-      ? (activeIndex < shortsList.length - 1 ? activeIndex + 1 : 0)
-      : (activeIndex > 0 ? activeIndex - 1 : shortsList.length - 1);
+      ? (activeIndex + 1) % count
+      : (activeIndex - 1 + count) % count;
+    if (toIndex === activeIndex) return;
 
-    setSlideState({ fromIndex: activeIndex, toIndex, direction, phase: 'animating' });
+    const nextVideo = desktopVideoRefs.current.get(toIndex);
+    if (nextVideo) {
+      modalVideoRef.current = nextVideo;
+      nextVideo.muted = modalVideoMuted;
+      if (nextVideo.currentTime > 0.5) {
+        try { nextVideo.currentTime = 0.04; } catch (err) { /* kadr tayyor bo'lmasa */ }
+      }
+      nextVideo.play().catch(() => {});
+    }
 
-    slideTimeoutRef.current = setTimeout(() => {
-      setActiveIndex(toIndex);
-      setSlideState(null);
-    }, SLIDE_DURATION);
-  }, [activeIndex, slideState, shortsList]);
+    if (slideTimeoutRef.current) clearTimeout(slideTimeoutRef.current);
+    if (slideRafRef.current) cancelAnimationFrame(slideRafRef.current);
+
+    setSlideState({ fromIndex: activeIndex, toIndex, direction, phase: 'prep' });
+    slideRafRef.current = requestAnimationFrame(() => {
+      slideRafRef.current = requestAnimationFrame(() => {
+        setSlideState((current) => (
+          current && current.toIndex === toIndex
+            ? { ...current, phase: 'animating' }
+            : current
+        ));
+        slideTimeoutRef.current = setTimeout(() => {
+          setActiveIndex(toIndex);
+          setSlideState(null);
+        }, SLIDE_DURATION);
+      });
+    });
+  }, [activeIndex, modalVideoMuted, slideState, shortsList.length]);
 
   useEffect(() => {
     if (!shortsList.length) return;
@@ -355,6 +382,22 @@ const ShortsVideos = ({
     if (newIndex < 0 || newIndex >= shortsList.length) return;
     setActiveIndex(newIndex);
   }, [shortsList.length]);
+
+  const handleMobileCommit = useCallback((newIndex) => {
+    mobileVideoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      if (index === newIndex) {
+        modalVideoRef.current = video;
+        video.muted = modalVideoMuted;
+        if (video.currentTime > 0.5) {
+          try { video.currentTime = 0.04; } catch (err) { /* kadr tayyor bo'lmasa */ }
+        }
+        video.play().catch(() => {});
+        return;
+      }
+      video.muted = true;
+    });
+  }, [modalVideoMuted]);
 
   const openModal = useCallback((index) => {
     setActiveIndex(index);
@@ -437,6 +480,46 @@ const ShortsVideos = ({
     v.currentTime = percent * v.duration;
   }, []);
 
+  const foregroundIndex = slideState?.toIndex ?? activeIndex;
+  const foregroundIndexRef = useRef(activeIndex);
+  foregroundIndexRef.current = foregroundIndex;
+
+  useLayoutEffect(() => {
+    if (!modalOpen) return;
+    const pool = isMobileView ? mobileVideoRefs.current : desktopVideoRefs.current;
+    const index = isMobileView ? activeIndex : foregroundIndex;
+    const el = pool.get(index);
+    if (el) modalVideoRef.current = el;
+  }, [modalOpen, isMobileView, activeIndex, foregroundIndex, shortsList.length]);
+
+  useEffect(() => {
+    if (!modalOpen || isMobileView) return;
+    desktopVideoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      const isLive = index === activeIndex
+        || index === slideState?.fromIndex
+        || index === slideState?.toIndex;
+      if (isLive) return;
+      video.muted = true;
+      if (!video.paused) video.pause();
+      if (video.readyState >= 2 && (video.currentTime < 0.04 || video.currentTime > 0.5)) {
+        try { video.currentTime = 0.04; } catch (err) { /* kadr tayyor bo'lmasa */ }
+      }
+    });
+  }, [modalOpen, isMobileView, activeIndex, slideState, shortsList.length]);
+
+  useEffect(() => {
+    if (!modalOpen || !isMobileView) return;
+    mobileVideoRefs.current.forEach((video, index) => {
+      if (!video || index === activeIndex) return;
+      video.muted = true;
+      video.pause();
+      if (video.readyState >= 2 && video.currentTime > 0.5) {
+        try { video.currentTime = 0.04; } catch (err) { /* kadr tayyor bo'lmasa */ }
+      }
+    });
+  }, [modalOpen, isMobileView, activeIndex, shortsList.length]);
+
   // Video event listeners (desktop ref + fallback)
   useEffect(() => {
     const v = modalVideoRef.current;
@@ -465,7 +548,7 @@ const ShortsVideos = ({
       v.removeEventListener('pause', onPause);
       v.removeEventListener('ended', onEnded);
     };
-  }, [modalOpen, activeIndex, shortsList.length]);
+  }, [modalOpen, foregroundIndex, shortsList.length]);
 
   useEffect(() => {
     setDescriptionExpanded(false);
@@ -772,17 +855,32 @@ const ShortsVideos = ({
       <div className="shorts-modal-video-inner shorts-modal-mobile-inner">
         <video
           ref={(el) => {
-            if (isCenter) {
-              modalVideoRef.current = el;
+            if (el) {
+              mobileVideoRefs.current.set(index, el);
+              if (isCenter) modalVideoRef.current = el;
+            } else {
+              mobileVideoRefs.current.delete(index);
             }
           }}
           src={getVideo(item)}
-          autoPlay
+          autoPlay={isCenter}
           playsInline
           loop
           muted={isCenter ? modalVideoMuted : true}
           preload="auto"
           className="shorts-modal-video shorts-modal-mobile-video-el"
+          onLoadedData={(e) => {
+            const video = e.currentTarget;
+            if (isCenter) {
+              if (video.paused) video.play().catch(() => {});
+              return;
+            }
+            video.muted = true;
+            video.pause();
+            if (video.currentTime < 0.04 || video.currentTime > 0.5) {
+              try { video.currentTime = 0.04; } catch (err) { /* kadr tayyor bo'lmasa */ }
+            }
+          }}
           onPlay={isCenter ? handleModalVideoPlay : undefined}
           onPlaying={isCenter ? handleModalVideoPlay : undefined}
           onPause={isCenter ? handleModalVideoPause : undefined}
@@ -932,35 +1030,64 @@ const ShortsVideos = ({
 
   const handleOverlayClick = (e) => { if (e.target === e.currentTarget) closeModal(); };
 
-  // Desktop slide animation styles
-  // "from" video chiqib ketadi, "to" video kirib keladi
-  const getSlideStyles = () => {
-    if (!slideState) return { current: {}, incoming: null };
-    const { direction } = slideState;
-    // direction 'down' = keyingi (next): current chiqib up, incoming pastdan kiradi
-    // direction 'up' = oldingi (prev): current chiqib down, incoming yuqoridan kiradi
-    const exitY = direction === 'down' ? '-100%' : '100%';
-    const enterStartY = direction === 'down' ? '100%' : '-100%';
-    return {
-      current: {
-        transform: `translateY(${exitY})`,
-        transition: `transform ${SLIDE_DURATION}ms cubic-bezier(0.4,0,0.2,1)`,
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-      },
-      incoming: {
-        transform: 'translateY(0)',
-        transition: `transform ${SLIDE_DURATION}ms cubic-bezier(0.4,0,0.2,1)`,
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        // Starts from enterStartY, animates to 0
-        // We use animation trick: set initial then next frame 0
-        animFrom: enterStartY,
-      },
-    };
-  };
+  const desktopSlotIndexes = useMemo(() => {
+    const count = shortsList.length;
+    if (!count) return [];
+    const indexes = [activeIndex];
+    if (count > 1) {
+      const next = (activeIndex + 1) % count;
+      const prev = (activeIndex - 1 + count) % count;
+      if (!indexes.includes(next)) indexes.push(next);
+      if (!indexes.includes(prev)) indexes.push(prev);
+    }
+    return indexes;
+  }, [activeIndex, shortsList.length]);
 
-  const slideStyles = getSlideStyles();
+  const desktopSlotStyle = (index) => {
+    const count = shortsList.length;
+    const base = {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
+    };
+    if (slideState) {
+      const { fromIndex, toIndex, direction, phase } = slideState;
+      const enterStartY = direction === 'down' ? '100%' : '-100%';
+      const exitY = direction === 'down' ? '-100%' : '100%';
+      const transition = phase === 'animating'
+        ? `transform ${SLIDE_DURATION}ms cubic-bezier(0.4,0,0.2,1)`
+        : 'none';
+      if (index === toIndex) {
+        return {
+          ...base,
+          transform: phase === 'animating' ? 'translateY(0)' : `translateY(${enterStartY})`,
+          transition,
+          zIndex: 3,
+        };
+      }
+      if (index === fromIndex) {
+        return {
+          ...base,
+          transform: phase === 'animating' ? `translateY(${exitY})` : 'translateY(0)',
+          transition,
+          zIndex: 2,
+        };
+      }
+    }
+    if (index === activeIndex) {
+      return { ...base, transform: 'translateY(0)', zIndex: 2 };
+    }
+    const next = count > 1 ? (activeIndex + 1) % count : activeIndex;
+    const prev = count > 1 ? (activeIndex - 1 + count) % count : activeIndex;
+    if (index === prev && index !== next) {
+      return { ...base, transform: 'translateY(-100%)', transition: 'none', zIndex: 1 };
+    }
+    return { ...base, transform: 'translateY(100%)', transition: 'none', zIndex: 1 };
+  };
 
   const modalMuteButton = (
     <button
@@ -1006,6 +1133,7 @@ const ShortsVideos = ({
               items={shortsList}
               activeIndex={activeIndex}
               onIndexChange={handleMobileIndexChange}
+              onCommitIndex={handleMobileCommit}
               renderItem={renderMobileShortSlide}
             />
             {/* Progress drag bilan ketmasin — VertikalDrag tashqarisida */}
@@ -1055,33 +1183,55 @@ const ShortsVideos = ({
               </button>
             </div>
 
-            {/* overflow:hidden wrapper — animatsiya uchun zarur */}
+            {/* overflow:hidden wrapper — oldingi va keyingi video elementi saqlanadi */}
             <div
               className="shorts-modal-video-wrapper shorts-modal-desktop-video"
               style={{ position: 'relative', overflow: 'hidden' }}
             >
-              {/* Joriy video — chiqib ketadi */}
+              {desktopSlotIndexes.map((index) => {
+                const item = shortsList[index];
+                if (!item) return null;
+                const itemMusic = item?.type === 'musicshorts';
+                const isForeground = index === foregroundIndex;
+                const showChrome = index === activeIndex || index === slideState?.toIndex;
+                return (
               <div
+                key={`${index}-${item?.type || 'short'}-${item?.id}`}
                 className="shorts-modal-video-inner shorts-modal-desktop-inner"
-                style={slideState ? slideStyles.current : {}}
-                onMouseEnter={() => setDesktopHover(true)}
-                onMouseLeave={() => setDesktopHover(false)}
+                style={desktopSlotStyle(index)}
+                onMouseEnter={isForeground ? () => setDesktopHover(true) : undefined}
+                onMouseLeave={isForeground ? () => setDesktopHover(false) : undefined}
               >
                 <video
-                  ref={modalVideoRef}
-                  key={activeIndex}
-                  src={getVideo(shortsList[activeIndex])}
-                  autoPlay
+                  ref={(el) => {
+                    if (el) desktopVideoRefs.current.set(index, el);
+                    else desktopVideoRefs.current.delete(index);
+                  }}
+                  src={getVideo(item)}
+                  autoPlay={isForeground}
                   playsInline
                   loop
-                  muted={modalVideoMuted}
+                  muted={isForeground ? modalVideoMuted : true}
+                  preload="auto"
                   className="shorts-modal-video shorts-modal-desktop-video-el"
-                  onPlay={handleModalVideoPlay}
-                  onPlaying={handleModalVideoPlay}
-                  onPause={handleModalVideoPause}
-                  onClick={() => { collapseDescription(); toggleModalVideoPlay(); }}
+                  onLoadedData={(e) => {
+                    const video = e.currentTarget;
+                    if (desktopVideoRefs.current.get(foregroundIndexRef.current) === video) {
+                      if (video.paused) video.play().catch(() => {});
+                      return;
+                    }
+                    video.muted = true;
+                    if (!video.paused) video.pause();
+                    if (video.currentTime < 0.04 || video.currentTime > 0.5) {
+                      try { video.currentTime = 0.04; } catch (err) { /* kadr tayyor bo'lmasa */ }
+                    }
+                  }}
+                  onPlay={isForeground ? handleModalVideoPlay : undefined}
+                  onPlaying={isForeground ? handleModalVideoPlay : undefined}
+                  onPause={isForeground ? handleModalVideoPause : undefined}
+                  onClick={isForeground ? () => { collapseDescription(); toggleModalVideoPlay(); } : undefined}
                 />
-                {desktopHover && !slideState && (
+                {isForeground && desktopHover && !slideState && (
                   <button
                     className="shorts-modal-play-pause-center"
                     onClick={(e) => { e.stopPropagation(); collapseDescription(); toggleModalVideoPlay(); }}
@@ -1094,25 +1244,26 @@ const ShortsVideos = ({
                     )}
                   </button>
                 )}
+                {showChrome && (
                 <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
                   <div className="shorts-modal-info-content">
-                    {renderShortsModalTitle(shortsList[activeIndex], contentLang, slideMusic, handleWatchClick)}
+                    {renderShortsModalTitle(item, contentLang, itemMusic, handleWatchClick)}
                     <div className="shorts-modal-caption-music-wrap">
                       <div className="shorts-modal-description-row">
                         <p
                           className={`shorts-modal-description ${descriptionExpanded ? 'shorts-modal-description-expanded' : ''}`}
                           onClick={toggleDescriptionExpanded}
                         >
-                          {getDescription(shortsList[activeIndex])}
+                          {getDescription(item)}
                         </p>
                       </div>
                     </div>
                     <div className="shorts-modal-buttons-row">
-                      {slideMusic ? (
+                      {itemMusic ? (
                         <>
-                          <Link to={getMusicLinkPath(shortsList[activeIndex])} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
+                          <Link to={getMusicLinkPath(item)} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
                             {(() => {
-                              const { label, iconType } = getMusicWatchButtonContent(shortsList[activeIndex]);
+                              const { label, iconType } = getMusicWatchButtonContent(item);
                               return (
                                 <>
                                   {renderMusicWatchButtonIcon(iconType)}
@@ -1121,8 +1272,8 @@ const ShortsVideos = ({
                               );
                             })()}
                           </Link>
-                          {shortsList[activeIndex]?.movieId != null && (
-                            <Link to={`/movie/${shortsList[activeIndex].movieId}`} className="shorts-modal-kino-btn" onClick={handleWatchClick}>
+                          {item?.movieId != null && (
+                            <Link to={`/movie/${item.movieId}`} className="shorts-modal-kino-btn" onClick={handleWatchClick}>
                               <svg className="shorts-modal-watch-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polygon points="23 7 16 12 23 17 23 7" />
                                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
@@ -1132,7 +1283,7 @@ const ShortsVideos = ({
                           )}
                         </>
                       ) : (
-                        <Link to={`/movie/${shortsList[activeIndex]?.movieId}`} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
+                        <Link to={`/movie/${item?.movieId}`} className="shorts-modal-watch-btn" onClick={handleWatchClick}>
                           {contentLang === 'ru' ? 'Смотреть' : 'Tomosha qilish'}
                         </Link>
                       )}
@@ -1159,11 +1310,13 @@ const ShortsVideos = ({
                     />
                   </div>
                 </div>
+                )}
+                {showChrome && (
                 <div className="shorts-modal-actions-sidebar">
                   <LikeButton
-                    key={shortsList[activeIndex]?.id}
+                    key={item?.id}
                     variant="shorts"
-                    contentId={shortsList[activeIndex]?.id}
+                    contentId={item?.id}
                     stopPropagation
                   />
                   <button
@@ -1178,47 +1331,39 @@ const ShortsVideos = ({
                     {shortsCommentCount > 0 && <span className="shorts-modal-action-count">{shortsCommentCount}</span>}
                   </button>
                   <ShortsShare
-                    shortItem={shortsList[activeIndex]}
-                    shortType={slideMusic ? 'musicshorts' : 'movieShorts'}
-                    sharePath={`/shorts?shortId=${shortsList[activeIndex]?.id}`}
+                    shortItem={item}
+                    shortType={itemMusic ? 'musicshorts' : 'movieShorts'}
+                    sharePath={`/shorts?shortId=${item?.id}`}
                   />
                   <Repost
                     className="shorts-modal-action-btn"
                     item={{
-                      id: shortsList[activeIndex]?.id,
-                      type: slideMusic ? 'musicshorts' : 'movieShorts',
-                      title: getTitle(shortsList[activeIndex]),
+                      id: item?.id,
+                      type: itemMusic ? 'musicshorts' : 'movieShorts',
+                      title: getTitle(item),
                       image: '/img/movie1.jpg',
-                      videoUrl: getVideo(shortsList[activeIndex]),
+                      videoUrl: getVideo(item),
                       route: repostShareRoute,
-                      repostCount: shortsList[activeIndex]?.repostCount,
+                      repostCount: item?.repostCount,
                     }}
                   />
                   <ShortsSaveButton
-                    item={shortsList[activeIndex]}
+                    item={item}
                     isInWishlist={isInWishlist}
                     onClick={handleShortsSaveClick}
                   />
                   <ShortsDownloadButton
-                    videoUrl={getVideo(shortsList[activeIndex])}
-                    shortsId={shortsList[activeIndex]?.id}
-                    shortType={slideMusic ? 'musicshorts' : 'movieShorts'}
-                    fileName={`shorts-${shortsList[activeIndex]?.id || 'video'}.mp4`}
+                    videoUrl={getVideo(item)}
+                    shortsId={item?.id}
+                    shortType={itemMusic ? 'musicshorts' : 'movieShorts'}
+                    fileName={`shorts-${item?.id || 'video'}.mp4`}
                   />
                 </div>
-                {renderMusicCornerButton(shortsList[activeIndex], slideMusic, 'shorts-modal-music-corner-desktop')}
+                )}
+                {showChrome && renderMusicCornerButton(item, itemMusic, 'shorts-modal-music-corner-desktop')}
               </div>
-
-              {/* Kelayotgan video — kirib keladi (faqat animatsiya paytida) */}
-              {slideState && (
-                <IncomingSlide
-                  item={shortsList[slideState.toIndex]}
-                  contentLang={contentLang}
-                  direction={slideState.direction}
-                  duration={SLIDE_DURATION}
-                  onWatchClick={handleWatchClick}
-                />
-              )}
+                );
+              })}
             </div>
           </div>
         )}
@@ -1426,51 +1571,6 @@ const ShortsVideos = ({
         </div>
       )}
       {modalOpen && createPortal(modalContent, document.body)}
-    </div>
-  );
-};
-
-// Desktop: kelayotgan video componenti — mount bo'lgandan keyin animate qiladi
-const IncomingSlide = (props) => {
-  const { item, contentLang, direction, duration, onWatchClick } = props;
-  const [style, setStyle] = useState({
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    transform: direction === 'down' ? 'translateY(100%)' : 'translateY(-100%)',
-    transition: 'none',
-  });
-
-  useEffect(() => {
-    // Keyingi frame da animate qilamiz
-    const raf = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setStyle((s) => ({
-          ...s,
-          transform: 'translateY(0)',
-          transition: `transform ${duration}ms cubic-bezier(0.4,0,0.2,1)`,
-        }));
-      });
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [duration]);
-
-  const getVideo = (it) => it.video?.[contentLang] || it.video?.uz || '';
-
-  return (
-    <div className="shorts-modal-video-inner shorts-modal-desktop-inner" style={style}>
-      <video
-        src={getVideo(item)}
-        autoPlay
-        playsInline
-        loop
-        muted
-        className="shorts-modal-video shorts-modal-desktop-video-el"
-      />
-      <div className="shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop">
-        <div className="shorts-modal-info-content">
-          {renderShortsModalTitle(item, contentLang, item?.type === 'musicshorts', onWatchClick)}
-        </div>
-      </div>
     </div>
   );
 };

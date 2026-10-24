@@ -9,6 +9,7 @@ const VertikalDrag = ({
   items,
   activeIndex,
   onIndexChange,
+  onCommitIndex,
   renderItem,
   className = '',
 }) => {
@@ -135,6 +136,7 @@ const VertikalDrag = ({
     }
 
     const newIndex = activeIndexRef.current - direction;
+    onCommitIndex?.(newIndex);
 
     setIsAnimating(true);
     dragYRef.current = direction === -1 ? -height : height;
@@ -148,7 +150,7 @@ const VertikalDrag = ({
       onIndexChange(newIndex);
       resetDrag();
     }, TRANSITION_MS);
-  }, [hasNext, hasPrev, onIndexChange, resetDrag]);
+  }, [hasNext, hasPrev, onCommitIndex, onIndexChange, resetDrag]);
 
   const handleTouchEnd = useCallback(() => {
     if (!isDragging.current) return;
@@ -193,7 +195,7 @@ const VertikalDrag = ({
           const item = items[idx];
           return (
             <div
-              key={item.id}
+              key={`${idx}-${item?.type || 'short'}-${item?.id}`}
               className={`vertikal-drag-slide ${offset === 0 ? 'vertikal-drag-slide-active' : ''}`}
               style={{ transform: `translateY(${offset * height}px)` }}
             >
