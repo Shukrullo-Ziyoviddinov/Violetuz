@@ -3015,6 +3015,28 @@
     padding: 0;
   }
 
+  /* Refresh skeleti sheet ichida emas. Qulfbalandlik uni siqib, keyingi
+     loaderlarni ustiga chiqaradi. Yuklanishda sahifa o‘zi o‘sadi. */
+  body.movie-detail-page-active:has(.movie-detail--loading) .App {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  body.movie-detail-page-active:has(.movie-detail--loading) .App-main {
+    flex: none;
+    height: auto;
+    overflow: visible;
+    display: block;
+  }
+
+  .movie-detail--loading {
+    flex: none;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
   .movie-detail:not(.movie-detail--loading) .movie-detail-bg-block,
   .movie-detail:not(.movie-detail--loading) .movie-detail-container:not(.movie-detail-similar-wrapper),
   .movie-detail:not(.movie-detail--loading) .movie-detail-content {
