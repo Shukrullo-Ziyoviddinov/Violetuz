@@ -1336,46 +1336,44 @@ const MovieDetail = () => {
           <div className="movie-detail-bg-block">
             <div className="movie-detail-container">
               <div className="movie-detail-content">
+                <div className="movie-detail-image-block">
+                  <div className="movie-detail-image">
+                    <div className="video-player-controls trailer-modal-video-wrapper">
+                      <div className="trailer-modal-media-slot" />
+                    </div>
+                  </div>
+                </div>
                 <div className="movie-detail-info-block">
                   <div className="movie-detail-info">
-                    <div className="movie-detail-rating movie-detail-rating--skeleton" aria-hidden="true">
-                      {Array.from({ length: 4 }, (_, i) => (
-                        <div
-                          key={`rating-sk-${i}`}
-                          className="movie-detail-rating-item movie-detail-rating-item--skeleton"
-                        >
-                          <SkeletonLoader
-                            variant="movie-detail-rating"
-                            className="movie-detail-rating-item-skeleton"
-                          />
-                        </div>
-                      ))}
+                    <div className="view-count-heading">
+                      <h1 className="movie-detail-title">
+                        <SkeletonLoader variant="movie-detail-page-title" />
+                      </h1>
+                      <div className="movie-detail-views-row">
+                        <SkeletonLoader variant="view-count-text" />
+                      </div>
                     </div>
-                    <div className="movie-detail-actions movie-detail-actions--skeleton" aria-hidden="true">
-                      <SkeletonLoader
-                        variant="movie-detail-action"
-                        className="movie-detail-action-btn-skeleton"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-action"
-                        className="movie-detail-action-btn-skeleton"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-action"
-                        className="movie-detail-action-btn-skeleton"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-action-wide"
-                        className="movie-detail-action-btn-skeleton movie-detail-action-btn-skeleton--wide"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-action"
-                        className="movie-detail-action-btn-skeleton"
-                      />
-                      <SkeletonLoader
-                        variant="movie-detail-action"
-                        className="movie-detail-action-btn-skeleton"
-                      />
+                    <div className="movie-detail-meta-row">
+                      <div className="movie-detail-meta-left">
+                        <div className="movie-detail-rating movie-detail-rating--skeleton" aria-hidden="true">
+                          {Array.from({ length: 4 }, (_, i) => (
+                            <div
+                              key={`rating-sk-${i}`}
+                              className="movie-detail-rating-item movie-detail-rating-item--skeleton"
+                            >
+                              <SkeletonLoader variant="movie-detail-meta-rating" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="movie-detail-meta-right movie-detail-actions movie-detail-actions--skeleton" aria-hidden="true">
+                        <SkeletonLoader variant="movie-detail-meta-action" className="movie-detail-meta-action--comment" />
+                        <SkeletonLoader variant="movie-detail-meta-action" className="movie-detail-meta-action--rate" />
+                        <SkeletonLoader variant="movie-detail-meta-action" className="movie-detail-action-btn-wishlist movie-detail-meta-action--save" />
+                        <SkeletonLoader variant="movie-detail-meta-action" className="repost-btn movie-detail-action-btn movie-detail-meta-action--repost" />
+                        <SkeletonLoader variant="movie-detail-meta-action" className="movie-detail-meta-action--share" />
+                        <SkeletonLoader variant="movie-detail-meta-action" className="movie-detail-actions-more-btn movie-detail-meta-action--more" />
+                      </div>
                     </div>
                     <div className="movie-detail-description movie-detail-description--skeleton movie-detail-description--has-img" aria-hidden="true">
                       <div className="movie-detail-description-img-wrap">

@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .similar-movies-title {
@@ -323,7 +323,7 @@
   .similar-movies-header {
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .similar-movies-title {
@@ -358,7 +358,7 @@
 
 @media (max-width: 500px) {
   .similar-movies-header {
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
   }
 
   .similar-movies-title {

@@ -121,6 +121,12 @@
   object-fit: cover;
 }
 
+.movie-detail--loading .movie-detail-image > .video-player-controls {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+
 .movie-detail-video-wrapper--skeleton,
 .movie-detail-video-wrapper--loading {
   background-color: #0a0a0a;
@@ -2636,6 +2642,35 @@
     font-size: 1.1rem;
   }
 
+  .skeleton-loader--movie-detail-page-title {
+    height: calc(1.1rem * 1.2);
+  }
+
+  .skeleton-loader--movie-detail-meta-action {
+    height: calc(0.25rem * 2 + max(14px, 0.9rem * 1.2));
+    border-radius: 6px;
+  }
+
+  .movie-detail-meta-action--comment {
+    width: calc(0.2rem + 14px + 0.5rem + 1.2rem);
+  }
+
+  .movie-detail-meta-action--rate {
+    width: calc(0.2rem + 14px + 0.5rem + 4.6rem);
+  }
+
+  .movie-detail-meta-action--save {
+    width: calc(0.2rem + 14px + 0.5rem + 4rem);
+  }
+
+  .movie-detail-meta-action--repost {
+    width: calc(0.2rem + 14px + 0.5rem + 3.4rem);
+  }
+
+  .movie-detail-meta-action--share {
+    width: calc(0.2rem + 14px + 0.5rem + 4.6rem);
+  }
+
   .movie-detail-title-img {
     max-width: 220px;
   }
@@ -2834,6 +2869,31 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+  }
+
+  .skeleton-loader--movie-detail-meta-action,
+  .movie-detail-meta-action--more {
+    height: calc(0.25rem * 2 + 20px);
+  }
+
+  .movie-detail-meta-action--comment {
+    width: calc(0.2rem + 20px + 0.5rem + 1.2rem);
+  }
+
+  .movie-detail-meta-action--rate {
+    width: calc(0.2rem + 20px + 0.5rem + 4.6rem);
+  }
+
+  .movie-detail-meta-action--save {
+    width: calc(0.2rem + 20px + 0.5rem + 4rem);
+  }
+
+  .movie-detail-meta-action--repost {
+    width: calc(0.2rem + 20px + 0.5rem + 3.4rem);
+  }
+
+  .movie-detail-meta-action--share {
+    width: calc(0.2rem + 20px + 0.5rem + 4.6rem);
   }
 
   .movie-detail-action-btn-skeleton,

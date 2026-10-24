@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import './MovieSoundtrackClips.css';
 
@@ -90,24 +91,59 @@ const SoundtrackClipCard = ({ clip, artistName, onOpen }) => {
  * Kino videolari. movieSauntrikVideo dagi id ni klip yoki konsert katalogidan o‘qiydi.
  * Id ikkalasida ham bo‘lsa tushib qoladi. Tartib massiv tartibi. Algoritm yo‘q.
  */
+const SoundtrackClipCardSkeleton = () => (
+  <div className="movie-soundtrack-clip-card movie-soundtrack-clip-card--skeleton" aria-hidden="true">
+    <div className="movie-soundtrack-clip-cover">
+      <SkeletonLoader variant="movie-soundtrack-clip-cover" />
+      <span className="movie-soundtrack-clip-save movie-soundtrack-clip-save--skeleton">
+        <SkeletonLoader variant="movie-soundtrack-clip-save" />
+      </span>
+      <span className="movie-soundtrack-clip-play movie-soundtrack-clip-play--skeleton">
+        <SkeletonLoader variant="movie-soundtrack-clip-play" />
+      </span>
+      <div className="movie-soundtrack-clip-info">
+        <SkeletonLoader variant="movie-soundtrack-clip-title" />
+        <SkeletonLoader variant="movie-soundtrack-clip-artist" />
+      </div>
+    </div>
+  </div>
+);
+
 const MovieSoundtrackClips = ({ movie, title }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { getClipByIdLocal, getConcertByIdLocal, getArtistById } = useMusicApi();
+  const { getClipByIdLocal, getConcertByIdLocal, getArtistById, clipsLoading, concertsLoading } = useMusicApi();
+  const ids = useMemo(() => clipIds(movie), [movie]);
   const clips = useMemo(
-    () => clipIds(movie).map((id) => {
+    () => ids.map((id) => {
       const clip = getClipByIdLocal(id);
       const concert = getConcertByIdLocal(id);
       if (clip && concert) return null;
       return clip || concert || null;
     }).filter(Boolean),
-    [movie, getClipByIdLocal, getConcertByIdLocal]
+    [ids, getClipByIdLocal, getConcertByIdLocal]
   );
+  const showSkeleton = ids.length > 0 && clips.length === 0 && (clipsLoading || concertsLoading);
 
-  if (clips.length === 0) return null;
+  if (!showSkeleton && clips.length === 0) return null;
 
   const heading = title || t('detail.movieSoundtrackClips', 'Saundtrek videolar');
   const openClip = (id) => navigate(`/music/video/${id}`);
+
+  if (showSkeleton) {
+    return (
+      <section className="movie-soundtrack-clips movie-soundtrack-clips--skeleton" aria-busy="true" aria-label={heading}>
+        <h2 className="movie-soundtrack-clips-title movie-soundtrack-clips-title--skeleton">
+          <SkeletonLoader variant="movie-soundtrack-clips-title" />
+        </h2>
+        <HorizontalScroll>
+          {ids.map((id) => (
+            <SoundtrackClipCardSkeleton key={id} />
+          ))}
+        </HorizontalScroll>
+      </section>
+    );
+  }
 
   return (
     <section className="movie-soundtrack-clips" aria-label={heading}>

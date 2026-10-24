@@ -1836,6 +1836,48 @@
   margin-top: 0;
 }
 
+.skeleton-loader--movie-detail-page-title {
+  width: min(16rem, 72%);
+  height: calc(1.35rem * 1.2);
+  border-radius: 6px;
+}
+
+.skeleton-loader--movie-detail-meta-rating {
+  width: calc(1rem + 0.4rem + 1.5em);
+  height: max(1rem, calc(0.95rem * 1.2));
+  border-radius: 4px;
+}
+
+.skeleton-loader--movie-detail-meta-action {
+  height: 28px;
+  border-radius: 999px;
+}
+
+.movie-detail-meta-action--comment {
+  width: calc(20px + 14px + 0.3rem + 1.4rem);
+}
+
+.movie-detail-meta-action--rate {
+  width: calc(20px + 14px + 0.3rem + 4.2rem);
+}
+
+.movie-detail-meta-action--save {
+  width: calc(20px + 14px + 0.3rem + 3.6rem);
+}
+
+.movie-detail-meta-action--repost {
+  width: calc(20px + 14px + 0.3rem + 3.2rem);
+}
+
+.movie-detail-meta-action--share {
+  width: calc(20px + 14px + 0.3rem + 4.2rem);
+}
+
+.movie-detail-meta-action--more {
+  width: 28px;
+  height: 28px;
+}
+
 .trailer-movie-card--ended .skeleton-loader--trailer-movie-card-btn {
   width: 100%;
 }

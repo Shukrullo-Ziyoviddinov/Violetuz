@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import './MovieSoundtracks.css';
 
@@ -78,19 +79,54 @@ const SoundtrackCard = ({ track, artistName, onOpen }) => {
  * Kino saundtreklari. movieSauntrik dagi id larni musiqa katalogidan o‘qiydi.
  * Tartib massiv tartibi. Algoritm yo‘q.
  */
+const SoundtrackCardSkeleton = () => (
+  <div className="movie-soundtrack-card movie-soundtrack-card--skeleton" aria-hidden="true">
+    <div className="movie-soundtrack-cover">
+      <SkeletonLoader variant="movie-soundtrack-cover" />
+      <span className="movie-soundtrack-save movie-soundtrack-save--skeleton">
+        <SkeletonLoader variant="movie-soundtrack-save" />
+      </span>
+      <span className="movie-soundtrack-play movie-soundtrack-play--skeleton">
+        <SkeletonLoader variant="movie-soundtrack-play" />
+      </span>
+      <div className="movie-soundtrack-info">
+        <SkeletonLoader variant="movie-soundtrack-title" />
+        <SkeletonLoader variant="movie-soundtrack-artist" />
+      </div>
+    </div>
+  </div>
+);
+
 const MovieSoundtracks = ({ movie, title }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { getMusicByIdLocal, getArtistById } = useMusicApi();
+  const { getMusicByIdLocal, getArtistById, musicLoading } = useMusicApi();
+  const ids = useMemo(() => soundtrackIds(movie), [movie]);
   const tracks = useMemo(
-    () => soundtrackIds(movie).map((id) => getMusicByIdLocal(id)).filter(Boolean),
-    [movie, getMusicByIdLocal]
+    () => ids.map((id) => getMusicByIdLocal(id)).filter(Boolean),
+    [ids, getMusicByIdLocal]
   );
+  const showSkeleton = ids.length > 0 && tracks.length === 0 && musicLoading;
 
-  if (tracks.length === 0) return null;
+  if (!showSkeleton && tracks.length === 0) return null;
 
   const heading = title || t('detail.movieSoundtracks', 'Saundtrek');
   const openTrack = (id) => navigate(`/music/${id}`);
+
+  if (showSkeleton) {
+    return (
+      <section className="movie-soundtracks movie-soundtracks--skeleton" aria-busy="true" aria-label={heading}>
+        <h2 className="movie-soundtracks-title movie-soundtracks-title--skeleton">
+          <SkeletonLoader variant="movie-soundtrack-section-title" />
+        </h2>
+        <HorizontalScroll>
+          {ids.map((id) => (
+            <SoundtrackCardSkeleton key={id} />
+          ))}
+        </HorizontalScroll>
+      </section>
+    );
+  }
 
   return (
     <section className="movie-soundtracks" aria-label={heading}>
