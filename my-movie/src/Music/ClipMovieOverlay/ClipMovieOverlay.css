@@ -25,6 +25,29 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 0.28rem;
+  animation: clip-movie-overlay-in 350ms ease-out;
+}
+
+.clip-movie-overlay.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+}
+
+.clip-movie-overlay--flight {
+  animation: none;
+  transform-origin: center center;
+}
+
+@keyframes clip-movie-overlay-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .clip-movie-overlay-close {
@@ -196,5 +219,11 @@
     left: 0.65rem;
     max-width: calc(100% - 1.3rem);
     bottom: calc(0.65rem + 2.5rem + 3px + 0.35rem + 0.35rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clip-movie-overlay {
+    animation: none;
   }
 }
