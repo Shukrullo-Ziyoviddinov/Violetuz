@@ -141,7 +141,6 @@ const ClipMovieOverlay = ({ clip, video }) => {
   const clipKey = clip?.id;
   const { hideCard, gone, flight, startFlight, cancelFlight } = useFilmFlight({
     clipId: clipKey,
-    active: Boolean(visible && movie?.id),
     cardRef,
     flightRef,
   });

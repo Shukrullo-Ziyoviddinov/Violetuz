@@ -2,7 +2,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 export const FILM_BUTTON_SELECTOR = '.video-detail-actions .clip-movie-film-btn';
 
-const HOLD_MS = 5000;
 const FLIGHT_MS = 600;
 const FADE_MS = 350;
 const PULSE_MS = 1800;
@@ -36,11 +35,10 @@ const pulseFilmButton = (button) => {
   };
 };
 
-export const useFilmFlight = ({ clipId, active, cardRef, flightRef }) => {
+export const useFilmFlight = ({ clipId, cardRef, flightRef }) => {
   const [hideCard, setHideCard] = useState(false);
   const [gone, setGone] = useState(false);
   const [flight, setFlight] = useState(null);
-  const holdTimerRef = useRef(0);
   const flyingRef = useRef(false);
   const doneRef = useRef(false);
   const pulseClearRef = useRef(() => {});
@@ -48,10 +46,6 @@ export const useFilmFlight = ({ clipId, active, cardRef, flightRef }) => {
   const fadeAnimRef = useRef(null);
 
   const clearTimers = useCallback(() => {
-    if (holdTimerRef.current) {
-      window.clearTimeout(holdTimerRef.current);
-      holdTimerRef.current = 0;
-    }
     if (animRef.current) {
       animRef.current.cancel();
       animRef.current = null;
@@ -84,10 +78,6 @@ export const useFilmFlight = ({ clipId, active, cardRef, flightRef }) => {
   const startFlight = useCallback(() => {
     if (doneRef.current || flyingRef.current) return;
     flyingRef.current = true;
-    if (holdTimerRef.current) {
-      window.clearTimeout(holdTimerRef.current);
-      holdTimerRef.current = 0;
-    }
 
     const card = cardRef.current;
     const button = document.querySelector(FILM_BUTTON_SELECTOR);
@@ -141,22 +131,6 @@ export const useFilmFlight = ({ clipId, active, cardRef, flightRef }) => {
     setFlight(null);
     clearTimers();
   }, [clipId, clearTimers]);
-
-  const startFlightRef = useRef(startFlight);
-  startFlightRef.current = startFlight;
-
-  useEffect(() => {
-    if (!active || gone) return undefined;
-    holdTimerRef.current = window.setTimeout(() => {
-      startFlightRef.current();
-    }, HOLD_MS);
-    return () => {
-      if (holdTimerRef.current) {
-        window.clearTimeout(holdTimerRef.current);
-        holdTimerRef.current = 0;
-      }
-    };
-  }, [active, gone, clipId]);
 
   useLayoutEffect(() => {
     if (!flight) return undefined;
