@@ -32,9 +32,26 @@
   border: 1px solid #b07af0;
 }
 
+.video-detail-actions:has(.clip-movie-film-btn.is-pulse),
+.video-detail-actions:has(.clip-movie-film-btn.is-pulse) .scroll-touch,
+.video-detail-actions:has(.clip-movie-film-btn.is-pulse) .video-detail-actions-scroll {
+  overflow: visible !important;
+}
+
+.video-detail-actions:has(.clip-movie-film-btn.is-pulse) {
+  position: relative;
+  z-index: 5;
+}
+
 .video-detail-actions .video-detail-action-btn.clip-movie-film-btn.is-pulse {
   overflow: visible;
+  z-index: 2;
   animation: clip-movie-film-btn-glow 1800ms ease-out;
+}
+
+.video-detail-actions .video-detail-action-btn.clip-movie-film-btn.is-pulse > * {
+  position: relative;
+  z-index: 1;
 }
 
 .video-detail-actions .video-detail-action-btn.clip-movie-film-btn.is-pulse::after {
@@ -44,7 +61,7 @@
   border-radius: inherit;
   background: radial-gradient(circle, rgba(168, 85, 247, 0.55), transparent 70%);
   filter: blur(10px);
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   animation: clip-movie-film-btn-flare 1400ms ease-in-out;
 }
