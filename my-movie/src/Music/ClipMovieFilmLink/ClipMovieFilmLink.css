@@ -140,6 +140,16 @@
   flex-direction: column;
 }
 
+.clip-movie-film-modal.clip-movie-film-card.has-tint {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--clip-movie-film-tint), 0.96) 0%,
+      rgba(var(--clip-movie-film-tint), 0.72) 100%
+    ),
+    #0e0e10;
+}
+
 .clip-movie-film-modal-header {
   flex-shrink: 0;
   position: relative;
@@ -203,12 +213,12 @@
 }
 
 .clip-movie-film-card-poster {
-  width: 56px;
-  height: 56px;
+  background: #9b4fe759;
   border-radius: 12px;
-  overflow: hidden;
   flex-shrink: 0;
-  background: rgba(155, 79, 231, 0.35);
+  height: 70px;
+  overflow: hidden;
+  width: 56px;
 }
 
 .clip-movie-film-card-poster img {

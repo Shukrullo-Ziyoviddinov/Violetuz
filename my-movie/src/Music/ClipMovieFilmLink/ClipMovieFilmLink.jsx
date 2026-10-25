@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { formatMovieRating } from '../../components/Rating/CalculateRating';
+import { useDominantColor } from '../../hooks/useDominantColor';
 import './ClipMovieFilmLink.css';
 
 const ClipMovieFilmLinkContext = createContext(null);
@@ -288,10 +289,11 @@ export const ClipMovieFilmCard = () => {
   const { contentLang } = useContentLanguage();
   const ctx = useFilmLink();
   const movie = ctx?.movie;
+  const poster = moviePoster(movie, contentLang);
+  const tint = useDominantColor(poster || null);
   if (!ctx?.mounted || !movie?.id || typeof document === 'undefined') return null;
 
   const title = localized(movie.title, contentLang);
-  const poster = moviePoster(movie, contentLang);
   const rating = movieRating(movie);
   const textMeta = [movieYear(movie, contentLang), movieGenre(movie, contentLang)]
     .filter(Boolean)
@@ -335,8 +337,11 @@ export const ClipMovieFilmCard = () => {
       <div
         className={`clip-movie-film-modal clip-movie-film-card${
           ctx.open ? ' is-open' : ''
-        }${ctx.dragging ? ' is-dragging' : ''}`}
-        style={{ '--drag-y': `${ctx.dragY}px` }}
+        }${ctx.dragging ? ' is-dragging' : ''}${tint ? ' has-tint' : ''}`}
+        style={{
+          '--drag-y': `${ctx.dragY}px`,
+          ...(tint ? { '--clip-movie-film-tint': `${tint.r}, ${tint.g}, ${tint.b}` } : {}),
+        }}
         role="dialog"
         aria-modal="true"
         aria-label={t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
