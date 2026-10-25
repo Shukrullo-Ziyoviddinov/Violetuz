@@ -94,8 +94,10 @@ export const ClipMovieFilmLink = ({ clip, children }) => {
 
 export const ClipMovieFilmButton = () => {
   const { t } = useTranslation();
+  const { contentLang } = useContentLanguage();
   const ctx = useFilmLink();
   if (!ctx?.movie?.id) return null;
+  const poster = moviePoster(ctx.movie, contentLang);
 
   return (
     <button
@@ -105,9 +107,9 @@ export const ClipMovieFilmButton = () => {
       aria-expanded={ctx.open}
       aria-label={t('detail.film', 'Film')}
     >
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <rect x="4" y="5" width="16" height="14" rx="2" />
-      </svg>
+      <span className="clip-movie-film-btn-poster" aria-hidden="true">
+        {poster ? <img src={poster} alt="" /> : null}
+      </span>
       <span>{t('detail.film', 'Film')}</span>
     </button>
   );
