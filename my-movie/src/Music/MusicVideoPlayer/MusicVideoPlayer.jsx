@@ -839,7 +839,9 @@ const MusicVideoPlayer = forwardRef(({
     || (hoverFrame && !isDragging ? { ...hoverFrame, left: frameWindowLeft(hoverFrame.left) } : null);
   const playerType = String(contentType || '').trim().toLowerCase();
   const overlayClip =
-    (playerType === 'clip' || playerType === 'klip') && clip ? clip : null;
+    (playerType === 'clip' || playerType === 'klip' || playerType === 'concert' || playerType === 'konsert') && clip
+      ? clip
+      : null;
 
   return (
     <div

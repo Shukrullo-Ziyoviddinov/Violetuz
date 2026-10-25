@@ -648,7 +648,7 @@ const VideoPage = () => {
                   onExpandToggle={isMobileViewport() ? handleExpandToggle : undefined}
                   expanded={isImmersive}
                   contentType={isConcertVideo ? 'concert' : 'clip'}
-                  clip={isConcertVideo ? null : video}
+                  clip={video}
                   contentId={video.id}
                   categoryNameMusic={video.categoryNameMusic}
                   genre={video.genre}
@@ -696,7 +696,7 @@ const VideoPage = () => {
               )}
               </div>
 
-              <ClipMovieFilmLink clip={isConcertVideo ? null : video}>
+              <ClipMovieFilmLink clip={video}>
               <div
                 className="video-detail-actions"
                 aria-busy={showActionsSkeleton || undefined}

@@ -59,6 +59,14 @@ const concertSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    /**
+     * Konsert videosi biriktirilgan kinolar. movie.json dagi kino id lari.
+     * Tartib: arraydagi tartib chiqish tartibi. Bo‘sh bo‘lsa [].
+     */
+    movieId: {
+      type: [Number],
+      default: [],
+    },
     video: {
       type: String,
       trim: true,
