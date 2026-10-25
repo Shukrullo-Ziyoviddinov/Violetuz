@@ -292,7 +292,8 @@ export const ClipMovieFilmCard = () => {
 
   const title = localized(movie.title, contentLang);
   const poster = moviePoster(movie, contentLang);
-  const meta = [movieYear(movie, contentLang), movieGenre(movie, contentLang), movieRating(movie)]
+  const rating = movieRating(movie);
+  const textMeta = [movieYear(movie, contentLang), movieGenre(movie, contentLang)]
     .filter(Boolean)
     .join(' · ');
   const trailerId = firstTrailerId(movie);
@@ -353,6 +354,11 @@ export const ClipMovieFilmCard = () => {
           onTouchEnd={ctx.handleTouchEnd}
         >
           <div className="clip-movie-film-modal-drag-handle" />
+        </div>
+        <div className="clip-movie-film-card-kicker-row">
+          <p className="clip-movie-film-card-kicker">
+            {t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
+          </p>
           <button
             type="button"
             className="clip-movie-film-modal-close"
@@ -362,16 +368,24 @@ export const ClipMovieFilmCard = () => {
             ×
           </button>
         </div>
-        <p className="clip-movie-film-card-kicker">
-          {t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
-        </p>
         <div className="clip-movie-film-card-row">
           <div className="clip-movie-film-card-poster">
             {poster ? <img src={poster} alt="" /> : null}
           </div>
           <div className="clip-movie-film-card-copy">
             {title ? <div className="clip-movie-film-card-title">{title}</div> : null}
-            {meta ? <div className="clip-movie-film-card-meta">{meta}</div> : null}
+            {textMeta || rating ? (
+              <div className="clip-movie-film-card-meta">
+                {textMeta}
+                {textMeta && rating ? ' · ' : null}
+                {rating ? (
+                  <span className="clip-movie-film-card-rating" aria-label={`IMDb ${rating}`}>
+                    <img className="clip-movie-film-card-imdb" src="/img/imdbnew.png" alt="" />
+                    {rating}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="clip-movie-film-card-actions">

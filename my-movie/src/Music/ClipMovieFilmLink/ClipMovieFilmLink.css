@@ -155,10 +155,16 @@
   margin: 0.35rem auto 0.55rem;
 }
 
+.clip-movie-film-card-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 0.75rem;
+  min-width: 0;
+}
+
 .clip-movie-film-modal-close {
-  position: absolute;
-  top: 0;
-  right: 0;
+  flex-shrink: 0;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -172,7 +178,6 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  z-index: 2;
 }
 
 .clip-movie-film-modal-close:hover {
@@ -181,7 +186,9 @@
 }
 
 .clip-movie-film-card-kicker {
-  margin: 0 2.2rem 0.75rem 0;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
   font-size: 0.82rem;
   font-weight: 500;
   line-height: 1.2;
@@ -236,6 +243,19 @@
   white-space: nowrap;
 }
 
+.clip-movie-film-card-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.clip-movie-film-card-imdb {
+  height: 1em;
+  width: auto;
+  display: block;
+}
+
 .clip-movie-film-card-actions {
   display: flex;
   align-items: stretch;
@@ -278,34 +298,27 @@
 
 @media (min-width: 769px) {
   .clip-movie-film-modal.clip-movie-film-card {
-    top: 50%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px #0009;
     left: 50%;
     opacity: 0;
+    padding-top: 1rem;
+    top: 50%;
     transform: translate(-50%, -44%) scale(0.98);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    padding-top: 2.4rem;
-    transition:
-      transform 0.32s cubic-bezier(0.32, 0.72, 0, 1),
-      opacity 0.28s ease;
+    transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.28s ease;
   }
 
   .clip-movie-film-modal.clip-movie-film-card.is-open {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
-
-  .clip-movie-film-modal-close {
-    top: 0.75rem;
-    right: 0.75rem;
-  }
 }
 
 @media (max-width: 768px) {
   .video-detail-actions .clip-movie-film-btn-poster {
-    width: 16px;
-    height: 16px;
     border-radius: 4px;
+    height: 20px;
+    width: 16px;
   }
 
   .clip-movie-film-modal.clip-movie-film-card {
@@ -344,18 +357,13 @@
   }
 
   .clip-movie-film-modal-close {
-    top: 0.15rem;
-    right: 0.15rem;
-  }
-
-  .clip-movie-film-card-kicker {
-    margin-right: 2.2rem;
+    display: none;
   }
 
   .clip-movie-film-card-poster {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
+    border-radius: 5px;
+    height: 70px;
+    width: 50px;
   }
 
   .clip-movie-film-card-title {
