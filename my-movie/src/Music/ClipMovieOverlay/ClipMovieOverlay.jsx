@@ -8,6 +8,7 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useAppSelector } from '../../store/hooks';
 import { selectAuthReady, selectIsLoggedIn } from '../../store/slices/userSlice';
 import { useFilmFlight } from './useFilmFlight';
+import { useDominantColor } from '../../hooks/useDominantColor';
 import './ClipMovieOverlay.css';
 
 const SHOW_AFTER_RATIO = 0.2;
@@ -65,6 +66,7 @@ const OverlayCard = ({
   onClose,
   wishlistPending,
   showChrome,
+  tint,
 }) => (
   <>
     {showChrome ? (
@@ -79,7 +81,12 @@ const OverlayCard = ({
         </svg>
       </button>
     ) : null}
-    <div className="clip-movie-overlay-card">
+    <div
+      className={`clip-movie-overlay-card${tint ? ' has-tint' : ''}`}
+      style={
+        tint ? { '--clip-movie-overlay-tint': `${tint.r}, ${tint.g}, ${tint.b}` } : undefined
+      }
+    >
       <div className="clip-movie-overlay-poster">
         {poster ? <img src={poster} alt="" /> : null}
       </div>
@@ -145,6 +152,9 @@ const ClipMovieOverlay = ({ clip, video }) => {
     flightRef,
   });
 
+  const posterSrc = moviePoster(movie, contentLang);
+  const tint = useDominantColor(posterSrc || null);
+
   useEffect(() => {
     setVisible(false);
   }, [clipKey, movie?.id, video]);
@@ -178,7 +188,7 @@ const ClipMovieOverlay = ({ clip, video }) => {
   if (!visible && !flight) return null;
 
   const title = localized(movie.title, contentLang);
-  const poster = moviePoster(movie, contentLang);
+  const poster = posterSrc;
   const saved = isInWishlist(movie.id, 'movie');
   const saveLabel = t('detail.save', 'Saqlash');
   const watchLabel = t('detail.watch', "Ko'rish");
@@ -218,6 +228,7 @@ const ClipMovieOverlay = ({ clip, video }) => {
     onSave,
     onClose,
     wishlistPending,
+    tint,
   };
 
   return (

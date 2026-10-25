@@ -81,6 +81,16 @@
   box-sizing: border-box;
 }
 
+.clip-movie-overlay-card.has-tint {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--clip-movie-overlay-tint), 0.96) 0%,
+      rgba(var(--clip-movie-overlay-tint), 0.72) 100%
+    ),
+    #0e0e10;
+}
+
 .clip-movie-overlay-poster {
   width: 40px;
   height: 40px;
