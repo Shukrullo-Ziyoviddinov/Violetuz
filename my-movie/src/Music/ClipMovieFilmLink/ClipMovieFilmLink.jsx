@@ -1,4 +1,13 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -7,6 +16,8 @@ import { formatMovieRating } from '../../components/Rating/CalculateRating';
 import './ClipMovieFilmLink.css';
 
 const ClipMovieFilmLinkContext = createContext(null);
+const MOBILE_MAX = 768;
+const stopPortalTouch = (e) => e.stopPropagation();
 
 const movieIdsOf = (clip) => {
   const list = clip?.movieId;
@@ -62,7 +73,14 @@ const useFilmLink = () => useContext(ClipMovieFilmLinkContext);
 
 export const ClipMovieFilmLink = ({ clip, children }) => {
   const { allMovies } = useMoviesApi();
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
+  const closingRef = useRef(false);
+  const dragYRef = useRef(0);
+  const startYRef = useRef(0);
 
   const ids = useMemo(() => movieIdsOf(clip), [clip]);
   const movie = useMemo(() => {
@@ -75,14 +93,162 @@ export const ClipMovieFilmLink = ({ clip, children }) => {
     return null;
   }, [ids, allMovies]);
 
+  const openModal = useCallback(() => {
+    closingRef.current = false;
+    dragYRef.current = 0;
+    setDragY(0);
+    setDragging(false);
+    setDismissing(false);
+    if (mounted) {
+      setOpen(true);
+      return;
+    }
+    setOpen(false);
+    setMounted(true);
+  }, [mounted]);
+
+  const closeModal = useCallback(() => {
+    if (!mounted || closingRef.current) return;
+    closingRef.current = true;
+    setDragging(false);
+    setDismissing(true);
+    setOpen(false);
+  }, [mounted]);
+
+  const toggle = useCallback(() => {
+    if (mounted && open && !closingRef.current) closeModal();
+    else openModal();
+  }, [mounted, open, closeModal, openModal]);
+
+  const finishClose = useCallback(() => {
+    if (!closingRef.current) return;
+    closingRef.current = false;
+    setMounted(false);
+    setOpen(false);
+    dragYRef.current = 0;
+    setDragY(0);
+    setDragging(false);
+    setDismissing(false);
+  }, []);
+
+  useEffect(() => {
+    closingRef.current = false;
+    setMounted(false);
+    setOpen(false);
+    dragYRef.current = 0;
+    setDragY(0);
+    setDragging(false);
+    setDismissing(false);
+  }, [clip?.id]);
+
+  useEffect(() => {
+    if (!mounted) return undefined;
+    closingRef.current = false;
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (closingRef.current) return;
+        setOpen(true);
+      });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted || !closingRef.current) return undefined;
+    if (open && !dismissing) return undefined;
+    const t = window.setTimeout(finishClose, 500);
+    return () => window.clearTimeout(t);
+  }, [mounted, open, dismissing, finishClose]);
+
+  useEffect(() => {
+    if (!mounted) return undefined;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mounted, closeModal]);
+
+  const handleTransitionEnd = useCallback(
+    (e) => {
+      if (e.target !== e.currentTarget) return;
+      if (e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
+      finishClose();
+    },
+    [finishClose]
+  );
+
+  const handleTouchStart = useCallback((e) => {
+    if (closingRef.current) return;
+    startYRef.current = e.touches[0].clientY;
+    dragYRef.current = 0;
+    setDragging(true);
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    if (window.innerWidth > MOBILE_MAX || closingRef.current) return;
+    const diff = Math.max(0, e.touches[0].clientY - startYRef.current);
+    dragYRef.current = diff;
+    setDragY(diff);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (window.innerWidth > MOBILE_MAX || closingRef.current) return;
+    const y = dragYRef.current;
+    setDragging(false);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (y > 80) {
+          closingRef.current = true;
+          setDismissing(true);
+          const dismissY = Math.max(window.innerHeight, y + 24);
+          dragYRef.current = dismissY;
+          setDragY(dismissY);
+        } else {
+          dragYRef.current = 0;
+          setDragY(0);
+        }
+      });
+    });
+  }, []);
+
   const value = useMemo(
     () => ({
       movie,
       open,
-      toggle: () => setOpen((prev) => !prev),
-      close: () => setOpen(false),
+      mounted,
+      dragging,
+      dismissing,
+      dragY,
+      toggle,
+      close: closeModal,
+      handleTransitionEnd,
+      handleTouchStart,
+      handleTouchMove,
+      handleTouchEnd,
     }),
-    [movie, open]
+    [
+      movie,
+      open,
+      mounted,
+      dragging,
+      dismissing,
+      dragY,
+      toggle,
+      closeModal,
+      handleTransitionEnd,
+      handleTouchStart,
+      handleTouchMove,
+      handleTouchEnd,
+    ]
   );
 
   return (
@@ -98,13 +264,14 @@ export const ClipMovieFilmButton = () => {
   const ctx = useFilmLink();
   if (!ctx?.movie?.id) return null;
   const poster = moviePoster(ctx.movie, contentLang);
+  const active = ctx.mounted && ctx.open && !ctx.dismissing;
 
   return (
     <button
       type="button"
-      className={`video-detail-action-btn clip-movie-film-btn${ctx.open ? ' is-open' : ''}`}
+      className={`video-detail-action-btn clip-movie-film-btn${active ? ' is-open' : ''}`}
       onClick={ctx.toggle}
-      aria-expanded={ctx.open}
+      aria-expanded={active}
       aria-label={t('detail.film', 'Film')}
     >
       <span className="clip-movie-film-btn-poster" aria-hidden="true">
@@ -121,7 +288,7 @@ export const ClipMovieFilmCard = () => {
   const { contentLang } = useContentLanguage();
   const ctx = useFilmLink();
   const movie = ctx?.movie;
-  if (!ctx?.open || !movie?.id) return null;
+  if (!ctx?.mounted || !movie?.id || typeof document === 'undefined') return null;
 
   const title = localized(movie.title, contentLang);
   const poster = moviePoster(movie, contentLang);
@@ -131,10 +298,12 @@ export const ClipMovieFilmCard = () => {
   const trailerId = firstTrailerId(movie);
 
   const onWatch = () => {
+    ctx.close();
     navigate(`/movie/${movie.id}`);
   };
 
   const onTrailer = () => {
+    ctx.close();
     if (trailerId == null) {
       navigate(`/movie/${movie.id}/trailer`);
       return;
@@ -142,29 +311,80 @@ export const ClipMovieFilmCard = () => {
     navigate(`/movie/${movie.id}/trailer?trailerId=${trailerId}`);
   };
 
-  return (
-    <div className="clip-movie-film-card">
-      <p className="clip-movie-film-card-kicker">
-        {t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
-      </p>
-      <div className="clip-movie-film-card-row">
-        <div className="clip-movie-film-card-poster">
-          {poster ? <img src={poster} alt="" /> : null}
+  return createPortal(
+    <>
+      <div
+        className={`clip-movie-film-modal-overlay${
+          ctx.open && !ctx.dismissing ? ' is-open' : ''
+        }`}
+        onPointerDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          ctx.close();
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onTouchStart={stopPortalTouch}
+        onTouchMove={stopPortalTouch}
+        onTouchEnd={stopPortalTouch}
+        onTouchCancel={stopPortalTouch}
+      />
+      <div
+        className={`clip-movie-film-modal clip-movie-film-card${
+          ctx.open ? ' is-open' : ''
+        }${ctx.dragging ? ' is-dragging' : ''}`}
+        style={{ '--drag-y': `${ctx.dragY}px` }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={stopPortalTouch}
+        onTouchMove={stopPortalTouch}
+        onTouchEnd={stopPortalTouch}
+        onTouchCancel={stopPortalTouch}
+        onTransitionEnd={ctx.handleTransitionEnd}
+      >
+        <div
+          className="clip-movie-film-modal-header"
+          onTouchStart={ctx.handleTouchStart}
+          onTouchMove={ctx.handleTouchMove}
+          onTouchEnd={ctx.handleTouchEnd}
+        >
+          <div className="clip-movie-film-modal-drag-handle" />
+          <button
+            type="button"
+            className="clip-movie-film-modal-close"
+            onClick={ctx.close}
+            aria-label={t('common.close', 'Yopish')}
+          >
+            ×
+          </button>
         </div>
-        <div className="clip-movie-film-card-copy">
-          {title ? <div className="clip-movie-film-card-title">{title}</div> : null}
-          {meta ? <div className="clip-movie-film-card-meta">{meta}</div> : null}
+        <p className="clip-movie-film-card-kicker">
+          {t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
+        </p>
+        <div className="clip-movie-film-card-row">
+          <div className="clip-movie-film-card-poster">
+            {poster ? <img src={poster} alt="" /> : null}
+          </div>
+          <div className="clip-movie-film-card-copy">
+            {title ? <div className="clip-movie-film-card-title">{title}</div> : null}
+            {meta ? <div className="clip-movie-film-card-meta">{meta}</div> : null}
+          </div>
+        </div>
+        <div className="clip-movie-film-card-actions">
+          <button type="button" className="clip-movie-film-card-watch" onClick={onWatch}>
+            {t('detail.watchMovie', "Filmni ko'rish")}
+          </button>
+          <button type="button" className="clip-movie-film-card-trailer" onClick={onTrailer}>
+            {t('detail.trailer', 'Trailer')}
+          </button>
         </div>
       </div>
-      <div className="clip-movie-film-card-actions">
-        <button type="button" className="clip-movie-film-card-watch" onClick={onWatch}>
-          {t('detail.watchMovie', "Filmni ko'rish")}
-        </button>
-        <button type="button" className="clip-movie-film-card-trailer" onClick={onTrailer}>
-          {t('detail.trailer', 'Trailer')}
-        </button>
-      </div>
-    </div>
+    </>,
+    document.body
   );
 };
 
