@@ -13,6 +13,10 @@ import Repost from '../components/Repost/Repost';
 import ViewCount from '../components/ViewCount/ViewCount';
 import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import MusicVideoPlayer from '../Music/MusicVideoPlayer/MusicVideoPlayer';
+import ClipMovieFilmLink, {
+  ClipMovieFilmButton,
+  ClipMovieFilmCard,
+} from '../Music/ClipMovieFilmLink/ClipMovieFilmLink';
 import { MINI_VIDEO_KIND } from '../MiniVideo/miniVideoSession';
 import { useMiniVideoDetailPage, useMiniVideoPlayback } from '../MiniVideo/MiniVideoPlaybackContext';
 import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenreFilter';
@@ -644,6 +648,7 @@ const VideoPage = () => {
                   onExpandToggle={isMobileViewport() ? handleExpandToggle : undefined}
                   expanded={isImmersive}
                   contentType={isConcertVideo ? 'concert' : 'clip'}
+                  clip={isConcertVideo ? null : video}
                   contentId={video.id}
                   categoryNameMusic={video.categoryNameMusic}
                   genre={video.genre}
@@ -691,6 +696,7 @@ const VideoPage = () => {
               )}
               </div>
 
+              <ClipMovieFilmLink clip={isConcertVideo ? null : video}>
               <div
                 className="video-detail-actions"
                 aria-busy={showActionsSkeleton || undefined}
@@ -718,6 +724,7 @@ const VideoPage = () => {
                         route: `/music/video/${video.id}`,
                       }}
                     />
+                    <ClipMovieFilmButton />
                     <button
                       type="button"
                       className="video-detail-action-btn video-detail-download-btn"
@@ -760,6 +767,8 @@ const VideoPage = () => {
                   </ScrollTouch>
                 )}
               </div>
+              {!showActionsSkeleton ? <ClipMovieFilmCard /> : null}
+              </ClipMovieFilmLink>
             </div>
 
             {showArtistCard && (

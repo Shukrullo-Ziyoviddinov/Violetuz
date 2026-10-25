@@ -6,6 +6,7 @@ import { createClipMixWatchSignal } from './clipMixWatchSignal';
 import MusicSettingsModal from './MusicSettingsModal';
 import FramePreviewPlayer from '../../components/VideoPlayerControls/FramePreviewPlayer';
 import VideoLoader from '../../components/VideoLoader/VideoLoader';
+import ClipMovieOverlay from '../ClipMovieOverlay/ClipMovieOverlay';
 import './MusicVideoPlayer.css';
 
 const speedOptions = [1, 1.5, 2];
@@ -23,6 +24,7 @@ const MusicVideoPlayer = forwardRef(({
   categoryNameMusic = null,
   /** Mix janr (catalog genre) — guest local ledger uchun */
   genre = null,
+  clip = null,
   sharedMediaRef = null,
   onMediaSlot = null,
   mediaActive = false,
@@ -835,6 +837,9 @@ const MusicVideoPlayer = forwardRef(({
     : null;
   const activeFrame = scrubFrame
     || (hoverFrame && !isDragging ? { ...hoverFrame, left: frameWindowLeft(hoverFrame.left) } : null);
+  const playerType = String(contentType || '').trim().toLowerCase();
+  const overlayClip =
+    (playerType === 'clip' || playerType === 'klip') && clip ? clip : null;
 
   return (
     <div
@@ -942,6 +947,9 @@ const MusicVideoPlayer = forwardRef(({
             </svg>
           </button>
         </div>
+        {overlayClip ? (
+          <ClipMovieOverlay clip={overlayClip} video={mediaNode} />
+        ) : null}
       </div>
 
       <div className={`music-vp-bottom-controls ${showControls ? 'show' : ''}`}>
