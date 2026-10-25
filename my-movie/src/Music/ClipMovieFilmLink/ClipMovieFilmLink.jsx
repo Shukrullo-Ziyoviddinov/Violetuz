@@ -344,7 +344,7 @@ export const ClipMovieFilmCard = () => {
         }}
         role="dialog"
         aria-modal="true"
-        aria-label={t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
+        aria-label={t('detail.clipSoundtrackFilm', 'video klip Ijrosidagi kino')}
         onClick={(e) => e.stopPropagation()}
         onTouchStart={stopPortalTouch}
         onTouchMove={stopPortalTouch}
@@ -362,7 +362,7 @@ export const ClipMovieFilmCard = () => {
         </div>
         <div className="clip-movie-film-card-kicker-row">
           <p className="clip-movie-film-card-kicker">
-            {t('detail.clipSoundtrackFilm', 'Klip soundtracki olingan film')}
+            {t('detail.clipSoundtrackFilm', 'video klip Ijrosidagi kino')}
           </p>
           <button
             type="button"

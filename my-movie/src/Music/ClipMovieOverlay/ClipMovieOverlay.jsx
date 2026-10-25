@@ -192,7 +192,7 @@ const ClipMovieOverlay = ({ clip, video }) => {
   const saved = isInWishlist(movie.id, 'movie');
   const saveLabel = t('detail.save', 'Saqlash');
   const watchLabel = t('detail.watch', "Ko'rish");
-  const kicker = t('detail.clipSoundtrackMovie', 'Soundtrack filmdan');
+  const kicker = t('detail.clipSoundtrackMovie', 'video klip Ijrosidagi kino');
   const closeLabel = t('common.close', 'Yopish');
 
   const stop = (event) => {
