@@ -1,23 +1,14 @@
 /* Video detail klip → kino overlay. Treyler kartasi CSS import qilinmaydi. */
 
-.music-vp-video-wrapper:has(.clip-movie-overlay) .music-vp-controls-overlay.show {
-  z-index: 4;
-  pointer-events: none;
-}
-
-.music-vp-video-wrapper:has(.clip-movie-overlay) .music-vp-controls-overlay.show .music-vp-controls-center,
-.music-vp-video-wrapper:has(.clip-movie-overlay) .music-vp-controls-overlay.show .clip-movie-overlay {
-  pointer-events: auto;
-}
-
-.music-vp-controls-overlay.show .clip-movie-overlay {
+.music-vp-video-wrapper > .clip-movie-overlay {
   position: absolute;
   left: 2rem;
   bottom: calc(2rem + 3.6rem + 8px + 1rem + 0.75rem);
-  z-index: 5;
+  z-index: 6;
   width: max-content;
   max-width: min(420px, calc(100% - 4rem));
   box-sizing: border-box;
+  pointer-events: auto;
 }
 
 .clip-movie-overlay {
@@ -175,7 +166,7 @@
 }
 
 @media (min-width: 901px) and (max-width: 1160px) {
-  .music-vp-controls-overlay.show .clip-movie-overlay {
+  .music-vp-video-wrapper > .clip-movie-overlay {
     left: 10px;
     max-width: min(380px, calc(100% - 20px));
     bottom: calc(8px + 2.8rem + 5px + 6px + 4px);
@@ -183,7 +174,7 @@
 }
 
 @media (max-width: 969px) {
-  .music-vp-controls-overlay.show .clip-movie-overlay {
+  .music-vp-video-wrapper > .clip-movie-overlay {
     left: 1.25rem;
     max-width: min(380px, calc(100% - 2.5rem));
     bottom: calc(1rem + 3.1rem + 7px + 0.7rem + 0.7rem);
@@ -191,7 +182,7 @@
 }
 
 @media (max-width: 500px) {
-  .music-vp-controls-overlay.show .clip-movie-overlay {
+  .music-vp-video-wrapper > .clip-movie-overlay {
     left: 0.75rem;
     max-width: min(340px, calc(100% - 1.5rem));
     bottom: calc(0.75rem + 2.7rem + 3px + 0.4rem + 0.4rem);
@@ -215,7 +206,7 @@
 }
 
 @media (max-width: 360px) {
-  .music-vp-controls-overlay.show .clip-movie-overlay {
+  .music-vp-video-wrapper > .clip-movie-overlay {
     left: 0.65rem;
     max-width: calc(100% - 1.3rem);
     bottom: calc(0.65rem + 2.5rem + 3px + 0.35rem + 0.35rem);

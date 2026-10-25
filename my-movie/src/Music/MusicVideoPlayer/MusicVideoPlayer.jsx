@@ -947,9 +947,6 @@ const MusicVideoPlayer = forwardRef(({
             </svg>
           </button>
         </div>
-        {overlayClip ? (
-          <ClipMovieOverlay clip={overlayClip} video={mediaNode} />
-        ) : null}
       </div>
 
       <div className={`music-vp-bottom-controls ${showControls ? 'show' : ''}`}>
@@ -1150,6 +1147,9 @@ const MusicVideoPlayer = forwardRef(({
           </div>
         </div>
       </div>
+      {overlayClip ? (
+        <ClipMovieOverlay clip={overlayClip} video={mediaNode} />
+      ) : null}
     </div>
   );
 });
