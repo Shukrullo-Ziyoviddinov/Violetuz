@@ -1,6 +1,3 @@
-
-
-
 [
   {
     "id": 1,
@@ -33,7 +30,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 3,
@@ -49,7 +47,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 4,
@@ -65,7 +64,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 5,
@@ -77,7 +77,8 @@
       "uz": "Kosmosda yangi yashash joyi qidirish.",
       "ru": "Поиск нового места для жизни в космосе."
     },
-    "movieId": 5
+    "movieId": 5,
+    "type": "movieShorts"
   },
   {
     "id": 6,
@@ -93,7 +94,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 7,
@@ -109,7 +111,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 8,
@@ -121,7 +124,8 @@
       "uz": "Qamoqxonada umid va ozodlik haqida.",
       "ru": "О надежде и свободе в тюрьме."
     },
-    "movieId": 8
+    "movieId": 8,
+    "type": "movieShorts"
   },
   {
     "id": 9,
@@ -137,7 +141,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 10,
@@ -153,7 +158,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 11,
@@ -169,7 +175,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 12,
@@ -181,7 +188,8 @@
       "uz": "Kosmosda yangi yashash joyi qidirish.",
       "ru": "Поиск нового места для жизни в космосе."
     },
-    "movieId": 5
+    "movieId": 5,
+    "type": "movieShorts"
   },
   {
     "id": 13,
@@ -197,7 +205,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 14,
@@ -213,7 +222,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 15,
@@ -229,7 +239,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 16,
@@ -245,7 +256,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 17,
@@ -261,7 +273,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 18,
@@ -277,7 +290,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 19,
@@ -289,7 +303,8 @@
       "uz": "Kosmosda yangi yashash joyi qidirish.",
       "ru": "Поиск нового места для жизни в космосе."
     },
-    "movieId": 5
+    "movieId": 5,
+    "type": "movieShorts"
   },
   {
     "id": 20,
@@ -305,7 +320,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 21,
@@ -321,7 +337,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 22,
@@ -333,7 +350,8 @@
       "uz": "Qamoqxonada umid va ozodlik haqida.",
       "ru": "О надежде и свободе в тюрьме."
     },
-    "movieId": 8
+    "movieId": 8,
+    "type": "movieShorts"
   },
   {
     "id": 23,
@@ -349,7 +367,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 24,
@@ -365,7 +384,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 25,
@@ -381,7 +401,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 26,
@@ -397,7 +418,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 27,
@@ -413,7 +435,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 28,
@@ -429,7 +452,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 29,
@@ -445,7 +469,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 30,
@@ -457,7 +482,8 @@
       "uz": "Kosmosda yangi yashash joyi qidirish.",
       "ru": "Поиск нового места для жизни в космосе."
     },
-    "movieId": 5
+    "movieId": 5,
+    "type": "movieShorts"
   },
   {
     "id": 31,
@@ -473,7 +499,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 32,
@@ -489,7 +516,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 33,
@@ -501,7 +529,8 @@
       "uz": "Qamoqxonada umid va ozodlik haqida.",
       "ru": "О надежде и свободе в тюрьме."
     },
-    "movieId": 8
+    "movieId": 8,
+    "type": "movieShorts"
   },
   {
     "id": 34,
@@ -517,7 +546,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 35,
@@ -533,7 +563,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 36,
@@ -549,7 +580,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 37,
@@ -565,7 +597,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 38,
@@ -581,7 +614,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 39,
@@ -597,7 +631,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 40,
@@ -613,7 +648,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 41,
@@ -625,7 +661,8 @@
       "uz": "Kosmosda yangi yashash joyi qidirish.",
       "ru": "Поиск нового места для жизни в космосе."
     },
-    "movieId": 5
+    "movieId": 5,
+    "type": "movieShorts"
   },
   {
     "id": 42,
@@ -641,7 +678,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 43,
@@ -657,7 +695,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 44,
@@ -669,7 +708,8 @@
       "uz": "Qamoqxonada umid va ozodlik haqida.",
       "ru": "О надежде и свободе в тюрьме."
     },
-    "movieId": 8
+    "movieId": 8,
+    "type": "movieShorts"
   },
   {
     "id": 45,
@@ -685,7 +725,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 46,
@@ -701,7 +742,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 47,
@@ -717,7 +759,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 48,
@@ -729,7 +772,8 @@
       "uz": "Kosmosda yangi yashash joyi qidirish.",
       "ru": "Поиск нового места для жизни в космосе."
     },
-    "movieId": 5
+    "movieId": 5,
+    "type": "movieShorts"
   },
   {
     "id": 49,
@@ -745,7 +789,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 50,
@@ -761,7 +806,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 51,
@@ -777,7 +823,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 52,
@@ -793,7 +840,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 53,
@@ -809,7 +857,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 54,
@@ -825,7 +874,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 55,
@@ -837,7 +887,8 @@
       "uz": "Kosmosda yangi yashash joyi qidirish.",
       "ru": "Поиск нового места для жизни в космосе."
     },
-    "movieId": 5
+    "movieId": 5,
+    "type": "movieShorts"
   },
   {
     "id": 56,
@@ -853,7 +904,8 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   },
   {
     "id": 57,
@@ -869,6 +921,7 @@
     "musics": {
       "musicId": 602,
       "videoId": 1203
-    }
+    },
+    "type": "movieShorts"
   }
 ]
