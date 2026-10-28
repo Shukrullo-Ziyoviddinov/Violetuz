@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
@@ -11,7 +11,7 @@ import { normalizeImagePath } from '../../utils/utils';
 import './SearchModalMovieTrending.css';
 
 const MORE_PATH = '/recommended/hozir-trendda';
-const DESKTOP_QUERY = '(min-width: 769px)';
+const PREVIEW_LIMIT = 6;
 
 const titleOf = (movie, contentLang) => {
   if (movie?.title && typeof movie.title === 'object') {
@@ -34,22 +34,6 @@ const genresOf = (movie, contentLang) => {
 const hasImdb = (movie) => {
   const value = movie?.ratingImdb;
   return value != null && value !== '' && value !== 'none';
-};
-
-const useDesktopRow = () => {
-  const [desktop, setDesktop] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(DESKTOP_QUERY).matches
-  );
-
-  useEffect(() => {
-    const media = window.matchMedia(DESKTOP_QUERY);
-    const sync = () => setDesktop(media.matches);
-    sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
-  }, []);
-
-  return desktop;
 };
 
 const TrendCard = ({ movie, contentLang, onOpen }) => {
@@ -119,17 +103,20 @@ const TrendCard = ({ movie, contentLang, onOpen }) => {
 
 const TrendCardSkeleton = () => (
   <div className="search-modal-movie-trend-card search-modal-movie-trend-card--skeleton" aria-hidden="true">
-    <SkeletonLoader variant="movie-image" className="search-modal-movie-trend-poster-skeleton" />
+    <div className="search-modal-movie-trend-poster-wrap">
+      <SkeletonLoader variant="movie-image" className="search-modal-movie-trend-poster-skeleton" />
+    </div>
     <div className="search-modal-movie-trend-body">
-      <SkeletonLoader variant="movies-title" className="search-modal-movie-trend-line" />
-      <SkeletonLoader variant="movies-title" className="search-modal-movie-trend-line search-modal-movie-trend-line--short" />
+      <SkeletonLoader variant="block" className="search-modal-movie-trend-line" />
+      <SkeletonLoader variant="block" className="search-modal-movie-trend-line search-modal-movie-trend-line--mid" />
+      <SkeletonLoader variant="block" className="search-modal-movie-trend-line search-modal-movie-trend-line--short" />
     </div>
   </div>
 );
 
 /**
  * Qidiruv modalidagi kino “Hozir trendda”.
- * Ma’lumot: oxirgi 7 kun, eng ko‘p ko‘rilgan 20 ta. Bu yerda bir qator.
+ * Ma’lumot: oxirgi 7 kun, eng ko‘p ko‘rilgan 20 ta. Bu yerda 6 tasi.
  */
 const SearchModalMovieTrending = ({ onMovieClick }) => {
   const { t } = useTranslation();
@@ -137,8 +124,6 @@ const SearchModalMovieTrending = ({ onMovieClick }) => {
   const { contentLang } = useContentLanguage();
   const { getMovieByIdLocal, moviesLoading } = useMoviesApi();
   const { movies: rows, loading } = useMostWatchedMovies();
-  const desktop = useDesktopRow();
-  const previewLimit = desktop ? 3 : 2;
 
   const ranked = useMemo(
     () =>
@@ -148,7 +133,7 @@ const SearchModalMovieTrending = ({ onMovieClick }) => {
     [getMovieByIdLocal, rows]
   );
 
-  const preview = ranked.slice(0, previewLimit);
+  const preview = ranked.slice(0, PREVIEW_LIMIT);
   const waiting = (loading || moviesLoading) && preview.length === 0;
 
   const goMore = () => {
@@ -184,7 +169,7 @@ const SearchModalMovieTrending = ({ onMovieClick }) => {
       </div>
       <div className="search-modal-movie-trend-list">
         {waiting
-          ? Array.from({ length: previewLimit }, (_, index) => (
+          ? Array.from({ length: PREVIEW_LIMIT }, (_, index) => (
               <TrendCardSkeleton key={`movie-trend-skeleton-${index}`} />
             ))
           : preview.map((movie) => (
