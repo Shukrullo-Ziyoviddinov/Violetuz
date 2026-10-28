@@ -18,7 +18,7 @@
   gap: 0.4rem;
   margin: 0;
   color: #fff;
-  font-size: 1.05rem;
+  font-size: 0.8rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -37,7 +37,7 @@
   border: none;
   background: none;
   color: #b07cff;
-  font-size: 0.82rem;
+  font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -50,7 +50,7 @@
 .search-modal-trending-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 1.25rem;
+  column-gap: 0.5rem;
   row-gap: 0.15rem;
 }
 
@@ -175,16 +175,28 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-@media (max-width: 520px) {
+@media (max-width: 499px) {
+  .search-modal-trending-row {
+    gap: 0.3rem;
+  }
+
+  .search-modal-trending-rank {
+    width: 1rem;
+  }
+
+  .search-modal-trending-cover {
+    width: 40px;
+    height: 40px;
+  }
+
+  .search-modal-trending-actions {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 374px) {
   .search-modal-trending-list {
     grid-template-columns: 1fr;
-  }
-
-  .search-modal-trending-title {
-    font-size: 0.98rem;
-  }
-
-  .search-modal-trending-more {
-    font-size: 0.78rem;
   }
 }

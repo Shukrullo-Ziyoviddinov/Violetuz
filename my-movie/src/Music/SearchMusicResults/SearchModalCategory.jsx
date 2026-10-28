@@ -13,14 +13,7 @@ const CATEGORY_TO_SECTION = {
   shorts: null,
 };
 
-const CATEGORIES = [
-  { id: 'songs', icon: '🎵' },
-  { id: 'artists', icon: '👤' },
-  { id: 'albums', icon: '💿' },
-  { id: 'clips', icon: '🎬' },
-  { id: 'concerts', icon: '🎤' },
-  { id: 'shorts', icon: '📱' },
-];
+const CATEGORIES = ['songs', 'artists', 'albums', 'clips', 'concerts', 'shorts'];
 
 const SearchModalCategory = ({ onCategoryClick }) => {
   const { t } = useTranslation();
@@ -37,14 +30,14 @@ const SearchModalCategory = ({ onCategoryClick }) => {
     shorts: t('navbar.shorts', 'Shorts'),
   };
 
-  const handleClick = (category) => {
+  const handleClick = (categoryId) => {
     if (hasDraggedRef.current) return;
     if (onCategoryClick) onCategoryClick();
-    if (category.id === 'shorts') {
+    if (categoryId === 'shorts') {
       navigate('/shorts');
       return;
     }
-    const section = CATEGORY_TO_SECTION[category.id] || 'trend';
+    const section = CATEGORY_TO_SECTION[categoryId] || 'trend';
     navigate(`/music/more/${section}`);
   };
 
@@ -66,15 +59,14 @@ const SearchModalCategory = ({ onCategoryClick }) => {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
       >
-        {CATEGORIES.map((cat) => (
+        {CATEGORIES.map((id) => (
           <button
-            key={cat.id}
+            key={id}
             type="button"
             className="search-modal-category-item"
-            onClick={() => handleClick(cat)}
+            onClick={() => handleClick(id)}
           >
-            <span className="search-modal-category-icon">{cat.icon}</span>
-            <span className="search-modal-category-label">{sectionLabels[cat.id]}</span>
+            <span className="search-modal-category-label">{sectionLabels[id]}</span>
           </button>
         ))}
       </ScrollTouch>
