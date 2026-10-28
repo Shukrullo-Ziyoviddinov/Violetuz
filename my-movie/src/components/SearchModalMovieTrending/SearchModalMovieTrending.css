@@ -194,5 +194,10 @@
 
   .search-modal-movie-trend-name {
     font-size: 0.78rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
