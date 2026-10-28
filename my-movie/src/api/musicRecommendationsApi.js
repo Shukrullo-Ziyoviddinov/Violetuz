@@ -343,6 +343,35 @@ export const fetchPopularClips = async ({ limit } = {}) => {
 };
 
 /**
+ * Hozir trendda (public): GET /api/music-recommendations/most-listened
+ * Oxirgi 7 kun, limit server configda (max 20). Hafta/oy top 10 dan alohida.
+ *
+ * @param {{ limit?: number }} [opts]
+ * @returns {Promise<{ items: Array<{ contentKey: string, contentId: string, viewCount: number, listenedSeconds: number, rank: number }>, windowDays?: number, limit?: number, minViews?: number, contentType?: string, source?: string }>}
+ */
+export const fetchMostListenedMusic = async ({ limit } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/music-recommendations/most-listened?${query.toString()}`
+    : '/music-recommendations/most-listened';
+
+  const res = await musicRecFetch(path);
+  const data = await parseJson(res);
+  const items = Array.isArray(data?.items) ? data.items : [];
+
+  return {
+    items,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    contentType: data?.contentType,
+    source: data?.source || (items.length ? 'most_listened_music' : 'empty'),
+  };
+};
+
+/**
  * Hafta + oy top (public): GET /api/music-recommendations/top-charts
  * Music page da bitta so‘rov — ikkala blok shu javobdan o‘qiydi.
  *

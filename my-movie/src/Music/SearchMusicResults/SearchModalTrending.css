@@ -1,0 +1,190 @@
+.search-modal-trending {
+  width: 100%;
+  margin-top: 1.15rem;
+  text-align: left;
+}
+
+.search-modal-trending-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.search-modal-trending-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.search-modal-trending-flame {
+  display: inline-flex;
+  color: #ff6a2a;
+}
+
+.search-modal-trending-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #b07cff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-modal-trending-more:hover {
+  color: #c9a6ff;
+}
+
+.search-modal-trending-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1.25rem;
+  row-gap: 0.15rem;
+}
+
+.search-modal-trending-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.35rem 0.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.search-modal-trending-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.search-modal-trending-row--active {
+  background: rgba(155, 79, 231, 0.16);
+}
+
+.search-modal-trending-row--skeleton {
+  height: 52px;
+  margin: 0.2rem 0;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: default;
+}
+
+.search-modal-trending-rank {
+  flex-shrink: 0;
+  width: 1.5rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.85rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.search-modal-trending-cover {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1c1c1c;
+}
+
+.search-modal-trending-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.search-modal-trending-play {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  cursor: pointer;
+}
+
+.search-modal-trending-play:hover {
+  background: #fff;
+}
+
+.search-modal-trending-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  gap: 0.12rem;
+}
+
+.search-modal-trending-name,
+.search-modal-trending-artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-modal-trending-name {
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.search-modal-trending-artist {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.search-modal-trending-actions {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+}
+
+.search-modal-trending-actions:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 520px) {
+  .search-modal-trending-list {
+    grid-template-columns: 1fr;
+  }
+
+  .search-modal-trending-title {
+    font-size: 0.98rem;
+  }
+
+  .search-modal-trending-more {
+    font-size: 0.78rem;
+  }
+}

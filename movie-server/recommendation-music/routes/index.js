@@ -7,6 +7,7 @@
  * GET  /api/music-recommendations/top-charts              (public, weekly+monthly one response)
  * GET  /api/music-recommendations/popular-albums          (public, album ListenEvent, 30d, limit 20)
  * GET  /api/music-recommendations/popular-clips           (public, clip ListenEvent, 30d, limit 20)
+ * GET  /api/music-recommendations/most-listened          (public, music ListenEvent, rolling 7d, limit 20)
  * POST /api/music-recommendations/:categoryNameMusic/guest  (public, rate-limited)
  * GET  /api/music-recommendations/:categoryNameMusic?contentType=&limit=
  * POST /api/music-recommendations/progress
@@ -31,6 +32,7 @@ router.get('/monthly-top', controller.getMonthlyTopMusic);
 router.get('/top-charts', controller.getTopMusicCharts);
 router.get('/popular-albums', controller.getPopularAlbums);
 router.get('/popular-clips', controller.getPopularClips);
+router.get('/most-listened', controller.getMostListenedMusic);
 router.post('/progress', requireAuth, controller.postProgress);
 
 router.post(

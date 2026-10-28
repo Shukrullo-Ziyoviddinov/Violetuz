@@ -29,6 +29,9 @@ const {
 const {
   getPopularClipsFromListenEvents,
 } = require('../services/popularClipsRead.service');
+const {
+  getMostListenedMusicFromListenEvents,
+} = require('../services/mostListenedMusicRead.service');
 
 /**
  * GET /api/music-recommendations/config/progress
@@ -106,6 +109,18 @@ const getPopularClips = asyncHandler(async (req, res) => {
 });
 
 /**
+ * GET /api/music-recommendations/most-listened
+ * Public. Oxirgi 7 kun, limit 20. Yozuv yo‘q, oyna suriladi.
+ */
+const getMostListenedMusic = asyncHandler(async (req, res) => {
+  const result = await getMostListenedMusicFromListenEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
  * GET /api/music-recommendations/:categoryNameMusic?limit=&lazy=&contentType=
  */
 const getByCategory = asyncHandler(async (req, res) => {
@@ -165,6 +180,7 @@ module.exports = {
   getTopMusicCharts,
   getPopularAlbums,
   getPopularClips,
+  getMostListenedMusic,
   getByCategory,
   postGuestByCategory,
   postProgress,

@@ -4,7 +4,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
-import { fetchPopularAlbums, fetchPopularClips } from '../api/musicRecommendationsApi';
+import {
+  fetchMostListenedMusic,
+  fetchPopularAlbums,
+  fetchPopularClips,
+} from '../api/musicRecommendationsApi';
 import { useMusicHomeFeed } from '../hooks/useMusicHomeFeed';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
@@ -75,6 +79,13 @@ const SECTIONS = {
     titleDefault: 'Trend Musiqa',
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
+  },
+  'hozir-trendda': {
+    titleKey: 'music.hozirTrendda',
+    titleDefault: 'Hozir trendda',
+    wishlistType: 'music',
+    getDetailPath: (id) => `/music/${id}`,
+    isMostListened: true,
   },
   'top-albums': {
     categoryNameMusic: 'TopAlbums',
@@ -416,7 +427,9 @@ const MusicMorePage = () => {
 
   const [popularRanked, setPopularRanked] = useState([]);
   const [popularLoading, setPopularLoading] = useState(false);
-  const isPopularRanked = Boolean(config.isPopularAlbums || config.isPopularClips);
+  const isPopularRanked = Boolean(
+    config.isPopularAlbums || config.isPopularClips || config.isMostListened
+  );
 
   useEffect(() => {
     if (!isPopularRanked) {
@@ -430,7 +443,9 @@ const MusicMorePage = () => {
       try {
         const data = config.isPopularClips
           ? await fetchPopularClips()
-          : await fetchPopularAlbums();
+          : config.isMostListened
+            ? await fetchMostListenedMusic()
+            : await fetchPopularAlbums();
         const list = Array.isArray(data?.items) ? data.items : [];
         if (!cancelled) setPopularRanked(list);
       } catch {
@@ -442,11 +457,14 @@ const MusicMorePage = () => {
     return () => {
       cancelled = true;
     };
-  }, [isPopularRanked, config.isPopularAlbums, config.isPopularClips]);
+  }, [isPopularRanked, config.isPopularAlbums, config.isPopularClips, config.isMostListened]);
 
   const catalogLoading = useMemo(() => {
     if (config.isMusicHomeFeed) {
       return Boolean(forYouFeedLoading) || Boolean(musicLoading);
+    }
+    if (config.isMostListened) {
+      return Boolean(popularLoading) || Boolean(musicLoading);
     }
     if (config.isPopularAlbums) {
       return Boolean(popularLoading) || Boolean(albumsLoading);
@@ -466,6 +484,7 @@ const MusicMorePage = () => {
     return Boolean(musicLoading);
   }, [
     config.isMusicHomeFeed,
+    config.isMostListened,
     config.isPopularAlbums,
     config.isPopularClips,
     config.isAllArtists,
@@ -486,6 +505,16 @@ const MusicMorePage = () => {
       const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
       const out = [];
       for (const row of forYouFeed) {
+        const track = byId.get(String(row.contentId));
+        if (!track) continue;
+        out.push(track);
+      }
+      return out;
+    }
+    if (config.isMostListened) {
+      const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
+      const out = [];
+      for (const row of popularRanked) {
         const track = byId.get(String(row.contentId));
         if (!track) continue;
         out.push(track);
@@ -538,6 +567,7 @@ const MusicMorePage = () => {
     return ensureArray(sectionData);
   }, [
     config.isMusicHomeFeed,
+    config.isMostListened,
     config.isPopularAlbums,
     config.isPopularClips,
     config.isAllArtists,
