@@ -101,6 +101,10 @@ const musicSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    /** Saytga birinchi yozuv vaqti. Tahrir va tinglash yangilamaydi. */
+    uploadedAt: {
+      type: Date,
+    },
   },
   {
     strict: true,
@@ -117,6 +121,7 @@ musicSchema.statics.getNextId = async function getNextId() {
 musicSchema.index({ categoryNameMusic: 1, id: 1 });
 musicSchema.index({ artistId: 1, id: 1 });
 musicSchema.index({ audio: 1 });
+musicSchema.index({ uploadedAt: -1, id: -1 });
 
 musicSchema.pre('validate', async function assignAutoId() {
   if (!this.isNew || this.id != null) {
@@ -124,6 +129,11 @@ musicSchema.pre('validate', async function assignAutoId() {
   }
 
   this.id = await this.constructor.getNextId();
+});
+
+musicSchema.pre('validate', function stampUploadedAt() {
+  if (!this.isNew) return;
+  this.uploadedAt = new Date();
 });
 
 musicSchema.set('toJSON', {

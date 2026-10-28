@@ -20,6 +20,7 @@ router.get(
   validateMusicArtistParam,
   asyncHandler(musicController.getMusicByArtist)
 );
+router.get('/recently-uploaded', asyncHandler(musicController.getRecentlyUploaded));
 router.get('/:id', validateMusicIdParam, asyncHandler(musicController.getMusicById));
 router.get('/', validateMusicListQuery, asyncHandler(musicController.getMusicList));
 

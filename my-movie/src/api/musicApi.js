@@ -37,6 +37,16 @@ export const fetchMusicById = async (id) => {
   return isMusicLike(data?.data) ? data.data : null;
 };
 
+export const fetchRecentlyUploadedMusic = async () => {
+  const data = await fetchJson(`${API_BASE_URL}/music/recently-uploaded`);
+  const items = Array.isArray(data?.items) ? data.items : [];
+  return {
+    items,
+    limit: Number(data?.limit) || 20,
+    count: items.length,
+  };
+};
+
 export const fetchMusicSections = async () => {
   const data = await fetchJson(`${API_BASE_URL}/music-sections`);
   return normalizeMusicSectionsPayload(data);

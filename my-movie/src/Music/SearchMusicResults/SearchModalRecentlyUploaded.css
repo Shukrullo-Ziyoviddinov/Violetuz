@@ -1,0 +1,112 @@
+.search-modal-recent {
+  width: 100%;
+  margin-top: 1.15rem;
+  text-align: left;
+}
+
+.search-modal-recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.search-modal-recent-title {
+  margin: 0;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.search-modal-recent-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #b07cff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-modal-recent-more:hover {
+  color: #c9a6ff;
+}
+
+.search-modal-recent-list {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.55rem;
+  padding-bottom: 0.15rem;
+}
+
+.search-modal-recent-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 0 0 7.1rem;
+  width: 7.1rem;
+  margin: 0;
+  padding: 0.35rem 0.35rem 0.5rem;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-modal-recent-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.search-modal-recent-card--skeleton {
+  height: 8.6rem;
+  cursor: default;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.search-modal-recent-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1c1c1c;
+}
+
+.search-modal-recent-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.search-modal-recent-name,
+.search-modal-recent-artist {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-modal-recent-name {
+  margin-top: 0.4rem;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.search-modal-recent-artist {
+  margin-top: 0.12rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.7rem;
+  line-height: 1.2;
+}

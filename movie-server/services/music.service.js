@@ -9,6 +9,8 @@ const stripMongoId = (doc) => {
   return rest;
 };
 
+const RECENTLY_UPLOADED_LIMIT = 20;
+
 const WRITABLE_FIELDS = [
   'categoryNameMusic',
   'artistId',
@@ -80,8 +82,33 @@ class MusicService {
     return items.map(stripMongoId);
   }
 
+  /** Eng yangi yuklangan qo‘shiqlar. Limitdan tashqarisi ro‘yxatdan chiqadi, o‘chmaydi. */
+  async getRecentlyUploaded(limit = RECENTLY_UPLOADED_LIMIT) {
+    const size = Math.min(
+      RECENTLY_UPLOADED_LIMIT,
+      Math.max(1, Number(limit) || RECENTLY_UPLOADED_LIMIT)
+    );
+    const rows = await MusicModel.find({ uploadedAt: { $type: 'date' } })
+      .sort({ uploadedAt: -1, id: -1 })
+      .limit(size)
+      .select({ id: 1, uploadedAt: 1, _id: 0 })
+      .lean();
+
+    return rows.map((row) => ({
+      id: row.id,
+      uploadedAt: row.uploadedAt instanceof Date ? row.uploadedAt.toISOString() : row.uploadedAt,
+    }));
+  }
+
   async create(musicData) {
-    const { id: _oldId, fingerprint: _fp, fingerprintDuration: _fpd, durationSec: _ds, ...rest } = musicData || {};
+    const {
+      id: _oldId,
+      fingerprint: _fp,
+      fingerprintDuration: _fpd,
+      durationSec: _ds,
+      uploadedAt: _uploadedAt,
+      ...rest
+    } = musicData || {};
     if (rest.categoryNameMusic) {
       rest.categoryNameMusic = String(rest.categoryNameMusic).trim();
     }

@@ -34,9 +34,19 @@ const getMusicByArtist = async (req, res) => {
   });
 };
 
+const getRecentlyUploaded = async (_req, res) => {
+  const items = await musicService.getRecentlyUploaded();
+  sendSuccess(res, {
+    limit: 20,
+    count: items.length,
+    items,
+  });
+};
+
 module.exports = {
   getMusicList,
   getMusicById,
   getMusicByCategory,
   getMusicByArtist,
+  getRecentlyUploaded,
 };

@@ -10,6 +10,7 @@ import {
   fetchPopularClips,
 } from '../api/musicRecommendationsApi';
 import { useMusicHomeFeed } from '../hooks/useMusicHomeFeed';
+import { useRecentlyUploadedMusic } from '../hooks/useRecentlyUploadedMusic';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
@@ -86,6 +87,13 @@ const SECTIONS = {
     wishlistType: 'music',
     getDetailPath: (id) => `/music/${id}`,
     isMostListened: true,
+  },
+  'yangi-yuklanganlar': {
+    titleKey: 'music.yangiYuklanganlar',
+    titleDefault: 'Yangi yuklanganlar',
+    wishlistType: 'music',
+    getDetailPath: (id) => `/music/${id}`,
+    isRecentlyUploaded: true,
   },
   'top-albums': {
     categoryNameMusic: 'TopAlbums',
@@ -417,6 +425,9 @@ const MusicMorePage = () => {
   } = useMusicApi();
 
   const config = SECTIONS[section] || SECTIONS.trend;
+  const { items: recentUploaded, loading: recentLoading } = useRecentlyUploadedMusic({
+    enabled: Boolean(config.isRecentlyUploaded),
+  });
   const {
     data: sectionData,
     categoryNameMusic,
@@ -468,6 +479,9 @@ const MusicMorePage = () => {
     if (config.isMostListened) {
       return Boolean(popularLoading) || Boolean(musicLoading);
     }
+    if (config.isRecentlyUploaded) {
+      return Boolean(recentLoading) || Boolean(musicLoading);
+    }
     if (config.isPopularAlbums) {
       return Boolean(popularLoading) || Boolean(albumsLoading);
     }
@@ -487,12 +501,14 @@ const MusicMorePage = () => {
   }, [
     config.isMusicHomeFeed,
     config.isMostListened,
+    config.isRecentlyUploaded,
     config.isPopularAlbums,
     config.isPopularClips,
     config.isAllArtists,
     categoryNameMusic,
     wishlistType,
     popularLoading,
+    recentLoading,
     musicLoading,
     albumsLoading,
     clipsLoading,
@@ -518,6 +534,16 @@ const MusicMorePage = () => {
       const out = [];
       for (const row of popularRanked) {
         const track = byId.get(String(row.contentId));
+        if (!track) continue;
+        out.push(track);
+      }
+      return out;
+    }
+    if (config.isRecentlyUploaded) {
+      const byId = new Map((allMusic || []).map((track) => [String(track.id), track]));
+      const out = [];
+      for (const row of recentUploaded) {
+        const track = byId.get(String(row.id));
         if (!track) continue;
         out.push(track);
       }
@@ -570,12 +596,14 @@ const MusicMorePage = () => {
   }, [
     config.isMusicHomeFeed,
     config.isMostListened,
+    config.isRecentlyUploaded,
     config.isPopularAlbums,
     config.isPopularClips,
     config.isAllArtists,
     categoryNameMusic,
     wishlistType,
     popularRanked,
+    recentUploaded,
     allMusic,
     allAlbums,
     allClips,

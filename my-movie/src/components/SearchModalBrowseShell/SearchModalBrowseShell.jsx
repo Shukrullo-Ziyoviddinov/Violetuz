@@ -6,6 +6,7 @@ import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import SearchModalTrending from '../../Music/SearchMusicResults/SearchModalTrending';
 import SearchModalForYou from '../../Music/SearchMusicResults/SearchModalForYou';
 import SearchModalPopularArtists from '../../Music/SearchMusicResults/SearchModalPopularArtists';
+import SearchModalRecentlyUploaded from '../../Music/SearchMusicResults/SearchModalRecentlyUploaded';
 import './SearchModalBrowseShell.css';
 
 const SLIDE_MS = 380;
@@ -13,7 +14,7 @@ const SLIDE_MS = 380;
 /**
  * Browse: Kino | Music + slide carousel.
  * Kino: Genre + Anons + Tavsiya (Category yo‘q).
- * Music: SearchModalTrending + SearchModalForYou + SearchModalPopularArtists.
+ * Music: SearchModalTrending + SearchModalForYou + SearchModalPopularArtists + SearchModalRecentlyUploaded.
  * History bu shellda emas — compose rejimida SearchModalIdleBody orqali.
  * Default tab: kino. Music → panel o‘ngga; Kino → chapga.
  */
@@ -125,6 +126,7 @@ const SearchModalBrowseShell = ({ onNavigateAway }) => {
             <SearchModalTrending onNavigateAway={close} />
             <SearchModalForYou onNavigateAway={close} enabled={isMusic} />
             {isMusic ? <SearchModalPopularArtists onNavigateAway={close} /> : null}
+            {isMusic ? <SearchModalRecentlyUploaded onNavigateAway={close} /> : null}
           </div>
 
           <div
