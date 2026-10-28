@@ -1,0 +1,99 @@
+.search-modal-artists {
+  width: 100%;
+  margin-top: 1.15rem;
+  text-align: left;
+}
+
+.search-modal-artists-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.search-modal-artists-title {
+  margin: 0;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.search-modal-artists-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #b07cff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-modal-artists-more:hover {
+  color: #c9a6ff;
+}
+
+.search-modal-artists-list {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.85rem;
+  padding-bottom: 0.15rem;
+}
+
+.search-modal-artists-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 4.6rem;
+  width: 4.6rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.search-modal-artists-item--skeleton {
+  height: 6.2rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: default;
+}
+
+.search-modal-artists-avatar {
+  display: block;
+  width: 4.35rem;
+  height: 4.35rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #9b4fe7;
+  background: #1c1c1c;
+}
+
+.search-modal-artists-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.search-modal-artists-name {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
