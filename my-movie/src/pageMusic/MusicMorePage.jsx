@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useContentLanguage } from '../context/ContentLanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useMusicApi } from '../context/MusicApiContext';
@@ -394,7 +394,9 @@ const MusicMorePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { section = 'trend' } = useParams();
+  const [searchParams] = useSearchParams();
   const isForYouMusicPage = section === 'sizga-mos-musiqalar';
+  const fromSearchForYou = isForYouMusicPage && searchParams.get('from') === 'search';
   const { items: forYouFeed, isLoading: forYouFeedLoading } = useMusicHomeFeed({
     enabled: isForYouMusicPage,
   });
@@ -657,7 +659,11 @@ const MusicMorePage = () => {
               className="music-more-page-title-skeleton"
             />
           ) : (
-            <h1 className="music-more-page-title">{t(titleKey, titleDefault)}</h1>
+            <h1 className="music-more-page-title">
+              {fromSearchForYou
+                ? t('music.sizUchunTavsiyalar', 'Siz uchun tavsiyalar')
+                : t(titleKey, titleDefault)}
+            </h1>
           )}
         </div>
 
