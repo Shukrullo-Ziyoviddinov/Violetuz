@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { getTopRatedMovies } from '../components/TopRatedContent/TopRatedContent';
 import { useMoviesApi } from '../context/MoviesApiContext';
@@ -13,6 +14,7 @@ import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
 import { useHomeFeed } from '../hooks/useHomeFeed';
+import { useMostWatchedMovies } from '../hooks/useMostWatchedMovies';
 import { useSimilarMovies } from '../hooks/useSimilarMovies';
 import './RecommendedPage.css';
 
@@ -36,6 +38,7 @@ const filterMoviesByNavCategory = (movies, categoryConfig) => {
 };
 
 const RecommendedPage = () => {
+  const { t } = useTranslation();
   const { categoryId, movieId } = useParams();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -86,8 +89,12 @@ const RecommendedPage = () => {
   }, [genreFromUrl, getGenresFromUrl]);
 
   const isForYouPage = location.pathname === '/recommended';
+  const isTrendingPage = location.pathname === '/recommended/hozir-trendda';
   const { items: feedItems, isLoading: feedLoading } = useHomeFeed({
     enabled: isForYouPage && !genreFromUrl,
+  });
+  const { movies: trendingRows, loading: trendingLoading } = useMostWatchedMovies({
+    enabled: isTrendingPage,
   });
 
   // Genre filter bo'lsa (URL ?genre=) - barcha kinolardan qidirish (allMovies)
@@ -96,6 +103,14 @@ const RecommendedPage = () => {
   // Categories bar (/category/romantika va h.k.) - DB categories.filterCategory
   const navCategory = categoryId ? getCategoryById(categoryId) : null;
   const isNavCategory = Boolean(navCategory);
+
+  const trendingMovies = useMemo(() => {
+    if (!isTrendingPage) return [];
+    const byId = new Map(allMovies.map((movie) => [String(movie.id), movie]));
+    return (trendingRows || [])
+      .map((row) => byId.get(String(row.movieId)))
+      .filter(Boolean);
+  }, [allMovies, isTrendingPage, trendingRows]);
 
   const forYouMovies = useMemo(() => {
     if (!isForYouPage || useAllMoviesForGenre) return [];
@@ -108,6 +123,7 @@ const RecommendedPage = () => {
   const localCategoryMovies = useMemo(() => {
     // Similar — faqat server cache API (front filter yo'q)
     if (isSimilarMoviesPage) return similarApiMovies;
+    if (isTrendingPage) return trendingMovies;
     if (genreFromUrl || useAllMoviesForGenre) return allMovies;
     if (isForYouPage) return forYouMovies;
     if (categoryId === 'topRated') return getTopRatedMovies(allMovies);
@@ -129,8 +145,10 @@ const RecommendedPage = () => {
     isForYouPage,
     isNavCategory,
     isSimilarMoviesPage,
+    isTrendingPage,
     navCategory,
     similarApiMovies,
+    trendingMovies,
     useAllMoviesForGenre,
   ]);
 
@@ -243,9 +261,11 @@ const RecommendedPage = () => {
 
   const listLoading = isSimilarMoviesPage
     ? similarLoading
-    : moviesLoading ||
-      recommendationsLoading ||
-      (isForYouPage && !useAllMoviesForGenre && feedLoading);
+    : isTrendingPage
+      ? moviesLoading || trendingLoading
+      : moviesLoading ||
+        recommendationsLoading ||
+        (isForYouPage && !useAllMoviesForGenre && feedLoading);
 
   return (
     <div className="recommended-page">
@@ -268,7 +288,8 @@ const RecommendedPage = () => {
         sectionType="all"
         limit={null}
         filteredMovies={filteredMovies}
-        hideHeader
+        hideHeader={!isTrendingPage}
+        headerTitle={isTrendingPage ? t('movies.hozirTrendda', 'Hozir trendda') : undefined}
         isLoading={listLoading}
       />
     </div>

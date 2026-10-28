@@ -89,6 +89,7 @@ function AppShell() {
             <Route path="/triller" element={<TrillerPage />} />
             <Route path="/triller/:id" element={<TrillerPage />} />
             <Route path="/recommended" element={<RecommendedPage />} />
+            <Route path="/recommended/hozir-trendda" element={<RecommendedPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/shorts" element={<ShortsPage />} />

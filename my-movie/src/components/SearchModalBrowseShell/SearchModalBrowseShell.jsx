@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import SearchModalGenre from '../SearchModalGenre/SearchModalGenre';
 import SearchModalAnons from '../SearchModalAnons/SearchModalAnons';
 import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
+import SearchModalMovieTrending from '../SearchModalMovieTrending/SearchModalMovieTrending';
 import SearchModalTrending from '../../Music/SearchMusicResults/SearchModalTrending';
 import SearchModalForYou from '../../Music/SearchMusicResults/SearchModalForYou';
 import SearchModalPopularArtists from '../../Music/SearchMusicResults/SearchModalPopularArtists';
@@ -13,7 +14,7 @@ const SLIDE_MS = 380;
 
 /**
  * Browse: Kino | Music + slide carousel.
- * Kino: Genre + Anons + Tavsiya (Category yo‘q).
+ * Kino: Hozir trendda + Genre + Anons + Tavsiya (Category yo‘q).
  * Music: SearchModalTrending + SearchModalForYou + SearchModalPopularArtists + SearchModalRecentlyUploaded.
  * History bu shellda emas — compose rejimida SearchModalIdleBody orqali.
  * Default tab: kino. Music → panel o‘ngga; Kino → chapga.
@@ -136,6 +137,7 @@ const SearchModalBrowseShell = ({ onNavigateAway }) => {
             aria-labelledby="search-browse-tab-kino"
             aria-hidden={activeTab !== 'kino'}
           >
+            <SearchModalMovieTrending onMovieClick={close} />
             <SearchModalGenre onGenreClick={close} />
             <SearchModalAnons onAnonsClick={close} />
             <SearchModalTavsiya onMovieClick={close} />

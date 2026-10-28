@@ -19,6 +19,9 @@ const {
 const {
   getMonthlyTopMoviesFromWatchEvents,
 } = require('../services/monthlyTopMoviesRead.service');
+const {
+  getMostWatchedMoviesFromWatchEvents,
+} = require('../services/mostWatchedMoviesRead.service');
 
 /**
  * GET /api/recommendations/config/progress
@@ -53,6 +56,18 @@ const getWeeklyTopMovies = asyncHandler(async (req, res) => {
  */
 const getMonthlyTopMovies = asyncHandler(async (req, res) => {
   const result = await getMonthlyTopMoviesFromWatchEvents({
+    limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/recommendations/most-watched
+ * Public. Oxirgi 7 kun, limit 20. Hafta/oy top 10 ga yozilmaydi.
+ */
+const getMostWatchedMovies = asyncHandler(async (req, res) => {
+  const result = await getMostWatchedMoviesFromWatchEvents({
     limit: req.query?.limit,
   });
 
@@ -112,6 +127,7 @@ module.exports = {
   getProgressConfig,
   getWeeklyTopMovies,
   getMonthlyTopMovies,
+  getMostWatchedMovies,
   getByCategory,
   postGuestByCategory,
   postProgress,

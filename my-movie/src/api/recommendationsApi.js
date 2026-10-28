@@ -280,6 +280,33 @@ export const fetchMonthlyTopMovies = async ({ limit } = {}) => {
   };
 };
 
+/**
+ * Hozir trendda (public): GET /api/recommendations/most-watched
+ * Oxirgi 7 kun, limit 20. Hafta/oy top 10 endpointiga ulanmaydi.
+ *
+ * @param {{ limit?: number }} [opts]
+ */
+export const fetchMostWatchedMovies = async ({ limit } = {}) => {
+  const query = new URLSearchParams();
+  if (limit) query.set('limit', String(limit));
+
+  const path = query.toString()
+    ? `/recommendations/most-watched?${query.toString()}`
+    : '/recommendations/most-watched';
+
+  const res = await recommendationsFetch(path);
+  const data = await parseJson(res);
+  const movies = Array.isArray(data?.movies) ? data.movies : [];
+
+  return {
+    movies,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    source: data?.source || (movies.length ? 'most_watched_movies' : 'empty'),
+  };
+};
+
 export const fetchProgressConfig = async () => {
   const res = await recommendationsFetch('/recommendations/config/progress');
   const data = await parseJson(res);
