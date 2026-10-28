@@ -339,6 +339,42 @@
   text-overflow: ellipsis;
 }
 
+.music-detail-trend-card-meta-row {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-detail-trend-card-meta-row .view-count-text,
+.music-detail-trend-card-meta-row .uploaded-at-time,
+.music-detail-trend-card-meta-row .music-detail-trend-card-uploaded-at {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+  flex-shrink: unset;
+  gap: 0;
+}
+
+.music-detail-trend-card-meta-row .uploaded-at-time-dot {
+  display: inline;
+  margin: 0 0.25rem;
+}
+
+.music-detail-trend-card-meta-row .uploaded-at-time-text {
+  display: inline;
+}
+
 .music-detail-artist-row .view-count-text--loading .skeleton-loader--view-count-text {
   width: 7.5rem;
   height: calc(0.9rem * 1.2);

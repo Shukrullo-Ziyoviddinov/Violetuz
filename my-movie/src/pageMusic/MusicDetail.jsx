@@ -28,6 +28,7 @@ import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
 import MusicDetailMixSheet, { useNarrowLayout } from '../Music/YourMixes/MusicDetailMixSheet';
 import { mixSectionLabel } from '../Music/YourMixes/mixSectionLabel';
 import ViewCount from '../components/ViewCount/ViewCount';
+import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import '../Music/YourMixes/YourMixes.css';
 import './MusicDetail.css';
 
@@ -193,7 +194,19 @@ const MusicDetailTrendCard = ({
                 {itemArtist?.name || ''}
               </span>
               {item?.id != null && (
-                <ViewCount itemId={item.id} type="music" variant="text" record={false} />
+                <div className="music-detail-trend-card-meta-row">
+                  <ViewCount
+                    itemId={item.id}
+                    type="music"
+                    variant="text"
+                    record={false}
+                    className="view-count-text music-detail-trend-card-view-count"
+                  />
+                  <UploadedAtTime
+                    at={item.uploadedAt || item.createdAt}
+                    className="music-detail-trend-card-uploaded-at"
+                  />
+                </div>
               )}
             </div>
             <span className="music-detail-trend-card-meta">
