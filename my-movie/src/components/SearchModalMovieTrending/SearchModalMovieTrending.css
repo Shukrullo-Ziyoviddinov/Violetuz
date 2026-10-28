@@ -99,26 +99,32 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  max-height: 72px;
+  overflow: hidden;
 }
 
 .search-modal-movie-trend-name {
   margin: 0;
+  min-width: 0;
   color: #fff;
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.25;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .search-modal-movie-trend .search-modal-movie-trend-views.view-count-text {
   margin: 0;
+  min-width: 0;
   font-size: 0.62rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .search-modal-movie-trend-genres {
@@ -180,6 +186,10 @@
   .search-modal-movie-trend-poster-wrap {
     width: 58px;
     height: 80px;
+  }
+
+  .search-modal-movie-trend-body {
+    max-height: 80px;
   }
 
   .search-modal-movie-trend-name {
