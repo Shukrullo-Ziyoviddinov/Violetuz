@@ -1,6 +1,6 @@
 /**
  * Haqiqiy tomosha (≥5 daqiqa / qisqa film ~80%) dan keyin saqlanadi —
- * detail ochish emas. SearchModalTavsiya local signal sifatida ishlatadi.
+ * detail ochish emas.
  * Format: { items: [{ id, typeCategory, filterGenre, filterCountry }] }
  *
  * Privacy: register / to‘liq logout da tozalanadi (guest rec history bilan bir xil

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
-import { useViewedMovies } from '../../context/ViewedMoviesContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
-import { getRecommendations } from '../../utils/getRecommendations';
+import { useHomeFeed } from '../../hooks/useHomeFeed';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import { normalizeImagePath } from '../../utils/utils';
@@ -102,25 +101,18 @@ const SearchModalTavsiya = ({ onMovieClick }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
-  const { getViewedItems } = useViewedMovies();
-  const { allMovies } = useMoviesApi();
-  const [recommendations, setRecommendations] = useState([]);
-  const [tavsiyaLoading, setTavsiyaLoading] = useState(true);
+  const { getMovieByIdLocal, moviesLoading } = useMoviesApi();
+  const { items, isLoading } = useHomeFeed();
 
-  useEffect(() => {
-    let cancelled = false;
-    setTavsiyaLoading(true);
-    // Umumiy search tavsiya — category engine emas (keyin alohida global algo).
-    const viewedItems = getViewedItems();
-    const list = getRecommendations(allMovies, viewedItems, 12);
-    if (!cancelled) {
-      setRecommendations(Array.isArray(list) ? list : []);
-      setTavsiyaLoading(false);
-    }
-    return () => {
-      cancelled = true;
-    };
-  }, [getViewedItems, allMovies]);
+  const recommendations = useMemo(
+    () =>
+      (items || [])
+        .map((item) => getMovieByIdLocal(item.movieId))
+        .filter(Boolean),
+    [getMovieByIdLocal, items]
+  );
+
+  const tavsiyaLoading = (isLoading || moviesLoading) && recommendations.length === 0;
 
   const getTitle = (m) => {
     if (m?.title && typeof m.title === 'object') {
