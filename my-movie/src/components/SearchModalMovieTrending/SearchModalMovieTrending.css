@@ -96,7 +96,7 @@
 .search-modal-movie-trend-rank {
   position: absolute;
   left: 0;
-  bottom: -7px;
+  bottom: 3px;
   z-index: 2;
   margin: 0;
   font-family: Impact, 'Arial Black', 'Arial Narrow', sans-serif;
@@ -207,7 +207,6 @@
   }
 
   .search-modal-movie-trend-rank {
-    bottom: -8px;
     -webkit-text-stroke-width: 1.7px;
   }
 
