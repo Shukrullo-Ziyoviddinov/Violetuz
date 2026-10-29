@@ -7,6 +7,7 @@ const { PORT } = require('./config/env');
 const startServer = async () => {
   try {
     await connectDB();
+    require('./shorts-reco').createShortsRecoModule().startCatalogSync();
 
     // Recommendation jobs: handlers register via routes; cron after DB is ready
     const {

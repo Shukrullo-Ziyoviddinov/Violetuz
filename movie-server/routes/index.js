@@ -113,5 +113,6 @@ router.use('/detail-recommend', detailRecommendRoutes);
 router.use('/music-recommendations', musicRecommendationRoutes);
 router.use('/recommended-actors', recommendedActorsRoutes);
 router.use('/recommended-artists', recommendedArtistsRoutes);
+router.use('/shorts-reco', require('../shorts-reco').createShortsRecoModule().router);
 
 module.exports = router;
