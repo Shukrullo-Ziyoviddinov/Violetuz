@@ -36,7 +36,7 @@ const hasImdb = (movie) => {
   return value != null && value !== '' && value !== 'none';
 };
 
-const TrendCard = ({ movie, contentLang, onOpen }) => {
+const TrendCard = ({ movie, rank, contentLang, onOpen }) => {
   const title = titleOf(movie, contentLang);
   const genres = genresOf(movie, contentLang);
   const rawImg = movie?.homeImg
@@ -79,6 +79,7 @@ const TrendCard = ({ movie, contentLang, onOpen }) => {
             onError={onError}
           />
         )}
+        <span className="search-modal-movie-trend-rank" aria-hidden="true">{rank}</span>
       </div>
       <div className="search-modal-movie-trend-body">
         <h3 className="search-modal-movie-trend-name">{title}</h3>
@@ -172,10 +173,11 @@ const SearchModalMovieTrending = ({ onMovieClick }) => {
           ? Array.from({ length: PREVIEW_LIMIT }, (_, index) => (
               <TrendCardSkeleton key={`movie-trend-skeleton-${index}`} />
             ))
-          : preview.map((movie) => (
+            : preview.map((movie, index) => (
               <TrendCard
                 key={movie.id}
                 movie={movie}
+                rank={index + 1}
                 contentLang={contentLang}
                 onOpen={openMovie}
               />

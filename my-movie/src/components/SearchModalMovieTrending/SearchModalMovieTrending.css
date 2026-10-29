@@ -93,6 +93,24 @@
   pointer-events: none;
 }
 
+.search-modal-movie-trend-rank {
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+  z-index: 2;
+  margin: 0;
+  font-family: Impact, 'Arial Black', 'Arial Narrow', sans-serif;
+  font-size: 52px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #fff;
+  pointer-events: none;
+  user-select: none;
+}
+
 .search-modal-movie-trend-body {
   min-width: 0;
   flex: 1 1 auto;
@@ -186,6 +204,12 @@
   .search-modal-movie-trend-poster-wrap {
     width: 65px;
     height: 90px;
+  }
+
+  .search-modal-movie-trend-rank {
+    bottom: -8px;
+    font-size: 58px;
+    -webkit-text-stroke-width: 1.7px;
   }
 
   .search-modal-movie-trend-body {
