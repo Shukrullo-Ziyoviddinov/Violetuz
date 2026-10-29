@@ -99,14 +99,14 @@
   bottom: 3px;
   z-index: 2;
   margin: 0;
-  font-family: Impact, 'Arial Black', 'Arial Narrow', sans-serif;
+  font-family: Impact, 'Arial Black', sans-serif;
   font-size: 37px;
-  font-weight: 400;
+  font-weight: 900;
   font-style: italic;
   line-height: 0.8;
   letter-spacing: -0.03em;
   color: transparent;
-  -webkit-text-stroke: 1.5px #fff;
+  -webkit-text-stroke: 1px #fff;
   pointer-events: none;
   user-select: none;
 }
@@ -204,10 +204,6 @@
   .search-modal-movie-trend-poster-wrap {
     width: 65px;
     height: 90px;
-  }
-
-  .search-modal-movie-trend-rank {
-    -webkit-text-stroke-width: 1.7px;
   }
 
   .search-modal-movie-trend-body {
