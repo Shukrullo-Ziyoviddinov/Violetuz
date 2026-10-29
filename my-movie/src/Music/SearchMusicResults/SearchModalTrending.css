@@ -79,13 +79,13 @@
 }
 
 .search-modal-trending-rank {
-  -webkit-text-stroke: 1px #fff;
+  -webkit-text-stroke: 0.6px #fff;
   color: #0000;
   flex-shrink: 0;
   font-family: Impact, 'Arial Black', sans-serif;
   font-size: 17px;
   font-style: italic;
-  font-weight: 100;
+  font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 0.8;
   margin: 0;
