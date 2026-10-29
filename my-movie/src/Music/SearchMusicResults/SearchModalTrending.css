@@ -80,12 +80,18 @@
 
 .search-modal-trending-rank {
   flex-shrink: 0;
-  width: 1.5rem;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 0.85rem;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
+  width: auto;
+  margin: 0;
+  font-family: Impact, 'Arial Black', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1px #fff;
+  pointer-events: none;
+  user-select: none;
 }
 
 .search-modal-trending-cover {
@@ -177,10 +183,6 @@
 @media (max-width: 499px) {
   .search-modal-trending-row {
     gap: 0.3rem;
-  }
-
-  .search-modal-trending-rank {
-    width: 1rem;
   }
 
   .search-modal-trending-cover {
