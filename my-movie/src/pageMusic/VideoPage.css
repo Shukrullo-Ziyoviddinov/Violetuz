@@ -1440,11 +1440,6 @@ body.video-detail-page-active {
 }
 
 @media (max-width: 768px) {
-  .video-detail-info .video-detail-title,
-  .video-detail-artist-name {
-    font-size: 1.1rem;
-  }
-
   /* Mobile: rasmdagi kompakt pill — matn/ikon blok ichida */
   .video-detail-actions .scroll-touch,
   .video-detail-actions-scroll {
