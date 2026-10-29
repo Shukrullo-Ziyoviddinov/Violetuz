@@ -79,19 +79,20 @@
 }
 
 .search-modal-trending-rank {
-  flex-shrink: 0;
-  width: auto;
-  margin: 0;
-  font-family: Impact, 'Arial Black', sans-serif;
-  font-size: 28px;
-  font-weight: 900;
-  font-style: italic;
-  line-height: 0.8;
-  letter-spacing: -0.03em;
-  color: transparent;
   -webkit-text-stroke: 1px #fff;
+  color: #0000;
+  flex-shrink: 0;
+  font-family: Impact, 'Arial Black', sans-serif;
+  font-size: 17px;
+  font-style: italic;
+  font-weight: 100;
+  letter-spacing: -0.03em;
+  line-height: 0.8;
+  margin: 0;
   pointer-events: none;
+  -webkit-user-select: none;
   user-select: none;
+  width: auto;
 }
 
 .search-modal-trending-cover {
