@@ -69,8 +69,8 @@
 
 .search-modal-movie-trend-poster-wrap {
   position: relative;
-  width: 52px;
-  height: 72px;
+  width: 62px;
+  height: 80px;
   flex-shrink: 0;
   border-radius: 6px;
   overflow: hidden;
@@ -99,7 +99,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  max-height: 72px;
+  max-height: 80px;
   overflow: hidden;
 }
 
@@ -107,7 +107,7 @@
   margin: 0;
   min-width: 0;
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.88rem;
   font-weight: 600;
   line-height: 1.25;
   white-space: nowrap;
@@ -118,7 +118,7 @@
 .search-modal-movie-trend .search-modal-movie-trend-views.view-count-text {
   margin: 0;
   min-width: 0;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.2;
@@ -156,7 +156,7 @@
 
 .search-modal-movie-trend-imdb-value {
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   line-height: 1;
 }
@@ -184,16 +184,15 @@
   }
 
   .search-modal-movie-trend-poster-wrap {
-    width: 58px;
-    height: 80px;
+    width: 65px;
+    height: 90px;
   }
 
   .search-modal-movie-trend-body {
-    max-height: 80px;
+    max-height: 90px;
   }
 
   .search-modal-movie-trend-name {
-    font-size: 0.78rem;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
