@@ -88,6 +88,10 @@
   color: #fff;
 }
 
+.feed-video-card-info .video-detail-title {
+  font-size: 1.3rem;
+}
+
 .feed-video-card-info .video-detail-artist-name {
   color: rgba(255, 255, 255, 0.72);
   font-weight: 600;
@@ -359,4 +363,10 @@
   gap: 0.45rem;
   overflow: visible;
   white-space: normal;
+}
+
+@media (max-width: 768px) {
+  .feed-video-card-info .video-detail-title {
+    font-size: 1.1rem;
+  }
 }
