@@ -27,29 +27,37 @@ export const fetchShortsShelf = async ({ type, block = 0, limit = 10 }) => {
   return fetchJson(`${API_BASE_URL}/shorts-reco/shelf?${params.toString()}`);
 };
 
-export const fetchShortsRecoFeed = async ({ sessionId, position = 0, limit = 20 } = {}) => {
+export const fetchShortsRecoFeed = async ({ sessionId, position = 0, limit = 20, focus } = {}) => {
   const params = new URLSearchParams({
     position: String(position),
     limit: String(limit),
   });
   if (sessionId) params.set('sessionId', sessionId);
+  if (focus != null && focus !== '') params.set('focus', String(focus));
   return fetchJson(`${API_BASE_URL}/shorts-reco/feed?${params.toString()}`);
 };
 
-export const postShortsRecoEvent = async ({ shortId, passRatio, playedMsDelta, completionsDelta }) => {
+export const postShortsRecoEvent = async (event) => {
   const eventId = typeof crypto !== 'undefined' && crypto.randomUUID
     ? crypto.randomUUID()
     : null;
-  if (!eventId || shortId == null) return null;
+  if (!eventId || !event || event.shortId == null) return null;
   const body = {
     eventId,
-    shortId,
-    passRatio,
-    playedMsDelta,
+    shortId: event.shortId,
+    passRatio: event.passRatio,
+    playedMsDelta: event.playedMsDelta,
+    final: event.final !== false,
   };
-  if (completionsDelta != null) body.completionsDelta = completionsDelta;
+  if (event.completionsDelta != null) body.completionsDelta = event.completionsDelta;
+  if (event.viewId) body.viewId = event.viewId;
+  if (event.seq != null) body.seq = event.seq;
+  if (event.liked != null) body.liked = event.liked;
+  if (event.commented != null) body.commented = event.commented;
+  if (event.shared != null) body.shared = event.shared;
   return fetchJson(`${API_BASE_URL}/shorts-reco/events`, {
     method: 'POST',
     body: JSON.stringify(body),
+    keepalive: true,
   });
 };

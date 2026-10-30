@@ -34,6 +34,30 @@ const uniqueShorts = (items) => {
   return list;
 };
 
+const FROZEN_AHEAD = 3;
+
+const mergeTail = (current, incoming, displayIndex) => {
+  if (!current || !current.length) return incoming;
+  const prefixLen = Math.min(current.length, Math.max(0, displayIndex) + 1 + FROZEN_AHEAD);
+  const prefix = current.slice(0, prefixLen);
+  const seen = new Set(prefix.map(itemKey));
+  const tail = [];
+  incoming.forEach((item) => {
+    const key = itemKey(item);
+    if (seen.has(key)) return;
+    seen.add(key);
+    tail.push(item);
+  });
+  const next = [...prefix, ...tail];
+  if (
+    next.length === current.length
+    && next.every((item, index) => itemKey(item) === itemKey(current[index]))
+  ) {
+    return current;
+  }
+  return next;
+};
+
 const playbackFromFeed = (catalog, feedItems, shortId) => {
   const mapped = uniqueShorts(
     (feedItems || []).map((row) => matchCatalogShort(catalog, row))
@@ -52,7 +76,13 @@ const playbackFromFeed = (catalog, feedItems, shortId) => {
  * Scroll order for the shorts player. The opened card stays first.
  * Everything after it is the shared shorts feed.
  */
-export const useShortsRecoPlayback = ({ enabled, catalog, shortId }) => {
+export const useShortsRecoPlayback = ({
+  enabled,
+  catalog,
+  shortId,
+  refreshKey = 0,
+  locked = false,
+}) => {
   const [list, setList] = useState(null);
   const sessionRef = useRef({
     sessionId: null,
@@ -61,15 +91,33 @@ export const useShortsRecoPlayback = ({ enabled, catalog, shortId }) => {
     loading: false,
     done: false,
   });
+  const sessionKeyRef = useRef(null);
   const catalogRef = useRef(catalog);
+  const syncAtRef = useRef(() => {});
+  const lockedRef = useRef(locked);
   catalogRef.current = catalog;
+  lockedRef.current = locked;
 
   useEffect(() => {
     if (!enabled) {
+      sessionKeyRef.current = null;
+      sessionRef.current = {
+        sessionId: null,
+        count: 0,
+        pinned: false,
+        loading: false,
+        done: false,
+      };
       setList(null);
       return undefined;
     }
-    if (!catalog.length) return undefined;
+    if (!catalogRef.current.length) return undefined;
+    const key = `${shortId || ''}::${refreshKey}`;
+    if (sessionKeyRef.current === key) return undefined;
+    const sameShort = sessionKeyRef.current != null
+      && sessionKeyRef.current.startsWith(`${shortId || ''}::`);
+    if (sameShort && sessionRef.current.sessionId && lockedRef.current) return undefined;
+    sessionKeyRef.current = key;
     let cancelled = false;
     sessionRef.current = {
       sessionId: null,
@@ -78,18 +126,23 @@ export const useShortsRecoPlayback = ({ enabled, catalog, shortId }) => {
       loading: true,
       done: false,
     };
-    fetchShortsRecoFeed({ position: 0, limit: 20 })
+    fetchShortsRecoFeed({ position: 0, limit: 20, focus: shortId || undefined })
       .then((page) => {
         if (cancelled || !page) return;
-        const built = playbackFromFeed(catalog, page.items, shortId);
+        const built = playbackFromFeed(catalogRef.current, page.items, shortId);
+        const pendingIndex = sessionRef.current.pendingIndex;
         sessionRef.current = {
           sessionId: page.sessionId,
           count: (page.items || []).length,
           pinned: built.pinned,
           loading: false,
           done: (page.items || []).length === 0,
+          pendingIndex: null,
         };
         setList(built.list);
+        if (Number.isInteger(pendingIndex)) {
+          syncAtRef.current(pendingIndex);
+        }
       })
       .catch(() => {
         if (!cancelled) sessionRef.current.loading = false;
@@ -97,14 +150,19 @@ export const useShortsRecoPlayback = ({ enabled, catalog, shortId }) => {
     return () => {
       cancelled = true;
     };
-  }, [enabled, catalog, shortId]);
+  }, [enabled, catalog.length, shortId, refreshKey]);
 
-  const loadMore = useCallback((displayIndex) => {
+  const syncAt = useCallback((displayIndex) => {
     const state = sessionRef.current;
-    if (!enabled || state.loading || state.done || !state.sessionId) return;
-    const sessionIndex = Math.max(0, displayIndex - (state.pinned ? 1 : 0));
-    if (sessionIndex < state.count - 4) return;
+    const index = Number.isInteger(displayIndex) && displayIndex >= 0 ? displayIndex : 0;
+    if (!enabled) return;
+    if (!state.sessionId || state.loading) {
+      state.pendingIndex = index;
+      return;
+    }
+    const sessionIndex = Math.max(0, index - (state.pinned ? 1 : 0));
     state.loading = true;
+    state.pendingIndex = null;
     fetchShortsRecoFeed({
       sessionId: state.sessionId,
       position: sessionIndex,
@@ -113,17 +171,26 @@ export const useShortsRecoPlayback = ({ enabled, catalog, shortId }) => {
       .then((page) => {
         state.loading = false;
         if (!page) return;
+        const mapped = uniqueShorts(
+          (page.items || []).map((row) => matchCatalogShort(catalogRef.current, row))
+        );
         const nextCount = (page.items || []).length;
-        if (nextCount <= state.count) state.done = true;
-        state.count = nextCount;
-        const built = playbackFromFeed(catalogRef.current, page.items, shortId);
-        state.pinned = built.pinned;
-        setList(built.list);
+        if (nextCount <= state.count && sessionIndex >= state.count - 4) state.done = true;
+        state.count = Math.max(state.count, nextCount);
+        if (mapped.length) {
+          setList((current) => mergeTail(current, mapped, index));
+        }
+        if (Number.isInteger(state.pendingIndex)) {
+          const pending = state.pendingIndex;
+          state.pendingIndex = null;
+          syncAt(pending);
+        }
       })
       .catch(() => {
         state.loading = false;
       });
-  }, [enabled, shortId]);
+  }, [enabled]);
+  syncAtRef.current = syncAt;
 
-  return { list, loadMore };
+  return { list, loadMore: syncAt, syncAt };
 };

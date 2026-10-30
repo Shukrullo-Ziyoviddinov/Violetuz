@@ -30,7 +30,12 @@ const createHttpHandlers = (deps) => {
       body: req.body,
     });
 
-    if (result.status === 'ignored' || result.status === 'duplicate') {
+    if (
+      result.status === 'ignored' ||
+      result.status === 'duplicate' ||
+      result.status === 'stale' ||
+      result.status === 'limited'
+    ) {
       return res.status(204).end();
     }
     if (result.status === 'invalid') {
@@ -66,6 +71,7 @@ const createHttpHandlers = (deps) => {
       sessionId: query.value.sessionId,
       position: query.value.position,
       limit: query.value.limit,
+      focus: query.value.focus,
     });
     const items = await deps.hydrate(page.items);
     return res.status(200).json({

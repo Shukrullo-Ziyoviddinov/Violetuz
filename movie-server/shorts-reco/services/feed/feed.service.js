@@ -12,7 +12,7 @@ const { emptyProfile, hydrateProfile } = require('../profile.service');
 const { planAnchors } = require('../anchors.service');
 const { levelFor, buildSlotPlan } = require('./slotPlan');
 const { buildFeed } = require('./feedBuilder');
-const { createFeedSessionService } = require('./feedSession.service');
+const { createFeedSessionService, reuseStoredSession } = require('./feedSession.service');
 const { collect: collectProfile } = require('./sources/profile.source');
 
 const movieType = collections.existing.shortsVideos.type;
@@ -104,7 +104,7 @@ const fatigueRows = (sessionItems, watches) => {
   const items = sessionItems || [];
   for (let i = items.length - 1; i >= 0 && rows.length < config.fatigueServedCount; i -= 1) {
     const watch = watches.get(items[i].shortId);
-    if (!watch) continue;
+    if (!watch || watch.isProvisional === true) continue;
     rows.push({ anchorKey: items[i].anchorKey, bestPassRatio: watch.bestPassRatio });
   }
   return rows.reverse();
@@ -143,17 +143,49 @@ const createFeedService = (options = {}) => {
       const request = input || {};
       const clock = request.now || new Date();
       const userId = request.userId ? String(request.userId) : null;
-      const watchList = userId ? await watchesRepo.listByUser(userId, config.watchStateReadLimit) : [];
-      const watchMap = new Map(watchList.map((row) => [row.shortId, row]));
-      const profile = userId
-        ? hydrateProfile(await profiles.findByUserId(userId), userId, clock)
-        : emptyProfile('guest', clock);
-      const viewCount = watchList.length;
-      const cold = !userId || viewCount < config.coldStartMinViews;
+      const limit = request.limit || config.feedBatchSize;
       let storedSession = request.sessionId ? await sessionRepo.findById(request.sessionId) : null;
       if (storedSession && userId && storedSession.userId && storedSession.userId !== userId) {
         storedSession = null;
       }
+      const storedProfile = userId ? await profiles.findByUserId(userId) : null;
+      const profileVersion = storedProfile && Number.isInteger(storedProfile.version)
+        ? storedProfile.version
+        : 0;
+      const reused = reuseStoredSession(
+        storedSession,
+        request.position,
+        limit,
+        profileVersion,
+        clock
+      );
+      if (reused) return reused;
+
+      let focusItem = null;
+      if (request.focus && !storedSession) {
+        const doc = await catalog.findByClientShortId(request.focus);
+        if (doc && doc.shortId) {
+          focusItem = {
+            shortId: doc.shortId,
+            slot: 'explore',
+            anchorKey: null,
+            type: doc.type,
+            contentType: doc.contentType == null ? null : doc.contentType,
+            movieId: doc.movieId == null ? null : doc.movieId,
+            artistId: doc.artistId || null,
+            musicKey: doc.musicKey || null,
+            repeat: false,
+          };
+        }
+      }
+
+      const watchList = userId ? await watchesRepo.listByUser(userId, config.watchStateReadLimit) : [];
+      const watchMap = new Map(watchList.map((row) => [row.shortId, row]));
+      const profile = userId
+        ? hydrateProfile(storedProfile, userId, clock)
+        : emptyProfile('guest', clock);
+      const viewCount = watchList.length;
+      const cold = !userId || viewCount < config.coldStartMinViews;
       const planned = planAnchors({
         items: profile.session.items || [],
         multipliers: profile.anchorMultipliers,
@@ -175,12 +207,13 @@ const createFeedService = (options = {}) => {
       const popular = await stats.listTop(config.candidateFetchLimit);
       const popularIds = popular.map((row) => row.shortId).filter(Boolean);
       const statsByShortId = new Map(popular.map((row) => [row.shortId, row]));
-      const limit = request.limit || config.feedBatchSize;
-
       return sessions.serve({
         sessionId: request.sessionId,
         userId,
         position: request.position,
+        limit,
+        profileVersion,
+        focusItem,
         build: async (page) => {
           if (cold) {
             const coldPool = await query({}, config.similarFetchLimit, { catalogAddedAt: -1 });
@@ -247,5 +280,6 @@ const createFeedService = (options = {}) => {
 module.exports = {
   createFeedService,
   describeAnchor,
+  fatigueRows,
   topValues,
 };

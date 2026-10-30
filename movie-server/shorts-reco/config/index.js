@@ -107,6 +107,13 @@ const config = deepFreeze({
   shelfReadLimit: 200,
   slotsPerCycle: 10,
   frozenAhead: 3,
+  /** Client progress pings. The server does not reject other ratios. */
+  progressMilestones: [0.4, 0.7],
+  maxEventsPerShortPerMinute: 20,
+  eventRateWindowMs: 60000,
+  feedRebuildMinIntervalSeconds: 5,
+  /** Interim events cannot produce a negative base score while this is on. */
+  provisionalScoring: true,
   coldStartMinViews: 3,
   /** With 1–2 views, every Nth cold-start item is a profile pick. */
   coldStartProfileEvery: 3,

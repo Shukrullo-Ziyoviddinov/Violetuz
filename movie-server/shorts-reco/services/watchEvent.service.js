@@ -115,12 +115,38 @@ const createWatchEventService = (options) => {
   };
 
   /**
+   * @param {Date[]|string[]} ats
+   * @param {Date} at
+   */
+  const freshEventAts = (ats, at) => {
+    const cutoff = at.getTime() - config.eventRateWindowMs;
+    return (ats || []).filter((stamp) => new Date(stamp).getTime() >= cutoff);
+  };
+
+  /**
    * @param {string} userId
    * @param {object} event
    * @param {object} catalog
    */
   const applyEvent = async (userId, event, catalog) => {
     const previousWatch = await watchRepo.findOne(userId, catalog.shortId);
+    if (
+      event.viewId &&
+      event.seq != null &&
+      previousWatch &&
+      previousWatch.lastViewId === event.viewId &&
+      event.seq <= (previousWatch.lastSeq || 0)
+    ) {
+      return { status: 'stale', shortId: catalog.shortId };
+    }
+    const recentAts = freshEventAts(
+      previousWatch && previousWatch.recentEventAts,
+      event.ts
+    );
+    if (recentAts.length >= config.maxEventsPerShortPerMinute) {
+      return { status: 'limited', shortId: catalog.shortId };
+    }
+
     const storedProfile = await profileRepo.findByUserId(userId);
     const profile = hydrateProfile(storedProfile, userId, event.ts);
     const decayFactor = decayProfile(profile, event.ts);
@@ -148,12 +174,17 @@ const createWatchEventService = (options) => {
       applyActorPenalty(profile, onThisMovie, oldScore, aggregate.score, decayFactor);
     }
 
-    profile.session = pushSession(profile.session, {
-      shortId: catalog.shortId,
-      refs: sessionRefs(catalog),
-      score: aggregate.score,
-      ts: event.ts,
-    });
+    const alreadyInSession = (profile.session.items || [])
+      .some((item) => item.shortId === catalog.shortId);
+    if (aggregate.score !== 0 || alreadyInSession) {
+      profile.session = pushSession(profile.session, {
+        shortId: catalog.shortId,
+        refs: sessionRefs(catalog),
+        score: aggregate.score,
+        ts: event.ts,
+      });
+    }
+    profile.version = (profile.version || 0) + 1;
     profile.updatedAt = event.ts;
 
     const watch = {
@@ -167,6 +198,13 @@ const createWatchEventService = (options) => {
       shared: aggregate.shared,
       firstSeenAt: previousWatch ? previousWatch.firstSeenAt : event.ts,
       lastSeenAt: event.ts,
+      isProvisional: event.final === false,
+      lastViewId: event.viewId || (previousWatch && previousWatch.lastViewId) || null,
+      lastSeq: event.seq == null
+        ? (previousWatch && previousWatch.lastSeq) || 0
+        : event.seq,
+      lastEventAt: event.ts,
+      recentEventAts: recentAts.concat(event.ts),
       score: aggregate.score,
       movieId: catalog.movieId == null ? null : catalog.movieId,
       musicKey: catalog.musicKey || null,
@@ -179,7 +217,7 @@ const createWatchEventService = (options) => {
     await statsRepo.applyDelta(
       catalog.shortId,
       {
-        views: 1,
+        views: !event.viewId || !previousWatch || previousWatch.lastViewId !== event.viewId ? 1 : 0,
         completions: aggregate.completions - (previousWatch ? previousWatch.completions || 0 : 0),
         likes: aggregate.liked && !(previousWatch && previousWatch.liked) ? 1 : 0,
         comments: aggregate.commented && !(previousWatch && previousWatch.commented) ? 1 : 0,

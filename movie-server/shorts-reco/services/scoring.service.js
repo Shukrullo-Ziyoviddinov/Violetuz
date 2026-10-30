@@ -16,19 +16,25 @@ const { clamp } = require('../utils/math');
  *   commented?: boolean,
  *   shared?: boolean,
  * }} aggregate
+ * @param {{ provisional?: boolean }} [options]
  * @returns {number}
  */
-const shortScore = (aggregate) => {
+const shortScore = (aggregate, options) => {
   const source = aggregate || {};
-  const completions = source.completions || 0;
+  const storedCompletions = source.completions || 0;
   const played = source.totalPlayedMs || 0;
   const ratio = source.bestPassRatio || 0;
   const liked = source.liked === true;
   const commented = source.commented === true;
   const shared = source.shared === true;
+  const completions = Math.max(
+    storedCompletions,
+    ratio >= config.completionPassRatio ? 1 : 0
+  );
+  const provisional = config.provisionalScoring && options && options.provisional === true;
 
   if (
-    completions === 0 &&
+    storedCompletions === 0 &&
     played < config.quickFlickMs &&
     !liked &&
     !commented &&
@@ -51,6 +57,7 @@ const shortScore = (aggregate) => {
       }
     }
   }
+  if (provisional && score < 0) score = 0;
 
   if (liked) {
     const lowWatch = ratio < config.lowWatchPassRatio && completions === 0;

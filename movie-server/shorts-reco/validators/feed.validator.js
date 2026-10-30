@@ -40,6 +40,16 @@ const validateFeedQuery = (query) => {
     }
   }
 
+  let focus = null;
+  if (source.focus != null && source.focus !== '') {
+    if (typeof source.focus !== 'string' && typeof source.focus !== 'number') {
+      errors.push('focus must be a short id');
+    } else {
+      focus = String(source.focus).trim();
+      if (!focus || focus.length > 80) errors.push('focus must be 1 to 80 characters');
+    }
+  }
+
   const position = readInteger(source.position, 'position', { min: 0, fallback: 0 });
   if (!position.ok) errors.push(position.error);
   const limit = readInteger(source.limit, 'limit', {
@@ -57,6 +67,7 @@ const validateFeedQuery = (query) => {
       sessionId,
       position: position.value,
       limit: limit.value,
+      focus,
     },
   };
 };

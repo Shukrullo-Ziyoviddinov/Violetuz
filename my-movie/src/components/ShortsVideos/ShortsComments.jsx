@@ -96,7 +96,7 @@ const EMOJI_LIST = [
 
 const VL_EMOJI_IMG = '/img/photo_2026-02-16_20-30-31_preview_rev_1.png';
 
-const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compact }, ref) => {
+const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, onCommentPosted, compact }, ref) => {
   const { i18n } = useTranslation();
   const { profile, isLoggedIn } = useAuth();
   const [shortsComments, setShortsComments] = useState([]);
@@ -314,6 +314,7 @@ const ShortsComments = forwardRef(({ shortsId, targetType, onCountChange, compac
       }
       setShortsInputValue('');
       shortsCommentsApi.dispatchShortsCommentsChanged(shortsId, { skipReload: true });
+      onCommentPosted?.();
     } catch (err) {
       setSubmitError(
         err?.message ||

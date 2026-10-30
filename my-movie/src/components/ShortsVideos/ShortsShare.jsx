@@ -12,7 +12,7 @@ const MOBILE_BREAKPOINT = 768;
 const DRAG_THRESHOLD = 8;
 const CLOSE_MS = 320;
 
-const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenChange }) => {
+const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenChange, onShared }) => {
   const { t } = useTranslation();
   const { contentLang } = useContentLanguage();
   const { isLoggedIn } = useAuth();
@@ -229,6 +229,7 @@ const ShortsShare = ({ shortItem, shortType = 'movieShorts', sharePath, onOpenCh
       });
     }
 
+    onShared?.();
     closeShortsShareModal();
   };
 

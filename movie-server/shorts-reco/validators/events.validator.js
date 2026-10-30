@@ -75,6 +75,29 @@ const validateWatchEvent = (body, now = new Date()) => {
     else ts = parsed;
   }
 
+  const final = source.final == null ? true : source.final;
+  if (typeof final !== 'boolean') errors.push('final must be a boolean');
+
+  let viewId = null;
+  if (source.viewId != null && source.viewId !== '') {
+    if (typeof source.viewId !== 'string' || !UUID_PATTERN.test(source.viewId.trim())) {
+      errors.push('viewId must be a uuid');
+    } else {
+      viewId = source.viewId.trim();
+    }
+  }
+
+  let seq = null;
+  if (source.seq != null) {
+    if (typeof source.seq !== 'number' || !Number.isInteger(source.seq) || source.seq < 1) {
+      errors.push('seq must be an integer of at least 1');
+    } else {
+      seq = source.seq;
+    }
+  }
+  if (viewId && seq == null) errors.push('seq is required when viewId is set');
+  if (!viewId && seq != null) errors.push('viewId is required when seq is set');
+
   if (errors.length > 0) return { ok: false, errors };
   return {
     ok: true,
@@ -88,6 +111,9 @@ const validateWatchEvent = (body, now = new Date()) => {
       commented: flags.commented,
       shared: flags.shared,
       ts,
+      final,
+      viewId,
+      seq,
     },
   };
 };

@@ -9,6 +9,13 @@ import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 import { addWatch } from '../../api/shortsWatchHistory';
 import { postShortsRecoEvent } from '../../api/shortsRecoApi';
 import { useShortsRecoPlayback } from './useShortsRecoPlayback';
+import {
+  createWatch,
+  notePlayback,
+  progressEvents,
+  signalWatch,
+  closeWatch,
+} from './shortsRecoWatch';
 import { recordViewRequest } from '../../api/viewsApi';
 import { useAuth } from '../../context/AuthContext';
 import VertikalDrag from '../VertikalDrag/VertikalDrag';
@@ -205,10 +212,24 @@ const ShortsVideos = ({
   );
   const isMusicShorts = variant === 'music';
   const recoEnabled = !initialShorts && !repostIds?.length && !repostShortsEntries?.length;
-  const { list: recoList, loadMore: loadMoreReco } = useShortsRecoPlayback({
+  const [modalOpen, setModalOpen] = useState(
+    () => startIndex != null && startIndex >= 0
+  );
+  const [feedRefresh, setFeedRefresh] = useState(0);
+  const [openedFocus, setOpenedFocus] = useState(shortId ?? null);
+  const pendingWatchesRef = useRef(new Map());
+  const activeWatchRef = useRef(null);
+  const flushWatchesRef = useRef(() => {});
+  const watchRef = useRef(null);
+  const sendChainRef = useRef(Promise.resolve());
+  const shortsListRef = useRef([]);
+  const activeIndexRef = useRef(0);
+  const { list: recoList, loadMore: loadMoreReco, syncAt: syncReco } = useShortsRecoPlayback({
     enabled: recoEnabled,
     catalog: mixedCatalog,
-    shortId,
+    shortId: feedRefresh === 0 ? (openedFocus ?? shortId ?? null) : null,
+    refreshKey: feedRefresh,
+    locked: modalOpen,
   });
   const baseList = initialShorts || (isMusicShorts ? musicShortsCatalog : mixedCatalog);
   const isDataLoading = isMusicShorts
@@ -222,10 +243,9 @@ const ShortsVideos = ({
     return orderShortsByRepostIds(baseList, repostIds);
   });
   const [isMobileView, setIsMobileView] = useState(false);
-  const [modalOpen, setModalOpen] = useState(
-    () => startIndex != null && startIndex >= 0
-  );
   const [activeIndex, setActiveIndex] = useState(startIndex ?? 0);
+  shortsListRef.current = shortsList;
+  activeIndexRef.current = activeIndex;
 
   useEffect(() => {
     if (repostShortsEntries?.length) {
@@ -318,15 +338,88 @@ const ShortsVideos = ({
   }, [shortId, shortsList]);
 
   const recoOpenedRef = useRef(null);
+  const focusId = openedFocus ?? shortId;
   useEffect(() => {
-    if (!recoList || shortId == null || String(shortId) === '') return;
-    if (recoOpenedRef.current === String(shortId)) return;
-    recoOpenedRef.current = String(shortId);
+    if (!recoList || focusId == null || String(focusId) === '') return;
+    if (recoOpenedRef.current === String(focusId)) return;
+    recoOpenedRef.current = String(focusId);
     setActiveIndex(0);
     setModalOpen(true);
-  }, [recoList, shortId]);
+  }, [recoList, focusId]);
 
-  // Track watch: addWatch after 2 sec viewing. The same event updates the shorts feed.
+  const rememberWatch = (short, stats) => {
+    if (!short || short.id == null) return;
+    if (stats.playedMsDelta < 1500 && stats.passRatio < 0.15) return;
+    const key = `${short.type || 'movieShorts'}:${short.id}`;
+    const prev = pendingWatchesRef.current.get(key);
+    const passRatio = Math.max(prev ? prev.passRatio : 0, stats.passRatio);
+    pendingWatchesRef.current.set(key, {
+      shortId: short.id,
+      passRatio,
+      playedMsDelta: (prev ? prev.playedMsDelta : 0) + stats.playedMsDelta,
+      completionsDelta: passRatio >= 0.9 ? 1 : undefined,
+    });
+  };
+
+  const takeWatches = () => {
+    const batch = [...pendingWatchesRef.current.values()];
+    pendingWatchesRef.current.clear();
+    return batch;
+  };
+
+  const syncRecoRef = useRef(syncReco);
+  syncRecoRef.current = syncReco;
+
+  const enqueueReco = (event, index, shouldSync) => {
+    sendChainRef.current = sendChainRef.current
+      .catch(() => {})
+      .then(() => (event ? postShortsRecoEvent(event) : null))
+      .then(() => {
+        if (shouldSync) syncRecoRef.current(index);
+      })
+      .catch(() => {});
+  };
+
+  const flushPendingWatches = ({ refresh = false } = {}) => {
+    if (recoEnabled) {
+      const current = watchRef.current;
+      let event = null;
+      if (current) {
+        notePlayback(current, performance.now(), modalVideoRef.current, false);
+        event = closeWatch(current);
+        watchRef.current = null;
+      }
+      if (event) enqueueReco(event, activeIndexRef.current, false);
+      if (refresh) setFeedRefresh((value) => value + 1);
+      return;
+    }
+    const snap = activeWatchRef.current;
+    if (snap) {
+      const duration = snap.video && Number.isFinite(snap.video.duration) ? snap.video.duration : 0;
+      const current = snap.video && Number.isFinite(snap.video.currentTime) ? snap.video.currentTime : 0;
+      const passRatio = duration > 0 ? Math.min(1, Math.max(0, current / duration)) : 0;
+      rememberWatch(snap.short, {
+        passRatio,
+        playedMsDelta: Math.max(0, Date.now() - snap.started),
+      });
+      activeWatchRef.current = null;
+    }
+    const batch = takeWatches();
+    if (!batch.length) return;
+    Promise.all(batch.map((event) => postShortsRecoEvent(event).catch(() => {}))).then(() => {
+      if (refresh) setFeedRefresh((value) => value + 1);
+    });
+  };
+  flushWatchesRef.current = flushPendingWatches;
+
+  const sendRecoSignal = (flags) => {
+    if (!recoEnabled) return;
+    const watch = watchRef.current;
+    if (!watch) return;
+    const event = signalWatch(watch, flags);
+    if (event) enqueueReco(event, activeIndexRef.current, true);
+  };
+
   useEffect(() => {
     if (!modalOpen) return undefined;
     const short = shortsList[activeIndex];
@@ -334,22 +427,94 @@ const ShortsVideos = ({
     const started = Date.now();
     const videoMap = isMobileView ? mobileVideoRefs.current : desktopVideoRefs.current;
     const video = videoMap.get(activeIndex) || modalVideoRef.current;
+    activeWatchRef.current = recoEnabled ? null : { short, started, video };
     const t = setTimeout(() => addWatch(short), 2000);
     return () => {
       clearTimeout(t);
-      const duration = video && Number.isFinite(video.duration) ? video.duration : 0;
-      const current = video && Number.isFinite(video.currentTime) ? video.currentTime : 0;
-      const passRatio = duration > 0 ? Math.min(1, Math.max(0, current / duration)) : 0;
-      const playedMsDelta = Math.max(0, Date.now() - started);
-      if (playedMsDelta < 1500 && passRatio < 0.15) return;
-      postShortsRecoEvent({
-        shortId: short.id,
+      if (recoEnabled) return;
+      const snap = activeWatchRef.current;
+      if (!snap || snap.short !== short) return;
+      const duration = snap.video && Number.isFinite(snap.video.duration) ? snap.video.duration : 0;
+      const currentTime = snap.video && Number.isFinite(snap.video.currentTime) ? snap.video.currentTime : 0;
+      const passRatio = duration > 0 ? Math.min(1, Math.max(0, currentTime / duration)) : 0;
+      rememberWatch(snap.short, {
         passRatio,
-        playedMsDelta,
-        completionsDelta: passRatio >= 0.9 ? 1 : undefined,
-      }).catch(() => {});
+        playedMsDelta: Math.max(0, Date.now() - snap.started),
+      });
+      activeWatchRef.current = null;
     };
-  }, [modalOpen, activeIndex, shortsList, isMobileView]);
+  }, [modalOpen, activeIndex, shortsList, isMobileView, recoEnabled]);
+
+  const activeRecoKey = `${shortsList[activeIndex]?.type || ''}:${shortsList[activeIndex]?.id ?? ''}`;
+  useEffect(() => {
+    if (!recoEnabled || !modalOpen) return undefined;
+    const short = shortsListRef.current[activeIndex];
+    const watch = createWatch(short);
+    if (!watch) return undefined;
+    watchRef.current = watch;
+    enqueueReco(null, activeIndex, true);
+
+    const tick = () => {
+      const current = watchRef.current;
+      if (!current || current.closed || current.viewId !== watch.viewId) return;
+      const hidden = document.visibilityState === 'hidden';
+      notePlayback(current, performance.now(), modalVideoRef.current, hidden);
+      if (hidden) return;
+      progressEvents(current).forEach((event) => {
+        enqueueReco(event, activeIndex, true);
+      });
+    };
+
+    const finishHidden = () => {
+      const current = watchRef.current;
+      if (!current || current.viewId !== watch.viewId) return;
+      notePlayback(current, performance.now(), modalVideoRef.current, true);
+      const event = closeWatch(current);
+      if (event) enqueueReco(event, activeIndex, false);
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        finishHidden();
+        return;
+      }
+      const still = shortsListRef.current[activeIndexRef.current];
+      const next = createWatch(still);
+      if (next) watchRef.current = next;
+    };
+
+    const timer = window.setInterval(tick, 400);
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', finishHidden);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', finishHidden);
+      const current = watchRef.current;
+      if (!current || current.viewId !== watch.viewId) return;
+      notePlayback(current, performance.now(), modalVideoRef.current, false);
+      const event = closeWatch(current);
+      watchRef.current = null;
+      if (event) enqueueReco(event, activeIndex, false);
+    };
+  }, [recoEnabled, modalOpen, activeIndex, activeRecoKey]);
+
+  useEffect(() => {
+    if (modalOpen || recoEnabled) return undefined;
+    let cancelled = false;
+    const batch = takeWatches();
+    if (!batch.length) return undefined;
+    Promise.all(batch.map((event) => postShortsRecoEvent(event).catch(() => {}))).then(() => {
+      if (!cancelled) setFeedRefresh((value) => value + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [modalOpen]);
+
+  useEffect(() => () => {
+    flushWatchesRef.current({ refresh: false });
+  }, []);
 
   // Aktiv short modalda — ko‘rish hisobi (bir user = bir marta)
   useEffect(() => {
@@ -373,11 +538,12 @@ const ShortsVideos = ({
     if (slideState || shortsList.length < 2) return;
 
     const count = shortsList.length;
+    if (recoEnabled && direction === 'up' && activeIndex <= 0) return;
     if (recoEnabled && direction === 'down') loadMoreReco(activeIndex);
     if (recoEnabled && direction === 'down' && activeIndex >= count - 1) return;
     const toIndex = direction === 'down'
       ? (recoEnabled ? activeIndex + 1 : (activeIndex + 1) % count)
-      : (activeIndex - 1 + count) % count;
+      : (recoEnabled ? activeIndex - 1 : (activeIndex - 1 + count) % count);
     if (toIndex === activeIndex) return;
 
     const nextVideo = desktopVideoRefs.current.get(toIndex);
@@ -440,6 +606,8 @@ const ShortsVideos = ({
   }, [modalVideoMuted]);
 
   const openModal = useCallback((index) => {
+    const item = shortsListRef.current[index];
+    if (item?.id != null) setOpenedFocus(item.id);
     setActiveIndex(index);
     setModalOpen(true);
     setMobilePlayOverlayVisible(false);
@@ -459,15 +627,17 @@ const ShortsVideos = ({
 
   const closeModal = useCallback(() => {
     if (onCloseFromHome) {
-      // Modalni yopmasa — ortqa navigatsiya tugaguncha shorts grid flash bo‘lmasin
+      flushWatchesRef.current({ refresh: false });
       onCloseFromHome();
       return;
     }
     if (shortsModalHistoryRef.current) {
       shortsModalHistoryRef.current = false;
+      flushWatchesRef.current({ refresh: false });
       window.history.back();
       return;
     }
+    flushWatchesRef.current({ refresh: true });
     finishCloseModal();
   }, [onCloseFromHome, finishCloseModal]);
 
@@ -630,8 +800,10 @@ const ShortsVideos = ({
     e.stopPropagation();
     const item = shortsList[activeIndex];
     if (item?.id == null) return;
+    const alreadySaved = isInWishlist(item.id, shortsWishlistType(item));
     toggleWishlist(item.id, shortsWishlistType(item));
-  }, [activeIndex, toggleWishlist, shortsList]);
+    if (!alreadySaved) sendRecoSignal({ shared: true });
+  }, [activeIndex, toggleWishlist, shortsList, isInWishlist, recoEnabled]);
 
   const getMusicLinkPath = (item) => {
     const ct = item?.contentType;
@@ -1001,6 +1173,9 @@ const ShortsVideos = ({
             variant="shorts"
             contentId={item.id}
             stopPropagation
+            onLikeChange={(_id, state) => {
+              if (state === 'like') sendRecoSignal({ liked: true });
+            }}
           />
           <button
             type="button"
@@ -1017,6 +1192,7 @@ const ShortsVideos = ({
             shortItem={item}
             shortType={itemMusic ? 'musicshorts' : 'movieShorts'}
             sharePath={`/shorts?shortId=${item?.id}`}
+            onShared={() => sendRecoSignal({ shared: true })}
           />
           <Repost
             className="shorts-modal-action-btn"
@@ -1358,6 +1534,9 @@ const ShortsVideos = ({
                     variant="shorts"
                     contentId={item?.id}
                     stopPropagation
+                    onLikeChange={(_id, state) => {
+                      if (state === 'like') sendRecoSignal({ liked: true });
+                    }}
                   />
                   <button
                     type="button"
@@ -1374,6 +1553,7 @@ const ShortsVideos = ({
                     shortItem={item}
                     shortType={itemMusic ? 'musicshorts' : 'movieShorts'}
                     sharePath={`/shorts?shortId=${item?.id}`}
+                    onShared={() => sendRecoSignal({ shared: true })}
                   />
                   <Repost
                     className="shorts-modal-action-btn"
@@ -1416,6 +1596,7 @@ const ShortsVideos = ({
             }
             compact
             onCountChange={setShortsCommentCount}
+            onCommentPosted={() => sendRecoSignal({ commented: true })}
           />
         )}
         {!slideMusic && musicModalOpen && shortsList[activeIndex]?.musics && createPortal(

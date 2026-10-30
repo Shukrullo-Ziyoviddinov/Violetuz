@@ -68,6 +68,23 @@ assert.equal(forward.items[6].shortId, 'n1');
 assert.equal(forward.frozenUntil, 5);
 assert.equal(new Set(forward.items.map((row) => row.shortId)).size, forward.items.length);
 
+const focusStore = { doc: null };
+const focusSessions = {
+  async findById(id) {
+    return focusStore.doc && focusStore.doc.sessionId === id ? focusStore.doc : null;
+  },
+  async save(doc) {
+    focusStore.doc = doc;
+  },
+};
+const focused = await createFeedSessionService(focusSessions, { now: () => now }).serve({
+  userId: 'user-1',
+  position: 0,
+  focusItem: item('c'),
+  build: async () => ['a', 'b', 'c', 'd'].map(item),
+});
+assert.deepEqual(focused.items.map((row) => row.shortId), ['c', 'a', 'b', 'd']);
+
 console.log('ok feedSession');
 };
 

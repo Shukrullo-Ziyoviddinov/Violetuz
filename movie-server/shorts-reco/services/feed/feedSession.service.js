@@ -19,6 +19,25 @@ const publicItem = (item) => ({
 });
 
 /**
+ * The opened short leads a new session so the player index matches the server.
+ * @param {object[]} items
+ * @param {object|null} focusItem
+ */
+const placeFocus = (items, focusItem) => {
+  if (!focusItem || !focusItem.shortId) return items || [];
+  const list = (items || []).slice();
+  const index = list.findIndex((item) => item && item.shortId === focusItem.shortId);
+  if (index === 0) return list;
+  if (index > 0) {
+    const [picked] = list.splice(index, 1);
+    list.unshift(picked);
+    return list;
+  }
+  list.unshift(focusItem);
+  return list;
+};
+
+/**
  * History through `position` stays. The next frozenAhead items stay.
  * Everything after that is the new tail.
  * @param {object|null} existing
@@ -69,6 +88,42 @@ const carriedBlock = (items, prefixLength) => {
 };
 
 /**
+ * Return the stored list when the tail is already full and the profile
+ * has not changed, or the rebuild interval has not elapsed.
+ * @param {object|null} session
+ * @param {number|undefined} position
+ * @param {number} limit
+ * @param {number} profileVersion
+ * @param {Date} now
+ * @returns {object|null}
+ */
+const reuseStoredSession = (session, position, limit, profileVersion, now) => {
+  if (!session || !Array.isArray(session.items) || session.items.length === 0) return null;
+  const items = session.items;
+  const requested = Number.isInteger(position) && position >= 0 ? position : 0;
+  const safePosition = Math.min(requested, items.length - 1);
+  const prefixLength = Math.min(items.length, safePosition + 1 + config.frozenAhead);
+  const tailLength = items.length - prefixLength;
+  const size = limit || config.feedBatchSize;
+  if (tailLength < size) return null;
+
+  const storedVersion = Number.isInteger(session.builtWithProfileVersion)
+    ? session.builtWithProfileVersion
+    : 0;
+  if (storedVersion !== profileVersion) {
+    const last = session.lastRebuildAt ? new Date(session.lastRebuildAt).getTime() : 0;
+    const elapsed = now.getTime() - last;
+    if (!last || elapsed >= config.feedRebuildMinIntervalSeconds * 1000) return null;
+  }
+
+  return {
+    sessionId: session.sessionId,
+    frozenUntil: Math.min(items.length - 1, safePosition + config.frozenAhead),
+    items,
+  };
+};
+
+/**
  * @param {{ findById: Function, save: Function }} sessions
  * @param {{ now?: () => Date }} [options]
  */
@@ -82,6 +137,10 @@ const createFeedSessionService = (sessions, options = {}) => ({
     const existing = input.sessionId ? await sessions.findById(input.sessionId) : null;
     const owned = existing && (!userId || !existing.userId || existing.userId === userId);
     const base = owned ? existing : null;
+    const profileVersion = Number.isInteger(input.profileVersion) ? input.profileVersion : 0;
+    const limit = input.limit || config.feedBatchSize;
+    const reused = reuseStoredSession(base, input.position, limit, profileVersion, clock);
+    if (reused) return reused;
     const preview = composeSession(base, input.position, [], userId, clock);
     const prefix = preview.items;
     const built = await input.build({
@@ -90,16 +149,19 @@ const createFeedSessionService = (sessions, options = {}) => ({
       prefixTail: prefix.length ? prefix[prefix.length - 1] : null,
       carried: carriedBlock(prefix, prefix.length),
     });
+    const fresh = !base && input.focusItem ? placeFocus(built || [], input.focusItem) : built;
     const composed = composeSession(
       base || { sessionId: preview.session.sessionId, userId, items: [] },
       input.position,
-      built,
+      fresh,
       userId,
       clock
     );
     if (!owned && input.sessionId && existing) {
       composed.session.sessionId = randomUUID();
     }
+    composed.session.builtWithProfileVersion = profileVersion;
+    composed.session.lastRebuildAt = clock;
     await sessions.save(composed.session);
     return {
       sessionId: composed.session.sessionId,
@@ -113,5 +175,7 @@ module.exports = {
   publicItem,
   composeSession,
   carriedBlock,
+  reuseStoredSession,
+  placeFocus,
   createFeedSessionService,
 };

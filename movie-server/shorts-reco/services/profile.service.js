@@ -19,6 +19,7 @@ const emptyProfile = (userId, now) => ({
   anchorLocks: {},
   anchorFatigue: {},
   anchorPinned: null,
+  version: 0,
   decayedAt: now,
   updatedAt: now,
 });
@@ -106,6 +107,7 @@ const hydrateProfile = (doc, userId, now) => {
   profile.anchorLocks = profile.anchorLocks || {};
   profile.anchorFatigue = profile.anchorFatigue || {};
   if (profile.anchorPinned == null) profile.anchorPinned = null;
+  profile.version = Number.isInteger(profile.version) ? profile.version : 0;
   return profile;
 };
 
@@ -152,15 +154,21 @@ const sessionRefs = (catalog) => ({
 });
 
 /**
- * The same short stays one entry and moves to the end.
+ * One row per short. An existing row is replaced where it sits.
+ * A new row is appended, and the oldest row drops off the window.
  * @param {{ items: object[] }} session
  * @param {object} entry
  */
 const pushSession = (session, entry) => {
-  const kept = (session.items || []).filter((item) => item.shortId !== entry.shortId);
-  kept.push(entry);
-  while (kept.length > config.sessionWindow) kept.shift();
-  return { items: kept };
+  const items = (session.items || []).slice();
+  const index = items.findIndex((item) => item.shortId === entry.shortId);
+  if (index >= 0) {
+    items[index] = entry;
+    return { items };
+  }
+  items.push(entry);
+  while (items.length > config.sessionWindow) items.shift();
+  return { items };
 };
 
 module.exports = {

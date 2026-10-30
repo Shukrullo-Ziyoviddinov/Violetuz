@@ -6,8 +6,10 @@ const { shortScore } = require('./scoring.service');
 
 /**
  * One aggregate per (user, short). Rewatches update this record.
- * A pass at or above completionPassRatio counts as one completion
- * when the client sent nothing smaller than 1.
+ * Stored completions follow completionsDelta only.
+ * A legacy event with no viewId still counts passRatio >= completionPassRatio
+ * as one completion, so older clients keep their score.
+ * Scoring may still treat bestPassRatio >= completionPassRatio as one watch.
  * @param {object|null|undefined} previous
  * @param {{
  *   passRatio: number,
@@ -31,7 +33,8 @@ const applyWatch = (previous, event) => {
   };
 
   let completionsDelta = event.completionsDelta == null ? 0 : event.completionsDelta;
-  if (event.passRatio >= config.completionPassRatio) {
+  const legacy = event.viewId == null;
+  if (legacy && event.passRatio >= config.completionPassRatio) {
     completionsDelta = Math.max(completionsDelta, 1);
   }
 
@@ -47,7 +50,7 @@ const applyWatch = (previous, event) => {
     commented: event.commented == null ? prev.commented === true : event.commented === true,
     shared: event.shared == null ? prev.shared === true : event.shared === true,
   };
-  next.score = shortScore(next);
+  next.score = shortScore(next, { provisional: event.final === false });
   return next;
 };
 
