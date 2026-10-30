@@ -5,6 +5,7 @@ const { ensureRecoIndexes } = require('./repositories/indexes');
 const { createCatalogSync } = require('./services/catalogSync.service');
 const { createWatchEventService } = require('./services/watchEvent.service');
 const { createFeedService } = require('./services/feed/feed.service');
+const { createShelfService } = require('./services/shelf.service');
 const { createHydrator } = require('./services/hydrate.service');
 const { createHttpHandlers } = require('./controllers/http');
 const { createRouter } = require('./routes');
@@ -38,16 +39,19 @@ const createShortsRecoModule = (options = {}) => {
   const sync = createCatalogSync({ connection, logger });
   const watchEvents = createWatchEventService({ connection, logger });
   const feed = createFeedService({ connection, logger });
+  const shelf = createShelfService({ connection, logger });
   const hydrate = createHydrator(connection, logger);
   const handlers = createHttpHandlers({
     ingest: (input) => watchEvents.ingest(input),
     serveFeed: (input) => feed.serveFeed(input),
+    serveShelf: (input) => shelf.serveShelf(input),
     hydrate,
     getUserId: options.getUserId || userIdFromRequest,
   });
   const router = createRouter({
     postEvent: handlers.postEvent,
     getFeed: handlers.getFeed,
+    getShelf: handlers.getShelf,
     authMiddleware: options.authMiddleware,
   });
 
@@ -68,6 +72,7 @@ const createShortsRecoModule = (options = {}) => {
     runCatalogSync: () => sync.runOnce(),
     ingestEvent: (input) => watchEvents.ingest(input),
     serveFeed: (input) => feed.serveFeed(input),
+    serveShelf: (input) => shelf.serveShelf(input),
   };
 };
 

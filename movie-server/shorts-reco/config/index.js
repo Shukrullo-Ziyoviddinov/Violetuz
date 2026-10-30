@@ -102,6 +102,9 @@ const config = deepFreeze({
   repeatAfterDays: 7,
   maxRepeatsPer10: 2,
   feedBatchSize: 20,
+  /** Movie and music page cards. One block is one horizontal row. */
+  shelfBlockSize: 10,
+  shelfReadLimit: 200,
   slotsPerCycle: 10,
   frozenAhead: 3,
   coldStartMinViews: 3,

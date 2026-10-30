@@ -64,7 +64,7 @@ const shuffleWithSeed = (arr, seed) => {
   return a;
 };
 
-const SHORTS_PER_BLOCK = 12;
+const SHORTS_PER_BLOCK = 10;
 
 /**
  * Har bir Home blok uchun boshqa videolar - hech biri takrorlanmaydi.
@@ -72,7 +72,7 @@ const SHORTS_PER_BLOCK = 12;
  * @param {Array} allShorts - Barcha shortlar (horror qo'shilgan)
  * @param {Array} watchHistory - Watch history
  * @param {number} blockIndex - 0=primary, 1=secondary, 2=tertiary
- * @returns {Array} 12 ta short
+ * @returns {Array} 10 ta short
  */
 export const getShortsForHomeBlock = (allShorts, watchHistory = [], blockIndex = 0) => {
   const list = allShorts || [];

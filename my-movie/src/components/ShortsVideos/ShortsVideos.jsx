@@ -7,6 +7,8 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 import { addWatch } from '../../api/shortsWatchHistory';
+import { postShortsRecoEvent } from '../../api/shortsRecoApi';
+import { useShortsRecoPlayback } from './useShortsRecoPlayback';
 import { recordViewRequest } from '../../api/viewsApi';
 import { useAuth } from '../../context/AuthContext';
 import VertikalDrag from '../VertikalDrag/VertikalDrag';
@@ -202,6 +204,12 @@ const ShortsVideos = ({
     [movieShortsCatalog, musicShortsCatalog]
   );
   const isMusicShorts = variant === 'music';
+  const recoEnabled = !initialShorts && !repostIds?.length && !repostShortsEntries?.length;
+  const { list: recoList, loadMore: loadMoreReco } = useShortsRecoPlayback({
+    enabled: recoEnabled,
+    catalog: mixedCatalog,
+    shortId,
+  });
   const baseList = initialShorts || (isMusicShorts ? musicShortsCatalog : mixedCatalog);
   const isDataLoading = isMusicShorts
     ? musicShortsLoading
@@ -222,10 +230,14 @@ const ShortsVideos = ({
   useEffect(() => {
     if (repostShortsEntries?.length) {
       setShortsList(buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog));
-    } else {
-      setShortsList(orderShortsByRepostIds(baseList, repostIds));
+      return;
     }
-  }, [baseList, repostIds, repostShortsEntries, movieShortsCatalog, musicShortsCatalog]);
+    if (recoList) {
+      setShortsList(recoList);
+      return;
+    }
+    setShortsList(orderShortsByRepostIds(baseList, repostIds));
+  }, [baseList, repostIds, repostShortsEntries, movieShortsCatalog, musicShortsCatalog, recoList]);
 
   const slideMusic = shortsList[activeIndex]?.type === 'musicshorts';
 
@@ -305,14 +317,39 @@ const ShortsVideos = ({
     setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
   }, [shortId, shortsList]);
 
-  // Track watch: addWatch after 2 sec viewing
+  const recoOpenedRef = useRef(null);
   useEffect(() => {
-    if (!modalOpen) return;
+    if (!recoList || shortId == null || String(shortId) === '') return;
+    if (recoOpenedRef.current === String(shortId)) return;
+    recoOpenedRef.current = String(shortId);
+    setActiveIndex(0);
+    setModalOpen(true);
+  }, [recoList, shortId]);
+
+  // Track watch: addWatch after 2 sec viewing. The same event updates the shorts feed.
+  useEffect(() => {
+    if (!modalOpen) return undefined;
     const short = shortsList[activeIndex];
-    if (!short) return;
+    if (!short) return undefined;
+    const started = Date.now();
+    const videoMap = isMobileView ? mobileVideoRefs.current : desktopVideoRefs.current;
+    const video = videoMap.get(activeIndex) || modalVideoRef.current;
     const t = setTimeout(() => addWatch(short), 2000);
-    return () => clearTimeout(t);
-  }, [modalOpen, activeIndex, shortsList]);
+    return () => {
+      clearTimeout(t);
+      const duration = video && Number.isFinite(video.duration) ? video.duration : 0;
+      const current = video && Number.isFinite(video.currentTime) ? video.currentTime : 0;
+      const passRatio = duration > 0 ? Math.min(1, Math.max(0, current / duration)) : 0;
+      const playedMsDelta = Math.max(0, Date.now() - started);
+      if (playedMsDelta < 1500 && passRatio < 0.15) return;
+      postShortsRecoEvent({
+        shortId: short.id,
+        passRatio,
+        playedMsDelta,
+        completionsDelta: passRatio >= 0.9 ? 1 : undefined,
+      }).catch(() => {});
+    };
+  }, [modalOpen, activeIndex, shortsList, isMobileView]);
 
   // Aktiv short modalda — ko‘rish hisobi (bir user = bir marta)
   useEffect(() => {
@@ -336,8 +373,10 @@ const ShortsVideos = ({
     if (slideState || shortsList.length < 2) return;
 
     const count = shortsList.length;
+    if (recoEnabled && direction === 'down') loadMoreReco(activeIndex);
+    if (recoEnabled && direction === 'down' && activeIndex >= count - 1) return;
     const toIndex = direction === 'down'
-      ? (activeIndex + 1) % count
+      ? (recoEnabled ? activeIndex + 1 : (activeIndex + 1) % count)
       : (activeIndex - 1 + count) % count;
     if (toIndex === activeIndex) return;
 
@@ -368,7 +407,7 @@ const ShortsVideos = ({
         }, SLIDE_DURATION);
       });
     });
-  }, [activeIndex, modalVideoMuted, slideState, shortsList.length]);
+  }, [activeIndex, modalVideoMuted, slideState, shortsList.length, recoEnabled, loadMoreReco]);
 
   useEffect(() => {
     if (!shortsList.length) return;
@@ -380,8 +419,9 @@ const ShortsVideos = ({
 
   const handleMobileIndexChange = useCallback((newIndex) => {
     if (newIndex < 0 || newIndex >= shortsList.length) return;
+    if (recoEnabled) loadMoreReco(newIndex);
     setActiveIndex(newIndex);
-  }, [shortsList.length]);
+  }, [shortsList.length, recoEnabled, loadMoreReco]);
 
   const handleMobileCommit = useCallback((newIndex) => {
     mobileVideoRefs.current.forEach((video, index) => {

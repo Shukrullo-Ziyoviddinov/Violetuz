@@ -1,6 +1,7 @@
 'use strict';
 
 const { validateFeedQuery } = require('../validators/feed.validator');
+const { validateShelfQuery } = require('../validators/shelf.validator');
 
 /**
  * @param {import('express').Request} req
@@ -17,6 +18,7 @@ const userIdOf = (req, getUserId) => {
  * @param {{
  *   ingest: Function,
  *   serveFeed: Function,
+ *   serveShelf: Function,
  *   hydrate: Function,
  *   getUserId: Function,
  * }} deps
@@ -74,7 +76,31 @@ const createHttpHandlers = (deps) => {
     });
   };
 
-  return { postEvent, getFeed };
+  const getShelf = async (req, res) => {
+    const query = validateShelfQuery(req.query);
+    if (!query.ok) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid shelf query',
+        errors: query.errors,
+      });
+    }
+
+    const page = await deps.serveShelf({
+      userId: userIdOf(req, deps.getUserId),
+      type: query.value.type,
+      block: query.value.block,
+      limit: query.value.limit,
+    });
+    return res.status(200).json({
+      success: true,
+      type: page.type,
+      block: page.block,
+      items: page.items,
+    });
+  };
+
+  return { postEvent, getFeed, getShelf };
 };
 
 module.exports = {

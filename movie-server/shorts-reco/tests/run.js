@@ -21,6 +21,7 @@ const files = [
   'coldStart.test.js',
   'feedSession.test.js',
   'http.test.js',
+  'shelf.test.js',
 ];
 
 let failed = 0;

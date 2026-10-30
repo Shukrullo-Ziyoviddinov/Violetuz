@@ -1,11 +1,11 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
-import { getWatchHistory } from '../../api/shortsWatchHistory';
+import { fetchShortsShelf } from '../../api/shortsRecoApi';
 import { getShortsForHomeBlock } from '../../algo/shortsRecommendationAlgo';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
@@ -14,8 +14,9 @@ import ViewCount from '../ViewCount/ViewCount';
 import '../ShortsVideos/ShortsVideos.css';
 import './HomeShorts.css';
 
-const blockIndexMap = { primary: 0, secondary: 1, tertiary: 2, quaternary: 3, quinary: 4 };
+const blockIndexMap = { default: 0, primary: 0, secondary: 1, tertiary: 2, quaternary: 3, quinary: 4 };
 const HOME_SHORTS_SKELETON_COUNT = 8;
+const SHELF_SIZE = 10;
 
 /** 2-, 4-, 6-... pozitsiyadagi videolar ko'rinishda avto-ijro */
 const shouldAutoPlay = (index) => (index + 1) % 2 === 0;
@@ -32,6 +33,8 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
     musicShortsLoading,
   } = useMusicApi();
   const containerRef = useRef(null);
+  const [shelfIds, setShelfIds] = useState(null);
+  const [shelfFailed, setShelfFailed] = useState(false);
 
   const isMusic = source === 'music';
   const movieShortsCatalog = useMemo(
@@ -40,20 +43,51 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
     [allShortsVideos, allMovies, allMusic, allClips, allConcerts]
   );
   const allShorts = isMusic ? musicShortsCatalog : movieShortsCatalog;
-  const moreTo = '/shorts';
   /* API + bog‘liq kataloglar tugaguncha skeleton */
   const isDataLoading = isMusic
     ? musicShortsLoading
     : shortsLoading || moviesLoading;
 
-  const homeShorts = useMemo(() => {
-    const history = getWatchHistory();
-    const idx = blockIndexMap[variant] ?? 0;
-    return getShortsForHomeBlock(allShorts, history, idx);
-  }, [variant, allShorts]);
+  const blockIndex = blockIndexMap[variant] ?? 0;
 
-  const showSectionSkeleton = isDataLoading && homeShorts.length === 0;
-  const showHeaderSkeleton = isDataLoading;
+  useEffect(() => {
+    let cancelled = false;
+    setShelfIds(null);
+    setShelfFailed(false);
+    fetchShortsShelf({
+      type: isMusic ? 'musicshorts' : 'movieShorts',
+      block: blockIndex,
+      limit: SHELF_SIZE,
+    })
+      .then((page) => {
+        if (cancelled) return;
+        setShelfIds(Array.isArray(page?.items) ? page.items : []);
+      })
+      .catch(() => {
+        if (!cancelled) setShelfFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isMusic, blockIndex]);
+
+  const homeShorts = useMemo(() => {
+    const fallback = () => getShortsForHomeBlock(allShorts, [], blockIndex).slice(0, SHELF_SIZE);
+    if (shelfFailed) return fallback();
+    if (!Array.isArray(shelfIds)) return [];
+    return shelfIds
+      .map((row) => allShorts.find((item) => {
+        if (String(item.id) !== String(row.id)) return false;
+        if (!row.type || !item.type) return true;
+        return item.type === row.type;
+      }))
+      .filter(Boolean)
+      .slice(0, SHELF_SIZE);
+  }, [allShorts, blockIndex, shelfFailed, shelfIds]);
+
+  const shelfLoading = !shelfFailed && shelfIds == null;
+  const showSectionSkeleton = shelfLoading || (isDataLoading && homeShorts.length === 0);
+  const showHeaderSkeleton = shelfLoading || isDataLoading;
 
   useEffect(() => {
     if (!containerRef.current || showSectionSkeleton) return;
@@ -100,6 +134,8 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
     []
   );
 
+  if (!showSectionSkeleton && homeShorts.length === 0) return null;
+
   return (
     <section
       className={`home-shorts ${isMusic ? 'home-shorts--music music-cards' : ''}`}
@@ -111,31 +147,20 @@ const HomeShorts = ({ variant = 'primary', source = 'movie' }) => {
           aria-busy={showHeaderSkeleton || undefined}
         >
           {showHeaderSkeleton ? (
-            <>
-              <SkeletonLoader
-                variant="home-shorts-title"
-                className="home-shorts-title-skeleton"
-              />
-              <SkeletonLoader
-                variant="home-shorts-more"
-                className="home-shorts-more-skeleton"
-              />
-            </>
+            <SkeletonLoader
+              variant="home-shorts-title"
+              className="home-shorts-title-skeleton"
+            />
           ) : (
-            <>
-              <h2 className="home-shorts-title">
-                {isMusic ? t('music.shorts', 'Shorts') : t('navbar.shorts', 'Shorts')}
-              </h2>
-              <Link to={moreTo} className="home-shorts-more">
-                {isMusic ? t('music.all', 'Barchasi') : t('categories.all', 'Barchasi')}
-              </Link>
-            </>
+            <h2 className="home-shorts-title">
+              {isMusic ? t('music.shorts', 'Shorts') : t('navbar.shorts', 'Shorts')}
+            </h2>
           )}
         </div>
         <HorizontalScroll scrollAmount={200}>
           {showSectionSkeleton
             ? skeletonCards
-            : homeShorts.slice(0, 12).map((item, index) => {
+            : homeShorts.slice(0, SHELF_SIZE).map((item, index) => {
                 const isAutoPlay = shouldAutoPlay(index);
                 return (
                   <Link
