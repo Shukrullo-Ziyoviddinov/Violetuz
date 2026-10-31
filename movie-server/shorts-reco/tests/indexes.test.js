@@ -9,6 +9,8 @@ const {
   profileIndexSpecs,
   statsIndexSpecs,
   feedSessionIndexSpecs,
+  profileHeatIndexSpecs,
+  profileHeatUserIndexSpecs,
 } = require('../repositories/indexes');
 
 const catalogNames = catalogIndexSpecs.map((spec) => spec.options.name);
@@ -51,6 +53,12 @@ assert.ok(feedSessionIndexSpecs.some((spec) => spec.key.userId === 1 && spec.key
 assert.equal(
   feedSessionIndexSpecs.find((spec) => spec.options.name === 'updatedAt_ttl').options.expireAfterSeconds,
   2 * 24 * 60 * 60
+);
+assert.ok(profileHeatIndexSpecs.some((spec) => spec.options.unique && spec.key.key === 1));
+assert.ok(
+  profileHeatUserIndexSpecs.some(
+    (spec) => spec.options.unique && spec.key.userId === 1 && spec.key.key === 1
+  )
 );
 
 console.log('ok indexes');

@@ -108,6 +108,8 @@ const collections = deepFreeze({
     userProfiles: 'reco_user_profiles',
     feedSessions: 'reco_feed_sessions',
     shortStats: 'reco_short_stats',
+    profileHeat: 'reco_profile_heat',
+    profileHeatUsers: 'reco_profile_heat_users',
   },
 });
 

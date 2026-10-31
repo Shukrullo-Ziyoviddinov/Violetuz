@@ -84,6 +84,20 @@ const statsIndexSpecs = Object.freeze([
   }),
 ]);
 
+const profileHeatIndexSpecs = Object.freeze([
+  Object.freeze({
+    key: { key: 1 },
+    options: Object.freeze({ unique: true, name: 'profileKey_unique' }),
+  }),
+]);
+
+const profileHeatUserIndexSpecs = Object.freeze([
+  Object.freeze({
+    key: { userId: 1, key: 1 },
+    options: Object.freeze({ unique: true, name: 'userId_profileKey_unique' }),
+  }),
+]);
+
 const feedSessionIndexSpecs = Object.freeze([
   Object.freeze({
     key: { sessionId: 1 },
@@ -148,6 +162,14 @@ const ensureRecoIndexes = async (connection) => {
     connection.collection(collections.reco.feedSessions),
     feedSessionIndexSpecs
   );
+  await applyIndexSpecs(
+    connection.collection(collections.reco.profileHeat),
+    profileHeatIndexSpecs
+  );
+  await applyIndexSpecs(
+    connection.collection(collections.reco.profileHeatUsers),
+    profileHeatUserIndexSpecs
+  );
 };
 
 module.exports = {
@@ -158,5 +180,7 @@ module.exports = {
   profileIndexSpecs,
   statsIndexSpecs,
   feedSessionIndexSpecs,
+  profileHeatIndexSpecs,
+  profileHeatUserIndexSpecs,
   ensureRecoIndexes,
 };

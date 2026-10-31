@@ -6,6 +6,13 @@ const path = require('path');
 const files = [
   'normalize.test.js',
   'keys.test.js',
+  'profileRef.test.js',
+  'profileHeat.repo.test.js',
+  'profileHeat.test.js',
+  'profileSignal.test.js',
+  'profileSlice.test.js',
+  'profileAttach.test.js',
+  'profileVerify.test.js',
   'songLinks.test.js',
   'refs.test.js',
   'indexes.test.js',

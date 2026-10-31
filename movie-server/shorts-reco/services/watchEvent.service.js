@@ -8,6 +8,8 @@ const { createEventsRepo } = require('../repositories/events.repo');
 const { createWatchStateRepo } = require('../repositories/watchState.repo');
 const { createProfileRepo } = require('../repositories/profile.repo');
 const { createStatsRepo } = require('../repositories/stats.repo');
+const { createProfileHeatRepo } = require('../repositories/profileHeat.repo');
+const { createProfileSignalRecorder } = require('./profileHeat/record');
 const { validateWatchEvent } = require('../validators/events.validator');
 const { applyWatch } = require('./aggregate');
 const { topQualifyingMovies, confirmedActors } = require('./actors.service');
@@ -55,6 +57,8 @@ const wrapLogger = (logger) => {
  *   watchRepo?: object,
  *   profileRepo?: object,
  *   statsRepo?: object,
+ *   profileHeatRepo?: object,
+ *   recordProfileSignal?: (input: object) => Promise<void>,
  *   now?: () => Date,
  * }} options
  */
@@ -65,6 +69,11 @@ const createWatchEventService = (options) => {
   const watchRepo = options.watchRepo || createWatchStateRepo(options.connection);
   const profileRepo = options.profileRepo || createProfileRepo(options.connection);
   const statsRepo = options.statsRepo || createStatsRepo(options.connection);
+  const recordProfileSignal = options.recordProfileSignal || createProfileSignalRecorder({
+    repo: options.profileHeatRepo
+      || (options.connection ? createProfileHeatRepo(options.connection) : null),
+    logger,
+  });
   const now = options.now || (() => new Date());
   const actorCache = createTtlCache(config.actorCacheTtlMs, () => now().getTime());
   const tails = new Map();
@@ -225,6 +234,14 @@ const createWatchEventService = (options) => {
       },
       event.ts
     );
+
+    await recordProfileSignal({
+      userId,
+      catalog,
+      event,
+      previous: previousWatch,
+      next: aggregate,
+    });
 
     return { status: 'ok', score: aggregate.score, shortId: catalog.shortId };
   };

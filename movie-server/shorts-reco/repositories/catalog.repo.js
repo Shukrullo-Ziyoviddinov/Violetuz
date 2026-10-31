@@ -93,6 +93,27 @@ const createCatalogRepo = (connection) => {
     },
 
     /**
+     * Shorts whose artistId is the same value and the same type.
+     * @param {unknown} artistId
+     * @param {number} [limit]
+     * @returns {Promise<object[]>}
+     */
+    async findByArtistId(artistId, limit) {
+      if (typeof artistId === 'string') {
+        if (!artistId) return [];
+      } else if (typeof artistId !== 'number' || !Number.isSafeInteger(artistId)) {
+        return [];
+      }
+      const size = Math.max(1, limit || 100);
+      const docs = await col().find({ artistId }).limit(size).toArray();
+      return docs.map((doc) => {
+        if (!doc) return doc;
+        const { _id, ...rest } = doc;
+        return rest;
+      });
+    },
+
+    /**
      * Candidate read for the feed. Sort defaults to newest catalog rows.
      * @param {object} filter
      * @param {number} [limit]

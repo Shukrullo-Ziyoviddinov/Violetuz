@@ -7,6 +7,9 @@ const { createWatchStateRepo } = require('../../repositories/watchState.repo');
 const { createProfileRepo } = require('../../repositories/profile.repo');
 const { createStatsRepo } = require('../../repositories/stats.repo');
 const { createFeedSessionRepo } = require('../../repositories/feedSession.repo');
+const { createProfileHeatRepo } = require('../../repositories/profileHeat.repo');
+const { createProfileSliceService } = require('../profileHeat/slice');
+const { appendProfileHeat } = require('../profileHeat/attach');
 const { topQualifyingMovies, confirmedActors, splitActorSlots } = require('../actors.service');
 const { emptyProfile, hydrateProfile } = require('../profile.service');
 const { planAnchors } = require('../anchors.service');
@@ -126,6 +129,18 @@ const userTopsOf = (profile) => {
 /**
  * @param {object} options
  */
+/**
+ * @param {object} profile
+ * @returns {Record<string, number>}
+ */
+const genreScoresOf = (profile) => {
+  const longTerm = profile && profile.longTerm ? profile.longTerm : {};
+  return {
+    ...(longTerm.genres || {}),
+    ...(longTerm.musicGenres || {}),
+  };
+};
+
 const createFeedService = (options = {}) => {
   const catalog = options.catalogRepo || createCatalogRepo(options.connection);
   const watchesRepo = options.watchRepo || createWatchStateRepo(options.connection);
@@ -134,6 +149,13 @@ const createFeedService = (options = {}) => {
   const sessionRepo = options.sessionRepo || createFeedSessionRepo(options.connection);
   const sessions = createFeedSessionService(sessionRepo, { now: options.now });
   const query = (filter, limit, sort) => catalog.findMatching(filter, limit, sort);
+  const clock = { current: new Date() };
+  const heatRepo = options.profileHeatRepo
+    || (options.connection ? createProfileHeatRepo(options.connection) : null);
+  const profileSlice = options.profileSlice
+    || (heatRepo
+      ? createProfileSliceService({ heatRepo, catalogRepo: catalog, now: () => clock.current })
+      : null);
 
   return {
     /**
@@ -141,7 +163,7 @@ const createFeedService = (options = {}) => {
      */
     async serveFeed(input) {
       const request = input || {};
-      const clock = request.now || new Date();
+      clock.current = request.now || new Date();
       const userId = request.userId ? String(request.userId) : null;
       const limit = request.limit || config.feedBatchSize;
       let storedSession = request.sessionId ? await sessionRepo.findById(request.sessionId) : null;
@@ -158,7 +180,7 @@ const createFeedService = (options = {}) => {
         request.position,
         limit,
         profileVersion,
-        clock
+        clock.current
       );
       if (reused) {
         if (raised) await sessionRepo.save(storedSession);
@@ -186,8 +208,8 @@ const createFeedService = (options = {}) => {
       const watchList = userId ? await watchesRepo.listByUser(userId, config.watchStateReadLimit) : [];
       const watchMap = new Map(watchList.map((row) => [row.shortId, row]));
       const profile = userId
-        ? hydrateProfile(storedProfile, userId, clock)
-        : emptyProfile('guest', clock);
+        ? hydrateProfile(storedProfile, userId, clock.current)
+        : emptyProfile('guest', clock.current);
       const viewCount = watchList.length;
       const cold = !userId || viewCount < config.coldStartMinViews;
       const planned = planAnchors({
@@ -197,20 +219,28 @@ const createFeedService = (options = {}) => {
         fatigue: profile.anchorFatigue,
         pinned: profile.anchorPinned,
         served: fatigueRows(storedSession && storedSession.items, watchMap),
-        now: clock,
+        now: clock.current,
       });
       if (userId) {
         profile.anchorMultipliers = planned.multipliers;
         profile.anchorLocks = planned.locks;
         profile.anchorFatigue = planned.fatigue;
         profile.anchorPinned = planned.pinned;
-        profile.updatedAt = clock;
+        profile.updatedAt = clock.current;
         await profiles.save(profile);
       }
 
       const popular = await stats.listTop(config.candidateFetchLimit);
       const popularIds = popular.map((row) => row.shortId).filter(Boolean);
       const statsByShortId = new Map(popular.map((row) => [row.shortId, row]));
+      const finish = (built, page) => appendProfileHeat(built, {
+        select: profileSlice ? (query) => profileSlice.selectForUser(query) : null,
+        userId,
+        genreScores: genreScoresOf(profile),
+        watches: watchMap,
+        exclude: page && page.exclude,
+        logger: options.logger || null,
+      });
       return sessions.serve({
         sessionId: request.sessionId,
         userId,
@@ -229,10 +259,10 @@ const createFeedService = (options = {}) => {
                 userTops: userTopsOf(profile),
                 profile,
                 statsByShortId,
-                now: clock,
+                now: clock.current,
               })
               : [];
-            return buildFeed({
+            return finish(await buildFeed({
               ...page,
               cold: true,
               coldPool,
@@ -240,8 +270,8 @@ const createFeedService = (options = {}) => {
               profileDocs,
               viewCount,
               limit,
-              now: clock,
-            });
+              now: clock.current,
+            }), page);
           }
 
           const levelName = levelFor(planned.levelStrength).name;
@@ -252,7 +282,7 @@ const createFeedService = (options = {}) => {
           });
           const primary = planned.active[0] || null;
           const anchor = describeAnchor(primary, await loadAnchorSample(primary, query));
-          return buildFeed({
+          return finish(await buildFeed({
             ...page,
             slots: plan.slots,
             anchor,
@@ -272,9 +302,9 @@ const createFeedService = (options = {}) => {
             fetchLimit: config.candidateFetchLimit,
             similarLimit: config.similarFetchLimit,
             limit,
-            now: clock,
+            now: clock.current,
             logger: options.logger || null,
-          });
+          }), page);
         },
       });
     },
