@@ -149,12 +149,11 @@ const createFeedService = (options = {}) => {
   const sessionRepo = options.sessionRepo || createFeedSessionRepo(options.connection);
   const sessions = createFeedSessionService(sessionRepo, { now: options.now });
   const query = (filter, limit, sort) => catalog.findMatching(filter, limit, sort);
-  const clock = { current: new Date() };
   const heatRepo = options.profileHeatRepo
     || (options.connection ? createProfileHeatRepo(options.connection) : null);
   const profileSlice = options.profileSlice
     || (heatRepo
-      ? createProfileSliceService({ heatRepo, catalogRepo: catalog, now: () => clock.current })
+      ? createProfileSliceService({ heatRepo, catalogRepo: catalog, now: options.now })
       : null);
 
   return {
@@ -163,7 +162,7 @@ const createFeedService = (options = {}) => {
      */
     async serveFeed(input) {
       const request = input || {};
-      clock.current = request.now || new Date();
+      const at = request.now || new Date();
       const userId = request.userId ? String(request.userId) : null;
       const limit = request.limit || config.feedBatchSize;
       let storedSession = request.sessionId ? await sessionRepo.findById(request.sessionId) : null;
@@ -180,7 +179,7 @@ const createFeedService = (options = {}) => {
         request.position,
         limit,
         profileVersion,
-        clock.current
+        at
       );
       if (reused) {
         if (raised) await sessionRepo.save(storedSession);
@@ -208,8 +207,8 @@ const createFeedService = (options = {}) => {
       const watchList = userId ? await watchesRepo.listByUser(userId, config.watchStateReadLimit) : [];
       const watchMap = new Map(watchList.map((row) => [row.shortId, row]));
       const profile = userId
-        ? hydrateProfile(storedProfile, userId, clock.current)
-        : emptyProfile('guest', clock.current);
+        ? hydrateProfile(storedProfile, userId, at)
+        : emptyProfile('guest', at);
       const viewCount = watchList.length;
       const cold = !userId || viewCount < config.coldStartMinViews;
       const planned = planAnchors({
@@ -219,14 +218,14 @@ const createFeedService = (options = {}) => {
         fatigue: profile.anchorFatigue,
         pinned: profile.anchorPinned,
         served: fatigueRows(storedSession && storedSession.items, watchMap),
-        now: clock.current,
+        now: at,
       });
       if (userId) {
         profile.anchorMultipliers = planned.multipliers;
         profile.anchorLocks = planned.locks;
         profile.anchorFatigue = planned.fatigue;
         profile.anchorPinned = planned.pinned;
-        profile.updatedAt = clock.current;
+        profile.updatedAt = at;
         await profiles.save(profile);
       }
 
@@ -234,7 +233,9 @@ const createFeedService = (options = {}) => {
       const popularIds = popular.map((row) => row.shortId).filter(Boolean);
       const statsByShortId = new Map(popular.map((row) => [row.shortId, row]));
       const finish = (built, page) => appendProfileHeat(built, {
-        select: profileSlice ? (query) => profileSlice.selectForUser(query) : null,
+        select: profileSlice
+          ? (share) => profileSlice.selectForUser({ ...share, now: at })
+          : null,
         userId,
         genreScores: genreScoresOf(profile),
         watches: watchMap,
@@ -259,7 +260,7 @@ const createFeedService = (options = {}) => {
                 userTops: userTopsOf(profile),
                 profile,
                 statsByShortId,
-                now: clock.current,
+                now: at,
               })
               : [];
             return finish(await buildFeed({
@@ -270,7 +271,7 @@ const createFeedService = (options = {}) => {
               profileDocs,
               viewCount,
               limit,
-              now: clock.current,
+              now: at,
             }), page);
           }
 
@@ -302,7 +303,7 @@ const createFeedService = (options = {}) => {
             fetchLimit: config.candidateFetchLimit,
             similarLimit: config.similarFetchLimit,
             limit,
-            now: clock.current,
+            now: at,
             logger: options.logger || null,
           }), page);
         },

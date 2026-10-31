@@ -211,7 +211,9 @@ const createProfileSliceService = (options) => {
      */
     async selectForUser(input) {
       const source = input || {};
-      const at = now();
+      const at = source.now instanceof Date && !Number.isNaN(source.now.getTime())
+        ? source.now
+        : now();
       const profiles = await options.heatRepo.listHeat();
       const active = [];
       const shortsByKey = new Map();
