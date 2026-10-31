@@ -85,6 +85,39 @@ const focused = await createFeedSessionService(focusSessions, { now: () => now }
 });
 assert.deepEqual(focused.items.map((row) => row.shortId), ['c', 'a', 'b', 'd']);
 
+const backStore = { doc: null };
+const backSessions = {
+  async findById(id) {
+    return backStore.doc && backStore.doc.sessionId === id ? backStore.doc : null;
+  },
+  async save(doc) {
+    backStore.doc = doc;
+  },
+};
+const backFeed = createFeedSessionService(backSessions, { now: () => now });
+const started = await backFeed.serve({
+  userId: 'user-1',
+  position: 0,
+  build: async () => ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'].map(item),
+});
+const atSix = await backFeed.serve({
+  sessionId: started.sessionId,
+  userId: 'user-1',
+  position: 5,
+  build: async () => ['z'].map(item),
+});
+assert.deepEqual(atSix.items.slice(0, 9).map((row) => row.shortId), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']);
+assert.equal(atSix.items[9].shortId, 'z');
+const returned = await backFeed.serve({
+  sessionId: started.sessionId,
+  userId: 'user-1',
+  position: 0,
+  build: async () => ['n1', 'n2', 'n3'].map(item),
+});
+assert.deepEqual(returned.items.slice(0, 6).map((row) => row.shortId), ['a', 'b', 'c', 'd', 'e', 'f']);
+assert.equal(returned.items[6].shortId, 'n1');
+assert.equal(backStore.doc.maxPosition, 5);
+
 console.log('ok feedSession');
 };
 

@@ -36,9 +36,12 @@ const uniqueShorts = (items) => {
 
 const FROZEN_AHEAD = 3;
 
-const mergeTail = (current, incoming, displayIndex) => {
+const mergeTail = (current, incoming, displayIndex, furthestIndex) => {
   if (!current || !current.length) return incoming;
-  const prefixLen = Math.min(current.length, Math.max(0, displayIndex) + 1 + FROZEN_AHEAD);
+  const index = Math.max(0, displayIndex);
+  const furthest = Math.max(index, Number.isInteger(furthestIndex) ? furthestIndex : index);
+  const end = index < furthest ? furthest + 1 : index + 1 + FROZEN_AHEAD;
+  const prefixLen = Math.min(current.length, end);
   const prefix = current.slice(0, prefixLen);
   const seen = new Set(prefix.map(itemKey));
   const tail = [];
@@ -130,7 +133,6 @@ export const useShortsRecoPlayback = ({
       .then((page) => {
         if (cancelled || !page) return;
         const built = playbackFromFeed(catalogRef.current, page.items, shortId);
-        const pendingIndex = sessionRef.current.pendingIndex;
         sessionRef.current = {
           sessionId: page.sessionId,
           count: (page.items || []).length,
@@ -138,11 +140,9 @@ export const useShortsRecoPlayback = ({
           loading: false,
           done: (page.items || []).length === 0,
           pendingIndex: null,
+          maxIndex: 0,
         };
         setList(built.list);
-        if (Number.isInteger(pendingIndex)) {
-          syncAtRef.current(pendingIndex);
-        }
       })
       .catch(() => {
         if (!cancelled) sessionRef.current.loading = false;
@@ -161,6 +161,8 @@ export const useShortsRecoPlayback = ({
       return;
     }
     const sessionIndex = Math.max(0, index - (state.pinned ? 1 : 0));
+    state.maxIndex = Math.max(state.maxIndex || 0, index);
+    const furthestIndex = state.maxIndex;
     state.loading = true;
     state.pendingIndex = null;
     fetchShortsRecoFeed({
@@ -178,7 +180,7 @@ export const useShortsRecoPlayback = ({
         if (nextCount <= state.count && sessionIndex >= state.count - 4) state.done = true;
         state.count = Math.max(state.count, nextCount);
         if (mapped.length) {
-          setList((current) => mergeTail(current, mapped, index));
+          setList((current) => mergeTail(current, mapped, index, furthestIndex));
         }
         if (Number.isInteger(state.pendingIndex)) {
           const pending = state.pendingIndex;

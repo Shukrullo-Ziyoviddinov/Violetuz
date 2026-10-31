@@ -38,8 +38,44 @@ const placeFocus = (items, focusItem) => {
 };
 
 /**
+ * Remember the furthest short opened in this session.
+ * @param {object|null} session
+ * @param {number|undefined} position
+ * @returns {boolean}
+ */
+const rememberPosition = (session, position) => {
+  if (!session || !Array.isArray(session.items) || session.items.length === 0) return false;
+  const requested = Number.isInteger(position) && position >= 0 ? position : 0;
+  const capped = Math.min(requested, session.items.length - 1);
+  const stored = Number.isInteger(session.maxPosition) ? session.maxPosition : 0;
+  if (capped <= stored) return false;
+  session.maxPosition = capped;
+  return true;
+};
+
+const reachedPosition = (session, position, length) => {
+  const requested = Number.isInteger(position) && position >= 0 ? position : 0;
+  const safe = length === 0 ? 0 : Math.min(requested, Math.max(0, length - 1));
+  const stored = session && Number.isInteger(session.maxPosition) ? session.maxPosition : 0;
+  return { safe, furthest: Math.max(stored, safe) };
+};
+
+/**
+ * At the far end, keep the on-screen short and the next frozenAhead items.
+ * After a scroll back, keep every short through the furthest one already opened.
+ * @param {number} length
+ * @param {number} safe
+ * @param {number} furthest
+ */
+const prefixLengthFor = (length, safe, furthest) => {
+  if (length === 0) return 0;
+  const end = safe < furthest ? furthest + 1 : safe + 1 + config.frozenAhead;
+  return Math.min(length, end);
+};
+
+/**
  * History through `position` stays. The next frozenAhead items stay.
- * Everything after that is the new tail.
+ * A scroll back keeps the list through the furthest opened short.
  * @param {object|null} existing
  * @param {number|undefined} position
  * @param {object[]} built
@@ -48,11 +84,8 @@ const placeFocus = (items, focusItem) => {
  */
 const composeSession = (existing, position, built, userId, now) => {
   const current = existing && Array.isArray(existing.items) ? existing.items : [];
-  const requested = Number.isInteger(position) && position >= 0 ? position : 0;
-  const safePosition = current.length === 0 ? 0 : Math.min(requested, current.length - 1);
-  const prefixLength = current.length === 0
-    ? 0
-    : Math.min(current.length, safePosition + 1 + config.frozenAhead);
+  const reached = reachedPosition(existing, position, current.length);
+  const prefixLength = prefixLengthFor(current.length, reached.safe, reached.furthest);
   const prefix = current.slice(0, prefixLength).map(publicItem);
   const seen = new Set(prefix.map((item) => item.shortId));
   const items = prefix.slice();
@@ -63,14 +96,19 @@ const composeSession = (existing, position, built, userId, now) => {
     seen.add(item.shortId);
     items.push(publicItem(item));
   }
-  const savedPosition = items.length === 0 ? 0 : Math.min(safePosition, items.length - 1);
-  const frozenUntil = items.length === 0 ? 0 : Math.min(items.length - 1, savedPosition + config.frozenAhead);
+  const savedPosition = items.length === 0 ? 0 : Math.min(reached.safe, items.length - 1);
+  const savedFurthest = Math.max(reached.furthest, savedPosition);
+  const frozenEnd = savedPosition < savedFurthest
+    ? savedFurthest
+    : savedPosition + config.frozenAhead;
+  const frozenUntil = items.length === 0 ? 0 : Math.min(items.length - 1, frozenEnd);
   return {
     session: {
       sessionId: existing && existing.sessionId ? existing.sessionId : randomUUID(),
       userId: userId || (existing && existing.userId) || null,
       items,
       position: savedPosition,
+      maxPosition: savedFurthest,
       updatedAt: now,
     },
     frozenUntil,
@@ -100,9 +138,8 @@ const carriedBlock = (items, prefixLength) => {
 const reuseStoredSession = (session, position, limit, profileVersion, now) => {
   if (!session || !Array.isArray(session.items) || session.items.length === 0) return null;
   const items = session.items;
-  const requested = Number.isInteger(position) && position >= 0 ? position : 0;
-  const safePosition = Math.min(requested, items.length - 1);
-  const prefixLength = Math.min(items.length, safePosition + 1 + config.frozenAhead);
+  const reached = reachedPosition(session, position, items.length);
+  const prefixLength = prefixLengthFor(items.length, reached.safe, reached.furthest);
   const tailLength = items.length - prefixLength;
   const size = limit || config.feedBatchSize;
   if (tailLength < size) return null;
@@ -118,7 +155,10 @@ const reuseStoredSession = (session, position, limit, profileVersion, now) => {
 
   return {
     sessionId: session.sessionId,
-    frozenUntil: Math.min(items.length - 1, safePosition + config.frozenAhead),
+    frozenUntil: Math.min(
+      items.length - 1,
+      reached.safe < reached.furthest ? reached.furthest : reached.safe + config.frozenAhead
+    ),
     items,
   };
 };
@@ -139,8 +179,12 @@ const createFeedSessionService = (sessions, options = {}) => ({
     const base = owned ? existing : null;
     const profileVersion = Number.isInteger(input.profileVersion) ? input.profileVersion : 0;
     const limit = input.limit || config.feedBatchSize;
+    const raised = rememberPosition(base, input.position);
     const reused = reuseStoredSession(base, input.position, limit, profileVersion, clock);
-    if (reused) return reused;
+    if (reused) {
+      if (raised) await sessions.save(base);
+      return reused;
+    }
     const preview = composeSession(base, input.position, [], userId, clock);
     const prefix = preview.items;
     const built = await input.build({
@@ -177,5 +221,6 @@ module.exports = {
   carriedBlock,
   reuseStoredSession,
   placeFocus,
+  rememberPosition,
   createFeedSessionService,
 };

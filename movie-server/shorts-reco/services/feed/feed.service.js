@@ -12,7 +12,7 @@ const { emptyProfile, hydrateProfile } = require('../profile.service');
 const { planAnchors } = require('../anchors.service');
 const { levelFor, buildSlotPlan } = require('./slotPlan');
 const { buildFeed } = require('./feedBuilder');
-const { createFeedSessionService, reuseStoredSession } = require('./feedSession.service');
+const { createFeedSessionService, reuseStoredSession, rememberPosition } = require('./feedSession.service');
 const { collect: collectProfile } = require('./sources/profile.source');
 
 const movieType = collections.existing.shortsVideos.type;
@@ -152,6 +152,7 @@ const createFeedService = (options = {}) => {
       const profileVersion = storedProfile && Number.isInteger(storedProfile.version)
         ? storedProfile.version
         : 0;
+      const raised = rememberPosition(storedSession, request.position);
       const reused = reuseStoredSession(
         storedSession,
         request.position,
@@ -159,7 +160,10 @@ const createFeedService = (options = {}) => {
         profileVersion,
         clock
       );
-      if (reused) return reused;
+      if (reused) {
+        if (raised) await sessionRepo.save(storedSession);
+        return reused;
+      }
 
       let focusItem = null;
       if (request.focus && !storedSession) {
