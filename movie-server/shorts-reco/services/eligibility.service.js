@@ -4,7 +4,7 @@ const config = require('../config');
 const { DAY_MS } = require('../utils/time');
 
 /**
- * The 7-day window restarts from the latest view.
+ * The repeat window restarts from the latest view.
  * @param {object|null|undefined} watch
  * @param {Date} now
  * @returns {'unseen'|'blocked'|'repeat'}

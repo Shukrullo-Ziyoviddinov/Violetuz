@@ -78,7 +78,7 @@ Cold start (no user, or fewer than 3 watches) alternates movie and music shorts.
 
 Page cards only. `type` is `movieShorts` or `musicshorts`. `block` is the row index (0–20). `limit` defaults to 10 and is capped at 10.
 
-The score is the same profile score as the feed. The row keeps one type, drops shorts seen in the last 7 days, and does not follow the feed's slot order. Block 0 is the strongest matches. The next block continues that list, so a short is not repeated on the next row. Fewer than 10 cards means the type ran out. Opening a card and scrolling still uses `GET /feed`.
+The score is the same profile score as the feed. The row keeps one type, drops shorts seen in the last 2 days, and does not follow the feed's slot order. Block 0 is the strongest matches. The next block continues that list, so a short is not repeated on the next row. Fewer than 10 cards means the type ran out. Opening a card and scrolling still uses `GET /feed`.
 
 ## Collections
 
@@ -108,7 +108,7 @@ Knobs used most often:
 - `feedBatchSize` (20), `slotsPerCycle` (10), `frozenAhead` (3)
 - `progressMilestones` (0.4, 0.7), `maxEventsPerShortPerMinute` (20), `eventRateWindowMs` (60000)
 - `feedRebuildMinIntervalSeconds` (5), `provisionalScoring` (true)
-- `repeatAfterDays` (7), `maxRepeatsPer10` (2)
+- `repeatAfterDays` (2), `maxRepeatsPer10` (2)
 - `coldStartMinViews` (3), `coldStartProfileEvery` (3), `exploreShare` (0.15)
 - `levels` for weak / medium / strong / very strong
 - `anchorHalveFactor` (0.5)
@@ -122,7 +122,7 @@ Song groups prefer `music.clipId`, `clips.musicId`, and `concerts.musicId`. Othe
 
 Old watch rows without `isProvisional` count as finished watches. Old profiles without `version` count as version 0. Old feed sessions without `builtWithProfileVersion` count as version 0.
 
-`version` increases when a watch is saved. Saving anchor multipliers on a feed request does not increase it. A session-window row is updated in place by `shortId`. Fatigue ignores a watch while `isProvisional` is true. `lastSeenAt` is set on every accepted event, so the 7-day gap starts immediately, while the open session still keeps the scrolled shorts.
+`version` increases when a watch is saved. Saving anchor multipliers on a feed request does not increase it. A session-window row is updated in place by `shortId`. Fatigue ignores a watch while `isProvisional` is true. `lastSeenAt` is set on every accepted event, so the 2-day gap starts immediately, while the open session still keeps the scrolled shorts.
 
 ## Client contract
 

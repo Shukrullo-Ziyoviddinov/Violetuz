@@ -99,7 +99,7 @@ const config = deepFreeze({
   maxSameArtistPer10: 3,
   maxConsecutiveSameMovie: 2,
 
-  repeatAfterDays: 7,
+  repeatAfterDays: 2,
   maxRepeatsPer10: 2,
   feedBatchSize: 20,
   /** Movie and music page cards. One block is one horizontal row. */

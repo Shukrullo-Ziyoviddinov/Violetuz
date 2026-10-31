@@ -8,14 +8,14 @@ const day = 24 * 60 * 60 * 1000;
 const at = (daysAgo) => new Date(now.getTime() - daysAgo * day);
 
 assert.equal(seenStatus(null, now), 'unseen');
-assert.equal(seenStatus({ lastSeenAt: at(6) }, now), 'blocked');
-assert.equal(seenStatus({ lastSeenAt: at(8) }, now), 'repeat');
+assert.equal(seenStatus({ lastSeenAt: at(1) }, now), 'blocked');
+assert.equal(seenStatus({ lastSeenAt: at(3) }, now), 'repeat');
 
 const watches = new Map([
   ['liked', { lastSeenAt: at(10), liked: true, commented: false }],
   ['newer', { lastSeenAt: at(9), liked: false, commented: false }],
   ['oldest', { lastSeenAt: at(20), liked: false, commented: false }],
-  ['recent', { lastSeenAt: at(3), liked: false, commented: false }],
+  ['recent', { lastSeenAt: at(1), liked: false, commented: false }],
 ]);
 const ordered = orderRepeats(
   [{ shortId: 'liked' }, { shortId: 'newer' }, { shortId: 'oldest' }],
