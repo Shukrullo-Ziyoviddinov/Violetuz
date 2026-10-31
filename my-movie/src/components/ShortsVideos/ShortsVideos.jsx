@@ -224,7 +224,7 @@ const ShortsVideos = ({
   const sendChainRef = useRef(Promise.resolve());
   const shortsListRef = useRef([]);
   const activeIndexRef = useRef(0);
-  const { list: recoList, loadMore: loadMoreReco, syncAt: syncReco } = useShortsRecoPlayback({
+  const { list: recoList, failed: recoFailed, loadMore: loadMoreReco, syncAt: syncReco } = useShortsRecoPlayback({
     enabled: recoEnabled,
     catalog: mixedCatalog,
     shortId: feedRefresh === 0 ? (openedFocus ?? shortId ?? null) : null,
@@ -235,29 +235,20 @@ const ShortsVideos = ({
   const isDataLoading = isMusicShorts
     ? musicShortsLoading
     : shortsLoading || moviesLoading || musicShortsLoading;
-  const showGridSkeleton = !initialShorts && isDataLoading;
-  const [shortsList, setShortsList] = useState(() => {
+  const waitingForReco = recoEnabled && baseList.length > 0 && recoList == null && !recoFailed;
+  const showGridSkeleton = !initialShorts && (isDataLoading || waitingForReco);
+  const shortsList = useMemo(() => {
     if (repostShortsEntries?.length) {
       return buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog);
     }
+    if (recoList) return recoList;
+    if (waitingForReco) return [];
     return orderShortsByRepostIds(baseList, repostIds);
-  });
+  }, [repostShortsEntries, movieShortsCatalog, musicShortsCatalog, recoList, waitingForReco, baseList, repostIds]);
   const [isMobileView, setIsMobileView] = useState(false);
   const [activeIndex, setActiveIndex] = useState(startIndex ?? 0);
   shortsListRef.current = shortsList;
   activeIndexRef.current = activeIndex;
-
-  useEffect(() => {
-    if (repostShortsEntries?.length) {
-      setShortsList(buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog));
-      return;
-    }
-    if (recoList) {
-      setShortsList(recoList);
-      return;
-    }
-    setShortsList(orderShortsByRepostIds(baseList, repostIds));
-  }, [baseList, repostIds, repostShortsEntries, movieShortsCatalog, musicShortsCatalog, recoList]);
 
   const slideMusic = shortsList[activeIndex]?.type === 'musicshorts';
 

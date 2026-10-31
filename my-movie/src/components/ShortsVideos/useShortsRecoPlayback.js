@@ -87,6 +87,7 @@ export const useShortsRecoPlayback = ({
   locked = false,
 }) => {
   const [list, setList] = useState(null);
+  const [failed, setFailed] = useState(false);
   const sessionRef = useRef({
     sessionId: null,
     count: 0,
@@ -112,15 +113,17 @@ export const useShortsRecoPlayback = ({
         done: false,
       };
       setList(null);
+      setFailed(false);
       return undefined;
     }
     if (!catalogRef.current.length) return undefined;
-    const key = `${shortId || ''}::${refreshKey}`;
+    const key = `${shortId || ''}::${refreshKey}::${catalogRef.current.length}`;
     if (sessionKeyRef.current === key) return undefined;
     const sameShort = sessionKeyRef.current != null
       && sessionKeyRef.current.startsWith(`${shortId || ''}::`);
     if (sameShort && sessionRef.current.sessionId && lockedRef.current) return undefined;
     sessionKeyRef.current = key;
+    setFailed(false);
     let cancelled = false;
     sessionRef.current = {
       sessionId: null,
@@ -145,7 +148,9 @@ export const useShortsRecoPlayback = ({
         setList(built.list);
       })
       .catch(() => {
-        if (!cancelled) sessionRef.current.loading = false;
+        if (cancelled) return;
+        sessionRef.current.loading = false;
+        setFailed(true);
       });
     return () => {
       cancelled = true;
@@ -194,5 +199,5 @@ export const useShortsRecoPlayback = ({
   }, [enabled]);
   syncAtRef.current = syncAt;
 
-  return { list, loadMore: syncAt, syncAt };
+  return { list, failed, loadMore: syncAt, syncAt };
 };
