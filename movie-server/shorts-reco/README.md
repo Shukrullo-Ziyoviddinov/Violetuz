@@ -78,7 +78,7 @@ Cold start (no user, or fewer than 3 watches) alternates movie and music shorts.
 
 Page cards only. `type` is `movieShorts` or `musicshorts`. `block` is the row index (0–20). `limit` defaults to 10 and is capped at 10.
 
-The score is the same profile score as the feed. The row keeps one type, drops shorts seen in the last 2 days, and does not follow the feed's slot order. Block 0 is the strongest matches. The next block continues that list, so a short is not repeated on the next row. Fewer than 10 cards means the type ran out. Opening a card and scrolling still uses `GET /feed`.
+The score is the same profile score as the feed. The row keeps one type and only unseen shorts, and does not follow the feed's slot order. A short that was watched stays out of the row. Block 0 is the strongest unseen matches. The next block continues that list, so a short is not repeated on the next row. Fewer than 10 cards means the unseen shorts of that type ran out. Opening a card and scrolling still uses `GET /feed`.
 
 ### `GET /api/shorts-reco/page`
 

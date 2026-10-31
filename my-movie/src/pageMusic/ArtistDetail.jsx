@@ -236,6 +236,9 @@ const ArtistDetail = () => {
   const artistAlbums = getAlbumsByArtist(id);
   const artistClips = getClipsByArtist(id);
   const artistShorts = musicShorts.filter((s) => s.artistId === id);
+  const openArtistShort = (short) => {
+    navigate(`/shorts?shortId=${short.id}&artistSeq=${encodeURIComponent(id)}`);
+  };
   const artistConcerts = getConcertsByArtist(id);
   const artistMovies = useMemo(
     () => allMovies.filter(
@@ -1039,10 +1042,10 @@ const ArtistDetail = () => {
                     <div
                       key={short.id}
                       className="artist-detail-shorts-card music-cards-item clips-item"
-                      onClick={() => navigate(`/shorts?shortId=${short.id}`)}
+                      onClick={() => openArtistShort(short)}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/shorts?shortId=${short.id}`)}
+                      onKeyDown={(e) => e.key === 'Enter' && openArtistShort(short)}
                       aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
                     >
                       <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">
@@ -1068,10 +1071,10 @@ const ArtistDetail = () => {
                     <div
                       key={short.id}
                       className="artist-detail-shorts-card music-cards-item clips-item"
-                      onClick={() => navigate(`/shorts?shortId=${short.id}`)}
+                      onClick={() => openArtistShort(short)}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && navigate(`/shorts?shortId=${short.id}`)}
+                      onKeyDown={(e) => e.key === 'Enter' && openArtistShort(short)}
                       aria-label={`${getShortTitle(short, contentLang)} - ${artist.name}`}
                     >
                       <div className="music-cards-item-image-wrapper clips-image-wrapper artist-detail-shorts-thumb">

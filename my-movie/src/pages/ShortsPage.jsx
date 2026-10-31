@@ -11,6 +11,7 @@ const ShortsPage = () => {
   const startIndex = searchParams.get('startIndex');
   const startIndexNum = startIndex != null ? parseInt(startIndex, 10) : null;
   const shortId = searchParams.get('shortId') || searchParams.get('id');
+  const artistSeq = searchParams.get('artistSeq');
   const repostIdsRaw = searchParams.get('repostIds');
   const repostIds = useMemo(() => {
     if (!repostIdsRaw || typeof repostIdsRaw !== 'string' || !repostIdsRaw.trim()) return null;
@@ -41,6 +42,7 @@ const ShortsPage = () => {
       <ShortsVideos
         startIndex={isNaN(startIndexNum) ? null : startIndexNum}
         shortId={shortId}
+        artistSeq={artistSeq}
         onCloseFromHome={fromHomeLink ? handleCloseFromHome : undefined}
         repostIds={repostIds}
         repostShortsEntries={repostShortsEntries}

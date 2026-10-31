@@ -97,12 +97,15 @@ const main = async () => {
   const seen = createShelfService({
     catalogRepo: {
       async findMatching() {
-        return [movie(1, 1), movie(2, 8)];
+        return [movie(1, 1), movie(2, 8), movie(3, 3)];
       },
     },
     watchRepo: {
       async listByUser() {
-        return watches.concat([{ shortId: 'movieShorts:2', lastSeenAt: now }]);
+        return watches.concat([
+          { shortId: 'movieShorts:2', lastSeenAt: now },
+          { shortId: 'movieShorts:3', lastSeenAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000) },
+        ]);
       },
     },
     profileRepo: {
@@ -124,6 +127,8 @@ const main = async () => {
     now,
   });
   assert.equal(hidden.items.some((item) => item.shortId === 'movieShorts:2'), false);
+  assert.equal(hidden.items.some((item) => item.shortId === 'movieShorts:3'), false);
+  assert.equal(hidden.items[0].shortId, 'movieShorts:1');
 
   console.log('ok shelf');
 };

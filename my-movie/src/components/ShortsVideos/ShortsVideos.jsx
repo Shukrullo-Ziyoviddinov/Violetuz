@@ -186,6 +186,7 @@ const ShortsVideos = ({
   initialShorts = null,
   startIndex = null,
   shortId = null,
+  artistSeq = null,
   onCloseFromHome = null,
   variant = 'movie',
   repostIds = null,
@@ -213,6 +214,11 @@ const ShortsVideos = ({
   );
   const isMusicShorts = variant === 'music';
   const recoEnabled = !initialShorts && !repostIds?.length && !repostShortsEntries?.length;
+  const artistSeqList = useMemo(() => {
+    if (artistSeq == null || String(artistSeq) === '') return [];
+    return musicShortsCatalog.filter((item) => String(item.artistId) === String(artistSeq));
+  }, [artistSeq, musicShortsCatalog]);
+  const artistSeqMode = artistSeqList.length > 0;
   const [modalOpen, setModalOpen] = useState(
     () => startIndex != null && startIndex >= 0
   );
@@ -228,7 +234,7 @@ const ShortsVideos = ({
   const activeIndexRef = useRef(0);
   const playerFocus = openedFocus ?? shortId ?? null;
   const { list: recoList, loadMore: loadMoreReco, syncAt: syncReco } = useShortsRecoPlayback({
-    enabled: recoEnabled && (modalOpen || (playerFocus != null && String(playerFocus) !== '')),
+    enabled: recoEnabled && !artistSeq && (modalOpen || (playerFocus != null && String(playerFocus) !== '')),
     catalog: mixedCatalog,
     shortId: playerFocus,
     refreshKey: feedRefresh,
@@ -258,11 +264,12 @@ const ShortsVideos = ({
     return orderShortsByRepostIds(baseList, repostIds);
   }, [repostShortsEntries, movieShortsCatalog, musicShortsCatalog, recoEnabled, pageList, waitingForPage, baseList, repostIds]);
   const shortsList = useMemo(() => {
+    if (artistSeq) return artistSeqList;
     if (!recoEnabled) return gridList;
     if (recoList && recoList.length) return recoList;
     if (openedItem) return [openedItem];
     return [];
-  }, [recoEnabled, gridList, recoList, openedItem]);
+  }, [artistSeq, artistSeqList, recoEnabled, gridList, recoList, openedItem]);
   const [isMobileView, setIsMobileView] = useState(false);
   const [activeIndex, setActiveIndex] = useState(startIndex ?? 0);
   shortsListRef.current = shortsList;
@@ -556,12 +563,13 @@ const ShortsVideos = ({
     if (slideState || shortsList.length < 2) return;
 
     const count = shortsList.length;
-    if (recoEnabled && direction === 'up' && activeIndex <= 0) return;
-    if (recoEnabled && direction === 'down') loadMoreReco(activeIndex);
-    if (recoEnabled && direction === 'down' && activeIndex >= count - 1) return;
+    const linearPlay = recoEnabled || artistSeqMode;
+    if (linearPlay && direction === 'up' && activeIndex <= 0) return;
+    if (recoEnabled && !artistSeqMode && direction === 'down') loadMoreReco(activeIndex);
+    if (linearPlay && direction === 'down' && activeIndex >= count - 1) return;
     const toIndex = direction === 'down'
-      ? (recoEnabled ? activeIndex + 1 : (activeIndex + 1) % count)
-      : (recoEnabled ? activeIndex - 1 : (activeIndex - 1 + count) % count);
+      ? (linearPlay ? activeIndex + 1 : (activeIndex + 1) % count)
+      : (linearPlay ? activeIndex - 1 : (activeIndex - 1 + count) % count);
     if (toIndex === activeIndex) return;
 
     const nextVideo = desktopVideoRefs.current.get(toIndex);
@@ -591,7 +599,7 @@ const ShortsVideos = ({
         }, SLIDE_DURATION);
       });
     });
-  }, [activeIndex, modalVideoMuted, slideState, shortsList.length, recoEnabled, loadMoreReco]);
+  }, [activeIndex, modalVideoMuted, slideState, shortsList.length, recoEnabled, artistSeqMode, loadMoreReco]);
 
   useEffect(() => {
     if (!shortsList.length) return;
@@ -603,9 +611,9 @@ const ShortsVideos = ({
 
   const handleMobileIndexChange = useCallback((newIndex) => {
     if (newIndex < 0 || newIndex >= shortsList.length) return;
-    if (recoEnabled) loadMoreReco(newIndex);
+    if (recoEnabled && !artistSeqMode) loadMoreReco(newIndex);
     setActiveIndex(newIndex);
-  }, [shortsList.length, recoEnabled, loadMoreReco]);
+  }, [shortsList.length, recoEnabled, artistSeqMode, loadMoreReco]);
 
   const handleMobileCommit = useCallback((newIndex) => {
     mobileVideoRefs.current.forEach((video, index) => {

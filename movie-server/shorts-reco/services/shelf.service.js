@@ -84,8 +84,9 @@ const cardOf = (doc) => {
 };
 
 /**
- * Same profile and score as the shorts feed. Cards keep one type and skip
- * the feed slot order, so a row is the strongest matches, not the next swipe.
+ * Same profile and score as the shorts feed. Cards keep one type, skip
+ * every watched short, and skip the feed slot order, so a row is the
+ * strongest unseen matches, not the next swipe.
  * @param {object} [options]
  */
 const createShelfService = (options = {}) => {
@@ -121,7 +122,7 @@ const createShelfService = (options = {}) => {
       const statRows = await stats.listTop(config.shelfReadLimit);
       const statsByShortId = new Map(statRows.map((row) => [row.shortId, row]));
       const ranked = rankDocs(
-        (docs || []).filter((doc) => doc && seenStatus(watchMap.get(doc.shortId), clock) !== 'blocked'),
+        (docs || []).filter((doc) => doc && seenStatus(watchMap.get(doc.shortId), clock) === 'unseen'),
         profile,
         statsByShortId,
         clock
