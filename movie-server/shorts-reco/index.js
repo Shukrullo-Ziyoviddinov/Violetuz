@@ -45,6 +45,7 @@ const createShortsRecoModule = (options = {}) => {
     ingest: (input) => watchEvents.ingest(input),
     serveFeed: (input) => feed.serveFeed(input),
     serveShelf: (input) => shelf.serveShelf(input),
+    servePage: (input) => shelf.servePage(input),
     hydrate,
     getUserId: options.getUserId || userIdFromRequest,
   });
@@ -52,6 +53,7 @@ const createShortsRecoModule = (options = {}) => {
     postEvent: handlers.postEvent,
     getFeed: handlers.getFeed,
     getShelf: handlers.getShelf,
+    getPage: handlers.getPage,
     authMiddleware: options.authMiddleware,
   });
 
@@ -73,6 +75,7 @@ const createShortsRecoModule = (options = {}) => {
     ingestEvent: (input) => watchEvents.ingest(input),
     serveFeed: (input) => feed.serveFeed(input),
     serveShelf: (input) => shelf.serveShelf(input),
+    servePage: (input) => shelf.servePage(input),
   };
 };
 

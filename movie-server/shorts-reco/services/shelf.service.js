@@ -38,7 +38,7 @@ const sameNeighbor = (prev, doc) => {
  * @param {number} block
  * @param {number} limit
  */
-const sliceBlock = (ranked, block, limit) => {
+const mixNeighbors = (ranked) => {
   const pending = (ranked || []).slice();
   const picked = [];
   while (pending.length) {
@@ -47,8 +47,29 @@ const sliceBlock = (ranked, block, limit) => {
     if (index < 0) index = 0;
     picked.push(pending.splice(index, 1)[0]);
   }
+  return picked;
+};
+
+const sliceBlock = (ranked, block, limit) => {
+  const picked = mixNeighbors(ranked);
   return picked.slice(block * limit, (block + 1) * limit);
 };
+
+/**
+ * @param {object[]} docs
+ * @param {object} profile
+ * @param {Map<string, object>} statsByShortId
+ * @param {Date} clock
+ */
+const rankDocs = (docs, profile, statsByShortId, clock) =>
+  (docs || [])
+    .filter((doc) => doc && doc.shortId)
+    .map((doc) => ({
+      doc,
+      score: feedScoreOf(doc, profile, statsByShortId.get(doc.shortId) || null, clock),
+    }))
+    .sort(byInterest)
+    .map((row) => row.doc);
 
 /**
  * @param {object} doc
@@ -99,20 +120,58 @@ const createShelfService = (options = {}) => {
       );
       const statRows = await stats.listTop(config.shelfReadLimit);
       const statsByShortId = new Map(statRows.map((row) => [row.shortId, row]));
-      const ranked = (docs || [])
-        .filter((doc) => doc && doc.shortId && seenStatus(watchMap.get(doc.shortId), clock) !== 'blocked')
-        .map((doc) => ({
-          doc,
-          score: feedScoreOf(doc, profile, statsByShortId.get(doc.shortId) || null, clock),
-        }))
-        .sort(byInterest)
-        .map((row) => row.doc);
+      const ranked = rankDocs(
+        (docs || []).filter((doc) => doc && seenStatus(watchMap.get(doc.shortId), clock) !== 'blocked'),
+        profile,
+        statsByShortId,
+        clock
+      );
 
       return {
         type: request.type,
         block,
         items: sliceBlock(ranked, block, limit).map(cardOf),
       };
+    },
+
+    /**
+     * Shorts page grid. Unseen shorts stay above repeats. Each group is mixed
+     * by interest. Shorts inside the repeat window are left out. The swipe
+     * feed is a different request and does not use this order.
+     * @param {{ userId?: string|null, now?: Date }} input
+     */
+    async servePage(input) {
+      const request = input || {};
+      const clock = request.now || new Date();
+      const userId = request.userId ? String(request.userId) : null;
+      const watchList = userId
+        ? await watchesRepo.listByUser(userId, config.pageReadLimit)
+        : [];
+      const warm = Boolean(userId) && watchList.length >= config.coldStartMinViews;
+      const stored = warm ? await profiles.findByUserId(userId) : null;
+      const profile = warm
+        ? hydrateProfile(stored, userId, clock)
+        : emptyProfile(userId || 'guest', clock);
+      const watchMap = new Map(watchList.map((row) => [row.shortId, row]));
+      const docs = await catalog.findMatching(
+        {},
+        config.pageReadLimit,
+        { catalogAddedAt: -1, shortId: 1 }
+      );
+      const statRows = await stats.listTop(config.pageReadLimit);
+      const statsByShortId = new Map(statRows.map((row) => [row.shortId, row]));
+      const unseen = [];
+      const repeats = [];
+      (docs || []).forEach((doc) => {
+        if (!doc || !doc.shortId) return;
+        const status = seenStatus(watchMap.get(doc.shortId), clock);
+        if (status === 'blocked') return;
+        if (status === 'repeat') repeats.push(doc);
+        else unseen.push(doc);
+      });
+      const ordered = mixNeighbors(rankDocs(unseen, profile, statsByShortId, clock))
+        .concat(mixNeighbors(rankDocs(repeats, profile, statsByShortId, clock)));
+      return { items: ordered.map(cardOf) };
     },
   };
 };

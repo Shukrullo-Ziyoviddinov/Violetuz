@@ -105,6 +105,8 @@ const config = deepFreeze({
   /** Movie and music page cards. One block is one horizontal row. */
   shelfBlockSize: 10,
   shelfReadLimit: 200,
+  /** Shorts page grid. Unseen shorts, then repeats after repeatAfterDays. */
+  pageReadLimit: 5000,
   slotsPerCycle: 10,
   frozenAhead: 3,
   /** Client progress pings. The server does not reject other ratios. */

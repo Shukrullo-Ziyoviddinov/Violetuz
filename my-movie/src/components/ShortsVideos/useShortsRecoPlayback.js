@@ -124,6 +124,7 @@ export const useShortsRecoPlayback = ({
     if (sameShort && sessionRef.current.sessionId && lockedRef.current) return undefined;
     sessionKeyRef.current = key;
     setFailed(false);
+    setList(null);
     let cancelled = false;
     sessionRef.current = {
       sessionId: null,
@@ -154,6 +155,9 @@ export const useShortsRecoPlayback = ({
       });
     return () => {
       cancelled = true;
+      if (!sessionRef.current.sessionId && sessionKeyRef.current === key) {
+        sessionKeyRef.current = null;
+      }
     };
   }, [enabled, catalog.length, shortId, refreshKey]);
 

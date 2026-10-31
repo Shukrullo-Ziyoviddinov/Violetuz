@@ -22,6 +22,7 @@ const files = [
   'feedSession.test.js',
   'http.test.js',
   'shelf.test.js',
+  'page.test.js',
   'liveWatch.test.js',
 ];
 

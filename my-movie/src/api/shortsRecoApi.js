@@ -27,6 +27,10 @@ export const fetchShortsShelf = async ({ type, block = 0, limit = 10 }) => {
   return fetchJson(`${API_BASE_URL}/shorts-reco/shelf?${params.toString()}`);
 };
 
+export const fetchShortsRecoPage = async () => (
+  fetchJson(`${API_BASE_URL}/shorts-reco/page`)
+);
+
 export const fetchShortsRecoFeed = async ({ sessionId, position = 0, limit = 20, focus } = {}) => {
   const params = new URLSearchParams({
     position: String(position),

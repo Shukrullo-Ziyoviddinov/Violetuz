@@ -19,6 +19,7 @@ const userIdOf = (req, getUserId) => {
  *   ingest: Function,
  *   serveFeed: Function,
  *   serveShelf: Function,
+ *   servePage: Function,
  *   hydrate: Function,
  *   getUserId: Function,
  * }} deps
@@ -106,7 +107,17 @@ const createHttpHandlers = (deps) => {
     });
   };
 
-  return { postEvent, getFeed, getShelf };
+  const getPage = async (req, res) => {
+    const page = await deps.servePage({
+      userId: userIdOf(req, deps.getUserId),
+    });
+    return res.status(200).json({
+      success: true,
+      items: page.items,
+    });
+  };
+
+  return { postEvent, getFeed, getShelf, getPage };
 };
 
 module.exports = {

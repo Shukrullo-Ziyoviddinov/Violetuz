@@ -80,6 +80,10 @@ Page cards only. `type` is `movieShorts` or `musicshorts`. `block` is the row in
 
 The score is the same profile score as the feed. The row keeps one type, drops shorts seen in the last 2 days, and does not follow the feed's slot order. Block 0 is the strongest matches. The next block continues that list, so a short is not repeated on the next row. Fewer than 10 cards means the type ran out. Opening a card and scrolling still uses `GET /feed`.
 
+### `GET /api/shorts-reco/page`
+
+The shorts page grid. Movie and music shorts share one list. Unseen shorts come first, mixed by the same profile score as the shelf, with neighbors changed when another short is waiting. Shorts seen inside `repeatAfterDays` are omitted. Shorts older than that sit after every unseen short, mixed the same way inside that tail. There is no divider. `GET /feed` is unchanged: a watched short enters the player only when the feed's repeat rules pass, including when the opened card was one of those tail shorts.
+
 ## Collections
 
 Existing collections are read only. New collections use the `reco_` prefix.
@@ -108,7 +112,7 @@ Knobs used most often:
 - `feedBatchSize` (20), `slotsPerCycle` (10), `frozenAhead` (3)
 - `progressMilestones` (0.4, 0.7), `maxEventsPerShortPerMinute` (20), `eventRateWindowMs` (60000)
 - `feedRebuildMinIntervalSeconds` (5), `provisionalScoring` (true)
-- `repeatAfterDays` (2), `maxRepeatsPer10` (2)
+- `repeatAfterDays` (2), `maxRepeatsPer10` (2), `pageReadLimit` (5000)
 - `coldStartMinViews` (3), `coldStartProfileEvery` (3), `exploreShare` (0.15)
 - `levels` for weak / medium / strong / very strong
 - `anchorHalveFactor` (0.5)

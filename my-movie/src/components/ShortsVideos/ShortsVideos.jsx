@@ -9,6 +9,7 @@ import { resolveShortsWithMovies } from '../../utils/resolveShortsWithMovies';
 import { addWatch } from '../../api/shortsWatchHistory';
 import { postShortsRecoEvent } from '../../api/shortsRecoApi';
 import { useShortsRecoPlayback } from './useShortsRecoPlayback';
+import { useShortsPageOrder } from './useShortsPageOrder';
 import {
   createWatch,
   notePlayback,
@@ -223,31 +224,49 @@ const ShortsVideos = ({
   const watchRef = useRef(null);
   const sendChainRef = useRef(Promise.resolve());
   const shortsListRef = useRef([]);
+  const gridListRef = useRef([]);
   const activeIndexRef = useRef(0);
-  const { list: recoList, failed: recoFailed, loadMore: loadMoreReco, syncAt: syncReco } = useShortsRecoPlayback({
-    enabled: recoEnabled,
+  const playerFocus = openedFocus ?? shortId ?? null;
+  const { list: recoList, loadMore: loadMoreReco, syncAt: syncReco } = useShortsRecoPlayback({
+    enabled: recoEnabled && (modalOpen || (playerFocus != null && String(playerFocus) !== '')),
     catalog: mixedCatalog,
-    shortId: feedRefresh === 0 ? (openedFocus ?? shortId ?? null) : null,
+    shortId: playerFocus,
     refreshKey: feedRefresh,
     locked: modalOpen,
+  });
+  const { list: pageList, failed: pageFailed } = useShortsPageOrder({
+    enabled: recoEnabled,
+    catalog: mixedCatalog,
+    refreshKey: feedRefresh,
   });
   const baseList = initialShorts || (isMusicShorts ? musicShortsCatalog : mixedCatalog);
   const isDataLoading = isMusicShorts
     ? musicShortsLoading
     : shortsLoading || moviesLoading || musicShortsLoading;
-  const waitingForReco = recoEnabled && baseList.length > 0 && recoList == null && !recoFailed;
-  const showGridSkeleton = !initialShorts && (isDataLoading || waitingForReco);
-  const shortsList = useMemo(() => {
+  const waitingForPage = recoEnabled && baseList.length > 0 && pageList == null && !pageFailed;
+  const showGridSkeleton = !initialShorts && (isDataLoading || waitingForPage);
+  const openedItem = useMemo(() => {
+    if (playerFocus == null || String(playerFocus) === '') return null;
+    return mixedCatalog.find((item) => String(item.id) === String(playerFocus)) || null;
+  }, [playerFocus, mixedCatalog]);
+  const gridList = useMemo(() => {
     if (repostShortsEntries?.length) {
       return buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog);
     }
-    if (recoList) return recoList;
-    if (waitingForReco) return [];
+    if (recoEnabled && pageList) return pageList;
+    if (waitingForPage) return [];
     return orderShortsByRepostIds(baseList, repostIds);
-  }, [repostShortsEntries, movieShortsCatalog, musicShortsCatalog, recoList, waitingForReco, baseList, repostIds]);
+  }, [repostShortsEntries, movieShortsCatalog, musicShortsCatalog, recoEnabled, pageList, waitingForPage, baseList, repostIds]);
+  const shortsList = useMemo(() => {
+    if (!recoEnabled) return gridList;
+    if (recoList && recoList.length) return recoList;
+    if (openedItem) return [openedItem];
+    return [];
+  }, [recoEnabled, gridList, recoList, openedItem]);
   const [isMobileView, setIsMobileView] = useState(false);
   const [activeIndex, setActiveIndex] = useState(startIndex ?? 0);
   shortsListRef.current = shortsList;
+  gridListRef.current = gridList;
   activeIndexRef.current = activeIndex;
 
   const slideMusic = shortsList[activeIndex]?.type === 'musicshorts';
@@ -331,12 +350,16 @@ const ShortsVideos = ({
   const recoOpenedRef = useRef(null);
   const focusId = openedFocus ?? shortId;
   useEffect(() => {
-    if (!recoList || focusId == null || String(focusId) === '') return;
+    if (!recoEnabled || !recoList || focusId == null || String(focusId) === '') return;
     if (recoOpenedRef.current === String(focusId)) return;
+    const first = recoList[0];
+    if (!first || String(first.id) !== String(focusId)) return;
     recoOpenedRef.current = String(focusId);
-    setActiveIndex(0);
-    setModalOpen(true);
-  }, [recoList, focusId]);
+    if (!modalOpen) {
+      setActiveIndex(0);
+      setModalOpen(true);
+    }
+  }, [recoEnabled, recoList, focusId, modalOpen]);
 
   const rememberWatch = (short, stats) => {
     if (!short || short.id == null) return;
@@ -381,7 +404,11 @@ const ShortsVideos = ({
         watchRef.current = null;
       }
       if (event) enqueueReco(event, activeIndexRef.current, false);
-      if (refresh) setFeedRefresh((value) => value + 1);
+      if (refresh) {
+        sendChainRef.current = sendChainRef.current.then(() => {
+          setFeedRefresh((value) => value + 1);
+        });
+      }
       return;
     }
     const snap = activeWatchRef.current;
@@ -597,9 +624,9 @@ const ShortsVideos = ({
   }, [modalVideoMuted]);
 
   const openModal = useCallback((index) => {
-    const item = shortsListRef.current[index];
+    const item = gridListRef.current[index];
     if (item?.id != null) setOpenedFocus(item.id);
-    setActiveIndex(index);
+    setActiveIndex(0);
     setModalOpen(true);
     setMobilePlayOverlayVisible(false);
     setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
@@ -611,6 +638,8 @@ const ShortsVideos = ({
 
   const finishCloseModal = useCallback(() => {
     setModalOpen(false);
+    setOpenedFocus(null);
+    recoOpenedRef.current = null;
     setSlideState(null);
     setMusicModalOpen(false);
     setModalVideoMuted(false);
@@ -624,7 +653,7 @@ const ShortsVideos = ({
     }
     if (shortsModalHistoryRef.current) {
       shortsModalHistoryRef.current = false;
-      flushWatchesRef.current({ refresh: false });
+      flushWatchesRef.current({ refresh: true });
       window.history.back();
       return;
     }
@@ -637,6 +666,7 @@ const ShortsVideos = ({
     if (!modalOpen || onCloseFromHome) return undefined;
     const onPopState = () => {
       shortsModalHistoryRef.current = false;
+      flushWatchesRef.current({ refresh: true });
       finishCloseModal();
     };
     window.addEventListener('popstate', onPopState);
@@ -1760,7 +1790,7 @@ const ShortsVideos = ({
                     </div>
                   </div>
                 ))
-              : shortsList.map((item, index) => (
+              : gridList.map((item, index) => (
               <div key={`${item.type || 'short'}-${item.id}`} className="shorts-video-card">
                 <ShortsVideoThumb
                   videoSrc={getVideo(item)}
