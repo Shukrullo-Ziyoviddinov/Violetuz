@@ -1,5 +1,5 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
-import { sameFollowId } from './followingUtils';
+import { normalizeFollowType, sameFollowId } from './followingUtils';
 
 const toItem = (raw) => {
   if (raw == null) return null;
@@ -10,13 +10,13 @@ const toItem = (raw) => {
   if (raw.id == null || raw.id === '') return null;
   return {
     id: raw.id,
-    type: raw.type === 'actor' || raw.type === 'artist' ? raw.type : null,
+    type: normalizeFollowType(raw.type),
     ...(raw.snapshot != null ? { snapshot: raw.snapshot } : {}),
   };
 };
 
 const initialState = {
-  /** @type {Array<{ id: string|number, type: 'actor'|'artist'|null, snapshot?: object }>} */
+  /** @type {Array<{ id: string|number, type: 'actor'|'artist'|'channel'|null, snapshot?: object }>} */
   items: [],
   status: 'idle',
   synced: false,
@@ -47,12 +47,15 @@ const followingSlice = createSlice({
           : { id: action.payload, type: null }
       );
       if (!next) return;
-      const has = state.items.some(
+      const idx = state.items.findIndex(
         (x) =>
           sameFollowId(x.id, next.id) &&
           (next.type == null || x.type == null || x.type === next.type)
       );
-      if (has) return;
+      if (idx >= 0) {
+        if (next.snapshot) state.items[idx].snapshot = next.snapshot;
+        return;
+      }
       state.items.push(next);
     },
     unfollow: (state, action) => {

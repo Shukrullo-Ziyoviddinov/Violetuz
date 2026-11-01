@@ -4,6 +4,7 @@ const authRoutes = require('./auth.routes');
 const uploadRoutes = require('./upload.routes');
 const adminRoutes = require('./admin.routes');
 const movieRoutes = require('./movie.routes');
+const channelRoutes = require('./channel.routes');
 const movieSectionRoutes = require('./movieSection.routes');
 const musicRoutes = require('./music.routes');
 const musicSectionRoutes = require('./musicSection.routes');
@@ -76,6 +77,7 @@ router.use('/feed', feedRoutes);
 // similar: GET /movies/:movieId/similar — movie.routes /:id dan oldin
 router.use('/movies', movieSimilarRoutes);
 router.use('/movies', movieRoutes);
+router.use('/channels', channelRoutes);
 router.use('/actors', actorRoutes);
 router.use('/actor-page-labels', actorPageLabelRoutes);
 router.use('/banners', bannerRoutes);

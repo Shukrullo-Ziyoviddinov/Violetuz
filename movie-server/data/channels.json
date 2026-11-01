@@ -1,0 +1,37 @@
+[
+  {
+    "id": "violet-play",
+    "name": "VioletPlay",
+    "username": "violet",
+    "subscribers": 0,
+    "avatar": "/img/vlplay_preview_rev_1.png",
+    "profileBanner": {
+      "banners": [
+        { "image": "/img/banner-1.png" },
+        { "image": "/img/banner-2.png" },
+        { "image": "/img/banner-3.png" }
+      ]
+    },
+    "biografiya": {
+      "text": "VioletPlay — filmlar, seriallar va treylerlar kanali. Yangi kinolar va videolar shu yerda chiqadi.",
+      "link": {
+        "instagram": {
+          "name": "Instagram",
+          "url": "https://instagram.com/violetmovie"
+        },
+        "telegram": {
+          "name": "Telegram",
+          "url": "https://t.me/violetmovie"
+        },
+        "tiktok": {
+          "name": "TikTok",
+          "url": "https://tiktok.com/@violetmovie"
+        },
+        "youtube": {
+          "name": "YouTube",
+          "url": "https://youtube.com/@violetmovie"
+        }
+      }
+    }
+  }
+]

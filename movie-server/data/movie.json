@@ -1,6 +1,7 @@
 [
   {
     "id": 8001,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "John Wick 4",
@@ -122,11 +123,21 @@
       8004,
       8005
     ],
-    "movieSauntrik": [801, 802, 803],
-    "movieSauntrikVideo": [1101, 1102, 1103, 401]
+    "movieSauntrik": [
+      801,
+      802,
+      803
+    ],
+    "movieSauntrikVideo": [
+      1101,
+      1102,
+      1103,
+      401
+    ]
   },
   {
     "id": 8002,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "Mission: Impossible 7",
@@ -248,6 +259,7 @@
   },
   {
     "id": 8003,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "Fast X",
@@ -368,6 +380,7 @@
   },
   {
     "id": 8004,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "The Equalizer 3",
@@ -492,6 +505,7 @@
   },
   {
     "id": 8005,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "Extraction 2",
@@ -612,6 +626,7 @@
   },
   {
     "id": 8006,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "Sicario",
@@ -734,6 +749,7 @@
   },
   {
     "id": 8006,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "Sicario",
@@ -856,6 +872,7 @@
   },
   {
     "id": 11001,
+    "channelId": "violet-play",
     "categoryName": "adventureMovies",
     "title": {
       "uz": "Indiana Jones va Taqdir Diali",
@@ -974,11 +991,21 @@
       ]
     },
     "franchiseMovieIds": [],
-    "movieSauntrik": [801, 802, 803],
-    "movieSauntrikVideo": [1101, 1102, 1103, 401]
+    "movieSauntrik": [
+      801,
+      802,
+      803
+    ],
+    "movieSauntrikVideo": [
+      1101,
+      1102,
+      1103,
+      401
+    ]
   },
   {
     "id": 11002,
+    "channelId": "violet-play",
     "categoryName": "adventureMovies",
     "title": {
       "uz": "Uncharted",
@@ -1096,6 +1123,7 @@
   },
   {
     "id": 11003,
+    "channelId": "violet-play",
     "categoryName": "adventureMovies",
     "title": {
       "uz": "Jungle Cruise",
@@ -1217,6 +1245,7 @@
   },
   {
     "id": 11004,
+    "channelId": "violet-play",
     "categoryName": "adventureMovies",
     "title": {
       "uz": "Jumanji: Keyingi Daraja",
@@ -1338,6 +1367,7 @@
   },
   {
     "id": 11005,
+    "channelId": "violet-play",
     "categoryName": "adventureMovies",
     "title": {
       "uz": "Tomb Raider",
@@ -1457,6 +1487,7 @@
   },
   {
     "id": 11006,
+    "channelId": "violet-play",
     "categoryName": "adventureMovies",
     "title": {
       "uz": "The Lost City",
@@ -1579,6 +1610,7 @@
   },
   {
     "id": 11007,
+    "channelId": "violet-play",
     "categoryName": "adventureMovies",
     "title": {
       "uz": "Uncharted",
@@ -1696,6 +1728,7 @@
   },
   {
     "id": 4001,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Muz II",
@@ -1818,6 +1851,7 @@
   },
   {
     "id": 4002,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Toy Story 4",
@@ -1940,6 +1974,7 @@
   },
   {
     "id": 4003,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Shrek 2",
@@ -2061,6 +2096,7 @@
   },
   {
     "id": 4004,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Madagaskar",
@@ -2182,6 +2218,7 @@
   },
   {
     "id": 4005,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Kung Fu Panda 4",
@@ -2303,6 +2340,7 @@
   },
   {
     "id": 4006,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Coco",
@@ -2426,6 +2464,7 @@
   },
   {
     "id": 4007,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Coco",
@@ -2553,6 +2592,7 @@
   },
   {
     "id": 4008,
+    "channelId": "violet-play",
     "categoryName": "animations",
     "title": {
       "uz": "Coco",
@@ -2680,6 +2720,7 @@
   },
   {
     "id": 10001,
+    "channelId": "violet-play",
     "categoryName": "anime",
     "title": {
       "uz": "Ruhlar Olib Ketiladi",
@@ -2801,6 +2842,7 @@
   },
   {
     "id": 10002,
+    "channelId": "violet-play",
     "categoryName": "anime",
     "title": {
       "uz": "Sening Isming",
@@ -2922,6 +2964,7 @@
   },
   {
     "id": 10003,
+    "channelId": "violet-play",
     "categoryName": "anime",
     "title": {
       "uz": "Demon Qotar: Mugen Qatari",
@@ -3043,6 +3086,7 @@
   },
   {
     "id": 10004,
+    "channelId": "violet-play",
     "categoryName": "anime",
     "title": {
       "uz": "Howlning Qo'rg'oshin Qal'asi",
@@ -3164,6 +3208,7 @@
   },
   {
     "id": 10005,
+    "channelId": "violet-play",
     "categoryName": "anime",
     "title": {
       "uz": "Spy x Family Code: White",
@@ -3285,6 +3330,7 @@
   },
   {
     "id": 10006,
+    "channelId": "violet-play",
     "categoryName": "anime",
     "title": {
       "uz": "Jodugar Qiz",
@@ -3407,6 +3453,7 @@
   },
   {
     "id": 10007,
+    "channelId": "violet-play",
     "categoryName": "anime",
     "title": {
       "uz": "Spy x Family Code: White",
@@ -3528,6 +3575,7 @@
   },
   {
     "id": 90001,
+    "channelId": "violet-play",
     "categoryName": "anonslar",
     "title": {
       "uz": "Ruh 2 - Treyler",
@@ -3651,6 +3699,7 @@
   },
   {
     "id": 90002,
+    "channelId": "violet-play",
     "categoryName": "anonslar",
     "title": {
       "uz": "Oppenheimer 2 - Teaser",
@@ -3774,6 +3823,7 @@
   },
   {
     "id": 90003,
+    "channelId": "violet-play",
     "categoryName": "anonslar",
     "title": {
       "uz": "Romantika - Yangi mavsum",
@@ -3895,6 +3945,7 @@
   },
   {
     "id": 90004,
+    "channelId": "violet-play",
     "categoryName": "anonslar",
     "title": {
       "uz": "Multfilim 2025",
@@ -4016,6 +4067,7 @@
   },
   {
     "id": 90005,
+    "channelId": "violet-play",
     "categoryName": "anonslar",
     "title": {
       "uz": "Boevik - Teaser",
@@ -4137,6 +4189,7 @@
   },
   {
     "id": 90006,
+    "channelId": "violet-play",
     "categoryName": "anonslar",
     "title": {
       "uz": "Anime - Yangi seriya",
@@ -4258,6 +4311,7 @@
   },
   {
     "id": 90007,
+    "channelId": "violet-play",
     "categoryName": "anonslar",
     "title": {
       "uz": "Sarguzasht - Teaser",
@@ -4379,6 +4433,7 @@
   },
   {
     "id": 9001,
+    "channelId": "violet-play",
     "categoryName": "horrorMovies",
     "title": {
       "uz": "Qichqiriq 6",
@@ -4496,6 +4551,7 @@
   },
   {
     "id": 9002,
+    "channelId": "violet-play",
     "categoryName": "horrorMovies",
     "title": {
       "uz": "Evil Dead Rise",
@@ -4613,6 +4669,7 @@
   },
   {
     "id": 9003,
+    "channelId": "violet-play",
     "categoryName": "horrorMovies",
     "title": {
       "uz": "Smile",
@@ -4735,6 +4792,7 @@
   },
   {
     "id": 9004,
+    "channelId": "violet-play",
     "categoryName": "horrorMovies",
     "title": {
       "uz": "The Conjuring: Iblis Menga Topildi",
@@ -4852,6 +4910,7 @@
   },
   {
     "id": 9005,
+    "channelId": "violet-play",
     "categoryName": "horrorMovies",
     "title": {
       "uz": "Get Out",
@@ -4974,6 +5033,7 @@
   },
   {
     "id": 9006,
+    "channelId": "violet-play",
     "categoryName": "horrorMovies",
     "title": {
       "uz": "A Quiet Place",
@@ -5096,6 +5156,7 @@
   },
   {
     "id": 9007,
+    "channelId": "violet-play",
     "categoryName": "horrorMovies",
     "title": {
       "uz": "A Quiet Place",
@@ -5218,6 +5279,7 @@
   },
   {
     "id": 2001,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Ruh",
@@ -5341,11 +5403,21 @@
       ]
     },
     "franchiseMovieIds": [],
-    "movieSauntrik": [801, 802, 803],
-    "movieSauntrikVideo": [1101, 1102, 1103, 401]
+    "movieSauntrik": [
+      801,
+      802,
+      803
+    ],
+    "movieSauntrikVideo": [
+      1101,
+      1102,
+      1103,
+      401
+    ]
   },
   {
     "id": 2002,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Oppenheimer",
@@ -5468,6 +5540,7 @@
   },
   {
     "id": 2003,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Qon Qarzi Qon",
@@ -5590,6 +5663,7 @@
   },
   {
     "id": 2004,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Ajoyib Oilaviy",
@@ -5712,6 +5786,7 @@
   },
   {
     "id": 2005,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Uy-joy",
@@ -5834,6 +5909,7 @@
   },
   {
     "id": 2006,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "O'rgimchak-odam: Uyga Yo'l Yo'q",
@@ -5956,6 +6032,7 @@
   },
   {
     "id": 2007,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Guzallik va Maxluq",
@@ -6078,6 +6155,7 @@
   },
   {
     "id": 2008,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Dune",
@@ -6200,6 +6278,7 @@
   },
   {
     "id": 2009,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Betmen",
@@ -6322,6 +6401,7 @@
   },
   {
     "id": 2010,
+    "channelId": "violet-play",
     "categoryName": "kinolar",
     "title": {
       "uz": "Top Gun: Maverick",
@@ -6444,6 +6524,7 @@
   },
   {
     "id": 1001,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Sevgi Qulashi",
@@ -6600,6 +6681,7 @@
   },
   {
     "id": 1002,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Quyoshning Avlodlari",
@@ -6745,6 +6827,7 @@
   },
   {
     "id": 1003,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Dokki",
@@ -6889,6 +6972,7 @@
   },
   {
     "id": 1004,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Itaewon Klassi",
@@ -7032,6 +7116,7 @@
   },
   {
     "id": 1005,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Start-Up",
@@ -7175,6 +7260,7 @@
   },
   {
     "id": 1006,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Sharafli",
@@ -7318,6 +7404,7 @@
   },
   {
     "id": 1007,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Sekretar Kim",
@@ -7463,6 +7550,7 @@
   },
   {
     "id": 1008,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Mening Amakim",
@@ -7604,6 +7692,7 @@
   },
   {
     "id": 1,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "Inception",
@@ -7900,6 +7989,7 @@
   },
   {
     "id": 2,
+    "channelId": "violet-play",
     "categoryName": "actionMovies",
     "title": {
       "uz": "Qora Ritsar",
@@ -8184,6 +8274,7 @@
   },
   {
     "id": 3,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "Dilwale",
@@ -8465,6 +8556,7 @@
   },
   {
     "id": 4,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "3 Ahmoq",
@@ -8587,6 +8679,7 @@
   },
   {
     "id": 5,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Interstellar",
@@ -8707,6 +8800,7 @@
   },
   {
     "id": 6,
+    "channelId": "violet-play",
     "categoryName": "koreaDrama",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -8827,6 +8921,7 @@
   },
   {
     "id": 7,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -8946,6 +9041,7 @@
   },
   {
     "id": 8,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9065,6 +9161,7 @@
   },
   {
     "id": 9,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9184,6 +9281,7 @@
   },
   {
     "id": 10,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9303,6 +9401,7 @@
   },
   {
     "id": 11,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9423,6 +9522,7 @@
   },
   {
     "id": 12,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9543,6 +9643,7 @@
   },
   {
     "id": 13,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9663,6 +9764,7 @@
   },
   {
     "id": 14,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9760,6 +9862,7 @@
   },
   {
     "id": 16,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9880,6 +9983,7 @@
   },
   {
     "id": 17,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -9995,6 +10099,7 @@
   },
   {
     "id": 18,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10115,6 +10220,7 @@
   },
   {
     "id": 19,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10217,6 +10323,7 @@
   },
   {
     "id": 20,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10337,6 +10444,7 @@
   },
   {
     "id": 21,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10457,6 +10565,7 @@
   },
   {
     "id": 22,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10559,6 +10668,7 @@
   },
   {
     "id": 23,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10679,6 +10789,7 @@
   },
   {
     "id": 24,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10781,6 +10892,7 @@
   },
   {
     "id": 25,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -10901,6 +11013,7 @@
   },
   {
     "id": 26,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -11003,6 +11116,7 @@
   },
   {
     "id": 27,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -11105,6 +11219,7 @@
   },
   {
     "id": 28,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -11225,6 +11340,7 @@
   },
   {
     "id": 29,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -11327,6 +11443,7 @@
   },
   {
     "id": 31,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -11447,6 +11564,7 @@
   },
   {
     "id": 32,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -11549,6 +11667,7 @@
   },
   {
     "id": 33,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Shawshank Qutqarilishi",
@@ -11669,6 +11788,7 @@
   },
   {
     "id": 13001,
+    "channelId": "violet-play",
     "categoryName": "retroMovies",
     "title": {
       "uz": "Godfather",
@@ -11786,6 +11906,7 @@
   },
   {
     "id": 13002,
+    "channelId": "violet-play",
     "categoryName": "retroMovies",
     "title": {
       "uz": "Back to the Future",
@@ -11907,6 +12028,7 @@
   },
   {
     "id": 13003,
+    "channelId": "violet-play",
     "categoryName": "retroMovies",
     "title": {
       "uz": "E.T. - O'zga Sayyoralik",
@@ -12028,6 +12150,7 @@
   },
   {
     "id": 13004,
+    "channelId": "violet-play",
     "categoryName": "retroMovies",
     "title": {
       "uz": "Terminator",
@@ -12149,6 +12272,7 @@
   },
   {
     "id": 13005,
+    "channelId": "violet-play",
     "categoryName": "retroMovies",
     "title": {
       "uz": "Dirty Dancing",
@@ -12270,6 +12394,7 @@
   },
   {
     "id": 13006,
+    "channelId": "violet-play",
     "categoryName": "retroMovies",
     "title": {
       "uz": "The Shawshank Redemption",
@@ -12381,6 +12506,7 @@
   },
   {
     "id": 13001,
+    "channelId": "violet-play",
     "categoryName": "retroMovies",
     "title": {
       "uz": "Godfather",
@@ -12498,6 +12624,7 @@
   },
   {
     "id": 12001,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "Titanik",
@@ -12619,6 +12746,7 @@
   },
   {
     "id": 12002,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "Notebook",
@@ -12736,6 +12864,7 @@
   },
   {
     "id": 12003,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "La La Land",
@@ -12857,6 +12986,7 @@
   },
   {
     "id": 12004,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "The Fault in Our Stars",
@@ -12974,6 +13104,7 @@
   },
   {
     "id": 12005,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "Crazy Rich Asians",
@@ -13095,6 +13226,7 @@
   },
   {
     "id": 12006,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "Pride and Prejudice",
@@ -13216,6 +13348,7 @@
   },
   {
     "id": 12001,
+    "channelId": "violet-play",
     "categoryName": "romanceMovies",
     "title": {
       "uz": "Titanik",
@@ -13337,6 +13470,7 @@
   },
   {
     "id": 6001,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Aka",
@@ -13459,6 +13593,7 @@
   },
   {
     "id": 6002,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Leviathan",
@@ -13570,6 +13705,7 @@
   },
   {
     "id": 6003,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Yuqoriga Harakat",
@@ -13693,6 +13829,7 @@
   },
   {
     "id": 6004,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Moskva Yig'lamaydi",
@@ -13815,6 +13952,7 @@
   },
   {
     "id": 6005,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Taqdirning Ironiyasi",
@@ -13941,6 +14079,7 @@
   },
   {
     "id": 6006,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "T-34",
@@ -14063,6 +14202,7 @@
   },
   {
     "id": 6007,
+    "channelId": "violet-play",
     "categoryName": "russianMovies",
     "title": {
       "uz": "Aka",
@@ -14185,6 +14325,7 @@
   },
   {
     "id": 5001,
+    "channelId": "violet-play",
     "categoryName": "turkishSeries",
     "title": {
       "uz": "Ajoyib Asr",
@@ -14393,6 +14534,7 @@
   },
   {
     "id": 5002,
+    "channelId": "violet-play",
     "categoryName": "turkishSeries",
     "title": {
       "uz": "Ertug'rul Qaytishi",
@@ -14581,6 +14723,7 @@
   },
   {
     "id": 5003,
+    "channelId": "violet-play",
     "categoryName": "turkishSeries",
     "title": {
       "uz": "Sevgi Havoda",
@@ -14716,6 +14859,7 @@
   },
   {
     "id": 5004,
+    "channelId": "violet-play",
     "categoryName": "turkishSeries",
     "title": {
       "uz": "Taqiq Qilingan Sevgi",
@@ -14869,6 +15013,7 @@
   },
   {
     "id": 5005,
+    "channelId": "violet-play",
     "categoryName": "turkishSeries",
     "title": {
       "uz": "Qora Gul",
@@ -15018,6 +15163,7 @@
   },
   {
     "id": 5006,
+    "channelId": "violet-play",
     "categoryName": "turkishSeries",
     "title": {
       "uz": "Osmonning Qizi",
@@ -15167,6 +15313,7 @@
   },
   {
     "id": 5007,
+    "channelId": "violet-play",
     "categoryName": "turkishSeries",
     "title": {
       "uz": "Osmonning Qizi",
@@ -15316,6 +15463,7 @@
   },
   {
     "id": 7001,
+    "channelId": "violet-play",
     "categoryName": "tvSeries",
     "title": {
       "uz": "Yomon Kimyoviy",
@@ -15504,6 +15652,7 @@
   },
   {
     "id": 7002,
+    "channelId": "violet-play",
     "categoryName": "tvSeries",
     "title": {
       "uz": "Taxtlar O'yini",
@@ -15731,6 +15880,7 @@
   },
   {
     "id": 7003,
+    "channelId": "violet-play",
     "categoryName": "tvSeries",
     "title": {
       "uz": "Jodugar",
@@ -15893,6 +16043,7 @@
   },
   {
     "id": 7004,
+    "channelId": "violet-play",
     "categoryName": "tvSeries",
     "title": {
       "uz": "Qora Oyna",
@@ -16081,6 +16232,7 @@
   },
   {
     "id": 7005,
+    "channelId": "violet-play",
     "categoryName": "tvSeries",
     "title": {
       "uz": "Sherlock",
@@ -16256,6 +16408,7 @@
   },
   {
     "id": 7006,
+    "channelId": "violet-play",
     "categoryName": "tvSeries",
     "title": {
       "uz": "Stranger Things",
@@ -16444,6 +16597,7 @@
   },
   {
     "id": 7007,
+    "channelId": "violet-play",
     "categoryName": "tvSeries",
     "title": {
       "uz": "Stranger Things",
@@ -16632,6 +16786,7 @@
   },
   {
     "id": 14001,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "Mahallada duv-duv gap",
@@ -16749,6 +16904,7 @@
   },
   {
     "id": 14002,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "Kelgindi qiz",
@@ -16866,6 +17022,7 @@
   },
   {
     "id": 14003,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "Cholpon",
@@ -16982,6 +17139,7 @@
   },
   {
     "id": 14004,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "Qora ko'zlar",
@@ -17099,6 +17257,7 @@
   },
   {
     "id": 14005,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "O'g'il bolalar",
@@ -17215,6 +17374,7 @@
   },
   {
     "id": 14006,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "Tilla qadam",
@@ -17331,6 +17491,7 @@
   },
   {
     "id": 14007,
+    "channelId": "violet-play",
     "categoryName": "uzbekMovies",
     "title": {
       "uz": "Qora ko'zlar",
@@ -17448,6 +17609,7 @@
   },
   {
     "id": 3001,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Rahmat",
@@ -17569,6 +17731,7 @@
   },
   {
     "id": 3002,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Annaatthe",
@@ -17691,6 +17854,7 @@
   },
   {
     "id": 3003,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "55",
@@ -17806,6 +17970,7 @@
   },
   {
     "id": 3004,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Qichqiriq 7",
@@ -17923,6 +18088,7 @@
   },
   {
     "id": 3005,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "GOAT",
@@ -18044,6 +18210,7 @@
   },
   {
     "id": 3006,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Tishsiz 2: Bo'rilar Shahri",
@@ -18165,6 +18332,7 @@
   },
   {
     "id": 3007,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Yordam Yuboring",
@@ -18282,6 +18450,7 @@
   },
   {
     "id": 3008,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Hamnet",
@@ -18403,6 +18572,7 @@
   },
   {
     "id": 3009,
+    "channelId": "violet-play",
     "categoryName": "worldMovies",
     "title": {
       "uz": "Mushuklar va Itlar",

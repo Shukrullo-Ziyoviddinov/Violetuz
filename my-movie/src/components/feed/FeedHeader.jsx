@@ -12,6 +12,8 @@ const FeedHeader = ({ currentUser, followedPeople = [] }) => {
   const openPerson = (person) => {
     if (person.entityType === 'actor') {
       navigate(`/actor/${person.followId}`);
+    } else if (person.entityType === 'channel') {
+      navigate(`/channel/${encodeURIComponent(person.followId)}`);
     } else {
       navigate(`/music/artist/${person.followId}`);
     }

@@ -40,6 +40,7 @@ const NavbarMobile = () => {
   const isMoviesActive = pathname === '/' || pathname.startsWith('/movie/');
   const isShortsActive = pathname === '/shorts' || pathname === '/music/shorts';
   const isProfileActive = pathname === '/profile';
+  const isChannelPage = pathname === '/channel' || pathname.startsWith('/channel/');
 
   const hasSearchQuery = searchQuery.trim().length > 0;
   const isComposing = searchMode === SEARCH_MODE_COMPOSE;
@@ -220,7 +221,7 @@ const NavbarMobile = () => {
 
   return (
     <>
-      <nav className="navbar-mobile">
+      <nav className={`navbar-mobile${isChannelPage ? ' navbar-mobile--channel-page' : ''}`}>
         <button
           className={`navbar-mobile-item ${isHomeActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => navigate('/feed')}

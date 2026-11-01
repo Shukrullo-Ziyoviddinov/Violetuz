@@ -40,6 +40,8 @@ const MODAL_SELECTOR = [
   '.artist-music-story-modal',
   '.music-filter-modal-overlay',
   '.music-filter-modal',
+  '.chanel-biografiya-overlay',
+  '.chanel-biografiya-modal',
   '.video-modal--sheet',
   '.video-modal--desktop',
   '.share-modal-content',

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-/** Obuna: faqat aktyor yoki artist */
-const FOLLOWING_TYPES = Object.freeze(['actor', 'artist']);
+/** Obuna: aktyor, artist yoki kanal. Tur hujjatlarni aralashtirmaydi. */
+const FOLLOWING_TYPES = Object.freeze(['actor', 'artist', 'channel']);
 
 const followingSchema = new mongoose.Schema(
   {
@@ -17,7 +17,7 @@ const followingSchema = new mongoose.Schema(
       enum: FOLLOWING_TYPES,
       index: true,
     },
-    /** Actor (number) yoki Artist (string) id — string sifatida */
+    /** Actor (number), Artist yoki Channel id — string sifatida */
     targetId: {
       type: String,
       required: true,

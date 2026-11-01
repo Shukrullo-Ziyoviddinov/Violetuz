@@ -65,6 +65,15 @@ const movieSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    /**
+     * Kino qaysi kanalga tegishli. channels.json dagi id.
+     */
+    channelId: {
+      type: String,
+      trim: true,
+      default: '',
+      index: true,
+    },
     categoryName: {
       type: String,
       required: true,

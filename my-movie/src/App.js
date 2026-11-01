@@ -19,6 +19,7 @@ import MusicAlbumDetail from './pageMusic/MusicAlbumDetail';
 import MusicMorePage from './pageMusic/MusicMorePage';
 import ArtistDetail from './pageMusic/ArtistDetail';
 import ActorsPage from './pages/ActorsPage';
+import ChanelPage from './pages/ChanelPage';
 import LikeHistoryPage from './pages/LikeHistoryPage';
 import RatingPage from './pages/RatingPage';
 import TrailerPage from './pages/TrailerPage';
@@ -102,6 +103,8 @@ function AppShell() {
             <Route path="/music/video/:id" element={<VideoPage />} />
             <Route path="/music/:id" element={<MusicDetailWithKey />} />
             <Route path="/actor/:id" element={<ActorsPage />} />
+            <Route path="/channel" element={<ChanelPage />} />
+            <Route path="/channel/:id" element={<ChanelPage />} />
             <Route path="/like-history" element={<LikeHistoryPage />} />
             <Route path="/rating-page" element={<RatingPage />} />
           </Routes>

@@ -1,0 +1,82 @@
+.channel-profile-banner {
+  position: relative;
+  width: 100%;
+  height: 196px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1a1a1a;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.channel-profile-banner.is-dragging {
+  cursor: grabbing;
+}
+
+.channel-profile-banner.is-single {
+  cursor: default;
+}
+
+.channel-profile-banner-track {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+}
+
+.channel-profile-banner-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.channel-profile-banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+}
+
+.channel-profile-banner-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.55rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  pointer-events: auto;
+}
+
+.channel-profile-banner-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+}
+
+.channel-profile-banner-dot.is-active {
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .channel-profile-banner {
+    height: 132px;
+    border-radius: 10px;
+  }
+
+  .channel-profile-banner-slide {
+    border-radius: 10px;
+  }
+}

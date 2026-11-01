@@ -260,4 +260,8 @@
   .navbar-mobile-search-input::placeholder {
     color: rgba(255, 255, 255, 0.4);
   }
+
+  .navbar-mobile.navbar-mobile--channel-page {
+    display: none;
+  }
 }

@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
+const { channelHoldsUsername } = require('./channelUsername');
 const AuthOtp = require('../models/AuthOtp.model');
 const DeviceAccountLink = require('../models/DeviceAccountLink.model');
 const { sendOtpEmail } = require('./brevoEmail.service');
@@ -59,7 +60,8 @@ const isUsernameTaken = async (usernameNormalized, excludeUserId = null) => {
     query._id = { $ne: excludeUserId };
   }
   const existing = await User.findOne(query).select('_id').lean();
-  return Boolean(existing);
+  if (existing) return true;
+  return channelHoldsUsername(usernameNormalized);
 };
 
 const checkUsernameAvailability = async (rawUsername, excludeUserId = null) => {

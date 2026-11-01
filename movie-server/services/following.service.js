@@ -2,6 +2,7 @@ const Following = require('../models/Following.model');
 const { FOLLOWING_TYPES } = Following;
 const Actor = require('../models/Actor.model');
 const Artist = require('../models/Artist.model');
+const channelService = require('./channel.service');
 const { badRequest, notFound } = require('../utils/errors');
 
 const stripMongoMeta = (doc) => {
@@ -16,7 +17,7 @@ const assertType = (raw) => {
     .trim()
     .toLowerCase();
   if (!FOLLOWING_TYPES.includes(type)) {
-    throw badRequest(`type faqat actor yoki artist bo‘lishi kerak`, {
+    throw badRequest('type faqat actor, artist yoki channel bo‘lishi kerak', {
       allowedTypes: [...FOLLOWING_TYPES],
     });
   }
@@ -31,7 +32,7 @@ const normalizeTargetId = (id) => {
 };
 
 const toFrontendId = (targetId, type) => {
-  if (type === 'artist') return String(targetId);
+  if (type === 'artist' || type === 'channel') return String(targetId);
   const num = parseInt(targetId, 10);
   return Number.isNaN(num) || String(num) !== String(targetId) ? targetId : num;
 };
@@ -54,6 +55,10 @@ const resolveFollowSnapshot = async (targetId, typeHint = null) => {
 
   if (typeHint) {
     const type = assertType(typeHint);
+    if (type === 'channel') {
+      const snapshot = await channelService.getFollowSnapshot(idStr);
+      return { type, targetId: snapshot.id, snapshot };
+    }
     if (type === 'artist') {
       const artist = await Artist.findOne({ id: idStr }).lean();
       if (!artist) throw notFound(`Artist topilmadi: ${idStr}`);

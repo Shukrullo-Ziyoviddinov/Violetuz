@@ -675,6 +675,16 @@ const validateSearchQuery = (req, _res, next) => {
   next();
 };
 
+const validateChannelIdParam = (req, _res, next) => {
+  const channelId = String(req.params.id || '').trim();
+  if (!channelId) {
+    return next(badRequest('Invalid channel id. It is required.'));
+  }
+
+  req.params.id = channelId;
+  next();
+};
+
 module.exports = {
   validateMovieIdParam,
   validateCategoryParam,
@@ -716,4 +726,5 @@ module.exports = {
   validateMusicShortListQuery,
   validateMusicBannerIdParam,
   validateSearchQuery,
+  validateChannelIdParam,
 };

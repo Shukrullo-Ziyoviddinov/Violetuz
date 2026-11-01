@@ -6,6 +6,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "seed:movies": "node seeds/seedMovies.js",
+    "seed:channels": "node seeds/seedChannels.js",
     "seed:music": "node seeds/seedMusic.js",
     "seed:albums": "node seeds/seedAlbums.js",
     "seed:clips": "node seeds/seedClips.js",

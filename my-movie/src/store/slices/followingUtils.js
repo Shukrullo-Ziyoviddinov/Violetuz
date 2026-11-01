@@ -1,5 +1,9 @@
 export const FOLLOWING_STORAGE_KEY = 'violet_following_artists';
 
+export const FOLLOW_TYPES = ['actor', 'artist', 'channel'];
+
+export const normalizeFollowType = (type) => (FOLLOW_TYPES.includes(type) ? type : null);
+
 export const sameFollowId = (a, b) => String(a) === String(b);
 
 export const loadLegacyFollowingIds = () => {
@@ -34,7 +38,7 @@ const normalizeEntries = (following = []) =>
     if (x != null && typeof x === 'object' && x.id != null) {
       return {
         id: String(x.id),
-        type: x.type === 'actor' || x.type === 'artist' ? x.type : null,
+        type: normalizeFollowType(x.type),
       };
     }
     return { id: String(x), type: null };
@@ -83,7 +87,24 @@ export const getFollowedPeople = (following = [], lang = 'uz', actorsList = [], 
       }))
   );
 
-  return [...followedActors, ...followedArtists];
+  const followedChannels = uniqueById(
+    (Array.isArray(following) ? following : [])
+      .filter((row) => row && typeof row === 'object' && row.type === 'channel' && row.id != null)
+      .map((row) => {
+        const snap = row.snapshot && typeof row.snapshot === 'object' ? row.snapshot : {};
+        return {
+          id: `channel-${row.id}`,
+          followId: row.id,
+          entityType: 'channel',
+          name: snap.name || '',
+          image: snap.avatar || '/img/newlogo.jpg',
+          subscribers: snap.subscribers ?? 0,
+          type: 'Kanal',
+        };
+      })
+  );
+
+  return [...followedActors, ...followedArtists, ...followedChannels];
 };
 
 /** Feed header — obuna bo'lganlar avatari */
@@ -158,6 +179,15 @@ export const getFeedHeaderFromFollowingItems = (followingItems = [], lang = 'uz'
           entityType: 'artist',
           name: snap.name || '',
           image: snap.imgArtist || snap.img || '/img/movie1.jpg',
+        };
+      }
+      if (row.type === 'channel') {
+        return {
+          key: `channel-${row.id}`,
+          followId: row.id,
+          entityType: 'channel',
+          name: snap.name || '',
+          image: snap.avatar || '/img/newlogo.jpg',
         };
       }
       return null;

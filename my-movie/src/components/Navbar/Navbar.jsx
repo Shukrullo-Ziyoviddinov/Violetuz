@@ -29,6 +29,7 @@ const Navbar = () => {
   const isShortsPage =
     location.pathname === '/shorts' || location.pathname === '/music/shorts';
   const isProfilePage = location.pathname === '/profile';
+  const isChannelProfile = /^\/channel\/[^/]+$/.test(location.pathname);
   const isMovieDetailPage = /^\/movie\/\d+$/.test(location.pathname);
   const isMusicDetailPage = /^\/music\/\d+$/.test(location.pathname);
   const isVideoDetailPage = /^\/music\/video\/[^/]+$/.test(location.pathname);
@@ -253,8 +254,9 @@ const Navbar = () => {
 
   return (
     <>
-    <nav className={`navbar${isProfilePage ? ' navbar--profile-page' : ''}${isFeedPage ? ' navbar--feed-page' : ''}${hideTopNavbarOnMobile ? ' navbar--hide-mobile-top' : ''}`}>
+    <nav className={`navbar${isProfilePage ? ' navbar--profile-page' : ''}${isFeedPage ? ' navbar--feed-page' : ''}${isChannelProfile ? ' navbar--channel-profile' : ''}${hideTopNavbarOnMobile ? ' navbar--hide-mobile-top' : ''}`}>
       <div className="navbar-container">
+        {isChannelProfile ? <div id="navbar-channel-identity" className="navbar-channel-identity" /> : null}
         <div className="navbar-left">
           <div className="navbar-logo" onClick={() => navigate('/')}>
             <img
@@ -425,6 +427,16 @@ const Navbar = () => {
           >
             <i className="fa-solid fa-bell" aria-hidden="true" />
           </button>
+
+          {isChannelProfile ? (
+            <button
+              type="button"
+              className="navbar-mobile-action-btn navbar-channel-more-btn"
+              aria-label={t('navbar.more', 'Yana')}
+            >
+              <i className="fa-solid fa-ellipsis-vertical" aria-hidden="true" />
+            </button>
+          ) : null}
         </div>
 
         {isProfilePage && (

@@ -247,6 +247,8 @@ const ProfilePage = () => {
     if (!person) return;
     if (person.entityType === 'actor') {
       navigate(`/actor/${person.followId}`);
+    } else if (person.entityType === 'channel') {
+      navigate(`/channel/${encodeURIComponent(person.followId)}`);
     } else {
       navigate(`/music/artist/${person.followId}`);
     }
@@ -550,7 +552,11 @@ const ProfilePage = () => {
                 </div>
                 <FollowingButton
                   artistId={person.followId}
-                  entityType={person.entityType === 'actor' ? 'actor' : 'artist'}
+                  entityType={
+                    person.entityType === 'actor' || person.entityType === 'channel'
+                      ? person.entityType
+                      : 'artist'
+                  }
                   wrapperClassName="profile-following-action"
                   stopPropagation
                 />
