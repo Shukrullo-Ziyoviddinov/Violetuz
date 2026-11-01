@@ -14,6 +14,7 @@ import MovieSoundtracks from './MovieSoundtracks';
 import MovieSoundtrackClips from './MovieSoundtrackClips';
 import MovieDetailForYou from './MovieDetailForYou';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
+import ChanelDetailProfile from '../Chanel/ChanelDetailProfile';
 import ImgModal from '../ImgModal/ImgModal';
 import VideoModal from '../VideoModal/VideoModal';
 import ShareButton from '../ShareButton/ShareButton';
@@ -1884,6 +1885,8 @@ const MovieDetail = () => {
                   </button>
                 </div>
               </ScrollTouch>
+
+              {movie.channelId ? <ChanelDetailProfile channelId={movie.channelId} /> : null}
 
               <div
                 className={`movie-detail-description${

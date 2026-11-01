@@ -7,6 +7,16 @@ const musicSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    /**
+     * Trek qaysi kanalga tegishli. channels.json dagi id.
+     * Bo'sh bo'lsa kanal profiliga chiqmaydi.
+     */
+    channelId: {
+      type: String,
+      trim: true,
+      default: '',
+      index: true,
+    },
     categoryNameMusic: {
       type: String,
       required: true,

@@ -6,6 +6,8 @@ import { fetchAllChannels, fetchChannelById } from '../api/channelsApi';
 import { requestOpenSearchModal } from '../searchModalBridge';
 import ChanelBiografiyaModal from '../components/Chanel/ChanelBiografiyaModal';
 import ChanelProfileBanner from '../components/Chanel/ChanelProfileBanner';
+import ChanelTypeFilter from '../components/Chanel/ChanelTypeFilter';
+import ChanelContent from '../components/Chanel/ChanelContent';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import { useIsFollowing } from '../context/FollowingContext';
 import { useDominantColor } from '../hooks/useDominantColor';
@@ -71,6 +73,9 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
   const { t, i18n } = useTranslation();
   const [navSlot, setNavSlot] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [contentFilter, setContentFilter] = useState('all');
+  const [backIdentity, setBackIdentity] = useState(false);
+  const [backScrolled, setBackScrolled] = useState(false);
   const swapLock = useRef(false);
   const swapTimer = useRef(0);
   const preview = String(channel.biografiya?.text || '').replace(/\s+/g, ' ').trim();
@@ -93,6 +98,39 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
     window.clearTimeout(swapTimer.current);
     clearChannelViewClasses();
   }, []);
+
+  useEffect(() => {
+    if (!profileOpen) {
+      setBackIdentity(false);
+      setBackScrolled(false);
+      return undefined;
+    }
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const scrolled = window.scrollY > 8;
+      setBackScrolled((current) => (current === scrolled ? current : scrolled));
+      const filter = document.querySelector('.channel-profile .chanel-type-filter');
+      const back = document.querySelector('.channel-profile-back');
+      if (!filter || !back) return;
+      const reached = filter.getBoundingClientRect().top <= back.getBoundingClientRect().bottom + 1;
+      setBackIdentity((current) => (current === reached ? current : reached));
+    };
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [profileOpen]);
 
   const swapView = (nextOpen) => {
     if (swapLock.current || window.innerWidth > MOBILE_NAV_MAX || nextOpen === profileOpen) return;
@@ -122,7 +160,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
         <ChannelNavbarIdentity channel={channel} onOpen={() => swapView(true)} />,
         navSlot
       ) : null}
-      <div className="channel-profile-back">
+      <div className={`channel-profile-back${backScrolled ? ' is-scrolled' : ''}`}>
         <button
           type="button"
           className="channel-profile-back-btn"
@@ -131,6 +169,22 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
         >
           <i className="fa-solid fa-angle-left" aria-hidden="true" />
         </button>
+        <div className={`channel-profile-back-identity${backIdentity ? ' is-visible' : ''}`} aria-hidden={!backIdentity}>
+          <div className="channel-profile-back-id-avatar">
+            {channel.avatar ? (
+              <img src={channel.avatar} alt="" />
+            ) : (
+              <span aria-hidden="true">{String(channel.name || '?').slice(0, 1)}</span>
+            )}
+          </div>
+          <div className="channel-profile-back-id-text">
+            <p className="channel-profile-back-id-name">{channel.name}</p>
+            <div className="channel-profile-back-id-handle">
+              {username ? <span>{username}</span> : null}
+              <span>{formatCount(displaySubscribers)} {subscriberLabel}</span>
+            </div>
+          </div>
+        </div>
         <div className="channel-profile-back-actions">
           <button
             type="button"
@@ -179,6 +233,8 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
           </div>
         </div>
       </div>
+      <ChanelTypeFilter value={contentFilter} onChange={setContentFilter} />
+      <ChanelContent channelId={channel.id} filter={contentFilter} />
     </article>
   );
 };

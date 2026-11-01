@@ -1,6 +1,7 @@
 [
   {
     "id": 801,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -17,6 +18,7 @@
   },
   { 
     "id": 802,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -33,6 +35,7 @@
   },
   { 
     "id": 803,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-1.avif",
@@ -48,6 +51,7 @@
   }, 
   {
     "id": 804,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -63,6 +67,7 @@
   },
   {
     "id": 805,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie-4.5-2.jpeg",
@@ -78,6 +83,7 @@
   },
   {
     "id": 806,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie-4.5-3.jpg",
@@ -93,6 +99,7 @@
   },
   {
     "id": 807,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "michael-jackson",
     "img": "/img/movie1.jpg",
@@ -108,6 +115,7 @@
   },
   {
     "id": 808,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie2.jpg",
@@ -123,6 +131,7 @@
   },
   {
     "id": 809,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -138,6 +147,7 @@
   },
   {
     "id": 810,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-1.avif",
@@ -153,6 +163,7 @@
   },
   {
     "id": 811,
+    "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -168,6 +179,7 @@
   },
   {
     "id": 501,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -183,6 +195,7 @@
   },
   {
     "id": 502,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -198,6 +211,7 @@
   },
   {
     "id": 503,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -213,6 +227,7 @@
   },
   {
     "id": 504,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-1.avif",
@@ -228,6 +243,7 @@
   },
   {
     "id": 505,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -243,6 +259,7 @@
   },
   {
     "id": 506,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -258,6 +275,7 @@
   },
   {
     "id": 507,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie-4.5-2.jpeg",
@@ -273,6 +291,7 @@
   },
   {
     "id": 508,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-3.jpg",
@@ -288,6 +307,7 @@
   },
   {
     "id": 509,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie2.jpg",
@@ -303,6 +323,7 @@
   },
   {
     "id": 510,
+    "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -318,6 +339,7 @@
   },
   {
     "id": 701,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -333,6 +355,7 @@
   },
   {
     "id": 702,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -348,6 +371,7 @@
   },
   {
     "id": 703,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-1.avif",
@@ -363,6 +387,7 @@
   },
   {
     "id": 704,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -378,6 +403,7 @@
   },
   {
     "id": 705,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "shohruhxon",
     "img": "/img/movie-4.5-2.jpeg",
@@ -393,6 +419,7 @@
   },
   {
     "id": 706,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "jah-khalib",
     "img": "/img/movie-4.5-3.jpg",
@@ -408,6 +435,7 @@
   },
   {
     "id": 707,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "michael-jackson",
     "img": "/img/movie1.jpg",
@@ -423,6 +451,7 @@
   },
   {
     "id": 708,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "shohruhxon",
     "img": "/img/movie2.jpg",
@@ -438,6 +467,7 @@
   },
   {
     "id": 709,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -453,6 +483,7 @@
   },
   {
     "id": 710,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-1.avif",
@@ -468,6 +499,7 @@
   },
   {
     "id": 711,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -483,6 +515,7 @@
   },
   {
     "id": 601,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -498,6 +531,7 @@
   },
   {
     "id": 602,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -513,6 +547,7 @@
   },
   {
     "id": 603,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-1.avif",
@@ -528,6 +563,7 @@
   },
   {
     "id": 604,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -543,6 +579,7 @@
   },
   {
     "id": 605,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -558,6 +595,7 @@
   },
   {
     "id": 606,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "jah-khalib",
     "img": "/img/jah-khalib.jpg",
@@ -573,6 +611,7 @@
   },
   {
     "id": 607,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-2.jpeg",
@@ -588,6 +627,7 @@
   },
   {
     "id": 608,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "shohruhxon",
     "img": "/img/movie2.jpg",
@@ -603,6 +643,7 @@
   },
   {
     "id": 609,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "jah-khalib",
     "img": "/img/movie-4.5-3.jpg",
@@ -618,6 +659,7 @@
   },
   {
     "id": 610,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
     "artistId": "michael-jackson",
     "img": "/img/movie-4.5-1.avif",
@@ -633,6 +675,7 @@
   },
   {
     "id": 901,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "maher-zain",
     "img": "/img/nasheedsimg1.jpg",
@@ -648,6 +691,7 @@
   },
   {
     "id": 902,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "sami-yusuf",
     "img": "/img/nasheedsimg2.jpg",
@@ -663,6 +707,7 @@
   },
   {
     "id": 903,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "maher-zain",
     "img": "/img/nasheedsimg3.jpg",
@@ -678,6 +723,7 @@
   },
   {
     "id": 904,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "sami-yusuf",
     "img": "/img/nasheedsimg4.jpg",
@@ -693,6 +739,7 @@
   },
   {
     "id": 905,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "maher-zain",
     "img": "/img/nasheedsimg5.jpg",
@@ -708,6 +755,7 @@
   },
   {
     "id": 906,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "sami-yusuf",
     "img": "/img/nasheedsimg6.jpg",
@@ -723,6 +771,7 @@
   },
   {
     "id": 907,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "maher-zain",
     "img": "/img/nasheedsimg7.jpg",
@@ -738,6 +787,7 @@
   },
   {
     "id": 908,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "sami-yusuf",
     "img": "/img/nasheedsimg8.jpg",
@@ -753,6 +803,7 @@
   },
   {
     "id": 909,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "maher-zain",
     "img": "/img/nasheedsimg9.jpg",
@@ -768,6 +819,7 @@
   },
   {
     "id": 910,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "sami-yusuf",
     "img": "/img/nasheedsimg10.jpg",
@@ -783,6 +835,7 @@
   },
   {
     "id": 911,
+    "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
     "artistId": "maher-zain",
     "img": "/img/nasheedsimg11.jpg",
@@ -798,6 +851,7 @@
   },
   {
     "id": 101,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/TheWeeknd_Banner_Mobile.webp",
@@ -813,6 +867,7 @@
   },
   {
     "id": 103,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "shohruhxon",
     "img": "/img/movie1.jpg",
@@ -828,6 +883,7 @@
   },
   {
     "id": 104,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -843,6 +899,7 @@
   },
   {
     "id": 105,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie-4.5-2.jpeg",
@@ -858,6 +915,7 @@
   },
   {
     "id": 106,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie5.jpg",
@@ -873,6 +931,7 @@
   },
   {
     "id": 107,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -888,6 +947,7 @@
   },
   {
     "id": 108,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -903,6 +963,7 @@
   },
   {
     "id": 109,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -918,6 +979,7 @@
   },
   {
     "id": 1010,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -933,6 +995,7 @@
   },
   {
     "id": 1011,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -948,6 +1011,7 @@
   },
   {
     "id": 1012,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -963,6 +1027,7 @@
   },
   {
     "id": 1013,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -978,6 +1043,7 @@
   },
   {
     "id": 1014,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -993,6 +1059,7 @@
   },
   {
     "id": 1015,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -1008,6 +1075,7 @@
   },
   {
     "id": 1016,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -1023,6 +1091,7 @@
   },
   {
     "id": 1017,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
@@ -1038,6 +1107,7 @@
   },
   {
     "id": 1018,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
     "artistId": "jah-khalib",
     "img": "/img/movie2.jpg",
