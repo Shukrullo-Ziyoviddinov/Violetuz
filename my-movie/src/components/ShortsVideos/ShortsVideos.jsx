@@ -295,6 +295,8 @@ const ShortsVideos = ({
   const [slideState, setSlideState] = useState(null);
   const slideTimeoutRef = useRef(null);
   const slideRafRef = useRef(null);
+  const slideBusyRef = useRef(false);
+  const wheelLockRef = useRef(0);
 
   const modalVideoRef = useRef(null);
   const desktopVideoRefs = useRef(new Map());
@@ -327,6 +329,7 @@ const ShortsVideos = ({
   useEffect(() => () => {
     if (slideTimeoutRef.current) clearTimeout(slideTimeoutRef.current);
     if (slideRafRef.current) cancelAnimationFrame(slideRafRef.current);
+    slideBusyRef.current = false;
   }, []);
 
   // Open modal at startIndex when provided (e.g. from /shorts?startIndex=2)
@@ -560,7 +563,7 @@ const ShortsVideos = ({
 
   // Desktop: animatsiya bilan o'tish
   const desktopNavigate = useCallback((direction) => {
-    if (slideState || shortsList.length < 2) return;
+    if (slideBusyRef.current || slideState || shortsList.length < 2) return;
 
     const count = shortsList.length;
     const linearPlay = recoEnabled || artistSeqMode;
@@ -571,6 +574,7 @@ const ShortsVideos = ({
       ? (linearPlay ? activeIndex + 1 : (activeIndex + 1) % count)
       : (linearPlay ? activeIndex - 1 : (activeIndex - 1 + count) % count);
     if (toIndex === activeIndex) return;
+    slideBusyRef.current = true;
 
     const nextVideo = desktopVideoRefs.current.get(toIndex);
     if (nextVideo) {
@@ -594,6 +598,7 @@ const ShortsVideos = ({
             : current
         ));
         slideTimeoutRef.current = setTimeout(() => {
+          slideBusyRef.current = false;
           setActiveIndex(toIndex);
           setSlideState(null);
         }, SLIDE_DURATION);
@@ -608,6 +613,10 @@ const ShortsVideos = ({
 
   const goPrev = useCallback(() => desktopNavigate('up'), [desktopNavigate]);
   const goNext = useCallback(() => desktopNavigate('down'), [desktopNavigate]);
+  const goPrevRef = useRef(goPrev);
+  const goNextRef = useRef(goNext);
+  goPrevRef.current = goPrev;
+  goNextRef.current = goNext;
 
   const handleMobileIndexChange = useCallback((newIndex) => {
     if (newIndex < 0 || newIndex >= shortsList.length) return;
@@ -630,6 +639,49 @@ const ShortsVideos = ({
       video.muted = true;
     });
   }, [modalVideoMuted]);
+  const mobileCommitRef = useRef(handleMobileCommit);
+  const mobileIndexRef = useRef(handleMobileIndexChange);
+  mobileCommitRef.current = handleMobileCommit;
+  mobileIndexRef.current = handleMobileIndexChange;
+
+  useEffect(() => {
+    if (!modalOpen) return undefined;
+    let accum = 0;
+    let accumAt = 0;
+    const onWheel = (event) => {
+      const node = event.target;
+      if (!(node instanceof Element) || !node.closest('.shorts-modal-overlay')) return;
+      if (node.closest('.shorts-comments-list, .shorts-comments-modal-body, .shorts-comments-input, .shorts-share-body, .shorts-music-modal')) return;
+      const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+      if (Math.abs(event.deltaX) > Math.abs(delta)) return;
+      event.preventDefault();
+      const now = performance.now();
+      if (now < wheelLockRef.current) return;
+      if (now - accumAt > 160) accum = 0;
+      accum += delta;
+      accumAt = now;
+      if (Math.abs(accum) < 48) return;
+      const direction = accum > 0 ? 'down' : 'up';
+      const list = shortsListRef.current;
+      const index = activeIndexRef.current;
+      const linear = recoEnabled || artistSeqMode;
+      if (list.length < 2) return;
+      if (direction === 'up' && linear && index <= 0) return;
+      if (direction === 'down' && linear && index >= list.length - 1) return;
+      accum = 0;
+      wheelLockRef.current = now + 640;
+      if (window.innerWidth <= MOBILE_BREAKPOINT) {
+        const next = direction === 'down' ? index + 1 : index - 1;
+        mobileCommitRef.current(next);
+        mobileIndexRef.current(next);
+        return;
+      }
+      if (direction === 'down') goNextRef.current();
+      else goPrevRef.current();
+    };
+    window.addEventListener('wheel', onWheel, { passive: false, capture: true });
+    return () => window.removeEventListener('wheel', onWheel, { capture: true });
+  }, [modalOpen, recoEnabled, artistSeqMode]);
 
   const openModal = useCallback((index) => {
     const item = gridListRef.current[index];
@@ -648,6 +700,7 @@ const ShortsVideos = ({
     setModalOpen(false);
     setOpenedFocus(null);
     recoOpenedRef.current = null;
+    slideBusyRef.current = false;
     setSlideState(null);
     setMusicModalOpen(false);
     setModalVideoMuted(false);
