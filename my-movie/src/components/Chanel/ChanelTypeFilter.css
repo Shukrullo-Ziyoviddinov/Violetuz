@@ -1,12 +1,79 @@
+.chanel-type-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  margin-top: 1rem;
+}
+
 .chanel-type-filter {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
   gap: 0.45rem;
+  flex: 1 1 auto;
   width: 100%;
   min-width: 0;
-  margin-top: 1rem;
+  margin-top: 0;
+  padding-right: 10.4rem;
   box-sizing: border-box;
+}
+
+.chanel-type-search {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  z-index: 2;
+  display: block;
+  width: 9.5rem;
+  transform: translateY(-50%);
+  background: #000;
+}
+
+.chanel-type-search::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 1.25rem;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0), #000);
+  pointer-events: none;
+}
+
+.chanel-type-search input {
+  display: block;
+  width: 100%;
+  height: 27px;
+  margin: 0;
+  padding: 0 1.7rem 0 0.7rem;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  outline: none;
+}
+
+.chanel-type-search input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.chanel-type-search input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.chanel-type-search i {
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.72rem;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .chanel-type-filter-chip {
@@ -27,4 +94,14 @@
   background: #1e03d24d;
   border-color: #1f16cc99;
   color: #fff;
+}
+
+@media (max-width: 768px) {
+  .chanel-type-filter {
+    padding-right: 0;
+  }
+
+  .chanel-type-search {
+    display: none;
+  }
 }

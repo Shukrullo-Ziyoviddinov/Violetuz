@@ -33,29 +33,42 @@ const ChanelContent = ({ channelId, filter = 'all' }) => {
   if (!items.length) return null;
 
   const layout = filter === 'all' ? 'row' : 'grid';
-  const cards = items.map((entry) => (
+  const renderCard = (entry, cardLayout) => (
     entry.kind === 'short' ? (
-      <ChanelShortCard key={entry.key} item={entry.item} layout={layout} />
+      <ChanelShortCard key={entry.key} item={entry.item} layout={cardLayout} />
     ) : (
       <ChanelContentCard
         key={entry.key}
         kind={entry.kind}
         item={entry.item}
-        layout={layout}
+        layout={cardLayout}
       />
     )
-  ));
+  );
+
+  if (filter === 'all') {
+    const mainCards = items.filter((entry) => entry.kind !== 'short').map((entry) => renderCard(entry, 'row'));
+    const shortCards = items.filter((entry) => entry.kind === 'short').map((entry) => renderCard(entry, 'row'));
+    return (
+      <>
+        {mainCards.length ? (
+          <div className="chanel-content-row">
+            <HorizontalScroll>{mainCards}</HorizontalScroll>
+          </div>
+        ) : null}
+        {shortCards.length ? (
+          <div className="chanel-content-row">
+            <HorizontalScroll>{shortCards}</HorizontalScroll>
+          </div>
+        ) : null}
+      </>
+    );
+  }
+
+  const cards = items.map((entry) => renderCard(entry, layout));
 
   if (filter === 'shorts') {
     return <div className="chanel-content-shorts">{cards}</div>;
-  }
-
-  if (layout === 'row') {
-    return (
-      <div className="chanel-content-row">
-        <HorizontalScroll>{cards}</HorizontalScroll>
-      </div>
-    );
   }
 
   return <div className="chanel-content-grid">{cards}</div>;

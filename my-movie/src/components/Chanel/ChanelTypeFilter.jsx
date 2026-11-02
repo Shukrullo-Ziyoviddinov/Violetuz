@@ -21,20 +21,26 @@ const ChanelTypeFilter = ({ value, onChange }) => {
   };
 
   return (
-    <ScrollTouch className="chanel-type-filter" role="tablist" aria-label="Kanal turlari">
-      {CHANNEL_TYPES.map((type) => (
-        <button
-          key={type.id}
-          type="button"
-          role="tab"
-          aria-selected={selected === type.id}
-          className={`chanel-type-filter-chip${selected === type.id ? ' is-active' : ''}`}
-          onClick={() => select(type.id)}
-        >
-          {type.label}
-        </button>
-      ))}
-    </ScrollTouch>
+    <div className="chanel-type-bar">
+      <ScrollTouch className="chanel-type-filter" role="tablist" aria-label="Kanal turlari">
+        {CHANNEL_TYPES.map((type) => (
+          <button
+            key={type.id}
+            type="button"
+            role="tab"
+            aria-selected={selected === type.id}
+            className={`chanel-type-filter-chip${selected === type.id ? ' is-active' : ''}`}
+            onClick={() => select(type.id)}
+          >
+            {type.label}
+          </button>
+        ))}
+      </ScrollTouch>
+      <label className="chanel-type-search">
+        <input type="text" aria-label="Qidirish" placeholder="Qidirish..." />
+        <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+      </label>
+    </div>
   );
 };
 
