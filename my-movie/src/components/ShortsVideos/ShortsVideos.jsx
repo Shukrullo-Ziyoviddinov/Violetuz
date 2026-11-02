@@ -266,11 +266,20 @@ const ShortsVideos = ({
   const shortsList = useMemo(() => {
     if (artistSeq) return artistSeqList;
     if (!recoEnabled) return gridList;
+    if (recoList && recoList.length > 1) return recoList;
+    if (openedItem && gridList.length) {
+      const rest = gridList.filter((item) => (
+        item.type !== openedItem.type || String(item.id) !== String(openedItem.id)
+      ));
+      return [openedItem, ...rest];
+    }
     if (recoList && recoList.length) return recoList;
     if (openedItem) return [openedItem];
     return [];
   }, [artistSeq, artistSeqList, recoEnabled, gridList, recoList, openedItem]);
-  const [isMobileView, setIsMobileView] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT
+  );
   const [activeIndex, setActiveIndex] = useState(startIndex ?? 0);
   shortsListRef.current = shortsList;
   gridListRef.current = gridList;

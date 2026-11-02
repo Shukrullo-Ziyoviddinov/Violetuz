@@ -30,6 +30,7 @@ const VertikalDrag = ({
 
   const [dragY, setDragY] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const isAnimatingRef = useRef(false);
 
   activeIndexRef.current = activeIndex;
 
@@ -40,15 +41,22 @@ const VertikalDrag = ({
   }, [activeIndex, isAnimating]);
 
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return undefined;
     const updateHeight = () => {
-      if (!containerRef.current) return;
-      const h = containerRef.current.clientHeight;
+      const h = el.clientHeight;
+      if (!h) return;
       wrapperHeightRef.current = h;
-      setContainerHeight(h);
+      setContainerHeight((prev) => (prev === h ? prev : h));
     };
     updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(el);
     window.addEventListener('resize', updateHeight);
-    return () => window.removeEventListener('resize', updateHeight);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateHeight);
+    };
   }, []);
 
   useEffect(() => () => {
@@ -66,19 +74,14 @@ const VertikalDrag = ({
   }, []);
 
   const handleTouchStart = useCallback((e) => {
-    if (isAnimating) return;
-
-    if (commitTimeoutRef.current) {
-      clearTimeout(commitTimeoutRef.current);
-      commitTimeoutRef.current = null;
-    }
+    if (isAnimatingRef.current) return;
 
     touchStartY.current = e.touches[0].clientY;
     lastY.current = touchStartY.current;
     lastTime.current = performance.now();
     velocity.current = 0;
     isDragging.current = true;
-  }, [isAnimating]);
+  }, []);
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging.current || touchStartY.current === null) return;
@@ -125,10 +128,12 @@ const VertikalDrag = ({
     }
 
     if (direction === 0) {
+      isAnimatingRef.current = true;
       setIsAnimating(true);
       dragYRef.current = 0;
       setDragY(0);
       commitTimeoutRef.current = window.setTimeout(() => {
+        isAnimatingRef.current = false;
         setIsAnimating(false);
         resetDrag();
       }, TRANSITION_MS);
@@ -138,11 +143,13 @@ const VertikalDrag = ({
     const newIndex = activeIndexRef.current - direction;
     onCommitIndex?.(newIndex);
 
+    isAnimatingRef.current = true;
     setIsAnimating(true);
     dragYRef.current = direction === -1 ? -height : height;
     setDragY(direction === -1 ? -height : height);
 
     commitTimeoutRef.current = window.setTimeout(() => {
+      isAnimatingRef.current = false;
       setIsAnimating(false);
       dragYRef.current = 0;
       setDragY(0);
