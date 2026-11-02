@@ -672,6 +672,23 @@ const validateSearchQuery = (req, _res, next) => {
     req.query.limit = limit;
   }
 
+  if (req.query.channelId != null) {
+    const channelId = String(req.query.channelId).trim();
+    if (!channelId || channelId.length > 80) {
+      return next(badRequest('Invalid channelId.'));
+    }
+    req.query.channelId = channelId;
+  }
+
+  if (req.query.channelType != null) {
+    const channelType = String(req.query.channelType).trim();
+    const allowed = ['all', 'movies', 'videos', 'shorts', 'playlists', 'posts'];
+    if (channelType && !allowed.includes(channelType)) {
+      return next(badRequest(`channelType must be one of: ${allowed.join(', ')}`));
+    }
+    req.query.channelType = channelType || 'all';
+  }
+
   next();
 };
 

@@ -1,5 +1,6 @@
 .chanel-type-bar {
   position: relative;
+  z-index: 4;
   display: flex;
   align-items: center;
   width: 100%;
@@ -69,11 +70,65 @@
 .chanel-type-search i {
   position: absolute;
   right: 0.55rem;
-  top: 50%;
+  top: 13.5px;
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.72rem;
   transform: translateY(-50%);
   pointer-events: none;
+}
+
+.chanel-type-search-results {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  z-index: 5;
+  width: 18rem;
+  max-height: 18rem;
+  overflow: auto;
+  padding: 0.35rem;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: #111;
+}
+
+.chanel-type-search-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.4rem 0.45rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chanel-type-search-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chanel-type-search-kind {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.68rem;
+}
+
+.chanel-type-search-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.chanel-type-search-empty {
+  margin: 0;
+  padding: 0.45rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8rem;
 }
 
 .chanel-type-filter-chip {

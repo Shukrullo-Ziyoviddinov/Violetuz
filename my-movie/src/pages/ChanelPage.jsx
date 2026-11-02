@@ -74,6 +74,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
   const [navSlot, setNavSlot] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [contentFilter, setContentFilter] = useState('all');
+  const [genreId, setGenreId] = useState(null);
   const [backIdentity, setBackIdentity] = useState(false);
   const [backScrolled, setBackScrolled] = useState(false);
   const swapLock = useRef(false);
@@ -233,8 +234,14 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
           </div>
         </div>
       </div>
-      <ChanelTypeFilter value={contentFilter} onChange={setContentFilter} />
-      <ChanelContent channelId={channel.id} filter={contentFilter} />
+      <ChanelTypeFilter
+        value={contentFilter}
+        onChange={setContentFilter}
+        channelId={channel.id}
+        genreId={genreId}
+        onGenreChange={setGenreId}
+      />
+      <ChanelContent channelId={channel.id} filter={contentFilter} genreId={genreId} />
     </article>
   );
 };

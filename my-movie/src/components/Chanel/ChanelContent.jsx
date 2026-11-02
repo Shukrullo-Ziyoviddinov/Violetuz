@@ -5,12 +5,13 @@ import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ChanelContentCard from './ChanelContentCard';
 import ChanelShortCard from './ChanelShortCard';
 import { sortByUploadedAtDesc } from './sortByUploadedAt';
+import { movieMatchesGenre } from './channelGenre';
 import './ChanelContent.css';
 
 const sameChannel = (item, channelId) => String(item?.channelId || '') === String(channelId || '');
 
-const ChanelContent = ({ channelId, filter = 'all' }) => {
-  const { allMovies, allShortsVideos } = useMoviesApi();
+const ChanelContent = ({ channelId, filter = 'all', genreId = null }) => {
+  const { allMovies, allShortsVideos, allGenres } = useMoviesApi();
   const { allMusic } = useMusicApi();
 
   const items = useMemo(() => {
@@ -21,6 +22,11 @@ const ChanelContent = ({ channelId, filter = 'all' }) => {
       .filter((track) => sameChannel(track, channelId))
       .map((track) => ({ kind: 'music', key: `music-${track.id}`, item: track }));
     const shorts = (allShortsVideos || []).filter((short) => sameChannel(short, channelId));
+    const genre = genreId ? (allGenres || []).find((item) => item.id === genreId) : null;
+
+    if (genre) {
+      return sortByUploadedAtDesc(movies.filter((movie) => movieMatchesGenre(movie, genre))).map(toMovie);
+    }
 
     if (filter === 'movies') return sortByUploadedAtDesc(movies).map(toMovie);
     if (filter === 'videos') return [];
@@ -28,7 +34,7 @@ const ChanelContent = ({ channelId, filter = 'all' }) => {
     if (filter === 'playlists') return [];
     if (filter === 'posts') return [];
     return [...movies.map(toMovie), ...music, ...shorts.map(toShort)];
-  }, [allMovies, allMusic, allShortsVideos, channelId, filter]);
+  }, [allMovies, allMusic, allShortsVideos, allGenres, channelId, filter, genreId]);
 
   if (!items.length) return null;
 
@@ -45,6 +51,10 @@ const ChanelContent = ({ channelId, filter = 'all' }) => {
       />
     )
   );
+
+  if (genreId) {
+    return <div className="chanel-content-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
+  }
 
   if (filter === 'all') {
     const mainCards = items.filter((entry) => entry.kind !== 'short').map((entry) => renderCard(entry, 'row'));

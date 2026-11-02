@@ -52,6 +52,8 @@ export const fetchSearchResults = async (query, lang = 'uz', options = {}) => {
     params.set('cursor', String(options.cursor));
   }
   if (options.limit != null) params.set('limit', String(options.limit));
+  if (options.channelId) params.set('channelId', String(options.channelId));
+  if (options.channelType) params.set('channelType', String(options.channelType));
 
   const res = await fetch(`${API_BASE_URL}/search?${params.toString()}`, {
     credentials: 'include',

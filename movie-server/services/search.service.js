@@ -9,6 +9,7 @@ const Album = require('../models/Album.model');
 const Clip = require('../models/Clip.model');
 const Concert = require('../models/Concert.model');
 const Artist = require('../models/Artist.model');
+const ShortVideo = require('../models/ShortVideo.model');
 const {
   rankAllResults,
   paginateRankedResults,
@@ -168,12 +169,89 @@ const getRankedCached = async (query, lang) => {
   return ranked;
 };
 
+const CHANNEL_TYPES = new Set(['all', 'movies', 'videos', 'shorts', 'playlists', 'posts']);
+
+const emptyChannelCollections = () => ({
+  actors: [],
+  movies: [],
+  music: [],
+  albums: [],
+  clips: [],
+  concerts: [],
+  musicArtists: [],
+});
+
+/**
+ * Kanal qidiruvi — shu rankAllResults. Kolleksiya oldindan channelId bo'yicha kesiladi.
+ * Navbar keshiga va umumiy rank yo'liga yozilmaydi.
+ */
+const searchChannel = async (query, _contentLang, options) => {
+  const channelId = String(options.channelId || '').trim();
+  const channelType = CHANNEL_TYPES.has(options.channelType) ? options.channelType : 'all';
+  const wantMovies = channelType === 'all' || channelType === 'movies';
+  const wantMusic = channelType === 'all';
+  const wantShorts = channelType === 'all' || channelType === 'shorts';
+  const hasCatalog = wantMovies || wantMusic || wantShorts;
+
+  const [movies, music, shorts] = hasCatalog
+    ? await Promise.all([
+      wantMovies
+        ? Movie.find({ channelId }, MOVIE_SEARCH_PROJECTION).lean()
+        : [],
+      wantMusic
+        ? Music.find({ channelId }, MUSIC_SEARCH_PROJECTION).lean()
+        : [],
+      wantShorts
+        ? ShortVideo.find(
+          { channelId },
+          { _id: 0, id: 1, description: 1, movieId: 1, channelId: 1 }
+        ).lean()
+        : [],
+    ])
+    : [[], [], []];
+
+  const ranked = rankAllResults(query, {
+    ...emptyChannelCollections(),
+    movies,
+    music,
+  });
+  const page = paginateRankedResults(ranked, {
+    section: null,
+    cursor: 0,
+    limits: DEFAULT_LIMITS,
+  });
+
+  const rankedShorts = wantShorts
+    ? rankAllResults(query, {
+      ...emptyChannelCollections(),
+      movies: shorts.map((short) => ({
+        id: short.id,
+        title: short.description,
+        movieId: short.movieId,
+      })),
+    })
+    : { movies: [] };
+
+  page.data.shorts = (rankedShorts.movies || []).slice(0, DEFAULT_LIMITS.movies).map((item) => ({
+    id: item.id,
+    title: item.title,
+    movieId: item.movieId,
+  }));
+
+  return page;
+};
+
 /**
  * @param {string} query
  * @param {string} contentLang
- * @param {{ section?: string|null, cursor?: number|string, limit?: number }} options
+ * @param {{ section?: string|null, cursor?: number|string, limit?: number, channelId?: string|null, channelType?: string|null }} options
  */
 const searchAll = async (query, contentLang = 'uz', options = {}) => {
+  const channelId = String(options.channelId || '').trim();
+  if (channelId) {
+    return searchChannel(query, contentLang, { ...options, channelId });
+  }
+
   const section = options.section && SEARCH_SECTIONS.includes(options.section) ? options.section : null;
   const cursor = Math.max(0, Number(options.cursor) || 0);
   const pageLimit = options.limit != null ? Math.max(1, Math.min(40, Number(options.limit))) : null;
