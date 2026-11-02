@@ -31,6 +31,15 @@ const FeedMovieCard = ({ item }) => {
   const [commentsCount, setCommentsCount] = useState(0);
   const saved = isInWishlist(item.movieId, 'movie');
   const movieRoute = `/movie/${item.movieId}`;
+  const channelId = item.channelId || '';
+  const channelName = item.channelName || '';
+  const channelImage = item.channelImage || '';
+
+  const openChannel = (event) => {
+    event.stopPropagation();
+    if (!channelId) return;
+    navigate(`/channel/${channelId}`);
+  };
 
   const metaText = useMemo(() => {
     if (item.metaText) return item.metaText;
@@ -50,14 +59,25 @@ const FeedMovieCard = ({ item }) => {
 
   return (
     <div className="feed-movie-card" onClick={() => navigate(movieRoute)} role="button" tabIndex={0}>
-      <div className="feed-movie-card-profile">
-        <img src={item.actorImage} alt={item.actorName} className="feed-movie-card-avatar" />
+      <div
+        className="feed-movie-card-profile"
+        role="link"
+        tabIndex={0}
+        onClick={openChannel}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openChannel(event);
+          }
+        }}
+      >
+        <img src={channelImage} alt={channelName} className="feed-movie-card-avatar" />
         <div className="feed-movie-card-profile-text">
           <div className="feed-movie-card-name">
-            <span className="feed-movie-card-name-text">{item.actorName}</span>
+            <span className="feed-movie-card-name-text">{channelName}</span>
             <img src="/img/galichka2.png" alt="" className="feed-movie-card-name-verified" aria-hidden />
           </div>
-          <div className="feed-movie-card-type">Movie actor</div>
+          <div className="feed-movie-card-type">Kanal</div>
         </div>
       </div>
       <img src={item.cover} alt={item.title} className="feed-movie-card-cover" />

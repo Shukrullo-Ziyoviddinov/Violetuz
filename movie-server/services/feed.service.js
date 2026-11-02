@@ -2,9 +2,9 @@ const Following = require('../models/Following.model');
 const { FEED_PAGE_SIZE, FEED_MAX_ITEMS } = require('../constants/feed.constants');
 const { attachFeedLikeCounts } = require('../utils/reactionCounts');
 const {
-  loadActorsByIds,
+  loadChannelsByIds,
   loadArtistsByIds,
-  fetchMoviesForActor,
+  fetchMoviesForChannel,
   fetchMusicForArtist,
   fetchClipsForArtist,
   fetchConcertsForArtist,
@@ -41,11 +41,11 @@ const buildPoolForUser = async (userId, category) => {
     .select('type targetId')
     .lean();
 
-  const actorIds = follows.filter((f) => f.type === 'actor').map((f) => f.targetId);
+  const channelIds = follows.filter((f) => f.type === 'channel').map((f) => f.targetId);
   const artistIds = follows.filter((f) => f.type === 'artist').map((f) => f.targetId);
 
-  const [actorsMap, artistsMap] = await Promise.all([
-    loadActorsByIds(actorIds),
+  const [channelsMap, artistsMap] = await Promise.all([
+    loadChannelsByIds(channelIds),
     loadArtistsByIds(artistIds),
   ]);
 
@@ -56,14 +56,13 @@ const buildPoolForUser = async (userId, category) => {
 
   const tasks = [];
 
-  for (const actorId of actorIds) {
-    const actor = actorsMap.get(String(actorId).trim());
-    if (!actor) continue;
-    const owner = { id: actor.id, name: actor.name, image: actor.image };
+  for (const channelId of channelIds) {
+    const channel = channelsMap.get(String(channelId).trim());
+    if (!channel) continue;
 
     if (wantMovies) {
       tasks.push(
-        fetchMoviesForActor(actorId).then((rows) => rows.map((doc) => mapMovie(doc, owner)))
+        fetchMoviesForChannel(channelId).then((rows) => rows.map((doc) => mapMovie(doc, channel)))
       );
     }
   }

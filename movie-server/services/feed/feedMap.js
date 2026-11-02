@@ -23,13 +23,19 @@ const toFeedItem = ({
   ownerId,
   title: title || '',
   cover: cover || FALLBACK_IMG,
-  ...(ownerType === 'actor'
-    ? { actorId: ownerId, actorName: ownerName, actorImage: ownerImage || FALLBACK_IMG }
-    : {
-        artistId: ownerId,
-        artistName: ownerName,
-        artistImage: ownerImage || FALLBACK_IMG,
-      }),
+  ...(ownerType === 'channel'
+    ? {
+        channelId: ownerId,
+        channelName: ownerName,
+        channelImage: ownerImage || FALLBACK_IMG,
+      }
+    : ownerType === 'actor'
+      ? { actorId: ownerId, actorName: ownerName, actorImage: ownerImage || FALLBACK_IMG }
+      : {
+          artistId: ownerId,
+          artistName: ownerName,
+          artistImage: ownerImage || FALLBACK_IMG,
+        }),
   ...extra,
 });
 
@@ -52,16 +58,16 @@ const buildMovieMetaText = (doc) => {
   return metaParts.join(' ');
 };
 
-const mapMovie = (doc, actor) => {
+const mapMovie = (doc, channel) => {
   const metaText = buildMovieMetaText(doc);
 
   return toFeedItem({
     type: 'movie',
     catalogId: doc.id,
-    ownerType: 'actor',
-    ownerId: actor.id,
-    ownerName: pickLocalized(actor.name) || 'Movie actor',
-    ownerImage: actor.image,
+    ownerType: 'channel',
+    ownerId: channel.id,
+    ownerName: channel.name || 'Kanal',
+    ownerImage: channel.avatar,
     title: pickLocalized(doc.title) || 'Movie',
     cover: pickLocalized(doc.homeImg),
     extra: {

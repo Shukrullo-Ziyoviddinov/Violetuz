@@ -6,6 +6,7 @@ const ShortVideo = require('../../models/ShortVideo.model');
 const MusicShort = require('../../models/MusicShort.model');
 const Actor = require('../../models/Actor.model');
 const Artist = require('../../models/Artist.model');
+const Channel = require('../../models/Channel.model');
 const { FEED_PER_TYPE_LIMIT } = require('../../constants/feed.constants');
 
 const actorIdMatchers = (rawId) => {
@@ -49,6 +50,15 @@ const loadActorsByIds = async (ids) => {
   return new Map(rows.map((a) => [String(a.id), a]));
 };
 
+const loadChannelsByIds = async (ids) => {
+  const strs = ids.map((id) => String(id).trim()).filter(Boolean);
+  if (!strs.length) return new Map();
+  const rows = await Channel.find({ id: { $in: strs } })
+    .select('id name avatar')
+    .lean();
+  return new Map(rows.map((channel) => [String(channel.id), channel]));
+};
+
 const loadArtistsByIds = async (ids) => {
   const strs = ids.map((id) => String(id).trim()).filter(Boolean);
   if (!strs.length) return new Map();
@@ -56,6 +66,16 @@ const loadArtistsByIds = async (ids) => {
     .select('id name img imgArtist')
     .lean();
   return new Map(rows.map((a) => [String(a.id), a]));
+};
+
+const fetchMoviesForChannel = (channelId) => {
+  const id = String(channelId || '').trim();
+  if (!id) return Promise.resolve([]);
+  return latestByAutoId(
+    Movie,
+    { channelId: id },
+    'id title homeImg like dislike specs filterCountry createdAt'
+  );
 };
 
 const fetchMoviesForActor = (actorId) =>
@@ -104,7 +124,9 @@ module.exports = {
   pickLocalized,
   sortAt,
   loadActorsByIds,
+  loadChannelsByIds,
   loadArtistsByIds,
+  fetchMoviesForChannel,
   fetchMoviesForActor,
   fetchMovieShortsForActor,
   fetchMusicForArtist,
