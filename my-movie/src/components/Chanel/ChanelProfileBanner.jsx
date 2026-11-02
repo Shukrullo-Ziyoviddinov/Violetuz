@@ -1,5 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMoviesApi } from '../../context/MoviesApiContext';
+import { useContentLanguage } from '../../context/ContentLanguageContext';
+import { getLocalizedText, normalizeImagePath } from '../../utils/utils';
 import './ChanelProfileBanner.css';
 
 const SLIDE_EASE = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -19,7 +22,16 @@ const readBanners = (profileBanner) => {
 
 const ChanelProfileBanner = ({ profileBanner }) => {
   const navigate = useNavigate();
+  const { allMovies } = useMoviesApi();
+  const { contentLang } = useContentLanguage();
   const banners = readBanners(profileBanner);
+  const movieById = useMemo(() => {
+    const map = new Map();
+    (Array.isArray(allMovies) ? allMovies : []).forEach((movie) => {
+      map.set(String(movie.id), movie);
+    });
+    return map;
+  }, [allMovies]);
   const count = banners.length;
   const rootRef = useRef(null);
   const trackRef = useRef(null);
@@ -47,6 +59,12 @@ const ChanelProfileBanner = ({ profileBanner }) => {
     const movieId = banner?.movieId;
     if (movieId == null || movieId === '') return;
     navigate(`/movie/${movieId}`);
+  };
+
+  const titleImage = (banner) => {
+    const movie = movieById.get(String(banner?.movieId ?? ''));
+    const src = getLocalizedText(movie?.titleImg, contentLang).trim();
+    return src ? normalizeImagePath(src) : '';
   };
 
   const handleDragStart = (clientX) => {
@@ -170,7 +188,10 @@ const ChanelProfileBanner = ({ profileBanner }) => {
               openMovie(banner);
             }}
           >
-            <img src={bannerImage(banner)} alt="" draggable={false} />
+            <img className="channel-profile-banner-photo" src={bannerImage(banner)} alt="" draggable={false} />
+            {titleImage(banner) ? (
+              <img className="channel-profile-banner-title" src={titleImage(banner)} alt="" draggable={false} />
+            ) : null}
           </li>
         ))}
       </ul>

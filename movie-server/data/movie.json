@@ -7,6 +7,10 @@
       "uz": "John Wick 4",
       "ru": "Джон Уик 4"
     },
+    "titleImg": {
+      "uz": "/img/titleimg_preview_rev_1.png",
+      "ru": "/img/titleimg_preview_rev_1.png"
+    },
     "homeImg": {
       "uz": "/img/movie1.jpg",
       "ru": "/img/movie1.jpg"
@@ -143,6 +147,10 @@
       "uz": "Mission: Impossible 7",
       "ru": "Миссия невыполнима 7"
     },
+    "titleImg": {
+      "uz": "/img/titliimg22_preview_rev_1.png",
+      "ru": "/img/titliimg22_preview_rev_1.png"
+    },
     "homeImg": {
       "uz": "/img/movie2.jpg",
       "ru": "/img/movie2.jpg"
@@ -264,6 +272,10 @@
     "title": {
       "uz": "Fast X",
       "ru": "Форсаж 10"
+    },
+    "titleImg": {
+      "uz": "/img/laxmontitle_preview_rev_1.png",
+      "ru": "/img/laxmontitle_preview_rev_1.png"
     },
     "homeImg": {
       "uz": "/img/movie4.jpg",
