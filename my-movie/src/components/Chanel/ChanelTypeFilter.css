@@ -166,6 +166,117 @@
   color: #fff;
 }
 
+body.channel-mobile-search-open .navbar.navbar--channel-profile .navbar-channel-identity,
+body.channel-mobile-search-open .navbar.navbar--channel-profile .navbar-mobile-actions {
+  display: none;
+}
+
+.chanel-search-nav-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  animation: chanel-search-nav-in 0.28s ease;
+}
+
+.chanel-search-nav-back {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+}
+
+.chanel-search-nav-back i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.chanel-search-nav-field input {
+  display: block;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 0 2rem 0 0.85rem;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.chanel-search-nav-field input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.chanel-search-nav-field > i {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.8rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+@keyframes chanel-search-nav-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chanel-search-nav-field {
+    animation: none;
+  }
+}
+
+.chanel-search-mobile {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 53px;
+  box-sizing: border-box;
+  background: #0a0a0a;
+}
+
+.chanel-search-mobile-sheet {
+  height: 100%;
+  overflow: auto;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  background: #0a0a0a;
+}
+
+.chanel-search-mobile-results .chanel-type-search-results {
+  position: static;
+  width: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
 @media (max-width: 768px) {
   .chanel-type-filter {
     padding-right: 0;

@@ -7,6 +7,7 @@ import { requestOpenProfileInfoMenu } from '../../profileInfoMenuBridge';
 import { requestOpenMessagesModal } from '../../messagesModalBridge';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { requestOpenSearchModal } from '../../searchModalBridge';
+import { requestOpenChannelSearch } from '../../channelSearchBridge';
 import {
   SEARCH_MODE_BROWSE,
   SEARCH_MODE_COMPOSE,
@@ -402,7 +403,13 @@ const Navbar = () => {
             <button
               type="button"
               className="navbar-mobile-action-btn navbar-mobile-search-btn"
-              onClick={openSearchBrowse}
+              onClick={() => {
+                if (isChannelProfile && window.innerWidth <= MOBILE_NAV_MAX) {
+                  requestOpenChannelSearch();
+                  return;
+                }
+                openSearchBrowse();
+              }}
               aria-label={t('navbar.search')}
             >
               <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
