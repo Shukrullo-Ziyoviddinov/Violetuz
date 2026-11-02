@@ -12,6 +12,36 @@
   margin-top: 1rem;
 }
 
+.chanel-content-shorts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.chanel-short-card {
+  width: 100%;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.chanel-short-card--row {
+  flex-shrink: 0;
+  width: 150px;
+}
+
+@media (min-width: 768px) {
+  .chanel-content-shorts {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .chanel-short-card--row {
+    width: 200px;
+  }
+}
+
 @media (max-width: 768px) {
   .chanel-content-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -36,6 +36,13 @@ const shortVideoSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    /** Shorts qaysi kanalga tegishli. channels.json dagi id. */
+    channelId: {
+      type: String,
+      trim: true,
+      default: '',
+      index: true,
+    },
     type: {
       type: String,
       trim: true,
@@ -51,6 +58,7 @@ const shortVideoSchema = new mongoose.Schema(
     strict: true,
     collection: 'shortsVideos',
     versionKey: false,
+    timestamps: true,
   }
 );
 

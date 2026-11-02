@@ -52,8 +52,9 @@ const ChanelContentCard = ({ kind, item, layout = 'grid' }) => {
       ? item.homeImg[contentLang] || item.homeImg.uz || item.homeImg.ru || ''
       : '')
     : item?.img || '';
+  const wishlistType = isMovie ? 'movie' : 'music';
   const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
-  const saved = isInWishlist(item.id, isMovie ? 'movie' : 'music');
+  const saved = isInWishlist(item.id, wishlistType);
   const isSoon = isMovie && item.category === 'anonslar';
   const showRating = isMovie
     && !isSoon
@@ -107,7 +108,7 @@ const ChanelContentCard = ({ kind, item, layout = 'grid' }) => {
           <>
             <WishlistButton
               saved={saved}
-              onToggle={() => toggleWishlist(item.id, isMovie ? 'movie' : 'music')}
+              onToggle={() => toggleWishlist(item.id, wishlistType)}
             />
             {isMovie && (isSoon ? (
               <div className="movies-item-badge movies-item-badge-soon">

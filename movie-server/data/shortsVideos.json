@@ -10,6 +10,7 @@
       "ru": "Опытный вор пытается выполнить невозможную задачу инцепции."
     },
     "movieId": 1,
+    "channelId": "violet-play",
     "type": "movieShorts",
     "musics": {
       "musicId": 602,
@@ -27,6 +28,7 @@
       "ru": "Бэтмен борется за спасение Готэма."
     },
     "movieId": 2,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -44,6 +46,7 @@
       "ru": "Романтическое и боевик приключение."
     },
     "movieId": 3,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -61,6 +64,7 @@
       "ru": "Индийская комедия о дружбе и образовании."
     },
     "movieId": 4,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -78,6 +82,7 @@
       "ru": "Поиск нового места для жизни в космосе."
     },
     "movieId": 5,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -91,6 +96,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 6,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -108,6 +114,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 7,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -125,6 +132,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 8,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -138,6 +146,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 9,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -155,6 +164,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 10,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -172,6 +182,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 11,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -189,6 +200,7 @@
       "ru": "Поиск нового места для жизни в космосе."
     },
     "movieId": 5,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -202,6 +214,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 10,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -219,6 +232,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 9,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -236,6 +250,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 1,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -253,6 +268,7 @@
       "ru": "Бэтмен борется за спасение Готэма."
     },
     "movieId": 2,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -270,6 +286,7 @@
       "ru": "Романтическое и боевик приключение."
     },
     "movieId": 3,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -287,6 +304,7 @@
       "ru": "Индийская комедия о дружбе и образовании."
     },
     "movieId": 4,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -304,6 +322,7 @@
       "ru": "Поиск нового места для жизни в космосе."
     },
     "movieId": 5,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -317,6 +336,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 6,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -334,6 +354,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 7,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -351,6 +372,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 8,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -364,6 +386,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 9,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -381,6 +404,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 10,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -398,6 +422,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 11,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -415,6 +440,7 @@
       "ru": "Опытный вор пытается выполнить невозможную задачу инцепции."
     },
     "movieId": 1,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -432,6 +458,7 @@
       "ru": "Бэтмен борется за спасение Готэма."
     },
     "movieId": 2,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -449,6 +476,7 @@
       "ru": "Романтическое и боевик приключение."
     },
     "movieId": 3,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -466,6 +494,7 @@
       "ru": "Индийская комедия о дружбе и образовании."
     },
     "movieId": 4,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -483,6 +512,7 @@
       "ru": "Поиск нового места для жизни в космосе."
     },
     "movieId": 5,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -496,6 +526,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 6,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -513,6 +544,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 7,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -530,6 +562,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 8,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -543,6 +576,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 9,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -560,6 +594,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 10,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -577,6 +612,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 11,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -594,6 +630,7 @@
       "ru": "Опытный вор пытается выполнить невозможную задачу инцепции."
     },
     "movieId": 1,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -611,6 +648,7 @@
       "ru": "Бэтмен борется за спасение Готэма."
     },
     "movieId": 2,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -628,6 +666,7 @@
       "ru": "Романтическое и боевик приключение."
     },
     "movieId": 3,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -645,6 +684,7 @@
       "ru": "Индийская комедия о дружбе и образовании."
     },
     "movieId": 4,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -662,6 +702,7 @@
       "ru": "Поиск нового места для жизни в космосе."
     },
     "movieId": 5,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -675,6 +716,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 6,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -692,6 +734,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 7,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -709,6 +752,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 8,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -722,6 +766,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 9,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -739,6 +784,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 10,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -756,6 +802,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 11,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -773,6 +820,7 @@
       "ru": "Поиск нового места для жизни в космосе."
     },
     "movieId": 5,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -786,6 +834,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 10,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -803,6 +852,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 9,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -820,6 +870,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 1,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -837,6 +888,7 @@
       "ru": "Бэтмен борется за спасение Готэма."
     },
     "movieId": 2,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -854,6 +906,7 @@
       "ru": "Романтическое и боевик приключение."
     },
     "movieId": 3,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -871,6 +924,7 @@
       "ru": "Индийская комедия о дружбе и образовании."
     },
     "movieId": 4,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -888,6 +942,7 @@
       "ru": "Поиск нового места для жизни в космосе."
     },
     "movieId": 5,
+    "channelId": "violet-play",
     "type": "movieShorts"
   },
   {
@@ -901,6 +956,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 6,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
@@ -918,6 +974,7 @@
       "ru": "О надежде и свободе в тюрьме."
     },
     "movieId": 11,
+    "channelId": "violet-play",
     "musics": {
       "musicId": 602,
       "videoId": 1203
