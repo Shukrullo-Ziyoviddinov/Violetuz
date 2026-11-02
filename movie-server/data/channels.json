@@ -7,9 +7,9 @@
     "avatar": "/img/vlplay_preview_rev_1.png",
     "profileBanner": {
       "banners": [
-        { "image": "/img/banner-1.png" },
-        { "image": "/img/banner-2.png" },
-        { "image": "/img/banner-3.png" }
+        { "img": "/img/banner-1.png", "movieId": 8001 },
+        { "img": "/img/banner-2.png", "movieId": 8002 },
+        { "img": "/img/banner-3.png", "movieId": 8003 }
       ]
     },
     "biografiya": {

@@ -30,7 +30,8 @@ const biografiyaSchema = new mongoose.Schema(
 
 /** Har bir rasmga Mongo o‘zi _id beradi. JSON da id yozilmaydi. */
 const profileBannerItemSchema = new mongoose.Schema({
-  image: { type: String, trim: true, default: '' },
+  img: { type: String, trim: true, default: '' },
+  movieId: { type: Number, default: null },
 });
 
 const profileBannerSchema = new mongoose.Schema(
@@ -113,16 +114,21 @@ channelSchema.pre('validate', function normalizeChannelUsername() {
   this.usernameNormalized = username.toLowerCase();
 });
 
-const toPublicBanner = (item) => ({
-  id: item?._id ? String(item._id) : String(item?.id || ''),
-  image: item?.image || '',
-});
+const toPublicBanner = (item) => {
+  const img = String(item?.img || item?.image || '').trim();
+  const movieId = Number(item?.movieId);
+  return {
+    id: item?._id ? String(item._id) : String(item?.id || ''),
+    img,
+    movieId: Number.isFinite(movieId) ? movieId : null,
+  };
+};
 
 channelSchema.set('toJSON', {
   transform: (_doc, ret) => {
     const { _id, usernameNormalized, profileBanner, ...rest } = ret;
     const banners = Array.isArray(profileBanner?.banners)
-      ? profileBanner.banners.map(toPublicBanner).filter((item) => item.image)
+      ? profileBanner.banners.map(toPublicBanner).filter((item) => item.img)
       : [];
     return { ...rest, profileBanner: { banners } };
   },

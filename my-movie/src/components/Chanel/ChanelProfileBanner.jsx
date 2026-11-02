@@ -1,25 +1,31 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ChanelProfileBanner.css';
 
 const SLIDE_EASE = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
 const VELOCITY_THRESHOLD = 0.3;
 
+const bannerImage = (item) => String(item?.img || item?.image || '').trim();
+
 const readBanners = (profileBanner) => {
   if (Array.isArray(profileBanner?.banners)) {
-    return profileBanner.banners.filter((item) => item && item.image);
+    return profileBanner.banners.filter((item) => bannerImage(item));
   }
   if (typeof profileBanner === 'string' && profileBanner.trim()) {
-    return [{ id: 'legacy', image: profileBanner.trim() }];
+    return [{ id: 'legacy', img: profileBanner.trim(), movieId: null }];
   }
   return [];
 };
 
 const ChanelProfileBanner = ({ profileBanner }) => {
+  const navigate = useNavigate();
   const banners = readBanners(profileBanner);
   const count = banners.length;
   const rootRef = useRef(null);
   const trackRef = useRef(null);
   const draggingRef = useRef(false);
+  const tapBannerRef = useRef(null);
+  const tapHandledRef = useRef(false);
   const startXRef = useRef(0);
   const currentXRef = useRef(0);
   const dragStartTimeRef = useRef(0);
@@ -36,6 +42,12 @@ const ChanelProfileBanner = ({ profileBanner }) => {
     setCurrentIndex((prev) => (count ? (prev - 1 + count) % count : 0));
     setDragOffset(0);
   }, [count]);
+
+  const openMovie = (banner) => {
+    const movieId = banner?.movieId;
+    if (movieId == null || movieId === '') return;
+    navigate(`/movie/${movieId}`);
+  };
 
   const handleDragStart = (clientX) => {
     if (count < 2) return;
@@ -62,11 +74,15 @@ const ChanelProfileBanner = ({ profileBanner }) => {
     const width = rootRef.current?.offsetWidth || 0;
     const threshold = Math.max(48, width * 0.22);
 
+    const banner = tapBannerRef.current;
+    tapBannerRef.current = null;
+    tapHandledRef.current = true;
     if (Math.abs(diff) > threshold || (Math.abs(diff) > 10 && velocity > VELOCITY_THRESHOLD)) {
       if (diff > 0) prevSlide();
       else nextSlide();
     } else {
       setDragOffset(0);
+      if (Math.abs(diff) <= 8) openMovie(banner);
     }
     setIsDragging(false);
   };
@@ -137,8 +153,24 @@ const ChanelProfileBanner = ({ profileBanner }) => {
     >
       <ul className="channel-profile-banner-track" ref={trackRef}>
         {banners.map((banner, index) => (
-          <li key={banner.id || index} className="channel-profile-banner-slide">
-            <img src={banner.image} alt="" draggable={false} />
+          <li
+            key={banner.id || index}
+            className={`channel-profile-banner-slide${banner.movieId != null && banner.movieId !== '' ? ' is-linked' : ''}`}
+            onMouseDown={() => {
+              tapBannerRef.current = banner;
+            }}
+            onTouchStart={() => {
+              tapBannerRef.current = banner;
+            }}
+            onClick={() => {
+              if (tapHandledRef.current) {
+                tapHandledRef.current = false;
+                return;
+              }
+              openMovie(banner);
+            }}
+          >
+            <img src={bannerImage(banner)} alt="" draggable={false} />
           </li>
         ))}
       </ul>
@@ -152,6 +184,7 @@ const ChanelProfileBanner = ({ profileBanner }) => {
               aria-label={`Banner ${index + 1}`}
               aria-current={index === currentIndex ? 'true' : undefined}
               onMouseDown={(event) => event.stopPropagation()}
+              onTouchStart={(event) => event.stopPropagation()}
               onClick={() => {
                 setCurrentIndex(index);
                 setDragOffset(0);

@@ -4,11 +4,13 @@ const { badRequest, notFound } = require('../utils/errors');
 
 const toPublicBanner = (item) => {
   if (!item || typeof item !== 'object') return null;
-  const image = String(item.image || '').trim();
-  if (!image) return null;
+  const img = String(item.img || item.image || '').trim();
+  if (!img) return null;
+  const movieId = Number(item.movieId);
   return {
     id: item._id ? String(item._id) : String(item.id || ''),
-    image,
+    img,
+    movieId: Number.isFinite(movieId) ? movieId : null,
   };
 };
 
