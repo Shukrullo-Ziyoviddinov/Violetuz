@@ -53,7 +53,7 @@ const ChanelSearchGenre = ({ channelId, selectedId, onSelect }) => {
   if (!genresLoading && genres.length === 0) return null;
 
   return (
-    <div className="chanel-search-genre" onMouseDownCapture={(event) => event.preventDefault()}>
+    <div className="chanel-search-genre">
       <p className="chanel-search-genre-title">Janr</p>
       <HorizontalScroll scrollAmount={182}>
         {genres.map((genre) => (

@@ -15,11 +15,15 @@ const { mostWatchedMoviesConfig } = require('../config/mostWatchedMovies.config'
 const { readWeeklyMovieWatchStats } = require('./weeklyTopMoviesRead.service');
 const { rankWeeklyTopMovies } = require('../utils/weeklyTopMoviesRanker');
 
+/** Kanal trendi. Umumiy topLimit (20) ga tegmaydi. */
+const CHANNEL_TOP_LIMIT = 10;
+
 /**
  * @param {Array<{ movieId?: unknown }>} stats
+ * @param {string} [channelId] berilsa faqat shu kanal kinolari qoladi
  * @returns {Promise<Array<{ movieId?: unknown }>>}
  */
-const keepStatsWithLiveMovies = async (stats) => {
+const keepStatsWithLiveMovies = async (stats, channelId = '') => {
   const rows = Array.isArray(stats) ? stats : [];
   if (rows.length === 0) return [];
 
@@ -33,7 +37,11 @@ const keepStatsWithLiveMovies = async (stats) => {
   }
   if (idNums.length === 0) return [];
 
-  const docs = await Movie.find({ id: { $in: idNums } })
+  const query = { id: { $in: idNums } };
+  const channel = String(channelId || '').trim();
+  if (channel) query.channelId = channel;
+
+  const docs = await Movie.find(query)
     .select({ id: 1, _id: 0 })
     .lean();
   const live = new Set((docs || []).map((d) => String(d.id)));
@@ -44,7 +52,7 @@ const keepStatsWithLiveMovies = async (stats) => {
 /**
  * Read + same ranker. Writes nothing. Oyna configdan, query oyna o‘zgartirmaydi.
  *
- * @param {{ now?: Date, limit?: number }} [opts]
+ * @param {{ now?: Date, limit?: number, channelId?: string }} [opts]
  */
 const getMostWatchedMoviesFromWatchEvents = async (opts = {}) => {
   const now = opts.now instanceof Date ? opts.now : new Date();
@@ -54,11 +62,13 @@ const getMostWatchedMoviesFromWatchEvents = async (opts = {}) => {
     Number.isFinite(requested) && requested > 0
       ? requested
       : mostWatchedMoviesConfig.topLimit;
+  const channelId = String(opts.channelId || '').trim();
+  const rankLimit = channelId ? Math.min(limit, CHANNEL_TOP_LIMIT) : limit;
 
   const stats = await readWeeklyMovieWatchStats({ now, windowDays });
-  const liveStats = await keepStatsWithLiveMovies(stats);
+  const liveStats = await keepStatsWithLiveMovies(stats, channelId);
   const movies = rankWeeklyTopMovies(liveStats, {
-    limit,
+    limit: rankLimit,
     minViews: mostWatchedMoviesConfig.minViews,
     maxLimit: mostWatchedMoviesConfig.topMaxLimit,
   });
@@ -66,7 +76,7 @@ const getMostWatchedMoviesFromWatchEvents = async (opts = {}) => {
   return {
     movies,
     windowDays,
-    limit: mostWatchedMoviesConfig.topLimit,
+    limit: channelId ? CHANNEL_TOP_LIMIT : mostWatchedMoviesConfig.topLimit,
     minViews: mostWatchedMoviesConfig.minViews,
     source: movies.length ? 'most_watched_movies' : 'empty',
   };

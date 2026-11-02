@@ -4,6 +4,7 @@ import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { fetchSearchResults } from '../../api/searchApi';
 import ChanelSearchGenre from './ChanelSearchGenre';
+import ChanelSearchTrend from './ChanelSearchTrend';
 import './ChanelTypeFilter.css';
 
 const CHANNEL_TYPES = [
@@ -21,7 +22,14 @@ const resultTitle = (item, lang) => {
   return String(title || '').trim();
 };
 
-const ChanelTypeFilter = ({ value, onChange, channelId, genreId, onGenreChange }) => {
+const ChanelTypeFilter = ({
+  value,
+  onChange,
+  channelId,
+  genreId,
+  onGenreChange,
+  onTrendChange,
+}) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const [internalValue, setInternalValue] = useState('all');
@@ -34,11 +42,19 @@ const ChanelTypeFilter = ({ value, onChange, channelId, genreId, onGenreChange }
   const select = (id) => {
     if (value === undefined) setInternalValue(id);
     onGenreChange?.(null);
+    onTrendChange?.(null);
     onChange?.(id);
   };
 
   const chooseGenre = (genre) => {
+    onTrendChange?.(null);
     onGenreChange?.(genreId === genre.id ? null : genre.id);
+    setGenreOpen(false);
+  };
+
+  const showTrend = (ids) => {
+    onGenreChange?.(null);
+    onTrendChange?.(Array.isArray(ids) ? ids : []);
     setGenreOpen(false);
   };
 
@@ -126,11 +142,14 @@ const ChanelTypeFilter = ({ value, onChange, channelId, genreId, onGenreChange }
         />
         <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
         {genreOpen && !showResults ? (
-          <ChanelSearchGenre
-            channelId={channelId}
-            selectedId={genreId}
-            onSelect={chooseGenre}
-          />
+          <div className="chanel-search-panel" onMouseDownCapture={(event) => event.preventDefault()}>
+            <ChanelSearchGenre
+              channelId={channelId}
+              selectedId={genreId}
+              onSelect={chooseGenre}
+            />
+            <ChanelSearchTrend channelId={channelId} onShowAll={showTrend} />
+          </div>
         ) : null}
         {showResults ? (
           <div className="chanel-type-search-results" role="listbox">

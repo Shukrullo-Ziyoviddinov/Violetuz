@@ -10,7 +10,7 @@ import './ChanelContent.css';
 
 const sameChannel = (item, channelId) => String(item?.channelId || '') === String(channelId || '');
 
-const ChanelContent = ({ channelId, filter = 'all', genreId = null }) => {
+const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null }) => {
   const { allMovies, allShortsVideos, allGenres } = useMoviesApi();
   const { allMusic } = useMusicApi();
 
@@ -24,6 +24,11 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null }) => {
     const shorts = (allShortsVideos || []).filter((short) => sameChannel(short, channelId));
     const genre = genreId ? (allGenres || []).find((item) => item.id === genreId) : null;
 
+    if (Array.isArray(trendIds) && trendIds.length) {
+      const byId = new Map(movies.map((movie) => [String(movie.id), movie]));
+      return trendIds.map((id) => byId.get(String(id))).filter(Boolean).map(toMovie);
+    }
+
     if (genre) {
       return sortByUploadedAtDesc(movies.filter((movie) => movieMatchesGenre(movie, genre))).map(toMovie);
     }
@@ -34,7 +39,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null }) => {
     if (filter === 'playlists') return [];
     if (filter === 'posts') return [];
     return [...movies.map(toMovie), ...music, ...shorts.map(toShort)];
-  }, [allMovies, allMusic, allShortsVideos, allGenres, channelId, filter, genreId]);
+  }, [allMovies, allMusic, allShortsVideos, allGenres, channelId, filter, genreId, trendIds]);
 
   if (!items.length) return null;
 
@@ -52,7 +57,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null }) => {
     )
   );
 
-  if (genreId) {
+  if (genreId || (Array.isArray(trendIds) && trendIds.length)) {
     return <div className="chanel-content-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
   }
 

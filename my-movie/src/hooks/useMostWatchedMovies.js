@@ -5,10 +5,11 @@ import { fetchMostWatchedMovies } from '../api/recommendationsApi';
  * Hozir trendda — oxirgi 7 kun, eng ko‘p ko‘rilgan 20 ta.
  * Tartib va oyna serverda. Hook faqat ro‘yxatni oladi.
  *
- * @param {{ enabled?: boolean }} [opts]
+ * @param {{ enabled?: boolean, channelId?: string, limit?: number }} [opts]
  * @returns {{ movies: Array<{ movieId: string, viewCount: number, watchedSeconds: number, rank: number }>, loading: boolean }}
  */
-export function useMostWatchedMovies({ enabled = true } = {}) {
+export function useMostWatchedMovies({ enabled = true, channelId = '', limit } = {}) {
+  const channel = String(channelId || '').trim();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(enabled);
 
@@ -24,7 +25,10 @@ export function useMostWatchedMovies({ enabled = true } = {}) {
     setLoading(true);
     (async () => {
       try {
-        const data = await fetchMostWatchedMovies();
+        const request = {};
+        if (limit) request.limit = limit;
+        if (channel) request.channelId = channel;
+        const data = await fetchMostWatchedMovies(request);
         const list = Array.isArray(data?.movies) ? data.movies : [];
         if (!cancelled) setMovies(list);
       } catch {
@@ -37,7 +41,7 @@ export function useMostWatchedMovies({ enabled = true } = {}) {
     return () => {
       cancelled = true;
     };
-  }, [enabled]);
+  }, [enabled, channel, limit]);
 
   return { movies, loading };
 }

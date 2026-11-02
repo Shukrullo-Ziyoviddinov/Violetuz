@@ -284,11 +284,13 @@ export const fetchMonthlyTopMovies = async ({ limit } = {}) => {
  * Hozir trendda (public): GET /api/recommendations/most-watched
  * Oxirgi 7 kun, limit 20. Hafta/oy top 10 endpointiga ulanmaydi.
  *
- * @param {{ limit?: number }} [opts]
+ * @param {{ limit?: number, channelId?: string }} [opts]
  */
-export const fetchMostWatchedMovies = async ({ limit } = {}) => {
+export const fetchMostWatchedMovies = async ({ limit, channelId } = {}) => {
   const query = new URLSearchParams();
   if (limit) query.set('limit', String(limit));
+  const channel = String(channelId || '').trim();
+  if (channel) query.set('channelId', channel);
 
   const path = query.toString()
     ? `/recommendations/most-watched?${query.toString()}`

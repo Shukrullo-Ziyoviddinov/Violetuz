@@ -67,8 +67,10 @@ const getMonthlyTopMovies = asyncHandler(async (req, res) => {
  * Public. Oxirgi 7 kun, limit 20. Hafta/oy top 10 ga yozilmaydi.
  */
 const getMostWatchedMovies = asyncHandler(async (req, res) => {
+  const channelId = String(req.query?.channelId || '').trim();
   const result = await getMostWatchedMoviesFromWatchEvents({
     limit: req.query?.limit,
+    ...(channelId ? { channelId } : {}),
   });
 
   return sendSuccess(res, { data: result });
