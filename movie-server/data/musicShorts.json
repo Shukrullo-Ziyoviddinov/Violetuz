@@ -10,7 +10,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -26,7 +28,9 @@
       "ru": "Романтическая песня Шохрухона - о любви и мечтах."
     },
     "musicId": 802,
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon"
+    ],
     "movieId": 2,
     "contentType": "music",
     "type": "musicshorts"
@@ -42,7 +46,9 @@
       "ru": "Король поп-музыки - легендарная песня Майкла Джексона."
     },
     "musicId": 803,
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson"
+    ],
     "movieId": 3,
     "contentType": "music",
     "type": "musicshorts"
@@ -58,7 +64,9 @@
       "ru": "Божественная песня Махера Зайна - о благодарности."
     },
     "musicId": 1510,
-    "artistId": "maher-zain",
+    "artistId": [
+      "maher-zain"
+    ],
     "contentType": "konsert",
     "type": "musicshorts"
   },
@@ -73,7 +81,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -89,7 +99,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -105,7 +117,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -121,7 +135,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -137,7 +153,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -153,7 +171,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -169,7 +189,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -185,7 +207,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -201,7 +225,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"
@@ -217,7 +243,9 @@
       "ru": "Узбекская поп-песня - один из самых популярных треков группы Уммон."
     },
     "musicId": 1010,
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib"
+    ],
     "movieId": 1,
     "contentType": "klip",
     "type": "musicshorts"

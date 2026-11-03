@@ -2,7 +2,7 @@
 
 const config = require('../config');
 const collections = require('../config/collections');
-const { movieProfileKey, musicProfileKey, artistProfileKey } = require('../utils/keys');
+const { movieProfileKey, musicProfileKey, artistProfileKey, artistIdsOf } = require('../utils/keys');
 
 const movieShortType = collections.existing.shortsVideos.type;
 const musicShortType = collections.existing.musicShorts.type;
@@ -36,17 +36,26 @@ const anchorParts = (item) => {
     out.push({ key, kind, amount, ...extra });
   };
 
+  const pushArtists = (share) => {
+    const ids = artistIdsOf(refs.artistId);
+    if (!ids.length || !share) return;
+    const portion = (share * item.score) / ids.length;
+    for (let i = 0; i < ids.length; i += 1) {
+      push(artistProfileKey(ids[i]), 'artist', portion, { artistId: ids[i] });
+    }
+  };
+
   if (refs.type === movieShortType) {
     const share = config.shares.movieShorts;
     push(movieProfileKey(refs.movieId), 'movie', share.movie * item.score, { movieId: refs.movieId });
     push(musicProfileKey(refs.musicKey), 'music', share.musicKey * item.score, { musicKey: refs.musicKey });
-    push(artistProfileKey(refs.artistId), 'artist', share.artist * item.score, { artistId: refs.artistId });
+    pushArtists(share.artist);
     return out;
   }
 
   if (refs.type === musicShortType) {
     const share = config.shares.musicshorts;
-    push(artistProfileKey(refs.artistId), 'artist', share.artist * item.score, { artistId: refs.artistId });
+    pushArtists(share.artist);
     push(musicProfileKey(refs.musicKey), 'music', share.musicKey * item.score, { musicKey: refs.musicKey });
   }
   return out;

@@ -23,13 +23,37 @@ const LAYERS = similarityWeights.layers;
 const itemIdOf = (item) => toCatalogId(item?.id);
 
 /**
+ * Massiv yoki bitta id. Har bir artist id alohida.
  * @param {unknown} item
- * @returns {string}
+ * @returns {string[]}
  */
-const artistIdOf = (item) =>
-  String(item?.artistId || '')
-    .trim()
-    .toLowerCase();
+const artistIdsOf = (item) => {
+  const raw = item?.artistId;
+  if (raw === null || raw === undefined || raw === '') return [];
+  const list = Array.isArray(raw) ? raw : [raw];
+  const seen = new Set();
+  const out = [];
+  for (const value of list) {
+    const id = String(value ?? '').trim().toLowerCase();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+};
+
+/**
+ * Umumiy bitta artist id bo‘lsa, shu artist.
+ * @param {unknown} left
+ * @param {unknown} right
+ * @returns {boolean}
+ */
+const sameArtist = (left, right) => {
+  const ids = artistIdsOf(left);
+  if (!ids.length) return false;
+  const other = new Set(artistIdsOf(right));
+  return ids.some((id) => other.has(id));
+};
 
 /**
  * @param {unknown} item
@@ -159,17 +183,16 @@ const resolveFranchiseLayer = (byId, ids, usedIds, maxCount) => {
  * @returns {object[]}
  */
 const resolveArtistGenreLayer = (current, pool, usedIds, maxCount) => {
-  const artist = artistIdOf(current);
   const genre = genreOf(current);
   const cap = Math.max(0, Number(maxCount) || 0);
-  if (!artist || !genre || cap <= 0) return [];
+  if (!artistIdsOf(current).length || !genre || cap <= 0) return [];
 
   /** @type {Array<{ item: object, year: number }>} */
   const matched = [];
   for (const candidate of pool) {
     const id = itemIdOf(candidate);
     if (id == null || usedIds.has(id)) continue;
-    if (artistIdOf(candidate) !== artist) continue;
+    if (!sameArtist(current, candidate)) continue;
     if (genreOf(candidate) !== genre) continue;
     matched.push({
       item: candidate,
@@ -203,15 +226,13 @@ const resolveGeneralLayer = (current, pool, usedIds, maxCount) => {
   const cap = Math.max(0, Number(maxCount) || 0);
   if (cap <= 0) return [];
 
-  const currentArtist = artistIdOf(current);
-
   /** @type {Array<{ item: object, score: number }>} */
   const scored = [];
   for (const candidate of pool) {
     const id = itemIdOf(candidate);
     if (id == null || usedIds.has(id)) continue;
     // Bir xil artist — faqat Q2; Q3 diversifikatsiya
-    if (currentArtist && artistIdOf(candidate) === currentArtist) continue;
+    if (sameArtist(current, candidate)) continue;
     const score = computeGeneralSimilarity(current, candidate);
     if (!(score > 0)) continue;
     scored.push({ item: candidate, score });
@@ -362,7 +383,8 @@ module.exports = {
   computeGeneralSimilarity,
   getYearProximityScore,
   interleaveArtistGenreAndGeneral,
-  artistIdOf,
+  artistIdsOf,
+  sameArtist,
   genreOf,
   countryOf,
   languageOf,

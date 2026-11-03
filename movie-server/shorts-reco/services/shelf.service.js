@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config');
-const { parseShortCatalogId } = require('../utils/keys');
+const { parseShortCatalogId, sharesArtist } = require('../utils/keys');
 const { createCatalogRepo } = require('../repositories/catalog.repo');
 const { createWatchStateRepo } = require('../repositories/watchState.repo');
 const { createProfileRepo } = require('../repositories/profile.repo');
@@ -26,7 +26,7 @@ const byInterest = (left, right) => {
  */
 const sameNeighbor = (prev, doc) => {
   if (!prev || !doc) return false;
-  if (doc.artistId && prev.artistId === doc.artistId) return true;
+  if (sharesArtist(doc.artistId, prev.artistId)) return true;
   if (doc.musicKey && prev.musicKey === doc.musicKey) return true;
   return doc.movieId != null && prev.movieId != null && String(doc.movieId) === String(prev.movieId);
 };

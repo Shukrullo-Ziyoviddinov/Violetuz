@@ -257,6 +257,19 @@ if (otherIds.slice(0, 5).join(',') !== '1,2,3,10,11') {
   fail('other-language mix order: ' + otherIds.join(','));
 } else ok('other-language step mixes inside itself');
 
+const arrayIds = idsOf(assembleDetailRecommend({
+  page: { type: 'music', artistId: ['a', 'b'], genre: 'jazz', language: 'fr', country: 'fr' },
+  catalog: [
+    popClip(21, ['b', 'z'], 2024),
+    popClip(22, ['q'], 2026),
+    popClip(23, 'a', 2020),
+  ],
+  seenIds: [],
+}));
+if (arrayIds.join(',') !== '21,23') {
+  fail('array artist ids were not each read: ' + arrayIds.join(','));
+} else ok('each artist id in the array is read');
+
 if (errors.length) {
   console.log('FAILED ' + errors.length);
   process.exit(1);

@@ -260,6 +260,25 @@ const seenIdsFromGuestHistory = (localHistory, resultType) => {
 const asText = (value) => String(value ?? '').trim();
 
 /**
+ * Bitta id yoki massiv. Har bir artist id alohida.
+ * @param {unknown} value
+ * @returns {string[]}
+ */
+const artistIdsOf = (value) => {
+  if (value === null || value === undefined || value === '') return [];
+  const list = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const out = [];
+  for (const item of list) {
+    const id = asText(item);
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+};
+
+/**
  * @param {unknown} value
  * @returns {string}
  */
@@ -396,20 +415,23 @@ const toSeenSet = (seenIds) => {
 
 /**
  * @param {Object} row
- * @param {string} artistId
+ * @param {Set<string>} artistIds
  * @returns {boolean}
  */
-const isActiveArtist = (row, artistId) => Boolean(artistId) && asText(row?.artistId) === artistId;
+const isActiveArtist = (row, artistIds) => {
+  if (!artistIds || artistIds.size === 0) return false;
+  return artistIdsOf(row?.artistId).some((id) => artistIds.has(id));
+};
 
 /**
  * @param {Object[]} rows
- * @param {string} artistId
+ * @param {Set<string>} artistIds
  * @returns {number}
  */
-const trailingActiveRun = (rows, artistId) => {
+const trailingActiveRun = (rows, artistIds) => {
   let run = 0;
   for (let index = rows.length - 1; index >= 0; index -= 1) {
-    if (!isActiveArtist(rows[index], artistId)) break;
+    if (!isActiveArtist(rows[index], artistIds)) break;
     run += 1;
   }
   return run;
@@ -419,16 +441,16 @@ const trailingActiveRun = (rows, artistId) => {
  * Kuchliroq aktiv ijrochi qoladi. Limitdan oshgani tushadi.
  *
  * @param {Object[]} rows
- * @param {string} artistId
+ * @param {Set<string>} artistIds
  * @param {number} max
  * @returns {Object[]}
  */
-const capActiveArtist = (rows, artistId, max) => {
-  if (!artistId || !Number.isFinite(max) || max < 0) return rows;
+const capActiveArtist = (rows, artistIds, max) => {
+  if (!artistIds || artistIds.size === 0 || !Number.isFinite(max) || max < 0) return rows;
   let kept = 0;
   const out = [];
   for (const row of rows) {
-    if (isActiveArtist(row, artistId)) {
+    if (isActiveArtist(row, artistIds)) {
       if (kept >= max) continue;
       kept += 1;
     }
@@ -442,24 +464,24 @@ const capActiveArtist = (rows, artistId, max) => {
  * Boshqa ijrochi qolmagan bo'lsa, qolgani o'z joyida turadi.
  *
  * @param {Object[]} rows
- * @param {string} artistId
+ * @param {Set<string>} artistIds
  * @param {number} runMax
  * @param {number} [initialRun]
  * @returns {Object[]}
  */
-const spaceActiveArtist = (rows, artistId, runMax, initialRun = 0) => {
-  if (!artistId || !Number.isFinite(runMax) || runMax <= 0) return rows.slice();
+const spaceActiveArtist = (rows, artistIds, runMax, initialRun = 0) => {
+  if (!artistIds || artistIds.size === 0 || !Number.isFinite(runMax) || runMax <= 0) return rows.slice();
   const pending = rows.slice();
   const out = [];
   let run = initialRun > 0 ? initialRun : 0;
   while (pending.length) {
-    const active = isActiveArtist(pending[0], artistId);
+    const active = isActiveArtist(pending[0], artistIds);
     if (!active || run < runMax) {
       out.push(pending.shift());
       run = active ? run + 1 : 0;
       continue;
     }
-    const otherIndex = pending.findIndex((row) => !isActiveArtist(row, artistId));
+    const otherIndex = pending.findIndex((row) => !isActiveArtist(row, artistIds));
     if (otherIndex === -1) {
       out.push(pending.shift());
       run += 1;
@@ -475,17 +497,17 @@ const spaceActiveArtist = (rows, artistId, runMax, initialRun = 0) => {
  * Qadam ichida: eshitilmagan oldin, keyin aktiv ijrochi limiti va aralashish.
  *
  * @param {Object[]} rows
- * @param {string} artistId
+ * @param {Set<string>} artistIds
  * @param {Set<string>} seen
  * @param {number} initialRun
  * @returns {Object[]}
  */
-const mixInsideStep = (rows, artistId, seen, initialRun) => {
+const mixInsideStep = (rows, artistIds, seen, initialRun) => {
   const ordered = unseenFirst(rows, seen);
-  const capped = capActiveArtist(ordered, artistId, detailRecommendWeights.activeArtistStepMax);
+  const capped = capActiveArtist(ordered, artistIds, detailRecommendWeights.activeArtistStepMax);
   return spaceActiveArtist(
     capped,
-    artistId,
+    artistIds,
     detailRecommendWeights.activeArtistRunMax,
     initialRun
   );
@@ -540,12 +562,12 @@ const assembleDetailRecommend = ({ page, catalog, seenIds } = {}) => {
   }
 
   const artistPool = [];
-  const artistId = asText(page?.artistId);
-  if (artistId) {
+  const artistIds = new Set(artistIdsOf(page?.artistId));
+  if (artistIds.size) {
     for (const row of byId.values()) {
       const id = asText(row.id);
       if (used.has(id)) continue;
-      if (asText(row.artistId) !== artistId) continue;
+      if (!isActiveArtist(row, artistIds)) continue;
       artistPool.push(row);
     }
     artistPool.sort(compareNewerYear(page));
@@ -574,9 +596,9 @@ const assembleDetailRecommend = ({ page, catalog, seenIds } = {}) => {
     : unseenFirst([...linked, ...artistOrdered], seen);
   const genreOrdered = mixInsideStep(
     genrePool,
-    artistId,
+    artistIds,
     seen,
-    trailingActiveRun(head, artistId)
+    trailingActiveRun(head, artistIds)
   );
   const ordered = [...head, ...genreOrdered];
 
@@ -599,9 +621,9 @@ const assembleDetailRecommend = ({ page, catalog, seenIds } = {}) => {
   otherLanguage.sort(compareNewerYear(page));
   const otherOrdered = mixInsideStep(
     otherLanguage,
-    artistId,
+    artistIds,
     seen,
-    trailingActiveRun(result, artistId)
+    trailingActiveRun(result, artistIds)
   );
 
   const filled = result.slice();

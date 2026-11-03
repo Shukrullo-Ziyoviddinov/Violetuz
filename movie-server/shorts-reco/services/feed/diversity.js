@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('../../config');
+const { sharesArtist } = require('../../utils/keys');
 
 /**
  * @param {unknown} left
@@ -39,7 +40,7 @@ const accepts = (picked, candidate, ctx) => {
     if (movieCount >= config.maxSameMoviePer10) return false;
   }
   if (candidate.artistId) {
-    const artistCount = block.filter((item) => item.artistId === candidate.artistId).length;
+    const artistCount = block.filter((item) => sharesArtist(item.artistId, candidate.artistId)).length;
     if (artistCount >= config.maxSameArtistPer10) return false;
   }
 
@@ -50,7 +51,7 @@ const accepts = (picked, candidate, ctx) => {
   const prev = history[history.length - 1];
   if (!prev) return true;
   if (candidate.musicKey && prev.musicKey === candidate.musicKey) return false;
-  if (candidate.artistId && prev.artistId === candidate.artistId) return false;
+  if (sharesArtist(candidate.artistId, prev.artistId)) return false;
   if (candidate.movieId == null) return true;
 
   let run = 0;

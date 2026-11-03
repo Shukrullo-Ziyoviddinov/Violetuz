@@ -1,6 +1,8 @@
 'use strict';
 
 const collections = require('../../../config/collections');
+const { artistIdsOf } = require('../../../utils/keys');
+const { balancedByArtist } = require('./artistBalance');
 
 /**
  * musicKey, then same song-group klip, then konsert.
@@ -21,10 +23,10 @@ const collect = async (ctx) => {
     return ctx.query({ songGroupId: anchor.songGroupId, contentType }, ctx.fetchLimit);
   }
   if (ctx.step === 'artistType') {
-    if (!anchor.artistId) return [];
-    const filter = { artistId: anchor.artistId };
-    if (anchor.contentType) filter.contentType = anchor.contentType;
-    return ctx.query(filter, ctx.fetchLimit);
+    if (!artistIdsOf(anchor.artistId).length) return [];
+    const extra = {};
+    if (anchor.contentType) extra.contentType = anchor.contentType;
+    return balancedByArtist(ctx, extra);
   }
   return [];
 };

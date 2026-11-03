@@ -2,7 +2,7 @@
 
 const collections = require('../../config/collections');
 const { readPath } = require('../../utils/get');
-const { toFiniteNumber, blankToNull } = require('../../utils/keys');
+const { toFiniteNumber, blankToNull, storedArtistId } = require('../../utils/keys');
 const { projectionFrom, forEachBatch, findByIds } = require('./batch');
 
 /**
@@ -25,7 +25,7 @@ const mapTrack = (doc, spec) => {
   return {
     kind: spec.kind,
     id: toFiniteNumber(readPath(doc, fields.id)),
-    artistId: blankToNull(readPath(doc, fields.artistId)),
+    artistId: storedArtistId(readPath(doc, fields.artistId)),
     title: blankToNull(readPath(doc, fields.title)) || '',
     genre: readPath(doc, fields.genre),
     country: readPath(doc, fields.country),

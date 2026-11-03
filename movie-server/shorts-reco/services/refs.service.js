@@ -2,7 +2,7 @@
 
 const config = require('../config');
 const collections = require('../config/collections');
-const { musicKey, blankToNull } = require('../utils/keys');
+const { musicKey, storedArtistId } = require('../utils/keys');
 const {
   genreKeysOfMovie,
   countryKeysOfMovie,
@@ -39,7 +39,7 @@ const getShortRefs = (input) => {
       movieId: short.movieId == null ? null : short.movieId,
       musicKey: key,
       songGroupId: input.songGroupId || null,
-      artistId: track && track.artistId ? track.artistId : null,
+      artistId: storedArtistId(track && track.artistId),
       movieGenres,
       movieCountries,
       musicGenres: genreKeysOfMusic(track),
@@ -56,7 +56,7 @@ const getShortRefs = (input) => {
     movieId: null,
     musicKey: key,
     songGroupId: key ? input.songGroupId || null : null,
-    artistId: blankToNull(short.artistId),
+    artistId: storedArtistId(short.artistId),
     movieGenres,
     movieCountries,
     musicGenres: unionKeys(genreKeysOfMusic(track), toKeyList(artist && artist.genres)),

@@ -1,6 +1,6 @@
 'use strict';
 
-const { genreProfileKey, musicGenreProfileKey } = require('../../utils/keys');
+const { genreProfileKey, musicGenreProfileKey, artistIdsOf } = require('../../utils/keys');
 const { seenStatus, canRepeat } = require('../eligibility.service');
 const { activityScore, dayWeight } = require('./heat');
 
@@ -143,7 +143,7 @@ const selectProfileSlice = (profiles, input) => {
     const seenShorts = new Set();
     for (let j = 0; j < shorts.length && eligible.length < shorts.length; j += 1) {
       const short = shorts[j];
-      if (!short || short.artistId !== profile.id || typeof short.shortId !== 'string') continue;
+      if (!short || !artistIdsOf(short.artistId).includes(String(profile.id)) || typeof short.shortId !== 'string') continue;
       if (taken.has(short.shortId) || seenShorts.has(short.shortId)) continue;
       const watch = readKey(source.watches, short.shortId);
       const status = seenStatus(watch, now);

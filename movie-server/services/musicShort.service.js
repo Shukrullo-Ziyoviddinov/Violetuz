@@ -1,6 +1,22 @@
 const MusicShortModel = require('../models/MusicShort.model');
 const { badRequest, notFound } = require('../utils/errors');
 
+const storedArtistId = (value) => {
+  if (value == null || value === '') return [];
+  const list = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const ids = [];
+  for (let i = 0; i < list.length; i += 1) {
+    const item = list[i];
+    if (item == null || item === '' || typeof item === 'object') continue;
+    const id = String(item).trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+};
+
 const stripMongoId = (doc) => {
   if (!doc) return doc;
   const plain = typeof doc.toJSON === 'function' ? doc.toJSON() : { ...doc };
@@ -88,7 +104,7 @@ class MusicShortService {
       rest.type = 'musicshorts';
     }
     if (rest.artistId) {
-      rest.artistId = String(rest.artistId).trim();
+      rest.artistId = storedArtistId(rest.artistId);
     }
 
     const item = new MusicShortModel(rest);

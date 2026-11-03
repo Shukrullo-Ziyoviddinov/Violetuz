@@ -18,6 +18,7 @@ import { getDominantColor } from '../utils/dominantColor';
 import { formatCount } from '../utils/utils';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
+import { hasArtistId } from './useArtistCycle';
 import '../Music/MusicCards/MusicCards.css';
 import '../Music/ClipsCards/ClipsCards.css';
 import '../components/Movies/Movies.css';
@@ -228,7 +229,7 @@ const ArtistDetail = () => {
     };
   }, [artist?.bio]);
 
-  const artistTracks = allMusic.filter((tr) => tr.artistId === id);
+  const artistTracks = allMusic.filter((tr) => hasArtistId(tr.artistId, id));
   const artistStories = getArtistMusicStoriesByArtist(id);
   const showStoriesSkeleton =
     showHeroDataSkeleton ||
@@ -284,7 +285,7 @@ const ArtistDetail = () => {
   }, [artist?.img]);
 
   useEffect(() => {
-    const isTrackFromThisArtist = currentMusic?.artistId === id;
+    const isTrackFromThisArtist = hasArtistId(currentMusic?.artistId, id);
     if (!isTrackFromThisArtist || !currentMusic) {
       setPlayingTrackColor(null);
       return;

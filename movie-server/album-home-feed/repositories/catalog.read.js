@@ -75,14 +75,33 @@ const findCatalogAlbumsByIds = async (contentIds) => {
 };
 
 /**
- * Tartib uchun bo'lim va ijrochi.
+ * Bitta id yoki massiv. Har bir artist id alohida.
+ * @param {unknown} value
+ * @returns {string[]}
+ */
+const artistIdsOf = (value) => {
+  if (value === null || value === undefined || value === '') return [];
+  const list = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const out = [];
+  for (const item of list) {
+    const id = String(item ?? '').trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+};
+
+/**
+ * Tartib uchun bo'lim va ijrochilar.
  *
  * @param {Array<string|number>} contentIds
- * @returns {Promise<Map<string, { category: string, artistId: string, genre: string }>>}
+ * @returns {Promise<Map<string, { category: string, artistIds: string[], genre: string }>>}
  */
 const findRankMetaByIds = async (contentIds) => {
   const ids = numericIds(contentIds);
-  /** @type {Map<string, { category: string, artistId: string, genre: string }>} */
+  /** @type {Map<string, { category: string, artistIds: string[], genre: string }>} */
   const map = new Map();
   if (!ids.length) return map;
 
@@ -96,7 +115,7 @@ const findRankMetaByIds = async (contentIds) => {
     if (!contentId || !category) continue;
     map.set(contentId, {
       category,
-      artistId: String(row.artistId || '').trim(),
+      artistIds: artistIdsOf(row.artistId),
       genre: String(row.genre || '').trim(),
     });
   }

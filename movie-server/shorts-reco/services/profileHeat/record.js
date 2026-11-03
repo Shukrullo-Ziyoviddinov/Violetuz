@@ -2,6 +2,7 @@
 
 const config = require('../../config');
 const { artistProfileRef } = require('./profileRef');
+const { artistIdsOf } = require('../../utils/keys');
 const { ACTIVITY, withinWindow } = require('./heat');
 
 const HEAT_FIELDS = ['likes', 'comments', 'rewatches'];
@@ -113,8 +114,8 @@ const createProfileSignalRecorder = (options = {}) => {
     if (!repo) return;
     try {
       const source = input || {};
-      const ref = artistProfileRef(source.catalog && source.catalog.artistId);
-      if (!ref || typeof source.userId !== 'string' || !source.userId.trim()) return;
+      const ids = artistIdsOf(source.catalog && source.catalog.artistId);
+      if (!ids.length || typeof source.userId !== 'string' || !source.userId.trim()) return;
 
       const signal = profileSignals(source);
       const at = source.event && source.event.ts instanceof Date
@@ -123,27 +124,32 @@ const createProfileSignalRecorder = (options = {}) => {
       const day = utcDay(at);
       if (!day) return;
 
-      if (signal.likes > 0 || signal.comments > 0 || signal.rewatches > 0) {
-        const current = await repo.findHeat(ref.key);
-        await repo.saveHeat({
-          key: ref.key,
-          kind: ref.kind,
-          id: ref.id,
-          days: bumpDays(current && current.days, day, signal, HEAT_FIELDS, at),
-          updatedAt: at,
-        });
-      }
+      for (let i = 0; i < ids.length; i += 1) {
+        const ref = artistProfileRef(ids[i]);
+        if (!ref) continue;
 
-      if (signal.passes > 0) {
-        const current = await repo.findUserSlowdown(source.userId, ref.key);
-        await repo.saveUserSlowdown({
-          userId: source.userId,
-          key: ref.key,
-          kind: ref.kind,
-          id: ref.id,
-          days: bumpDays(current && current.days, day, signal, PASS_FIELDS, at),
-          updatedAt: at,
-        });
+        if (signal.likes > 0 || signal.comments > 0 || signal.rewatches > 0) {
+          const current = await repo.findHeat(ref.key);
+          await repo.saveHeat({
+            key: ref.key,
+            kind: ref.kind,
+            id: ref.id,
+            days: bumpDays(current && current.days, day, signal, HEAT_FIELDS, at),
+            updatedAt: at,
+          });
+        }
+
+        if (signal.passes > 0) {
+          const current = await repo.findUserSlowdown(source.userId, ref.key);
+          await repo.saveUserSlowdown({
+            userId: source.userId,
+            key: ref.key,
+            kind: ref.kind,
+            id: ref.id,
+            days: bumpDays(current && current.days, day, signal, PASS_FIELDS, at),
+            updatedAt: at,
+          });
+        }
       }
     } catch (error) {
       logFailure(logger, error);

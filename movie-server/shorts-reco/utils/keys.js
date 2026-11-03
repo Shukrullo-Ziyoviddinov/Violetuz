@@ -109,6 +109,51 @@ const actorProfileKey = (id) => profileKey('ac', id);
  * @param {unknown} value
  * @returns {Array<number|string>}
  */
+/**
+ * Bitta id yoki massiv. Har bir artist id alohida.
+ * @param {unknown} value
+ * @returns {string[]}
+ */
+const artistIdsOf = (value) => {
+  if (value == null || value === '') return [];
+  const list = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const out = [];
+  for (let i = 0; i < list.length; i += 1) {
+    const item = list[i];
+    if (item == null || item === '' || typeof item === 'object') continue;
+    const id = String(item).trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+};
+
+/**
+ * Bitta id satr bo‘lib qoladi. Bir nechtasi massiv.
+ * @param {unknown} value
+ * @returns {string|string[]|null}
+ */
+const storedArtistId = (value) => {
+  const ids = artistIdsOf(value);
+  if (!ids.length) return null;
+  if (ids.length === 1) return ids[0];
+  return ids;
+};
+
+/**
+ * @param {unknown} left
+ * @param {unknown} right
+ * @returns {boolean}
+ */
+const sharesArtist = (left, right) => {
+  const ids = artistIdsOf(left);
+  if (!ids.length) return false;
+  const other = new Set(artistIdsOf(right));
+  return ids.some((id) => other.has(id));
+};
+
 const uniqueIds = (value) => {
   const list = Array.isArray(value) ? value : value == null ? [] : [value];
   const out = [];
@@ -155,5 +200,8 @@ module.exports = {
   countryProfileKey,
   typeProfileKey,
   actorProfileKey,
+  artistIdsOf,
+  storedArtistId,
+  sharesArtist,
   uniqueIds,
 };

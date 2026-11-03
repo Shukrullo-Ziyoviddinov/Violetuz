@@ -81,8 +81,15 @@ const cols = {
   musicArtists: artists,
 };
 
+const hasArtist = (item, artistId) => {
+  const raw = item?.artistId;
+  if (raw == null || raw === '') return false;
+  const list = Array.isArray(raw) ? raw : [raw];
+  return list.some((id) => String(id) === artistId);
+};
+
 const allJah = (list) =>
-  list.length > 0 && list.every((x) => String(x.artistId) === 'jah-khalib');
+  list.length > 0 && list.every((x) => hasArtist(x, 'jah-khalib'));
 
 // Content type multi
 const ct1 = parseContentType('jah khalib musiqalari kliplari konsertlari');
@@ -152,7 +159,7 @@ ok(
   r6.music.length > 0 &&
     r6.music.every(
       (m) =>
-        m.artistId === 'jah-khalib' &&
+        hasArtist(m, 'jah-khalib') &&
         Number(m.year) === 2024 &&
         /rap|hip/i.test(String(m.genre))
     ),

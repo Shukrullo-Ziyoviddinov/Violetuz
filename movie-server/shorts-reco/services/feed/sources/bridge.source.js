@@ -1,6 +1,8 @@
 'use strict';
 
 const collections = require('../../../config/collections');
+const { artistIdsOf } = require('../../../utils/keys');
+const { balancedByArtist } = require('./artistBalance');
 
 const movieType = collections.existing.shortsVideos.type;
 const musicType = collections.existing.musicShorts.type;
@@ -35,8 +37,8 @@ const collect = async (ctx) => {
     return ctx.query({ type: musicType, songGroupId: anchor.songGroupId }, ctx.fetchLimit);
   }
   if (ctx.step === 'artist') {
-    if (!anchor.artistId) return [];
-    return ctx.query({ type: musicType, artistId: anchor.artistId }, ctx.fetchLimit);
+    if (!artistIdsOf(anchor.artistId).length) return [];
+    return balancedByArtist(ctx, { type: musicType });
   }
   if (ctx.step === 'musicTaste') {
     const or = tasteFilter(anchor.musicGenres || [], anchor.musicCountries || [], 'musicGenres', 'musicCountries');

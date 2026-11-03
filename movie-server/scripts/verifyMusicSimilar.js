@@ -18,7 +18,7 @@ const {
   buildSimilarMusicItems,
   computeGeneralSimilarity,
   interleaveArtistGenreAndGeneral,
-  artistIdOf,
+  sameArtist,
   genreOf,
 } = require('../music-similar/services/similarMusicEngine');
 const {
@@ -132,12 +132,11 @@ if (fMany.length !== similarityWeights.q1Max) {
   fail('q1Max not applied ' + fMany.length);
 } else ok('Q1 cut by q1Max=' + similarityWeights.q1Max);
 
-const artist = artistIdOf(m801);
 const genre = genreOf(m801);
 const q2 = rows1.filter((r) => r.layer === L.artistGenre);
 if (q2.length > similarityWeights.q2Max) fail('q2Max exceeded ' + q2.length);
 else ok('Q2 cap <= q2Max (' + q2.length + ')');
-if (q2.some((r) => artistIdOf(r.item) !== artist || genreOf(r.item) !== genre)) {
+if (q2.some((r) => !sameArtist(m801, r.item) || genreOf(r.item) !== genre)) {
   fail('Q2 not hard artist+genre');
 } else ok('Q2 hard artist+genre');
 
@@ -196,10 +195,7 @@ if (clipF[0]?.id !== 1103 || clipF[1]?.id !== 1104) {
 } else ok('clip L1 franchise order [1103,1104]');
 
 const q3SameArtist = clipRows.filter(
-  (r) =>
-    r.layer === L.general &&
-    String(r.item?.artistId || '').toLowerCase() ===
-      String(k1101.artistId || '').toLowerCase()
+  (r) => r.layer === L.general && sameArtist(k1101, r.item)
 );
 if (q3SameArtist.length) fail('Q3 includes same artist');
 else ok('Q3 excludes same artist');
@@ -210,11 +206,7 @@ const dramaRows = buildSimilarMusicItems(k1102, klips, {
   limit: 10,
 });
 const dramaQ3 = dramaRows.filter((r) => r.layer === L.general);
-const dramaQ3Other = dramaQ3.filter(
-  (r) =>
-    String(r.item?.artistId || '').toLowerCase() !==
-    String(k1102.artistId || '').toLowerCase()
-);
+const dramaQ3Other = dramaQ3.filter((r) => !sameArtist(k1102, r.item));
 if (dramaQ3.length && dramaQ3Other.length !== dramaQ3.length) {
   fail('drama Q3 same artist leak');
 } else ok('drama Q3 only other artists (' + dramaQ3Other.length + ')');

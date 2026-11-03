@@ -13,6 +13,12 @@ export const artistIdsOf = (value) => {
 
 export const firstArtistId = (value) => artistIdsOf(value)[0] || '';
 
+export const hasArtistId = (value, artistId) => {
+  const id = String(artistId || '').trim();
+  if (!id) return false;
+  return artistIdsOf(value).includes(id);
+};
+
 /**
  * 2 va undan ko'p artist bo'lsa har 4 soniyada keyingisiga o'tadi.
  * phase: idle | out | in

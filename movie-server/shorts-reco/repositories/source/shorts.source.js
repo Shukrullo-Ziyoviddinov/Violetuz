@@ -2,7 +2,7 @@
 
 const collections = require('../../config/collections');
 const { readPath } = require('../../utils/get');
-const { toFiniteNumber, blankToNull } = require('../../utils/keys');
+const { toFiniteNumber, blankToNull, storedArtistId } = require('../../utils/keys');
 const { projectionFrom, forEachBatch } = require('./batch');
 
 /**
@@ -32,7 +32,7 @@ const mapShort = (doc, spec, role) => {
     numericId,
     sourceType: blankToNull(readPath(doc, fields.type)),
     musicId: toFiniteNumber(readPath(doc, fields.musicId)),
-    artistId: blankToNull(readPath(doc, fields.artistId)),
+    artistId: storedArtistId(readPath(doc, fields.artistId)),
     movieId: toFiniteNumber(readPath(doc, fields.movieId)),
     contentType: blankToNull(readPath(doc, fields.contentType)),
   };

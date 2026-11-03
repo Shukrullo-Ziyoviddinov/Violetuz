@@ -6,6 +6,7 @@ const {
   movieProfileKey,
   musicProfileKey,
   artistProfileKey,
+  artistIdsOf,
   genreProfileKey,
   musicGenreProfileKey,
   countryProfileKey,
@@ -140,14 +141,9 @@ const portionsOf = (catalog) => {
       portion: share.type,
       kind: 'type',
     });
-    if (catalog.artistId) {
-      parts.push({
-        bucket: 'artists',
-        key: artistProfileKey(catalog.artistId),
-        portion: share.artist,
-        kind: 'artist',
-      });
-    }
+    parts.push(
+      ...equalPortions(artistIdsOf(catalog.artistId), share.artist, artistProfileKey, 'artists', 'artist')
+    );
     parts.push(...genrePortions(catalog.movieGenres, catalog.movieTypeCategories));
     parts.push(
       ...equalPortions(catalog.movieCountries, share.country, countryProfileKey, 'countries', 'country')
@@ -175,14 +171,9 @@ const portionsOf = (catalog) => {
 
   if (catalog.type === musicShortType) {
     const share = config.shares.musicshorts;
-    if (catalog.artistId) {
-      parts.push({
-        bucket: 'artists',
-        key: artistProfileKey(catalog.artistId),
-        portion: share.artist,
-        kind: 'artist',
-      });
-    }
+    parts.push(
+      ...equalPortions(artistIdsOf(catalog.artistId), share.artist, artistProfileKey, 'artists', 'artist')
+    );
     if (catalog.musicKey) {
       parts.push({
         bucket: 'musicKeys',

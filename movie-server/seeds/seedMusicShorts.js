@@ -37,8 +37,19 @@ const seedMusicShorts = async () => {
     } else {
       data.type = 'musicshorts';
     }
-    if (data.artistId) {
-      data.artistId = String(data.artistId).trim();
+    if (data.artistId == null || data.artistId === '') {
+      data.artistId = [];
+    } else {
+      const list = Array.isArray(data.artistId) ? data.artistId : [data.artistId];
+      const seen = new Set();
+      const ids = [];
+      for (const item of list) {
+        const id = String(item ?? '').trim();
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+        ids.push(id);
+      }
+      data.artistId = ids;
     }
     if (data.video?.uz && !String(data.video.uz).startsWith('/')) {
       data.video.uz = `/${data.video.uz}`;

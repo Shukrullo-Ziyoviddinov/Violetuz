@@ -54,7 +54,7 @@ const assembleAlbumFeed = async ({
     withMeta.push({
       ...row,
       category: info.category,
-      artists: info.artistId ? [info.artistId] : [],
+      artists: info.artistIds || [],
     });
   }
 

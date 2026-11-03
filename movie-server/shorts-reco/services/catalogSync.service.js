@@ -2,7 +2,7 @@
 
 const config = require('../config');
 const collections = require('../config/collections');
-const { musicKey } = require('../utils/keys');
+const { musicKey, artistIdsOf } = require('../utils/keys');
 const { minutesToMs, nowDate } = require('../utils/time');
 const { createReadSources } = require('../repositories/source');
 const { createCatalogRepo, chunkRecords } = require('../repositories/catalog.repo');
@@ -113,7 +113,7 @@ const createCatalogSync = (options) => {
     for (let i = 0; i < musicShorts.length; i += 1) {
       const short = musicShorts[i];
       if (short.movieId != null) movieIds.push(short.movieId);
-      if (short.artistId) artistIds.push(short.artistId);
+      artistIds.push(...artistIdsOf(short.artistId));
     }
 
     const movies = await sources.movies.findByIds(movieIds);
@@ -134,8 +134,9 @@ const createCatalogSync = (options) => {
         const kind = key ? key.slice(0, key.indexOf(':')) : null;
         const track = lookupTrack(trackIndex, kind, short.musicId);
         const movie = short.movieId == null ? null : movies.get(short.movieId) || null;
-        const artist = short.role === 'music' && short.artistId
-          ? artists.get(short.artistId) || null
+        const shortArtistIds = artistIdsOf(short.artistId);
+        const artist = short.role === 'music' && shortArtistIds.length
+          ? artists.get(shortArtistIds[0]) || null
           : null;
         const record = buildCatalogRecord({
           short,

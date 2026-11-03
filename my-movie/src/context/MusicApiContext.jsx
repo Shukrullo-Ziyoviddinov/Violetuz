@@ -22,6 +22,7 @@ import { fetchAllArtists } from '../api/artistsApi';
 import { fetchAllMusicShorts } from '../api/musicShortsApi';
 import { fetchAllMusicBanners } from '../api/musicBannersApi';
 import { resolveMusicShortsCatalog } from '../utils/resolveMusicShortsCatalog';
+import { hasArtistId } from '../pageMusic/useArtistCycle';
 
 const MusicApiContext = createContext(null);
 
@@ -257,13 +258,13 @@ export const MusicApiProvider = ({ children }) => {
       return allMusic.filter((item) => item.categoryNameMusic === section.categoryNameMusic);
     },
     getMusicByArtist: (artistId) =>
-      allMusic.filter((item) => item.artistId === artistId),
+      allMusic.filter((item) => hasArtistId(item.artistId, artistId)),
     getAlbumsByArtist: (artistId) =>
-      allAlbums.filter((item) => item.artistId === artistId),
+      allAlbums.filter((item) => hasArtistId(item.artistId, artistId)),
     getClipsByArtist: (artistId) =>
-      allClips.filter((item) => item.artistId === artistId),
+      allClips.filter((item) => hasArtistId(item.artistId, artistId)),
     getConcertsByArtist: (artistId) =>
-      allConcerts.filter((item) => item.artistId === artistId),
+      allConcerts.filter((item) => hasArtistId(item.artistId, artistId)),
     getArtistMusicStoriesByArtist: (artistId) =>
       allArtistMusicStories.filter((item) => item.artistId === artistId),
     getMusicShortsByArtist: (artistId) =>

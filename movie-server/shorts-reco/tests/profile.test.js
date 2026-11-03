@@ -65,6 +65,15 @@ near(music.longTerm.movies['m:9'], 0.6);
 assert.equal(music.longTerm.movieEngagementRaw['9'], undefined);
 near(music.longTerm.artists['a:jah-khalib'], 1.5);
 
+const splitArtists = emptyProfile('user-1', now);
+applyScoreChange(splitArtists, {
+  type: 'musicshorts',
+  artistId: ['jah-khalib', 'shohruhxon'],
+  musicKey: 'music:802',
+}, 0, 1.5, 1);
+near(splitArtists.longTerm.artists['a:jah-khalib'], 0.75);
+near(splitArtists.longTerm.artists['a:shohruhxon'], 0.75);
+
 let session = { items: [] };
 for (let id = 1; id <= 13; id += 1) {
   session = pushSession(session, { shortId: `movieShorts:${id}`, score: id, refs: {}, ts: now });

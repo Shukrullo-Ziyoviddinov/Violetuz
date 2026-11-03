@@ -9,6 +9,7 @@ const { createStatsRepo } = require('../../repositories/stats.repo');
 const { createFeedSessionRepo } = require('../../repositories/feedSession.repo');
 const { createProfileHeatRepo } = require('../../repositories/profileHeat.repo');
 const { createProfileSliceService } = require('../profileHeat/slice');
+const { artistIdsOf } = require('../../utils/keys');
 const { appendProfileHeat } = require('../profileHeat/attach');
 const { topQualifyingMovies, confirmedActors, splitActorSlots } = require('../actors.service');
 const { emptyProfile, hydrateProfile } = require('../profile.service');
@@ -69,8 +70,10 @@ const loadAnchorSample = async (anchor, query) => {
   if (anchor.kind === 'music' && anchor.musicKey) {
     return (await query({ musicKey: anchor.musicKey }, 1))[0] || null;
   }
-  if (anchor.kind === 'artist' && anchor.artistId) {
-    return (await query({ artistId: anchor.artistId }, 1))[0] || null;
+  const artistIds = artistIdsOf(anchor.artistId);
+  if (anchor.kind === 'artist' && artistIds.length) {
+    const artistId = artistIds.length === 1 ? artistIds[0] : { $in: artistIds };
+    return (await query({ artistId }, 1))[0] || null;
   }
   return null;
 };

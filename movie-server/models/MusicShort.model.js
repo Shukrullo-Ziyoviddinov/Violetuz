@@ -29,9 +29,8 @@ const musicShortSchema = new mongoose.Schema(
       index: true,
     },
     artistId: {
-      type: String,
-      trim: true,
-      default: '',
+      type: [String],
+      default: [],
       index: true,
     },
     movieId: {

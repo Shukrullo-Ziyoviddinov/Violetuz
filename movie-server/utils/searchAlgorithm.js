@@ -333,9 +333,13 @@ const movieHasAnyActor = (movie, actorIds) => {
 
 const mediaHasAnyArtist = (item, artistIds) => {
   if (!artistIds?.length) return true;
-  const id = item?.artistId;
-  if (id == null || id === '') return false;
-  return artistIds.some((aid) => String(aid) === String(id));
+  const raw = item?.artistId;
+  if (raw == null || raw === '') return false;
+  const list = (Array.isArray(raw) ? raw : [raw])
+    .map((id) => String(id ?? '').trim())
+    .filter(Boolean);
+  if (!list.length) return false;
+  return artistIds.some((aid) => list.includes(String(aid)));
 };
 
 const rankItemsByYearFacets = (items, facets, scoreFn, getYear = getItemYear, options = {}) => {
