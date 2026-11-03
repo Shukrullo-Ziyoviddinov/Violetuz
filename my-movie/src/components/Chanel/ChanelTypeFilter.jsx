@@ -229,7 +229,10 @@ const ChanelTypeFilter = ({
           />
           <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
         </label>,
-        document.querySelector('.navbar.navbar--channel-profile .navbar-container') || document.body,
+        (document.body.classList.contains('channel-mobile-profile')
+          ? document.querySelector('.channel-profile-back')
+          : document.querySelector('.navbar.navbar--channel-profile .navbar-container'))
+          || document.body,
       ) : null}
       {mobileOpen ? createPortal(
         <div className="chanel-search-mobile">

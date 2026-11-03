@@ -510,6 +510,20 @@ a.channel-page-card:hover {
     gap: 0.35rem;
   }
 
+  body.channel-mobile-profile.channel-mobile-search-open .channel-profile-back {
+    z-index: 1000;
+  }
+
+  body.channel-mobile-profile.channel-mobile-search-open .channel-profile-back-btn,
+  body.channel-mobile-profile.channel-mobile-search-open .channel-profile-back-identity,
+  body.channel-mobile-profile.channel-mobile-search-open .channel-profile-back-actions {
+    display: none;
+  }
+
+  body.channel-mobile-profile.channel-mobile-search-open .chanel-search-mobile {
+    padding-top: 49px;
+  }
+
   body.channel-mobile-profile .channel-profile-search-btn {
     display: inline-flex;
     align-items: center;

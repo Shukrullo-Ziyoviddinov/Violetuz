@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { fetchAllChannels, fetchChannelById } from '../api/channelsApi';
-import { requestOpenSearchModal } from '../searchModalBridge';
+import { requestOpenChannelSearch } from '../channelSearchBridge';
 import ChanelBiografiyaModal from '../components/Chanel/ChanelBiografiyaModal';
 import ChanelProfileBanner from '../components/Chanel/ChanelProfileBanner';
 import ChanelTypeFilter from '../components/Chanel/ChanelTypeFilter';
@@ -191,7 +191,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
           <button
             type="button"
             className="channel-profile-search-btn"
-            onClick={requestOpenSearchModal}
+            onClick={requestOpenChannelSearch}
             aria-label={t('navbar.search')}
           >
             <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
