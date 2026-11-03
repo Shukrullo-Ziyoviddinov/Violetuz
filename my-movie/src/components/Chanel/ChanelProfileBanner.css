@@ -93,7 +93,7 @@
 
 @media (max-width: 640px) {
   .channel-profile-banner {
-    height: 132px;
+    height: 160px;
     border-radius: 10px;
   }
 
@@ -105,5 +105,46 @@
     left: 0.7rem;
     max-width: min(150px, 46%);
     max-height: 58px;
+  }
+}
+
+@media (min-width: 500px) and (max-width: 640px) {
+  .channel-profile-banner-title {
+    max-width: min(185px, 50%);
+    max-height: 74px;
+  }
+}
+
+@media (max-width: 460px) {
+  .channel-profile-banner {
+    height: 132px;
+  }
+}
+
+@media (min-width: 601px) {
+  .channel-profile-banner {
+    height: 240px;
+  }
+}
+
+@media (min-width: 801px) {
+  .channel-profile-banner {
+    height: 300px;
+  }
+
+  .channel-profile-banner-title {
+    max-width: min(280px, 46%);
+    max-height: 108px;
+  }
+}
+
+@media (min-width: 1021px) {
+  .channel-profile-banner {
+    height: 380px;
+  }
+
+  .channel-profile-banner-title {
+    max-width: min(310px, 46%);
+    max-height: 124px;
   }
 }
