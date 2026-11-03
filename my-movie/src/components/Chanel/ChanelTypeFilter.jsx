@@ -14,6 +14,9 @@ const MOBILE_SEARCH_MAX = 768;
 const CHANNEL_TYPES = [
   { id: 'all', label: 'Hammasi' },
   { id: 'movies', label: 'Kinolar' },
+  { id: 'music', label: 'Musiqa' },
+  { id: 'klip', label: 'Klip' },
+  { id: 'album', label: 'Albom' },
   { id: 'videos', label: 'Videolar' },
   { id: 'shorts', label: 'Shortslar' },
   { id: 'playlists', label: 'Playlistlar' },

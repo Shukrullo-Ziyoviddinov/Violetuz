@@ -34,17 +34,23 @@ const ShortsChannelHead = ({ item, onWatchClick }) => {
             <span aria-hidden="true">{String(channel.name || '?').slice(0, 1)}</span>
           )}
         </div>
-        <div className="shorts-modal-channel-meta">
+      </Link>
+      <div className="shorts-modal-channel-copy">
+        <Link
+          to={`/channel/${encodeURIComponent(channel.id || channelId)}`}
+          className="shorts-modal-channel-meta"
+          onClick={handleClick}
+        >
           <div className="shorts-modal-channel-name">{channel.name}</div>
           <div className="shorts-modal-channel-type">Kanal</div>
-        </div>
-      </Link>
-      <FollowingButton
-        artistId={channel.id || channelId}
-        entityType="channel"
-        stopPropagation
-        wrapperClassName="shorts-modal-channel-follow"
-      />
+        </Link>
+        <FollowingButton
+          artistId={channel.id || channelId}
+          entityType="channel"
+          stopPropagation
+          wrapperClassName="shorts-modal-channel-follow"
+        />
+      </div>
     </div>
   );
 };

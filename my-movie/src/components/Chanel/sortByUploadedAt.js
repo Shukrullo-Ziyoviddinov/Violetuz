@@ -1,5 +1,5 @@
 const uploadedAt = (item) => {
-  const time = Date.parse(item?.createdAt || '');
+  const time = Date.parse(item?.createdAt || item?.uploadedAt || '');
   return Number.isFinite(time) ? time : 0;
 };
 

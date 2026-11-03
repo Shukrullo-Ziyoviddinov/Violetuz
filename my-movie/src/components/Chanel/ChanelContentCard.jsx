@@ -40,6 +40,18 @@ const WishlistButton = ({ saved, onToggle }) => (
   </button>
 );
 
+const MEDIA_ROUTE = {
+  music: (item) => `/music/${item.id}`,
+  klip: (item) => `/music/video/${item.id}`,
+  album: (item) => `/music/album/${item.id}`,
+};
+
+const MEDIA_WISHLIST = {
+  music: 'music',
+  klip: 'klip',
+  album: 'album',
+};
+
 const ChanelContentCard = ({ kind, item, layout = 'grid' }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -52,7 +64,7 @@ const ChanelContentCard = ({ kind, item, layout = 'grid' }) => {
       ? item.homeImg[contentLang] || item.homeImg.uz || item.homeImg.ru || ''
       : '')
     : item?.img || '';
-  const wishlistType = isMovie ? 'movie' : 'music';
+  const wishlistType = isMovie ? 'movie' : (MEDIA_WISHLIST[kind] || 'music');
   const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
   const saved = isInWishlist(item.id, wishlistType);
   const isSoon = isMovie && item.category === 'anonslar';
