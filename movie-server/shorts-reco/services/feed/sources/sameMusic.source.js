@@ -2,6 +2,7 @@
 
 const collections = require('../../../config/collections');
 const { artistIdsOf } = require('../../../utils/keys');
+const { songGroupMatch } = require('../../songLinks.service');
 const { balancedByArtist } = require('./artistBalance');
 
 /**
@@ -16,11 +17,12 @@ const collect = async (ctx) => {
     return ctx.query({ musicKey: anchor.musicKey }, ctx.fetchLimit);
   }
   if (ctx.step === 'klip' || ctx.step === 'konsert') {
-    if (!anchor.songGroupId) return [];
+    const songGroupId = songGroupMatch(anchor.songGroupId);
+    if (!songGroupId) return [];
     const contentType = ctx.step === 'klip'
       ? collections.existing.clips.kind
       : collections.existing.concerts.kind;
-    return ctx.query({ songGroupId: anchor.songGroupId, contentType }, ctx.fetchLimit);
+    return ctx.query({ songGroupId, contentType }, ctx.fetchLimit);
   }
   if (ctx.step === 'artistType') {
     if (!artistIdsOf(anchor.artistId).length) return [];

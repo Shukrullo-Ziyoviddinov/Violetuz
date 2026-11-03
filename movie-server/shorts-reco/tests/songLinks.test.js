@@ -81,8 +81,40 @@ const sameIds = buildSongGroups([
   { kind: 'music', id: 31, artistId: ['shohruhxon', 'jah-khalib'], title: 'Life' },
   { kind: 'konsert', id: 32, artistId: ['jah-khalib', 'shohruhxon'], title: 'Life' },
 ]);
-assert.equal(sameIds.groups.length, 1);
-assert.equal(sameIds.byMusicKey.get('music:31'), sameIds.byMusicKey.get('konsert:32'));
+assert.deepEqual(
+  sameIds.groups.map((group) => group.songGroupId).sort(),
+  ['song:title:jah-khalib:life', 'song:title:shohruhxon:life']
+);
+assert.deepEqual(sameIds.byMusicKey.get('music:31'), sameIds.byMusicKey.get('konsert:32'));
+assert.deepEqual(sameIds.byMusicKey.get('music:31'), [
+  'song:title:jah-khalib:life',
+  'song:title:shohruhxon:life',
+]);
+
+const bridge = buildSongGroups([
+  { kind: 'music', id: 61, artistId: 'shohruhxon', title: 'Life' },
+  { kind: 'klip', id: 62, artistId: ['shohruhxon', 'jah-khalib'], title: 'Life' },
+  { kind: 'konsert', id: 63, artistId: 'jah-khalib', title: 'Life' },
+]);
+const bridgeId = (artistId) => bridge.groups.find((group) => group.songGroupId === `song:title:${artistId}:life`);
+const shohruhGroup = bridgeId('shohruhxon');
+const jahGroup = bridgeId('jah-khalib');
+assert.equal(bridge.groups.length, 2);
+assert.equal(bridge.groups.some((group) => String(group.songGroupId).includes(':null:')), false);
+assert.deepEqual(
+  shohruhGroup.members.map((member) => member.musicKey),
+  ['music:61', 'klip:62']
+);
+assert.deepEqual(
+  jahGroup.members.map((member) => member.musicKey),
+  ['klip:62', 'konsert:63']
+);
+assert.equal(resolveSongGroup(bridge.byMusicKey, 'music:61'), 'song:title:shohruhxon:life');
+assert.equal(resolveSongGroup(bridge.byMusicKey, 'konsert:63'), 'song:title:jah-khalib:life');
+assert.deepEqual(resolveSongGroup(bridge.byMusicKey, 'klip:62'), [
+  'song:title:jah-khalib:life',
+  'song:title:shohruhxon:life',
+]);
 
 const differentArtist = buildSongGroups([
   { kind: 'music', id: 41, artistId: ['jah-khalib'], title: 'Life' },

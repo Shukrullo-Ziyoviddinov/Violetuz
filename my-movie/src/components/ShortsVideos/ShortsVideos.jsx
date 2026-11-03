@@ -25,8 +25,7 @@ import ShortsShare from './ShortsShare';
 import Repost from '../Repost/Repost';
 import SearchModalTavsiya from '../SearchModalTavsiya/SearchModalTavsiya';
 import LikeButton from '../../Music/LikeButton/LikeButton';
-import ShortsMovieHead from './ShortsMovieHead';
-import ShortsMusicHead from './ShortsMusicHead';
+import ShortsChannelHead from './ShortsChannelHead';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
 import { hasArtistId } from '../../pageMusic/useArtistCycle';
 import { formatShortsLikeCount } from '../../utils/utils';
@@ -104,17 +103,9 @@ const ShortsSaveButton = ({ item, isInWishlist, onClick }) => {
   );
 };
 
-const renderShortsModalTitle = (item, contentLang, isMusicSlide = false, onWatchClick) => {
-  if (isMusicSlide && item?.musicId) {
-    return <ShortsMusicHead item={item} contentLang={contentLang} onWatchClick={onWatchClick} />;
-  }
-  if (!isMusicSlide && item?.movieId) {
-    return <ShortsMovieHead item={item} contentLang={contentLang} onWatchClick={onWatchClick} />;
-  }
-  return (
-    <h3 className="shorts-modal-title">{getLocalizedField(item?.title, contentLang)}</h3>
-  );
-};
+const renderShortsModalTitle = (item, onWatchClick) => (
+  <ShortsChannelHead item={item} onWatchClick={onWatchClick} />
+);
 
 // Bitta video player card (desktop animatsiya uchun)
 const VideoSlide = React.forwardRef(({ item, contentLang, videoState, onVideoClick, onProgressClick, onDescriptionClick, onWatchClick, descriptionExpanded, showPlayPause, onMouseEnter, onMouseLeave }, ref) => {
@@ -159,7 +150,7 @@ const VideoSlide = React.forwardRef(({ item, contentLang, videoState, onVideoCli
           <Link to={`/movie/${item.movieId}`} className="shorts-modal-watch-btn" onClick={onWatchClick}>
             {contentLang === 'ru' ? 'Смотреть' : 'Tomosha qilish'}
           </Link>
-          {renderShortsModalTitle(item, contentLang, false, onWatchClick)}
+          {renderShortsModalTitle(item, onWatchClick)}
           <p
             className={`shorts-modal-description ${descriptionExpanded ? 'shorts-modal-description-expanded' : ''}`}
             onClick={onDescriptionClick}
@@ -1216,7 +1207,7 @@ const ShortsVideos = ({
           <>
         <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-mobile ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
           <div className="shorts-modal-info-content">
-            {renderShortsModalTitle(item, contentLang, itemMusic, handleWatchClick)}
+            {renderShortsModalTitle(item, handleWatchClick)}
             <div className="shorts-modal-caption-music-wrap">
               <div className="shorts-modal-description-row">
                 <p
@@ -1555,7 +1546,7 @@ const ShortsVideos = ({
                 {showChrome && (
                 <div className={`shorts-modal-info shorts-modal-info-overlay shorts-modal-info-desktop ${descriptionExpanded ? 'shorts-modal-info-expanded' : ''}`}>
                   <div className="shorts-modal-info-content">
-                    {renderShortsModalTitle(item, contentLang, itemMusic, handleWatchClick)}
+                    {renderShortsModalTitle(item, handleWatchClick)}
                     <div className="shorts-modal-caption-music-wrap">
                       <div className="shorts-modal-description-row">
                         <p

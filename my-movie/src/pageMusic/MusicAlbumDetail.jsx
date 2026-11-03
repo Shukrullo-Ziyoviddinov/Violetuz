@@ -29,7 +29,7 @@ import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import ViewCount from '../components/ViewCount/ViewCount';
 import './MusicDetail.css';
 import './MusicAlbumDetail.css';
-import { artistIdsOf, firstArtistId, useArtistCycle } from './useArtistCycle';
+import { artistIdsOf, firstArtistId, formatArtistNames, useArtistCycle } from './useArtistCycle';
 
 const TREND_SKELETON_COUNT = 8;
 const SONGS_SKELETON_COUNT = 6;
@@ -69,8 +69,12 @@ const AlbumTrendCard = ({
   audioGraphReady,
   blockClick,
 }) => {
+  const { getArtistById } = useMusicApi();
   const imgSrc = item.img || '/img/movie1.jpg';
   const { showSkeleton: showImgSkeleton, imgRef, onLoad, onError } = useImageReady(imgSrc);
+  const artistLabel =
+    formatArtistNames(item?.artistId, getArtistById) ||
+    (typeof item?.artist === 'string' ? item.artist.trim() : '');
 
   return (
     <div
@@ -141,7 +145,7 @@ const AlbumTrendCard = ({
           <>
             <span className="music-detail-trend-card-title">{item.title}</span>
             <div className="music-detail-trend-card-artist-wrap">
-              <span className="music-detail-trend-card-artist">{item.artist}</span>
+              <span className="music-detail-trend-card-artist">{artistLabel}</span>
               {item?.id != null && (
                 <ViewCount itemId={item.id} type="album" variant="text" record={false} />
               )}
@@ -395,7 +399,9 @@ const MusicAlbumDetail = () => {
   const artistImgSrc = manyAlbumArtists
     ? (cycledAlbumArtist?.imgArtist || cycledAlbumArtist?.img || '')
     : (album ? album.img || '/img/movie1.jpg' : '');
-  const artistName = manyAlbumArtists ? (cycledAlbumArtist?.name || '') : (album?.artist || '');
+  const artistName = manyAlbumArtists
+    ? (cycledAlbumArtist?.name || '')
+    : (albumArtists[0]?.name || (typeof album?.artist === 'string' ? album.artist.trim() : ''));
   const artistSwapClass = artistPhase === 'out'
     ? ' music-detail-artist-swap is-out'
     : artistPhase === 'in'

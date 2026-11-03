@@ -380,7 +380,7 @@ const WishlistPage = () => {
   if (hasTrillers) {
     availableTabs.push({
       id: 'triller',
-      label: t('wishlist.tabTriller', 'Triller'),
+      label: t('wishlist.tabTriller', 'Video'),
     });
   }
   if (hasShorts) {
@@ -513,7 +513,7 @@ const WishlistPage = () => {
                 onClick={() => setActiveTab('triller')}
               >
                 <span className="wishlist-tab-icon">{WishlistTabIcons.triller}</span>
-                {t('wishlist.tabTriller', 'Triller')}
+                {t('wishlist.tabTriller', 'Video')}
               </button>
             )}
             {hasShorts && (

@@ -149,21 +149,6 @@ const buildSongGroups = (tracks, options = {}) => {
   const isExplicit = (track) =>
     componentIsExplicit(parent, explicitMembers, musicKey(track.kind, track.id));
 
-  /**
-   * @param {Map<string, object[]>} buckets
-   */
-  const mergeFreeBuckets = (buckets) => {
-    for (const bucket of buckets.values()) {
-      const free = bucket.filter((track) => !isExplicit(track));
-      const kinds = new Set(free.map((track) => track.kind));
-      if (kinds.size < 2) continue;
-      const first = musicKey(free[0].kind, free[0].id);
-      for (let i = 1; i < free.length; i += 1) {
-        unionKeys(parent, first, musicKey(free[i].kind, free[i].id));
-      }
-    }
-  };
-
   const titleBuckets = new Map();
   const artistBuckets = new Map();
 
@@ -187,9 +172,6 @@ const buildSongGroups = (tracks, options = {}) => {
     }
   }
 
-  mergeFreeBuckets(titleBuckets);
-  if (allowArtistOnly) mergeFreeBuckets(artistBuckets);
-
   /** @type {Map<string, string[]>} */
   const components = new Map();
   for (const key of byKey.keys()) {
@@ -202,6 +184,57 @@ const buildSongGroups = (tracks, options = {}) => {
   const groups = [];
   const byMusicKey = new Map();
   const kindRank = new Map(config.contentTypes.map((kind, index) => [kind, index]));
+
+  const rememberGroup = (key, songGroupId) => {
+    const current = byMusicKey.get(key);
+    const list = !current ? [] : Array.isArray(current) ? current.slice() : [current];
+    if (!list.includes(songGroupId)) list.push(songGroupId);
+    list.sort();
+    byMusicKey.set(key, list.length === 1 ? list[0] : list);
+  };
+
+  const publicMembersOf = (members) =>
+    members
+      .map((member) => ({ musicKey: member.musicKey, kind: member.kind }))
+      .sort((left, right) => {
+        const byKind = (kindRank.get(left.kind) ?? 9) - (kindRank.get(right.kind) ?? 9);
+        if (byKind !== 0) return byKind;
+        return left.musicKey < right.musicKey ? -1 : 1;
+      });
+
+  /**
+   * One artist box stays one group. Boxes are not unioned, so a collab
+   * track can sit in each artist's group without gluing those artists together.
+   * @param {Map<string, object[]>} buckets
+   * @param {string} method
+   */
+  const emitFreeBuckets = (buckets, method) => {
+    const bucketKeys = [...buckets.keys()].sort();
+    for (let b = 0; b < bucketKeys.length; b += 1) {
+      const bucketKey = bucketKeys[b];
+      const free = buckets.get(bucketKey).filter((track) => !isExplicit(track));
+      const kinds = new Set(free.map((track) => track.kind));
+      if (kinds.size < 2) continue;
+      const artistId = method === methods.artistTitle
+        ? bucketKey.slice(0, bucketKey.indexOf('\0'))
+        : bucketKey;
+      if (!artistId) continue;
+      const members = free.map((track) => ({
+        musicKey: musicKey(track.kind, track.id),
+        kind: track.kind,
+        id: track.id,
+        artistId: track.artistId || null,
+        title: track.title || '',
+        explicit: false,
+      }));
+      const songGroupId = songGroupIdFor(members, method, artistId);
+      const publicMembers = publicMembersOf(members);
+      groups.push({ songGroupId, artistId, members: publicMembers, method });
+      for (let i = 0; i < publicMembers.length; i += 1) {
+        rememberGroup(publicMembers[i].musicKey, songGroupId);
+      }
+    }
+  };
 
   for (const keys of components.values()) {
     const members = keys.map((key) => {
@@ -225,21 +258,37 @@ const buildSongGroups = (tracks, options = {}) => {
     else if (members.every((member) => !normalizeTitle(member.title))) method = methods.artistOnly;
 
     const songGroupId = songGroupIdFor(members, method, artistId);
-    const publicMembers = members
-      .map((member) => ({ musicKey: member.musicKey, kind: member.kind }))
-      .sort((left, right) => {
-        const byKind = (kindRank.get(left.kind) ?? 9) - (kindRank.get(right.kind) ?? 9);
-        if (byKind !== 0) return byKind;
-        return left.musicKey < right.musicKey ? -1 : 1;
-      });
+    const publicMembers = publicMembersOf(members);
 
     groups.push({ songGroupId, artistId, members: publicMembers, method });
     for (let i = 0; i < publicMembers.length; i += 1) {
-      byMusicKey.set(publicMembers[i].musicKey, songGroupId);
+      rememberGroup(publicMembers[i].musicKey, songGroupId);
     }
   }
 
+  emitFreeBuckets(titleBuckets, methods.artistTitle);
+  if (allowArtistOnly) emitFreeBuckets(artistBuckets, methods.artistOnly);
+
   return { groups, byMusicKey };
+};
+
+/**
+ * One id stays a string match. Several ids match any of them.
+ * @param {string|string[]|null|undefined} songGroupId
+ * @returns {string|{ $in: string[] }|null}
+ */
+const songGroupMatch = (songGroupId) => {
+  if (Array.isArray(songGroupId)) {
+    const ids = [];
+    for (let i = 0; i < songGroupId.length; i += 1) {
+      const id = songGroupId[i];
+      if (typeof id === 'string' && id && !ids.includes(id)) ids.push(id);
+    }
+    if (!ids.length) return null;
+    return { $in: ids };
+  }
+  if (typeof songGroupId !== 'string' || !songGroupId) return null;
+  return songGroupId;
 };
 
 /**
@@ -257,4 +306,5 @@ const resolveSongGroup = (byMusicKey, key) => {
 module.exports = {
   buildSongGroups,
   resolveSongGroup,
+  songGroupMatch,
 };

@@ -51,6 +51,13 @@ const musicShortSchema = new mongoose.Schema(
       default: 'musicshorts',
       index: true,
     },
+    /** Shorts qaysi kanalga tegishli. channels.json dagi id. */
+    channelId: {
+      type: String,
+      trim: true,
+      default: '',
+      index: true,
+    },
   },
   {
     strict: true,

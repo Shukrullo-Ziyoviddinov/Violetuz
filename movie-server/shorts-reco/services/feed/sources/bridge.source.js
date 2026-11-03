@@ -2,6 +2,7 @@
 
 const collections = require('../../../config/collections');
 const { artistIdsOf } = require('../../../utils/keys');
+const { songGroupMatch } = require('../../songLinks.service');
 const { balancedByArtist } = require('./artistBalance');
 
 const movieType = collections.existing.shortsVideos.type;
@@ -33,8 +34,9 @@ const collect = async (ctx) => {
     return ctx.query({ type: musicType, musicKey: anchor.musicKey }, ctx.fetchLimit);
   }
   if (ctx.step === 'songGroup') {
-    if (!anchor.songGroupId) return [];
-    return ctx.query({ type: musicType, songGroupId: anchor.songGroupId }, ctx.fetchLimit);
+    const songGroupId = songGroupMatch(anchor.songGroupId);
+    if (!songGroupId) return [];
+    return ctx.query({ type: musicType, songGroupId }, ctx.fetchLimit);
   }
   if (ctx.step === 'artist') {
     if (!artistIdsOf(anchor.artistId).length) return [];
@@ -48,7 +50,8 @@ const collect = async (ctx) => {
   if (ctx.step === 'movieMusic') {
     const or = [];
     if (anchor.musicKey) or.push({ musicKey: anchor.musicKey });
-    if (anchor.songGroupId) or.push({ songGroupId: anchor.songGroupId });
+    const songGroupId = songGroupMatch(anchor.songGroupId);
+    if (songGroupId) or.push({ songGroupId });
     if (!or.length) return [];
     return ctx.query({ type: movieType, $or: or }, ctx.fetchLimit);
   }

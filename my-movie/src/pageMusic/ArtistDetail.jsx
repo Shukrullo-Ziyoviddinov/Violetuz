@@ -18,7 +18,7 @@ import { getDominantColor } from '../utils/dominantColor';
 import { formatCount } from '../utils/utils';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
-import { hasArtistId } from './useArtistCycle';
+import { formatArtistNames, hasArtistId } from './useArtistCycle';
 import '../Music/MusicCards/MusicCards.css';
 import '../Music/ClipsCards/ClipsCards.css';
 import '../components/Movies/Movies.css';
@@ -188,6 +188,9 @@ const ArtistDetail = () => {
   const [bioLineClamp, setBioLineClamp] = useState(3);
 
   const artist = getArtistById(id);
+  const albumArtistLabel = (albumItem) =>
+    formatArtistNames(albumItem?.artistId, getArtistById) ||
+    (typeof albumItem?.artist === 'string' ? albumItem.artist.trim() : '');
   const artistImgSrc = artist ? (artist.img || '/img/movie1.jpg') : '';
   const artistImg = useImageReady(artistImgSrc);
   const showHeroDataSkeleton = Boolean(artistsLoading) && !artist;
@@ -848,7 +851,7 @@ const ArtistDetail = () => {
                       </div>
                       <div className="music-cards-item-info">
                         <h3 className="music-cards-item-title">{album.title}</h3>
-                        <p className="music-cards-item-artist">{album.artist}</p>
+                        <p className="music-cards-item-artist">{albumArtistLabel(album)}</p>
                       </div>
                     </div>
                   </div>
@@ -889,7 +892,7 @@ const ArtistDetail = () => {
                       </div>
                       <div className="music-cards-item-info">
                         <h3 className="music-cards-item-title">{album.title}</h3>
-                        <p className="music-cards-item-artist">{album.artist}</p>
+                        <p className="music-cards-item-artist">{albumArtistLabel(album)}</p>
                       </div>
                     </div>
                   </div>
