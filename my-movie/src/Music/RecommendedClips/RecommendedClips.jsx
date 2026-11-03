@@ -9,6 +9,7 @@ import { useDetailRecommendClips } from '../../hooks/useDetailRecommendClips';
 import { useMusicApi } from '../../context/MusicApiContext';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './RecommendedClips.css';
 
 const DEFAULT_SKELETON_COUNT = 8;
@@ -188,10 +189,7 @@ const RecommendedClips = ({
     return String(it.title);
   };
 
-  const getArtistText = (artistId) => {
-    const artist = getArtistById(artistId);
-    return artist?.name || artistId || '';
-  };
+  const getArtistText = (artistId) => formatArtistNames(artistId, getArtistById);
 
   const handleCardClick = (clipId) => {
     navigate(`/music/video/${clipId}`, { replace: false });

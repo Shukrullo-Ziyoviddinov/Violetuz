@@ -6,6 +6,7 @@ import { useMusicApi } from '../../context/MusicApiContext';
 import { useMusicPlayer } from '../../context/MusicPlayerContext';
 import { useMostListenedMusic } from '../../hooks/useMostListenedMusic';
 import TopMusicMoreModal from '../TopMusicChart/TopMusicMoreModal';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './SearchModalTrending.css';
 
 const PREVIEW_LIMIT = 6;
@@ -62,10 +63,8 @@ const SearchModalTrending = ({ onNavigateAway }) => {
     return String(item.title);
   };
 
-  const getArtistName = (item) => {
-    const artist = getArtistById?.(item.artistId);
-    return artist?.name || item.artist || '';
-  };
+  const getArtistName = (item) =>
+    formatArtistNames(item?.artistId, getArtistById) || item?.artist || '';
 
   const goMore = () => {
     onNavigateAway?.();

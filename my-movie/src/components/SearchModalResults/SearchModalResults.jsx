@@ -16,6 +16,7 @@ import {
   isSearchSectionVisible,
 } from '../../utils/searchFilterTypes';
 import SearchMusicResultsItem from '../../Music/SearchMusicResults/SearchMusicResultsItem';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import SearchModalResultsMovieItem from './SearchModalResultsMovieItem';
 import SearchModalResultsActorItem from './SearchModalResultsActorItem';
 import './SearchModalResults.css';
@@ -276,13 +277,8 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     return String(item.title);
   };
 
-  const getMusicArtistName = (item) => {
-    if (item?.artistId) {
-      const artist = getArtistById(item.artistId);
-      return artist?.name || item.artistId || '';
-    }
-    return item?.artist || '';
-  };
+  const getMusicArtistName = (item) =>
+    formatArtistNames(item?.artistId, getArtistById) || item?.artist || '';
 
   const closeAndNavigate = (path) => {
     if (onMovieClick) onMovieClick();

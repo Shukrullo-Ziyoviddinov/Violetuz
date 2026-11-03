@@ -19,6 +19,18 @@ export const hasArtistId = (value, artistId) => {
   return artistIdsOf(value).includes(id);
 };
 
+export const formatArtistNames = (artistId, getArtistById) => {
+  const ids = artistIdsOf(artistId);
+  if (!ids.length) return '';
+  return ids
+    .map((id) => {
+      const artist = typeof getArtistById === 'function' ? getArtistById(id) : null;
+      const name = typeof artist?.name === 'string' ? artist.name.trim() : '';
+      return name || id;
+    })
+    .join(' & ');
+};
+
 /**
  * 2 va undan ko'p artist bo'lsa har 4 soniyada keyingisiga o'tadi.
  * phase: idle | out | in

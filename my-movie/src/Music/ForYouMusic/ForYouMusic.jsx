@@ -9,15 +9,14 @@ import MusicButtonMore from '../MusicButtonMore/MusicButtonMore';
 import CartochkaHoverModal from '../../components/cartochkaHoverModal';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { ForYouMusicCard, ForYouMusicCardSkeleton } from './ForYouMusicCard';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import '../MusicCards/MusicCards.css';
 
 const HOME_LIMIT = 10;
 const MORE_PATH = '/music/more/sizga-mos-musiqalar';
 
-const artistTextOf = (item, getArtistById) => {
-  const artist = getArtistById?.(item?.artistId);
-  return artist?.name || item?.artist || item?.artistId || '';
-};
+const artistTextOf = (item, getArtistById) =>
+  formatArtistNames(item?.artistId, getArtistById) || item?.artist || '';
 
 const titleOf = (item, contentLang) => {
   if (!item?.title) return '';

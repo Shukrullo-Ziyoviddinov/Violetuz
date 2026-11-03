@@ -172,12 +172,38 @@ const generateAllFingerprints = async ({ onlyMissing = true } = {}) => {
   return summary;
 };
 
-const buildArtistNameMap = async (artistIds) => {
-  const unique = [...new Set(artistIds.filter(Boolean))];
+const artistIdsOfValue = (value) => {
+  if (value == null || value === '') return [];
+  const list = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const ids = [];
+  for (const raw of list) {
+    if (raw == null || raw === '' || typeof raw === 'object') continue;
+    const id = String(raw).trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+};
+
+const buildArtistNameMap = async (artistIdValues) => {
+  const unique = [...new Set(artistIdValues.flatMap(artistIdsOfValue))];
   if (!unique.length) return new Map();
 
   const artists = await Artist.find({ id: { $in: unique } }).select({ id: 1, name: 1 }).lean();
   return new Map(artists.map((a) => [a.id, a.name]));
+};
+
+const artistLabelOf = (artistId, artistMap) => {
+  const ids = artistIdsOfValue(artistId);
+  if (!ids.length) return '';
+  return ids
+    .map((id) => {
+      const name = artistMap.get(id);
+      return typeof name === 'string' && name.trim() ? name.trim() : id;
+    })
+    .join(' & ');
 };
 
 const collectTrackFingerprints = (track) => {
@@ -362,7 +388,7 @@ const identifyFromAudioBuffer = async (buffer, originalName) => {
         id: track.id,
         title: track.title,
         artistId: track.artistId,
-        artistName: artistMap.get(track.artistId) || track.artistId,
+        artistName: artistLabelOf(track.artistId, artistMap),
         img: track.img || '',
         durationSec: resolveDurationSec(track, durationByAudio),
         audio: track.audio || '',

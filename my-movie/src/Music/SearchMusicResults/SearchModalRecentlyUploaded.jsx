@@ -5,6 +5,7 @@ import ScrollTouch from '../../components/ScrollTouch/ScrollTouch';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import { useRecentlyUploadedMusic } from '../../hooks/useRecentlyUploadedMusic';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './SearchModalRecentlyUploaded.css';
 
 const PREVIEW_LIMIT = 10;
@@ -44,10 +45,8 @@ const SearchModalRecentlyUploaded = ({ onNavigateAway }) => {
   const preview = tracks.slice(0, PREVIEW_LIMIT);
   const waiting = (loading || musicLoading) && preview.length === 0;
 
-  const artistOf = (item) => {
-    const artist = getArtistById?.(item.artistId);
-    return artist?.name || item.artist || '';
-  };
+  const artistOf = (item) =>
+    formatArtistNames(item?.artistId, getArtistById) || item?.artist || '';
 
   const goMore = () => {
     onNavigateAway?.();

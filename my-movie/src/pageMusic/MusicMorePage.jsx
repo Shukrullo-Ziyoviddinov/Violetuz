@@ -14,8 +14,21 @@ import { useRecentlyUploadedMusic } from '../hooks/useRecentlyUploadedMusic';
 import MusicFilter from '../Music/MusicFilter/MusicFilter';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
+import { artistIdsOf } from './useArtistCycle';
 import '../Music/MusicFilter/MusicFilter.css';
 import './MusicMorePage.css';
+
+const formatArtistNames = (artistId, getArtistById) => {
+  const ids = artistIdsOf(artistId);
+  if (!ids.length) return '';
+  return ids
+    .map((id) => {
+      const artist = typeof getArtistById === 'function' ? getArtistById(id) : null;
+      const name = typeof artist?.name === 'string' ? artist.name.trim() : '';
+      return name || id;
+    })
+    .join(' & ');
+};
 
 const ensureArray = (arr) => (Array.isArray(arr) ? arr : []);
 const SKELETON_COUNT = 12;
@@ -642,11 +655,8 @@ const MusicMorePage = () => {
     return String(item.title);
   };
 
-  const getArtistDisplay = (item) => {
-    if (item.artist) return item.artist;
-    const artist = getArtistById(item.artistId);
-    return artist?.name || item.artistId || '';
-  };
+  const getArtistDisplay = (item) =>
+    formatArtistNames(item?.artistId, getArtistById) || item?.artist || '';
 
   const handleCardClick = (item) => {
     const path = resolveDetailPath(item);

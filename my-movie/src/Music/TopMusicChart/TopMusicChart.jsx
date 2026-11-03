@@ -9,7 +9,20 @@ import { useMusicApi } from '../../context/MusicApiContext';
 import { useMusicPlayer } from '../../context/MusicPlayerContext';
 import AudioDuration from '../AudioDuration/AudioDuration';
 import TopMusicMoreModal from './TopMusicMoreModal';
+import { artistIdsOf } from '../../pageMusic/useArtistCycle';
 import './TopMusicChart.css';
+
+const formatArtistNames = (artistId, getArtistById) => {
+  const ids = artistIdsOf(artistId);
+  if (!ids.length) return '';
+  return ids
+    .map((id) => {
+      const artist = typeof getArtistById === 'function' ? getArtistById(id) : null;
+      const name = typeof artist?.name === 'string' ? artist.name.trim() : '';
+      return name || id;
+    })
+    .join(' & ');
+};
 
 const formatDuration = (sec) => {
   if (!sec || Number.isNaN(sec) || sec <= 0) return '';
@@ -90,10 +103,8 @@ const TopMusicChart = ({
     return String(item.title);
   };
 
-  const getArtistName = (item) => {
-    const artist = getArtistById?.(item.artistId);
-    return artist?.name || item.artist || '';
-  };
+  const getArtistName = (item) =>
+    formatArtistNames(item?.artistId, getArtistById) || item?.artist || '';
 
   const handlePlayClick = (e, item) => {
     e.stopPropagation();

@@ -261,6 +261,7 @@ body.video-detail-page-active {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0;
 }
 
 .video-detail-player-wrap {
@@ -284,16 +285,22 @@ body.video-detail-page-active {
 }
 
 .video-detail-info {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem 0.5rem;
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .video-detail-info--skeleton {
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 0.5rem;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .video-detail-actions--skeleton {
@@ -377,6 +384,13 @@ body.video-detail-page-active {
 
 .video-detail-info .video-detail-title {
   font-size: 1.3rem;
+}
+
+.video-detail-info .video-detail-artist-name,
+.video-detail-info .video-detail-info-sep,
+.video-detail-info .video-detail-title {
+  display: inline;
+  white-space: nowrap;
 }
 
 .video-detail-artist-name {

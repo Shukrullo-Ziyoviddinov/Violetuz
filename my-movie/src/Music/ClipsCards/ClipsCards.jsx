@@ -8,6 +8,7 @@ import CartochkaMobileAutoPlay from '../../components/cartochkaHoverModal/Cartoc
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import { useMusicApi } from '../../context/MusicApiContext';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import '../MusicCards/MusicCards.css';
 import '../MusicButtonMore/MusicButtonMore.css';
 import './ClipsCards.css';
@@ -141,10 +142,7 @@ const ClipsCards = ({ section, isLoading: isLoadingProp = null }) => {
     isLoadingProp ??
     (dataLoading || clipSectionsLoading || concertSectionsLoading || pageContentLoading);
 
-  const getArtistName = (artistId) => {
-    const artist = getArtistById(artistId);
-    return artist?.name || artistId;
-  };
+  const getArtistName = (artistId) => formatArtistNames(artistId, getArtistById);
 
   const handleCardClick = (itemId) => {
     navigate(`/music/video/${itemId}`);

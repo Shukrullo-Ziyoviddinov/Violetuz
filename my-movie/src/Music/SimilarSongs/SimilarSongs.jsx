@@ -9,6 +9,7 @@ import { useDetailRecommendSongs } from '../../hooks/useDetailRecommendSongs';
 import { useMusicApi } from '../../context/MusicApiContext';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './SimilarSongs.css';
 
 const DEFAULT_SKELETON_COUNT = 8;
@@ -176,10 +177,7 @@ const SimilarSongs = ({
     return String(song.title);
   };
 
-  const getArtistName = (artistId) => {
-    const artist = getArtistById(artistId);
-    return artist?.name || artistId || '';
-  };
+  const getArtistName = (artistId) => formatArtistNames(artistId, getArtistById);
 
   const handleCardClick = (itemId, sectionId) => {
     const path = `/music/${itemId}${sectionId ? `?section=${encodeURIComponent(sectionId)}` : ''}`;

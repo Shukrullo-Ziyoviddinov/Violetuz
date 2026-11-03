@@ -9,6 +9,7 @@ import MusicButtonMore from '../MusicButtonMore/MusicButtonMore';
 import CartochkaHoverModal from '../../components/cartochkaHoverModal';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './MusicCards.css';
 
 const DEFAULT_SKELETON_COUNT = 10;
@@ -167,20 +168,15 @@ const MusicCards = ({ section, items: itemsProp = null, isLoading: isLoadingProp
     return String(item.title);
   };
 
-  const getArtistName = (artistId) => {
-    const artist = getArtistById(artistId);
-    return artist?.name || artistId;
-  };
+  const getArtistName = (artistId) => formatArtistNames(artistId, getArtistById);
 
   const handleCardClick = (itemId) => {
     const path = getDetailPath(itemId);
     navigate(`${path}?section=${encodeURIComponent(section.id)}`, { replace: false });
   };
 
-  const getArtistText = (item) => {
-    if (wishlistType === 'album' && item.artist) return item.artist;
-    return getArtistName(item.artistId) || item.artist || '';
-  };
+  const getArtistText = (item) =>
+    getArtistName(item.artistId) || item.artist || '';
 
   const handleWishlistClick = (e, itemId) => {
     e.stopPropagation();

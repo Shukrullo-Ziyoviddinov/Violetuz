@@ -181,5 +181,36 @@ ok(
 const r10 = rankAllResults('jah khalib kipi', cols);
 ok('kipi typo is clip', allJah(r10.clips) && r10.music.length === 0, `clips=${r10.clips.length}`);
 
+const hasId = (list, id) => list.some((item) => Number(item.id) === id);
+const artistOnly = rankAllResults('shohruhxon', cols);
+ok('artist only music', hasId(artistOnly.music, 801));
+ok('artist only clip', hasId(artistOnly.clips, 1101));
+
+const titleOnlyClip = rankAllResults('die with a smile', cols);
+ok('title only clip', hasId(titleOnlyClip.clips, 1101));
+ok('title only concert', hasId(titleOnlyClip.concerts, 401));
+
+const titleOnlyMusic = rankAllResults('deep bass', cols);
+ok('title only music', hasId(titleOnlyMusic.music, 801));
+
+const artistAndClip = rankAllResults('shohruhxon die with a smile', cols);
+ok('artist+clip', hasId(artistAndClip.clips, 1101), `clips=${artistAndClip.clips.length}`);
+ok('artist+concert', hasId(artistAndClip.concerts, 401), `concerts=${artistAndClip.concerts.length}`);
+
+const artistAndMusic = rankAllResults('shohruhxon deep bass', cols);
+ok('artist+music', hasId(artistAndMusic.music, 801), `music=${artistAndMusic.music.length}`);
+
+const artistAndAlbum = rankAllResults('shohruhxon best of 2025', cols);
+ok('artist+album', artistAndAlbum.albums.some((item) => String(item.title) === 'Best of 2025'));
+
+const laterName = rankAllResults('michael', cols);
+ok('later id music', hasId(laterName.music, 801), `n=${laterName.music.length}`);
+ok('later id clip', hasId(laterName.clips, 1101), `n=${laterName.clips.length}`);
+ok('later id album', hasId(laterName.albums, 1001), `n=${laterName.albums.length}`);
+
+const middleName = rankAllResults('shohruhxon', cols);
+ok('middle id music', hasId(middleName.music, 801));
+ok('middle id clip', hasId(middleName.clips, 1101));
+
 console.log(`\nTOTAL FAILS: ${fail}`);
 process.exit(fail ? 1 : 0);

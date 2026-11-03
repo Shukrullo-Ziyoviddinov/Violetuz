@@ -188,10 +188,66 @@ const getActorName = (actor, lang) => {
   return String(actor.name);
 };
 
-const getMusicArtistName = (item, artistsList = []) => {
-  if (item?.artist) return String(item.artist);
-  const artist = artistsList.find((a) => a.id === item.artistId);
-  return artist?.name || item.artistId || '';
+const artistIdsOfItem = (value) => {
+  if (value == null || value === '') return [];
+  const list = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const ids = [];
+  for (const raw of list) {
+    if (raw == null || raw === '' || typeof raw === 'object') continue;
+    const id = String(raw).trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+};
+
+const musicArtistNames = (item, artistsList = []) => {
+  const names = [];
+  const seen = new Set();
+  const push = (name) => {
+    const text = String(name || '').trim();
+    if (!text || seen.has(text)) return;
+    seen.add(text);
+    names.push(text);
+  };
+  for (const id of artistIdsOfItem(item?.artistId)) {
+    const artist = artistsList.find((row) => String(row?.id) === id);
+    push(artist?.name || id);
+  }
+  if (!names.length && item?.artist) push(item.artist);
+  return names;
+};
+
+const bestArtistNameScore = (q, queryWords, names) => {
+  let best = 0;
+  for (const name of names) {
+    const score = nameMatchScore(q, queryWords, name);
+    if (score > best) best = score;
+  }
+  return best;
+};
+
+const artistTokensInQuery = (queryWords, artistsList) => {
+  const tokens = ensureArray(queryWords).filter((word) => String(word).length >= 2);
+  if (!tokens.length || !artistsList?.length) return [];
+  const blobs = artistsList.map((artist) => normalizeText(artist?.name || '')).filter(Boolean);
+  return tokens.filter((token) => blobs.some((blob) => wordMatchesInBlob(token, blob)));
+};
+
+const artistAndTitleScore = (title, artistNames, queryWords, artistsList) => {
+  const words = ensureArray(queryWords).filter(Boolean);
+  const artistWords = artistTokensInQuery(words, artistsList);
+  if (!artistWords.length) return 0;
+  const artistWordSet = new Set(artistWords);
+  const titleWords = words.filter((word) => !artistWordSet.has(word));
+  if (!titleWords.length) return 0;
+  const artistScore = bestArtistNameScore(artistWords.join(' '), artistWords, artistNames);
+  if (artistScore < MIN_SCORE) return 0;
+  const titleScore = blobMatchScore(titleWords.join(' '), titleWords, title);
+  if (titleScore < MIN_SCORE) return 0;
+  return Math.max(artistScore, titleScore);
 };
 
 const movieMatchScore = (movie, q, queryWords, facets) => {
@@ -237,7 +293,7 @@ const musicArtistMatchScore = (artist, q, queryWords) => {
 
 const mediaItemMatchScore = (item, q, queryWords, artistsList, facets, facetScoreFn) => {
   const title = `${getTitleForLang(item, 'uz')} ${getTitleForLang(item, 'ru')}`;
-  const artist = getMusicArtistName(item, artistsList);
+  const artistNames = musicArtistNames(item, artistsList);
   const titleSearchWords =
     facets.titleTokens.length > 0 ? facets.titleTokens : facets.isFacetSearch ? [] : queryWords;
 
@@ -253,7 +309,7 @@ const mediaItemMatchScore = (item, q, queryWords, artistsList, facets, facetScor
   }
 
   if (!facets.isFacetSearch && queryWords.length === 1) {
-    const artistScore = nameMatchScore(q, queryWords, artist);
+    const artistScore = bestArtistNameScore(q, queryWords, artistNames);
     if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
   }
 
@@ -262,12 +318,17 @@ const mediaItemMatchScore = (item, q, queryWords, artistsList, facets, facetScor
   }
 
   score = Math.max(score, facetScoreFn(item, facets, queryWords));
+  if (score < MIN_SCORE) {
+    const extra = artistAndTitleScore(title, artistNames, queryWords, artistsList);
+    if (extra >= MIN_SCORE) score = extra;
+  }
   return score >= MIN_SCORE ? score : 0;
 };
 
 const albumMatchScore = (album, q, queryWords, artistsList, facets) => {
   const title = String(album.title || '');
-  const artist = getMusicArtistName(album, artistsList);
+  const artistNames = musicArtistNames(album, artistsList);
+  const artist = artistNames.join(' ');
   const songsBlob = ensureArray(album.songs)
     .map((s) => `${String(s.title || '')} ${String(s.artist || '')}`)
     .join(' ');
@@ -287,11 +348,15 @@ const albumMatchScore = (album, q, queryWords, artistsList, facets) => {
   }
 
   if (!facets.isFacetSearch && queryWords.length === 1) {
-    const artistScore = nameMatchScore(q, queryWords, artist);
+    const artistScore = bestArtistNameScore(q, queryWords, artistNames);
     if (artistScore >= MIN_SCORE) score = Math.max(score, artistScore);
   }
 
   score = Math.max(score, albumFacetMatchScore(album, facets, queryWords));
+  if (score < MIN_SCORE) {
+    const extra = artistAndTitleScore(title, artistNames, queryWords, artistsList);
+    if (extra >= MIN_SCORE) score = extra;
+  }
   return score >= MIN_SCORE ? score : 0;
 };
 

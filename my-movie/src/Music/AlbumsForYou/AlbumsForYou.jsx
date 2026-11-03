@@ -9,6 +9,7 @@ import { useAlbumHomeFeed } from '../../hooks/useAlbumHomeFeed';
 import { useMusicApi } from '../../context/MusicApiContext';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './AlbumsForYou.css';
 
 const DEFAULT_SKELETON_COUNT = 8;
@@ -206,11 +207,8 @@ const AlbumsForYou = ({
     return String(albumItem.title);
   };
 
-  const getArtistText = (albumItem) => {
-    if (albumItem?.artist) return albumItem.artist;
-    const artist = getArtistById(albumItem?.artistId);
-    return artist?.name || albumItem?.artistId || '';
-  };
+  const getArtistText = (albumItem) =>
+    formatArtistNames(albumItem?.artistId, getArtistById) || albumItem?.artist || '';
 
   const handleCardClick = (albumId, sectionId) => {
     const path = `/music/album/${albumId}${sectionId ? `?section=${encodeURIComponent(sectionId)}` : ''}`;

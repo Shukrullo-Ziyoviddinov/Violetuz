@@ -30,6 +30,7 @@ import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
+import { formatArtistNames } from './useArtistCycle';
 import { fetchChannelById } from '../api/channelsApi';
 import { useIsFollowing } from '../context/FollowingContext';
 import { useMusicMixes } from '../hooks/useMusicMixes';
@@ -165,7 +166,7 @@ const VideoPage = () => {
   });
   const videoLikeCount = videoLikeQuery.data?.like ?? video?.like;
   const videoDislikeCount = videoLikeQuery.data?.dislike ?? video?.dislike;
-  const artist = video ? getArtistById(video.artistId) : null;
+  const artistLabel = video ? formatArtistNames(video.artistId, getArtistById) : '';
   const channelId = String(video?.channelId || '').trim();
   const channelQuery = useQuery({
     queryKey: ['channel', channelId],
@@ -391,12 +392,12 @@ const VideoPage = () => {
       id: video.id,
       kind: isConcertVideo ? MINI_VIDEO_KIND.KONSERT : MINI_VIDEO_KIND.KLIP,
       title: video.title || '',
-      subtitle: artist?.name || '',
+      subtitle: artistLabel,
       cover: typeof video.img === 'string' ? video.img : '',
       src: video.video,
       route: `/music/video/${video.id}${query ? `?${query}` : ''}`,
     };
-  }, [artist?.name, isConcertVideo, searchParams, video]);
+  }, [artistLabel, isConcertVideo, searchParams, video]);
 
   const clipMediaActive = Boolean(
     clipSession
@@ -550,10 +551,7 @@ const VideoPage = () => {
     else navigate(`/music/video/${clipId}`);
   };
 
-  const getArtistName = (artistId) => {
-    const a = getArtistById(artistId);
-    return a?.name || artistId || '';
-  };
+  const getArtistName = (artistId) => formatArtistNames(artistId, getArtistById);
 
   const handleDownload = () => {
     if (!video?.video) return;
@@ -685,8 +683,8 @@ const VideoPage = () => {
                   </>
                 ) : (
                   <>
-                    {artist && <span className="video-detail-artist-name">{artist.name}</span>}
-                    {artist && <span className="video-detail-info-sep"> - </span>}
+                    {artistLabel ? <span className="video-detail-artist-name">{artistLabel}</span> : null}
+                    {artistLabel ? <span className="video-detail-info-sep"> - </span> : null}
                     <span className="video-detail-title">{video.title}</span>
                   </>
                 )}
@@ -767,7 +765,7 @@ const VideoPage = () => {
                         id: video.id,
                         type: wishlistType,
                         title: video.title || '',
-                        artistName: artist?.name || '',
+                        artistName: artistLabel,
                         image: video.img || '/img/movie1.jpg',
                         route: `/music/video/${video.id}`,
                       }}
