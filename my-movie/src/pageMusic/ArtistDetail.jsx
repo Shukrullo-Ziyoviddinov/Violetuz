@@ -236,7 +236,7 @@ const ArtistDetail = () => {
     (Boolean(artistMusicStoriesLoading) && artistStories.length === 0);
   const artistAlbums = getAlbumsByArtist(id);
   const artistClips = getClipsByArtist(id);
-  const artistShorts = musicShorts.filter((s) => s.artistId === id);
+  const artistShorts = musicShorts.filter((s) => hasArtistId(s.artistId, id));
   const openArtistShort = (short) => {
     navigate(`/shorts?shortId=${short.id}&artistSeq=${encodeURIComponent(id)}`);
   };

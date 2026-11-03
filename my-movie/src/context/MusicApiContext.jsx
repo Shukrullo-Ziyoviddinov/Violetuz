@@ -268,7 +268,7 @@ export const MusicApiProvider = ({ children }) => {
     getArtistMusicStoriesByArtist: (artistId) =>
       allArtistMusicStories.filter((item) => item.artistId === artistId),
     getMusicShortsByArtist: (artistId) =>
-      musicShortsCatalog.filter((item) => item.artistId === artistId),
+      musicShortsCatalog.filter((item) => hasArtistId(item.artistId, artistId)),
     getArtistById: (id) =>
       allArtists.find((item) => String(item.id) === String(id)) || null,
     getMusicShortByIdLocal: (id) =>

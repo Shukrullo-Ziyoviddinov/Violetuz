@@ -28,6 +28,7 @@ import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShortsMovieHead from './ShortsMovieHead';
 import ShortsMusicHead from './ShortsMusicHead';
 import { getLocalizedField } from '../../utils/shortsMovieUtils';
+import { hasArtistId } from '../../pageMusic/useArtistCycle';
 import { formatShortsLikeCount } from '../../utils/utils';
 import {
   shortsWishlistType,
@@ -216,7 +217,7 @@ const ShortsVideos = ({
   const recoEnabled = !initialShorts && !repostIds?.length && !repostShortsEntries?.length;
   const artistSeqList = useMemo(() => {
     if (artistSeq == null || String(artistSeq) === '') return [];
-    return musicShortsCatalog.filter((item) => String(item.artistId) === String(artistSeq));
+    return musicShortsCatalog.filter((item) => hasArtistId(item.artistId, artistSeq));
   }, [artistSeq, musicShortsCatalog]);
   const artistSeqMode = artistSeqList.length > 0;
   const [modalOpen, setModalOpen] = useState(
