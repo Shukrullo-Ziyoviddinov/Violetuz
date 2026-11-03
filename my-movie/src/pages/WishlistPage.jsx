@@ -25,6 +25,7 @@ import {
   applyWishlistTabFilters,
 } from '../components/WishlistPageFilter';
 import { useImageReady } from '../utils/useImageReady';
+import { formatArtistNames } from '../pageMusic/useArtistCycle';
 import { useMusicMixes } from '../hooks/useMusicMixes';
 import { YourMixCard } from '../Music/YourMixes/YourMixCard';
 import './WishlistPage.css';
@@ -279,10 +280,9 @@ const WishlistPage = () => {
     return String(item.title);
   };
 
-  const getArtistName = (artistId) => {
-    const artist = getArtistById(artistId);
-    return artist?.name || artistId || '';
-  };
+  const getArtistName = (artistId, fallback = '') =>
+    formatArtistNames(artistId, getArtistById) ||
+    (typeof fallback === 'string' ? fallback.trim() : '');
 
   const handleMusicWishlistClick = (e, id) => {
     e.stopPropagation();
@@ -623,7 +623,9 @@ const WishlistPage = () => {
                     </div>
                     <div className="wishlist-music-item-info">
                       <h3 className="wishlist-music-item-title">{album.title}</h3>
-                      <p className="wishlist-music-item-artist">{album.artist}</p>
+                      <p className="wishlist-music-item-artist">
+                        {getArtistName(album.artistId, album.artist)}
+                      </p>
                     </div>
                     <div className="wishlist-music-item-play">
                       <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">

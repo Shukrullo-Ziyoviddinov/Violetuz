@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMusicApi } from '../../context/MusicApiContext';
 import './RepostMusicCard.css';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 
 const RepostMusicCard = ({ item }) => {
   const navigate = useNavigate();
@@ -9,8 +10,7 @@ const RepostMusicCard = ({ item }) => {
   const open = () => navigate(item.route || `/music/${item.id}`);
   const music = getMusicByIdLocal(item.id);
   const artistName =
-    item.artistName ||
-    (music?.artistId ? getArtistById(music.artistId)?.name || '' : '');
+    formatArtistNames(music?.artistId, getArtistById) || item.artistName || '';
 
   return (
     <button type="button" className="repost-music-card" onClick={open}>

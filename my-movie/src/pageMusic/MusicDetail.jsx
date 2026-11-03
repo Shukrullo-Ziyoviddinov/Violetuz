@@ -34,7 +34,7 @@ import ViewCount from '../components/ViewCount/ViewCount';
 import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import '../Music/YourMixes/YourMixes.css';
 import './MusicDetail.css';
-import { artistIdsOf, useArtistCycle } from './useArtistCycle';
+import { artistIdsOf, formatArtistNames, useArtistCycle } from './useArtistCycle';
 
 const TREND_SKELETON_COUNT = 8;
 
@@ -777,7 +777,7 @@ const MusicDetail = () => {
       if (item._skeleton) {
         return <MusicDetailTrendCardSkeleton key={item.id} mix />;
       }
-      const itemArtist = getArtistById(item.artistId);
+      const itemArtist = { name: formatArtistNames(item.artistId, getArtistById) };
       return (
         <MusicDetailTrendCard
           key={item.id}
@@ -822,7 +822,7 @@ const MusicDetail = () => {
           if (item._skeleton) {
             return <MusicDetailTrendCardSkeleton key={item.id} />;
           }
-          const itemArtist = getArtistById(item.artistId);
+          const itemArtist = { name: formatArtistNames(item.artistId, getArtistById) };
           const isPlayingTrack = item.id === currentMusic?.id;
           const cardDominantColor = isPlayingTrack
             ? pageDominantColor || dominantColor

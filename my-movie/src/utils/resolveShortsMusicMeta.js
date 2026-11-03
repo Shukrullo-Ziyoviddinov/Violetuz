@@ -1,4 +1,5 @@
 import { matchId } from './musicDataUtils';
+import { formatArtistNames } from '../pageMusic/useArtistCycle';
 
 const normalizeLocalized = (value) => {
   if (!value) return { uz: '', ru: '' };
@@ -16,12 +17,10 @@ const getSourceByContentType = (contentType, musicList = [], clipList = [], conc
 };
 
 const resolveArtist = (item, artistsList = []) => {
-  if (item?.artist) return normalizeLocalized(item.artist);
-  if (item?.artistId) {
-    const artist = artistsList.find((a) => a.id === item.artistId);
-    const name = artist?.name || item.artistId;
-    return { uz: name, ru: name };
-  }
+  const lookup = (id) => artistsList.find((row) => String(row?.id) === String(id)) || null;
+  const fromIds = formatArtistNames(item?.artistId, lookup);
+  if (fromIds) return { uz: fromIds, ru: fromIds };
+  if (item?.artist && !Array.isArray(item.artist)) return normalizeLocalized(item.artist);
   return { uz: '', ru: '' };
 };
 

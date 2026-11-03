@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import styles from './MusicPlayerModal.module.css';
 import ImgButtonVisual from '../Visual/imgButtonVisual';
 import CardVisual from '../Visual/cardVisual';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 
 const MusicPlayerModal = ({
   isOpen,
@@ -124,7 +125,10 @@ const MusicPlayerModal = ({
           {trendList.length > 0 && (
             <div className={styles.artworkTrendGrid}>
               {trendList.map((item) => {
-                const itemArtist = artists.find((a) => a.id === item.artistId);
+                const itemArtistName = formatArtistNames(
+                  item.artistId,
+                  (id) => artists.find((row) => String(row?.id) === String(id)) || null
+                );
                 const isActive = item.id === music?.id;
                 return (
                   <div
@@ -141,7 +145,9 @@ const MusicPlayerModal = ({
                     </div>
                     <div className={styles.trendCardInfo}>
                       <span className={styles.trendCardTitle}>{getTitle(item)}</span>
-                      {itemArtist && <span className={styles.trendCardArtist}>{itemArtist.name}</span>}
+                      {itemArtistName ? (
+                        <span className={styles.trendCardArtist}>{itemArtistName}</span>
+                      ) : null}
                     </div>
                     {isActive && analyserRef && (
                       <div className={styles.trendCardVisual}>

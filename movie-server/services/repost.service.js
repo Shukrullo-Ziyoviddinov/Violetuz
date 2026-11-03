@@ -102,12 +102,32 @@ const toIdOnly = (row) => ({
   type: row.type,
 });
 
+const artistIdsOf = (value) => {
+  if (value == null || value === '') return [];
+  const list = Array.isArray(value) ? value : [value];
+  const seen = new Set();
+  const ids = [];
+  for (const raw of list) {
+    if (raw == null || raw === '' || typeof raw === 'object') continue;
+    const id = String(raw).trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+};
+
 const artistNameById = async (artistId) => {
-  if (!artistId) return '';
-  const artist = await Artist.findOne({ id: String(artistId) })
-    .select('name')
-    .lean();
-  return artist?.name || '';
+  const ids = artistIdsOf(artistId);
+  if (!ids.length) return '';
+  const artists = await Artist.find({ id: { $in: ids } }).select('id name').lean();
+  const byId = new Map(artists.map((row) => [String(row.id), row.name]));
+  return ids
+    .map((id) => {
+      const name = byId.get(id);
+      return typeof name === 'string' && name.trim() ? name.trim() : id;
+    })
+    .join(' & ');
 };
 
 const buildSlimSnapshot = async (type, itemId) => {

@@ -11,6 +11,7 @@ import { formatMovieRating } from '../Rating/CalculateRating';
 import '../Movies/Movies.css';
 import '../../pageMusic/MusicMorePage.css';
 import './LikeHistory.css';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 
 const EMPTY_IMG_SRC = '/img/LikeHistoryImg_preview_rev_1.png';
 
@@ -162,9 +163,7 @@ const LikeHistory = ({ items = [], activeCategory = '' }) => {
           const mediaItem = Number.isFinite(videoIdFromRoute)
             ? sourceList.find((v) => Number(v.id) === videoIdFromRoute)
             : null;
-          const artistName = mediaItem?.artistId
-            ? (getArtistById(mediaItem.artistId)?.name || '')
-            : '';
+          const artistName = formatArtistNames(mediaItem?.artistId, getArtistById);
           const wlType = item.category === 'concert' ? 'konsert' : 'klip';
           const wlId =
             mediaItem?.id ?? (Number.isFinite(videoIdFromRoute) ? videoIdFromRoute : null);

@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMusicApi } from '../../context/MusicApiContext';
 import './RepostVideoCard.css';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 
 const RepostVideoCard = ({ item }) => {
   const navigate = useNavigate();
@@ -10,8 +11,7 @@ const RepostVideoCard = ({ item }) => {
   const source = item.type === 'konsert' ? allConcerts : allClips;
   const raw = (Array.isArray(source) ? source : []).find((v) => Number(v.id) === Number(item.id));
   const artistName =
-    item.artistName ||
-    (raw?.artistId ? getArtistById(raw.artistId)?.name || '' : '');
+    formatArtistNames(raw?.artistId, getArtistById) || item.artistName || '';
   return (
     <button type="button" className="repost-video-card" onClick={open}>
       <div className="music-more-page-item-image-wrapper">

@@ -16,6 +16,7 @@ import { albumSongToTrack, ALBUM_TRACK_ID_OFFSET } from '../utils/albumSongToTra
 import MusicMiniPlayer from '../Music/MusicMiniPlayer/MusicMiniPlayer';
 import { registerMusicPause, requestPauseVideos } from '../MiniVideo/mediaPlaybackGate';
 import MusicPlayerModal from '../Music/MusicPlayerModal/MusicPlayerModal';
+import { formatArtistNames } from '../pageMusic/useArtistCycle';
 import '../pageMusic/MusicDetail.css';
 
 const MusicPlayerContext = createContext();
@@ -357,9 +358,11 @@ export const MusicPlayerProvider = ({ children }) => {
     };
   }, [lyricsModalOpen, closeLyricsModal]);
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const artist = currentMusic
-    ? (currentMusic.artistId ? getArtistById(currentMusic.artistId) : (currentMusic.artist ? { name: currentMusic.artist } : null))
-    : null;
+  const artistLabel = currentMusic
+    ? formatArtistNames(currentMusic.artistId, getArtistById) ||
+      (typeof currentMusic.artist === 'string' ? currentMusic.artist.trim() : '')
+    : '';
+  const artist = artistLabel ? { name: artistLabel } : null;
   const dominantColor = useDominantColor(currentMusic?.img);
 
   const getTitle = useCallback((item) => {

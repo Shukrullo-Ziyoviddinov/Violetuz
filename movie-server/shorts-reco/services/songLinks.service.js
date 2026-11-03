@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config');
-const { musicKey } = require('../utils/keys');
+const { musicKey, artistIdsOf } = require('../utils/keys');
 const { normalizeTitle, titleToken } = require('../utils/normalize');
 
 /**
@@ -63,14 +63,23 @@ const componentIsExplicit = (parent, explicitMembers, key) => {
  * @returns {string|null}
  */
 const sharedArtistId = (members) => {
-  let artistId = null;
+  let shared = null;
   for (let i = 0; i < members.length; i += 1) {
-    const current = members[i].artistId || null;
-    if (!current) return null;
-    if (artistId == null) artistId = current;
-    else if (artistId !== current) return null;
+    const ids = artistIdsOf(members[i].artistId);
+    if (!ids.length) return null;
+    if (!shared) {
+      shared = new Set(ids);
+      continue;
+    }
+    const next = new Set(ids);
+    for (const id of [...shared]) {
+      if (!next.has(id)) shared.delete(id);
+    }
+    if (!shared.size) return null;
   }
-  return artistId;
+  if (!shared || !shared.size) return null;
+  const list = [...shared].sort();
+  return list.length === 1 ? list[0] : list.join(',');
 };
 
 /**
@@ -161,15 +170,20 @@ const buildSongGroups = (tracks, options = {}) => {
   for (const track of byKey.values()) {
     if (isExplicit(track)) continue;
     const title = normalizeTitle(track.title);
-    if (title && track.artistId) {
-      const bucketKey = `${track.artistId}\0${title}`;
-      const bucket = titleBuckets.get(bucketKey) || [];
-      bucket.push(track);
-      titleBuckets.set(bucketKey, bucket);
-    } else if (allowArtistOnly && !title && track.artistId) {
-      const bucket = artistBuckets.get(track.artistId) || [];
-      bucket.push(track);
-      artistBuckets.set(track.artistId, bucket);
+    const artistIds = artistIdsOf(track.artistId);
+    if (title && artistIds.length) {
+      for (let i = 0; i < artistIds.length; i += 1) {
+        const bucketKey = `${artistIds[i]}\0${title}`;
+        const bucket = titleBuckets.get(bucketKey) || [];
+        bucket.push(track);
+        titleBuckets.set(bucketKey, bucket);
+      }
+    } else if (allowArtistOnly && !title && artistIds.length) {
+      for (let i = 0; i < artistIds.length; i += 1) {
+        const bucket = artistBuckets.get(artistIds[i]) || [];
+        bucket.push(track);
+        artistBuckets.set(artistIds[i], bucket);
+      }
     }
   }
 

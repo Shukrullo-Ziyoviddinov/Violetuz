@@ -68,4 +68,32 @@ assert.equal(artistOnly.groups.length, 1);
 assert.equal(artistOnly.groups[0].method, 'artistOnly');
 assert.equal(artistOnly.groups[0].songGroupId, 'song:artist:a');
 
+const sharedInArray = buildSongGroups([
+  { kind: 'music', id: 21, artistId: ['jah-khalib', 'shohruhxon'], title: 'Life' },
+  { kind: 'klip', id: 22, artistId: 'jah-khalib', title: 'Life' },
+]);
+assert.equal(sharedInArray.groups.length, 1);
+assert.equal(sharedInArray.groups[0].method, 'artistTitle');
+assert.equal(sharedInArray.groups[0].songGroupId, 'song:title:jah-khalib:life');
+assert.equal(sharedInArray.byMusicKey.get('music:21'), sharedInArray.byMusicKey.get('klip:22'));
+
+const sameIds = buildSongGroups([
+  { kind: 'music', id: 31, artistId: ['shohruhxon', 'jah-khalib'], title: 'Life' },
+  { kind: 'konsert', id: 32, artistId: ['jah-khalib', 'shohruhxon'], title: 'Life' },
+]);
+assert.equal(sameIds.groups.length, 1);
+assert.equal(sameIds.byMusicKey.get('music:31'), sameIds.byMusicKey.get('konsert:32'));
+
+const differentArtist = buildSongGroups([
+  { kind: 'music', id: 41, artistId: ['jah-khalib'], title: 'Life' },
+  { kind: 'klip', id: 42, artistId: 'michael-jackson', title: 'Life' },
+]);
+assert.equal(differentArtist.groups.length, 0);
+
+const emptyArtist = buildSongGroups([
+  { kind: 'music', id: 51, artistId: [], title: 'Life' },
+  { kind: 'klip', id: 52, artistId: null, title: 'Life' },
+]);
+assert.equal(emptyArtist.groups.length, 0);
+
 console.log('ok songLinks');

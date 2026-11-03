@@ -6,6 +6,7 @@ import { useWishlist } from '../../context/WishlistContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
+import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './MovieSoundtrackClips.css';
 
 const clipIds = (movie) => {
@@ -156,7 +157,7 @@ const MovieSoundtrackClips = ({ movie, title, pending = false }) => {
           <SoundtrackClipCard
             key={clip.id}
             clip={clip}
-            artistName={getArtistById(clip.artistId)?.name || ''}
+            artistName={formatArtistNames(clip.artistId, getArtistById)}
             onOpen={openClip}
           />
         ))}
