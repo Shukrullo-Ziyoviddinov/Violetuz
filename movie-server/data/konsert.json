@@ -1,8 +1,13 @@
 [
   {
     "id": 401,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -13,13 +18,19 @@
     "video": "/video/Lady_Gaga,_Bruno_Mars_Die_With_A_Smile_Official_Music_Video.mp4",
     "like": "1110",
     "dislike": "0",
-    "movieId": [8001],
+    "movieId": [
+      8001
+    ],
     "musicId": null
   },
   {
     "id": 402,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -30,13 +41,21 @@
     "video": "/video/The Amateur _ Official Trailer.mp4",
     "like": "0",
     "dislike": "0",
-    "movieId": [1],
+    "movieId": [
+      1
+    ],
     "musicId": null
   },
   {
     "id": 403,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life",
     "year": 2020,
@@ -47,13 +66,20 @@
     "video": "/video/Zivert - Life   Премьера клипа.mp4",
     "like": "0",
     "dislike": "0",
-    "movieId": [2001],
+    "movieId": [
+      2001
+    ],
     "musicId": null
   },
   {
     "id": 404,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
@@ -68,8 +94,12 @@
   },
   {
     "id": 405,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "jah-khalib"
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "The Amateur Trailer",
     "year": 2024,
@@ -84,8 +114,14 @@
   },
   {
     "id": 406,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -100,8 +136,13 @@
   },
   {
     "id": 407,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-7.jpg",
     "title": "Die With A Smile - Official",
     "year": 2024,
@@ -116,8 +157,12 @@
   },
   {
     "id": 408,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-8.jpg",
     "title": "The Amateur - Official Trailer",
     "year": 2024,
@@ -132,8 +177,14 @@
   },
   {
     "id": 409,
+    "channelId": "violet-play",
     "categoryNameMusic": "jaxonConcertsData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-9.jpg",
     "title": "Life - Zivert",
     "year": 2020,
@@ -148,8 +199,13 @@
   },
   {
     "id": 1501,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -164,8 +220,12 @@
   },
   {
     "id": 1502,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "Live Performance",
     "year": 2024,
@@ -180,8 +240,14 @@
   },
   {
     "id": 1503,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life",
     "year": 2020,
@@ -196,8 +262,13 @@
   },
   {
     "id": 1504,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Concert Highlights",
     "year": 2024,
@@ -212,8 +283,12 @@
   },
   {
     "id": 1505,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "Live At Stadium",
     "year": 2024,
@@ -228,8 +303,14 @@
   },
   {
     "id": 1506,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Premiere Live",
     "year": 2020,
@@ -244,8 +325,13 @@
   },
   {
     "id": 1507,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-7.jpg",
     "title": "Official Live",
     "year": 2024,
@@ -260,8 +346,12 @@
   },
   {
     "id": 1508,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "jah-khalib"
+    ],
     "img": "/img/movie-4.5-8.jpg",
     "title": "Concert Special",
     "year": 2024,
@@ -276,8 +366,14 @@
   },
   {
     "id": 1509,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-9.jpg",
     "title": "Zivert Live",
     "year": 2020,
@@ -292,8 +388,13 @@
   },
   {
     "id": 1510,
+    "channelId": "violet-play",
     "categoryNameMusic": "liveStagesData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie-4.5-10.jpg",
     "title": "Music Video Live",
     "year": 2024,
@@ -308,8 +409,12 @@
   },
   {
     "id": 1601,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -324,8 +429,14 @@
   },
   {
     "id": 1602,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "Stars Stage Performance",
     "year": 2024,
@@ -340,8 +451,13 @@
   },
   {
     "id": 1603,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life on Stage",
     "year": 2020,
@@ -356,8 +472,12 @@
   },
   {
     "id": 1604,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Stars Concert",
     "year": 2024,
@@ -372,8 +492,14 @@
   },
   {
     "id": 1605,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "Stars Stage Special",
     "year": 2024,
@@ -388,8 +514,13 @@
   },
   {
     "id": 1606,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Premiere Stars",
     "year": 2020,
@@ -404,8 +535,12 @@
   },
   {
     "id": 1607,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-7.jpg",
     "title": "Official Stars Stage",
     "year": 2024,
@@ -420,8 +555,14 @@
   },
   {
     "id": 1608,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "jah-khalib",
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-8.jpg",
     "title": "Concert Stars",
     "year": 2024,
@@ -436,8 +577,13 @@
   },
   {
     "id": 1609,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-9.jpg",
     "title": "Stars Live",
     "year": 2020,
@@ -452,8 +598,12 @@
   },
   {
     "id": 1610,
+    "channelId": "violet-play",
     "categoryNameMusic": "starsStageData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-10.jpg",
     "title": "Stars Stage Live",
     "year": 2024,

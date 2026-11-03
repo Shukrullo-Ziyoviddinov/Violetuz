@@ -585,6 +585,11 @@ body.video-detail-page-active {
   margin-bottom: 0;
 }
 
+.video-detail-creators {
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
 .video-detail-artist-card {
   padding-top: 1rem;
   margin-bottom: 1rem;

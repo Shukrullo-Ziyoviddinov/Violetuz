@@ -494,7 +494,7 @@
 .music-detail-artist-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.75rem 1.25rem;
   margin-top: 1rem;
   min-width: 0;
@@ -502,11 +502,14 @@
 
 .music-detail-artist-row .music-detail-artist-block {
   margin-top: 0;
-  min-width: 0;
+  flex: 0 0 auto;
 }
 
 .music-detail-artist-row .view-count-text {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -573,6 +576,38 @@
 
 .music-detail-artist-block:hover {
   opacity: 0.85;
+}
+
+.music-detail-artist-swap.is-out {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.music-detail-artist-swap.is-in {
+  animation: music-detail-artist-in 0.28s ease;
+}
+
+@keyframes music-detail-artist-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-detail-artist-swap.is-out,
+  .music-detail-artist-swap.is-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
 }
 
 .music-detail-artist-img {

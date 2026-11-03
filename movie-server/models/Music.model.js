@@ -23,10 +23,13 @@ const musicSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+    /**
+     * artists.json dagi artist id lari. Bir trekda bir nechta artist.
+     * Bo'sh bo'lsa [].
+     */
     artistId: {
-      type: String,
-      required: true,
-      trim: true,
+      type: [String],
+      default: [],
       index: true,
     },
     img: {

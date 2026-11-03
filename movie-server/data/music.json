@@ -3,7 +3,11 @@
     "id": 801,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Deep Bass",
     "year": 2025,
@@ -11,16 +15,22 @@
     "language": "english",
     "country": "usa",
     "type": "music",
-    "franchiseMusicIds": [806, 803],
+    "franchiseMusicIds": [
+      806,
+      803
+    ],
     "audio": "/music/Official Arctic Monkeys - I Wanna Be Yours.mp3",
     "lyricsText": "Chuqur bass - jonimga\nDeep bass - titrash\nHar bir beat - hayot",
     "clipId": null
   },
-  { 
+  {
     "id": 802,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Subwoofer",
     "year": 2024,
@@ -28,16 +38,23 @@
     "language": "uzbek",
     "country": "uzbekistan",
     "type": "music",
-    "franchiseMusicIds": [805],
+    "franchiseMusicIds": [
+      805
+    ],
     "audio": "/music/Zivert - Life.mp3",
     "lyricsText": "Subwoofer - yuragim titraydi\nKuchli ovoz - sensiz emas\nBu kecha - bizniki",
     "clipId": null
   },
-  { 
+  {
     "id": 803,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Bass Drop",
     "year": 2023,
@@ -48,12 +65,16 @@
     "audio": "/music/Reed Wonder - When I Dream Of You.mp3",
     "lyricsText": "Bass drop - moment\nHar bir drop - hayajon\nAbadiy kecha",
     "clipId": null
-  }, 
+  },
   {
     "id": 804,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Low Frequency",
     "year": 2024,
@@ -69,7 +90,10 @@
     "id": 805,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "Heavy Bass",
     "year": 2022,
@@ -85,7 +109,12 @@
     "id": 806,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Bassline",
     "year": 2025,
@@ -101,7 +130,11 @@
     "id": 807,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Earthquake",
     "year": 2023,
@@ -117,7 +150,10 @@
     "id": 808,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Bass Cannon",
     "year": 2024,
@@ -133,7 +169,12 @@
     "id": 809,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Sub Bass",
     "year": 2022,
@@ -149,7 +190,11 @@
     "id": 810,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Bass Boost",
     "year": 2025,
@@ -165,7 +210,10 @@
     "id": 811,
     "channelId": "violet-play",
     "categoryNameMusic": "bassMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Rumble",
     "year": 2023,
@@ -181,7 +229,12 @@
     "id": 501,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Face love",
     "year": 2025,
@@ -197,7 +250,11 @@
     "id": 502,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Summer Vibes",
     "year": 2024,
@@ -213,7 +270,10 @@
     "id": 503,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Night Drive",
     "year": 2023,
@@ -229,7 +289,12 @@
     "id": 504,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Moonlight",
     "year": 2022,
@@ -245,7 +310,11 @@
     "id": 505,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Dream State",
     "year": 2024,
@@ -261,7 +330,10 @@
     "id": 506,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie1.jpg",
     "title": "City Lights",
     "year": 2023,
@@ -277,7 +349,12 @@
     "id": 507,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "Ocean View",
     "year": 2022,
@@ -293,7 +370,11 @@
     "id": 508,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Golden Hour",
     "year": 2024,
@@ -309,7 +390,10 @@
     "id": 509,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Rainy Days",
     "year": 2021,
@@ -325,7 +409,12 @@
     "id": 510,
     "channelId": "violet-play",
     "categoryNameMusic": "discoverMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Starlight",
     "year": 2023,
@@ -341,7 +430,11 @@
     "id": 701,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Violet Dreams",
     "year": 2025,
@@ -357,7 +450,10 @@
     "id": 702,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie1.jpg",
     "title": "City Soul",
     "year": 2024,
@@ -373,7 +469,12 @@
     "id": 703,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Midnight Groove",
     "year": 2023,
@@ -389,7 +490,11 @@
     "id": 704,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Sunset Boulevard",
     "year": 2024,
@@ -405,7 +510,10 @@
     "id": 705,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "Echo Valley",
     "year": 2022,
@@ -421,7 +529,12 @@
     "id": 706,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Neon Lights",
     "year": 2025,
@@ -437,7 +550,11 @@
     "id": 707,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Smooth Operator",
     "year": 2023,
@@ -453,7 +570,10 @@
     "id": 708,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib"
+    ],
     "img": "/img/movie2.jpg",
     "title": "River Flow",
     "year": 2024,
@@ -469,7 +589,12 @@
     "id": 709,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Sky High",
     "year": 2022,
@@ -485,7 +610,11 @@
     "id": 710,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Thunder Storm",
     "year": 2025,
@@ -501,7 +630,10 @@
     "id": 711,
     "channelId": "violet-play",
     "categoryNameMusic": "musicHubData ",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Desert Wind",
     "year": 2023,
@@ -517,7 +649,12 @@
     "id": 601,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Silent Night",
     "year": 2024,
@@ -533,7 +670,11 @@
     "id": 602,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Old Town Road",
     "year": 2023,
@@ -549,7 +690,10 @@
     "id": 603,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Dancing Stars",
     "year": 2022,
@@ -565,7 +709,12 @@
     "id": 604,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Blue Skies",
     "year": 2025,
@@ -581,7 +730,11 @@
     "id": 605,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Winter Dreams",
     "year": 2023,
@@ -597,7 +750,10 @@
     "id": 606,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/jah-khalib.jpg",
     "title": "Sunset Boulevard",
     "year": 2024,
@@ -613,7 +769,12 @@
     "id": 607,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "Electric Soul",
     "year": 2022,
@@ -629,7 +790,11 @@
     "id": 608,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Morning Light",
     "year": 2021,
@@ -645,7 +810,10 @@
     "id": 609,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Neon Hearts",
     "year": 2023,
@@ -661,7 +829,12 @@
     "id": 610,
     "channelId": "violet-play",
     "categoryNameMusic": "musicLibraryData",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "jah-khalib",
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Paradise Lost",
     "year": 2024,
@@ -677,7 +850,11 @@
     "id": 901,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "maher-zain",
+    "artistId": [
+      "maher-zain",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/nasheedsimg1.jpg",
     "title": "Bismillah",
     "year": 2024,
@@ -693,7 +870,10 @@
     "id": 902,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "sami-yusuf",
+    "artistId": [
+      "sami-yusuf",
+      "shohruhxon"
+    ],
     "img": "/img/nasheedsimg2.jpg",
     "title": "Al-Quran Al-Kareem",
     "year": 2023,
@@ -709,7 +889,12 @@
     "id": 903,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "maher-zain",
+    "artistId": [
+      "maher-zain",
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/nasheedsimg3.jpg",
     "title": "نشيد",
     "year": 2024,
@@ -725,7 +910,11 @@
     "id": 904,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "sami-yusuf",
+    "artistId": [
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/nasheedsimg4.jpg",
     "title": "Oydin tun",
     "year": 2023,
@@ -741,7 +930,10 @@
     "id": 905,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "maher-zain",
+    "artistId": [
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/nasheedsimg5.jpg",
     "title": "Cho'l va oy",
     "year": 2022,
@@ -757,7 +949,12 @@
     "id": 906,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "sami-yusuf",
+    "artistId": [
+      "sami-yusuf",
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/nasheedsimg6.jpg",
     "title": "Masjid va fonus",
     "year": 2025,
@@ -773,7 +970,11 @@
     "id": 907,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "maher-zain",
+    "artistId": [
+      "maher-zain",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/nasheedsimg7.jpg",
     "title": "Eid Mubarak",
     "year": 2024,
@@ -789,7 +990,10 @@
     "id": 908,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "sami-yusuf",
+    "artistId": [
+      "sami-yusuf",
+      "shohruhxon"
+    ],
     "img": "/img/nasheedsimg8.jpg",
     "title": "Qur'on va suv",
     "year": 2023,
@@ -805,7 +1009,12 @@
     "id": 909,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "maher-zain",
+    "artistId": [
+      "maher-zain",
+      "michael-jackson",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/nasheedsimg9.jpg",
     "title": "Dua qollari",
     "year": 2024,
@@ -821,7 +1030,11 @@
     "id": 910,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "sami-yusuf",
+    "artistId": [
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/nasheedsimg10.jpg",
     "title": "Bismillah va masjid",
     "year": 2023,
@@ -837,7 +1050,10 @@
     "id": 911,
     "channelId": "violet-play",
     "categoryNameMusic": "topNasheedsData",
-    "artistId": "maher-zain",
+    "artistId": [
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/nasheedsimg11.jpg",
     "title": "Ummat birdamligi",
     "year": 2025,
@@ -853,7 +1069,12 @@
     "id": 101,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/TheWeeknd_Banner_Mobile.webp",
     "title": "Life",
     "year": 2020,
@@ -869,7 +1090,11 @@
     "id": 103,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie1.jpg",
     "title": "Wrong",
     "year": 2012,
@@ -885,7 +1110,10 @@
     "id": 104,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Sariq devona",
     "year": 2022,
@@ -901,7 +1129,12 @@
     "id": 105,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "Monkeys",
     "year": 2015,
@@ -917,7 +1150,11 @@
     "id": 106,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie5.jpg",
     "title": "Red wonder",
     "year": 2023,
@@ -933,7 +1170,10 @@
     "id": 107,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Under loves",
     "year": 2017,
@@ -949,7 +1189,12 @@
     "id": 108,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2026,
@@ -965,7 +1210,11 @@
     "id": 109,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2010,
@@ -981,7 +1230,10 @@
     "id": 1010,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2020,
@@ -997,7 +1249,12 @@
     "id": 1011,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2023,
@@ -1013,7 +1270,11 @@
     "id": 1012,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2024,
@@ -1029,7 +1290,10 @@
     "id": 1013,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2020,
@@ -1045,7 +1309,12 @@
     "id": 1014,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2012,
@@ -1061,7 +1330,11 @@
     "id": 1015,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2020,
@@ -1077,7 +1350,10 @@
     "id": 1016,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2017,
@@ -1093,7 +1369,12 @@
     "id": 1017,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2019,
@@ -1109,7 +1390,11 @@
     "id": 1018,
     "channelId": "violet-play",
     "categoryNameMusic": "trendMusicData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "title": "Face love",
     "year": 2018,

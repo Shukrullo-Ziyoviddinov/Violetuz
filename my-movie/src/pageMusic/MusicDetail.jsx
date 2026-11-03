@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
@@ -15,6 +16,8 @@ import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
 import { AudioVisualizerCanvas, CardVisual } from '../Music/Visual';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
+import { fetchChannelById } from '../api/channelsApi';
+import { useIsFollowing } from '../context/FollowingContext';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
 import {
@@ -31,6 +34,7 @@ import ViewCount from '../components/ViewCount/ViewCount';
 import UploadedAtTime from '../components/UploadedAtTime/UploadedAtTime';
 import '../Music/YourMixes/YourMixes.css';
 import './MusicDetail.css';
+import { artistIdsOf, useArtistCycle } from './useArtistCycle';
 
 const TREND_SKELETON_COUNT = 8;
 
@@ -278,12 +282,20 @@ const MusicDetail = () => {
     : mixGenreParam;
   const mixMode = isSharedMix || Boolean(mixGenreParam);
 
-  const pageArtist = useMemo(() => {
-    if (!music) return null;
-    if (music.artistId) return getArtistById(music.artistId) || null;
-    if (music.artist) return { name: music.artist, img: music.img };
-    return null;
+  const pageArtists = useMemo(() => {
+    if (!music) return [];
+    return artistIdsOf(music.artistId)
+      .map((artistId) => getArtistById(artistId))
+      .filter(Boolean);
   }, [music, getArtistById]);
+  const { artist: cycledArtist, phase: artistPhase } = useArtistCycle(pageArtists);
+  const pageArtist = cycledArtist
+    || (music?.artist ? { name: music.artist, img: music.img } : null);
+  const artistSwapClass = artistPhase === 'out'
+    ? ' music-detail-artist-swap is-out'
+    : artistPhase === 'in'
+      ? ' music-detail-artist-swap is-in'
+      : '';
 
   const findSectionForMusicId = (musicId) => {
     if (musicId == null) return null;
@@ -426,6 +438,18 @@ const MusicDetail = () => {
     ? pageArtist.imgArtist || pageArtist.img || '/img/movie1.jpg'
     : '';
   const artistImg = useImageReady(artistImgSrc);
+  const channelId = String(music?.channelId || '').trim();
+  const channelQuery = useQuery({
+    queryKey: ['channel', channelId],
+    queryFn: () => fetchChannelById(channelId),
+    enabled: Boolean(channelId),
+    staleTime: 60_000,
+  });
+  const channel = channelQuery.data || null;
+  const isChannelSubscribed = useIsFollowing(channel?.id || channelId, 'channel');
+  const channelImgSrc = channel?.avatar || '';
+  const channelImg = useImageReady(channelImgSrc);
+  const channelSubscribers = (channel?.subscribers ?? 0) + (isChannelSubscribed ? 1 : 0);
 
   const showHeroDataSkeleton = Boolean(musicLoading) && !music;
   const heroAwaitingCover = Boolean(music) && coverImg.showSkeleton;
@@ -440,10 +464,10 @@ const MusicDetail = () => {
   const showLyricsSkeleton =
     showHeroDataSkeleton ||
     (heroAwaitingCover && Boolean(music?.lyricsText));
-  const showArtistCardSkeleton =
-    showArtistDataSkeleton ||
-    (Boolean(pageArtist?.id) && (showArtistImgSkeleton || heroAwaitingCover));
-  const showArtistCard = showArtistCardSkeleton || Boolean(pageArtist?.id);
+  const showChannelCardDataSkeleton =
+    showHeroDataSkeleton || (Boolean(channelId) && channelQuery.isLoading && !channel);
+  const showChannelImgSkeleton = Boolean(channel?.avatar) && channelImg.showSkeleton;
+  const showChannelCard = showChannelCardDataSkeleton || Boolean(channel?.id);
 
   const setCoverImgRef = (el) => {
     imgRef.current = el;
@@ -914,8 +938,8 @@ const MusicDetail = () => {
                         </>
                       ) : (
                         <>
-                          <div className="music-detail-artist-img-wrap">
-                            {showArtistImgSkeleton && (
+                          <div className={`music-detail-artist-img-wrap${artistSwapClass}`}>
+                            {showArtistImgSkeleton && artistPhase === 'idle' && (
                               <SkeletonLoader
                                 variant="music-detail-artist-img"
                                 className="music-detail-artist-img--skeleton"
@@ -927,7 +951,7 @@ const MusicDetail = () => {
                                 src={artistImgSrc}
                                 alt={pageArtist.name}
                                 className={`music-detail-artist-img${
-                                  showArtistImgSkeleton
+                                  showArtistImgSkeleton && artistPhase === 'idle'
                                     ? ' music-detail-artist-img--loading'
                                     : ''
                                 }`}
@@ -937,7 +961,7 @@ const MusicDetail = () => {
                             )}
                           </div>
                           <div className="music-detail-artist-info">
-                            <span className="music-detail-artist-name">
+                            <span className={`music-detail-artist-name${artistSwapClass}`}>
                               {pageArtist.name}
                             </span>
                             {music?.year && (
@@ -1052,20 +1076,18 @@ const MusicDetail = () => {
                 </button>
               )
             )}
-            {(showArtistCard || showHeroDataSkeleton) && (
+            {showChannelCard && (
               <div
                 className={`music-detail-artist-card${
-                  showArtistCardSkeleton || showHeroDataSkeleton
-                    ? ' music-detail-artist-card--skeleton'
-                    : ''
+                  showChannelCardDataSkeleton ? ' music-detail-artist-card--skeleton' : ''
                 }`}
                 onClick={() => {
-                  if (showArtistCardSkeleton || showHeroDataSkeleton) return;
-                  if (pageArtist?.id) navigate(`/music/artist/${pageArtist.id}`);
+                  if (showChannelCardDataSkeleton || !channel?.id) return;
+                  navigate(`/channel/${encodeURIComponent(channel.id)}`);
                 }}
-                aria-busy={showArtistCardSkeleton || showHeroDataSkeleton || undefined}
+                aria-busy={showChannelCardDataSkeleton || showChannelImgSkeleton || undefined}
               >
-                {showArtistCardSkeleton || showHeroDataSkeleton ? (
+                {showChannelCardDataSkeleton ? (
                   <>
                     <SkeletonLoader variant="music-detail-artist-card-img" />
                     <div className="music-detail-artist-card-info">
@@ -1086,30 +1108,30 @@ const MusicDetail = () => {
                 ) : (
                   <>
                     <div className="music-detail-artist-card-img-wrap">
-                      {showArtistImgSkeleton && (
+                      {showChannelImgSkeleton && (
                         <SkeletonLoader
                           variant="music-detail-artist-card-img"
                           className="music-detail-artist-card-img--skeleton"
                         />
                       )}
-                      {artistImgSrc && (
+                      {channelImgSrc && (
                         <img
-                          ref={artistImg.imgRef}
-                          src={artistImgSrc}
-                          alt={pageArtist.name}
+                          ref={channelImg.imgRef}
+                          src={channelImgSrc}
+                          alt={channel.name}
                           className={`music-detail-artist-card-img${
-                            showArtistImgSkeleton
+                            showChannelImgSkeleton
                               ? ' music-detail-artist-card-img--loading'
                               : ''
                           }`}
-                          onLoad={artistImg.onLoad}
-                          onError={artistImg.onError}
+                          onLoad={channelImg.onLoad}
+                          onError={channelImg.onError}
                         />
                       )}
                     </div>
                     <div className="music-detail-artist-card-info">
                       <span className="music-detail-artist-card-name">
-                        {pageArtist.name}
+                        {channel.name}
                         <img
                           src="/img/galichka.png"
                           alt=""
@@ -1119,14 +1141,14 @@ const MusicDetail = () => {
                       </span>
                       <div className="artist-detail-stat-item music-detail-artist-stat">
                         <span className="artist-detail-track-num">
-                          {formatCount(pageArtist.subscribers ?? 0)}
+                          {formatCount(channelSubscribers)}
                         </span>
                         <span className="artist-detail-track-label">Obunachi</span>
                       </div>
                     </div>
                     <FollowingButton
-                      artistId={pageArtist.id}
-                      entityType="artist"
+                      artistId={channel.id}
+                      entityType="channel"
                       wrapperClassName="music-detail-artist-card-btn"
                       stopPropagation
                     />

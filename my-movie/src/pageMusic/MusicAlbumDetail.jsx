@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../context/WishlistContext';
@@ -14,7 +15,11 @@ import SimilarSongs from '../Music/SimilarSongs/SimilarSongs';
 import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
 import { AudioVisualizerCanvas, CardVisual } from '../Music/Visual';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import { useImageReady } from '../utils/useImageReady';
+import { formatCount } from '../utils/utils';
+import { fetchChannelById } from '../api/channelsApi';
+import { useIsFollowing } from '../context/FollowingContext';
 import { albumSongToTrack } from '../utils/albumSongToTrack';
 import {
   useHomeMusicCategoryRecommendations,
@@ -24,6 +29,7 @@ import { wishlistTypeToContentType } from '../api/musicRecommendationsApi';
 import ViewCount from '../components/ViewCount/ViewCount';
 import './MusicDetail.css';
 import './MusicAlbumDetail.css';
+import { artistIdsOf, firstArtistId, useArtistCycle } from './useArtistCycle';
 
 const TREND_SKELETON_COUNT = 8;
 const SONGS_SKELETON_COUNT = 6;
@@ -164,7 +170,7 @@ const AlbumSongRowSkeleton = () => (
 
 const MusicAlbumDetail = () => {
   const { id } = useParams();
-  const { sections, allAlbums, getAlbumsByCategory, albumsLoading } = useMusicApi();
+  const { sections, allAlbums, getAlbumsByCategory, albumsLoading, getArtistById } = useMusicApi();
   const albumSections = useMemo(
     () => (sections || []).filter((s) => s.wishlistType === 'album'),
     [sections]
@@ -376,8 +382,38 @@ const MusicAlbumDetail = () => {
 
   const coverSrc = album?.img || (album ? '/img/movie1.jpg' : '');
   const coverImg = useImageReady(coverSrc);
-  const artistImgSrc = album ? album.img || '/img/movie1.jpg' : '';
+  const albumArtists = useMemo(() => {
+    if (!album) return [];
+    return artistIdsOf(album.artistId)
+      .map((artistId) => getArtistById(artistId))
+      .filter(Boolean);
+  }, [album, getArtistById]);
+  const manyAlbumArtists = albumArtists.length > 1;
+  const { artist: cycledAlbumArtist, phase: artistPhase } = useArtistCycle(
+    manyAlbumArtists ? albumArtists : [],
+  );
+  const artistImgSrc = manyAlbumArtists
+    ? (cycledAlbumArtist?.imgArtist || cycledAlbumArtist?.img || '')
+    : (album ? album.img || '/img/movie1.jpg' : '');
+  const artistName = manyAlbumArtists ? (cycledAlbumArtist?.name || '') : (album?.artist || '');
+  const artistSwapClass = artistPhase === 'out'
+    ? ' music-detail-artist-swap is-out'
+    : artistPhase === 'in'
+      ? ' music-detail-artist-swap is-in'
+      : '';
   const artistImg = useImageReady(artistImgSrc);
+  const channelId = String(album?.channelId || '').trim();
+  const channelQuery = useQuery({
+    queryKey: ['channel', channelId],
+    queryFn: () => fetchChannelById(channelId),
+    enabled: Boolean(channelId),
+    staleTime: 60_000,
+  });
+  const channel = channelQuery.data || null;
+  const isChannelSubscribed = useIsFollowing(channel?.id || channelId, 'channel');
+  const channelImgSrc = channel?.avatar || '';
+  const channelImg = useImageReady(channelImgSrc);
+  const channelSubscribers = (channel?.subscribers ?? 0) + (isChannelSubscribed ? 1 : 0);
 
   const showHeroDataSkeleton = Boolean(albumsLoading) && !album;
   const heroAwaitingCover = Boolean(album) && coverImg.showSkeleton;
@@ -386,6 +422,10 @@ const MusicAlbumDetail = () => {
   const showArtistDataSkeleton = showHeroDataSkeleton || heroAwaitingCover;
   const showArtistImgSkeleton = Boolean(album) && artistImg.showSkeleton;
   const showSongsSkeleton = showHeroDataSkeleton || heroAwaitingCover;
+  const showChannelCardDataSkeleton =
+    showHeroDataSkeleton || (Boolean(channelId) && channelQuery.isLoading && !channel);
+  const showChannelImgSkeleton = Boolean(channel?.avatar) && channelImg.showSkeleton;
+  const showChannelCard = showChannelCardDataSkeleton || Boolean(channel?.id);
 
   // albumList — Home bilan bir xil personalized tartib (login), aks holda katalog
   const sectionTitle = sectionConfig
@@ -421,10 +461,12 @@ const MusicAlbumDetail = () => {
     );
   };
 
+  const visibleArtistId = manyAlbumArtists
+    ? cycledAlbumArtist?.id
+    : firstArtistId(album?.artistId);
+
   const handleArtistClick = () => {
-    if (album?.artistId) {
-      navigate(`/music/artist/${album.artistId}`);
-    }
+    if (visibleArtistId) navigate(`/music/artist/${visibleArtistId}`);
   };
 
   const handleDownload = () => {
@@ -535,20 +577,20 @@ const MusicAlbumDetail = () => {
                           : ''
                       }`}
                       role={
-                        !showArtistDataSkeleton && album?.artistId
+                        !showArtistDataSkeleton && visibleArtistId
                           ? 'button'
                           : undefined
                       }
                       tabIndex={
-                        !showArtistDataSkeleton && album?.artistId ? 0 : undefined
+                        !showArtistDataSkeleton && visibleArtistId ? 0 : undefined
                       }
                       onClick={
-                        !showArtistDataSkeleton && album?.artistId
+                        !showArtistDataSkeleton && visibleArtistId
                           ? handleArtistClick
                           : undefined
                       }
                       onKeyDown={
-                        !showArtistDataSkeleton && album?.artistId
+                        !showArtistDataSkeleton && visibleArtistId
                           ? (e) => {
                               if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
@@ -558,7 +600,7 @@ const MusicAlbumDetail = () => {
                           : undefined
                       }
                       style={
-                        showArtistDataSkeleton || !album?.artistId
+                        showArtistDataSkeleton || !visibleArtistId
                           ? { cursor: 'default' }
                           : { cursor: 'pointer' }
                       }
@@ -576,8 +618,8 @@ const MusicAlbumDetail = () => {
                         </>
                       ) : (
                         <>
-                          <div className="music-detail-artist-img-wrap">
-                            {showArtistImgSkeleton && (
+                          <div className={`music-detail-artist-img-wrap${artistSwapClass}`}>
+                            {showArtistImgSkeleton && artistPhase === 'idle' && (
                               <SkeletonLoader
                                 variant="music-detail-artist-img"
                                 className="music-detail-artist-img--skeleton"
@@ -587,9 +629,9 @@ const MusicAlbumDetail = () => {
                               <img
                                 ref={artistImg.imgRef}
                                 src={artistImgSrc}
-                                alt={album.artist}
+                                alt={artistName}
                                 className={`music-detail-artist-img${
-                                  showArtistImgSkeleton
+                                  showArtistImgSkeleton && artistPhase === 'idle'
                                     ? ' music-detail-artist-img--loading'
                                     : ''
                                 }`}
@@ -599,24 +641,17 @@ const MusicAlbumDetail = () => {
                             )}
                           </div>
                           <div className="music-detail-artist-info">
-                            <span className="music-detail-artist-name">
-                              {album.artist}
+                            <span className={`music-detail-artist-name${artistSwapClass}`}>
+                              {artistName}
                             </span>
                             {album.year && (
                               <span className="music-detail-artist-year">
                                 {album.year}
                               </span>
                             )}
-                            {album.songs?.length > 0 && (
-                              <span className="music-detail-artist-year">
-                                {t('music.albumSongsCount', {
-                                  count: album.songs.length,
-                                })}
-                              </span>
-                            )}
                             {albumTotalDuration != null && albumTotalDuration > 0 && (
                               <span className="music-detail-artist-duration">
-                                {t('music.albumTotal')} {formatTime(albumTotalDuration)}
+                                {formatTime(albumTotalDuration)}
                               </span>
                             )}
                           </div>
@@ -725,6 +760,86 @@ const MusicAlbumDetail = () => {
                   </span>
                 </span>
               </button>
+            )}
+            {showChannelCard && (
+              <div
+                className={`music-detail-artist-card${
+                  showChannelCardDataSkeleton ? ' music-detail-artist-card--skeleton' : ''
+                }`}
+                onClick={() => {
+                  if (showChannelCardDataSkeleton || !channel?.id) return;
+                  navigate(`/channel/${encodeURIComponent(channel.id)}`);
+                }}
+                aria-busy={showChannelCardDataSkeleton || showChannelImgSkeleton || undefined}
+              >
+                {showChannelCardDataSkeleton ? (
+                  <>
+                    <SkeletonLoader variant="music-detail-artist-card-img" />
+                    <div className="music-detail-artist-card-info">
+                      <span className="music-detail-artist-card-name music-detail-artist-card-name--skeleton">
+                        <SkeletonLoader variant="music-detail-artist-card-name" />
+                      </span>
+                      <div className="artist-detail-stat-item music-detail-artist-stat music-detail-artist-stat--skeleton">
+                        <SkeletonLoader variant="music-detail-artist-stat-num" />
+                        <SkeletonLoader variant="music-detail-artist-stat-label" />
+                      </div>
+                    </div>
+                    <div className="music-detail-artist-card-btn">
+                      <span className="following-btn following-btn--skeleton" aria-hidden="true">
+                        <SkeletonLoader variant="music-detail-following-btn" />
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="music-detail-artist-card-img-wrap">
+                      {showChannelImgSkeleton && (
+                        <SkeletonLoader
+                          variant="music-detail-artist-card-img"
+                          className="music-detail-artist-card-img--skeleton"
+                        />
+                      )}
+                      {channelImgSrc && (
+                        <img
+                          ref={channelImg.imgRef}
+                          src={channelImgSrc}
+                          alt={channel.name}
+                          className={`music-detail-artist-card-img${
+                            showChannelImgSkeleton
+                              ? ' music-detail-artist-card-img--loading'
+                              : ''
+                          }`}
+                          onLoad={channelImg.onLoad}
+                          onError={channelImg.onError}
+                        />
+                      )}
+                    </div>
+                    <div className="music-detail-artist-card-info">
+                      <span className="music-detail-artist-card-name">
+                        {channel.name}
+                        <img
+                          src="/img/galichka.png"
+                          alt=""
+                          className="music-detail-artist-card-verified"
+                          aria-hidden
+                        />
+                      </span>
+                      <div className="artist-detail-stat-item music-detail-artist-stat">
+                        <span className="artist-detail-track-num">
+                          {formatCount(channelSubscribers)}
+                        </span>
+                        <span className="artist-detail-track-label">Obunachi</span>
+                      </div>
+                    </div>
+                    <FollowingButton
+                      artistId={channel.id}
+                      entityType="channel"
+                      wrapperClassName="music-detail-artist-card-btn"
+                      stopPropagation
+                    />
+                  </>
+                )}
+              </div>
             )}
             <div className="music-album-songs-list">
               {showSongsSkeleton ? (

@@ -7,17 +7,35 @@ const clipSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    /**
+     * Klip qaysi kanalga tegishli. channels.json dagi id.
+     * Bo'sh bo'lsa kanal profiliga chiqmaydi.
+     */
+    channelId: {
+      type: String,
+      trim: true,
+      default: '',
+      index: true,
+    },
     categoryNameMusic: {
       type: String,
       required: true,
       trim: true,
       index: true,
     },
+    /**
+     * artists.json dagi artist id lari. Bir klipda bir nechta artist.
+     * Bo'sh bo'lsa [].
+     */
     artistId: {
-      type: String,
-      required: true,
-      trim: true,
+      type: [String],
+      default: [],
       index: true,
+    },
+    /** actors.json dagi aktyor id lari. Bo'sh bo'lsa []. */
+    actors: {
+      type: [Number],
+      default: [],
     },
     img: {
       type: String,

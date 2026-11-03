@@ -1,10 +1,15 @@
 [
   {
     "id": 1001,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Best of 2025",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2025,
     "genre": "Pop",
@@ -30,10 +35,14 @@
   },
   {
     "id": 1002,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Summer Hits",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2024,
     "genre": "Pop",
@@ -59,10 +68,16 @@
   },
   {
     "id": 1003,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Night Vibes",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2024,
     "genre": "Rap",
@@ -81,10 +96,15 @@
   },
   {
     "id": 1004,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Top Mix",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie5.jpg",
     "year": 2023,
     "genre": "Pop",
@@ -110,10 +130,14 @@
   },
   {
     "id": 1005,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Golden Era",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2023,
     "genre": "Rap",
@@ -132,10 +156,16 @@
   },
   {
     "id": 1006,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Urban Sound",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "year": 2024,
     "genre": "Pop",
@@ -161,10 +191,15 @@
   },
   {
     "id": 1007,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Chart Toppers",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/jah-khalib.jpg",
     "year": 2025,
     "genre": "Pop",
@@ -183,10 +218,14 @@
   },
   {
     "id": 1008,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Electric Pulse",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2024,
     "genre": "electronic",
@@ -212,10 +251,16 @@
   },
   {
     "id": 1009,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Rhythm Collection",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2023,
     "genre": "Rap",
@@ -234,10 +279,15 @@
   },
   {
     "id": 1010,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Ultimate Hits",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2025,
     "genre": "Pop",
@@ -263,10 +313,14 @@
   },
   {
     "id": 1011,
+    "channelId": "violet-play",
     "categoryNameMusic": "hitCollectionsData",
     "title": "Star Collection",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie5.jpg",
     "year": 2024,
     "genre": "Pop",
@@ -292,10 +346,16 @@
   },
   {
     "id": 801,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Top Hits 2025",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2025,
     "genre": "Rap",
@@ -328,10 +388,15 @@
   },
   {
     "id": 802,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Summer Vibes",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2024,
     "genre": "Rap",
@@ -357,10 +422,14 @@
   },
   {
     "id": 803,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Night Dreams",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2023,
     "genre": "Pop",
@@ -386,10 +455,16 @@
   },
   {
     "id": 804,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Classic Collection",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf",
+      "jah-khalib",
+      "michael-jackson"
+    ],
     "img": "/img/movie5.jpg",
     "year": 2022,
     "genre": "Pop",
@@ -408,10 +483,15 @@
   },
   {
     "id": 805,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Electric Soul",
     "artist": "michael-jackson",
-    "artistId": "michael-jackson",
+    "artistId": [
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2024,
     "genre": "jazz",
@@ -437,10 +517,14 @@
   },
   {
     "id": 806,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Neon Hearts",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "year": 2023,
     "genre": "Rock",
@@ -466,10 +550,16 @@
   },
   {
     "id": 807,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Golden Hour",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/jah-khalib.jpg",
     "year": 2024,
     "genre": "jazz",
@@ -488,10 +578,15 @@
   },
   {
     "id": 808,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "City Lights",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2023,
     "genre": "Rap",
@@ -517,10 +612,14 @@
   },
   {
     "id": 809,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Ocean View",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2022,
     "genre": "pop",
@@ -539,10 +638,16 @@
   },
   {
     "id": 810,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Starlight",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2024,
     "genre": "Rock",
@@ -568,10 +673,15 @@
   },
   {
     "id": 811,
+    "channelId": "violet-play",
     "categoryNameMusic": "musicDropsData",
     "title": "Dream State",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2025,
     "genre": "electronic",
@@ -597,10 +707,14 @@
   },
   {
     "id": 901,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Love Stories",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2025,
     "genre": "Pop",
@@ -633,10 +747,16 @@
   },
   {
     "id": 902,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Romantic Nights",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2024,
     "genre": "Pop",
@@ -662,10 +782,15 @@
   },
   {
     "id": 903,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Soul Connection",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2023,
     "genre": "Rap",
@@ -691,10 +816,14 @@
   },
   {
     "id": 904,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Sweet Melodies",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
     "img": "/img/movie5.jpg",
     "year": 2024,
     "genre": "Pop",
@@ -713,10 +842,16 @@
   },
   {
     "id": 905,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Eternal Love",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2022,
     "genre": "Jazz",
@@ -742,10 +877,15 @@
   },
   {
     "id": 906,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Eternal Love",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2022,
     "genre": "Jazz",
@@ -771,10 +911,14 @@
   },
   {
     "id": 907,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Eternal Love",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2022,
     "genre": "Jazz",
@@ -800,10 +944,16 @@
   },
   {
     "id": 908,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Eternal Love",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2022,
     "genre": "Jazz",
@@ -829,10 +979,15 @@
   },
   {
     "id": 909,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Eternal Love",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2022,
     "genre": "Jazz",
@@ -858,10 +1013,14 @@
   },
   {
     "id": 910,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Eternal Love",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2022,
     "genre": "Jazz",
@@ -887,10 +1046,16 @@
   },
   {
     "id": 911,
+    "channelId": "violet-play",
     "categoryNameMusic": "sevgiVaMusiqaData",
     "title": "Eternal Love",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-1.avif",
     "year": 2022,
     "genre": "Jazz",
@@ -916,10 +1081,15 @@
   },
   {
     "id": 1,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Top Hits 2025",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2025,
     "genre": "Rap",
@@ -952,10 +1122,14 @@
   },
   {
     "id": 2,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Summer Vibes",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2024,
     "genre": "Rap",
@@ -981,10 +1155,16 @@
   },
   {
     "id": 3,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Night Dreams",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2023,
     "genre": "Pop",
@@ -1010,10 +1190,15 @@
   },
   {
     "id": 4,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Classic Collection",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib",
+      "michael-jackson"
+    ],
     "img": "/img/movie5.jpg",
     "year": 2022,
     "genre": "Pop",
@@ -1032,10 +1217,14 @@
   },
   {
     "id": 5,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Top Hits 2025",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2025,
     "genre": "Rap",
@@ -1068,10 +1257,16 @@
   },
   {
     "id": 6,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Summer Vibes",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2024,
     "genre": "Rap",
@@ -1099,10 +1294,15 @@
   },
   {
     "id": 7,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Night Dreams",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2023,
     "genre": "Pop",
@@ -1130,10 +1330,14 @@
   },
   {
     "id": 8,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Classic Collection",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib"
+    ],
     "img": "/img/movie5.jpg",
     "year": 2022,
     "genre": "Pop",
@@ -1152,10 +1356,16 @@
   },
   {
     "id": 9,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Top Hits 2025",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
     "img": "/img/movie1.jpg",
     "year": 2025,
     "genre": "Rap",
@@ -1188,10 +1398,15 @@
   },
   {
     "id": 10,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Summer Vibes",
     "artist": "Jah Khalib",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
     "img": "/img/movie2.jpg",
     "year": 2024,
     "genre": "Rap",
@@ -1217,10 +1432,14 @@
   },
   {
     "id": 11,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Night Dreams",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson"
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "year": 2023,
     "genre": "Pop",
@@ -1246,10 +1465,16 @@
   },
   {
     "id": 12,
+    "channelId": "violet-play",
     "categoryNameMusic": "TopAlbums",
     "title": "Classic Collection",
     "artist": "shohruhxon",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
     "img": "/img/movie5.jpg",
     "year": 2022,
     "genre": "Pop",

@@ -23,12 +23,15 @@ import MusicVideoGenreFilter from '../Music/MusicVideoGenreFilter/MusicVideoGenr
 import VideoDetailTrendCard from './VideoDetailTrendCard';
 import MovieComments from '../components/MovieDetail/MovieComments';
 import RecommendedClips from '../Music/RecommendedClips/RecommendedClips';
+import ClipCreators from './ClipCreators';
 import SimilarSongs from '../Music/SimilarSongs/SimilarSongs';
 import AlbumsForYou from '../Music/AlbumsForYou/AlbumsForYou';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../utils/useImageReady';
 import { useDominantColor } from '../hooks/useDominantColor';
 import { formatCount } from '../utils/utils';
+import { fetchChannelById } from '../api/channelsApi';
+import { useIsFollowing } from '../context/FollowingContext';
 import { useMusicMixes } from '../hooks/useMusicMixes';
 import { useSharedMix } from '../hooks/useSharedMix';
 import MusicDetailMixList from '../Music/YourMixes/MusicDetailMixList';
@@ -93,7 +96,6 @@ const VideoPage = () => {
     fetchConcertByIdRemote,
     clipsLoading,
     concertsLoading,
-    artistsLoading,
   } = useMusicApi();
   const videoRef = useRef(null);
   const { mediaRef, session, bindSession, activateSession, registerDetailSlot } = useMiniVideoPlayback();
@@ -164,20 +166,26 @@ const VideoPage = () => {
   const videoLikeCount = videoLikeQuery.data?.like ?? video?.like;
   const videoDislikeCount = videoLikeQuery.data?.dislike ?? video?.dislike;
   const artist = video ? getArtistById(video.artistId) : null;
-
-  const artistImgSrc = artist
-    ? artist.imgArtist || artist.img || '/img/movie1.jpg'
-    : '';
-  const artistImg = useImageReady(artistImgSrc);
+  const channelId = String(video?.channelId || '').trim();
+  const channelQuery = useQuery({
+    queryKey: ['channel', channelId],
+    queryFn: () => fetchChannelById(channelId),
+    enabled: Boolean(channelId),
+    staleTime: 60_000,
+  });
+  const channel = channelQuery.data || null;
+  const isChannelSubscribed = useIsFollowing(channel?.id || channelId, 'channel');
+  const channelImgSrc = channel?.avatar || '';
+  const channelImg = useImageReady(channelImgSrc);
+  const channelSubscribers = (channel?.subscribers ?? 0) + (isChannelSubscribed ? 1 : 0);
 
   const showHeroDataSkeleton = Boolean(videosLoading) && !video;
   const showInfoSkeleton = showHeroDataSkeleton;
   const showActionsSkeleton = showHeroDataSkeleton;
-  const showArtistCardDataSkeleton =
-    showHeroDataSkeleton ||
-    (Boolean(video?.artistId) && Boolean(artistsLoading) && !artist);
-  const showArtistImgSkeleton = Boolean(artist) && artistImg.showSkeleton;
-  const showArtistCard = showArtistCardDataSkeleton || Boolean(artist?.id);
+  const showChannelCardDataSkeleton =
+    showHeroDataSkeleton || (Boolean(channelId) && channelQuery.isLoading && !channel);
+  const showChannelImgSkeleton = Boolean(channel?.avatar) && channelImg.showSkeleton;
+  const showChannelCard = showChannelCardDataSkeleton || Boolean(channel?.id);
 
   const catalogRelatedMeta = useMemo(() => {
     if (!video) {
@@ -771,21 +779,21 @@ const VideoPage = () => {
               </ClipMovieFilmLink>
             </div>
 
-            {showArtistCard && (
+            {showChannelCard && (
               <div
                 className={`video-detail-artist-card${
-                  showArtistCardDataSkeleton ? ' video-detail-artist-card--skeleton' : ''
+                  showChannelCardDataSkeleton ? ' video-detail-artist-card--skeleton' : ''
                 }`}
                 onClick={() => {
-                  if (showArtistCardDataSkeleton) return;
-                  if (artist?.id) navigate(`/music/artist/${artist.id}`);
+                  if (showChannelCardDataSkeleton || !channel?.id) return;
+                  navigate(`/channel/${encodeURIComponent(channel.id)}`);
                 }}
                 style={
-                  showArtistCardDataSkeleton || !artist?.id ? { cursor: 'default' } : undefined
+                  showChannelCardDataSkeleton || !channel?.id ? { cursor: 'default' } : undefined
                 }
-                aria-busy={showArtistCardDataSkeleton || showArtistImgSkeleton || undefined}
+                aria-busy={showChannelCardDataSkeleton || showChannelImgSkeleton || undefined}
               >
-                {showArtistCardDataSkeleton ? (
+                {showChannelCardDataSkeleton ? (
                   <>
                     <SkeletonLoader variant="music-detail-artist-card-img" />
                     <div className="video-detail-artist-card-info">
@@ -803,35 +811,35 @@ const VideoPage = () => {
                 ) : (
                   <>
                     <div className="video-detail-artist-card-img-wrap">
-                      {showArtistImgSkeleton && (
+                      {showChannelImgSkeleton && (
                         <SkeletonLoader
                           variant="music-detail-artist-card-img"
                           className="video-detail-artist-card-img--skeleton"
                         />
                       )}
-                      {artistImgSrc && (
+                      {channelImgSrc && (
                         <img
-                          ref={artistImg.imgRef}
-                          src={artistImgSrc}
-                          alt={artist.name}
+                          ref={channelImg.imgRef}
+                          src={channelImgSrc}
+                          alt={channel.name}
                           className={`video-detail-artist-card-img${
-                            showArtistImgSkeleton ? ' video-detail-artist-card-img--loading' : ''
+                            showChannelImgSkeleton ? ' video-detail-artist-card-img--loading' : ''
                           }`}
-                          onLoad={artistImg.onLoad}
-                          onError={artistImg.onError}
+                          onLoad={channelImg.onLoad}
+                          onError={channelImg.onError}
                         />
                       )}
                     </div>
                     <div className="video-detail-artist-card-info">
-                      <span className="video-detail-artist-card-name">{artist.name}</span>
+                      <span className="video-detail-artist-card-name">{channel.name}</span>
                       <div className="artist-detail-stat-item video-detail-artist-stat">
-                        <span className="artist-detail-track-num">{formatCount(artist.subscribers ?? 0)}</span>
+                        <span className="artist-detail-track-num">{formatCount(channelSubscribers)}</span>
                         <span className="artist-detail-track-label">Obunachi</span>
                       </div>
                     </div>
                     <FollowingButton
-                      artistId={artist.id}
-                      entityType="artist"
+                      artistId={channel.id}
+                      entityType="channel"
                       wrapperClassName="video-detail-artist-card-btn"
                       stopPropagation
                     />
@@ -849,6 +857,7 @@ const VideoPage = () => {
                 mobileSheetUi
               />
             )}
+            {video && !isConcertVideo ? <ClipCreators video={video} /> : null}
             <RecommendedClips
               klip={video}
               titleKey="music.similarClips"

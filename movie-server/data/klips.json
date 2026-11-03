@@ -1,8 +1,18 @@
 [
   {
     "id": 1101,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      1,
+      2,
+      3
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -10,17 +20,30 @@
     "language": "english",
     "country": "usa",
     "type": "klip",
-    "franchiseClipIds": [1103, 1104],
+    "franchiseClipIds": [
+      1103,
+      1104
+    ],
     "video": "/video/Lady_Gaga,_Bruno_Mars_Die_With_A_Smile_Official_Music_Video.mp4",
     "like": "0",
     "dislike": "0",
-    "movieId": [8001],
+    "movieId": [
+      8001
+    ],
     "musicId": null
   },
   {
     "id": 1102,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
+    "actors": [
+      4,
+      5
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -28,17 +51,33 @@
     "language": "english",
     "country": "usa",
     "type": "klip",
-    "franchiseClipIds": [1105],
+    "franchiseClipIds": [
+      1105
+    ],
     "video": "/video/The Amateur _ Official Trailer.mp4",
     "like": "0",
     "dislike": "0",
-    "movieId": [1],
+    "movieId": [
+      1
+    ],
     "musicId": null
   },
   {
     "id": 1103,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      6,
+      7,
+      8,
+      9
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life",
     "year": 2020,
@@ -49,13 +88,25 @@
     "video": "/video/Zivert - Life   Премьера клипа.mp4",
     "like": "0",
     "dislike": "0",
-    "movieId": [2001],
+    "movieId": [
+      2001
+    ],
     "musicId": null
   },
   {
     "id": 1104,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      10,
+      1,
+      2
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
@@ -70,8 +121,16 @@
   },
   {
     "id": 1105,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib"
+    ],
+    "actors": [
+      3,
+      4
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "The Amateur Trailer",
     "year": 2024,
@@ -86,8 +145,20 @@
   },
   {
     "id": 1106,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
+    "actors": [
+      5,
+      6,
+      7,
+      8
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -102,8 +173,18 @@
   },
   {
     "id": 1107,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
+    "actors": [
+      9,
+      10,
+      1
+    ],
     "img": "/img/movie-4.5-7.jpg",
     "title": "Die With A Smile - Official",
     "year": 2024,
@@ -118,8 +199,16 @@
   },
   {
     "id": 1108,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      2,
+      3
+    ],
     "img": "/img/movie-4.5-8.jpg",
     "title": "The Amateur - Official Trailer",
     "year": 2024,
@@ -134,8 +223,20 @@
   },
   {
     "id": 1109,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
+    "actors": [
+      4,
+      5,
+      6,
+      7
+    ],
     "img": "/img/movie-4.5-9.jpg",
     "title": "Life - Zivert",
     "year": 2020,
@@ -150,8 +251,18 @@
   },
   {
     "id": 1110,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain"
+    ],
+    "actors": [
+      8,
+      9,
+      10
+    ],
     "img": "/img/movie-4.5-10.jpg",
     "title": "Die With A Smile - Music Video",
     "year": 2024,
@@ -166,8 +277,16 @@
   },
   {
     "id": 1111,
+    "channelId": "violet-play",
     "categoryNameMusic": "loveAndDesireData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf"
+    ],
+    "actors": [
+      1,
+      2
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -182,8 +301,20 @@
   },
   {
     "id": 1301,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
+    "actors": [
+      3,
+      4,
+      5,
+      6
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -198,8 +329,18 @@
   },
   {
     "id": 1302,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
+    "actors": [
+      7,
+      8,
+      9
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -214,8 +355,16 @@
   },
   {
     "id": 1303,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
+    "actors": [
+      10,
+      1
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life",
     "year": 2020,
@@ -230,8 +379,20 @@
   },
   {
     "id": 1304,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      2,
+      3,
+      4,
+      5
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
@@ -246,8 +407,18 @@
   },
   {
     "id": 1305,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib",
+      "michael-jackson"
+    ],
+    "actors": [
+      6,
+      7,
+      8
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "The Amateur Trailer",
     "year": 2024,
@@ -262,8 +433,16 @@
   },
   {
     "id": 1306,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain"
+    ],
+    "actors": [
+      9,
+      10
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -278,8 +457,20 @@
   },
   {
     "id": 1307,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      1,
+      2,
+      3,
+      4
+    ],
     "img": "/img/movie-4.5-7.jpg",
     "title": "Die With A Smile - Official",
     "year": 2024,
@@ -294,8 +485,18 @@
   },
   {
     "id": 1308,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      5,
+      6,
+      7
+    ],
     "img": "/img/movie-4.5-8.jpg",
     "title": "The Amateur - Official Trailer",
     "year": 2024,
@@ -310,8 +511,16 @@
   },
   {
     "id": 1309,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
+    "actors": [
+      8,
+      9
+    ],
     "img": "/img/movie-4.5-9.jpg",
     "title": "Life - Zivert",
     "year": 2020,
@@ -326,8 +535,20 @@
   },
   {
     "id": 1310,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      10,
+      1,
+      2,
+      3
+    ],
     "img": "/img/movie-4.5-10.jpg",
     "title": "Die With A Smile - Music Video",
     "year": 2024,
@@ -342,8 +563,18 @@
   },
   {
     "id": 1311,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib",
+      "michael-jackson"
+    ],
+    "actors": [
+      4,
+      5,
+      6
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -358,8 +589,16 @@
   },
   {
     "id": 1212,
+    "channelId": "violet-play",
     "categoryNameMusic": "stageCreationData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
+    "actors": [
+      7,
+      8
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -374,8 +613,20 @@
   },
   {
     "id": 301,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      9,
+      10,
+      1,
+      2
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -390,8 +641,18 @@
   },
   {
     "id": 302,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      3,
+      4,
+      5
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -406,8 +667,16 @@
   },
   {
     "id": 303,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
+    "actors": [
+      6,
+      7
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life",
     "year": 2020,
@@ -422,8 +691,20 @@
   },
   {
     "id": 304,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      8,
+      9,
+      10,
+      1
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
@@ -438,8 +719,18 @@
   },
   {
     "id": 305,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib",
+      "michael-jackson"
+    ],
+    "actors": [
+      2,
+      3,
+      4
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "The Amateur Trailer",
     "year": 2024,
@@ -454,8 +745,16 @@
   },
   {
     "id": 306,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain"
+    ],
+    "actors": [
+      5,
+      6
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -470,8 +769,20 @@
   },
   {
     "id": 307,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      7,
+      8,
+      9,
+      10
+    ],
     "img": "/img/movie-4.5-7.jpg",
     "title": "Die With A Smile - Official",
     "year": 2024,
@@ -486,8 +797,18 @@
   },
   {
     "id": 308,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      1,
+      2,
+      3
+    ],
     "img": "/img/movie-4.5-8.jpg",
     "title": "The Amateur - Official Trailer",
     "year": 2024,
@@ -502,8 +823,16 @@
   },
   {
     "id": 309,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
+    "actors": [
+      4,
+      5
+    ],
     "img": "/img/movie-4.5-9.jpg",
     "title": "Life - Zivert",
     "year": 2020,
@@ -518,8 +847,20 @@
   },
   {
     "id": 310,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendClipsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      6,
+      7,
+      8,
+      9
+    ],
     "img": "/img/movie-4.5-10.jpg",
     "title": "Die With A Smile - Music Video",
     "year": 2024,
@@ -534,8 +875,18 @@
   },
   {
     "id": 1201,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      10,
+      1,
+      2
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -550,8 +901,16 @@
   },
   {
     "id": 1202,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
+    "actors": [
+      3,
+      4
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -566,8 +925,20 @@
   },
   {
     "id": 1203,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      5,
+      6,
+      7,
+      8
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life",
     "year": 2020,
@@ -582,8 +953,18 @@
   },
   {
     "id": 1204,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      9,
+      10,
+      1
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
@@ -598,8 +979,16 @@
   },
   {
     "id": 1205,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib"
+    ],
+    "actors": [
+      2,
+      3
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "The Amateur Trailer",
     "year": 2024,
@@ -614,8 +1003,20 @@
   },
   {
     "id": 1206,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
+    "actors": [
+      4,
+      5,
+      6,
+      7
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -630,8 +1031,18 @@
   },
   {
     "id": 1207,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
+    "actors": [
+      8,
+      9,
+      10
+    ],
     "img": "/img/movie-4.5-7.jpg",
     "title": "Die With A Smile - Official",
     "year": 2024,
@@ -646,8 +1057,16 @@
   },
   {
     "id": 1208,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      1,
+      2
+    ],
     "img": "/img/movie-4.5-8.jpg",
     "title": "The Amateur - Official Trailer",
     "year": 2024,
@@ -662,8 +1081,20 @@
   },
   {
     "id": 1209,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf",
+      "shohruhxon"
+    ],
+    "actors": [
+      3,
+      4,
+      5,
+      6
+    ],
     "img": "/img/movie-4.5-9.jpg",
     "title": "Life - Zivert",
     "year": 2020,
@@ -678,8 +1109,18 @@
   },
   {
     "id": 1210,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain"
+    ],
+    "actors": [
+      7,
+      8,
+      9
+    ],
     "img": "/img/movie-4.5-10.jpg",
     "title": "Die With A Smile - Music Video",
     "year": 2024,
@@ -694,8 +1135,16 @@
   },
   {
     "id": 1211,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf"
+    ],
+    "actors": [
+      10,
+      1
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -710,8 +1159,16 @@
   },
   {
     "id": 1212,
+    "channelId": "violet-play",
     "categoryNameMusic": "trendVideosData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
+    "actors": [
+      7,
+      8
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -726,8 +1183,20 @@
   },
   {
     "id": 1001,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson",
+      "maher-zain"
+    ],
+    "actors": [
+      2,
+      3,
+      4,
+      5
+    ],
     "img": "/img/movie-4.5-1.avif",
     "title": "Die With A Smile",
     "year": 2024,
@@ -742,8 +1211,18 @@
   },
   {
     "id": 1002,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "sami-yusuf",
+      "jah-khalib"
+    ],
+    "actors": [
+      6,
+      7,
+      8
+    ],
     "img": "/img/movie-4.5-2.jpeg",
     "title": "The Amateur",
     "year": 2024,
@@ -758,8 +1237,16 @@
   },
   {
     "id": 1003,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
+    "actors": [
+      9,
+      10
+    ],
     "img": "/img/movie-4.5-3.jpg",
     "title": "Life",
     "year": 2020,
@@ -774,8 +1261,20 @@
   },
   {
     "id": 1004,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      1,
+      2,
+      3,
+      4
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
@@ -790,8 +1289,18 @@
   },
   {
     "id": 1005,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "jah-khalib",
+      "michael-jackson"
+    ],
+    "actors": [
+      5,
+      6,
+      7
+    ],
     "img": "/img/movie-4.5-5.jpg",
     "title": "The Amateur Trailer",
     "year": 2024,
@@ -806,8 +1315,16 @@
   },
   {
     "id": 1006,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain"
+    ],
+    "actors": [
+      8,
+      9
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -822,8 +1339,20 @@
   },
   {
     "id": 1007,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "sami-yusuf",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      10,
+      1,
+      2,
+      3
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -838,8 +1367,18 @@
   },
   {
     "id": 1008,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      4,
+      5,
+      6
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -854,8 +1393,16 @@
   },
   {
     "id": 1009,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon"
+    ],
+    "actors": [
+      7,
+      8
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -870,8 +1417,20 @@
   },
   {
     "id": 1010,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "michael-jackson",
+      "maher-zain",
+      "sami-yusuf"
+    ],
+    "actors": [
+      9,
+      10,
+      1,
+      2
+    ],
     "img": "/img/movie-4.5-6.avif",
     "title": "Life - Premiere",
     "year": 2020,
@@ -886,8 +1445,18 @@
   },
   {
     "id": 1011,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "jah-khalib",
+    "artistId": [
+      "jah-khalib",
+      "shohruhxon",
+      "michael-jackson"
+    ],
+    "actors": [
+      3,
+      4,
+      5
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
@@ -902,8 +1471,16 @@
   },
   {
     "id": 1012,
+    "channelId": "violet-play",
     "categoryNameMusic": "visualBeatsData",
-    "artistId": "shohruhxon",
+    "artistId": [
+      "shohruhxon",
+      "maher-zain"
+    ],
+    "actors": [
+      6,
+      7
+    ],
     "img": "/img/movie-4.5-4.webp",
     "title": "Die With A Smile (Live)",
     "year": 2024,
