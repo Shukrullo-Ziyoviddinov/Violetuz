@@ -20,6 +20,11 @@ const matchesCategory = (itemType, category) => {
   return itemType === category;
 };
 
+const mapRowsWithChannel = async (rows, mapRow) => {
+  const channels = await loadChannelsByIds(rows.map((doc) => doc.channelId));
+  return rows.map((doc) => mapRow(doc, channels.get(String(doc.channelId || '').trim()) || null));
+};
+
 const parseCategory = (raw) => {
   const v = String(raw || 'all').trim().toLowerCase();
   if (['all', 'movie', 'music', 'klip', 'konsert'].includes(v)) return v;
@@ -73,20 +78,22 @@ const buildPoolForUser = async (userId, category) => {
 
     if (wantMusic) {
       tasks.push(
-        fetchMusicForArtist(artistId).then((rows) => rows.map((doc) => mapMusic(doc, artist)))
+        fetchMusicForArtist(artistId).then((rows) =>
+          mapRowsWithChannel(rows, (doc, channel) => mapMusic(doc, artist, channel))
+        )
       );
     }
     if (wantKlip) {
       tasks.push(
         fetchClipsForArtist(artistId).then((rows) =>
-          rows.map((doc) => mapClipOrConcert(doc, artist, 'klip'))
+          mapRowsWithChannel(rows, (doc, channel) => mapClipOrConcert(doc, artist, 'klip', channel))
         )
       );
     }
     if (wantKonsert) {
       tasks.push(
         fetchConcertsForArtist(artistId).then((rows) =>
-          rows.map((doc) => mapClipOrConcert(doc, artist, 'konsert'))
+          mapRowsWithChannel(rows, (doc, channel) => mapClipOrConcert(doc, artist, 'konsert', channel))
         )
       );
     }

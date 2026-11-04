@@ -101,16 +101,20 @@ const fetchMovieShortsForActor = async (actorId) => {
 };
 
 const fetchMusicForArtist = (artistId) =>
-  latestByAutoId(Music, { artistId: String(artistId) }, 'id title img audio artistId');
+  latestByAutoId(Music, { artistId: String(artistId) }, 'id title img audio artistId channelId');
 
 const fetchClipsForArtist = (artistId) =>
-  latestByAutoId(Clip, { artistId: String(artistId) }, 'id title img like dislike artistId type');
+  latestByAutoId(
+    Clip,
+    { artistId: String(artistId) },
+    'id title img like dislike artistId type channelId createdAt'
+  );
 
 const fetchConcertsForArtist = (artistId) =>
   latestByAutoId(
     Concert,
     { artistId: String(artistId) },
-    'id title img like dislike artistId type'
+    'id title img like dislike artistId type channelId createdAt'
   );
 
 const fetchMusicShortsForArtist = (artistId) =>

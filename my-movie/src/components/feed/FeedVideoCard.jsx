@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import LikeButton from '../../Music/LikeButton/LikeButton';
 import ShareButton from '../ShareButton/ShareButton';
 import MovieComments from '../MovieDetail/MovieComments';
@@ -11,6 +12,7 @@ import './FeedVideoCard.css';
 
 const FeedVideoCard = ({ item }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const commentsRef = useRef(null);
   const [commentsCount, setCommentsCount] = useState(0);
@@ -20,16 +22,37 @@ const FeedVideoCard = ({ item }) => {
   const isShorts = item.type === 'movieShorts' || item.type === 'musicshorts';
   const videoRoute = item.route || `/music/video/${item.videoId}`;
 
+  const channelId = String(item.channelId || '').trim();
+  const channelName = item.channelName || '';
+  const channelImage = item.channelImage || '';
+
+  const openChannel = (event) => {
+    event.stopPropagation();
+    if (!channelId) return;
+    navigate(`/channel/${encodeURIComponent(channelId)}`);
+  };
+
   return (
     <div className="feed-video-card" onClick={() => navigate(videoRoute)} role="button" tabIndex={0}>
-      <div className="feed-video-card-profile">
-        <img src={item.artistImage} alt={item.artistName} className="feed-video-card-avatar" />
+      <div
+        className="feed-video-card-profile"
+        role="link"
+        tabIndex={0}
+        onClick={openChannel}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openChannel(event);
+          }
+        }}
+      >
+        <img src={channelImage} alt={channelName} className="feed-video-card-avatar" />
         <div className="feed-video-card-profile-text">
           <div className="feed-video-card-name">
-            <span className="feed-video-card-name-text">{item.artistName}</span>
+            <span className="feed-video-card-name-text">{channelName}</span>
             <img src="/img/galichka.png" alt="" className="feed-artist-name-verified" aria-hidden />
           </div>
-          <div className="feed-video-card-type">Music artist</div>
+          <div className="feed-video-card-type">{t('channel.kind', 'Kanal')}</div>
         </div>
       </div>
       <div className="feed-video-card-media-wrap">

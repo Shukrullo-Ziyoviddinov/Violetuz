@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
@@ -14,7 +15,18 @@ import './ChanelContent.css';
 
 const sameChannel = (item, channelId) => String(item?.channelId || '') === String(channelId || '');
 
+const ChannelSection = ({ title, cards }) => {
+  if (!cards.length) return null;
+  return (
+    <div className="chanel-content-row">
+      <h2 className="chanel-content-title">{title}</h2>
+      <HorizontalScroll>{cards}</HorizontalScroll>
+    </div>
+  );
+};
+
 const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null }) => {
+  const { t } = useTranslation();
   const { allMovies, allShortsVideos, allGenres } = useMoviesApi();
   const { allMusic, allClips, allAlbums } = useMusicApi();
   const { data: allTrillers = [] } = useTrillerList();
@@ -51,6 +63,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     return [
       ...movies.map(toMovie),
       ...sortByUploadedAtDesc(music).map(toKind('music')),
+      ...sortByUploadedAtDesc(albums).map(toKind('album')),
       ...sortByUploadedAtDesc(trailers).map(toKind('parda')),
       ...sortByUploadedAtDesc(clips).map(toKind('klip')),
       ...shorts.map(toShort),
@@ -64,8 +77,16 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     if (entry.kind === 'short') {
       return <ChanelShortCard key={entry.key} item={entry.item} layout={cardLayout} />;
     }
-    if (entry.kind === 'music') {
-      return <ChanelMusicCard key={entry.key} item={entry.item} layout={cardLayout === 'row' ? 'row' : 'grid'} />;
+    if (entry.kind === 'music' || entry.kind === 'album') {
+      return (
+        <ChanelMusicCard
+          key={entry.key}
+          item={entry.item}
+          layout={cardLayout === 'row' ? 'row' : 'grid'}
+          wishlistType={entry.kind === 'album' ? 'album' : 'music'}
+          to={entry.kind === 'album' ? `/music/album/${entry.item.id}` : undefined}
+        />
+      );
     }
     if (entry.kind === 'klip') {
       return <ChanelClipCard key={entry.key} item={entry.item} layout={cardLayout === 'row' ? 'row' : 'grid'} />;
@@ -90,41 +111,23 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
   if (filter === 'all') {
     const movieCards = items.filter((entry) => entry.kind === 'movie').map((entry) => renderCard(entry, 'row'));
     const musicCards = items.filter((entry) => entry.kind === 'music').map((entry) => renderCard(entry, 'row'));
+    const albumCards = items.filter((entry) => entry.kind === 'album').map((entry) => renderCard(entry, 'row'));
     const pardaCards = items.filter((entry) => entry.kind === 'parda').map((entry) => renderCard(entry, 'row'));
     const clipCards = items.filter((entry) => entry.kind === 'klip').map((entry) => renderCard(entry, 'row'));
     const shortCards = items.filter((entry) => entry.kind === 'short').map((entry) => renderCard(entry, 'row'));
     return (
       <>
-        {movieCards.length ? (
-          <div className="chanel-content-row">
-            <HorizontalScroll>{movieCards}</HorizontalScroll>
-          </div>
-        ) : null}
-        {clipCards.length ? (
-          <div className="chanel-content-row">
-            <HorizontalScroll>{clipCards}</HorizontalScroll>
-          </div>
-        ) : null}
-        {musicCards.length ? (
-          <div className="chanel-content-row">
-            <HorizontalScroll>{musicCards}</HorizontalScroll>
-          </div>
-        ) : null}
-        {pardaCards.length ? (
-          <div className="chanel-content-row">
-            <HorizontalScroll>{pardaCards}</HorizontalScroll>
-          </div>
-        ) : null}
-        {shortCards.length ? (
-          <div className="chanel-content-row">
-            <HorizontalScroll>{shortCards}</HorizontalScroll>
-          </div>
-        ) : null}
+        <ChannelSection title={t('channel.movies', 'Kinolar')} cards={movieCards} />
+        <ChannelSection title={t('channel.clips', 'Kliplar')} cards={clipCards} />
+        <ChannelSection title={t('channel.music', 'Musiqalar')} cards={musicCards} />
+        <ChannelSection title={t('channel.albums', 'Albomlar')} cards={albumCards} />
+        <ChannelSection title={t('channel.videos', 'Videolar')} cards={pardaCards} />
+        <ChannelSection title={t('channel.shorts', 'Shortslar')} cards={shortCards} />
       </>
     );
   }
 
-  if (filter === 'music') {
+  if (filter === 'music' || filter === 'album') {
     return <div className="chanel-music-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
   }
 

@@ -628,7 +628,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-decoration: none;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   width: fit-content;
   transition: all 0.2s ease;
 
@@ -698,6 +698,27 @@
   font-size: 0.8rem;
   line-height: 1;
   white-space: nowrap;
+  background-color: #fff;
+  color: #111;
+  border-color: #fff;
+}
+
+.shorts-modal-channel-follow .following-btn:hover {
+  background-color: #f3f3f3;
+  color: #111;
+  border-color: #f3f3f3;
+}
+
+.shorts-modal-channel-follow .following-btn.following-btn--active {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.shorts-modal-channel-follow .following-btn.following-btn--active:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .shorts-modal-channel-head:hover {

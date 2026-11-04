@@ -222,7 +222,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
             <p className="channel-profile-bio">
               {preview ? <span className="channel-profile-bio-text">{preview}</span> : null}
               <button type="button" className="channel-profile-more" onClick={onOpenBio}>
-                ko‘proq
+                {t('channel.more', 'ko‘proq')}
               </button>
             </p>
           ) : null}
@@ -230,7 +230,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
             <FollowingButton artistId={channel.id} entityType="channel" />
             <button type="button" className="channel-profile-message">
               <i className="fa-solid fa-message" aria-hidden="true" />
-              Xabar
+              {t('channel.message', 'Xabar')}
             </button>
           </div>
         </div>

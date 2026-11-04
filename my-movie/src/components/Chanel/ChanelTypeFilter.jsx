@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
@@ -12,15 +13,15 @@ import './ChanelTypeFilter.css';
 const MOBILE_SEARCH_MAX = 768;
 
 const CHANNEL_TYPES = [
-  { id: 'all', label: 'Hammasi' },
-  { id: 'movies', label: 'Kinolar' },
-  { id: 'music', label: 'Musiqa' },
-  { id: 'klip', label: 'Klip' },
-  { id: 'album', label: 'Albom' },
-  { id: 'videos', label: 'Videolar' },
-  { id: 'shorts', label: 'Shortslar' },
-  { id: 'playlists', label: 'Playlistlar' },
-  { id: 'posts', label: 'Postlar' },
+  { id: 'all', fallback: 'Hammasi' },
+  { id: 'movies', fallback: 'Kinolar' },
+  { id: 'music', fallback: 'Musiqa' },
+  { id: 'klip', fallback: 'Klip' },
+  { id: 'album', fallback: 'Albom' },
+  { id: 'videos', fallback: 'Videolar' },
+  { id: 'shorts', fallback: 'Shortslar' },
+  { id: 'playlists', fallback: 'Playlistlar' },
+  { id: 'posts', fallback: 'Postlar' },
 ];
 
 const resultTitle = (item, lang) => {
@@ -37,6 +38,7 @@ const ChanelTypeFilter = ({
   onGenreChange,
   onTrendChange,
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
   const [internalValue, setInternalValue] = useState('all');
@@ -191,15 +193,15 @@ const ChanelTypeFilter = ({
             className={`chanel-type-filter-chip${selected === type.id ? ' is-active' : ''}`}
             onClick={() => select(type.id)}
           >
-            {type.label}
+            {t(`channel.filters.${type.id}`, type.fallback)}
           </button>
         ))}
       </ScrollTouch>
       <label className="chanel-type-search">
         <input
           type="text"
-          aria-label="Qidirish"
-          placeholder="Qidirish..."
+          aria-label={t('navbar.search', 'Qidirish...')}
+          placeholder={t('navbar.search', 'Qidirish...')}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => setGenreOpen(true)}
@@ -221,8 +223,8 @@ const ChanelTypeFilter = ({
           </button>
           <input
             type="text"
-            aria-label="Qidirish"
-            placeholder="Qidirish..."
+            aria-label={t('navbar.search', 'Qidirish...')}
+            placeholder={t('navbar.search', 'Qidirish...')}
             value={query}
             autoFocus
             onChange={(event) => setQuery(event.target.value)}

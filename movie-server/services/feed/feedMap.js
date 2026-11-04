@@ -39,6 +39,12 @@ const toFeedItem = ({
   ...extra,
 });
 
+const channelFields = (doc, channel) => ({
+  channelId: channel?.id || String(doc?.channelId || '').trim(),
+  channelName: channel?.name || '',
+  channelImage: channel?.avatar || '',
+});
+
 const buildMovieMetaText = (doc) => {
   const year = doc?.specs?.year ?? doc?.year ?? null;
   const countriesRaw = doc?.specs?.countries;
@@ -86,7 +92,7 @@ const mapMovie = (doc, channel) => {
   });
 };
 
-const mapMusic = (doc, artist) =>
+const mapMusic = (doc, artist, channel) =>
   toFeedItem({
     type: 'music',
     catalogId: doc.id,
@@ -100,11 +106,12 @@ const mapMusic = (doc, artist) =>
       trackId: doc.id,
       trackTitle: doc.title || 'Music',
       audio: doc.audio || '',
+      ...channelFields(doc, channel),
     },
     doc,
   });
 
-const mapClipOrConcert = (doc, artist, type) =>
+const mapClipOrConcert = (doc, artist, type, channel) =>
   toFeedItem({
     type,
     catalogId: doc.id,
@@ -122,6 +129,7 @@ const mapClipOrConcert = (doc, artist, type) =>
       dislike: doc.dislike,
       route: `/music/video/${doc.id}`,
       createdAt: doc.createdAt || null,
+      ...channelFields(doc, channel),
     },
     doc,
   });

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ViewCount from '../ViewCount/ViewCount';
 import ShareButton from '../ShareButton/ShareButton';
 import { useWishlist } from '../../context/WishlistContext';
@@ -41,9 +42,16 @@ const FeedMusicDuration = ({ audioUrl }) => {
 
 const FeedMusicCard = ({ item }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const channelId = String(item.channelId || '').trim();
+  const channelName = item.channelName || '';
+  const channelImage = item.channelImage || '';
 
-  const openArtist = () => navigate(`/music/artist/${item.artistId}`);
+  const openChannel = () => {
+    if (!channelId) return;
+    navigate(`/channel/${encodeURIComponent(channelId)}`);
+  };
 
   const section = item.musicSectionId ? `?section=${encodeURIComponent(item.musicSectionId)}` : '';
   const sharePath =
@@ -69,22 +77,22 @@ const FeedMusicCard = ({ item }) => {
         tabIndex={0}
         onClick={(e) => {
           e.stopPropagation();
-          openArtist();
+          openChannel();
         }}
         onKeyDown={(e) => {
           if (activateKey(e)) {
             e.preventDefault();
-            openArtist();
+            openChannel();
           }
         }}
       >
-        <img src={item.artistImage} alt={item.artistName} className="feed-music-card-avatar" />
+        <img src={channelImage} alt={channelName} className="feed-music-card-avatar" />
         <div className="feed-music-card-profile-text">
           <div className="feed-music-card-name">
-            <span className="feed-music-card-name-text">{item.artistName}</span>
+            <span className="feed-music-card-name-text">{channelName}</span>
             <img src="/img/galichka.png" alt="" className="feed-artist-name-verified" aria-hidden />
           </div>
-          <div className="feed-music-card-type">Music artist</div>
+          <div className="feed-music-card-type">{t('channel.kind', 'Kanal')}</div>
         </div>
       </div>
 

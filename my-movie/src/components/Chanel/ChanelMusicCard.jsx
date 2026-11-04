@@ -7,19 +7,19 @@ import { useImageReady } from '../../utils/useImageReady';
 import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './ChanelMusicCard.css';
 
-const ChanelMusicCard = ({ item, layout = 'row' }) => {
+const ChanelMusicCard = ({ item, layout = 'row', wishlistType = 'music', to }) => {
   const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { getArtistById } = useMusicApi();
   const imgSrc = item?.img || '';
   const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
-  const saved = isInWishlist(item?.id, 'music');
+  const saved = isInWishlist(item?.id, wishlistType);
   const title = typeof item?.title === 'string' ? item.title : '';
   const artist = formatArtistNames(item?.artistId, getArtistById);
 
   const open = () => {
     if (showSkeleton || item?.id == null) return;
-    navigate(`/music/${item.id}`);
+    navigate(to || `/music/${item.id}`);
   };
 
   return (
@@ -57,7 +57,7 @@ const ChanelMusicCard = ({ item, layout = 'row' }) => {
               aria-label="Sevimlilarga qo'shish"
               onClick={(event) => {
                 event.stopPropagation();
-                toggleWishlist(item.id, 'music');
+                toggleWishlist(item.id, wishlistType);
               }}
             >
               <svg
