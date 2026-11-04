@@ -9,6 +9,7 @@ import { OPEN_CHANNEL_SEARCH_EVENT } from '../../channelSearchBridge';
 import ChanelSearchGenre from './ChanelSearchGenre';
 import ChanelSearchTrend from './ChanelSearchTrend';
 import ChanelSearchMovieResults from './ChanelSearchMovieResults';
+import SearchShortsCard from '../SearchShorts/SearchShortsCard';
 import './ChanelTypeFilter.css';
 
 const MOBILE_SEARCH_MAX = 768;
@@ -128,18 +129,13 @@ const ChanelTypeFilter = ({
   }, [query, channelId, contentLang]);
 
   const movies = Array.isArray(results?.movies) ? results.movies : [];
+  const shorts = Array.isArray(results?.shorts) ? results.shorts : [];
   const rows = [
     ...(results?.music || []).map((item) => ({
       key: `music-${item.id}`,
       kind: 'Musiqa',
       title: resultTitle(item, contentLang),
       to: `/music/${item.id}`,
-    })),
-    ...(results?.shorts || []).map((item) => ({
-      key: `short-${item.id}`,
-      kind: 'Shorts',
-      title: resultTitle(item, contentLang),
-      to: `/shorts?shortId=${item.id}`,
     })),
   ].filter((row) => row.title);
 
@@ -162,13 +158,29 @@ const ChanelTypeFilter = ({
     navigate(`/movie/${movie.id}`);
   };
 
+  const openShort = (item) => {
+    if (item?.id == null) return;
+    const playlist = shorts
+      .filter((row) => row?.id != null && (row.type === 'movieShorts' || row.type === 'musicshorts'))
+      .map((row) => `${row.type}:${row.id}`)
+      .join(',');
+    const params = new URLSearchParams();
+    params.set('shortId', String(item.id));
+    if (item.type) params.set('shortsType', String(item.type));
+    if (playlist) params.set('searchShorts', playlist);
+    closeSearch();
+    navigate(`/shorts?${params.toString()}`);
+  };
+
+  const wideResults = movies.length > 0 || shorts.length > 0;
+
   const resultList = (
     <div
-      className={`chanel-type-search-results${movies.length ? ' chanel-type-search-results--movies' : ''}`}
+      className={`chanel-type-search-results${wideResults ? ' chanel-type-search-results--movies' : ''}`}
       role="listbox"
     >
       {searching ? <p className="chanel-type-search-empty">Qidirilmoqda</p> : null}
-      {!searching && movies.length === 0 && rows.length === 0 ? (
+      {!searching && movies.length === 0 && rows.length === 0 && shorts.length === 0 ? (
         <p className="chanel-type-search-empty">Topilmadi</p>
       ) : null}
       {!searching && movies.length > 0 ? (
@@ -186,6 +198,24 @@ const ChanelTypeFilter = ({
           <span className="chanel-type-search-title">{row.title}</span>
         </button>
       )) : null}
+      {!searching && shorts.length > 0 ? (
+        <div className="search-shorts-row">
+          <h3 className="search-shorts-row-title">
+            {t('searchModal.shortsSection', 'Shortslar')}
+          </h3>
+          <ScrollTouch className="search-music-results-scroll">
+            <div className="search-shorts-row-track">
+              {shorts.map((item) => (
+                <SearchShortsCard
+                  key={`${item.type}-${item.id}`}
+                  item={item}
+                  onOpen={openShort}
+                />
+              ))}
+            </div>
+          </ScrollTouch>
+        </div>
+      ) : null}
     </div>
   );
 

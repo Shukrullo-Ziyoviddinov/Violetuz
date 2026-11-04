@@ -6,7 +6,7 @@ import '../ShortsVideos/ShortsVideos.css';
 import './SearchShortsCard.css';
 
 /**
- * Qidiruv shortsi. Kanal ham shu kartochkani chaqiradi, hozir faqat katta qidiruv.
+ * Qidiruv shortsi. Katta qidiruv va kanal qidiruvi shu kartochkani chaqiradi.
  * Tarix bu yerda yozilmaydi.
  */
 const SearchShortsCard = ({ item, onOpen }) => {

@@ -9,7 +9,6 @@ const Album = require('../models/Album.model');
 const Clip = require('../models/Clip.model');
 const Concert = require('../models/Concert.model');
 const Artist = require('../models/Artist.model');
-const ShortVideo = require('../models/ShortVideo.model');
 const {
   rankAllResults,
   paginateRankedResults,
@@ -192,29 +191,28 @@ const searchChannel = async (query, _contentLang, options) => {
   const wantMovies = channelType === 'all' || channelType === 'movies';
   const wantMusic = channelType === 'all';
   const wantShorts = channelType === 'all' || channelType === 'shorts';
-  const hasCatalog = wantMovies || wantMusic || wantShorts;
+  const rankParents = channelType === 'shorts';
+  const loadMovies = wantMovies || rankParents;
+  const loadMusic = wantMusic || rankParents;
+  const loadClips = wantMusic || rankParents;
+  const loadConcerts = wantMusic || rankParents;
+  const hasCatalog = loadMovies || loadMusic || loadClips || loadConcerts;
 
-  const [movies, music, shorts] = hasCatalog
+  const [movies, music, clips, concerts] = hasCatalog
     ? await Promise.all([
-      wantMovies
-        ? Movie.find({ channelId }, MOVIE_SEARCH_PROJECTION).lean()
-        : [],
-      wantMusic
-        ? Music.find({ channelId }, MUSIC_SEARCH_PROJECTION).lean()
-        : [],
-      wantShorts
-        ? ShortVideo.find(
-          { channelId },
-          { _id: 0, id: 1, description: 1, movieId: 1, channelId: 1 }
-        ).lean()
-        : [],
+      loadMovies ? Movie.find({ channelId }, MOVIE_SEARCH_PROJECTION).lean() : [],
+      loadMusic ? Music.find({ channelId }, MUSIC_SEARCH_PROJECTION).lean() : [],
+      loadClips ? Clip.find({ channelId }, CLIP_SEARCH_PROJECTION).lean() : [],
+      loadConcerts ? Concert.find({ channelId }, CONCERT_SEARCH_PROJECTION).lean() : [],
     ])
-    : [[], [], []];
+    : [[], [], [], []];
 
   const ranked = rankAllResults(query, {
     ...emptyChannelCollections(),
     movies,
     music,
+    clips,
+    concerts,
   });
   const page = paginateRankedResults(ranked, {
     section: null,
@@ -222,23 +220,15 @@ const searchChannel = async (query, _contentLang, options) => {
     limits: DEFAULT_LIMITS,
   });
 
-  const rankedShorts = wantShorts
-    ? rankAllResults(query, {
-      ...emptyChannelCollections(),
-      movies: shorts.map((short) => ({
-        id: short.id,
-        title: short.description,
-        movieId: short.movieId,
-      })),
-    })
-    : { movies: [] };
+  if (!wantMovies) page.data.movies = [];
+  if (!wantMusic) {
+    page.data.music = [];
+    page.data.clips = [];
+    page.data.concerts = [];
+    page.data.albums = [];
+  }
 
-  page.data.shorts = (rankedShorts.movies || []).slice(0, DEFAULT_LIMITS.movies).map((item) => ({
-    id: item.id,
-    title: item.title,
-    movieId: item.movieId,
-  }));
-
+  page.data.shorts = wantShorts ? await attachSearchShorts(query, ranked, channelId) : [];
   return page;
 };
 

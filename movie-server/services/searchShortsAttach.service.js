@@ -2,7 +2,8 @@
  * Qidiruv shortslari — alohida qator.
  * Matn balli searchAlgorithm da qoladi. Bu fayl faqat allaqachon topilgan
  * kino / musiqa / klip / konsert id lariga shortsni yopishtiradi.
- * Tavsiya va yangi solishtirish yo'q. Kanal qidiruvi bu yerdan o'tmaydi.
+ * Tavsiya va yangi solishtirish yo'q.
+ * channelId berilsa faqat shu kanal shortslari yopishtiriladi.
  */
 
 'use strict';
@@ -100,7 +101,8 @@ const toClient = (row) => ({
   parentId: row.parentId,
 });
 
-const attachSearchShorts = async (query, ranked) => {
+const attachSearchShorts = async (query, ranked, channelId = '') => {
+  const channel = String(channelId || '').trim();
   const movieIds = idsOf(ranked?.movies);
   const musicIds = idsOf(ranked?.music);
   const clipIds = idsOf(ranked?.clips);
@@ -109,14 +111,15 @@ const attachSearchShorts = async (query, ranked) => {
     return [];
   }
 
+  const scoped = (clause) => (channel ? { ...clause, channelId: channel } : clause);
   const musicOr = [];
-  if (musicIds.length) musicOr.push({ contentType: 'music', musicId: { $in: musicIds } });
-  if (clipIds.length) musicOr.push({ contentType: 'klip', musicId: { $in: clipIds } });
-  if (concertIds.length) musicOr.push({ contentType: 'konsert', musicId: { $in: concertIds } });
+  if (musicIds.length) musicOr.push(scoped({ contentType: 'music', musicId: { $in: musicIds } }));
+  if (clipIds.length) musicOr.push(scoped({ contentType: 'klip', musicId: { $in: clipIds } }));
+  if (concertIds.length) musicOr.push(scoped({ contentType: 'konsert', musicId: { $in: concertIds } }));
 
   const [movieDocs, musicDocs] = await Promise.all([
     movieIds.length
-      ? ShortVideo.find({ movieId: { $in: movieIds } })
+      ? ShortVideo.find(scoped({ movieId: { $in: movieIds } }))
         .select({ id: 1, video: 1, movieId: 1, type: 1, _id: 0 })
         .lean()
       : [],
