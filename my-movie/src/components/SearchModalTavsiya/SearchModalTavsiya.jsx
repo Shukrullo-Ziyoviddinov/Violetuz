@@ -10,7 +10,7 @@ import { normalizeImagePath } from '../../utils/utils';
 import './SearchModalTavsiya.css';
 
 /** Faqat real tavsiya item — rasm/badge tayyor bo‘lguncha shu blok ichida loader */
-const SearchModalTavsiyaItem = ({ movie, title, imgSrc, onOpen, t }) => {
+export const SearchModalTavsiyaItem = ({ movie, title, imgSrc, onOpen, t }) => {
   const src = normalizeImagePath(imgSrc || '');
   const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(src);
   const isSoon = movie.category === 'anonslar';

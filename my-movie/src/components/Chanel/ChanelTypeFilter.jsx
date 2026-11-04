@@ -8,6 +8,7 @@ import { fetchSearchResults } from '../../api/searchApi';
 import { OPEN_CHANNEL_SEARCH_EVENT } from '../../channelSearchBridge';
 import ChanelSearchGenre from './ChanelSearchGenre';
 import ChanelSearchTrend from './ChanelSearchTrend';
+import ChanelSearchTavsiya from './ChanelSearchTavsiya';
 import ChanelSearchMovieResults from './ChanelSearchMovieResults';
 import SearchShortsCard from '../SearchShorts/SearchShortsCard';
 import './ChanelTypeFilter.css';
@@ -149,6 +150,7 @@ const ChanelTypeFilter = ({
         onSelect={chooseGenre}
       />
       <ChanelSearchTrend channelId={channelId} onShowAll={showTrend} />
+      <ChanelSearchTavsiya channelId={channelId} onOpen={closeSearch} />
     </>
   );
 

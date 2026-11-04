@@ -52,8 +52,19 @@ const listExplorationSource = async (userId, options = {}) => {
     }
   }
 
+  const catalogFilter = { rating: { $gte: minRating } };
+  const allowedMovieIds = options.allowedMovieIds;
+  if (allowedMovieIds instanceof Set) {
+    if (!allowedMovieIds.size) return [];
+    const ids = [...allowedMovieIds]
+      .map((id) => Number(String(id).trim()))
+      .filter((id) => Number.isInteger(id));
+    if (!ids.length) return [];
+    catalogFilter.id = { $in: ids };
+  }
+
   const rows = await findCatalogMovies(
-    { rating: { $gte: minRating } },
+    catalogFilter,
     400
   );
 

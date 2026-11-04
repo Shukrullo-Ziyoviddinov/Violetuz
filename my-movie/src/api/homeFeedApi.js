@@ -56,6 +56,40 @@ export const fetchGuestHomeFeed = async (localHistory = []) => {
   };
 };
 
+const channelPath = (channelId) => {
+  const id = String(channelId || '').trim();
+  return `/home-feed/channel/${encodeURIComponent(id)}`;
+};
+
+export const fetchChannelLoginHomeFeed = async (channelId) => {
+  const res = await homeFeedFetch(channelPath(channelId));
+  const data = await parseJson(res);
+  return {
+    movies: Array.isArray(data?.movies) ? data.movies : [],
+    source: data?.source || 'channel',
+  };
+};
+
+export const fetchChannelGuestHomeFeed = async (channelId, localHistory = []) => {
+  const res = await homeFeedFetch(`${channelPath(channelId)}/guest`, {
+    method: 'POST',
+    body: JSON.stringify({
+      localHistory: Array.isArray(localHistory) ? localHistory : [],
+    }),
+  });
+  const data = await parseJson(res);
+  return {
+    movies: Array.isArray(data?.movies) ? data.movies : [],
+    source: data?.source || 'channel_guest',
+  };
+};
+
+export const fetchChannelViewerHomeFeed = async ({ channelId, isLoggedIn, localHistory } = {}) => {
+  if (isLoggedIn) return fetchChannelLoginHomeFeed(channelId);
+  const history = localHistory != null ? localHistory : getMovieGuestWatchHistory();
+  return fetchChannelGuestHomeFeed(channelId, history);
+};
+
 export const fetchViewerHomeFeed = async ({ isLoggedIn, localHistory } = {}) => {
   if (isLoggedIn) return fetchLoginHomeFeed();
   const history = localHistory != null ? localHistory : getMovieGuestWatchHistory();

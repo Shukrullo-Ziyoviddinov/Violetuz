@@ -40,7 +40,7 @@ const ageScore = (createdAt, nowMs, maxAgeDays) => {
  * @param {number} [nowMs]
  * @returns {Promise<Array<{ movieId: string, category: string, sourceType: 'fresh', rawScore: number, unrated: boolean }>>}
  */
-const listFreshSource = async (nowMs = Date.now()) => {
+const listFreshSource = async (nowMs = Date.now(), allowedMovieIds) => {
   const cfg = homeFeedWeights.fresh || {};
   const maxAgeDays = cfg.maxAgeDays ?? 45;
   const minRating = cfg.minRating ?? 4.7;
@@ -53,11 +53,21 @@ const listFreshSource = async (nowMs = Date.now()) => {
     ratingClause.push({ rating: { $in: [null, 0] } });
   }
 
+  const catalogFilter = {
+    createdAt: { $gte: since },
+    $or: ratingClause,
+  };
+  if (allowedMovieIds instanceof Set) {
+    if (!allowedMovieIds.size) return [];
+    const ids = [...allowedMovieIds]
+      .map((id) => Number(String(id).trim()))
+      .filter((id) => Number.isInteger(id));
+    if (!ids.length) return [];
+    catalogFilter.id = { $in: ids };
+  }
+
   const rows = await findCatalogMovies(
-    {
-      createdAt: { $gte: since },
-      $or: ratingClause,
-    },
+    catalogFilter,
     Math.max(limit * 4, limit),
     { createdAt: -1, rating: -1 }
   );

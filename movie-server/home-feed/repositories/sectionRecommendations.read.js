@@ -21,17 +21,22 @@ const { parseUserId } = require('./parseUserId');
  * @param {number} [limitPerCategory]
  * @returns {Promise<Array<{ movieId: string, category: string, score: number, rank: number|null, generatedAt: Date|null, sourceType: 'personal' }>>}
  */
-const listPersonalCandidates = async (userId, limitPerCategory) => {
+const listPersonalCandidates = async (userId, limitPerCategory, allowedMovieIds) => {
   const uid = parseUserId(userId);
   if (!uid) return [];
+  if (allowedMovieIds instanceof Set && !allowedMovieIds.size) return [];
 
   const perCategory = Math.max(
     1,
     Number(limitPerCategory) || homeFeedWeights.candidateLimits.personalPerCategory
   );
+  const match = { userId: uid, ...excludedCategoryMatch() };
+  if (allowedMovieIds instanceof Set) {
+    match.movieId = { $in: [...allowedMovieIds] };
+  }
 
   const groups = await UserRecommendation.aggregate([
-    { $match: { userId: uid, ...excludedCategoryMatch() } },
+    { $match: match },
     { $sort: { rank: 1, score: -1 } },
     {
       $group: {

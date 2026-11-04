@@ -19,14 +19,19 @@ const { excludedCategoryMatch, isExcludedCategory } = require('./excludedCategor
  * @param {number} [limitPerCategory]
  * @returns {Promise<Array<{ movieId: string, category: string, trendingScore: number, scoreSource: string, sourceType: 'trending' }>>}
  */
-const listTrendingCandidates = async (limitPerCategory) => {
+const listTrendingCandidates = async (limitPerCategory, allowedMovieIds) => {
   const perCategory = Math.max(
     1,
     Number(limitPerCategory) || homeFeedWeights.candidateLimits.trendingPerCategory
   );
+  const match = { ...excludedCategoryMatch() };
+  if (allowedMovieIds instanceof Set) {
+    if (!allowedMovieIds.size) return [];
+    match.movieId = { $in: [...allowedMovieIds] };
+  }
 
   const groups = await CategoryTrendingScore.aggregate([
-    { $match: { ...excludedCategoryMatch() } },
+    { $match: match },
     { $sort: { trendingScore: -1 } },
     {
       $group: {
