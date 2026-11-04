@@ -107,6 +107,12 @@
   background: #111;
 }
 
+.chanel-type-search-results--movies {
+  width: 50vw;
+  max-height: 70vh;
+  padding: 0.55rem 0.7rem 0.7rem;
+}
+
 .chanel-type-search-row {
   display: flex;
   align-items: baseline;

@@ -183,6 +183,8 @@ const ShortsVideos = ({
   variant = 'movie',
   repostIds = null,
   repostShortsEntries = null,
+  searchShortsEntries = null,
+  shortsType = null,
 }) => {
   const { contentLang } = useContentLanguage();
   const { isLoggedIn } = useAuth();
@@ -205,7 +207,8 @@ const ShortsVideos = ({
     [movieShortsCatalog, musicShortsCatalog]
   );
   const isMusicShorts = variant === 'music';
-  const recoEnabled = !initialShorts && !repostIds?.length && !repostShortsEntries?.length;
+  const lockedShortsEntries = searchShortsEntries?.length ? searchShortsEntries : repostShortsEntries;
+  const recoEnabled = !initialShorts && !repostIds?.length && !lockedShortsEntries?.length;
   const artistSeqList = useMemo(() => {
     if (artistSeq == null || String(artistSeq) === '') return [];
     return musicShortsCatalog.filter((item) => hasArtistId(item.artistId, artistSeq));
@@ -248,13 +251,13 @@ const ShortsVideos = ({
     return mixedCatalog.find((item) => String(item.id) === String(playerFocus)) || null;
   }, [playerFocus, mixedCatalog]);
   const gridList = useMemo(() => {
-    if (repostShortsEntries?.length) {
-      return buildRepostShortsList(repostShortsEntries, movieShortsCatalog, musicShortsCatalog);
+    if (lockedShortsEntries?.length) {
+      return buildRepostShortsList(lockedShortsEntries, movieShortsCatalog, musicShortsCatalog);
     }
     if (recoEnabled && pageList) return pageList;
     if (waitingForPage) return [];
     return orderShortsByRepostIds(baseList, repostIds);
-  }, [repostShortsEntries, movieShortsCatalog, musicShortsCatalog, recoEnabled, pageList, waitingForPage, baseList, repostIds]);
+  }, [lockedShortsEntries, movieShortsCatalog, musicShortsCatalog, recoEnabled, pageList, waitingForPage, baseList, repostIds]);
   const shortsList = useMemo(() => {
     if (artistSeq) return artistSeqList;
     if (!recoEnabled) return gridList;
@@ -348,15 +351,21 @@ const ShortsVideos = ({
   const openedShortIdRef = useRef(null);
   useEffect(() => {
     if (shortId == null || String(shortId) === '' || shortsList.length === 0) return;
-    if (openedShortIdRef.current === String(shortId)) return;
-    const idx = shortsList.findIndex((item) => String(item.id) === String(shortId));
+    const focusKey = `${shortsType || ''}:${shortId}`;
+    if (openedShortIdRef.current === focusKey) return;
+    const typedIndex = shortsType
+      ? shortsList.findIndex((item) => String(item.id) === String(shortId) && item.type === shortsType)
+      : -1;
+    const idx = typedIndex >= 0
+      ? typedIndex
+      : shortsList.findIndex((item) => String(item.id) === String(shortId));
     if (idx < 0) return;
-    openedShortIdRef.current = String(shortId);
+    openedShortIdRef.current = focusKey;
     setActiveIndex(idx);
     setModalOpen(true);
     setMobilePlayOverlayVisible(false);
     setModalVideoState((s) => ({ ...s, isPlaying: true, currentTime: 0 }));
-  }, [shortId, shortsList]);
+  }, [shortId, shortsType, shortsList]);
 
   const recoOpenedRef = useRef(null);
   const focusId = openedFocus ?? shortId;

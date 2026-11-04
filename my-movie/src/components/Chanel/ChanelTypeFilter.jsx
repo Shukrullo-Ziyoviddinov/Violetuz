@@ -8,6 +8,7 @@ import { fetchSearchResults } from '../../api/searchApi';
 import { OPEN_CHANNEL_SEARCH_EVENT } from '../../channelSearchBridge';
 import ChanelSearchGenre from './ChanelSearchGenre';
 import ChanelSearchTrend from './ChanelSearchTrend';
+import ChanelSearchMovieResults from './ChanelSearchMovieResults';
 import './ChanelTypeFilter.css';
 
 const MOBILE_SEARCH_MAX = 768;
@@ -126,13 +127,8 @@ const ChanelTypeFilter = ({
     };
   }, [query, channelId, contentLang]);
 
+  const movies = Array.isArray(results?.movies) ? results.movies : [];
   const rows = [
-    ...(results?.movies || []).map((item) => ({
-      key: `movie-${item.id}`,
-      kind: 'Kino',
-      title: resultTitle(item, contentLang),
-      to: `/movie/${item.id}`,
-    })),
     ...(results?.music || []).map((item) => ({
       key: `music-${item.id}`,
       kind: 'Musiqa',
@@ -160,11 +156,23 @@ const ChanelTypeFilter = ({
     </>
   );
 
+  const openMovie = (movie) => {
+    if (movie?.id == null) return;
+    closeSearch();
+    navigate(`/movie/${movie.id}`);
+  };
+
   const resultList = (
-    <div className="chanel-type-search-results" role="listbox">
+    <div
+      className={`chanel-type-search-results${movies.length ? ' chanel-type-search-results--movies' : ''}`}
+      role="listbox"
+    >
       {searching ? <p className="chanel-type-search-empty">Qidirilmoqda</p> : null}
-      {!searching && rows.length === 0 ? (
+      {!searching && movies.length === 0 && rows.length === 0 ? (
         <p className="chanel-type-search-empty">Topilmadi</p>
+      ) : null}
+      {!searching && movies.length > 0 ? (
+        <ChanelSearchMovieResults movies={movies} onOpen={openMovie} />
       ) : null}
       {!searching ? rows.map((row) => (
         <button

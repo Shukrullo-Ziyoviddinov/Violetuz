@@ -19,6 +19,7 @@ import SearchMusicResultsItem from '../../Music/SearchMusicResults/SearchMusicRe
 import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import SearchModalResultsMovieItem from './SearchModalResultsMovieItem';
 import SearchModalResultsActorItem from './SearchModalResultsActorItem';
+import SearchShortsCard from '../SearchShorts/SearchShortsCard';
 import './SearchModalResults.css';
 import '../../Music/SearchMusicResults/SearchMusicResults.css';
 
@@ -63,6 +64,7 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     albums: [],
     clips: [],
     concerts: [],
+    shorts: [],
   });
   const [sectionsMeta, setSectionsMeta] = useState(() => cloneEmptyMetaSections());
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -87,6 +89,7 @@ const SearchModalResults = ({ query, onMovieClick }) => {
       albums: [],
       clips: [],
       concerts: [],
+      shorts: [],
     });
     setSectionsMeta(cloneEmptyMetaSections());
     setActiveFilter(SEARCH_FILTER_ALL);
@@ -117,11 +120,12 @@ const SearchModalResults = ({ query, onMovieClick }) => {
       albums: firstPage.albums || [],
       clips: firstPage.clips || [],
       concerts: firstPage.concerts || [],
+      shorts: firstPage.shorts || [],
     });
     setSectionsMeta(firstPage.meta?.sections || cloneEmptyMetaSections());
   }, [isSuccess, firstPage, debouncedQuery]);
 
-  const { actors, musicArtists, movies, music, albums, clips, concerts } = accumulated;
+  const { actors, musicArtists, movies, music, albums, clips, concerts, shorts = [] } = accumulated;
 
   const availableFilters = useMemo(
     () =>
@@ -303,6 +307,19 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     closeAndNavigate(`/movie/${movie.id}`);
   };
 
+  const openSearchShort = (item) => {
+    if (item?.id == null) return;
+    const playlist = shorts
+      .filter((row) => row?.id != null && (row.type === 'movieShorts' || row.type === 'musicshorts'))
+      .map((row) => `${row.type}:${row.id}`)
+      .join(',');
+    const params = new URLSearchParams();
+    params.set('shortId', String(item.id));
+    if (item.type) params.set('shortsType', String(item.type));
+    if (playlist) params.set('searchShorts', playlist);
+    closeAndNavigate(`/shorts?${params.toString()}`);
+  };
+
   const handleActorClick = (actor) => {
     recordHistoryClick(actor?.id, 'actor');
     closeAndNavigate(`/actor/${actor.id}`);
@@ -353,6 +370,7 @@ const SearchModalResults = ({ query, onMovieClick }) => {
   const hasAny =
     actors.length > 0 ||
     movies.length > 0 ||
+    shorts.length > 0 ||
     musicSections.some((s) => s.items.length > 0);
 
   const hasMoreAny = getSectionsToLoadMore().length > 0;
@@ -473,6 +491,25 @@ const SearchModalResults = ({ query, onMovieClick }) => {
           );
         })}
       </div>
+
+      {show('shorts') && shorts.length > 0 ? (
+        <div className="search-shorts-row">
+          <h3 className="search-shorts-row-title">
+            {t('searchModal.shortsSection', 'Shortslar')}
+          </h3>
+          <ScrollTouch className="search-music-results-scroll">
+            <div className="search-shorts-row-track">
+              {shorts.map((item) => (
+                <SearchShortsCard
+                  key={`${item.type}-${item.id}`}
+                  item={item}
+                  onOpen={() => openSearchShort(item)}
+                />
+              ))}
+            </div>
+          </ScrollTouch>
+        </div>
+      ) : null}
 
       {!hasAny && (
         <p className="search-modal-results-empty">{t('searchModal.noResults', 'Natija topilmadi')}</p>

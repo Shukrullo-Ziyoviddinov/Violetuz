@@ -10,6 +10,12 @@ export const SEARCH_FILTER_TYPES = [
     labelDefault: 'Kino',
   },
   {
+    id: 'shorts',
+    resultKey: 'shorts',
+    labelKey: 'searchModal.filterShorts',
+    labelDefault: 'Shorts',
+  },
+  {
     id: 'music',
     resultKey: 'music',
     labelKey: 'searchModal.filterMusic',

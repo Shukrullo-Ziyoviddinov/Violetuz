@@ -20,6 +20,8 @@ const ShortsPage = () => {
   }, [repostIdsRaw]);
   const repostShortsRaw = searchParams.get('repostShorts');
   const repostShortsEntries = useMemo(() => parseRepostShortsParam(repostShortsRaw), [repostShortsRaw]);
+  const searchShortsRaw = searchParams.get('searchShorts');
+  const searchShortsEntries = useMemo(() => parseRepostShortsParam(searchShortsRaw), [searchShortsRaw]);
 
   const fromHomeLink =
     (startIndex != null && !isNaN(startIndexNum)) ||
@@ -46,6 +48,8 @@ const ShortsPage = () => {
         onCloseFromHome={fromHomeLink ? handleCloseFromHome : undefined}
         repostIds={repostIds}
         repostShortsEntries={repostShortsEntries}
+        searchShortsEntries={searchShortsEntries}
+        shortsType={searchParams.get('shortsType')}
       />
     </div>
   );

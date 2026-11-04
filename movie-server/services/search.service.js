@@ -30,6 +30,7 @@ const {
   ALBUM_SEARCH_PROJECTION,
 } = require('../utils/searchProjections');
 const searchCache = require('../utils/searchQueryCache');
+const { attachSearchShorts } = require('./searchShortsAttach.service');
 
 /**
  * So'rovga qarab qaysi kolleksiyalar kerak.
@@ -265,7 +266,7 @@ const searchAll = async (query, contentLang = 'uz', options = {}) => {
     }
   }
 
-  // Section load-more: faqat shu bo'limdan cursor dan boshlab
+  // Section load-more: faqat shu bo'limdan cursor dan boshlab. Shorts qatori qayta hisoblanmaydi.
   if (section) {
     return paginateRankedResults(ranked, {
       section,
@@ -274,12 +275,13 @@ const searchAll = async (query, contentLang = 'uz', options = {}) => {
     });
   }
 
-  // Birinchi sahifa: har bo'lim 0 dan
-  return paginateRankedResults(ranked, {
+  const page = paginateRankedResults(ranked, {
     section: null,
     cursor: 0,
     limits,
   });
+  page.data.shorts = await attachSearchShorts(query, ranked);
+  return page;
 };
 
 module.exports = {
