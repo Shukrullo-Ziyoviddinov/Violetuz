@@ -17,6 +17,9 @@ const {
   getWeeklyTopMoviesFromWatchEvents,
 } = require('../services/weeklyTopMoviesRead.service');
 const {
+  getChannelWeeklyTopMovies,
+} = require('../services/channelWeeklyTopMovies.service');
+const {
   getMonthlyTopMoviesFromWatchEvents,
 } = require('../services/monthlyTopMoviesRead.service');
 const {
@@ -45,6 +48,18 @@ const getProgressConfig = asyncHandler(async (_req, res) => {
 const getWeeklyTopMovies = asyncHandler(async (req, res) => {
   const result = await getWeeklyTopMoviesFromWatchEvents({
     limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/recommendations/weekly-top/channel/:channelId
+ * Umumiy haftalik tartib. Ro‘yxatdan oldin faqat shu kanal kinolari qoladi.
+ */
+const getChannelWeeklyTopMoviesHandler = asyncHandler(async (req, res) => {
+  const result = await getChannelWeeklyTopMovies({
+    channelId: req.params.channelId,
   });
 
   return sendSuccess(res, { data: result });
@@ -128,6 +143,7 @@ const postProgress = asyncHandler(async (req, res) => {
 module.exports = {
   getProgressConfig,
   getWeeklyTopMovies,
+  getChannelWeeklyTopMoviesHandler,
   getMonthlyTopMovies,
   getMostWatchedMovies,
   getByCategory,

@@ -52,7 +52,7 @@ const MEDIA_WISHLIST = {
   album: 'album',
 };
 
-const ChanelContentCard = ({ kind, item, layout = 'grid' }) => {
+const ChanelContentCard = ({ kind, item, layout = 'grid', rank = null, forceSkeleton = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();
@@ -65,15 +65,17 @@ const ChanelContentCard = ({ kind, item, layout = 'grid' }) => {
       : '')
     : item?.img || '';
   const wishlistType = isMovie ? 'movie' : (MEDIA_WISHLIST[kind] || 'music');
-  const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
+  const { showSkeleton: imageSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
+  const showSkeleton = forceSkeleton || imageSkeleton;
   const saved = isInWishlist(item.id, wishlistType);
   const isSoon = isMovie && item.category === 'anonslar';
   const showRating = isMovie
     && !isSoon
+    && !showSkeleton
     && item.rating != null
     && item.rating !== ''
     && item.rating !== 'none';
-  const showAge = isMovie && item.ageRestriction != null;
+  const showAge = isMovie && !showSkeleton && rank == null && item.ageRestriction != null;
   const year = isMovie ? item.specs?.year : item?.year;
   const countries = isMovie && Array.isArray(item.specs?.countries)
     ? item.specs.countries.filter(Boolean).join(', ')
@@ -132,6 +134,9 @@ const ChanelContentCard = ({ kind, item, layout = 'grid' }) => {
             {showAge && (
               <div className="movies-item-badge movies-item-badge-age">{item.ageRestriction}+</div>
             )}
+            {rank != null ? (
+              <span className="chanel-weekly-top-rank" aria-hidden="true">{rank}</span>
+            ) : null}
             {showRating && (
               <div className="movies-item-rating">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffd700" stroke="none">

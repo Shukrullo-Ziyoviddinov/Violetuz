@@ -8,6 +8,8 @@ import ChanelMusicCard from './ChanelMusicCard';
 import ChanelClipCard from './ChanelClipCard';
 import ChanelPardaCard from './ChanelPardaCard';
 import ChanelShortCard from './ChanelShortCard';
+import ChanelWeeklyTopMovies from './ChanelWeeklyTopMovies';
+import ChanelWeeklyTopMusic from './ChanelWeeklyTopMusic';
 import { useTrillerList } from '../../hooks/useTrillerList';
 import { sortByUploadedAtDesc } from './sortByUploadedAt';
 import { movieMatchesGenre } from './channelGenre';
@@ -120,6 +122,8 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
         <ChannelSection title={t('channel.movies', 'Kinolar')} cards={movieCards} />
         <ChannelSection title={t('channel.clips', 'Kliplar')} cards={clipCards} />
         <ChannelSection title={t('channel.music', 'Musiqalar')} cards={musicCards} />
+        <ChanelWeeklyTopMusic channelId={channelId} />
+        <ChanelWeeklyTopMovies channelId={channelId} />
         <ChannelSection title={t('channel.albums', 'Albomlar')} cards={albumCards} />
         <ChannelSection title={t('channel.videos', 'Videolar')} cards={pardaCards} />
         <ChannelSection title={t('channel.shorts', 'Shortslar')} cards={shortCards} />
@@ -128,7 +132,14 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
   }
 
   if (filter === 'music' || filter === 'album') {
-    return <div className="chanel-music-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
+    const grid = <div className="chanel-music-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
+    if (filter === 'album') return grid;
+    return (
+      <>
+        <ChanelWeeklyTopMusic channelId={channelId} />
+        {grid}
+      </>
+    );
   }
 
   if (filter === 'klip' || filter === 'videos') {
@@ -139,6 +150,15 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
 
   if (filter === 'shorts') {
     return <div className="chanel-content-shorts">{cards}</div>;
+  }
+
+  if (filter === 'movies') {
+    return (
+      <>
+        <ChanelWeeklyTopMovies channelId={channelId} />
+        <div className="chanel-content-grid">{cards}</div>
+      </>
+    );
   }
 
   return <div className="chanel-content-grid">{cards}</div>;

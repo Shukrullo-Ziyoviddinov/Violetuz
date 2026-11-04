@@ -18,6 +18,9 @@ const {
   getWeeklyTopMusicFromListenEvents,
 } = require('../services/weeklyTopMusicRead.service');
 const {
+  getChannelWeeklyTopMusic,
+} = require('../services/channelWeeklyTopMusic.service');
+const {
   getMonthlyTopMusicFromListenEvents,
 } = require('../services/monthlyTopMusicRead.service');
 const {
@@ -55,6 +58,18 @@ const getProgressConfig = asyncHandler(async (_req, res) => {
 const getWeeklyTopMusic = asyncHandler(async (req, res) => {
   const result = await getWeeklyTopMusicFromListenEvents({
     limit: req.query?.limit,
+  });
+
+  return sendSuccess(res, { data: result });
+});
+
+/**
+ * GET /api/music-recommendations/weekly-top/channel/:channelId
+ * Umumiy haftalik tartib. Ro‘yxatdan oldin faqat shu kanal qo‘shiqlari qoladi.
+ */
+const getChannelWeeklyTopMusicHandler = asyncHandler(async (req, res) => {
+  const result = await getChannelWeeklyTopMusic({
+    channelId: req.params.channelId,
   });
 
   return sendSuccess(res, { data: result });
@@ -176,6 +191,7 @@ const postProgress = asyncHandler(async (req, res) => {
 module.exports = {
   getProgressConfig,
   getWeeklyTopMusic,
+  getChannelWeeklyTopMusicHandler,
   getMonthlyTopMusic,
   getTopMusicCharts,
   getPopularAlbums,

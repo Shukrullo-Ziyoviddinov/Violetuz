@@ -233,6 +233,27 @@ export const fetchMusicProgressConfig = async () => {
  * @param {{ limit?: number }} [opts]
  * @returns {Promise<{ items: Array<{ contentKey: string, contentId: string, viewCount: number, listenedSeconds: number, rank: number }>, windowDays?: number, limit?: number, minViews?: number, contentType?: string, source?: string }>}
  */
+/**
+ * Kanal sahifasidagi haftaning top musiqalari.
+ * GET /api/music-recommendations/weekly-top/channel/:channelId
+ * Tartib serverdagi umumiy weekly hisob. Limit so‘rovda yuborilmaydi.
+ */
+export const fetchChannelWeeklyTopMusic = async (channelId) => {
+  const id = encodeURIComponent(String(channelId || '').trim());
+  const res = await musicRecFetch(`/music-recommendations/weekly-top/channel/${id}`);
+  const data = await parseJson(res);
+  const items = Array.isArray(data?.items) ? data.items : [];
+
+  return {
+    items,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    contentType: data?.contentType,
+    source: data?.source || (items.length ? 'channel_weekly_top_music' : 'empty'),
+  };
+};
+
 export const fetchWeeklyTopMusic = async ({ limit } = {}) => {
   const query = new URLSearchParams();
   if (limit) query.set('limit', String(limit));

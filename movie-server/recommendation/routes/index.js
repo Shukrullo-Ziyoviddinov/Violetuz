@@ -24,6 +24,10 @@ const {
 const router = Router();
 
 router.get('/config/progress', recommendationController.getProgressConfig);
+router.get(
+  '/weekly-top/channel/:channelId',
+  recommendationController.getChannelWeeklyTopMoviesHandler
+);
 router.get('/weekly-top', recommendationController.getWeeklyTopMovies);
 router.get('/monthly-top', recommendationController.getMonthlyTopMovies);
 router.get('/most-watched', recommendationController.getMostWatchedMovies);

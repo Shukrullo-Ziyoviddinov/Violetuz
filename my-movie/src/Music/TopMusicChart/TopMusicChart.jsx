@@ -54,6 +54,8 @@ const TopMusicChart = ({
   loading = false,
   title,
   rankSrc,
+  showTextRank = false,
+  className = '',
   skeletonKey = 'top-music-chart',
 }) => {
   const { t } = useTranslation();
@@ -148,7 +150,10 @@ const TopMusicChart = ({
     typeof rankSrc === 'function' ? rankSrc : () => '';
 
   return (
-    <div className="top-music-chart" aria-busy={waiting || undefined}>
+    <div
+      className={`top-music-chart${className ? ` ${className}` : ''}`}
+      aria-busy={waiting || undefined}
+    >
       <div className="top-music-chart-container">
         <div className="top-music-chart-header">
           <h2 className="top-music-chart-title">{title}</h2>
@@ -195,7 +200,11 @@ const TopMusicChart = ({
                       }}
                       aria-label={`${item.rank}. ${getTitle(item)}`}
                     >
-                      {rankImage ? (
+                      {showTextRank ? (
+                        <span className="top-music-chart-rank chanel-weekly-music-rank" aria-hidden="true">
+                          {item.rank}
+                        </span>
+                      ) : rankImage ? (
                         <img
                           className="top-music-chart-rank"
                           src={encodeURI(rankImage)}

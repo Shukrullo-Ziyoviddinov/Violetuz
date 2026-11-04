@@ -232,6 +232,26 @@ export const DEFAULT_PROGRESS_CONFIG = Object.freeze({
  * @param {{ limit?: number }} [opts]
  * @returns {Promise<{ movies: Array<{ movieId: string, viewCount: number, watchedSeconds: number, rank: number }>, windowDays?: number, limit?: number, minViews?: number, source?: string }>}
  */
+/**
+ * Kanal sahifasidagi haftaning top filmlari.
+ * GET /api/recommendations/weekly-top/channel/:channelId
+ * Tartib serverdagi umumiy weekly hisob. Limit so‘rovda yuborilmaydi.
+ */
+export const fetchChannelWeeklyTopMovies = async (channelId) => {
+  const id = encodeURIComponent(String(channelId || '').trim());
+  const res = await recommendationsFetch(`/recommendations/weekly-top/channel/${id}`);
+  const data = await parseJson(res);
+  const movies = Array.isArray(data?.movies) ? data.movies : [];
+
+  return {
+    movies,
+    windowDays: data?.windowDays,
+    limit: data?.limit,
+    minViews: data?.minViews,
+    source: data?.source,
+  };
+};
+
 export const fetchWeeklyTopMovies = async ({ limit } = {}) => {
   const query = new URLSearchParams();
   if (limit) query.set('limit', String(limit));

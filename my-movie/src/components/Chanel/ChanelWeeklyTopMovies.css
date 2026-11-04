@@ -1,0 +1,24 @@
+/* Qidiruv .search-modal-movie-trend-rank bilan bir xil bo‘sh raqam. Kanalda ozroq katta. */
+.chanel-weekly-top-rank {
+  position: absolute;
+  left: 0;
+  bottom: 3px;
+  z-index: 2;
+  margin: 0;
+  font-family: Impact, 'Arial Black', sans-serif;
+  font-size: 58px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1px #fff;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .chanel-weekly-top-rank {
+    font-size: 50px;
+  }
+}
