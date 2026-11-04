@@ -9,6 +9,7 @@ import { OPEN_CHANNEL_SEARCH_EVENT } from '../../channelSearchBridge';
 import ChanelSearchGenre from './ChanelSearchGenre';
 import ChanelSearchTrend from './ChanelSearchTrend';
 import ChanelSearchTavsiya from './ChanelSearchTavsiya';
+import ChanelSearchForYou from './ChanelSearchForYou';
 import ChanelSearchMovieResults from './ChanelSearchMovieResults';
 import SearchShortsCard from '../SearchShorts/SearchShortsCard';
 import './ChanelTypeFilter.css';
@@ -40,6 +41,7 @@ const ChanelTypeFilter = ({
   genreId,
   onGenreChange,
   onTrendChange,
+  onMusicForYouChange,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -56,6 +58,7 @@ const ChanelTypeFilter = ({
     if (value === undefined) setInternalValue(id);
     onGenreChange?.(null);
     onTrendChange?.(null);
+    onMusicForYouChange?.(null);
     onChange?.(id);
   };
 
@@ -66,13 +69,22 @@ const ChanelTypeFilter = ({
 
   const chooseGenre = (genre) => {
     onTrendChange?.(null);
+    onMusicForYouChange?.(null);
     onGenreChange?.(genreId === genre.id ? null : genre.id);
     closeSearch();
   };
 
   const showTrend = (ids) => {
     onGenreChange?.(null);
+    onMusicForYouChange?.(null);
     onTrendChange?.(Array.isArray(ids) ? ids : []);
+    closeSearch();
+  };
+
+  const showMusicForYou = (ids) => {
+    onGenreChange?.(null);
+    onTrendChange?.(null);
+    onMusicForYouChange?.(Array.isArray(ids) ? ids : []);
     closeSearch();
   };
 
@@ -150,6 +162,11 @@ const ChanelTypeFilter = ({
         onSelect={chooseGenre}
       />
       <ChanelSearchTrend channelId={channelId} onShowAll={showTrend} />
+      <ChanelSearchForYou
+        channelId={channelId}
+        onOpen={closeSearch}
+        onShowAll={showMusicForYou}
+      />
       <ChanelSearchTavsiya channelId={channelId} onOpen={closeSearch} />
     </>
   );

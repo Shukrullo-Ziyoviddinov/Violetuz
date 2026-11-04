@@ -21,17 +21,22 @@ const { parseUserId } = require('./parseUserId');
  * @param {number} [limitPerCategory]
  * @returns {Promise<Array<{ contentId: string, category: string, score: number, rank: number|null, generatedAt: Date|null, sourceType: 'personal' }>>}
  */
-const listPersonalCandidates = async (userId, limitPerCategory) => {
+const listPersonalCandidates = async (userId, limitPerCategory, allowedContentIds) => {
   const uid = parseUserId(userId);
   if (!uid) return [];
+  if (allowedContentIds instanceof Set && !allowedContentIds.size) return [];
 
   const perCategory = Math.max(
     1,
     Number(limitPerCategory) || musicHomeFeedWeights.candidateLimits.personalPerCategory
   );
+  const match = { userId: uid, ...musicContentMatch() };
+  if (allowedContentIds instanceof Set) {
+    match.contentId = { $in: [...allowedContentIds] };
+  }
 
   const groups = await UserMusicRecommendation.aggregate([
-    { $match: { userId: uid, ...musicContentMatch() } },
+    { $match: match },
     { $sort: { rank: 1, score: -1 } },
     {
       $group: {

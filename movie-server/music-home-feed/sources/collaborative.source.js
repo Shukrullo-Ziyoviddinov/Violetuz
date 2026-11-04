@@ -15,18 +15,23 @@ const { listCoOccurredTracks } = require('../repositories/coOccurrence.repositor
  * @param {string[]} seedIds
  * @returns {Promise<Array<{ contentId: string, category: string, sourceType: 'collaborative', rawScore: number }>>}
  */
-const listCollaborativeFromSeeds = async (seedIds) => {
+const listCollaborativeFromSeeds = async (seedIds, allowedContentIds) => {
   const seeds = [...new Set((seedIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
   const limit = musicHomeFeedWeights.candidateLimits.collaborative;
-  if (!seeds.length) return [];
+  const allow = allowedContentIds instanceof Set ? allowedContentIds : null;
+  if (!seeds.length || (allow && !allow.size)) return [];
 
   const seedSet = new Set(seeds);
-  const rows = await listCoOccurredTracks(seeds, Math.max(limit * 3, limit));
+  const fetchLimit = allow
+    ? Math.min(400, Math.max(limit * 3, allow.size, limit))
+    : Math.max(limit * 3, limit);
+  const rows = await listCoOccurredTracks(seeds, fetchLimit);
   /** @type {Map<string, number>} */
   const best = new Map();
 
   for (const row of rows) {
     if (!row.contentId || seedSet.has(row.contentId)) continue;
+    if (allow && !allow.has(row.contentId)) continue;
     const prev = best.get(row.contentId) || 0;
     if (row.coListenCount > prev) best.set(row.contentId, row.coListenCount);
   }
@@ -47,14 +52,14 @@ const listCollaborativeFromSeeds = async (seedIds) => {
  *
  * @param {string|import('mongoose').Types.ObjectId|null} userId
  */
-const listCollaborativeSource = async (userId) => {
+const listCollaborativeSource = async (userId, allowedContentIds) => {
   const progress = await listListenProgress(userId);
   const take = musicHomeFeedWeights.coOccurrence.recentSeedTracks;
   const seeds = progress
     .filter((row) => row.listened)
     .slice(0, Math.max(1, take))
     .map((row) => row.contentId);
-  return listCollaborativeFromSeeds(seeds);
+  return listCollaborativeFromSeeds(seeds, allowedContentIds);
 };
 
 module.exports = {

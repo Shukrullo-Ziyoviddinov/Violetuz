@@ -19,14 +19,19 @@ const { isMusicContentType, musicContentMatch } = require('./musicContent');
  * @param {number} [limitPerCategory]
  * @returns {Promise<Array<{ contentId: string, category: string, trendingScore: number, scoreSource: string, sourceType: 'trending' }>>}
  */
-const listTrendingCandidates = async (limitPerCategory) => {
+const listTrendingCandidates = async (limitPerCategory, allowedContentIds) => {
   const perCategory = Math.max(
     1,
     Number(limitPerCategory) || musicHomeFeedWeights.candidateLimits.trendingPerCategory
   );
+  const match = { ...musicContentMatch() };
+  if (allowedContentIds instanceof Set) {
+    if (!allowedContentIds.size) return [];
+    match.contentId = { $in: [...allowedContentIds] };
+  }
 
   const groups = await CategoryMusicTrendingScore.aggregate([
-    { $match: { ...musicContentMatch() } },
+    { $match: match },
     { $sort: { trendingScore: -1 } },
     {
       $group: {

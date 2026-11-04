@@ -30,15 +30,25 @@ const yearScore = (year, nowYear, maxAgeYears) => {
  * @param {number} [nowMs]
  * @returns {Promise<Array<{ contentId: string, category: string, sourceType: 'fresh', rawScore: number }>>}
  */
-const listFreshSource = async (nowMs = Date.now()) => {
+const listFreshSource = async (nowMs = Date.now(), allowedContentIds) => {
   const cfg = musicHomeFeedWeights.fresh || {};
   const maxAgeYears = Math.max(0, Number(cfg.maxAgeYears) || 0);
   const limit = musicHomeFeedWeights.candidateLimits.fresh;
   const nowYear = new Date(nowMs).getUTCFullYear();
   const minYear = nowYear - maxAgeYears;
 
+  const catalogFilter = { year: { $gte: minYear, $lte: nowYear } };
+  if (allowedContentIds instanceof Set) {
+    if (!allowedContentIds.size) return [];
+    const ids = [...allowedContentIds]
+      .map((id) => Number(String(id).trim()))
+      .filter((id) => Number.isInteger(id));
+    if (!ids.length) return [];
+    catalogFilter.id = { $in: ids };
+  }
+
   const rows = await findCatalogTracks(
-    { year: { $gte: minYear, $lte: nowYear } },
+    catalogFilter,
     Math.max(limit * 4, limit),
     { year: -1, id: -1 }
   );

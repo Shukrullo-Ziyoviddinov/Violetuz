@@ -63,7 +63,18 @@ const listExplorationSource = async (userId, options = {}) => {
     }
   }
 
-  const rows = await findCatalogTracks({}, 400, { year: -1, id: -1 });
+  const catalogFilter = {};
+  const allowedContentIds = options.allowedContentIds;
+  if (allowedContentIds instanceof Set) {
+    if (!allowedContentIds.size) return [];
+    const ids = [...allowedContentIds]
+      .map((id) => Number(String(id).trim()))
+      .filter((id) => Number.isInteger(id));
+    if (!ids.length) return [];
+    catalogFilter.id = { $in: ids };
+  }
+
+  const rows = await findCatalogTracks(catalogFilter, 400, { year: -1, id: -1 });
 
   /** @type {Map<string, number>} */
   const perCategory = new Map();

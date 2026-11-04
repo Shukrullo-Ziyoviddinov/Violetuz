@@ -13,8 +13,8 @@ const { listPersonalCandidates } = require('../repositories/sectionRecommendatio
  * @param {string|import('mongoose').Types.ObjectId} userId
  * @returns {Promise<Array<{ contentId: string, category: string, sourceType: 'personal', rawScore: number }>>}
  */
-const listPersonalSource = async (userId) => {
-  const rows = await listPersonalCandidates(userId);
+const listPersonalSource = async (userId, allowedContentIds) => {
+  const rows = await listPersonalCandidates(userId, undefined, allowedContentIds);
   return rows.map((row) => ({
     contentId: row.contentId,
     category: row.category,

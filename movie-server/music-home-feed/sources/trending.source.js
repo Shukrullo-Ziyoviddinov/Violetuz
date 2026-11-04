@@ -12,8 +12,8 @@ const { listTrendingCandidates } = require('../repositories/trending.read');
 /**
  * @returns {Promise<Array<{ contentId: string, category: string, sourceType: 'trending', rawScore: number }>>}
  */
-const listTrendingSource = async () => {
-  const rows = await listTrendingCandidates();
+const listTrendingSource = async (allowedContentIds) => {
+  const rows = await listTrendingCandidates(undefined, allowedContentIds);
   return rows.map((row) => ({
     contentId: row.contentId,
     category: row.category,

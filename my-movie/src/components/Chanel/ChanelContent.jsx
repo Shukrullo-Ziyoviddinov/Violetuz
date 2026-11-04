@@ -27,7 +27,7 @@ const ChannelSection = ({ title, cards }) => {
   );
 };
 
-const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null }) => {
+const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null, musicForYouIds = null }) => {
   const { t } = useTranslation();
   const { allMovies, allShortsVideos, allGenres } = useMoviesApi();
   const { allMusic, allClips, allAlbums } = useMusicApi();
@@ -44,6 +44,11 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     const shorts = (allShortsVideos || []).filter((short) => sameChannel(short, channelId));
     const trailers = (allTrillers || []).filter((video) => sameChannel(video, channelId));
     const genre = genreId ? (allGenres || []).find((item) => item.id === genreId) : null;
+
+    if (Array.isArray(musicForYouIds) && musicForYouIds.length) {
+      const byId = new Map(music.map((track) => [String(track.id), track]));
+      return musicForYouIds.map((id) => byId.get(String(id))).filter(Boolean).map(toKind('music'));
+    }
 
     if (Array.isArray(trendIds) && trendIds.length) {
       const byId = new Map(movies.map((movie) => [String(movie.id), movie]));
@@ -70,7 +75,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
       ...sortByUploadedAtDesc(clips).map(toKind('klip')),
       ...shorts.map(toShort),
     ];
-  }, [allMovies, allMusic, allClips, allAlbums, allTrillers, allShortsVideos, allGenres, channelId, filter, genreId, trendIds]);
+  }, [allMovies, allMusic, allClips, allAlbums, allTrillers, allShortsVideos, allGenres, channelId, filter, genreId, trendIds, musicForYouIds]);
 
   if (!items.length) return null;
 
@@ -105,6 +110,10 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
       />
     );
   };
+
+  if (Array.isArray(musicForYouIds) && musicForYouIds.length) {
+    return <div className="chanel-music-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
+  }
 
   if (genreId || (Array.isArray(trendIds) && trendIds.length)) {
     return <div className="chanel-content-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;

@@ -76,6 +76,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
   const [contentFilter, setContentFilter] = useState('all');
   const [genreId, setGenreId] = useState(null);
   const [trendIds, setTrendIds] = useState(null);
+  const [musicForYouIds, setMusicForYouIds] = useState(null);
   const [backIdentity, setBackIdentity] = useState(false);
   const [backScrolled, setBackScrolled] = useState(false);
   const swapLock = useRef(false);
@@ -240,13 +241,26 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
         onChange={setContentFilter}
         channelId={channel.id}
         genreId={genreId}
-        onGenreChange={setGenreId}
-        onTrendChange={setTrendIds}
+        onGenreChange={(id) => {
+          setTrendIds(null);
+          setMusicForYouIds(null);
+          setGenreId(id);
+        }}
+        onTrendChange={(ids) => {
+          setMusicForYouIds(null);
+          setTrendIds(ids);
+        }}
+        onMusicForYouChange={(ids) => {
+          setGenreId(null);
+          setTrendIds(null);
+          setMusicForYouIds(ids);
+        }}
       />
       <ChanelContent
         channelId={channel.id}
         filter={contentFilter}
         genreId={genreId}
+        musicForYouIds={musicForYouIds}
         trendIds={trendIds}
       />
     </article>
