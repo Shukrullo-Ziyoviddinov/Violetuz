@@ -5,7 +5,7 @@ const { randomUUID } = require('node:crypto');
 const collections = require('../config/collections');
 const { createProfileHeatRepo } = require('../repositories/profileHeat.repo');
 const { createWatchEventService } = require('../services/watchEvent.service');
-const { profileSignals } = require('../services/profileHeat/record');
+const { profileSignals, heatPortions, createProfileSignalRecorder } = require('../services/profileHeat/record');
 
 const clone = (value) => {
   if (value instanceof Date) return new Date(value.getTime());
@@ -300,6 +300,64 @@ const run = async () => {
   assert.equal(broken.score, -1);
   assert.equal(failingMemory.watches.get('user-1:musicshorts:1').score, -1);
   assert.equal(failures, 1);
+
+  const portions = (catalog) => heatPortions(catalog).map((row) => ({
+    key: row.ref.key,
+    portion: row.portion,
+  }));
+  assert.deepEqual(portions({
+    type: 'musicshorts',
+    artistId: ['jah-khalib', 'shohruhxon', 'jah-khalib'],
+    channelId: ' violet-play ',
+  }), [
+    { key: 'channel:s:violet-play', portion: 0.5 },
+    { key: 'artist:s:jah-khalib', portion: 0.25 },
+    { key: 'artist:s:shohruhxon', portion: 0.25 },
+  ]);
+  assert.deepEqual(portions({
+    type: 'musicshorts',
+    artistId: ['jah-khalib', 'shohruhxon'],
+  }), [
+    { key: 'artist:s:jah-khalib', portion: 0.5 },
+    { key: 'artist:s:shohruhxon', portion: 0.5 },
+  ]);
+  assert.deepEqual(portions({
+    type: 'movieShorts',
+    artistId: 'jah-khalib',
+    channelId: 'violet-play',
+  }), [
+    { key: 'channel:s:violet-play', portion: 1 },
+  ]);
+  assert.deepEqual(portions({ type: 'musicshorts', artistId: 'jah-khalib' }), [
+    { key: 'artist:s:jah-khalib', portion: 1 },
+  ]);
+  assert.deepEqual(portions({ type: 'movieShorts', channelId: '' }), []);
+
+  const splitDb = createTables();
+  const splitRepo = createProfileHeatRepo(splitDb);
+  const recordSplit = createProfileSignalRecorder({ repo: splitRepo });
+  const splitTs = new Date('2026-10-31T12:00:00.000Z');
+  await recordSplit({
+    userId: 'user-1',
+    catalog: {
+      type: 'musicshorts',
+      artistId: ['jah-khalib', 'shohruhxon'],
+      channelId: 'violet-play',
+    },
+    event: { passRatio: 0.05, playedMsDelta: 1000, ts: splitTs, final: true },
+    previous: null,
+    next: { completions: 0, liked: true, commented: false },
+  });
+  const channelHeat = await splitRepo.findHeat('channel:s:violet-play');
+  const artistHeat = await splitRepo.findHeat('artist:s:jah-khalib');
+  const otherHeat = await splitRepo.findHeat('artist:s:shohruhxon');
+  assert.equal(channelHeat.days[0].likes, 0.5);
+  assert.equal(artistHeat.days[0].likes, 0.25);
+  assert.equal(otherHeat.days[0].likes, 0.25);
+  const channelSlow = await splitRepo.findUserSlowdown('user-1', 'channel:s:violet-play');
+  const artistSlow = await splitRepo.findUserSlowdown('user-1', 'artist:s:jah-khalib');
+  assert.equal(channelSlow.days[0].passes, 0.5);
+  assert.equal(artistSlow.days[0].passes, 0.25);
 
   console.log('ok profileSignal');
 };

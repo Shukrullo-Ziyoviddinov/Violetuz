@@ -23,6 +23,7 @@ const mapShort = (doc, spec, role) => {
       sourceType: blankToNull(readPath(doc, fields.type)),
       movieId: toFiniteNumber(readPath(doc, fields.movieId)),
       musicId: toFiniteNumber(readPath(doc, fields.musicId)),
+      channelId: blankToNull(readPath(doc, fields.channelId)),
     };
   }
 
@@ -35,6 +36,7 @@ const mapShort = (doc, spec, role) => {
     artistId: storedArtistId(readPath(doc, fields.artistId)),
     movieId: toFiniteNumber(readPath(doc, fields.movieId)),
     contentType: blankToNull(readPath(doc, fields.contentType)),
+    channelId: blankToNull(readPath(doc, fields.channelId)),
   };
 };
 

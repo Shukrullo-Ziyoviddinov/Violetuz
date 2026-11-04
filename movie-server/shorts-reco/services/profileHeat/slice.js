@@ -1,6 +1,6 @@
 'use strict';
 
-const { genreProfileKey, musicGenreProfileKey, artistIdsOf } = require('../../utils/keys');
+const { genreProfileKey, musicGenreProfileKey, artistIdsOf, blankToNull } = require('../../utils/keys');
 const { seenStatus, canRepeat } = require('../eligibility.service');
 const { activityScore, dayWeight } = require('./heat');
 
@@ -29,10 +29,27 @@ const slowdownScore = (days, now) => {
   let total = 0;
   for (let i = 0; i < days.length; i += 1) {
     const row = days[i];
-    if (!row || !Number.isSafeInteger(row.passes) || row.passes <= 0) continue;
+    if (!row || typeof row.passes !== 'number' || !Number.isFinite(row.passes) || row.passes <= 0) continue;
     total += row.passes * dayWeight(row.day, now);
   }
   return total;
+};
+
+/**
+ * @param {object|null|undefined} short
+ * @param {object|null|undefined} profile
+ * @returns {boolean}
+ */
+const ownsShort = (short, profile) => {
+  if (!short || typeof short.shortId !== 'string' || !profile) return false;
+  if (profile.kind === 'artist') {
+    return artistIdsOf(short.artistId).includes(String(profile.id));
+  }
+  if (profile.kind === 'channel') {
+    const channelId = blankToNull(short.channelId);
+    return channelId != null && channelId === String(profile.id);
+  }
+  return false;
 };
 
 /**
@@ -131,7 +148,7 @@ const selectProfileSlice = (profiles, input) => {
 
   for (let i = 0; i < (profiles || []).length; i += 1) {
     const profile = profiles[i];
-    if (!profile || profile.kind !== 'artist') continue;
+    if (!profile || (profile.kind !== 'artist' && profile.kind !== 'channel')) continue;
     const activity = activityScore(profile.days, now);
     if (activity <= 0) continue;
     const slowdown = readKey(source.slowdownByKey, profile.key);
@@ -143,7 +160,7 @@ const selectProfileSlice = (profiles, input) => {
     const seenShorts = new Set();
     for (let j = 0; j < shorts.length && eligible.length < shorts.length; j += 1) {
       const short = shorts[j];
-      if (!short || !artistIdsOf(short.artistId).includes(String(profile.id)) || typeof short.shortId !== 'string') continue;
+      if (!ownsShort(short, profile)) continue;
       if (taken.has(short.shortId) || seenShorts.has(short.shortId)) continue;
       const watch = readKey(source.watches, short.shortId);
       const status = seenStatus(watch, now);
@@ -221,13 +238,13 @@ const createProfileSliceService = (options) => {
 
       for (let i = 0; i < profiles.length; i += 1) {
         const profile = profiles[i];
-        if (!profile || profile.kind !== 'artist') continue;
+        if (!profile || (profile.kind !== 'artist' && profile.kind !== 'channel')) continue;
         if (activityScore(profile.days, at) <= 0) continue;
         active.push(profile);
-        shortsByKey.set(
-          profile.key,
-          await options.catalogRepo.findByArtistId(profile.id, ARTIST_SHORT_LIMIT)
-        );
+        const shorts = profile.kind === 'channel'
+          ? await options.catalogRepo.findByChannelId(profile.id, ARTIST_SHORT_LIMIT)
+          : await options.catalogRepo.findByArtistId(profile.id, ARTIST_SHORT_LIMIT);
+        shortsByKey.set(profile.key, shorts);
         if (source.userId) {
           const slowdown = await options.heatRepo.findUserSlowdown(source.userId, profile.key);
           if (slowdown) slowdownByKey.set(profile.key, slowdown);

@@ -52,7 +52,9 @@ const todayIndex = (now) => {
  * @param {unknown} value
  * @returns {number}
  */
-const count = (value) => (Number.isSafeInteger(value) && value > 0 ? value : 0);
+const count = (value) => (
+  typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0
+);
 
 /**
  * A stored day still belongs to the recent window.

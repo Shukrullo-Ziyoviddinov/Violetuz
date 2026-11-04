@@ -27,6 +27,7 @@ const collections = deepFreeze({
         type: 'type',
         movieId: 'movieId',
         musicId: 'musics.musicId',
+        channelId: 'channelId',
       },
     },
     musicShorts: {
@@ -39,6 +40,7 @@ const collections = deepFreeze({
         artistId: 'artistId',
         movieId: 'movieId',
         contentType: 'contentType',
+        channelId: 'channelId',
       },
     },
     movies: {

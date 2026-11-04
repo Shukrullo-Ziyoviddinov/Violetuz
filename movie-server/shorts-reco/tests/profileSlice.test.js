@@ -174,6 +174,34 @@ const excluded = selectProfileSlice([jah, shoh], {
 });
 assert.deepEqual(ids(excluded), ['musicshorts:3', 'musicshorts:5']);
 
+const channel = {
+  ...heat('channel:s:violet-play', 'violet-play', 8),
+  kind: 'channel',
+};
+const sharedShort = {
+  shortId: 'musicshorts:2',
+  artistId: 'jah-khalib',
+  channelId: 'violet-play',
+  musicGenres: ['pop'],
+  movieGenres: [],
+};
+const channelOnly = {
+  shortId: 'movieShorts:1',
+  artistId: 'jah-khalib',
+  channelId: 'violet-play',
+  musicGenres: [],
+  movieGenres: [],
+};
+const withChannel = selectProfileSlice([jah, channel], {
+  shortsByKey: {
+    'artist:s:jah-khalib': [sharedShort],
+    'channel:s:violet-play': [sharedShort, channelOnly],
+  },
+  now,
+  genreScores: { [popKey]: 2 },
+});
+assert.deepEqual(ids(withChannel), ['musicshorts:2', 'movieShorts:1']);
+
 const run = async () => {
   const db = createMemory();
   const heatRepo = createProfileHeatRepo(db);
@@ -222,6 +250,9 @@ const run = async () => {
         queried.push(artistId);
         return catalogRepo.findByArtistId(artistId, limit);
       },
+      findByChannelId(channelId, limit) {
+        return catalogRepo.findByChannelId(channelId, limit);
+      },
     },
     now: () => now,
   });
@@ -248,6 +279,17 @@ const run = async () => {
   const byText = await catalogRepo.findByArtistId('1');
   assert.deepEqual(byNumber.map((row) => row.shortId), ['musicshorts:11']);
   assert.deepEqual(byText.map((row) => row.shortId), ['musicshorts:12']);
+
+  catalog.push({
+    shortId: 'movieShorts:40',
+    artistId: null,
+    channelId: 'violet-play',
+    musicGenres: [],
+    movieGenres: [],
+  });
+  const channelRows = await catalogRepo.findByChannelId('violet-play');
+  assert.deepEqual(channelRows.map((row) => row.shortId), ['movieShorts:40']);
+  assert.deepEqual(await catalogRepo.findByChannelId(''), []);
 
   console.log('ok profileSlice');
 };

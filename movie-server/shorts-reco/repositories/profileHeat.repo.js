@@ -29,8 +29,8 @@ const asDate = (value) => {
  * @returns {number|null}
  */
 const count = (value) => {
-  if (!Number.isSafeInteger(value) || value < 0) return null;
-  return value;
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
+  return Math.round(value * 1e6) / 1e6;
 };
 
 /**

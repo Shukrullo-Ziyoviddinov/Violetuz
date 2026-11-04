@@ -114,6 +114,23 @@ const createCatalogRepo = (connection) => {
     },
 
     /**
+     * Shorts whose channelId is this channel. Movie and music shorts share the field.
+     * @param {unknown} channelId
+     * @param {number} [limit]
+     * @returns {Promise<object[]>}
+     */
+    async findByChannelId(channelId, limit) {
+      if (typeof channelId !== 'string' || !channelId.trim()) return [];
+      const size = Math.max(1, limit || 100);
+      const docs = await col().find({ channelId: channelId.trim() }).limit(size).toArray();
+      return docs.map((doc) => {
+        if (!doc) return doc;
+        const { _id, ...rest } = doc;
+        return rest;
+      });
+    },
+
+    /**
      * Candidate read for the feed. Sort defaults to newest catalog rows.
      * @param {object} filter
      * @param {number} [limit]

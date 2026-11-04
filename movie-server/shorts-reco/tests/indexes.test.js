@@ -21,6 +21,7 @@ assert.deepEqual(catalogNames, [
   'musicKey',
   'songGroupId',
   'artistId',
+  'channelId',
   'type_contentType',
   'movieGenres',
   'movieCountries',

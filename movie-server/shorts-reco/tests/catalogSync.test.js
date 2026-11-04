@@ -44,6 +44,7 @@ const run = async () => {
             sourceType: 'movieShorts',
             movieId: 4,
             musicId: 802,
+            channelId: 'violet-play',
           },
         ],
         loadMusicShorts: async () => [
@@ -56,6 +57,7 @@ const run = async () => {
             artistId: 'jah-khalib',
             movieId: 4,
             contentType: 'klip',
+            channelId: 'violet-play',
           },
         ],
       },
@@ -102,9 +104,11 @@ const run = async () => {
   assert.equal(stored.records[0].shortId, 'movieShorts:1');
   assert.equal(stored.records[0].musicKey, 'music:802');
   assert.equal(stored.records[0].artistId, 'jah-khalib');
+  assert.equal(stored.records[0].channelId, 'violet-play');
   assert.equal(stored.records[0].songGroupId, 'song:music:802');
   assert.deepEqual(stored.records[0].actors, [7]);
   assert.equal(stored.records[1].shortId, 'musicshorts:10001');
+  assert.equal(stored.records[1].channelId, 'violet-play');
   assert.equal(stored.records[1].musicKey, 'klip:550');
   assert.equal(stored.records[1].songGroupId, 'song:music:802');
   assert.deepEqual(stored.records[1].actors, []);

@@ -37,6 +37,7 @@ const buildCatalogRecord = (input) => {
     musicKey: refs.musicKey,
     songGroupId: refs.songGroupId,
     artistId: refs.artistId,
+    channelId: refs.channelId || null,
     movieGenres: refs.movieGenres,
     movieTypeCategories: typeCategoryKeysOfMovie(movie),
     movieCountries: refs.movieCountries,

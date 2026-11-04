@@ -15,6 +15,7 @@ const mappedShort = mapShort(
     description: { uz: 'hidden' },
     video: { uz: '/video/shorts1.mp4' },
     musics: { musicId: 9, videoId: 8 },
+    channelId: ' violet-play ',
     categoryName: 'nope',
   },
   collections.existing.shortsVideos,
@@ -28,6 +29,7 @@ assert.deepEqual(mappedShort, {
   sourceType: 'movieShorts',
   movieId: 2,
   musicId: 9,
+  channelId: 'violet-play',
 });
 
 const mappedTrack = mapTrack(
@@ -88,6 +90,7 @@ assert.equal(movieRecord.contentType, null);
 assert.equal(movieRecord.musicKey, 'music:802');
 assert.equal(movieRecord.songGroupId, 'song:music:802');
 assert.equal(movieRecord.artistId, 'jah-khalib');
+assert.equal(movieRecord.channelId, null);
 assert.deepEqual(movieRecord.movieGenres, ['jangari', 'triller']);
 assert.deepEqual(movieRecord.movieTypeCategories, ['action', 'thriller']);
 assert.deepEqual(movieRecord.movieCountries, ['usa', 'britain']);
@@ -128,6 +131,7 @@ assert.equal(musicRecord.contentType, 'klip');
 assert.equal(musicRecord.musicKey, 'klip:550');
 assert.equal(musicRecord.movieId, 1);
 assert.equal(musicRecord.artistId, 'jah-khalib');
+assert.equal(musicRecord.channelId, null);
 assert.deepEqual(musicRecord.musicGenres, ['pop', 'rock']);
 assert.deepEqual(musicRecord.musicCountries, ['usa', 'britaniya']);
 assert.deepEqual(musicRecord.actors, []);

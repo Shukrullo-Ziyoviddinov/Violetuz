@@ -10,6 +10,7 @@ const catalogIndexSpecs = Object.freeze([
   Object.freeze({ key: { musicKey: 1 }, options: Object.freeze({ name: 'musicKey' }) }),
   Object.freeze({ key: { songGroupId: 1 }, options: Object.freeze({ name: 'songGroupId' }) }),
   Object.freeze({ key: { artistId: 1 }, options: Object.freeze({ name: 'artistId' }) }),
+  Object.freeze({ key: { channelId: 1 }, options: Object.freeze({ name: 'channelId' }) }),
   Object.freeze({
     key: { type: 1, contentType: 1 },
     options: Object.freeze({ name: 'type_contentType' }),

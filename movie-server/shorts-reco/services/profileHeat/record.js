@@ -1,9 +1,10 @@
 'use strict';
 
 const config = require('../../config');
-const { artistProfileRef } = require('./profileRef');
-const { artistIdsOf } = require('../../utils/keys');
-const { ACTIVITY, withinWindow } = require('./heat');
+const collections = require('../../config/collections');
+const { artistIdsOf, blankToNull } = require('../../utils/keys');
+const { profileRef } = require('./profileRef');
+const { withinWindow } = require('./heat');
 
 const HEAT_FIELDS = ['likes', 'comments', 'rewatches'];
 const PASS_FIELDS = ['passes'];
@@ -53,6 +54,63 @@ const utcDay = (value) => {
  * @param {Date} now
  * @returns {object[]}
  */
+const roundAmount = (value) => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return 0;
+  return Math.round(value * 1e6) / 1e6;
+};
+
+/**
+ * One watch's profile-heat portions.
+ * A movie short's catalog artistId belongs to the linked track and stays out of this split.
+ * Channel id comes from the short. When both sides exist, the channel keeps half
+ * and the artist half is shared across the artistId list. One side alone keeps the whole amount.
+ * @param {object|null|undefined} catalog
+ * @returns {{ ref: { kind: string, id: string|number, key: string }, portion: number }[]}
+ */
+const heatPortions = (catalog) => {
+  const source = catalog || {};
+  const channelId = blankToNull(source.channelId);
+  const artists = source.type === collections.existing.shortsVideos.type
+    ? []
+    : artistIdsOf(source.artistId);
+  const rows = [];
+
+  if (channelId && artists.length) {
+    rows.push({ kind: 'channel', id: channelId, portion: 0.5 });
+    const each = 0.5 / artists.length;
+    for (let i = 0; i < artists.length; i += 1) {
+      rows.push({ kind: 'artist', id: artists[i], portion: each });
+    }
+  } else if (channelId) {
+    rows.push({ kind: 'channel', id: channelId, portion: 1 });
+  } else {
+    const each = artists.length ? 1 / artists.length : 0;
+    for (let i = 0; i < artists.length; i += 1) {
+      rows.push({ kind: 'artist', id: artists[i], portion: each });
+    }
+  }
+
+  const portions = [];
+  for (let i = 0; i < rows.length; i += 1) {
+    const ref = profileRef(rows[i].kind, rows[i].id);
+    const portion = roundAmount(rows[i].portion);
+    if (!ref || portion <= 0) continue;
+    portions.push({ ref, portion });
+  }
+  return portions;
+};
+
+/**
+ * @param {{ likes: number, comments: number, rewatches: number, passes: number }} signal
+ * @param {number} portion
+ */
+const scaleSignal = (signal, portion) => ({
+  likes: roundAmount((signal.likes || 0) * portion),
+  comments: roundAmount((signal.comments || 0) * portion),
+  rewatches: roundAmount((signal.rewatches || 0) * portion),
+  passes: roundAmount((signal.passes || 0) * portion),
+});
+
 const bumpDays = (days, day, amounts, fields, now) => {
   const next = [];
   let found = false;
@@ -70,7 +128,7 @@ const bumpDays = (days, day, amounts, fields, now) => {
       found = true;
       for (let j = 0; j < fields.length; j += 1) {
         const field = fields[j];
-        copy[field] += amounts[field] || 0;
+        copy[field] = roundAmount((copy[field] || 0) + (amounts[field] || 0));
       }
     }
     next.push(copy);
@@ -114,8 +172,9 @@ const createProfileSignalRecorder = (options = {}) => {
     if (!repo) return;
     try {
       const source = input || {};
-      const ids = artistIdsOf(source.catalog && source.catalog.artistId);
-      if (!ids.length || typeof source.userId !== 'string' || !source.userId.trim()) return;
+      if (typeof source.userId !== 'string' || !source.userId.trim()) return;
+      const portions = heatPortions(source.catalog);
+      if (!portions.length) return;
 
       const signal = profileSignals(source);
       const at = source.event && source.event.ts instanceof Date
@@ -124,29 +183,29 @@ const createProfileSignalRecorder = (options = {}) => {
       const day = utcDay(at);
       if (!day) return;
 
-      for (let i = 0; i < ids.length; i += 1) {
-        const ref = artistProfileRef(ids[i]);
-        if (!ref) continue;
+      for (let i = 0; i < portions.length; i += 1) {
+        const ref = portions[i].ref;
+        const scaled = scaleSignal(signal, portions[i].portion);
 
-        if (signal.likes > 0 || signal.comments > 0 || signal.rewatches > 0) {
+        if (scaled.likes > 0 || scaled.comments > 0 || scaled.rewatches > 0) {
           const current = await repo.findHeat(ref.key);
           await repo.saveHeat({
             key: ref.key,
             kind: ref.kind,
             id: ref.id,
-            days: bumpDays(current && current.days, day, signal, HEAT_FIELDS, at),
+            days: bumpDays(current && current.days, day, scaled, HEAT_FIELDS, at),
             updatedAt: at,
           });
         }
 
-        if (signal.passes > 0) {
+        if (scaled.passes > 0) {
           const current = await repo.findUserSlowdown(source.userId, ref.key);
           await repo.saveUserSlowdown({
             userId: source.userId,
             key: ref.key,
             kind: ref.kind,
             id: ref.id,
-            days: bumpDays(current && current.days, day, signal, PASS_FIELDS, at),
+            days: bumpDays(current && current.days, day, scaled, PASS_FIELDS, at),
             updatedAt: at,
           });
         }
@@ -159,5 +218,6 @@ const createProfileSignalRecorder = (options = {}) => {
 
 module.exports = {
   profileSignals,
+  heatPortions,
   createProfileSignalRecorder,
 };

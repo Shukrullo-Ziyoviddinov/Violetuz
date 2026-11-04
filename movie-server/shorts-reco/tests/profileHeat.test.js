@@ -18,6 +18,7 @@ assert.equal(ACTIVITY.windowDays, 30);
 const now = new Date('2026-10-31T18:00:00.000Z');
 const today = [row('2026-10-31', 4, 2, 1)];
 assert.equal(activityScore(today, now), 7);
+assert.equal(activityScore([row('2026-10-31', 0.5, 0.25, 0.25)], now), 1);
 
 const tenDaysAgo = [row('2026-10-21', 10, 0, 0)];
 near(activityScore(tenDaysAgo, now), 10 * (0.85 ** 10));
