@@ -33,6 +33,16 @@ const trillerSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    /**
+     * Video qaysi kanalga tegishli. channels.json dagi id.
+     * Bo'sh bo'lsa kanal sahifasiga chiqmaydi.
+     */
+    channelId: {
+      type: String,
+      trim: true,
+      default: '',
+      index: true,
+    },
     title: {
       type: localizedStringSchema,
       required: true,

@@ -16,6 +16,7 @@ import TrillerDescription from './TrillerDescription';
 import MovieComments from '../MovieDetail/MovieComments';
 import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
+import ChanelDetailProfile from '../Chanel/ChanelDetailProfile';
 import './Triller.css';
 
 const MOBILE_MAX = 900;
@@ -664,6 +665,11 @@ const Triller = ({ activeId }) => {
               title={title}
               image={poster}
             />
+            {!showLoading && activeTriller?.channelId ? (
+              <div className="triller-channel triller-channel--desktop">
+                <ChanelDetailProfile channelId={activeTriller.channelId} />
+              </div>
+            ) : null}
             <TrillerDescription
               className="triller-description--desktop"
               loading={showLoading}
@@ -727,6 +733,11 @@ const Triller = ({ activeId }) => {
               title={title}
               image={poster}
             />
+            {!showLoading && activeTriller?.channelId ? (
+              <div className="triller-channel triller-channel--mobile">
+                <ChanelDetailProfile channelId={activeTriller.channelId} />
+              </div>
+            ) : null}
             <TrillerDescription
               className="triller-description--mobile"
               loading={showLoading}

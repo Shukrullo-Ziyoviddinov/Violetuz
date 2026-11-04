@@ -22,6 +22,7 @@ const seedTrillers = async () => {
     const { id: _oldId, ...data } = item;
 
     const triller = new Triller({
+      channelId: data.channelId != null ? String(data.channelId).trim() : '',
       title: data.title,
       video: data.video,
       videoImg: data.videoImg,

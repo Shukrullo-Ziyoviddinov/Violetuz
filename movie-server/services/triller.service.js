@@ -152,6 +152,7 @@ class TrillerService {
     const { id: _oldId, ...raw } = data || {};
 
     const payload = {
+      channelId: raw.channelId != null ? String(raw.channelId).trim() : '',
       title: normalizeLocalized(raw.title, 'title'),
       video: normalizeLocalized(raw.video, 'video'),
       videoImg: normalizeLocalized(raw.videoImg, 'videoImg'),

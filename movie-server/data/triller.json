@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "channelId": "violet-play",
     "title": {
       "uz": "Soul — Trailer",
       "ru": "Душа — Трейлер"
@@ -44,6 +45,7 @@
   },
   {
     "id": 2,
+    "channelId": "violet-play",
     "title": {
       "uz": "Oppenheimer — Trailer",
       "ru": "Оппенгеймер — Трейлер"
@@ -87,6 +89,7 @@
   },
   {
     "id": 3,
+    "channelId": "violet-play",
     "title": {
       "uz": "The First Recon — Trailer",
       "ru": "The First Recon — Трейлер"
@@ -130,6 +133,7 @@
   },
   {
     "id": 4,
+    "channelId": "violet-play",
     "title": {
       "uz": "The Incredibles — Trailer",
       "ru": "Суперсемейка — Трейлер"
@@ -173,6 +177,7 @@
   },
   {
     "id": 5,
+    "channelId": "violet-play",
     "title": {
       "uz": "Homestead — Trailer",
       "ru": "Homestead — Трейлер"
@@ -216,6 +221,7 @@
   },
   {
     "id": 6,
+    "channelId": "violet-play",
     "title": {
       "uz": "Spider-Man — Trailer",
       "ru": "Человек-паук — Трейлер"
@@ -259,6 +265,7 @@
   },
   {
     "id": 7,
+    "channelId": "violet-play",
     "title": {
       "uz": "Beauty and the Beast — Trailer",
       "ru": "Красавица и чудовище — Трейлер"
@@ -302,6 +309,7 @@
   },
   {
     "id": 8,
+    "channelId": "violet-play",
     "title": {
       "uz": "Trailer 8",
       "ru": "Трейлер 8"
@@ -345,6 +353,7 @@
   },
   {
     "id": 9,
+    "channelId": "violet-play",
     "title": {
       "uz": "Trailer 9",
       "ru": "Трейлер 9"
@@ -388,6 +397,7 @@
   },
   {
     "id": 10,
+    "channelId": "violet-play",
     "title": {
       "uz": "Trailer 10",
       "ru": "Трейлер 10"
