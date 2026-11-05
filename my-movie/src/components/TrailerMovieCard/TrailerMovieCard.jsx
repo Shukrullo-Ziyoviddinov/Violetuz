@@ -298,6 +298,7 @@ const TrailerMovieCard = ({ movie, video }) => {
   const onReplay = (event) => {
     stop(event);
     if (!video) return;
+    video.dispatchEvent(new Event('trailer-watch-before-seek'));
     video.currentTime = 0;
     const play = video.play();
     if (play && typeof play.catch === 'function') play.catch(() => {});

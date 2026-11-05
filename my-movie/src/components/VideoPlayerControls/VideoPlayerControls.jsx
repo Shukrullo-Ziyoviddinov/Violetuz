@@ -1,3 +1,4 @@
+import { useTrailerWatch } from '../../trailer-home-feed/watch/useTrailerWatch';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MusicSettingsModal from '../../Music/MusicVideoPlayer/MusicSettingsModal';
@@ -43,6 +44,7 @@ const VideoPlayerControls = ({
   renderSettings = null,
   videoElementRef = null,
   promoMovie = null,
+  trailerIdentity = null,
 }) => {
   const { t } = useTranslation();
   const videoRef = useRef(null);
@@ -81,6 +83,7 @@ const VideoPlayerControls = ({
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [frameSrc, setFrameSrc] = useState('');
   const [mediaNode, setMediaNode] = useState(null);
+  useTrailerWatch(sharedMediaRef ? null : mediaNode, trailerIdentity?.movieId, trailerIdentity?.trailerId, src);
 
   const clearHideTimeout = () => {
     if (hideControlsTimeoutRef.current) {
@@ -243,6 +246,7 @@ const VideoPlayerControls = ({
     if (!video) return undefined;
 
     video.pause();
+    video.dispatchEvent(new Event('trailer-watch-before-seek'));
     video.currentTime = 0;
     setIsPlaying(false);
     setCurrentTime(0);
@@ -254,7 +258,10 @@ const VideoPlayerControls = ({
       attempts += 1;
       if (video.duration && !isNaN(video.duration)) {
         setDuration(video.duration);
-        if (video.playbackRate !== playbackSpeed) video.playbackRate = playbackSpeed;
+        if (video.playbackRate !== playbackSpeed) {
+          video.dispatchEvent(new Event('trailer-watch-before-rate'));
+          video.playbackRate = playbackSpeed;
+        }
         clearInterval(checkDuration);
       } else if (attempts >= maxAttempts) {
         clearInterval(checkDuration);
@@ -331,6 +338,7 @@ const VideoPlayerControls = ({
     if (videoRef.current) {
       const from = videoRef.current.currentTime;
       const to = Math.max(0, from - 10);
+      videoRef.current.dispatchEvent(new Event('trailer-watch-before-seek'));
       videoRef.current.currentTime = to;
       emitSeek(from, to);
     }
@@ -344,6 +352,7 @@ const VideoPlayerControls = ({
         videoRef.current.duration || 0,
         from + 10
       );
+      videoRef.current.dispatchEvent(new Event('trailer-watch-before-seek'));
       videoRef.current.currentTime = to;
       emitSeek(from, to);
     }
@@ -376,6 +385,7 @@ const VideoPlayerControls = ({
     setPlaybackSpeed(speed);
     if (videoRef.current) {
       try {
+        videoRef.current.dispatchEvent(new Event('trailer-watch-before-rate'));
         videoRef.current.playbackRate = speed;
       } catch (_) {
         /* ignore */
@@ -440,6 +450,7 @@ const VideoPlayerControls = ({
   const handleLoadedMetadata = () => {
     if (videoRef.current?.duration) {
       setDuration(videoRef.current.duration);
+      videoRef.current.dispatchEvent(new Event('trailer-watch-before-rate'));
       videoRef.current.playbackRate = playbackSpeed;
     }
   };
@@ -519,6 +530,7 @@ const VideoPlayerControls = ({
     const newTime = updateProgress(e.clientX, e.currentTarget);
     if (videoRef.current && newTime >= 0) {
       const from = videoRef.current.currentTime;
+      videoRef.current.dispatchEvent(new Event('trailer-watch-before-seek'));
       videoRef.current.currentTime = newTime;
       setCurrentTime(newTime);
       setPreviewTime(0);
@@ -558,6 +570,7 @@ const VideoPlayerControls = ({
       e.stopPropagation();
       if (videoRef.current && previewTime >= 0) {
         const from = videoRef.current.currentTime;
+        videoRef.current.dispatchEvent(new Event('trailer-watch-before-seek'));
         videoRef.current.currentTime = previewTime;
         setCurrentTime(previewTime);
         setPreviewTime(0);
@@ -584,6 +597,7 @@ const VideoPlayerControls = ({
     e.stopPropagation();
     if (isDragging && videoRef.current && previewTime >= 0) {
       const from = videoRef.current.currentTime;
+      videoRef.current.dispatchEvent(new Event('trailer-watch-before-seek'));
       videoRef.current.currentTime = previewTime;
       setCurrentTime(previewTime);
       setPreviewTime(0);
@@ -682,7 +696,10 @@ const VideoPlayerControls = ({
     } else {
       el.volume = volume;
       el.muted = isMuted;
-      if (!parentOwnsSpeedRef.current) el.playbackRate = playbackSpeed;
+      if (!parentOwnsSpeedRef.current) {
+        el.dispatchEvent(new Event('trailer-watch-before-rate'));
+        el.playbackRate = playbackSpeed;
+      }
     }
 
     const onPlay = () => {
@@ -720,11 +737,14 @@ const VideoPlayerControls = ({
   }, [onMediaSlot]);
 
   const setLocalVideo = useCallback((node) => {
+    if (!node && videoRef.current && !sharedMediaRef) {
+      videoRef.current.dispatchEvent(new Event('trailer-watch-before-replace'));
+    }
     videoRef.current = node;
     setMediaNode(node);
     if (typeof videoElementRef === 'function') videoElementRef(node);
     else if (videoElementRef) videoElementRef.current = node;
-  }, [videoElementRef]);
+  }, [videoElementRef, sharedMediaRef]);
 
   const controlsOpen = showControls && !controlsSuppressed;
 

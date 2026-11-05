@@ -14,6 +14,7 @@ import WeeklyTopMovies from '../components/WeeklyTopMovies/WeeklyTopMovies';
 import MonthlyTopMovies from '../components/MonthlyTopMovies/MonthlyTopMovies';
 import TrillerSection from '../components/Triller/TrillerSection';
 import ForYouMovies from '../components/ForYouMovies/ForYouMovies';
+import HomeTrailerSection from '../trailer-home-feed/HomeTrailerSection';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import { useHomeCategoryRecommendations } from '../hooks/useHomeCategoryRecommendations';
 import './Home.css';
@@ -53,6 +54,7 @@ const Home = () => {
       <Banner />
       <Categories />
       <ForYouMovies />
+      <HomeTrailerSection />
       {showHomeMovieSkeletons
         ? Array.from({ length: HOME_MOVIE_SKELETON_COUNT }, (_, index) => (
             <Movies

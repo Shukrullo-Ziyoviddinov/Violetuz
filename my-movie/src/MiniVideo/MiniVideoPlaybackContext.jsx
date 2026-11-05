@@ -1,3 +1,4 @@
+import { useTrailerWatch } from '../trailer-home-feed/watch/useTrailerWatch';
 import React, {
   createContext,
   useCallback,
@@ -109,6 +110,8 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
   const [suppressed, setSuppressed] = useState(false);
   const [detailKey, setDetailKey] = useState(null);
   const { note: noteTrillerWatch, flush: flushTrillerWatch } = useTrillerWatchPercent();
+  const trailerIds = session?.kind === MINI_VIDEO_KIND.TREYLER ? String(session.id).split('-') : [];
+  useTrailerWatch(mediaRef.current, trailerIds[0], trailerIds[1], session?.src);
   const noteTrillerRef = useRef(noteTrillerWatch);
   const flushTrillerRef = useRef(flushTrillerWatch);
   const activeTrillerIdRef = useRef(null);
@@ -163,6 +166,7 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     const video = mediaRef.current;
     const current = sessionRef.current;
     if (video) {
+      video.dispatchEvent(new Event('trailer-watch-before-replace'));
       if (current?.kind === MINI_VIDEO_KIND.TRILLER) {
         noteTrillerRef.current(current.id, video.currentTime, video.duration, { force: true });
       }
@@ -275,6 +279,7 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
     if (!video || !session) return;
     const sameVideo = video.dataset.miniVideoKind === session.kind
       && video.dataset.miniVideoId === String(session.id);
+    if (!sameVideo || !sameSource(video, session.src)) video.dispatchEvent(new Event('trailer-watch-before-replace'));
     if (!sameVideo) {
       video.muted = false;
       video.volume = 1;
@@ -405,6 +410,9 @@ export const MiniVideoPlaybackProvider = ({ children }) => {
       flushTrillerRef.current(previousTrillerId);
     }
     activeTrillerIdRef.current = nextTrillerId;
+    if (video.dataset.miniVideoId !== String(session.id) || !sameSource(video, session.src)) {
+      video.dispatchEvent(new Event('trailer-watch-before-replace'));
+    }
     video.dataset.miniVideoKind = session.kind;
     video.dataset.miniVideoId = String(session.id);
     if (sameSource(video, session.src)) return;

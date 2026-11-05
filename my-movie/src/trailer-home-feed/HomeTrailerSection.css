@@ -1,0 +1,6 @@
+.home-trailer-section { margin: 1.5rem 0; padding: 0 1rem; }
+.home-trailer-section h2 { color: #fff; font-size: 1.4rem; margin: 0 0 1rem; }
+.home-trailer-section-row { min-width: 0; }
+.home-trailer-placeholder { flex: 0 0 290px; height: 190px; border-radius: 8px; background: rgba(255,255,255,.08); }
+@media (max-width: 768px) { .home-trailer-placeholder { flex-basis: 220px; height: 160px; } }
+@media (prefers-reduced-motion: reduce) { .trailer-home-card-image { transition: none; } }

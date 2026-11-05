@@ -1,0 +1,35 @@
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import HomeTrailerSection from './HomeTrailerSection';
+import { fetchTrailerHomeFeed } from './feedApi';
+let mockAuth = { ready: false, logged: false };
+jest.mock('../store/hooks', () => ({ useAppSelector: (selector) => selector(mockAuth) }));
+jest.mock('../store/slices/userSlice', () => ({ selectAuthReady: (state) => state.ready, selectIsLoggedIn: (state) => state.logged }));
+jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key, options) => options.defaultValue }) }));
+jest.mock('./feedApi', () => ({ fetchTrailerHomeFeed: jest.fn() }));
+jest.mock('./TrailerHomeCard', () => ({ item }) => <a href={`/movie/${item.movieId}/trailer?trailerId=${item.id}`}>{item.title}</a>);
+jest.mock('../components/HorizontalScroll/HorizontalScroll', () => ({ children }) => <div>{children}</div>);
+beforeEach(() => { jest.clearAllMocks(); mockAuth = { ready: false, logged: false }; });
+test('waits for auth, then loads guest trailers and opens existing trailer route', async () => {
+  fetchTrailerHomeFeed.mockResolvedValue([{ key: '12-3', movieId: 12, id: 3, title: 'Trailer' }]);
+  const { rerender } = render(<HomeTrailerSection />);
+  expect(fetchTrailerHomeFeed).not.toHaveBeenCalled();
+  mockAuth = { ready: true, logged: false };
+  rerender(<HomeTrailerSection />);
+  const link = await screen.findByRole('link', { name: 'Trailer' });
+  expect(link.getAttribute('href')).toBe('/movie/12/trailer?trailerId=3');
+  expect(fetchTrailerHomeFeed.mock.calls[0][0].isLoggedIn).toBe(false);
+});
+test('auth switch aborts old request and removes guest cards; failed feed hides section', async () => {
+  fetchTrailerHomeFeed.mockResolvedValueOnce([{ key: '1-1', movieId: 1, id: 1, title: 'Guest trailer' }]);
+  mockAuth = { ready: true, logged: false };
+  const { rerender } = render(<HomeTrailerSection />);
+  await screen.findByText('Guest trailer');
+  fetchTrailerHomeFeed.mockRejectedValueOnce(new Error('offline'));
+  mockAuth = { ready: true, logged: true };
+  rerender(<HomeTrailerSection />);
+  expect(screen.queryByText('Guest trailer')).toBeNull();
+  expect(fetchTrailerHomeFeed.mock.calls[0][0].signal.aborted).toBe(true);
+  await waitFor(() => expect(screen.queryByRole('region')).toBeNull());
+  expect(fetchTrailerHomeFeed.mock.calls[1][0].isLoggedIn).toBe(true);
+});

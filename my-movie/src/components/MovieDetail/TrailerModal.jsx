@@ -667,9 +667,11 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
         >
             {(selectedTrailer || showLoading) && (
               <VideoPlayerControls
+                key={`${getTrailerKey(selectedTrailer)}:${trailerSession?.src || ''}`}
                 loading={showLoading && !mediaActive}
                 src={trailerSession?.src || ''}
                 resetKey={getTrailerKey(selectedTrailer)}
+                trailerIdentity={{ movieId: selectedTrailer?.movieId || movie?.id, trailerId: selectedTrailer?.id }}
                 className=""
                 videoClassName="trailer-modal-video"
                 objectFit="contain"

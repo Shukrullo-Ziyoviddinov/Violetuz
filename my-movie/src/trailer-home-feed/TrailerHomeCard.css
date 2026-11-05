@@ -1,0 +1,125 @@
+.trailer-home-card {
+  flex-shrink: 0;
+  width: 290px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.trailer-home-card-image-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 50%;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.trailer-home-card-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.trailer-home-card:hover .trailer-home-card-image {
+  transform: scale(1.05);
+}
+
+.trailer-home-card-title {
+  margin: 0.55rem 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailer-home-card-meta-row {
+  display: block;
+  margin: 0.2rem 0 0;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff8c;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.trailer-home-card-meta-row .trailer-home-card-view-count,
+.trailer-home-card-meta-row .view-count-text {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.trailer-home-card-meta-row .uploaded-at-time,
+.trailer-home-card-meta-row .trailer-home-card-uploaded-at {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+  flex-shrink: unset;
+  gap: 0;
+}
+
+.trailer-home-card-meta-row .uploaded-at-time-dot {
+  display: inline;
+  margin: 0 0.25rem;
+}
+
+.trailer-home-card-meta-row .uploaded-at-time-text {
+  display: inline;
+}
+
+.trailer-home-card--skeleton,
+.trailer-home-card--loading {
+  pointer-events: none;
+}
+
+.trailer-home-card-image--loading {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .trailer-home-card {
+    width: 220px;
+  }
+
+  .trailer-home-card-image-wrap {
+    padding-top: 53%;
+  }
+
+  .trailer-home-card-title {
+    font-size: 16px;
+    margin-top: 0.45rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .trailer-home-card-meta-row {
+    font-size: 13px;
+  }
+}
+
+.trailer-home-card { display: block; text-decoration: none; }
