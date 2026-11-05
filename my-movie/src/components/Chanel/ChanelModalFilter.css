@@ -1,0 +1,91 @@
+.chanel-filter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.chanel-filter-overlay.is-open {
+  opacity: 1;
+}
+
+.chanel-filter-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(480px, calc(100% - 32px));
+  min-height: 260px;
+  max-height: 85dvh;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #141414;
+  color: #fff;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+  outline: none;
+}
+
+.chanel-filter-header { flex: 0 0 auto; }
+.chanel-filter-grip { display: none; }
+.chanel-filter-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+.chanel-filter-heading h2 { margin: 0; font-size: 1rem; }
+.chanel-filter-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.chanel-filter-close:hover { background: rgba(255, 255, 255, 0.08); }
+.chanel-filter-body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 16px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (width < 768px) {
+  .chanel-filter-modal {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    min-height: 0;
+    max-height: none;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-radius: 18px 18px 0 0;
+    transition: top 280ms ease, border-radius 280ms ease;
+  }
+  .chanel-filter-modal.is-full { border-radius: 0; }
+  .chanel-filter-modal.is-dragging { transition: none; }
+  .chanel-filter-header { touch-action: none; cursor: grab; user-select: none; }
+  .is-dragging .chanel-filter-header { cursor: grabbing; }
+  .chanel-filter-grip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0 4px;
+  }
+  .chanel-filter-grip span {
+    width: 42px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.38);
+  }
+}

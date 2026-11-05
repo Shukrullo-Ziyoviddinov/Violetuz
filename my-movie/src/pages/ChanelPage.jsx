@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import { fetchAllChannels, fetchChannelById } from '../api/channelsApi';
 import { requestOpenChannelSearch } from '../channelSearchBridge';
 import ChanelBiografiyaModal from '../components/Chanel/ChanelBiografiyaModal';
+import ChanelModalFilter from '../components/Chanel/ChanelModalFilter';
 import ChanelProfileBanner from '../components/Chanel/ChanelProfileBanner';
 import ChanelTypeFilter from '../components/Chanel/ChanelTypeFilter';
 import ChanelContent from '../components/Chanel/ChanelContent';
@@ -40,6 +41,7 @@ const ChannelAvatar = ({ channel }) => (
 
 const ChannelActions = ({ channelId, mobile = false }) => {
   const { t } = useTranslation();
+  const [filterOpen, setFilterOpen] = useState(false);
 
   return (
     <div className={`channel-profile-subscribe${mobile ? ' channel-profile-actions-mobile' : ''}`}>
@@ -53,10 +55,14 @@ const ChannelActions = ({ channelId, mobile = false }) => {
           type="button"
           className="channel-profile-filter"
           aria-label={t('channel.filter', 'Filterlash')}
+          aria-haspopup="dialog"
+          aria-expanded={filterOpen}
+          onClick={() => setFilterOpen(true)}
         >
           <i className="fa-solid fa-sliders" aria-hidden="true" />
         </button>
       )}
+      {filterOpen && <ChanelModalFilter onClose={() => setFilterOpen(false)} />}
     </div>
   );
 };
