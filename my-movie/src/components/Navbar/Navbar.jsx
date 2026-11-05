@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LanguageModal from './LanguageModal';
+import ChannelMoreDropdown from './ChannelMoreDropdown';
 import SearchModalBody from '../SearchModalBody/SearchModalBody';
 import { requestOpenProfileInfoMenu } from '../../profileInfoMenuBridge';
 import { requestOpenMessagesModal } from '../../messagesModalBridge';
@@ -436,13 +437,7 @@ const Navbar = () => {
           </button>
 
           {isChannelProfile ? (
-            <button
-              type="button"
-              className="navbar-mobile-action-btn navbar-channel-more-btn"
-              aria-label={t('navbar.more', 'Yana')}
-            >
-              <i className="fa-solid fa-ellipsis-vertical" aria-hidden="true" />
-            </button>
+            <ChannelMoreDropdown key={location.pathname} />
           ) : null}
         </div>
 
