@@ -86,14 +86,26 @@ Catalog tests: `node trailer-home-feed/tests/catalog.test.js` (no database neede
 - `GET /api/trailer-home-feed`: authenticated account from the session cookie.
 - `POST /api/trailer-home-feed/guest`: bounded `sessions`, `actions`, `movieHistory`
   arrays; read-only request history, never imported into account collections.
-- Both return `{ success, data: { generatedAt, items } }`, up to 40 cards, with
+- Both return `{ success, data: { generatedAt, items, nextCursor } }`, up to 40 cards, with
   identity, localized titles and thumbnail only. No scores, taste or video URLs.
 - Responses are private/no-store; rate limit is 30 requests/minute/IP. Discovery
-  uses a fresh server-owned random seed per request. There is no pagination yet.
+  uses a fresh server-owned random seed for each new ordering. Append the opaque
+  `?cursor=` value to the same account/guest endpoint for continuation. Each page
+  uses the existing ranker with all previously shown keys excluded and the previous
+  nine items retained for diversity across the page boundary. Cached retries keep
+  the exact page order. Account cursors are scoped to their authenticated viewer;
+  guest cursors are unguessable bearer tokens for presentation-only results.
+  The process-local cursor cache holds at most 256 sessions for 30 minutes. Expiry,
+  eviction, a process restart or another server instance returns 410; the UI offers
+  a fresh ordering. Multiple instances need sticky routing or a shared cursor store.
 - Existing server JSON limit remains 256 KB. Frontend caps guest payload at
   200 KB, trimming oldest entries in the request without changing local stores.
-- `HomeTrailerSection` waits for auth resolution, aborts stale requests on auth
-  change/unmount, shows placeholders during loading and hides empty/failed rows.
+- `TrailerFeedProvider` waits for auth resolution and aborts stale requests on
+  viewer changes. Home splits one result into four rows of ten, spread across the
+  configured movie/content rows. Empty rows are hidden; no placeholders are invented.
+  `/recommended/trailers` reuses that same first page and appends ranked continuation
+  pages through its More button. Refresh/re-entry starts a new ordering. Existing
+  movie recommendation routes are unchanged.
   Cards use the independent TrailerHomeCard and link to the existing movie trailer route.
 
 See `progress/README.md` for the session protocol, collection and authenticated

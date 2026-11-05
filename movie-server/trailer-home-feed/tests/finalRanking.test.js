@@ -153,9 +153,9 @@ test('service excludes cooldowns BEFORE gathering pools, then ranks a cold-start
       return buildCandidatePools({ catalog: Array.from({ length: 50 }, (_, i) => item(i + 1, { uploadedAt: iso(1) })),
         sessionSeed: context.sessionSeed, nowMs: NOW, excludeKeys: context.excludeKeys });
     } });
-  const result = await service.rank({ sessionSeed: SEED, nowMs: NOW });
-  assert.deepEqual(excluded, ['1-1']);
-  assert.ok(result.items.every((row) => row.key !== '1-1'));
+  const result = await service.rank({ sessionSeed: SEED, nowMs: NOW, excludeKeys: ['2-1', '3-1'] });
+  assert.deepEqual(excluded, ['2-1', '3-1', '1-1']);
+  assert.ok(result.items.every((row) => !['1-1', '2-1', '3-1'].includes(row.key)));
   assert.equal(result.items.length, 40);
 });
 
@@ -166,6 +166,14 @@ test('empty inventory stays empty and invalid size/context is rejected before re
   await assert.rejects(service.rank({ sessionSeed: SEED, limit: 41 }));
   await assert.rejects(service.rank({ sessionSeed: 'bad' }));
   assert.equal(reads, 0);
+});
+
+test('continuation keeps the previous page channel boundary when alternatives exist', () => {
+  const candidates = [item(1, { channelId: 'same' }), item(2, { channelId: 'other' })];
+  const result = rank({ limit: 1, previousItems: [item(99, { channelId: 'same' })],
+    candidateSnapshot: { candidates, pools: { exploration: candidates.map((row, index) => ({ key: row.key, score: 1 - index * .1 })) } } });
+  assert.equal(result.items[0].key, '2-1');
+  assert.deepEqual(result.items[0].relaxedConstraints, []);
 });
 
 test('history reader scopes every query to the account and reads actual timestamps', async () => {

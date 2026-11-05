@@ -5,14 +5,14 @@ const { rankTrailerCandidates } = require('../rank/rankCandidates');
 const { trailerHomeFeedWeights } = require('../config/trailerHomeFeedWeights');
 
 const createFinalRankingService = ({ readProfile, readHistory, collectCandidates }) => ({
-  async rank({ sessionSeed, nowMs = Date.now(), limit } = {}) {
+  async rank({ sessionSeed, nowMs = Date.now(), limit, excludeKeys: previouslyShown = [], previousItems = [] } = {}) {
     validateCandidateContext({ sessionSeed, nowMs });
     if (limit !== undefined && (!Number.isSafeInteger(limit) || limit < 1 || limit > trailerHomeFeedWeights.feed.size)) throw new TypeError('Invalid trailer feed size');
     const [profile, history] = await Promise.all([readProfile({ nowMs }), readHistory({ nowMs })]);
     const repetitionState = buildRepetitionState({ ...history, nowMs });
-    const excludeKeys = [...new Set([...(profile?.excludedTrailerKeys || []), ...repetitionState.hardExcludedKeys])];
+    const excludeKeys = [...new Set([...previouslyShown, ...(profile?.excludedTrailerKeys || []), ...repetitionState.hardExcludedKeys])];
     const candidateSnapshot = await collectCandidates({ profile, excludeKeys, sessionSeed, nowMs });
-    return rankTrailerCandidates({ candidateSnapshot, profile, repetitionState, sessionSeed, nowMs, limit });
+    return rankTrailerCandidates({ candidateSnapshot, profile, repetitionState, sessionSeed, nowMs, limit, previousItems });
   },
 });
 

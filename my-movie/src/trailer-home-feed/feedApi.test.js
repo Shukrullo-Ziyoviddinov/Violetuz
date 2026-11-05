@@ -1,4 +1,4 @@
-import { fetchTrailerHomeFeed } from './feedApi';
+import { fetchTrailerHomeFeed, fetchTrailerFeedPage } from './feedApi';
 jest.mock('../api/apiBase', () => ({ resolveApiBaseUrl: () => '/api' }));
 jest.mock('./progress/guestTrailerProgress', () => ({ createGuestTrailerProgressStore: () => ({ history: () => [{ movieId: 1 }] }) }));
 jest.mock('./signals/guestTrailerSignals', () => ({ createGuestTrailerSignalStore: () => ({ history: () => [{ type: 'open' }] }) }));
@@ -26,4 +26,12 @@ test('unresolved auth and failed responses never silently switch to guest', asyn
   fetch.mockResolvedValueOnce({ ok: false, json: async () => ({ message: 'Unauthorized' }) });
   await expect(fetchTrailerHomeFeed({ isLoggedIn: true })).rejects.toThrow('Unauthorized');
   expect(fetch).toHaveBeenCalledTimes(1);
+});
+
+test('continuation sends an encoded cursor and retains server ranking order', async () => {
+  fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true,
+    data: { items: [{ key: '3-1' }, { key: '1-1' }], nextCursor: 'session:2' } }) });
+  expect(await fetchTrailerFeedPage({ isLoggedIn: true, cursor: 'session:1' })).toEqual({
+    items: [{ key: '3-1' }, { key: '1-1' }], nextCursor: 'session:2' });
+  expect(fetch.mock.calls[0][0]).toBe('/api/trailer-home-feed?cursor=session%3A1');
 });

@@ -1,12 +1,12 @@
 # Acceptance verification
 
-Checked 2026-11-05. Configuration weights were not changed.
+Checked 2026-11-06. Configuration weights were not changed.
 
 ## Automated checks
 
-- Server: 90 tests across catalog, progress, signals, trend, personal taste,
+- Server: 94 tests across catalog, progress, signals, trend, personal taste,
   candidates, final ranking and HTTP routes; all passed.
-- Frontend: 63 tests across played intervals, guest/account persistence, signals,
+- Frontend: 68 tests across played intervals, guest/account persistence, signals,
   feed transport and home rendering; all passed.
 - Playback tests cover 1x/1.5x/2x, speed changes, progress scrubbing, 10-second
   skips, pause/buffering, hidden tabs and replay without duplicate coverage.
@@ -46,3 +46,5 @@ and uncertainty; compare one config change at a time against a baseline. Keep
 exact-key deduplication, identity isolation and hard exclusions invariant.
 
 Guest ingestion tests exercise signed anonymous identity, playback tickets, elapsed-time checks, origin/account rejection, stable identity across sessions, retry deduplication, identity creation throttling and HTTP-to-trending flow with an in-memory progress model. Live MongoDB/browser end-to-end verification remains separate.
+
+Four-row Home verification: one shared request supplies four groups of ten in ranked order, with links to /recommended/trailers. Continuation tests cover 455 unique identities across pages, fixed per-session seeds, replayed/concurrent cursors, account scope, session expiration/eviction and diversity across page boundaries. Frontend tests cover Home-to-recommendations reuse, continuation deduplication, expired-session refresh and aborted requests on account changes. Browser/live MongoDB verification remains separate.

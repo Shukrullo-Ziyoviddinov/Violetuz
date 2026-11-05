@@ -23,7 +23,7 @@ const violations = (item, selected, config) => {
 
 /** Deterministic quota/constraint ranking, not a running additive interest counter. */
 const rankTrailerCandidates = ({ candidateSnapshot, profile = null, repetitionState = {}, sessionSeed,
-  nowMs = Date.now(), limit = trailerHomeFeedWeights.feed.size }) => {
+  nowMs = Date.now(), limit = trailerHomeFeedWeights.feed.size, previousItems = [] }) => {
   validateCandidateContext({ sessionSeed, nowMs });
   const config = trailerHomeFeedWeights;
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > config.feed.size) throw new TypeError('Invalid trailer feed size');
@@ -65,7 +65,7 @@ const rankTrailerCandidates = ({ candidateSnapshot, profile = null, repetitionSt
       const valid = {};
       for (const source of sourceTypes) {
         valid[source] = pools[source].find((row) => !picked.has(row.key)
-          && violations(canonical.get(row.key), selected, config.diversity).every((name) => relaxed.has(name)));
+          && violations(canonical.get(row.key), [...previousItems, ...selected], config.diversity).every((name) => relaxed.has(name)));
       }
       if (sourceTypes.some((source) => valid[source])) { choices = valid; break; }
       if (level < config.diversity.relaxationOrder.length) relaxed.add(config.diversity.relaxationOrder[level]);
@@ -81,7 +81,7 @@ const rankTrailerCandidates = ({ candidateSnapshot, profile = null, repetitionSt
     const source = available[0];
     const row = choices[source];
     const item = canonical.get(row.key);
-    const relaxedConstraints = violations(item, selected, config.diversity);
+    const relaxedConstraints = violations(item, [...previousItems, ...selected], config.diversity);
     relaxedConstraints.forEach((name) => { relaxations[name] += 1; });
     selected.push({ ...item, position: selected.length + 1, assignedSource: source,
       sourceScore: row.score, effectiveSourceScore: row.effectiveScore, relaxedConstraints });

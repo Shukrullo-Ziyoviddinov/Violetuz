@@ -3,7 +3,7 @@ import { createGuestTrailerProgressStore } from './progress/guestTrailerProgress
 import { createGuestTrailerSignalStore } from './signals/guestTrailerSignals';
 import { getWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHistory';
 
-export async function fetchTrailerHomeFeed({ isLoggedIn, signal }) {
+export async function fetchTrailerFeedPage({ isLoggedIn, signal, cursor }) {
   if (typeof isLoggedIn !== 'boolean') throw new TypeError('Resolved authentication state is required');
   const history = isLoggedIn ? undefined : {
     sessions: createGuestTrailerProgressStore().history().slice(0, 200),
@@ -19,11 +19,20 @@ export async function fetchTrailerHomeFeed({ isLoggedIn, signal }) {
       history[key].pop();
     }
   }
-  const response = await fetch(`${resolveApiBaseUrl()}/trailer-home-feed${isLoggedIn ? '' : '/guest'}`, {
+  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : '';
+  const response = await fetch(`${resolveApiBaseUrl()}/trailer-home-feed${isLoggedIn ? '' : '/guest'}${query}`, {
     method: isLoggedIn ? 'GET' : 'POST', credentials: 'include', signal,
     ...(history ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(history) } : {}),
   });
   const body = await response.json();
-  if (!response.ok || body?.success === false) throw new Error(body?.message || 'Trailer feed request failed');
-  return Array.isArray(body?.data?.items) ? body.data.items : [];
+  if (!response.ok || body?.success === false) {
+    const error = new Error(body?.message || 'Trailer feed request failed');
+    error.status = response.status;
+    throw error;
+  }
+  return { items: Array.isArray(body?.data?.items) ? body.data.items : [], nextCursor: body?.data?.nextCursor || null };
+}
+
+export async function fetchTrailerHomeFeed(options) {
+  return (await fetchTrailerFeedPage(options)).items;
 }
