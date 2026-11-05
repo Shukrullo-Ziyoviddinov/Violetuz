@@ -719,6 +719,23 @@ a.channel-page-card:hover {
   .channel-profile-actions-mobile .channel-profile-message {
     background-color: #0f0f0f;
   }
+
+  .channel-profile-actions-mobile .channel-profile-filter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: #0f0f0f;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    cursor: pointer;
+  }
 }
 
 @keyframes channel-view-out {

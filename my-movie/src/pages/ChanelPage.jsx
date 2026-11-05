@@ -48,6 +48,15 @@ const ChannelActions = ({ channelId, mobile = false }) => {
         <i className="fa-solid fa-message" aria-hidden="true" />
         {t('channel.message', 'Xabar')}
       </button>
+      {mobile && (
+        <button
+          type="button"
+          className="channel-profile-filter"
+          aria-label={t('channel.filter', 'Filterlash')}
+        >
+          <i className="fa-solid fa-sliders" aria-hidden="true" />
+        </button>
+      )}
     </div>
   );
 };
