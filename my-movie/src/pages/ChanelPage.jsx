@@ -38,6 +38,20 @@ const ChannelAvatar = ({ channel }) => (
   </div>
 );
 
+const ChannelActions = ({ channelId, mobile = false }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={`channel-profile-subscribe${mobile ? ' channel-profile-actions-mobile' : ''}`}>
+      <FollowingButton artistId={channelId} entityType="channel" />
+      <button type="button" className="channel-profile-message">
+        <i className="fa-solid fa-message" aria-hidden="true" />
+        {t('channel.message', 'Xabar')}
+      </button>
+    </div>
+  );
+};
+
 const ChannelNavbarIdentity = ({ channel, onOpen }) => {
   const { i18n } = useTranslation();
   const username = formatChannelUsername(channel.username);
@@ -227,13 +241,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
               </button>
             </p>
           ) : null}
-          <div className="channel-profile-subscribe">
-            <FollowingButton artistId={channel.id} entityType="channel" />
-            <button type="button" className="channel-profile-message">
-              <i className="fa-solid fa-message" aria-hidden="true" />
-              {t('channel.message', 'Xabar')}
-            </button>
-          </div>
+          <ChannelActions channelId={channel.id} />
         </div>
       </div>
       <ChanelTypeFilter
@@ -263,6 +271,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
         musicForYouIds={musicForYouIds}
         trendIds={trendIds}
       />
+      <ChannelActions channelId={channel.id} mobile />
     </article>
   );
 };
