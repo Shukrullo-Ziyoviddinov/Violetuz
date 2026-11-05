@@ -31,6 +31,7 @@ const plainTrailer = (raw) => {
   return {
     id: source.id == null ? null : source.id,
     trailers: source.trailers ?? null,
+    trillerimg: source.trillerimg || '',
     title: source.title ?? null,
     text: source.text ?? null,
     like: source.like ?? '',

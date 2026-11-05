@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import ViewCount from '../ViewCount/ViewCount';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../../utils/useImageReady';
 import './ChanelTrailerCard.css';
 
 const localized = (value, lang) => typeof value === 'string' ? value
@@ -10,31 +11,24 @@ const localized = (value, lang) => typeof value === 'string' ? value
 
 export default function ChanelTrailerCard({ item, layout = 'row' }) {
   const { contentLang } = useContentLanguage();
-  const source = localized(item.trailers, contentLang);
+  const source = item.trillerimg || '';
   const title = localized(item.title, contentLang) || localized(item.movieTitle, contentLang);
-  const [settledSource, setSettledSource] = useState('');
-  const loading = source && settledSource !== source;
+  const { showSkeleton: loading, imgRef, onLoad, onError, failed } = useImageReady(source);
 
   return (
     <Link className={`chanel-trailer-card chanel-trailer-card--${layout}`} to={`/movie/${encodeURIComponent(item.movieId)}/trailer?trailerId=${encodeURIComponent(item.id)}`}>
       <div className="chanel-trailer-card-preview">
         {loading && <SkeletonLoader variant="music-cards-image" className="chanel-trailer-card-skeleton" />}
-        <video
+        {!failed && source && <img
+          ref={imgRef}
           key={source}
           src={source}
-          muted
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
+          alt={title}
+          decoding="async"
           className={loading ? 'is-loading' : ''}
-          onLoadedMetadata={(event) => {
-            const video = event.currentTarget;
-            if (Number.isFinite(video.duration) && video.duration > 0) video.currentTime = Math.min(0.1, video.duration / 2);
-          }}
-          onLoadedData={() => setSettledSource(source)}
-          onSeeked={() => setSettledSource(source)}
-          onError={() => setSettledSource(source)}
-        />
+          onLoad={onLoad}
+          onError={onError}
+        />}
         <span className="chanel-trailer-card-play" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9z" /></svg>
         </span>

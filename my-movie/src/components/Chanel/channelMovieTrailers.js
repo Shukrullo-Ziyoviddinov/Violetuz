@@ -11,7 +11,7 @@ export const channelMovieTrailers = (movies, channelId) => {
       const key = `${movie.id}-${trailer.id}`;
       if (seen.has(key)) return [];
       seen.add(key);
-      return [{ ...trailer, movieId: movie.id, movieTitle: movie.title, key }];
+      return [{ ...trailer, trillerimg: trailer.trillerimg || movie.homeImg?.uz || movie.homeImg?.ru || '', movieId: movie.id, movieTitle: movie.title, key }];
     });
   });
 };

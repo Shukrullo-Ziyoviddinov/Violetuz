@@ -20,3 +20,13 @@ test('skips missing videos, duplicates and missing trailer ids; does not merge e
   expect(channelMovieTrailers(movies, '12').map((trailer) => trailer.key)).toEqual(['1-2', '2-2']);
   expect(channelMovieTrailers(movies, null)).toEqual([]);
 });
+
+test('uses trailer image and falls back to the movie image for existing records', () => {
+  const entries = channelMovieTrailers([
+    { id: 1, channelId: 'a', homeImg: { uz: '/movie.jpg' }, trailersVideo: [
+      { id: 1, trailers: '/one.mp4', trillerimg: '/trailer.jpg' },
+      { id: 2, trailers: '/two.mp4' },
+    ] },
+  ], 'a');
+  expect(entries.map((item) => item.trillerimg)).toEqual(['/trailer.jpg', '/movie.jpg']);
+});

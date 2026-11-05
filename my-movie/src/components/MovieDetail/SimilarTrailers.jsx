@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { useImageReady } from '../../utils/useImageReady';
 import { useTranslation } from 'react-i18next';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useSimilarTrailers } from '../../hooks/useSimilarTrailers';
@@ -12,65 +13,10 @@ import { formatMovieRating } from '../Rating/CalculateRating';
 import TrillerSideCardMoreModal from '../Triller/TrillerSideCardMoreModal';
 import './SimilarTrailers.css';
 
-const VIDEO_READY_TIMEOUT_MS = 20000;
-
 const hasMovieRating = (value) =>
   value != null && value !== '' && value !== 'none' && Number.isFinite(Number(value));
 
 const formatImdbLabel = (value) => (hasMovieRating(value) ? formatMovieRating(value) : null);
-
-/**
- * Preview kadrga seek. Tayyor bo‘lganda (seeked) onDone.
- * Ready ni seekdan oldin bermaymiz — aks holda qora/bo‘sh kadr chiqadi.
- */
-const seekPreviewFrame = (video, onDone) => {
-  if (!video) return () => {};
-  if (video.dataset.previewReady === '1') {
-    onDone?.();
-    return () => {};
-  }
-  if (video.dataset.previewSeeking === '1') return () => {};
-  video.dataset.previewSeeking = '1';
-
-  let settled = false;
-  let fallbackTimer = null;
-
-  const settle = () => {
-    if (settled) return;
-    settled = true;
-    video.dataset.previewReady = '1';
-    video.dataset.previewSeeking = '0';
-    if (fallbackTimer) window.clearTimeout(fallbackTimer);
-    onDone?.();
-  };
-
-  const onSeeked = () => {
-    video.removeEventListener('seeked', onSeeked);
-    settle();
-  };
-
-  try {
-    const duration = Number(video.duration);
-    const t = Number.isFinite(duration) && duration > 0
-      ? Math.min(1, Math.max(0.1, duration * 0.08))
-      : 0.1;
-
-    video.addEventListener('seeked', onSeeked);
-    video.currentTime = t;
-
-    fallbackTimer = window.setTimeout(() => {
-      video.removeEventListener('seeked', onSeeked);
-      settle();
-    }, 2000);
-  } catch {
-    settle();
-  }
-
-  return () => {
-    video.removeEventListener('seeked', onSeeked);
-    if (fallbackTimer) window.clearTimeout(fallbackTimer);
-  };
-};
 
 const SimilarTrailerItemSkeleton = () => (
   <div className="similar-trailer-item similar-trailer-item--skeleton" aria-hidden="true">
@@ -98,72 +44,12 @@ const SimilarTrailerItem = ({
   showMoreMenu = false,
 }) => {
   const { t } = useTranslation();
-  const videoRef = useRef(null);
   const moreBtnRef = useRef(null);
-  const seekCleanupRef = useRef(null);
-  const videoSrc =
-    trailer.trailers?.[contentLang] || trailer.trailers?.uz || trailer.trailers?.ru || '';
-  const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const imageSrc = trailer.trillerimg || '';
+  const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imageSrc);
   const [moreOpen, setMoreOpen] = useState(false);
   const [anchorRect, setAnchorRect] = useState(null);
 
-  useEffect(() => {
-    setReady(false);
-    setFailed(false);
-    seekCleanupRef.current?.();
-    seekCleanupRef.current = null;
-  }, [videoSrc]);
-
-  useEffect(
-    () => () => {
-      seekCleanupRef.current?.();
-    },
-    []
-  );
-
-  useEffect(() => {
-    if (!videoSrc || ready || failed) return undefined;
-
-    const timeoutId = window.setTimeout(() => {
-      const el = videoRef.current;
-      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
-        setReady(true);
-      } else {
-        setFailed(true);
-      }
-    }, VIDEO_READY_TIMEOUT_MS);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [videoSrc, ready, failed]);
-
-  const reveal = useCallback(() => {
-    setReady(true);
-    setFailed(false);
-  }, []);
-
-  const startPrime = useCallback(
-    (e) => {
-      const el = e?.currentTarget || videoRef.current;
-      if (!el || ready || failed) return;
-      if (el.dataset.previewSeeking === '1') return;
-      if (el.dataset.previewReady === '1') {
-        reveal();
-        return;
-      }
-      if (el.readyState < HTMLMediaElement.HAVE_METADATA) return;
-      seekCleanupRef.current?.();
-      seekCleanupRef.current = seekPreviewFrame(el, reveal);
-    },
-    [ready, failed, reveal]
-  );
-
-  const markFailed = useCallback(() => {
-    setFailed(true);
-    setReady(false);
-  }, []);
-
-  const showSkeleton = Boolean(videoSrc) && !ready && !failed;
   const imdbLabel = formatImdbLabel(trailer.ratingImdb);
   const trailerTitle =
     trailer.title?.[contentLang] || trailer.title?.uz || trailer.title?.ru || '';
@@ -218,21 +104,16 @@ const SimilarTrailerItem = ({
               className="similar-trailer-video-skeleton"
             />
           )}
-          {!failed && videoSrc && (
-            <video
-              ref={videoRef}
-              key={videoSrc}
-              src={videoSrc}
-              muted
-              playsInline
-              preload="auto"
-              className={`similar-trailer-video-element${
-                showSkeleton ? ' similar-trailer-video-element--loading' : ''
-              }`}
-              onLoadedMetadata={startPrime}
-              onLoadedData={startPrime}
-              onCanPlay={startPrime}
-              onError={markFailed}
+          {!failed && imageSrc && (
+            <img
+              ref={imgRef}
+              key={imageSrc}
+              src={imageSrc}
+              alt={trailerTitle}
+              decoding="async"
+              className={`similar-trailer-video-element${showSkeleton ? ' similar-trailer-video-element--loading' : ''}`}
+              onLoad={onLoad}
+              onError={onError}
             />
           )}
           {!showSkeleton && (

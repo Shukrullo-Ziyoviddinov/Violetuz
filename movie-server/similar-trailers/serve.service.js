@@ -23,6 +23,7 @@ const hasAccount = (userId) => userId != null && userId !== '';
 const toPublicTrailer = (trailer, movie) => ({
   id: trailer.id,
   trailers: trailer.trailers ?? null,
+  trillerimg: trailer.trillerimg || movie?.homeImg?.uz || movie?.homeImg?.ru || '',
   title: trailer.title ?? null,
   text: trailer.text ?? null,
   like: trailer.like ?? '',
@@ -59,6 +60,7 @@ const loadMovies = async () =>
       filterCountry: 1,
       actors: 1,
       trailersVideo: 1,
+      homeImg: 1,
     })
     .sort({ id: 1 })
     .lean();

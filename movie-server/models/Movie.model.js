@@ -20,6 +20,7 @@ const trailerItemSchema = new mongoose.Schema(
   {
     id: { type: Number, default: null },
     trailers: { type: localizedStringSchema, default: () => ({}) },
+    trillerimg: { type: String, trim: true, default: '' },
     title: { type: localizedStringSchema, default: () => ({}) },
     text: { type: trailerTextSchema, default: () => ({}) },
     like: { type: String, trim: true, default: '' },
