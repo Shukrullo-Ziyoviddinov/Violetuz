@@ -9,6 +9,7 @@ import ChanelModalFilter from '../components/Chanel/ChanelModalFilter';
 import ChanelProfileBanner from '../components/Chanel/ChanelProfileBanner';
 import ChanelTypeFilter from '../components/Chanel/ChanelTypeFilter';
 import ChanelContent from '../components/Chanel/ChanelContent';
+import ChannelMoreDropdown from '../components/Navbar/ChannelMoreDropdown';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import { useIsFollowing } from '../context/FollowingContext';
 import { useDominantColor } from '../hooks/useDominantColor';
@@ -235,13 +236,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
           >
             <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
           </button>
-          <button
-            type="button"
-            className="channel-profile-more-btn"
-            aria-label="Yana"
-          >
-            <i className="fa-solid fa-ellipsis-vertical" aria-hidden="true" />
-          </button>
+          <ChannelMoreDropdown channelId={channel.id} profile />
         </div>
       </div>
       <ChanelProfileBanner profileBanner={channel.profileBanner} />

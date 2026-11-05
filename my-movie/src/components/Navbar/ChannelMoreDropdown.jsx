@@ -1,15 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import ShareButton from '../ShareButton/ShareButton';
 import { fetchChannelById } from '../../api/channelsApi';
 import './ChannelMoreDropdown.css';
 
-export default function ChannelMoreDropdown({ channelId }) {
+export default function ChannelMoreDropdown({ channelId, profile = false }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
   const triggerRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const dropdownId = useId();
+  const [position, setPosition] = useState({});
+
+  useLayoutEffect(() => {
+    if (!open || !profile) return undefined;
+    const update = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (rect) setPosition({ position: 'fixed', top: rect.bottom + 10, right: Math.max(8, window.innerWidth - rect.right), zIndex: 1100 });
+    };
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    };
+  }, [open, profile]);
   const { data: channel, isError, refetch } = useQuery({
     queryKey: ['channel-share', channelId],
     queryFn: () => fetchChannelById(channelId),
@@ -21,7 +40,7 @@ export default function ChannelMoreDropdown({ channelId }) {
   useEffect(() => {
     if (!open) return undefined;
     const outside = (event) => {
-      if (!wrapperRef.current?.contains(event.target)) setOpen(false);
+      if (!wrapperRef.current?.contains(event.target) && !dropdownRef.current?.contains(event.target)) setOpen(false);
     };
     const onKey = (event) => {
       if (event.key === 'Escape') {
@@ -40,28 +59,12 @@ export default function ChannelMoreDropdown({ channelId }) {
     };
   }, [open]);
 
-  return (
-    <div
-      ref={wrapperRef}
-      className="navbar-channel-more"
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
-      }}
-    >
-      <button
-        ref={triggerRef}
-        type="button"
-        className="navbar-mobile-action-btn navbar-channel-more-btn"
-        aria-label={t('navbar.more', 'Yana')}
-        aria-expanded={open}
-        aria-controls="navbar-channel-more-dropdown"
-        onClick={() => setOpen((previous) => !previous)}
-      >
-        <i className="fa-solid fa-ellipsis-vertical" aria-hidden="true" />
-      </button>
+  const dropdown = (
       <div
-        id="navbar-channel-more-dropdown"
+        ref={dropdownRef}
+        id={dropdownId}
         className={`navbar-channel-more-dropdown${open ? ' is-open' : ''}`}
+        style={profile ? position : undefined}
         inert={!open}
       >
         {channel ? (
@@ -86,6 +89,28 @@ export default function ChannelMoreDropdown({ channelId }) {
           <span>{t('channel.delete', "O'chirish")}</span>
         </button>
       </div>
+  );
+
+  return (
+    <div
+      ref={wrapperRef}
+      className="navbar-channel-more"
+      onBlur={(event) => {
+        if (!wrapperRef.current?.contains(event.relatedTarget) && !dropdownRef.current?.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
+      <button
+        ref={triggerRef}
+        type="button"
+        className={profile ? 'channel-profile-more-btn' : 'navbar-mobile-action-btn navbar-channel-more-btn'}
+        aria-label={t('navbar.more', 'Yana')}
+        aria-expanded={open}
+        aria-controls={dropdownId}
+        onClick={() => setOpen((previous) => !previous)}
+      >
+        <i className="fa-solid fa-ellipsis-vertical" aria-hidden="true" />
+      </button>
+      {profile ? createPortal(dropdown, document.body) : dropdown}
     </div>
   );
 }
