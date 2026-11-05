@@ -39,7 +39,7 @@ const ChannelAvatar = ({ channel }) => (
   </div>
 );
 
-const ChannelActions = ({ channelId, mobile = false }) => {
+const ChannelActions = ({ channelId, mobile = false, filterValue, contentFilter, onApplyFilter }) => {
   const { t } = useTranslation();
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -62,7 +62,15 @@ const ChannelActions = ({ channelId, mobile = false }) => {
           <i className="fa-solid fa-sliders" aria-hidden="true" />
         </button>
       )}
-      {filterOpen && <ChanelModalFilter onClose={() => setFilterOpen(false)} />}
+      {filterOpen && (
+        <ChanelModalFilter
+          channelId={channelId}
+          value={filterValue}
+          initialType={contentFilter === 'movies' ? 'movie' : contentFilter}
+          onApply={onApplyFilter}
+          onClose={() => setFilterOpen(false)}
+        />
+      )}
     </div>
   );
 };
@@ -103,6 +111,7 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
   const [navSlot, setNavSlot] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [contentFilter, setContentFilter] = useState('all');
+  const [advancedFilter, setAdvancedFilter] = useState(null);
   const [genreId, setGenreId] = useState(null);
   const [trendIds, setTrendIds] = useState(null);
   const [musicForYouIds, setMusicForYouIds] = useState(null);
@@ -261,19 +270,25 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
       </div>
       <ChanelTypeFilter
         value={contentFilter}
-        onChange={setContentFilter}
+        onChange={(type) => {
+          setAdvancedFilter(null);
+          setContentFilter(type);
+        }}
         channelId={channel.id}
         genreId={genreId}
         onGenreChange={(id) => {
+          setAdvancedFilter(null);
           setTrendIds(null);
           setMusicForYouIds(null);
           setGenreId(id);
         }}
         onTrendChange={(ids) => {
+          setAdvancedFilter(null);
           setMusicForYouIds(null);
           setTrendIds(ids);
         }}
         onMusicForYouChange={(ids) => {
+          setAdvancedFilter(null);
           setGenreId(null);
           setTrendIds(null);
           setMusicForYouIds(ids);
@@ -281,12 +296,25 @@ const ChannelProfile = ({ channel, onOpenBio }) => {
       />
       <ChanelContent
         channelId={channel.id}
+        advancedFilter={advancedFilter}
         filter={contentFilter}
         genreId={genreId}
         musicForYouIds={musicForYouIds}
         trendIds={trendIds}
       />
-      <ChannelActions channelId={channel.id} mobile />
+      <ChannelActions
+        channelId={channel.id}
+        mobile
+        filterValue={advancedFilter}
+        contentFilter={contentFilter}
+        onApplyFilter={(selection) => {
+          setGenreId(null);
+          setTrendIds(null);
+          setMusicForYouIds(null);
+          setContentFilter(selection.type === 'movie' ? 'movies' : selection.type);
+          setAdvancedFilter(selection);
+        }}
+      />
     </article>
   );
 };

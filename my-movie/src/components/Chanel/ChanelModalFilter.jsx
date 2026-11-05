@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import './ChanelModalFilter.css';
+import ChanelFilterControls from './ChanelFilterControls';
 
 const MOTION_MS = 280;
 
-const ChanelModalFilter = ({ onClose, children }) => {
+const ChanelModalFilter = ({ onClose, channelId, value, initialType, onApply }) => {
   const { t } = useTranslation();
   const panelRef = useRef(null);
   const dragRef = useRef(null);
@@ -151,7 +152,17 @@ const ChanelModalFilter = ({ onClose, children }) => {
             </button>
           </div>
         </header>
-        <div className="chanel-filter-body">{children}</div>
+        <div className="chanel-filter-body">
+          <ChanelFilterControls
+            channelId={channelId}
+            value={value}
+            initialType={initialType}
+            onApply={(selection) => {
+              onApply(selection);
+              requestClose();
+            }}
+          />
+        </div>
       </section>
     </div>,
     document.body

@@ -22,7 +22,7 @@
   max-height: 85dvh;
   overflow: hidden;
   border-radius: 18px;
-  background: #141414;
+  background: #121212;
   color: #fff;
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
   outline: none;
@@ -54,8 +54,9 @@
 .chanel-filter-body {
   flex: 1;
   min-height: 0;
-  padding: 0 16px 16px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   overscroll-behavior: contain;
 }
 

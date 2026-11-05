@@ -22,6 +22,7 @@ const CHANNEL_TYPES = [
   { id: 'music', fallback: 'Musiqa' },
   { id: 'klip', fallback: 'Klip' },
   { id: 'album', fallback: 'Albom' },
+  { id: 'konsert', fallback: 'Konsertlar' },
   { id: 'videos', fallback: 'Videolar' },
   { id: 'shorts', fallback: 'Shortslar' },
   { id: 'playlists', fallback: 'Playlistlar' },

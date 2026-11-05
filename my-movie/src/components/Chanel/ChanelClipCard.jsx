@@ -7,13 +7,13 @@ import { useImageReady } from '../../utils/useImageReady';
 import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './ChanelClipCard.css';
 
-const ChanelClipCard = ({ item, layout = 'row' }) => {
+const ChanelClipCard = ({ item, layout = 'row', contentType = 'klip' }) => {
   const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { getArtistById } = useMusicApi();
   const imgSrc = item?.img || '';
   const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
-  const saved = isInWishlist(item?.id, 'klip');
+  const saved = isInWishlist(item?.id, contentType);
   const title = typeof item?.title === 'string' ? item.title : '';
   const artist = formatArtistNames(item?.artistId, getArtistById);
 
@@ -57,7 +57,7 @@ const ChanelClipCard = ({ item, layout = 'row' }) => {
               aria-label="Sevimlilarga qo'shish"
               onClick={(event) => {
                 event.stopPropagation();
-                toggleWishlist(item.id, 'klip');
+                toggleWishlist(item.id, contentType);
               }}
             >
               <svg

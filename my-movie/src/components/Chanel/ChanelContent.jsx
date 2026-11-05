@@ -14,6 +14,8 @@ import { useTrillerList } from '../../hooks/useTrillerList';
 import { sortByUploadedAtDesc } from './sortByUploadedAt';
 import { movieMatchesGenre } from './channelGenre';
 import './ChanelContent.css';
+import useChannelFilterCatalogs from './useChannelFilterCatalogs';
+import { filterChannelItems } from './channelFilterLogic';
 
 const sameChannel = (item, channelId) => String(item?.channelId || '') === String(channelId || '');
 
@@ -27,13 +29,19 @@ const ChannelSection = ({ title, cards }) => {
   );
 };
 
-const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null, musicForYouIds = null }) => {
+const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null, musicForYouIds = null, advancedFilter = null }) => {
   const { t } = useTranslation();
   const { allMovies, allShortsVideos, allGenres } = useMoviesApi();
   const { allMusic, allClips, allAlbums } = useMusicApi();
   const { data: allTrillers = [] } = useTrillerList();
+  const catalogs = useChannelFilterCatalogs(channelId);
 
   const items = useMemo(() => {
+    if (advancedFilter) {
+      return sortByUploadedAtDesc(filterChannelItems(catalogs, advancedFilter)).map((item) => ({
+        kind: advancedFilter.type, key: `${advancedFilter.type}-${item.id}`, item,
+      }));
+    }
     const toMovie = (movie) => ({ kind: 'movie', key: `movie-${movie.id}`, item: movie });
     const toShort = (short) => ({ kind: 'short', key: `short-${short.id}`, item: short });
     const toKind = (kind) => (item) => ({ kind, key: `${kind}-${item.id}`, item });
@@ -63,6 +71,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     if (filter === 'music') return sortByUploadedAtDesc(music).map(toKind('music'));
     if (filter === 'klip') return sortByUploadedAtDesc(clips).map(toKind('klip'));
     if (filter === 'album') return sortByUploadedAtDesc(albums).map(toKind('album'));
+    if (filter === 'konsert') return sortByUploadedAtDesc(catalogs.konsert).map(toKind('konsert'));
     if (filter === 'videos') return sortByUploadedAtDesc(trailers).map(toKind('parda'));
     if (filter === 'shorts') return sortByUploadedAtDesc(shorts).map(toShort);
     if (filter === 'playlists') return [];
@@ -71,13 +80,14 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
       ...movies.map(toMovie),
       ...sortByUploadedAtDesc(music).map(toKind('music')),
       ...sortByUploadedAtDesc(albums).map(toKind('album')),
+      ...sortByUploadedAtDesc(catalogs.konsert).map(toKind('konsert')),
       ...sortByUploadedAtDesc(trailers).map(toKind('parda')),
       ...sortByUploadedAtDesc(clips).map(toKind('klip')),
       ...shorts.map(toShort),
     ];
-  }, [allMovies, allMusic, allClips, allAlbums, allTrillers, allShortsVideos, allGenres, channelId, filter, genreId, trendIds, musicForYouIds]);
+  }, [allMovies, allMusic, allClips, allAlbums, allTrillers, allShortsVideos, allGenres, channelId, filter, genreId, trendIds, musicForYouIds, advancedFilter, catalogs]);
 
-  if (!items.length) return null;
+  if (!items.length) return advancedFilter ? <p className="channel-page-message">{t('channel.noFilterResults', 'Mos ma’lumot topilmadi')}</p> : null;
 
   const layout = filter === 'all' ? 'row' : 'grid';
   const renderCard = (entry, cardLayout) => {
@@ -95,8 +105,8 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
         />
       );
     }
-    if (entry.kind === 'klip') {
-      return <ChanelClipCard key={entry.key} item={entry.item} layout={cardLayout === 'row' ? 'row' : 'grid'} />;
+    if (entry.kind === 'klip' || entry.kind === 'konsert') {
+      return <ChanelClipCard key={entry.key} item={entry.item} contentType={entry.kind} layout={cardLayout === 'row' ? 'row' : 'grid'} />;
     }
     if (entry.kind === 'parda') {
       return <ChanelPardaCard key={entry.key} item={entry.item} layout={cardLayout === 'row' ? 'row' : 'grid'} />;
@@ -110,6 +120,12 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
       />
     );
   };
+
+  if (advancedFilter) {
+    const gridClass = advancedFilter.type === 'music' || advancedFilter.type === 'album'
+      ? 'chanel-music-grid' : advancedFilter.type === 'movie' ? 'chanel-content-grid' : 'chanel-clip-grid';
+    return <div className={gridClass}>{items.map((entry) => renderCard(entry, 'grid'))}</div>;
+  }
 
   if (Array.isArray(musicForYouIds) && musicForYouIds.length) {
     return <div className="chanel-music-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
@@ -126,6 +142,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     const pardaCards = items.filter((entry) => entry.kind === 'parda').map((entry) => renderCard(entry, 'row'));
     const clipCards = items.filter((entry) => entry.kind === 'klip').map((entry) => renderCard(entry, 'row'));
     const shortCards = items.filter((entry) => entry.kind === 'short').map((entry) => renderCard(entry, 'row'));
+    const concertCards = items.filter((entry) => entry.kind === 'konsert').map((entry) => renderCard(entry, 'row'));
     return (
       <>
         <ChannelSection title={t('channel.movies', 'Kinolar')} cards={movieCards} />
@@ -134,6 +151,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
         <ChanelWeeklyTopMusic channelId={channelId} />
         <ChanelWeeklyTopMovies channelId={channelId} />
         <ChannelSection title={t('channel.albums', 'Albomlar')} cards={albumCards} />
+        <ChannelSection title={t('channel.concerts', 'Konsertlar')} cards={concertCards} />
         <ChannelSection title={t('channel.videos', 'Videolar')} cards={pardaCards} />
         <ChannelSection title={t('channel.shorts', 'Shortslar')} cards={shortCards} />
       </>
@@ -151,7 +169,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     );
   }
 
-  if (filter === 'klip' || filter === 'videos') {
+  if (filter === 'klip' || filter === 'konsert' || filter === 'videos') {
     return <div className="chanel-clip-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
   }
 

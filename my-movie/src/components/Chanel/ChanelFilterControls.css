@@ -1,0 +1,156 @@
+.chanel-filter-controls {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chanel-filter-fields {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.85rem 1rem 1rem;
+  scroll-behavior: smooth;
+}
+
+.chanel-filter-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.chanel-filter-tabs button {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.85rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.chanel-filter-tabs button.active {
+  background: rgba(30, 3, 210, 0.3);
+}
+
+.chanel-filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  animation: chanelFilterPanelIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes chanelFilterPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chanel-filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.chanel-filter-section-title {
+  margin: 0;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.chanel-filter-panel .filters-modal-reyting-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0;
+}
+
+.chanel-filter-panel .filters-modal-reyting-type-btn {
+  flex: 1;
+  min-width: 60px;
+  padding: 0.3rem;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chanel-filter-panel .filters-modal-reyting-type-btn--active {
+  background: #1e03d24d;
+  border-color: #1f16cc99;
+}
+
+.chanel-filter-panel .filters-modal-reyting-type-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.chanel-filter-panel .filters-modal-reyting-type-img--netflix {
+  width: 45px;
+  height: 45px;
+}
+
+.chanel-filter-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #121212;
+  box-sizing: border-box;
+}
+
+.chanel-filter-modal-clear {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid #fff;
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.9rem 1rem;
+  box-sizing: border-box;
+}
+
+.chanel-filter-modal-clear:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chanel-filter-modal-apply {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #b87ff7, #9b4fe7);
+}
+
+.chanel-filter-modal-apply:hover {
+  filter: brightness(1.06);
+}
+

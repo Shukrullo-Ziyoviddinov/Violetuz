@@ -79,6 +79,7 @@ const MODAL_SELECTOR = [
   '.profile-edit-overlay',
   '.add-account-modal',
   '.add-account-overlay',
+  '.chanel-filter-modal',
 ].join(', ');
 
 const getMaxDrop = () =>
