@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import ShareButton from '../ShareButton/ShareButton';
 import { fetchChannelById } from '../../api/channelsApi';
-import { resolveApiBaseUrl } from '../../api/apiBase';
 import './ChannelMoreDropdown.css';
 
 export default function ChannelMoreDropdown({ channelId }) {
@@ -70,7 +69,7 @@ export default function ChannelMoreDropdown({ channelId }) {
             <ShareButton
               movie={{ id: channel.id, title: channel.name, img: channel.avatar }}
               sharePath={`/channel/${encodeURIComponent(channel.id)}`}
-              absoluteUrl={`${resolveApiBaseUrl()}/channels/${encodeURIComponent(channel.id)}/share`}
+              absoluteUrl={`https://www.violetplay.uz/channel/${encodeURIComponent(channel.id)}`}
               label={t('channel.share', 'Ulashish')}
               buttonClassName="navbar-channel-more-item"
               dropdownInPortal
