@@ -1,5 +1,6 @@
 const channelService = require('../services/channel.service');
 const { sendSuccess } = require('../utils/response');
+const { buildChannelSharePage } = require('../utils/channelSharePage');
 
 const getChannels = async (_req, res) => {
   const items = await channelService.getAll();
@@ -20,8 +21,15 @@ const checkUsername = async (req, res) => {
   sendSuccess(res, { data: result });
 };
 
+const getChannelShare = async (req, res) => {
+  const channel = await channelService.getById(req.params.id);
+  const baseUrl = process.env.PUBLIC_SITE_URL || 'https://www.violetplay.uz';
+  res.status(200).type('html').send(buildChannelSharePage(channel, baseUrl));
+};
+
 module.exports = {
   getChannels,
   getChannelById,
   checkUsername,
+  getChannelShare,
 };

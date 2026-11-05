@@ -54,6 +54,25 @@
   }
 
   .navbar-channel-more-item i { width: 18px; text-align: center; }
+  .navbar-channel-share,
+  .navbar-channel-share .share-button-wrapper { width: 100%; }
+  .navbar-channel-share .share-button-wrapper { position: static; }
+  .navbar-channel-share .share-button.navbar-channel-more-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.65rem 0.75rem;
+    gap: 0.75rem;
+    border-radius: 10px;
+    justify-content: flex-start;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+    transform: none;
+  }
+  .navbar-channel-share .share-button svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .navbar-channel-share .share-button .share-button-label { font: inherit; }
   .navbar-channel-more-item--delete { color: #ff6b6b; }
   .navbar-channel-more-item:hover,
   .navbar-channel-more-item:focus-visible { background: rgba(255, 255, 255, 0.08); }

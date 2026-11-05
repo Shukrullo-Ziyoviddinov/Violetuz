@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useMatch } from 'react-router-dom';
 import LanguageModal from './LanguageModal';
 import ChannelMoreDropdown from './ChannelMoreDropdown';
 import SearchModalBody from '../SearchModalBody/SearchModalBody';
@@ -24,6 +24,7 @@ const Navbar = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const channelMatch = useMatch('/channel/:id');
   const { isLoggedIn, profile } = useAuth();
   const isMusicPage = location.pathname === '/music';
   const isFeedPage = location.pathname === '/feed';
@@ -437,7 +438,7 @@ const Navbar = () => {
           </button>
 
           {isChannelProfile ? (
-            <ChannelMoreDropdown key={location.pathname} />
+            <ChannelMoreDropdown key={location.pathname} channelId={channelMatch?.params.id} />
           ) : null}
         </div>
 

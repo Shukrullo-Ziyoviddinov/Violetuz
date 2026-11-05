@@ -1,12 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import ShareButton from '../ShareButton/ShareButton';
+import { fetchChannelById } from '../../api/channelsApi';
+import { resolveApiBaseUrl } from '../../api/apiBase';
 import './ChannelMoreDropdown.css';
 
-export default function ChannelMoreDropdown() {
+export default function ChannelMoreDropdown({ channelId }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
   const triggerRef = useRef(null);
+  const { data: channel, isError, refetch } = useQuery({
+    queryKey: ['channel-share', channelId],
+    queryFn: () => fetchChannelById(channelId),
+    enabled: Boolean(open && channelId),
+    staleTime: 60_000,
+    retry: 1,
+  });
 
   useEffect(() => {
     if (!open) return undefined;
@@ -54,10 +65,23 @@ export default function ChannelMoreDropdown() {
         className={`navbar-channel-more-dropdown${open ? ' is-open' : ''}`}
         inert={!open}
       >
-        <button type="button" className="navbar-channel-more-item">
-          <i className="fa-solid fa-share-nodes" aria-hidden="true" />
-          <span>{t('channel.share', 'Ulashish')}</span>
-        </button>
+        {channel ? (
+          <div className="navbar-channel-share" onClickCapture={() => setOpen(false)}>
+            <ShareButton
+              movie={{ id: channel.id, title: channel.name, img: channel.avatar }}
+              sharePath={`/channel/${encodeURIComponent(channel.id)}`}
+              absoluteUrl={`${resolveApiBaseUrl()}/channels/${encodeURIComponent(channel.id)}/share`}
+              label={t('channel.share', 'Ulashish')}
+              buttonClassName="navbar-channel-more-item"
+              dropdownInPortal
+            />
+          </div>
+        ) : (
+          <button type="button" className="navbar-channel-more-item" disabled={!isError} onClick={() => refetch()}>
+            <i className="fa-solid fa-share-nodes" aria-hidden="true" />
+            <span>{isError ? t('channel.shareRetry', 'Qayta urinish') : t('channel.share', 'Ulashish')}</span>
+          </button>
+        )}
         <button type="button" className="navbar-channel-more-item navbar-channel-more-item--delete">
           <i className="fa-solid fa-trash-can" aria-hidden="true" />
           <span>{t('channel.delete', "O'chirish")}</span>
