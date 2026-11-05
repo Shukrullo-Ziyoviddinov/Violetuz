@@ -1,8 +1,12 @@
-.home-trailer-section { margin: 1.5rem 0; padding: 0 1rem; }
+.home-trailer-section { margin: 1.5rem 0; padding: 0 2rem; }
+.home-trailer-section-container { max-width: 1400px; margin: 0 auto; }
 .home-trailer-section h2 { color: #fff; font-size: 1.4rem; margin: 0 0 1rem; }
 .home-trailer-section-row { min-width: 0; }
 .home-trailer-section-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .home-trailer-section-header h2 { margin: 0; }
 .home-trailer-placeholder { flex: 0 0 290px; height: 190px; border-radius: 8px; background: rgba(255,255,255,.08); }
-@media (max-width: 768px) { .home-trailer-placeholder { flex-basis: 220px; height: 160px; } }
+@media (max-width: 768px) {
+  .home-trailer-section { padding: 0 0.7rem; }
+  .home-trailer-placeholder { flex-basis: 220px; height: 160px; }
+}
 @media (prefers-reduced-motion: reduce) { .trailer-home-card-image { transition: none; } }
