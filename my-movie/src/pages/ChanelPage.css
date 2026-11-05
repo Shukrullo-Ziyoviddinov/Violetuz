@@ -700,8 +700,7 @@ a.channel-page-card:hover {
     margin: 0;
     padding: 0.75rem 0.7rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
-    background: #0f0f0f;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
   }
 
   .channel-profile-subscribe.channel-profile-actions-mobile .following-btn,
@@ -714,6 +713,11 @@ a.channel-page-card:hover {
     min-height: 44px;
     padding: 0.65rem 0.75rem;
     font-size: 0.85rem;
+  }
+
+  .channel-profile-actions-mobile .following-btn--active,
+  .channel-profile-actions-mobile .channel-profile-message {
+    background-color: #0f0f0f;
   }
 }
 
