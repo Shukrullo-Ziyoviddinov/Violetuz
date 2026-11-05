@@ -19,6 +19,7 @@ const MOBILE_SEARCH_MAX = 768;
 const CHANNEL_TYPES = [
   { id: 'all', fallback: 'Hammasi' },
   { id: 'movies', fallback: 'Kinolar' },
+  { id: 'trailers', fallback: 'Treylerlar' },
   { id: 'music', fallback: 'Musiqa' },
   { id: 'klip', fallback: 'Klip' },
   { id: 'album', fallback: 'Albom' },

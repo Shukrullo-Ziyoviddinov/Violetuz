@@ -6,6 +6,8 @@ import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import ChanelContentCard from './ChanelContentCard';
 import ChanelMusicCard from './ChanelMusicCard';
 import ChanelClipCard from './ChanelClipCard';
+import ChanelTrailerCard from './ChanelTrailerCard';
+import { channelMovieTrailers } from './channelMovieTrailers';
 import ChanelPardaCard from './ChanelPardaCard';
 import ChanelShortCard from './ChanelShortCard';
 import ChanelWeeklyTopMovies from './ChanelWeeklyTopMovies';
@@ -46,6 +48,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     const toShort = (short) => ({ kind: 'short', key: `short-${short.id}`, item: short });
     const toKind = (kind) => (item) => ({ kind, key: `${kind}-${item.id}`, item });
     const movies = (allMovies || []).filter((movie) => sameChannel(movie, channelId));
+    const movieTrailers = channelMovieTrailers(movies, channelId);
     const music = (allMusic || []).filter((track) => sameChannel(track, channelId));
     const clips = (allClips || []).filter((clip) => sameChannel(clip, channelId));
     const albums = (allAlbums || []).filter((album) => sameChannel(album, channelId));
@@ -68,6 +71,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     }
 
     if (filter === 'movies') return sortByUploadedAtDesc(movies).map(toMovie);
+    if (filter === 'trailers') return movieTrailers.map((item) => ({ kind: 'trailer', key: `trailer-${item.key}`, item }));
     if (filter === 'music') return sortByUploadedAtDesc(music).map(toKind('music'));
     if (filter === 'klip') return sortByUploadedAtDesc(clips).map(toKind('klip'));
     if (filter === 'album') return sortByUploadedAtDesc(albums).map(toKind('album'));
@@ -78,6 +82,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     if (filter === 'posts') return [];
     return [
       ...movies.map(toMovie),
+      ...movieTrailers.map((item) => ({ kind: 'trailer', key: `trailer-${item.key}`, item })),
       ...sortByUploadedAtDesc(music).map(toKind('music')),
       ...sortByUploadedAtDesc(albums).map(toKind('album')),
       ...sortByUploadedAtDesc(catalogs.konsert).map(toKind('konsert')),
@@ -91,6 +96,9 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
 
   const layout = filter === 'all' ? 'row' : 'grid';
   const renderCard = (entry, cardLayout) => {
+    if (entry.kind === 'trailer') {
+      return <ChanelTrailerCard key={entry.key} item={entry.item} layout={cardLayout} />;
+    }
     if (entry.kind === 'short') {
       return <ChanelShortCard key={entry.key} item={entry.item} layout={cardLayout} />;
     }
@@ -137,6 +145,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
 
   if (filter === 'all') {
     const movieCards = items.filter((entry) => entry.kind === 'movie').map((entry) => renderCard(entry, 'row'));
+    const trailerCards = items.filter((entry) => entry.kind === 'trailer').map((entry) => renderCard(entry, 'row'));
     const musicCards = items.filter((entry) => entry.kind === 'music').map((entry) => renderCard(entry, 'row'));
     const albumCards = items.filter((entry) => entry.kind === 'album').map((entry) => renderCard(entry, 'row'));
     const pardaCards = items.filter((entry) => entry.kind === 'parda').map((entry) => renderCard(entry, 'row'));
@@ -146,6 +155,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     return (
       <>
         <ChannelSection title={t('channel.movies', 'Kinolar')} cards={movieCards} />
+        <ChannelSection title={t('channel.trailers', 'Treylerlar')} cards={trailerCards} />
         <ChannelSection title={t('channel.clips', 'Kliplar')} cards={clipCards} />
         <ChannelSection title={t('channel.music', 'Musiqalar')} cards={musicCards} />
         <ChanelWeeklyTopMusic channelId={channelId} />
@@ -169,7 +179,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     );
   }
 
-  if (filter === 'klip' || filter === 'konsert' || filter === 'videos') {
+  if (filter === 'klip' || filter === 'konsert' || filter === 'videos' || filter === 'trailers') {
     return <div className="chanel-clip-grid">{items.map((entry) => renderCard(entry, 'grid'))}</div>;
   }
 

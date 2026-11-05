@@ -50,7 +50,7 @@ const getTrailerMovieRatings = (sourceMovie) => {
   }, []);
 };
 
-const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoading = false }) => {
+const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoading = false, initialTrailerId = null }) => {
   const isPage = variant === 'page';
   const overlayClass = isPage ? 'trailer-page-overlay' : 'trailer-modal-overlay';
   const { t } = useTranslation();
@@ -119,10 +119,13 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     const active = session?.kind === MINI_VIDEO_KIND.TREYLER && session.route === route
       ? trailers.find((trailer) => `${trailer.movieId || movie.id}-${trailer.id}` === String(session.id))
       : null;
-    setSelectedTrailer(active || trailers[0] || null);
+    const requested = initialTrailerId != null
+      ? trailers.find((trailer) => String(trailer.id) === String(initialTrailerId))
+      : null;
+    setSelectedTrailer(requested || active || trailers[0] || null);
     // faqat film almashganda aktiv treylerni yoki birinchisini tanlash
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [movie?.id]);
+  }, [movie?.id, initialTrailerId]);
 
   useEffect(() => {
     if (externalLoading || !movie) {

@@ -1,0 +1,64 @@
+.chanel-trailer-card {
+  display: block;
+  min-width: 0;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.chanel-trailer-card:hover { transform: scale(1.02); }
+.chanel-trailer-card--row { flex-shrink: 0; width: 240px; }
+.chanel-trailer-card--grid { width: 100%; }
+.chanel-trailer-card-preview {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.chanel-trailer-card-preview video,
+.chanel-trailer-card-skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.chanel-trailer-card-preview video.is-loading { opacity: 0; }
+.chanel-trailer-card-play {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(155, 79, 231, 0.9);
+}
+.chanel-trailer-card-play svg { width: 20px; height: 20px; }
+.chanel-trailer-card-info { padding: 0.45rem 0.1rem 0; }
+.chanel-trailer-card-info h3 {
+  margin: 0 0 0.25rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.chanel-trailer-card-meta .view-count-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+@media (max-width: 500px) {
+  .chanel-trailer-card--row { width: 220px; }
+  .chanel-trailer-card--grid .chanel-trailer-card-preview { padding-top: 58%; }
+  .chanel-trailer-card-info h3 { font-size: 1rem; }
+  .chanel-trailer-card-play { width: 28px; height: 28px; }
+}
+@media (max-width: 390px) {
+  .chanel-trailer-card--row { width: 200px; }
+}

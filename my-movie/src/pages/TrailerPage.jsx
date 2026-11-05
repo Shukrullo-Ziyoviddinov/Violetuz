@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../context/MoviesApiContext';
 import TrailerModal from '../components/MovieDetail/TrailerModal';
@@ -10,6 +10,7 @@ import './TrailerPage.css';
 const TrailerPage = () => {
   useMiniVideoDetailPage();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { allMovies, moviesLoading } = useMoviesApi();
@@ -45,6 +46,7 @@ const TrailerPage = () => {
     <div className="trailer-page">
       <TrailerModal
         movie={movie}
+        initialTrailerId={searchParams.get('trailerId')}
         onClose={handleClose}
         variant="page"
         loading={pageLoading}
