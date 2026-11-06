@@ -11,7 +11,8 @@ jest.mock('../store/slices/userSlice', () => ({ selectAuthReady: (state) => stat
   selectIsLoggedIn: (state) => state.logged, selectProfile: (state) => ({ id: state.id }) }));
 jest.mock('./feedApi', () => ({ fetchTrailerFeedPage: jest.fn() }));
 jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key, options) => options.defaultValue }) }));
-jest.mock('./TrailerHomeCard', () => ({ item }) => <article>{item.key}</article>);
+jest.mock('./TrailerHomeCard', () => ({ __esModule: true, default: ({ item }) => <article>{item.key}</article>,
+  TrailerHomeCardSkeleton: () => <div aria-hidden="true" /> }));
 const Probe = () => {
   const feed = useTrailerFeed();
   return <><output>{feed.items.map((item) => item.key).join(',')}</output>

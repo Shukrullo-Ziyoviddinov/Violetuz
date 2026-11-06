@@ -11,7 +11,9 @@ jest.mock('react-router-dom', () => ({ useLocation: () => ({ pathname: '/' }) })
 jest.mock('../components/ShowMoreButton/ShowMoreButton', () => ({ to }) => <button data-to={to}>Barchasi</button>);
 jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key, options) => options.defaultValue }) }));
 jest.mock('./feedApi', () => ({ fetchTrailerFeedPage: jest.fn() }));
-jest.mock('./TrailerHomeCard', () => ({ item }) => <a href={`/movie/${item.movieId}/trailer?trailerId=${item.id}`}>{item.title}</a>);
+jest.mock('./TrailerHomeCard', () => ({ __esModule: true,
+  default: ({ item }) => <a href={`/movie/${item.movieId}/trailer?trailerId=${item.id}`}>{item.title}</a>,
+  TrailerHomeCardSkeleton: () => <div aria-hidden="true" /> }));
 jest.mock('../components/HorizontalScroll/HorizontalScroll', () => ({ children }) => <div>{children}</div>);
 beforeEach(() => { jest.clearAllMocks(); mockAuth = { ready: false, logged: false }; });
 test('waits for auth, then loads guest trailers and opens existing trailer route', async () => {

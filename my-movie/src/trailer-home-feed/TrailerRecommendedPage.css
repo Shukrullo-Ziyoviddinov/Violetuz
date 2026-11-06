@@ -2,7 +2,6 @@
 .trailer-recommended-page h1 { font-size: 1.6rem; margin: 0 0 1rem; }
 .trailer-recommended-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem .8rem; }
 .trailer-recommended-grid .trailer-home-card { width: 100%; min-width: 0; }
-.trailer-recommended-grid .home-trailer-placeholder { width: 100%; }
 .trailer-recommended-page > button { display: block; margin: 1.5rem auto 0; padding: .7rem 1.4rem; border: 0; border-radius: 8px; color: #fff; background: #9b4fe7; cursor: pointer; }
 .trailer-recommended-page > button:disabled { opacity: .6; cursor: wait; }
 @media (max-width: 580px) { .trailer-recommended-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

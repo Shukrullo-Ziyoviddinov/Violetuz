@@ -6,7 +6,7 @@ Checked 2026-11-06. Configuration weights were not changed.
 
 - Server: 94 tests across catalog, progress, signals, trend, personal taste,
   candidates, final ranking and HTTP routes; all passed.
-- Frontend: 68 tests across played intervals, guest/account persistence, signals,
+- Frontend: 70 tests across played intervals, guest/account persistence, signals,
   feed transport and home rendering; all passed.
 - Playback tests cover 1x/1.5x/2x, speed changes, progress scrubbing, 10-second
   skips, pause/buffering, hidden tabs and replay without duplicate coverage.

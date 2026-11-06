@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTrailerFeed } from './TrailerFeedContext';
 import ShowMoreButton from '../components/ShowMoreButton/ShowMoreButton';
-import TrailerHomeCard from './TrailerHomeCard';
+import TrailerHomeCard, { TrailerHomeCardSkeleton } from './TrailerHomeCard';
 import HorizontalScroll from '../components/HorizontalScroll/HorizontalScroll';
 import './HomeTrailerSection.css';
 
@@ -28,7 +28,7 @@ export default function HomeTrailerSection({ blockIndex = 0 }) {
     <div className="home-trailer-section-row" aria-busy={!ready}>
       <HorizontalScroll>
       {ready ? cards.map((item) => <TrailerHomeCard key={item.key} item={item} />)
-        : Array.from({ length: 5 }, (_, index) => <div key={index} className="home-trailer-placeholder" />)}
+        : Array.from({ length: 10 }, (_, index) => <TrailerHomeCardSkeleton key={index} />)}
       </HorizontalScroll>
     </div>
     </div>

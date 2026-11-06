@@ -101,6 +101,19 @@
   opacity: 0;
 }
 
+.trailer-home-card-title .skeleton-loader--triller-card-title {
+  margin: 0;
+  height: 1.3em;
+}
+
+.trailer-home-card-meta-row .view-count-text--loading {
+  display: block;
+}
+
+.trailer-home-card-meta-row .skeleton-loader--view-count-text {
+  height: 1.2em;
+}
+
 @media (max-width: 768px) {
   .trailer-home-card {
     width: 220px;
