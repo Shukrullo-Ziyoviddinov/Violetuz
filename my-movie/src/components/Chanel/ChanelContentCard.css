@@ -1,0 +1,13 @@
+.chanel-content-card .chanel-movie-title-skeleton {
+  width: 72%;
+  height: 1.3em;
+  min-height: 0;
+  border-radius: 4px;
+}
+
+.chanel-content-card .chanel-movie-meta-skeleton {
+  width: 48%;
+  height: 1.3em;
+  min-height: 0;
+  border-radius: 4px;
+}

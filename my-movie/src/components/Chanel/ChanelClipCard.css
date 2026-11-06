@@ -136,6 +136,20 @@
   font-size: 0.8rem;
 }
 
+.chanel-clip-card-title-skeleton {
+  width: 75%;
+  height: 1.3em;
+  min-height: 0;
+  border-radius: 4px;
+}
+
+.chanel-clip-card-artist-skeleton {
+  width: 55%;
+  height: 1.2em;
+  min-height: 0;
+  border-radius: 4px;
+}
+
 @media (max-width: 500px) {
   .chanel-clip-card--row {
     width: 220px;

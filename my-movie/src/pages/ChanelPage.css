@@ -679,7 +679,7 @@ a.channel-page-card:hover {
   }
 }
 
-@media (width < 768px) {
+@media (max-width: 767px) {
   .App-main:has(.channel-page .channel-profile) {
     padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
@@ -710,13 +710,13 @@ a.channel-page-card:hover {
     justify-content: center;
     flex: 1 1 0;
     min-width: 0;
-    min-height: 44px;
+    min-height: 35px;
     padding: 0.65rem 0.75rem;
     font-size: 0.85rem;
   }
 
   .channel-profile-subscribe.channel-profile-actions-mobile .following-btn {
-    flex-grow: 1.2;
+    flex-grow: 1.9;
   }
 
   .channel-profile-actions-mobile .following-btn--active,
@@ -728,15 +728,15 @@ a.channel-page-card:hover {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 44px;
-    width: 44px;
-    height: 44px;
+    flex: 0 0 35px;
+    width: 35px;
+    height: 35px;
     padding: 0;
     box-sizing: border-box;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid #ffffff4d;
     border-radius: 50%;
     background: #0f0f0f;
-    color: rgba(255, 255, 255, 0.9);
+    color: #ffffffe6;
     font-size: 1rem;
     cursor: pointer;
   }

@@ -7,10 +7,27 @@ import { useImageReady } from '../../utils/useImageReady';
 import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './ChanelClipCard.css';
 
+const ClipTitleSkeleton = () => <SkeletonLoader variant="block" className="chanel-clip-card-title chanel-clip-card-title-skeleton" />;
+const ClipArtistSkeleton = () => <SkeletonLoader variant="block" className="chanel-clip-card-artist chanel-clip-card-artist-skeleton" />;
+
+export const ChanelClipCardSkeleton = ({ layout = 'row' }) => (
+  <div className={`chanel-clip-card chanel-clip-card--${layout} chanel-clip-card--loading`} aria-hidden="true">
+    <div className="chanel-clip-card-image-wrap">
+      <SkeletonLoader variant="music-cards-image" className="chanel-clip-card-image-skeleton" />
+      <span className="chanel-clip-card-wish chanel-clip-card-wish--skeleton" />
+      <span className="chanel-clip-card-play chanel-clip-card-play--skeleton" />
+    </div>
+    <div className="chanel-clip-card-info">
+      <ClipTitleSkeleton />
+      <ClipArtistSkeleton />
+    </div>
+  </div>
+);
+
 const ChanelClipCard = ({ item, layout = 'row', contentType = 'klip' }) => {
   const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getArtistById } = useMusicApi();
+  const { getArtistById, artistsLoading } = useMusicApi();
   const imgSrc = item?.img || '';
   const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
   const saved = isInWishlist(item?.id, contentType);
@@ -81,12 +98,11 @@ const ChanelClipCard = ({ item, layout = 'row', contentType = 'klip' }) => {
           </>
         )}
       </div>
-      {showSkeleton ? null : (
-        <div className="chanel-clip-card-info">
-          <h3 className="chanel-clip-card-title">{title}</h3>
-          {artist ? <p className="chanel-clip-card-artist">{artist}</p> : null}
-        </div>
-      )}
+      <div className="chanel-clip-card-info">
+        {showSkeleton ? <ClipTitleSkeleton /> : <h3 className="chanel-clip-card-title">{title}</h3>}
+        {showSkeleton || (artistsLoading && item?.artistId)
+          ? <ClipArtistSkeleton /> : artist ? <p className="chanel-clip-card-artist">{artist}</p> : null}
+      </div>
     </article>
   );
 };

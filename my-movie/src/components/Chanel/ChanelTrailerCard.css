@@ -40,7 +40,8 @@
 }
 .chanel-trailer-card-play svg { width: 20px; height: 20px; }
 .chanel-trailer-card-info { padding: 0.45rem 0.1rem 0; }
-.chanel-trailer-card-info h3 {
+.chanel-trailer-card-info h3,
+.chanel-trailer-card-info .chanel-trailer-card-title {
   margin: 0 0 0.25rem;
   overflow: hidden;
   white-space: nowrap;
@@ -53,10 +54,14 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.8rem;
 }
+.chanel-trailer-card-title-skeleton { width: 75%; height: 1.3em; min-height: 0; border-radius: 4px; }
+.chanel-trailer-card-meta .view-count-text--loading { display: block; }
+.chanel-trailer-card-meta .skeleton-loader--view-count-text { height: 1.2em; min-height: 0; }
 @media (max-width: 500px) {
   .chanel-trailer-card--row { width: 220px; }
   .chanel-trailer-card--grid .chanel-trailer-card-preview { padding-top: 58%; }
-  .chanel-trailer-card-info h3 { font-size: 1rem; }
+  .chanel-trailer-card-info h3,
+  .chanel-trailer-card-info .chanel-trailer-card-title { font-size: 1rem; }
   .chanel-trailer-card-play { width: 28px; height: 28px; }
 }
 @media (max-width: 390px) {

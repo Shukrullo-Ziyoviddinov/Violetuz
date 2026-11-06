@@ -12,23 +12,10 @@ import ChanelSearchTavsiya from './ChanelSearchTavsiya';
 import ChanelSearchForYou from './ChanelSearchForYou';
 import ChanelSearchMovieResults from './ChanelSearchMovieResults';
 import SearchShortsCard from '../SearchShorts/SearchShortsCard';
+import { CHANNEL_TYPES } from './channelTypes';
 import './ChanelTypeFilter.css';
 
 const MOBILE_SEARCH_MAX = 768;
-
-const CHANNEL_TYPES = [
-  { id: 'all', fallback: 'Hammasi' },
-  { id: 'movies', fallback: 'Kinolar' },
-  { id: 'trailers', fallback: 'Treylerlar' },
-  { id: 'music', fallback: 'Musiqa' },
-  { id: 'klip', fallback: 'Klip' },
-  { id: 'album', fallback: 'Albom' },
-  { id: 'konsert', fallback: 'Konsertlar' },
-  { id: 'videos', fallback: 'Videolar' },
-  { id: 'shorts', fallback: 'Shortslar' },
-  { id: 'playlists', fallback: 'Playlistlar' },
-  { id: 'posts', fallback: 'Postlar' },
-];
 
 const resultTitle = (item, lang) => {
   const title = item?.title;

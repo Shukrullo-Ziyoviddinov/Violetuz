@@ -144,6 +144,20 @@
   font-size: 0.8rem;
 }
 
+.chanel-music-card-title-skeleton {
+  width: 85%;
+  height: 1.3em;
+  min-height: 0;
+  border-radius: 4px;
+}
+
+.chanel-music-card-artist-skeleton {
+  width: 65%;
+  height: 1.2em;
+  min-height: 0;
+  border-radius: 4px;
+}
+
 @media (min-width: 768px) {
   .chanel-music-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

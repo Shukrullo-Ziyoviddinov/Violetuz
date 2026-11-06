@@ -7,6 +7,25 @@ import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import '../Movies/Movies.css';
+import './ChanelContentCard.css';
+
+const ChanelMovieTextSkeleton = () => <>
+  <div className="movies-item-title" aria-hidden="true">
+    <SkeletonLoader variant="block" className="chanel-movie-title-skeleton" />
+  </div>
+  <div className="movies-item-meta" aria-hidden="true">
+    <SkeletonLoader variant="block" className="chanel-movie-meta-skeleton" />
+  </div>
+</>;
+
+export const ChanelMovieCardSkeleton = ({ layout = 'grid' }) => (
+  <div className={`movies-item chanel-content-card movies-item--skeleton${layout === 'row' ? ' movies-item-horizontal' : ''}`} aria-hidden="true">
+    <div className="movies-item-image-wrapper">
+      <SkeletonLoader variant="movie-image" className="movies-item-image-skeleton loader-skeleton" />
+    </div>
+    <ChanelMovieTextSkeleton />
+  </div>
+);
 
 const movieTitle = (movie, contentLang) => {
   if (movie?.title && typeof movie.title === 'object') {
@@ -93,7 +112,7 @@ const ChanelContentCard = ({ kind, item, layout = 'grid', rank = null, forceSkel
 
   return (
     <article
-      className={`movies-item${horizontal ? ' movies-item-horizontal' : ''}${
+      className={`movies-item chanel-content-card${horizontal ? ' movies-item-horizontal' : ''}${
         showSkeleton ? ' movies-item--loading' : ''
       }`}
       onClick={open}
@@ -148,8 +167,10 @@ const ChanelContentCard = ({ kind, item, layout = 'grid', rank = null, forceSkel
           </>
         )}
       </div>
-      <h3 className="movies-item-title">{title}</h3>
-      {metaText ? <p className="movies-item-meta">{metaText}</p> : null}
+      {showSkeleton ? <ChanelMovieTextSkeleton /> : <>
+        <h3 className="movies-item-title">{title}</h3>
+        {metaText ? <p className="movies-item-meta">{metaText}</p> : null}
+      </>}
     </article>
   );
 };

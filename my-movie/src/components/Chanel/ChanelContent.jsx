@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useMusicApi } from '../../context/MusicApiContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
-import ChanelContentCard from './ChanelContentCard';
-import ChanelMusicCard from './ChanelMusicCard';
-import ChanelClipCard from './ChanelClipCard';
-import ChanelTrailerCard from './ChanelTrailerCard';
+import ChanelContentCard, { ChanelMovieCardSkeleton } from './ChanelContentCard';
+import ChanelMusicCard, { ChanelMusicCardSkeleton } from './ChanelMusicCard';
+import ChanelClipCard, { ChanelClipCardSkeleton } from './ChanelClipCard';
+import ChanelTrailerCard, { ChanelTrailerCardSkeleton } from './ChanelTrailerCard';
 import { channelMovieTrailers } from './channelMovieTrailers';
 import ChanelPardaCard from './ChanelPardaCard';
 import ChanelShortCard from './ChanelShortCard';
@@ -33,8 +33,8 @@ const ChannelSection = ({ title, cards }) => {
 
 const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null, musicForYouIds = null, advancedFilter = null }) => {
   const { t } = useTranslation();
-  const { allMovies, allShortsVideos, allGenres } = useMoviesApi();
-  const { allMusic, allClips, allAlbums } = useMusicApi();
+  const { allMovies, allShortsVideos, allGenres, moviesLoading } = useMoviesApi();
+  const { allMusic, allClips, allAlbums, musicLoading, albumsLoading, clipsLoading, concertsLoading } = useMusicApi();
   const { data: allTrillers = [] } = useTrillerList();
   const catalogs = useChannelFilterCatalogs(channelId);
 
@@ -92,7 +92,45 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     ];
   }, [allMovies, allMusic, allClips, allAlbums, allTrillers, allShortsVideos, allGenres, channelId, filter, genreId, trendIds, musicForYouIds, advancedFilter, catalogs]);
 
-  if (!items.length) return advancedFilter ? <p className="channel-page-message">{t('channel.noFilterResults', 'Mos ma’lumot topilmadi')}</p> : null;
+  const movieScope = advancedFilter ? advancedFilter.type === 'movie'
+    : !(Array.isArray(musicForYouIds) && musicForYouIds.length)
+      && (filter === 'all' || filter === 'movies' || Boolean(genreId) || (Array.isArray(trendIds) && trendIds.length > 0));
+  const moviesPending = Boolean(moviesLoading && movieScope && !items.some((entry) => entry.kind === 'movie'));
+  const trailerScope = !advancedFilter && !genreId && !(Array.isArray(trendIds) && trendIds.length)
+    && !(Array.isArray(musicForYouIds) && musicForYouIds.length) && (filter === 'all' || filter === 'trailers');
+  const trailersPending = Boolean(moviesLoading && trailerScope && !items.some((entry) => entry.kind === 'trailer'));
+  const mediaScope = !genreId && !(Array.isArray(trendIds) && trendIds.length)
+    && !(Array.isArray(musicForYouIds) && musicForYouIds.length);
+  const clipsPending = Boolean(clipsLoading && !items.some((entry) => entry.kind === 'klip')
+    && (advancedFilter ? advancedFilter.type === 'klip' : mediaScope && (filter === 'all' || filter === 'klip')));
+  const concertsPending = Boolean(concertsLoading && !items.some((entry) => entry.kind === 'konsert')
+    && (advancedFilter ? advancedFilter.type === 'konsert' : mediaScope && (filter === 'all' || filter === 'konsert')));
+  const musicPending = Boolean(musicLoading && !items.some((entry) => entry.kind === 'music')
+    && (advancedFilter ? advancedFilter.type === 'music'
+      : (mediaScope && (filter === 'all' || filter === 'music')) || (Array.isArray(musicForYouIds) && musicForYouIds.length > 0)));
+  const albumsPending = Boolean(albumsLoading && !items.some((entry) => entry.kind === 'album')
+    && (advancedFilter ? advancedFilter.type === 'album' : mediaScope && (filter === 'all' || filter === 'album')));
+  if ((musicPending || albumsPending) && (advancedFilter || filter !== 'all' || (Array.isArray(musicForYouIds) && musicForYouIds.length))) {
+    return <div className="chanel-music-grid" aria-busy="true">
+      {Array.from({ length: 6 }, (_, index) => <ChanelMusicCardSkeleton key={index} layout="grid" />)}
+    </div>;
+  }
+  if ((clipsPending || concertsPending) && (advancedFilter || filter !== 'all')) {
+    return <div className="chanel-clip-grid" aria-busy="true">
+      {Array.from({ length: 6 }, (_, index) => <ChanelClipCardSkeleton key={index} layout="grid" />)}
+    </div>;
+  }
+  if (trailersPending && filter === 'trailers') {
+    return <div className="chanel-clip-grid" aria-busy="true">
+      {Array.from({ length: 6 }, (_, index) => <ChanelTrailerCardSkeleton key={index} layout="grid" />)}
+    </div>;
+  }
+  if (moviesPending && (advancedFilter || filter !== 'all' || genreId || (Array.isArray(trendIds) && trendIds.length))) {
+    return <div className="chanel-content-grid" aria-busy="true">
+      {Array.from({ length: 6 }, (_, index) => <ChanelMovieCardSkeleton key={index} />)}
+    </div>;
+  }
+  if (!items.length && !moviesPending && !trailersPending && !clipsPending && !concertsPending && !musicPending && !albumsPending) return advancedFilter ? <p className="channel-page-message">{t('channel.noFilterResults', 'Mos ma’lumot topilmadi')}</p> : null;
 
   const layout = filter === 'all' ? 'row' : 'grid';
   const renderCard = (entry, cardLayout) => {
@@ -144,14 +182,26 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
   }
 
   if (filter === 'all') {
-    const movieCards = items.filter((entry) => entry.kind === 'movie').map((entry) => renderCard(entry, 'row'));
-    const trailerCards = items.filter((entry) => entry.kind === 'trailer').map((entry) => renderCard(entry, 'row'));
-    const musicCards = items.filter((entry) => entry.kind === 'music').map((entry) => renderCard(entry, 'row'));
-    const albumCards = items.filter((entry) => entry.kind === 'album').map((entry) => renderCard(entry, 'row'));
+    const movieCards = moviesPending
+      ? Array.from({ length: 6 }, (_, index) => <ChanelMovieCardSkeleton key={`movie-loading-${index}`} layout="row" />)
+      : items.filter((entry) => entry.kind === 'movie').map((entry) => renderCard(entry, 'row'));
+    const trailerCards = trailersPending
+      ? Array.from({ length: 6 }, (_, index) => <ChanelTrailerCardSkeleton key={`trailer-loading-${index}`} />)
+      : items.filter((entry) => entry.kind === 'trailer').map((entry) => renderCard(entry, 'row'));
+    const musicCards = musicPending
+      ? Array.from({ length: 6 }, (_, index) => <ChanelMusicCardSkeleton key={`music-loading-${index}`} />)
+      : items.filter((entry) => entry.kind === 'music').map((entry) => renderCard(entry, 'row'));
+    const albumCards = albumsPending
+      ? Array.from({ length: 6 }, (_, index) => <ChanelMusicCardSkeleton key={`album-loading-${index}`} />)
+      : items.filter((entry) => entry.kind === 'album').map((entry) => renderCard(entry, 'row'));
     const pardaCards = items.filter((entry) => entry.kind === 'parda').map((entry) => renderCard(entry, 'row'));
-    const clipCards = items.filter((entry) => entry.kind === 'klip').map((entry) => renderCard(entry, 'row'));
+    const clipCards = clipsPending
+      ? Array.from({ length: 6 }, (_, index) => <ChanelClipCardSkeleton key={`clip-loading-${index}`} />)
+      : items.filter((entry) => entry.kind === 'klip').map((entry) => renderCard(entry, 'row'));
     const shortCards = items.filter((entry) => entry.kind === 'short').map((entry) => renderCard(entry, 'row'));
-    const concertCards = items.filter((entry) => entry.kind === 'konsert').map((entry) => renderCard(entry, 'row'));
+    const concertCards = concertsPending
+      ? Array.from({ length: 6 }, (_, index) => <ChanelClipCardSkeleton key={`concert-loading-${index}`} />)
+      : items.filter((entry) => entry.kind === 'konsert').map((entry) => renderCard(entry, 'row'));
     return (
       <>
         <ChannelSection title={t('channel.movies', 'Kinolar')} cards={movieCards} />

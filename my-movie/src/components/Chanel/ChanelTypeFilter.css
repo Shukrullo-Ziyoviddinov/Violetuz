@@ -172,6 +172,30 @@
   color: #fff;
 }
 
+.chanel-type-filter-chip--skeleton {
+  position: relative;
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+
+.chanel-type-filter-skeleton-label { visibility: hidden; }
+
+.chanel-type-filter-chip--skeleton > .skeleton-loader {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: inherit;
+}
+
+.chanel-type-search--skeleton > .skeleton-loader {
+  height: 27px;
+  border-radius: 999px;
+}
+
 body.channel-mobile-search-open .navbar.navbar--channel-profile .navbar-channel-identity,
 body.channel-mobile-search-open .navbar.navbar--channel-profile .navbar-mobile-actions {
   display: none;

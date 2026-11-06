@@ -6,8 +6,9 @@ import { fetchAllChannels, fetchChannelById } from '../api/channelsApi';
 import { requestOpenChannelSearch } from '../channelSearchBridge';
 import ChanelBiografiyaModal from '../components/Chanel/ChanelBiografiyaModal';
 import ChanelModalFilter from '../components/Chanel/ChanelModalFilter';
-import ChanelProfileBanner from '../components/Chanel/ChanelProfileBanner';
+import ChanelProfileBanner, { ChanelProfileBannerSkeleton } from '../components/Chanel/ChanelProfileBanner';
 import ChanelTypeFilter from '../components/Chanel/ChanelTypeFilter';
+import ChanelTypeFilterSkeleton from '../components/Chanel/ChanelTypeFilterSkeleton';
 import ChanelContent from '../components/Chanel/ChanelContent';
 import ChannelMoreDropdown from '../components/Navbar/ChannelMoreDropdown';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
@@ -364,7 +365,11 @@ const ChanelPage = () => {
 
   return (
     <div className="channel-page">
-      {status === 'loading' && <ChannelCardSkeleton />}
+      {status === 'loading' && (id ? <article className="channel-profile" aria-busy="true">
+        <ChanelProfileBannerSkeleton />
+        <ChannelCardSkeleton />
+        <ChanelTypeFilterSkeleton />
+      </article> : <ChannelCardSkeleton />)}
       {status === 'error' && <p className="channel-page-message">Kanallar yuklanmadi</p>}
       {status === 'missing' && <p className="channel-page-message">Kanal topilmadi</p>}
       {status === 'ready' && channels.length === 0 && (

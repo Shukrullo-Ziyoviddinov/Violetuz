@@ -7,10 +7,27 @@ import { useImageReady } from '../../utils/useImageReady';
 import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import './ChanelMusicCard.css';
 
+const MusicTitleSkeleton = () => <SkeletonLoader variant="block" className="chanel-music-card-title chanel-music-card-title-skeleton" />;
+const MusicArtistSkeleton = () => <SkeletonLoader variant="block" className="chanel-music-card-artist chanel-music-card-artist-skeleton" />;
+
+export const ChanelMusicCardSkeleton = ({ layout = 'row' }) => (
+  <div className={`chanel-music-card chanel-music-card--${layout} chanel-music-card--loading`} aria-hidden="true">
+    <div className="chanel-music-card-image-wrap">
+      <SkeletonLoader variant="music-cards-image" className="chanel-music-card-image-skeleton" />
+      <span className="chanel-music-card-wish chanel-music-card-wish--skeleton" />
+      <span className="chanel-music-card-play chanel-music-card-play--skeleton" />
+      <div className="chanel-music-card-info">
+        <MusicTitleSkeleton />
+        <MusicArtistSkeleton />
+      </div>
+    </div>
+  </div>
+);
+
 const ChanelMusicCard = ({ item, layout = 'row', wishlistType = 'music', to }) => {
   const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { getArtistById } = useMusicApi();
+  const { getArtistById, artistsLoading } = useMusicApi();
   const imgSrc = item?.img || '';
   const { showSkeleton, imgRef, onLoad, onError, failed } = useImageReady(imgSrc);
   const saved = isInWishlist(item?.id, wishlistType);
@@ -78,12 +95,13 @@ const ChanelMusicCard = ({ item, layout = 'row', wishlistType = 'music', to }) =
                 <polygon points="5 3 19 12 5 21" />
               </svg>
             </span>
-            <div className="chanel-music-card-info">
-              <h3 className="chanel-music-card-title">{title}</h3>
-              {artist ? <p className="chanel-music-card-artist">{artist}</p> : null}
-            </div>
           </>
         )}
+        <div className="chanel-music-card-info">
+          {showSkeleton ? <MusicTitleSkeleton /> : <h3 className="chanel-music-card-title">{title}</h3>}
+          {showSkeleton || (artistsLoading && item?.artistId)
+            ? <MusicArtistSkeleton /> : artist ? <p className="chanel-music-card-artist">{artist}</p> : null}
+        </div>
       </div>
     </article>
   );

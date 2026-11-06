@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { getLocalizedText, normalizeImagePath } from '../../utils/utils';
+import { useImageReady } from '../../utils/useImageReady';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import './ChanelProfileBanner.css';
 
 const SLIDE_EASE = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -20,9 +22,40 @@ const readBanners = (profileBanner) => {
   return [];
 };
 
+const BannerTitleSkeleton = () => <SkeletonLoader variant="block"
+  className="channel-profile-banner-title channel-profile-banner-title-skeleton" />;
+
+export const ChanelProfileBannerSkeleton = () => (
+  <div className="channel-profile-banner is-single" aria-hidden="true">
+    <ul className="channel-profile-banner-track">
+      <li className="channel-profile-banner-slide">
+        <SkeletonLoader variant="banner-image" className="channel-profile-banner-photo-skeleton" />
+        <BannerTitleSkeleton />
+      </li>
+    </ul>
+  </div>
+);
+
+const BannerImages = ({ photoSrc, titleSrc, titlePending }) => {
+  const photo = useImageReady(photoSrc);
+  const title = useImageReady(titleSrc);
+  const hasTitle = Boolean(titleSrc) || titlePending;
+  const titleLoading = hasTitle && (titlePending || photo.showSkeleton || title.showSkeleton);
+  return <>
+    {photo.showSkeleton && <SkeletonLoader variant="banner-image" className="channel-profile-banner-photo-skeleton" />}
+    {!photo.failed && photoSrc && <img ref={photo.imgRef}
+      className={`channel-profile-banner-photo${photo.showSkeleton ? ' is-loading' : ''}`}
+      src={photoSrc} alt="" draggable={false} onLoad={photo.onLoad} onError={photo.onError} />}
+    {titleLoading && <BannerTitleSkeleton />}
+    {!title.failed && titleSrc && <img ref={title.imgRef}
+      className={`channel-profile-banner-title${titleLoading ? ' is-loading' : ''}`}
+      src={titleSrc} alt="" draggable={false} onLoad={title.onLoad} onError={title.onError} />}
+  </>;
+};
+
 const ChanelProfileBanner = ({ profileBanner }) => {
   const navigate = useNavigate();
-  const { allMovies } = useMoviesApi();
+  const { allMovies, moviesLoading } = useMoviesApi();
   const { contentLang } = useContentLanguage();
   const banners = readBanners(profileBanner);
   const movieById = useMemo(() => {
@@ -188,10 +221,8 @@ const ChanelProfileBanner = ({ profileBanner }) => {
               openMovie(banner);
             }}
           >
-            <img className="channel-profile-banner-photo" src={bannerImage(banner)} alt="" draggable={false} />
-            {titleImage(banner) ? (
-              <img className="channel-profile-banner-title" src={titleImage(banner)} alt="" draggable={false} />
-            ) : null}
+            <BannerImages photoSrc={bannerImage(banner)} titleSrc={titleImage(banner)}
+              titlePending={Boolean(moviesLoading && banner.movieId != null && banner.movieId !== '')} />
           </li>
         ))}
       </ul>
