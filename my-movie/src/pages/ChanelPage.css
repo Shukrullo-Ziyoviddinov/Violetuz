@@ -28,6 +28,7 @@ a.channel-page-card:hover {
 }
 
 .channel-page-avatar {
+  position: relative;
   width: 96px;
   height: 96px;
   min-width: 96px;
@@ -45,6 +46,16 @@ a.channel-page-card:hover {
   height: 100%;
   object-fit: contain;
   display: block;
+}
+
+.channel-page-avatar img.is-loading { opacity: 0; }
+.channel-page-avatar > .channel-profile-avatar-skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: inherit;
 }
 
 .channel-page-avatar-fallback {
@@ -87,6 +98,8 @@ a.channel-page-card:hover {
   margin-top: 0.85rem;
   padding: 0;
 }
+
+.channel-profile-banner + .channel-profile-main { margin-top: 1rem; }
 
 .channel-profile.has-color .channel-profile-main {
   position: relative;

@@ -6,9 +6,11 @@ import { fetchAllChannels, fetchChannelById } from '../api/channelsApi';
 import { requestOpenChannelSearch } from '../channelSearchBridge';
 import ChanelBiografiyaModal from '../components/Chanel/ChanelBiografiyaModal';
 import ChanelModalFilter from '../components/Chanel/ChanelModalFilter';
-import ChanelProfileBanner, { ChanelProfileBannerSkeleton } from '../components/Chanel/ChanelProfileBanner';
+import ChanelProfileBanner from '../components/Chanel/ChanelProfileBanner';
 import ChanelTypeFilter from '../components/Chanel/ChanelTypeFilter';
-import ChanelTypeFilterSkeleton from '../components/Chanel/ChanelTypeFilterSkeleton';
+import ChanelProfileSkeleton from '../components/Chanel/ChanelProfileSkeleton';
+import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import { useImageReady } from '../utils/useImageReady';
 import ChanelContent from '../components/Chanel/ChanelContent';
 import ChannelMoreDropdown from '../components/Navbar/ChannelMoreDropdown';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
@@ -29,17 +31,20 @@ const clearChannelViewClasses = () => {
   document.body.classList.remove('channel-view-leave', 'channel-view-enter', 'channel-mobile-profile');
 };
 
-const ChannelAvatar = ({ channel }) => (
-  <div className="channel-page-avatar">
-    {channel.avatar ? (
-      <img src={channel.avatar} alt="" />
+const ChannelAvatar = ({ channel }) => {
+  const source = channel.avatar || '';
+  const { showSkeleton, failed, imgRef, onLoad, onError } = useImageReady(source);
+  return <div className="channel-page-avatar" aria-busy={showSkeleton || undefined}>
+    {showSkeleton && <SkeletonLoader variant="block" className="channel-profile-avatar-skeleton" />}
+    {source && !failed ? (
+      <img ref={imgRef} src={source} alt="" className={showSkeleton ? 'is-loading' : undefined} onLoad={onLoad} onError={onError} />
     ) : (
       <span className="channel-page-avatar-fallback" aria-hidden="true">
         {String(channel.name || '?').slice(0, 1)}
       </span>
     )}
-  </div>
-);
+  </div>;
+};
 
 const ChannelActions = ({ channelId, mobile = false, filterValue, contentFilter, onApplyFilter }) => {
   const { t } = useTranslation();
@@ -365,11 +370,7 @@ const ChanelPage = () => {
 
   return (
     <div className="channel-page">
-      {status === 'loading' && (id ? <article className="channel-profile" aria-busy="true">
-        <ChanelProfileBannerSkeleton />
-        <ChannelCardSkeleton />
-        <ChanelTypeFilterSkeleton />
-      </article> : <ChannelCardSkeleton />)}
+      {status === 'loading' && (id ? <ChanelProfileSkeleton /> : <ChannelCardSkeleton />)}
       {status === 'error' && <p className="channel-page-message">Kanallar yuklanmadi</p>}
       {status === 'missing' && <p className="channel-page-message">Kanal topilmadi</p>}
       {status === 'ready' && channels.length === 0 && (
