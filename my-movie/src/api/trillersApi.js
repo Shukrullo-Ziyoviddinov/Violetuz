@@ -36,16 +36,17 @@ const fetchJson = async (url, options = {}) => {
   return res.json();
 };
 
-export const fetchLoginTrillers = async () => {
-  const data = await fetchJson(`${API_BASE_URL}/trillers`);
+export const fetchLoginTrillers = async ({ signal } = {}) => {
+  const data = await fetchJson(`${API_BASE_URL}/trillers`, { signal });
   return normalizeTrillersPayload(data);
 };
 
-export const fetchGuestTrillers = async ({ localHistory, videoProgress } = {}) => {
+export const fetchGuestTrillers = async ({ localHistory, videoProgress, signal } = {}) => {
   const history = localHistory != null ? localHistory : getMovieGuestWatchHistory();
   const progress = videoProgress != null ? videoProgress : getGuestTrillerProgress();
   const data = await fetchJson(`${API_BASE_URL}/trillers/guest`, {
     method: 'POST',
+    signal,
     body: JSON.stringify({
       localHistory: Array.isArray(history) ? history : [],
       videoProgress: (Array.isArray(progress) ? progress : []).map((row) => ({
@@ -61,9 +62,9 @@ export const fetchGuestTrillers = async ({ localHistory, videoProgress } = {}) =
  * Hisob: GET, cookie. Mehmon: POST local tarix. Local hisobga yozilmaydi.
  * @param {{ isLoggedIn?: boolean, localHistory?: unknown, videoProgress?: unknown }} [opts]
  */
-export const fetchAllTrillers = async ({ isLoggedIn = false, localHistory, videoProgress } = {}) => {
-  if (isLoggedIn) return fetchLoginTrillers();
-  return fetchGuestTrillers({ localHistory, videoProgress });
+export const fetchAllTrillers = async ({ isLoggedIn = false, localHistory, videoProgress, signal } = {}) => {
+  if (isLoggedIn) return fetchLoginTrillers({ signal });
+  return fetchGuestTrillers({ localHistory, videoProgress, signal });
 };
 
 export const fetchTrillerById = async (id) => {

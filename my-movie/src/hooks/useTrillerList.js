@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppSelector } from '../store/hooks';
-import { selectAuthReady, selectIsLoggedIn } from '../store/slices/userSlice';
+import { selectAuthReady, selectIsLoggedIn, selectProfile } from '../store/slices/userSlice';
 import { fetchAllTrillers } from '../api/trillersApi';
 import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/events';
 
@@ -12,18 +12,20 @@ import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/
 export function useTrillerList() {
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const [guestEpoch, setGuestEpoch] = useState(0);
+  const accountId = useAppSelector(selectProfile)?.id;
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (isLoggedIn) return undefined;
-    const bump = () => setGuestEpoch((value) => value + 1);
+    const bump = () => { void queryClient.invalidateQueries({ queryKey: ['trillers', 'with-description', 'guest'] }); };
     window.addEventListener(GUEST_MOVIE_HISTORY_CHANGED, bump);
     return () => window.removeEventListener(GUEST_MOVIE_HISTORY_CHANGED, bump);
-  }, [isLoggedIn]);
+  }, [isLoggedIn, queryClient]);
 
-  return useQuery({
-    queryKey: ['trillers', 'with-description', isLoggedIn ? 'account' : 'guest', guestEpoch],
+  const result = useQuery({
+    queryKey: ['trillers', 'with-description', isLoggedIn ? `account:${accountId}` : 'guest'],
     enabled: authReady,
-    queryFn: () => fetchAllTrillers({ isLoggedIn }),
+    queryFn: ({ signal }) => fetchAllTrillers({ isLoggedIn, signal }),
   });
+  return { ...result, data: authReady ? result.data : undefined, isPending: !authReady || result.isPending };
 }

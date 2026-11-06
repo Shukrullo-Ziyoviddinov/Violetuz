@@ -1,7 +1,8 @@
 import React from 'react';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
-import TrillerCard from './TrillerCard';
+import TrillerCard, { TrillerCardSkeleton } from './TrillerCard';
+import ShowMoreButton, { DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import { useTrillerList } from '../../hooks/useTrillerList';
 import './TrillerSection.css';
 
@@ -15,7 +16,7 @@ const TrillerSection = () => {
   const showSkeleton = isPending || list.length === 0;
   const items = showSkeleton
     ? Array.from({ length: SKELETON_COUNT }, (_, i) => ({ id: `sk-${i}`, _skeleton: true }))
-    : list;
+    : list.slice(0, DEFAULT_LIMIT);
 
   return (
     <section className="triller-section" aria-busy={showSkeleton || undefined}>
@@ -26,21 +27,13 @@ const TrillerSection = () => {
           ) : (
             <h2 className="triller-section-title">Parda ortida</h2>
           )}
+          {!showSkeleton && list.length > DEFAULT_LIMIT && <ShowMoreButton to="/recommended/parda-ortida" />}
         </div>
         <div className="triller-section-scroll">
           <HorizontalScroll>
             {items.map((item) =>
               item._skeleton ? (
-                <div
-                  key={item.id}
-                  className="triller-card triller-card--skeleton"
-                  aria-hidden="true"
-                >
-                  <div className="triller-card-image-wrap">
-                    <SkeletonLoader variant="triller-card-image" />
-                  </div>
-                  <SkeletonLoader variant="triller-card-title" />
-                </div>
+                <TrillerCardSkeleton key={item.id} />
               ) : (
                 <TrillerCard key={item.id} triller={item} />
               )

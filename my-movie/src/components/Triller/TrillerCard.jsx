@@ -8,6 +8,15 @@ import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import './TrillerCard.css';
 
+export const TrillerCardSkeleton = () => (
+  <div className="triller-card triller-card--skeleton" aria-hidden="true">
+    <div className="triller-card-image-wrap">
+      <SkeletonLoader variant="triller-card-image" />
+    </div>
+    <SkeletonLoader variant="triller-card-title" />
+  </div>
+);
+
 const TrillerCard = ({ triller, className = '', onSelect }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();

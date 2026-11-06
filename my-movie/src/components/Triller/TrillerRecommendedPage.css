@@ -1,0 +1,8 @@
+.triller-recommended-page { padding: 0 2rem 2rem; color: #fff; }
+.triller-recommended-page h1 { margin-bottom: 1rem; }
+.triller-recommended-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem .8rem; }
+.triller-recommended-grid .triller-card { width: 100%; min-width: 0; }
+.triller-recommended-page [role="alert"] button { padding: .7rem 1.4rem; border: 0; border-radius: 8px; background: #9b4fe7; color: #fff; cursor: pointer; }
+.triller-recommended-page [role="alert"] button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 768px) { .triller-recommended-page { padding: 0 .7rem 2rem; } }
+@media (max-width: 580px) { .triller-recommended-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import FeedPage from './pages/feedPage';
 import RecommendedPage from './pages/RecommendedPage';
 import TrailerRecommendedPage from './trailer-home-feed/TrailerRecommendedPage';
+import TrillerRecommendedPage from './components/Triller/TrillerRecommendedPage';
 import { TrailerFeedProvider } from './trailer-home-feed/TrailerFeedContext';
 import WishlistPage from './pages/WishlistPage';
 import ProfilePage from './pages/ProfilePage';
@@ -93,6 +94,7 @@ function AppShell() {
             <Route path="/triller/:id" element={<TrillerPage />} />
             <Route path="/recommended" element={<RecommendedPage />} />
             <Route path="/recommended/trailers" element={<TrailerRecommendedPage />} />
+            <Route path="/recommended/parda-ortida" element={<TrillerRecommendedPage />} />
             <Route path="/recommended/hozir-trendda" element={<RecommendedPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/profile" element={<ProfilePage />} />
