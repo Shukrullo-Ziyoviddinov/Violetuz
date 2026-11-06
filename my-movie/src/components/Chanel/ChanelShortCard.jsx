@@ -5,6 +5,12 @@ import ShortsVideoThumb from '../ShortsVideos/ShortsVideoThumb';
 import ViewCount from '../ViewCount/ViewCount';
 import '../ShortsVideos/ShortsVideos.css';
 
+export const ChanelShortCardSkeleton = ({ layout = 'grid' }) => (
+  <div className={`shorts-video-card chanel-short-card${layout === 'row' ? ' chanel-short-card--row' : ''}`} aria-hidden="true">
+    <ShortsVideoThumb loading />
+  </div>
+);
+
 const ChanelShortCard = ({ item, layout = 'grid' }) => {
   const navigate = useNavigate();
   const { contentLang } = useContentLanguage();

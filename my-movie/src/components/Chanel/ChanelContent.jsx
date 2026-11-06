@@ -9,7 +9,7 @@ import ChanelClipCard, { ChanelClipCardSkeleton } from './ChanelClipCard';
 import ChanelTrailerCard, { ChanelTrailerCardSkeleton } from './ChanelTrailerCard';
 import { channelMovieTrailers } from './channelMovieTrailers';
 import ChanelPardaCard from './ChanelPardaCard';
-import ChanelShortCard from './ChanelShortCard';
+import ChanelShortCard, { ChanelShortCardSkeleton } from './ChanelShortCard';
 import ChanelWeeklyTopMovies from './ChanelWeeklyTopMovies';
 import ChanelWeeklyTopMusic from './ChanelWeeklyTopMusic';
 import { useTrillerList } from '../../hooks/useTrillerList';
@@ -33,7 +33,7 @@ const ChannelSection = ({ title, cards }) => {
 
 const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = null, musicForYouIds = null, advancedFilter = null }) => {
   const { t } = useTranslation();
-  const { allMovies, allShortsVideos, allGenres, moviesLoading } = useMoviesApi();
+  const { allMovies, allShortsVideos, allGenres, moviesLoading, shortsLoading } = useMoviesApi();
   const { allMusic, allClips, allAlbums, musicLoading, albumsLoading, clipsLoading, concertsLoading } = useMusicApi();
   const { data: allTrillers = [] } = useTrillerList();
   const catalogs = useChannelFilterCatalogs(channelId);
@@ -110,6 +110,13 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
       : (mediaScope && (filter === 'all' || filter === 'music')) || (Array.isArray(musicForYouIds) && musicForYouIds.length > 0)));
   const albumsPending = Boolean(albumsLoading && !items.some((entry) => entry.kind === 'album')
     && (advancedFilter ? advancedFilter.type === 'album' : mediaScope && (filter === 'all' || filter === 'album')));
+  const shortsPending = Boolean(shortsLoading && !advancedFilter && mediaScope
+    && (filter === 'all' || filter === 'shorts') && !items.some((entry) => entry.kind === 'short'));
+  if (shortsPending && filter === 'shorts') {
+    return <div className="chanel-content-shorts" aria-busy="true">
+      {Array.from({ length: 6 }, (_, index) => <ChanelShortCardSkeleton key={index} />)}
+    </div>;
+  }
   if ((musicPending || albumsPending) && (advancedFilter || filter !== 'all' || (Array.isArray(musicForYouIds) && musicForYouIds.length))) {
     return <div className="chanel-music-grid" aria-busy="true">
       {Array.from({ length: 6 }, (_, index) => <ChanelMusicCardSkeleton key={index} layout="grid" />)}
@@ -130,7 +137,7 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
       {Array.from({ length: 6 }, (_, index) => <ChanelMovieCardSkeleton key={index} />)}
     </div>;
   }
-  if (!items.length && !moviesPending && !trailersPending && !clipsPending && !concertsPending && !musicPending && !albumsPending) return advancedFilter ? <p className="channel-page-message">{t('channel.noFilterResults', 'Mos ma’lumot topilmadi')}</p> : null;
+  if (!items.length && !moviesPending && !trailersPending && !clipsPending && !concertsPending && !musicPending && !albumsPending && !shortsPending) return advancedFilter ? <p className="channel-page-message">{t('channel.noFilterResults', 'Mos ma’lumot topilmadi')}</p> : null;
 
   const layout = filter === 'all' ? 'row' : 'grid';
   const renderCard = (entry, cardLayout) => {
@@ -198,7 +205,9 @@ const ChanelContent = ({ channelId, filter = 'all', genreId = null, trendIds = n
     const clipCards = clipsPending
       ? Array.from({ length: 6 }, (_, index) => <ChanelClipCardSkeleton key={`clip-loading-${index}`} />)
       : items.filter((entry) => entry.kind === 'klip').map((entry) => renderCard(entry, 'row'));
-    const shortCards = items.filter((entry) => entry.kind === 'short').map((entry) => renderCard(entry, 'row'));
+    const shortCards = shortsPending
+      ? Array.from({ length: 6 }, (_, index) => <ChanelShortCardSkeleton key={`short-loading-${index}`} layout="row" />)
+      : items.filter((entry) => entry.kind === 'short').map((entry) => renderCard(entry, 'row'));
     const concertCards = concertsPending
       ? Array.from({ length: 6 }, (_, index) => <ChanelClipCardSkeleton key={`concert-loading-${index}`} />)
       : items.filter((entry) => entry.kind === 'konsert').map((entry) => renderCard(entry, 'row'));

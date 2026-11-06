@@ -100,6 +100,16 @@
   pointer-events: auto;
 }
 
+.shorts-video-thumb-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background: transparent;
+}
+
+.shorts-video-thumb--loading .shorts-video-thumb-shield { z-index: 3; }
+
 .shorts-video-preview-placeholder {
   background: #111;
 }

@@ -11,6 +11,7 @@ const ShortsVideoThumb = ({
   videoSrc = '',
   className = 'shorts-video-thumb',
   still = false,
+  loading = false,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -40,7 +41,7 @@ const ShortsVideoThumb = ({
     const intervalId = window.setInterval(check, 200);
     const timeoutId = window.setTimeout(() => {
       const el = videoRef.current;
-      if (el && el.readyState >= HTMLMediaElement.HAVE_METADATA) {
+      if (el && el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
         setReady(true);
       } else {
         setFailed(true);
@@ -80,6 +81,7 @@ const ShortsVideoThumb = ({
       : 0;
     const finish = () => {
       el.pause();
+      if (el.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
       el.dataset.stillHeld = '1';
       setReady(true);
       setFailed(false);
@@ -100,7 +102,7 @@ const ShortsVideoThumb = ({
     finish();
   };
 
-  const showSkeleton = Boolean(videoSrc) && !ready && !failed;
+  const showSkeleton = loading || (Boolean(videoSrc) && !ready && !failed);
 
   return (
     <div
@@ -110,12 +112,14 @@ const ShortsVideoThumb = ({
       onMouseLeave={onMouseLeave}
       aria-busy={showSkeleton || undefined}
     >
+      <div className="shorts-video-thumb-shield" aria-hidden="true">
       {showSkeleton && (
         <SkeletonLoader
           variant="shorts-thumb"
           className="shorts-video-thumb-skeleton"
         />
       )}
+      </div>
       {!failed && videoSrc && (
         <video
           ref={videoRef}
