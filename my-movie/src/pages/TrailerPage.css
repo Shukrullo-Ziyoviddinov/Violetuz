@@ -637,3 +637,5 @@ body.trailer-page-active {
     padding: 0;
   }
 }
+
+.trailer-page .trailer-modal-channel { margin: 0.65rem 0; min-width: 0; }

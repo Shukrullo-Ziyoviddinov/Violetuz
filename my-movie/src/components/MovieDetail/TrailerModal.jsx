@@ -11,6 +11,7 @@ import ViewCount from '../ViewCount/ViewCount';
 import UploadedAtTime from '../UploadedAtTime/UploadedAtTime';
 import ShareButton from '../ShareButton/ShareButton';
 import TrillerDescription from '../Triller/TrillerDescription';
+import ChanelDetailProfile from '../Chanel/ChanelDetailProfile';
 import MovieComments from './MovieComments';
 import { formatMovieRating } from '../Rating/CalculateRating';
 import { normalizeTrailerDescription } from '../../utils/trailerDescription';
@@ -304,6 +305,9 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
     }
     return movie || null;
   }, [selectedTrailer, movie, allMovies]);
+
+  const trailerChannelId = Number(ratingSourceMovie?.id) === Number(selectedTrailer?.movieId ?? movie?.id)
+    ? ratingSourceMovie?.channelId : null;
 
   const movieRatings = useMemo(
     () => getTrailerMovieRatings(ratingSourceMovie),
@@ -787,6 +791,11 @@ const TrailerModal = ({ movie, onClose, variant = 'modal', loading: externalLoad
                         </div>
                       ) : null}
                     </div>
+                    {isPage && trailerChannelId ? (
+                      <div className="trailer-modal-channel">
+                        <ChanelDetailProfile channelId={trailerChannelId} />
+                      </div>
+                    ) : null}
                     {trailerDescription ? (
                       <TrillerDescription
                         description={trailerDescription}
