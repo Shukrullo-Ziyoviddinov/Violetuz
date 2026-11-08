@@ -5,7 +5,7 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAppSelector } from '../../store/hooks';
 import { selectIsLoggedIn } from '../../store/slices/userSlice';
 import { useSimilarMovies } from '../../hooks/useSimilarMovies';
-import { fetchViewerHomeFeedPage } from '../../api/homeFeedApi';
+import { fetchViewerHomeFeedPage, isHomeFeedCard } from '../../api/homeFeedApi';
 import { getWatchHistory } from '../../utils/localStorage/guestHistory/movieGuestHistory';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
@@ -79,8 +79,19 @@ const MovieDetailForYou = ({ movieId }) => {
 
   const resolveMovies = (rows) =>
     (rows || [])
-      .map((item) => getMovieByIdLocal(item.movieId))
+      .map((item) => {
+        if (isHomeFeedCard(item)) {
+          const id = item.id != null && item.id !== '' ? item.id : item.movieId;
+          return { ...item, id };
+        }
+        return getMovieByIdLocal(item?.movieId);
+      })
       .filter((movie) => movie?.id != null);
+
+  const cursorOf = (result, fallback) => {
+    const next = Number(result?.nextOffset);
+    return Number.isFinite(next) ? next : fallback;
+  };
 
   useEffect(() => () => window.clearTimeout(revealTimerRef.current), []);
 
@@ -112,7 +123,7 @@ const MovieDetailForYou = ({ movieId }) => {
         if (cancelled || token !== loadTokenRef.current) return;
         setGenreOptions(result.genres);
         setPageMovies(resolveMovies(result.movies));
-        setPageOffset(result.movies.length);
+        setPageOffset(cursorOf(result, result.movies.length));
         setHasMore(result.hasMore);
       })
       .catch(() => {
@@ -148,7 +159,7 @@ const MovieDetailForYou = ({ movieId }) => {
         if (token !== loadTokenRef.current) return;
         const next = resolveMovies(result.movies);
         setGenreOptions(result.genres);
-        setPageOffset((current) => current + result.movies.length);
+        setPageOffset((current) => cursorOf(result, current + result.movies.length));
         setHasMore(result.hasMore);
         if (!next.length) {
           setPhase('idle');
@@ -205,7 +216,7 @@ const MovieDetailForYou = ({ movieId }) => {
         if (token !== loadTokenRef.current) return;
         setGenreOptions(result.genres);
         setPageMovies(resolveMovies(result.movies));
-        setPageOffset(result.movies.length);
+        setPageOffset(cursorOf(result, result.movies.length));
         setHasMore(result.hasMore);
       })
       .catch(() => {

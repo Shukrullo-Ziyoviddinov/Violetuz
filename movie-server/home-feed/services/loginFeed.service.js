@@ -69,7 +69,7 @@ const getLoginHomeFeed = async (userId, nowMs = Date.now()) => {
  *
  * @param {string|import('mongoose').Types.ObjectId} userId
  * @param {{ offset?: number, limit?: number, excludeIds?: string[], genre?: string, nowMs?: number }} [page]
- * @returns {Promise<{ movies: Object[], hasMore: boolean, genres: string[], source: 'cache'|'computed' }>}
+ * @returns {Promise<{ movies: Object[], hasMore: boolean, nextOffset: number, genres: string[], source: 'cache'|'computed' }>}
  */
 const getLoginHomeFeedPage = async (
   userId,
@@ -101,6 +101,7 @@ const getLoginHomeFeedPage = async (
   return {
     movies: page.movies,
     hasMore: page.hasMore,
+    nextOffset: page.nextOffset,
     genres: page.genres,
     source,
   };

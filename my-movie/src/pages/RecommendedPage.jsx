@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { getTopRatedMovies } from '../components/TopRatedContent/TopRatedContent';
@@ -13,9 +13,11 @@ import { getWatchHistory } from '../utils/localStorage/guestHistory/movieGuestHi
 import { GUEST_MOVIE_HISTORY_CHANGED } from '../utils/localStorage/guestHistory/events';
 import Filters from '../components/Filters';
 import Movies from '../components/Movies/Movies';
-import { useHomeFeed } from '../hooks/useHomeFeed';
+import { useForYouFeed } from '../hooks/useForYouFeed';
 import { useMostWatchedMovies } from '../hooks/useMostWatchedMovies';
 import { useSimilarMovies } from '../hooks/useSimilarMovies';
+import { useVisibleScreen } from '../paged-list/useVisibleCount';
+import { useLoadMoreTrigger } from '../paged-list/useLoadMoreTrigger';
 import './RecommendedPage.css';
 
 const getRatingFilter = (movie, selectedRatingType, selectedRating) => {
@@ -89,10 +91,21 @@ const RecommendedPage = () => {
   }, [genreFromUrl, getGenresFromUrl]);
 
   const isForYouPage = location.pathname === '/recommended';
+  const isPlainForYou = isForYouPage && !genreFromUrl;
   const isTrendingPage = location.pathname === '/recommended/hozir-trendda';
-  const { items: feedItems, isLoading: feedLoading } = useHomeFeed({
-    enabled: isForYouPage && !genreFromUrl,
-  });
+  const gridRef = useRef(null);
+  const itemRef = useRef(null);
+  const screenCount = useVisibleScreen(gridRef, itemRef, isPlainForYou);
+  const screenRef = useRef(0);
+  screenRef.current = screenCount;
+  const getLimit = useCallback(() => (isPlainForYou ? screenRef.current : 0), [isPlainForYou]);
+  const {
+    items: forYouItems,
+    hasMore: forYouHasMore,
+    isLoading: forYouLoading,
+    isFetchingNextPage: forYouFetching,
+    fetchNextPage: fetchForYouNext,
+  } = useForYouFeed({ enabled: isPlainForYou, getLimit });
   const { movies: trendingRows, loading: trendingLoading } = useMostWatchedMovies({
     enabled: isTrendingPage,
   });
@@ -112,20 +125,11 @@ const RecommendedPage = () => {
       .filter(Boolean);
   }, [allMovies, isTrendingPage, trendingRows]);
 
-  const forYouMovies = useMemo(() => {
-    if (!isForYouPage || useAllMoviesForGenre) return [];
-    const byId = new Map(allMovies.map((movie) => [String(movie.id), movie]));
-    return feedItems
-      .map((item) => byId.get(String(item.movieId)))
-      .filter(Boolean);
-  }, [allMovies, feedItems, isForYouPage, useAllMoviesForGenre]);
-
   const localCategoryMovies = useMemo(() => {
     // Similar — faqat server cache API (front filter yo'q)
     if (isSimilarMoviesPage) return similarApiMovies;
     if (isTrendingPage) return trendingMovies;
     if (genreFromUrl || useAllMoviesForGenre) return allMovies;
-    if (isForYouPage) return forYouMovies;
     if (categoryId === 'topRated') return getTopRatedMovies(allMovies);
     if (isNavCategory) return filterMoviesByNavCategory(allMovies, navCategory);
     if (categoryId) {
@@ -140,9 +144,7 @@ const RecommendedPage = () => {
   }, [
     allMovies,
     categoryId,
-    forYouMovies,
     genreFromUrl,
-    isForYouPage,
     isNavCategory,
     isSimilarMoviesPage,
     isTrendingPage,
@@ -242,30 +244,42 @@ const RecommendedPage = () => {
   }, [hideVlFilter]);
 
   let filteredMovies = categoryFiltered;
-  if (selectedRating !== null) {
+  if (!isPlainForYou && selectedRating !== null) {
     filteredMovies = filteredMovies.filter(movie =>
       getRatingFilter(movie, selectedRatingType, selectedRating)
     );
   }
-  if (selectedCountry !== null) {
+  if (!isPlainForYou && selectedCountry !== null) {
     filteredMovies = filteredMovies.filter(movie => movie.filterCountry === selectedCountry);
   }
-  if (selectedGenres.length > 0) {
+  if (!isPlainForYou && selectedGenres.length > 0) {
     filteredMovies = filteredMovies.filter(movie =>
       (movie.filterGenre || []).some(g => selectedGenres.includes(g))
     );
   }
-  if (selectedAge !== null) {
+  if (!isPlainForYou && selectedAge !== null) {
     filteredMovies = filteredMovies.filter(movie => movie.ageRestriction === selectedAge);
   }
+
+  const measuring = screenCount === 0;
+  const forYouWaiting = forYouItems.length === 0 && (measuring || forYouLoading);
+  const forYouSkeletonCount = measuring ? 1 : screenCount;
+  const loadForYouMore = useCallback(() => {
+    const limit = screenRef.current;
+    if (limit > 0) fetchForYouNext(limit);
+  }, [fetchForYouNext]);
+  const { sentinelRef } = useLoadMoreTrigger({
+    enabled: isPlainForYou && forYouHasMore && !forYouFetching && !forYouWaiting && screenCount > 0,
+    onLoadMore: loadForYouMore,
+  });
 
   const listLoading = isSimilarMoviesPage
     ? similarLoading
     : isTrendingPage
       ? moviesLoading || trendingLoading
-      : moviesLoading ||
-        recommendationsLoading ||
-        (isForYouPage && !useAllMoviesForGenre && feedLoading);
+      : isPlainForYou
+        ? false
+        : moviesLoading || recommendationsLoading;
 
   return (
     <div className="recommended-page">
@@ -282,16 +296,30 @@ const RecommendedPage = () => {
         onGenreSelect={setSelectedGenres}
         selectedAge={selectedAge}
         onAgeSelect={setSelectedAge}
-        isLoading={listLoading}
+        isLoading={isPlainForYou ? moviesLoading : listLoading}
       />
-      <Movies
-        sectionType="all"
-        limit={null}
-        filteredMovies={filteredMovies}
-        hideHeader={!isTrendingPage}
-        headerTitle={isTrendingPage ? t('movies.hozirTrendda', 'Hozir trendda') : undefined}
-        isLoading={listLoading}
-      />
+      {isPlainForYou ? (
+        <Movies
+          sectionType="all"
+          limit={forYouWaiting ? forYouSkeletonCount : null}
+          filteredMovies={forYouItems}
+          hideHeader
+          isLoading={forYouWaiting}
+          gridRef={gridRef}
+          itemRef={itemRef}
+          tailCount={forYouFetching ? screenCount : 0}
+          endRef={sentinelRef}
+        />
+      ) : (
+        <Movies
+          sectionType="all"
+          limit={null}
+          filteredMovies={filteredMovies}
+          hideHeader={!isTrendingPage}
+          headerTitle={isTrendingPage ? t('movies.hozirTrendda', 'Hozir trendda') : undefined}
+          isLoading={listLoading}
+        />
+      )}
     </div>
   );
 };

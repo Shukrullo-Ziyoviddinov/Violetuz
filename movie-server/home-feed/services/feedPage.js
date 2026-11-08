@@ -1,14 +1,17 @@
 /**
- * Movie detail "Siz uchun" sahifasi.
- * Janrlar butun lentadan yig'iladi. Tanlangan janr bo'yicha kesiladi.
- * Home to'liq javobiga tegmaydi.
+ * Tayyor "Siz uchun" lentasidan sahifa.
+ * Id tartibi o'zgarmaydi. Karta maydonlari faqat shu offset/limit kesimidan o'qiladi.
+ * Janr ro'yxati butun lenta bo'yicha qoladi — kino sahifasi shuni ishlatadi.
  *
  * @module home-feed/services/feedPage
  */
 
 'use strict';
 
-const { findCatalogMoviesByIds } = require('../sources/catalog.read');
+const {
+  findFeedPageGenresByIds,
+  findFeedPageCardsByIds,
+} = require('../sources/catalog.read');
 
 const MAX_PAGE = 40;
 
@@ -25,11 +28,47 @@ const genresOf = (value) => {
 };
 
 /**
+ * @param {unknown} value
+ * @returns {Object}
+ */
+const localized = (value) => (
+  value && typeof value === 'object' && !Array.isArray(value) ? value : {}
+);
+
+/**
+ * @param {Object} row
+ * @returns {Object}
+ */
+const toFeedPageCard = (row) => {
+  const id = row.id;
+  const countries = Array.isArray(row.specs?.countries)
+    ? row.specs.countries.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+  return {
+    movieId: String(id),
+    id,
+    title: localized(row.title),
+    homeImg: localized(row.homeImg),
+    category: row.category != null ? String(row.category) : '',
+    rating: row.rating ?? null,
+    ageRestriction: row.ageRestriction ?? null,
+    specs: {
+      year: row.specs?.year ?? null,
+      countries,
+    },
+    filterGenre: genresOf(row.filterGenre),
+  };
+};
+
+/**
  * @param {Array<{ movieId: string }>} movies
  * @param {{ offset?: number, limit?: number, excludeIds?: string[], genre?: string }} [page]
- * @returns {Promise<{ movies: Object[], hasMore: boolean, genres: string[] }>}
+ * @param {{ findFeedPageGenresByIds?: Function, findFeedPageCardsByIds?: Function }} [readers]
+ * @returns {Promise<{ movies: Object[], hasMore: boolean, nextOffset: number, genres: string[] }>}
  */
-const sliceFeedPage = async (movies, { offset = 0, limit = 10, excludeIds = [], genre = '' } = {}) => {
+const sliceFeedPage = async (movies, { offset = 0, limit = 10, excludeIds = [], genre = '' } = {}, readers = {}) => {
+  const loadGenres = readers.findFeedPageGenresByIds || findFeedPageGenresByIds;
+  const loadCards = readers.findFeedPageCardsByIds || findFeedPageCardsByIds;
   const exclude = new Set(
     (Array.isArray(excludeIds) ? excludeIds : []).map((id) => String(id).trim()).filter(Boolean)
   );
@@ -37,9 +76,9 @@ const sliceFeedPage = async (movies, { offset = 0, limit = 10, excludeIds = [], 
     (row) => row?.movieId != null && !exclude.has(String(row.movieId))
   );
 
-  const catalog = await findCatalogMoviesByIds(ordered.map((row) => row.movieId));
+  const genreRows = await loadGenres(ordered.map((row) => row.movieId));
   const genreById = new Map();
-  for (const row of catalog) {
+  for (const row of genreRows) {
     const movieId = String(row?.id ?? '').trim();
     if (!movieId) continue;
     genreById.set(movieId, genresOf(row.filterGenre));
@@ -62,11 +101,25 @@ const sliceFeedPage = async (movies, { offset = 0, limit = 10, excludeIds = [], 
 
   const skip = Math.max(0, Number(offset) || 0);
   const take = Math.min(MAX_PAGE, Math.max(1, Number(limit) || 10));
-  const pageMovies = matched.slice(skip, skip + take);
+  const pageRows = matched.slice(skip, skip + take);
+  const cardRows = await loadCards(pageRows.map((row) => row.movieId));
+  const cardById = new Map();
+  for (const row of cardRows) {
+    const movieId = String(row?.id ?? '').trim();
+    if (!movieId) continue;
+    cardById.set(movieId, toFeedPageCard(row));
+  }
+
+  const pageMovies = pageRows.map((row) => {
+    const movieId = String(row.movieId);
+    return cardById.get(movieId) || { movieId };
+  });
+  const nextOffset = skip + pageRows.length;
 
   return {
     movies: pageMovies,
-    hasMore: skip + pageMovies.length < matched.length,
+    hasMore: nextOffset < matched.length,
+    nextOffset,
     genres,
   };
 };

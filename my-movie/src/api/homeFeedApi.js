@@ -96,14 +96,57 @@ export const fetchViewerHomeFeed = async ({ isLoggedIn, localHistory } = {}) => 
   return fetchGuestHomeFeed(history);
 };
 
-const normalizePage = (data) => ({
-  movies: Array.isArray(data?.movies) ? data.movies : [],
-  hasMore: Boolean(data?.hasMore),
-  genres: Array.isArray(data?.genres)
-    ? data.genres.map((item) => String(item).trim()).filter(Boolean)
-    : [],
-  source: data?.source || 'computed',
-});
+const isLocalized = (value) =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+/** title va homeImg bor qator karta. Aks holda eski { movieId } qatori. */
+export const isHomeFeedCard = (row) =>
+  isLocalized(row?.title) && isLocalized(row?.homeImg);
+
+const toPageMovie = (row) => {
+  if (!row || typeof row !== 'object') return null;
+  const movieId = String(row.movieId ?? row.id ?? '').trim();
+  if (!movieId) return null;
+  if (!isHomeFeedCard(row)) return { movieId };
+  const countries = Array.isArray(row.specs?.countries)
+    ? row.specs.countries.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+  return {
+    movieId,
+    id: row.id != null && row.id !== '' ? row.id : movieId,
+    title: row.title,
+    homeImg: row.homeImg,
+    category: row.category != null ? String(row.category) : '',
+    rating: row.rating ?? null,
+    ageRestriction: row.ageRestriction ?? null,
+    specs: {
+      year: row.specs?.year ?? null,
+      countries,
+    },
+    filterGenre: Array.isArray(row.filterGenre)
+      ? row.filterGenre.map((item) => String(item).trim()).filter(Boolean)
+      : [],
+  };
+};
+
+const normalizePage = (data, offset = 0) => {
+  const movies = (Array.isArray(data?.movies) ? data.movies : [])
+    .map(toPageMovie)
+    .filter(Boolean);
+  const rawNext = Number(data?.nextOffset);
+  const nextOffset = Number.isFinite(rawNext)
+    ? Math.max(0, rawNext)
+    : Math.max(0, Number(offset) || 0) + movies.length;
+  return {
+    movies,
+    hasMore: Boolean(data?.hasMore),
+    nextOffset,
+    genres: Array.isArray(data?.genres)
+      ? data.genres.map((item) => String(item).trim()).filter(Boolean)
+      : [],
+    source: data?.source || 'computed',
+  };
+};
 
 const excludeParam = (excludeIds) =>
   (Array.isArray(excludeIds) ? excludeIds : [])
@@ -132,7 +175,7 @@ export const fetchViewerHomeFeedPage = async ({
     if (exclude.length) params.set('exclude', exclude.join(','));
     if (genreValue) params.set('genre', genreValue);
     const res = await homeFeedFetch(`/home-feed?${params.toString()}`);
-    return normalizePage(await parseJson(res));
+    return normalizePage(await parseJson(res), offset);
   }
 
   const history = localHistory != null ? localHistory : getMovieGuestWatchHistory();
@@ -146,5 +189,5 @@ export const fetchViewerHomeFeedPage = async ({
       ...(genreValue ? { genre: genreValue } : {}),
     }),
   });
-  return normalizePage(await parseJson(res));
+  return normalizePage(await parseJson(res), offset);
 };

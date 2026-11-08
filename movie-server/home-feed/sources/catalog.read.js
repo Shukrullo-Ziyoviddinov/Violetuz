@@ -62,6 +62,65 @@ const findCatalogMoviesByIds = async (movieIds) => {
   return rows || [];
 };
 
+const FEED_PAGE_GENRE_SELECT = Object.freeze({
+  _id: 0,
+  id: 1,
+  filterGenre: 1,
+});
+
+const FEED_PAGE_CARD_SELECT = Object.freeze({
+  _id: 0,
+  id: 1,
+  title: 1,
+  homeImg: 1,
+  category: 1,
+  rating: 1,
+  ageRestriction: 1,
+  filterGenre: 1,
+  'specs.year': 1,
+  'specs.countries': 1,
+});
+
+/**
+ * @param {Array<string|number>} movieIds
+ * @returns {number[]}
+ */
+const numericMovieIds = (movieIds) => [
+  ...new Set(
+    (movieIds || [])
+      .map((id) => Number(String(id).trim()))
+      .filter((id) => Number.isInteger(id))
+  ),
+];
+
+/**
+ * Sahifa janr ro'yxati. Faqat id va filterGenre.
+ * @param {Array<string|number>} movieIds
+ * @returns {Promise<Object[]>}
+ */
+const findFeedPageGenresByIds = async (movieIds) => {
+  const ids = numericMovieIds(movieIds);
+  if (!ids.length) return [];
+  const rows = await Movie.find({ id: { $in: ids } })
+    .select(FEED_PAGE_GENRE_SELECT)
+    .lean();
+  return rows || [];
+};
+
+/**
+ * Sahifa kartalari. Faqat so'ralgan id lar.
+ * @param {Array<string|number>} movieIds
+ * @returns {Promise<Object[]>}
+ */
+const findFeedPageCardsByIds = async (movieIds) => {
+  const ids = numericMovieIds(movieIds);
+  if (!ids.length) return [];
+  const rows = await Movie.find({ id: { $in: ids } })
+    .select(FEED_PAGE_CARD_SELECT)
+    .lean();
+  return rows || [];
+};
+
 /**
  * Tartib/diversity uchun category va aktyor. anonslar va eski movies tushadi.
  *
@@ -100,5 +159,7 @@ module.exports = {
   catalogCategoryMatch,
   findCatalogMovies,
   findCatalogMoviesByIds,
+  findFeedPageGenresByIds,
+  findFeedPageCardsByIds,
   findRankMetaByIds,
 };

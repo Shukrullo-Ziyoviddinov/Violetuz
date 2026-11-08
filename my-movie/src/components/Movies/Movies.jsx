@@ -24,6 +24,7 @@ const MoviePosterItem = ({
   t,
   blockClick,
   rankSrc = '',
+  nodeRef = null,
 }) => {
   const imgSrc = movie.homeImg
     ? movie.homeImg[contentLang] || movie.homeImg.uz || movie.homeImg.ru || ''
@@ -48,6 +49,7 @@ const MoviePosterItem = ({
 
   return (
     <div
+      ref={nodeRef}
       className={`movies-item ${isHorizontal ? 'movies-item-horizontal' : ''} ${isWideLayout ? 'movies-item-wide' : ''}${
         showImgSkeleton ? ' movies-item--loading' : ''
       }`}
@@ -166,6 +168,10 @@ const Movies = ({
   moreTo = null,
   isLoading: isLoadingProp = null,
   showRankBadge = false,
+  gridRef = null,
+  itemRef = null,
+  tailCount = 0,
+  endRef = null,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -232,14 +238,13 @@ const Movies = ({
   const useHorizontalScrollLayout = isHorizontal && (shouldShowLimit || sectionType === 'all');
   const isWideLayout = false;
 
-  const renderMovieItem = (movie) => {
-    if (movie._skeleton) {
-      return (
-        <div
-          key={movie.id}
-          className={`movies-item movies-item--skeleton ${isHorizontal ? 'movies-item-horizontal' : ''} ${isWideLayout ? 'movies-item-wide' : ''}`}
-          aria-hidden="true"
-        >
+  const renderSkeleton = (key, nodeRef) => (
+    <div
+      key={key}
+      ref={nodeRef}
+      className={`movies-item movies-item--skeleton ${isHorizontal ? 'movies-item-horizontal' : ''} ${isWideLayout ? 'movies-item-wide' : ''}`}
+      aria-hidden="true"
+    >
           <div className="movies-item-image-wrapper">
             <SkeletonLoader
               variant="movie-image"
@@ -266,13 +271,17 @@ const Movies = ({
           </div>
           <span className="movies-item-title movies-item-title--skeleton" aria-hidden="true" />
           <span className="movies-item-meta movies-item-meta--skeleton" aria-hidden="true" />
-        </div>
-      );
-    }
+    </div>
+  );
+
+  const renderMovieItem = (movie, index) => {
+    const nodeRef = index === 0 ? itemRef : undefined;
+    if (movie._skeleton) return renderSkeleton(movie.id, nodeRef);
 
     return (
       <MoviePosterItem
         key={movie.id}
+        nodeRef={nodeRef}
         movie={movie}
         isHorizontal={isHorizontal}
         isWideLayout={isWideLayout}
@@ -317,10 +326,14 @@ const Movies = ({
               {itemsToRender.map((movie) => renderMovieItem(movie))}
             </HorizontalScroll>
           ) : (
-            <div className="movies-grid">
-              {itemsToRender.map((movie) => renderMovieItem(movie))}
+            <div className="movies-grid" ref={gridRef}>
+              {itemsToRender.map((movie, index) => renderMovieItem(movie, index))}
+              {Array.from({ length: tailCount > 0 ? tailCount : 0 }, (_, index) => (
+                renderSkeleton(`movie-tail-${index}`)
+              ))}
             </div>
           )}
+          {endRef ? <div ref={endRef} /> : null}
         </div>
       </div>
     </div>

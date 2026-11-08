@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { isCarouselNearEnd } from '../../paged-list/useLoadMoreTrigger';
 import './HorizontalScroll.css';
 
 // Carousel drag: foizga yetmasa → joyiga qaytadi; yetganda / tezlikka qarab → silliq scroll
@@ -11,7 +12,14 @@ const EDGE_RESISTANCE = 0.35;
 const FRICTION = 0.0032; // inertia sekinlashishi (1/ms)
 const MIN_GLIDE_VELOCITY = 0.02; // px/ms
 
-const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = false, scrollToIndexRef, onScrollIndexChange }) => {
+const HorizontalScroll = ({
+  children,
+  scrollAmount = 400,
+  alwaysShowButtons = false,
+  scrollToIndexRef,
+  onScrollIndexChange,
+  onNearEnd,
+}) => {
   const wrapperRef = useRef(null);
   const trackRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -24,6 +32,9 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
   const rafRef = useRef(null);
 
   const translateX = useRef(0);
+  const onNearEndRef = useRef(onNearEnd);
+  const wasNearEndRef = useRef(false);
+  onNearEndRef.current = onNearEnd;
   const dragStartX = useRef(0);
   const dragStartY = useRef(0);
   const dragStartTranslate = useRef(0);
@@ -56,6 +67,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const rounded = Math.round(value * dpr) / dpr;
     translateX.current = rounded;
     trackRef.current.style.transform = `translate3d(${rounded}px, 0, 0)`;
+    publishNearEnd();
   };
 
   /** Drag: 1:1 kuzatish (kechikishsiz) + chegarada yumshoq qarshilik */
@@ -84,6 +96,19 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const style = window.getComputedStyle(trackRef.current);
     const gap = parseFloat(style.gap) || 12;
     return first.offsetWidth + gap;
+  };
+
+  const publishNearEnd = () => {
+    const maxScroll = getMaxScroll();
+    const stride = getItemWidth();
+    const remaining = maxScroll + translateX.current;
+    const near = maxScroll > 0 && isCarouselNearEnd(remaining, stride);
+    if (near && !wasNearEndRef.current) {
+      wasNearEndRef.current = true;
+      onNearEndRef.current?.();
+    } else if (!near) {
+      wasNearEndRef.current = false;
+    }
   };
 
   // Qolgan masofa yarim kartochkadan kichik bo‘lsa, oxir zonasi butun qatorni yutmasin.
@@ -161,6 +186,7 @@ const HorizontalScroll = ({ children, scrollAmount = 400, alwaysShowButtons = fa
     const tx = translateX.current;
     setCanScrollLeft(tx < -1);
     setCanScrollRight(tx > -maxScroll + 1);
+    publishNearEnd();
   };
 
   const setMotionClass = (on) => {

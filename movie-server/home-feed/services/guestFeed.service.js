@@ -66,7 +66,7 @@ const buildGuestHomeFeed = async ({ localHistory = null, nowMs = Date.now() } = 
  * Mehmon lentasidan sahifa. Javobda faqat so'ralgan bo'lak.
  *
  * @param {{ localHistory?: unknown, offset?: number, limit?: number, excludeIds?: string[], genre?: string, nowMs?: number }} [opts]
- * @returns {Promise<{ movies: Object[], hasMore: boolean, genres: string[], source: 'guest' }>}
+ * @returns {Promise<{ movies: Object[], hasMore: boolean, nextOffset: number, genres: string[], source: 'guest' }>}
  */
 const buildGuestHomeFeedPage = async ({
   localHistory = null,
@@ -81,6 +81,7 @@ const buildGuestHomeFeedPage = async ({
   return {
     movies: page.movies,
     hasMore: page.hasMore,
+    nextOffset: page.nextOffset,
     genres: page.genres,
     source: 'guest',
   };
