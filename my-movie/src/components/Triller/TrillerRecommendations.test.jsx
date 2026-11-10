@@ -3,16 +3,26 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TrillerSection from './TrillerSection';
 import TrillerRecommendedPage from './TrillerRecommendedPage';
 let mockList;
+let mockVisible = 10;
 jest.mock('../../hooks/useTrillerList', () => ({ useTrillerList: () => mockList }));
+jest.mock('../../paged-list/useVisibleCount', () => ({ useVisibleCount: () => mockVisible }));
 jest.mock('./TrillerCard', () => ({ __esModule: true,
   default: ({ triller }) => <article data-id={triller.id}>{triller.title}</article>,
   TrillerCardSkeleton: () => <div data-testid="triller-skeleton" /> }));
-jest.mock('../HorizontalScroll/HorizontalScroll', () => ({ children }) => <div>{children}</div>);
+jest.mock('../HorizontalScroll/HorizontalScroll', () => ({ children, onNearEnd }) => (
+  <div>
+    {onNearEnd ? <button type="button" onClick={onNearEnd}>near</button> : null}
+    {children}
+  </div>
+));
 jest.mock('../ShowMoreButton/ShowMoreButton', () => ({ __esModule: true, DEFAULT_LIMIT: 10,
   default: ({ to }) => <a href={to}>Ko‘proq</a> }));
 jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key, options) => options.defaultValue }) }));
 const list = [42, 3, 18, 9, 6, 17, 8, 2, 90, 5, 1, 12].map((id) => ({ id, title: `Video ${id}` }));
-beforeEach(() => { mockList = { data: list, isPending: false, isError: false, refetch: jest.fn() }; });
+beforeEach(() => {
+  mockVisible = 10;
+  mockList = { data: list, isPending: false, isError: false, refetch: jest.fn() };
+});
 
 test('Home shows only the first ten in server rank order and links to the dedicated page', () => {
   render(<TrillerSection />);
@@ -25,6 +35,17 @@ test.each([0, 5, 10])('Home does not show More for %s entries', (count) => {
   render(<TrillerSection />);
   expect(screen.queryByRole('link')).toBeNull();
   expect(document.querySelectorAll('article')).toHaveLength(count);
+});
+
+test('home reveals the ranked prefix up to ten without changing the order', () => {
+  mockVisible = 4;
+  render(<TrillerSection />);
+  const ids = () => [...document.querySelectorAll('article')].map((node) => Number(node.dataset.id));
+  expect(ids()).toEqual(list.slice(0, 4).map((item) => item.id));
+  fireEvent.click(screen.getByRole('button', { name: 'near' }));
+  expect(ids()).toEqual(list.slice(0, 8).map((item) => item.id));
+  fireEvent.click(screen.getByRole('button', { name: 'near' }));
+  expect(ids()).toEqual(list.slice(0, 10).map((item) => item.id));
 });
 
 test('recommendations render the full unchanged server ordering, including videos beyond the Home ten', () => {

@@ -33,6 +33,7 @@ const TopRatedContent = ({ limit = DEFAULT_LIMIT, showHorizontalScroll = true, m
       filteredMovies={topRatedMovies}
       limit={limit}
       showHorizontalScroll={showHorizontalScroll}
+      revealVisible={showHorizontalScroll}
       headerTitle={t('movies.topRated')}
       moreTo={moreTo}
     />

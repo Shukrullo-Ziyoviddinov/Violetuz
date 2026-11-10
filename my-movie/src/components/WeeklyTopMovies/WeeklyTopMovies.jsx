@@ -41,6 +41,7 @@ const WeeklyTopMovies = () => {
       limit={displayMovies.length > 0 ? displayMovies.length : undefined}
       showHorizontalScroll
       showRankBadge
+      revealVisible
       headerTitle={t('movies.haftaningTopFilmlari', 'Haftaning top 10 filmlari')}
       isLoading={waiting}
     />

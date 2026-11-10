@@ -134,7 +134,7 @@ const Home = () => {
                   headerTitle={t(titleKey)}
                   moreTo={moreTo}
                   isLoading={waitingRecs}
-                  revealVisible={sectionType === 'koreaDrama'}
+                  revealVisible={sectionType === 'koreaDrama' || sectionType === 'kinolar' || sectionType === 'worldMovies' || sectionType === 'animations' || sectionType === 'turkishSeries' || sectionType === 'russianMovies' || sectionType === 'tvSeries' || sectionType === 'actionMovies' || sectionType === 'horrorMovies' || sectionType === 'anime' || sectionType === 'adventureMovies' || sectionType === 'romanceMovies' || sectionType === 'retroMovies' || sectionType === 'uzbekMovies'}
                 />
                 {sectionType === 'koreaDrama' ? <WeeklyTopMovies /> : null}
                 {sectionType === 'animations' ? <MonthlyTopMovies /> : null}
