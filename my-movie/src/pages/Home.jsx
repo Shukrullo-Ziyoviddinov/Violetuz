@@ -134,6 +134,7 @@ const Home = () => {
                   headerTitle={t(titleKey)}
                   moreTo={moreTo}
                   isLoading={waitingRecs}
+                  revealVisible={sectionType === 'koreaDrama'}
                 />
                 {sectionType === 'koreaDrama' ? <WeeklyTopMovies /> : null}
                 {sectionType === 'animations' ? <MonthlyTopMovies /> : null}
