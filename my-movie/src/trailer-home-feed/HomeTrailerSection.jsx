@@ -2,7 +2,6 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../store/hooks';
 import { selectAuthReady, selectIsLoggedIn, selectProfile } from '../store/slices/userSlice';
-import { useTrailerFeed } from './TrailerFeedContext';
 import { fetchTrailerSlice } from './trailerFeedGate';
 import ShowMoreButton from '../components/ShowMoreButton/ShowMoreButton';
 import TrailerHomeCard, { TrailerHomeCardSkeleton } from './TrailerHomeCard';
@@ -20,7 +19,8 @@ const BLOCK_TITLES = [
 ];
 const BLOCK_MAX = 10;
 
-function LeadTrailerBlock({ title }) {
+function WindowTrailerBlock({ title, blockIndex }) {
+  const windowStart = blockIndex * BLOCK_MAX;
   const containerRef = useRef(null);
   const itemRef = useRef(null);
   const [visibleCount, setVisibleCount] = useState(0);
@@ -68,14 +68,14 @@ function LeadTrailerBlock({ title }) {
   const {
     items, hasMore, isLoading, isFetchingNextPage, fetchNextPage,
   } = usePagedList({
-    queryKey: ['trailer-home-block', 0, viewer],
+    queryKey: ['trailer-home-block', blockIndex, viewer],
     enabled: Boolean(viewer) && visibleCount > 0,
     maxItems: BLOCK_MAX,
     getLimit,
     fetchPage: async ({ offset, limit, signal }) => {
       const room = Math.min(limit, BLOCK_MAX - offset);
       if (!(room > 0)) return { items: [], hasMore: false };
-      const page = await fetchTrailerSlice({ isLoggedIn, signal, offset, limit: room, viewer });
+      const page = await fetchTrailerSlice({ isLoggedIn, signal, offset: windowStart + offset, limit: room, viewer });
       const cards = Array.isArray(page?.items) ? page.items.slice(0, room) : [];
       return {
         items: cards,
@@ -99,7 +99,7 @@ function LeadTrailerBlock({ title }) {
   const skeletonCount = measuring ? 1 : visibleCount;
   const peek = !waiting && !isFetchingNextPage && hasMore && room > 0 ? 1 : 0;
   const tailCount = isFetchingNextPage ? nextChunk : peek;
-  return <section className="home-trailer-section" aria-label={title} data-trailer-block={1} aria-busy={waiting || isFetchingNextPage || undefined}>
+  return <section className="home-trailer-section" aria-label={title} data-trailer-block={blockIndex + 1} aria-busy={waiting || isFetchingNextPage || undefined}>
     <div className="home-trailer-section-container" ref={containerRef}>
       <div className="home-trailer-section-header">
         <h2>{title}</h2>
@@ -125,30 +125,8 @@ function LeadTrailerBlock({ title }) {
   </section>;
 }
 
-function TailTrailerBlock({ blockIndex, title }) {
-  const { items, ready, rangeStart = 0 } = useTrailerFeed();
-  const start = blockIndex * BLOCK_MAX - rangeStart;
-  const cards = start >= 0 ? items.slice(start, start + BLOCK_MAX) : [];
-  if (ready && !cards.length) return null;
-  return <section className="home-trailer-section" aria-label={title} data-trailer-block={blockIndex + 1}>
-    <div className="home-trailer-section-container">
-      <div className="home-trailer-section-header">
-        <h2>{title}</h2>
-        {ready && <ShowMoreButton to="/recommended/trailers" />}
-      </div>
-      <div className="home-trailer-section-row" aria-busy={!ready}>
-        <HorizontalScroll>
-          {ready ? cards.map((item) => <TrailerHomeCard key={item.key} item={item} />)
-            : Array.from({ length: BLOCK_MAX }, (_, index) => <TrailerHomeCardSkeleton key={index} />)}
-        </HorizontalScroll>
-      </div>
-    </div>
-  </section>;
-}
-
 export default function HomeTrailerSection({ blockIndex = 0 }) {
   const { t } = useTranslation();
   const title = t(`trailerHomeBlocks.block${blockIndex + 1}`, { defaultValue: BLOCK_TITLES[blockIndex] || BLOCK_TITLES[0] });
-  if (blockIndex === 0) return <LeadTrailerBlock title={title} />;
-  return <TailTrailerBlock blockIndex={blockIndex} title={title} />;
+  return <WindowTrailerBlock title={title} blockIndex={blockIndex} />;
 }

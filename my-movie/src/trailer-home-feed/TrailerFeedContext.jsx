@@ -6,8 +6,6 @@ import { selectAuthReady, selectIsLoggedIn, selectProfile } from '../store/slice
 import { fetchTrailerFeedPage } from './feedApi';
 import { fetchTrailerSlice, resetTrailerFeedGate } from './trailerFeedGate';
 
-const HOME_TAIL_START = 10;
-const HOME_TAIL_LIMIT = 30;
 const FULL_PAGE = 40;
 
 const TrailerFeedContext = createContext(null);
@@ -31,20 +29,18 @@ export function TrailerFeedProvider({ children }) {
     if (!enabled || !authReady || !viewer) return undefined;
     if (epoch > 0) {
       resetTrailerFeedGate(viewer);
-      queryClient.removeQueries({ queryKey: ['trailer-home-block', 0, viewer] });
+      [0, 1, 2, 3].forEach((block) => queryClient.removeQueries({ queryKey: ['trailer-home-block', block, viewer] }));
     }
+    if (pathname === '/') return undefined;
     const abort = new AbortController();
     controller.current = abort;
     busy.current = true;
-    const onHome = pathname === '/';
-    const offset = onHome ? HOME_TAIL_START : 0;
-    const limit = onHome ? HOME_TAIL_LIMIT : FULL_PAGE;
-    fetchTrailerSlice({ isLoggedIn, signal: abort.signal, viewer, offset, limit }).then((page) => {
+    fetchTrailerSlice({ isLoggedIn, signal: abort.signal, viewer, offset: 0, limit: FULL_PAGE }).then((page) => {
       if (!abort.signal.aborted && generation.current === token) {
-        setResult({ ...page, viewer, rangeStart: offset, loading: false, error: null });
+        setResult({ ...page, viewer, rangeStart: 0, loading: false, error: null });
       }
     }).catch((error) => {
-      if (!abort.signal.aborted && generation.current === token) setResult({ viewer, rangeStart: offset, items: [], nextCursor: null, loading: false, error });
+      if (!abort.signal.aborted && generation.current === token) setResult({ viewer, rangeStart: 0, items: [], nextCursor: null, loading: false, error });
     }).finally(() => { if (generation.current === token) busy.current = false; });
     return () => abort.abort();
   }, [enabled, authReady, isLoggedIn, viewer, epoch, pathname, queryClient]);

@@ -4,4 +4,5 @@
 .trailer-recommended-grid .trailer-home-card { width: 100%; min-width: 0; }
 .trailer-recommended-page > button { display: block; margin: 1.5rem auto 0; padding: .7rem 1.4rem; border: 0; border-radius: 8px; color: #fff; background: #9b4fe7; cursor: pointer; }
 .trailer-recommended-page > button:disabled { opacity: .6; cursor: wait; }
+.trailer-recommended-sentinel { height: 1px; }
 @media (max-width: 580px) { .trailer-recommended-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
