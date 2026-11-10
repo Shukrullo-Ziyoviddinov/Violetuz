@@ -218,6 +218,7 @@ const HorizontalScroll = ({
 
   useEffect(() => {
     const runCheck = () => {
+      wasNearEndRef.current = false;
       checkScrollability();
       notifyIndexChange();
     };

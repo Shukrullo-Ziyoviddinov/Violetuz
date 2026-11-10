@@ -75,3 +75,36 @@ test('HTTP continuation retains account scope and passes previously shown identi
     assert.equal(calls[0].sessionSeed, calls[2].sessionSeed);
   } finally { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
 });
+
+test('a small window slices the stored page and does not rank again or shrink the rank', async () => {
+  const items = Array.from({ length: 40 }, (_, i) => ({ key: `${i + 1}-1`, movieId: i + 1, trailerId: 1 }));
+  const calls = [];
+  const rank = async (viewer, options) => {
+    calls.push(options);
+    return { items: items.slice(0, options.limit) };
+  };
+  const app = express();
+  app.use(express.json());
+  app.use('/feed', createFeedRouter({ account: rank, guest: rank,
+    authenticate: (req, res, next) => { req.authUser = { _id: 'a' }; next(); } }));
+  app.use((error, req, res, next) => res.status(error.status || 500).json({ message: error.message }));
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise((resolve) => server.once('listening', resolve));
+  const url = `http://127.0.0.1:${server.address().port}/feed`;
+  try {
+    const first = (await (await fetch(`${url}?offset=0&limit=4`)).json()).data;
+    assert.equal(first.items.map((item) => item.key).join(','), '1-1,2-1,3-1,4-1');
+    assert.equal(first.hasMore, true);
+    assert.equal(first.nextOffset, 4);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].limit, 40);
+    const second = (await (await fetch(`${url}?cursor=${encodeURIComponent(first.pageCursor)}&offset=4&limit=4`)).json()).data;
+    assert.equal(second.items[0].key, '5-1');
+    assert.equal(second.pageCursor, first.pageCursor);
+    assert.equal(calls.length, 1);
+    const full = (await (await fetch(`${url}?cursor=${encodeURIComponent(first.pageCursor)}`)).json()).data;
+    assert.equal(full.items.length, 40);
+    assert.equal(full.items[0].key, '1-1');
+    assert.equal(calls.length, 1);
+  } finally { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
+});

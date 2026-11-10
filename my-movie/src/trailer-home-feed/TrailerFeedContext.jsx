@@ -1,8 +1,14 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '../store/hooks';
 import { selectAuthReady, selectIsLoggedIn, selectProfile } from '../store/slices/userSlice';
 import { fetchTrailerFeedPage } from './feedApi';
+import { fetchTrailerSlice, resetTrailerFeedGate } from './trailerFeedGate';
+
+const HOME_TAIL_START = 10;
+const HOME_TAIL_LIMIT = 30;
+const FULL_PAGE = 40;
 
 const TrailerFeedContext = createContext(null);
 export function TrailerFeedProvider({ children }) {
@@ -12,6 +18,7 @@ export function TrailerFeedProvider({ children }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const accountId = useAppSelector(selectProfile)?.id;
   const viewer = authReady ? (isLoggedIn ? `account:${accountId}` : 'guest') : null;
+  const queryClient = useQueryClient();
   const [result, setResult] = useState(null);
   const [epoch, setEpoch] = useState(0);
   const generation = useRef(0);
@@ -21,17 +28,26 @@ export function TrailerFeedProvider({ children }) {
     const token = ++generation.current;
     setResult(null);
     busy.current = false;
-    if (!enabled || !authReady) return undefined;
+    if (!enabled || !authReady || !viewer) return undefined;
+    if (epoch > 0) {
+      resetTrailerFeedGate(viewer);
+      queryClient.removeQueries({ queryKey: ['trailer-home-block', 0, viewer] });
+    }
     const abort = new AbortController();
     controller.current = abort;
     busy.current = true;
-    fetchTrailerFeedPage({ isLoggedIn, signal: abort.signal }).then((page) => {
-      if (!abort.signal.aborted && generation.current === token) setResult({ ...page, viewer, loading: false, error: null });
+    const onHome = pathname === '/';
+    const offset = onHome ? HOME_TAIL_START : 0;
+    const limit = onHome ? HOME_TAIL_LIMIT : FULL_PAGE;
+    fetchTrailerSlice({ isLoggedIn, signal: abort.signal, viewer, offset, limit }).then((page) => {
+      if (!abort.signal.aborted && generation.current === token) {
+        setResult({ ...page, viewer, rangeStart: offset, loading: false, error: null });
+      }
     }).catch((error) => {
-      if (!abort.signal.aborted && generation.current === token) setResult({ viewer, items: [], nextCursor: null, loading: false, error });
+      if (!abort.signal.aborted && generation.current === token) setResult({ viewer, rangeStart: offset, items: [], nextCursor: null, loading: false, error });
     }).finally(() => { if (generation.current === token) busy.current = false; });
     return () => abort.abort();
-  }, [enabled, authReady, isLoggedIn, viewer, epoch]);
+  }, [enabled, authReady, isLoggedIn, viewer, epoch, pathname, queryClient]);
   const loadMore = useCallback(async () => {
     if (busy.current || !result?.nextCursor || result.viewer !== viewer) return;
     const token = generation.current;
@@ -52,6 +68,7 @@ export function TrailerFeedProvider({ children }) {
   }, [result, viewer, isLoggedIn]);
   const ready = authReady && result?.viewer === viewer;
   return <TrailerFeedContext.Provider value={{ items: ready ? result.items : [], ready,
+    rangeStart: ready ? (result.rangeStart ?? 0) : 0,
     loading: !ready || result.loading, nextCursor: ready ? result.nextCursor : null,
     error: ready ? result.error : null, loadMore, refresh: () => setEpoch((value) => value + 1) }}>
     {children}

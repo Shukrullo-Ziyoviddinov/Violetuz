@@ -27,7 +27,7 @@ export function usePagedList({
     initialPageParam: 0,
     staleTime,
     retry: 1,
-    queryFn: ({ pageParam }) => {
+    queryFn: ({ pageParam, signal }) => {
       const offset = Math.max(0, Number(pageParam) || 0);
       const pending = pendingLimitRef.current;
       pendingLimitRef.current = null;
@@ -36,7 +36,7 @@ export function usePagedList({
       if (!(limit > 0)) {
         return Promise.resolve({ items: [], hasMore: false, nextOffset: offset });
       }
-      return fetchPageRef.current({ offset, limit });
+      return fetchPageRef.current({ offset, limit, signal });
     },
     getNextPageParam: (lastPage, allPages) => {
       const loaded = allPages.reduce((sum, page) => sum + pageLength(page), 0);

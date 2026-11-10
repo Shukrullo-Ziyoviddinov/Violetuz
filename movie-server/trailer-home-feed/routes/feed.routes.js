@@ -15,6 +15,32 @@ const present = (result) => ({ generatedAt: result.generatedAt, nextCursor: resu
   title: item.title, movieTitle: item.movieTitle, trillerimg: item.trillerimg,
 })) });
 
+// offset/limit only cut an already ranked page. rank() still receives feed.size.
+const windowValue = (value) => {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (raw == null || raw === '') return null;
+  if (typeof raw !== 'string' || !/^\d{1,2}$/.test(raw)) throw badRequest('Invalid trailer feed window');
+  const number = Number(raw);
+  if (number > trailerHomeFeedWeights.feed.size) throw badRequest('Invalid trailer feed window');
+  return number;
+};
+
+const sendPage = (res, full, query) => {
+  const view = present(full);
+  const pageCursor = full.pageCursor || null;
+  const limit = windowValue(query.limit);
+  if (limit == null) {
+    sendSuccess(res, { data: { ...view, pageCursor } });
+    return;
+  }
+  const offset = windowValue(query.offset) ?? 0;
+  const items = view.items.slice(offset, offset + limit);
+  sendSuccess(res, { data: {
+    generatedAt: view.generatedAt, nextCursor: view.nextCursor, pageCursor, items,
+    hasMore: offset + items.length < view.items.length, nextOffset: offset + items.length,
+  } });
+};
+
 const createFeedRouter = ({ account = rankAccountTrailerFeed, guest = rankGuestTrailerFeed,
   authenticate = requireAuth } = {}) => {
   const router = Router();
@@ -22,8 +48,8 @@ const createFeedRouter = ({ account = rankAccountTrailerFeed, guest = rankGuestT
   router.use(rateLimit({ windowMs: 60_000, limit: 30, standardHeaders: 'draft-8', legacyHeaders: false }));
   router.use((req, res, next) => { res.set('Cache-Control', 'private, no-store'); next(); });
   router.get('/', authenticate, asyncHandler(async (req, res) => {
-    sendSuccess(res, { data: present(await paginate({ cursor: req.query.cursor, scope: `account:${req.authUser._id}`,
-      rank: (options) => account(req.authUser._id, options) })) });
+    sendPage(res, await paginate({ cursor: req.query.cursor, scope: `account:${req.authUser._id}`,
+      rank: (options) => account(req.authUser._id, options) }), req.query);
   }));
   router.post('/guest', asyncHandler(async (req, res) => {
     const body = req.body;
@@ -36,8 +62,8 @@ const createFeedRouter = ({ account = rankAccountTrailerFeed, guest = rankGuestT
       if (!Array.isArray(rows) || rows.length > max) throw badRequest('Invalid guest history');
       history[key] = rows;
     }
-    sendSuccess(res, { data: present(await paginate({ cursor: req.query.cursor, scope: 'guest',
-      rank: (options) => guest(history, options) })) });
+    sendPage(res, await paginate({ cursor: req.query.cursor, scope: 'guest',
+      rank: (options) => guest(history, options) }), req.query);
   }));
   return router;
 };

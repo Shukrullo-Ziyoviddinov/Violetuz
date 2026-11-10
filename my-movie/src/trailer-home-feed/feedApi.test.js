@@ -32,6 +32,15 @@ test('continuation sends an encoded cursor and retains server ranking order', as
   fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true,
     data: { items: [{ key: '3-1' }, { key: '1-1' }], nextCursor: 'session:2' } }) });
   expect(await fetchTrailerFeedPage({ isLoggedIn: true, cursor: 'session:1' })).toEqual({
-    items: [{ key: '3-1' }, { key: '1-1' }], nextCursor: 'session:2' });
+    items: [{ key: '3-1' }, { key: '1-1' }], nextCursor: 'session:2', pageCursor: null, hasMore: false, nextOffset: 2 });
   expect(fetch.mock.calls[0][0]).toBe('/api/trailer-home-feed?cursor=session%3A1');
+});
+
+test('window query asks for a slice and keeps the session cursor', async () => {
+  fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true, data: {
+    items: [{ key: '2-1' }], nextCursor: 'session:2', pageCursor: 'session:0', hasMore: true, nextOffset: 4,
+  } }) });
+  expect(await fetchTrailerFeedPage({ isLoggedIn: true, cursor: 'session:0', offset: 2, limit: 2 })).toEqual({
+    items: [{ key: '2-1' }], nextCursor: 'session:2', pageCursor: 'session:0', hasMore: true, nextOffset: 4 });
+  expect(fetch.mock.calls[0][0]).toBe('/api/trailer-home-feed?cursor=session%3A0&offset=2&limit=2');
 });

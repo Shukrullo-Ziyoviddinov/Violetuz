@@ -9,15 +9,40 @@ export function useVisibleCount(containerRef, itemRef) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    let alive = true;
+    let observer;
+    let frame = 0;
     const measure = () => {
-      setCount(measureVisibleCount(containerRef?.current, itemRef?.current));
+      if (!alive) return 0;
+      const next = measureVisibleCount(containerRef?.current, itemRef?.current);
+      setCount(next);
+      return next;
     };
-    measure();
-    if (typeof ResizeObserver === 'undefined') return undefined;
-    const observer = new ResizeObserver(measure);
-    if (containerRef?.current) observer.observe(containerRef.current);
-    if (itemRef?.current) observer.observe(itemRef.current);
-    return () => observer.disconnect();
+    const attach = () => {
+      observer?.disconnect();
+      if (typeof ResizeObserver === 'undefined') return;
+      observer = new ResizeObserver(() => measure());
+      if (containerRef?.current) observer.observe(containerRef.current);
+      if (itemRef?.current) observer.observe(itemRef.current);
+    };
+    const first = measure();
+    attach();
+    // The card node can attach after the first effect. Keep measuring until it has a width.
+    let tries = 0;
+    const retry = () => {
+      if (!alive || tries > 30) return;
+      tries += 1;
+      const next = measure();
+      attach();
+      if (next > 0) return;
+      frame = requestAnimationFrame(retry);
+    };
+    if (!(first > 0)) frame = requestAnimationFrame(retry);
+    return () => {
+      alive = false;
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+    };
   }, [containerRef, itemRef]);
 
   return count;

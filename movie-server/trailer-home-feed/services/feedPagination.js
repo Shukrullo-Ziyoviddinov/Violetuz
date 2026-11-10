@@ -39,8 +39,10 @@ const createFeedPagination = ({ now = Date.now, maxSessions = 256 } = {}) => {
         });
         session.tail = [...session.tail, ...items].slice(-(trailerHomeFeedWeights.diversity.windowSize - 1));
         session.done = items.length < pageSize;
+        const pageIndex = session.pages.length;
         const response = { ...result, items,
-          nextCursor: session.done ? null : `${id}:${session.pages.length + 1}` };
+          nextCursor: session.done ? null : `${id}:${pageIndex + 1}`,
+          pageCursor: `${id}:${pageIndex}` };
         session.pages.push(response);
         return response;
       })().finally(() => { session.pending = null; });
