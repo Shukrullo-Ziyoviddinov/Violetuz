@@ -1,12 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../context/WishlistContext';
 import { useContentLanguage } from '../../context/ContentLanguageContext';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
-import { useVisibleCount } from '../../paged-list/useVisibleCount';
-import { useLoadMoreTrigger } from '../../paged-list/useLoadMoreTrigger';
 import ShowMoreButton, { getDisplayItems, shouldShowMore, DEFAULT_LIMIT } from '../ShowMoreButton/ShowMoreButton';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import { useImageReady } from '../../utils/useImageReady';
@@ -174,7 +172,6 @@ const Movies = ({
   itemRef = null,
   tailCount = 0,
   endRef = null,
-  revealVisible = false,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -188,24 +185,6 @@ const Movies = ({
   const shouldShowLimit = limit != null;
   const displayMovies = getDisplayItems(allMoviesData, shouldShowLimit ? limit : null);
   const hasMoreMovies = shouldShowMore(allMoviesData, limit, moreTo);
-  const measureContainerRef = useRef(null);
-  const measureItemRef = useRef(null);
-  const visibleCount = useVisibleCount(measureContainerRef, measureItemRef);
-  const visibleRef = useRef(0);
-  visibleRef.current = visibleCount;
-  const [revealed, setRevealed] = useState(0);
-  const revealLimit = shouldShowLimit ? Number(limit) || DEFAULT_LIMIT : displayMovies.length;
-  const shown = !revealVisible
-    ? displayMovies.length
-    : visibleCount === 0
-      ? 0
-      : Math.min(displayMovies.length, Math.max(revealed, visibleCount));
-  const revealRoom = revealVisible ? Math.max(0, Math.min(revealLimit, displayMovies.length) - shown) : 0;
-  const revealMore = useCallback(() => {
-    const step = visibleRef.current;
-    if (step <= 0) return;
-    setRevealed((current) => Math.min(revealLimit, Math.max(current, step) + step));
-  }, [revealLimit]);
 
   const skeletonItems = useMemo(() => {
     /* limit=null (recommended grid) — DEFAULT_LIMIT o‘rniga to‘liqroq grid */
@@ -223,14 +202,7 @@ const Movies = ({
 
   /* API tugaguncha skeleton; timer bilan erta o‘chirmaslik — bo‘sh (null) flash bo‘lmasin */
   const showSectionSkeleton = Boolean(isLoading) && displayMovies.length === 0;
-  const measuring = revealVisible && visibleCount === 0;
-  const itemsToRender = showSectionSkeleton || (revealVisible && visibleCount === 0)
-    ? (revealVisible ? skeletonItems.slice(0, measuring ? 1 : visibleCount) : skeletonItems)
-    : (revealVisible ? displayMovies.slice(0, shown) : displayMovies);
-  const { notifyNearEnd } = useLoadMoreTrigger({
-    enabled: revealVisible && !showSectionSkeleton && revealRoom > 0 && visibleCount > 0,
-    onLoadMore: revealMore,
-  });
+  const itemsToRender = showSectionSkeleton ? skeletonItems : displayMovies;
   const showTitleSkeleton = showSectionSkeleton;
 
   const getMovieTitle = (movie) => {
@@ -303,7 +275,7 @@ const Movies = ({
   );
 
   const renderMovieItem = (movie, index) => {
-    const nodeRef = index === 0 ? (revealVisible ? measureItemRef : itemRef) : undefined;
+    const nodeRef = index === 0 ? itemRef : undefined;
     if (movie._skeleton) return renderSkeleton(movie.id, nodeRef);
 
     return (
@@ -348,11 +320,10 @@ const Movies = ({
             )}
           </div>
         )}
-        <div className="movies-content-wrapper" ref={revealVisible ? measureContainerRef : undefined}>
+        <div className="movies-content-wrapper">
           {useHorizontalScrollLayout ? (
-            <HorizontalScroll onNearEnd={revealVisible ? notifyNearEnd : undefined}>
-              {itemsToRender.map((movie, index) => renderMovieItem(movie, index))}
-              {revealRoom > 0 && shown > 0 ? renderSkeleton('movie-reveal-peek') : null}
+            <HorizontalScroll>
+              {itemsToRender.map((movie) => renderMovieItem(movie))}
             </HorizontalScroll>
           ) : (
             <div className="movies-grid" ref={gridRef}>
