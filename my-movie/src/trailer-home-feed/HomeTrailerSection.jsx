@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../store/hooks';
 import { selectAuthReady, selectIsLoggedIn, selectProfile } from '../store/slices/userSlice';
@@ -8,7 +8,7 @@ import ShowMoreButton from '../components/ShowMoreButton/ShowMoreButton';
 import TrailerHomeCard, { TrailerHomeCardSkeleton } from './TrailerHomeCard';
 import HorizontalScroll from '../components/HorizontalScroll/HorizontalScroll';
 import { usePagedList } from '../paged-list/usePagedList';
-import { useVisibleCount } from '../paged-list/useVisibleCount';
+import { measureVisibleCount } from '../paged-list/visibleCount';
 import { useLoadMoreTrigger } from '../paged-list/useLoadMoreTrigger';
 import './HomeTrailerSection.css';
 
@@ -23,9 +23,43 @@ const BLOCK_MAX = 10;
 function LeadTrailerBlock({ title }) {
   const containerRef = useRef(null);
   const itemRef = useRef(null);
-  const visibleCount = useVisibleCount(containerRef, itemRef);
+  const [visibleCount, setVisibleCount] = useState(0);
   const visibleRef = useRef(0);
   visibleRef.current = visibleCount;
+  useLayoutEffect(() => {
+    let alive = true;
+    let frame = 0;
+    let tries = 0;
+    let observer;
+    const publish = (next) => {
+      if (!alive || !(next > 0)) return false;
+      visibleRef.current = next;
+      setVisibleCount((prev) => (prev === next ? prev : next));
+      return true;
+    };
+    const read = () => measureVisibleCount(containerRef.current, itemRef.current);
+    const tick = () => {
+      if (!alive) return;
+      if (publish(read())) return;
+      if (tries >= 180) return;
+      tries += 1;
+      frame = requestAnimationFrame(tick);
+    };
+    tick();
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => {
+        if (visibleRef.current > 0) return;
+        publish(read());
+      });
+      if (containerRef.current) observer.observe(containerRef.current);
+      if (itemRef.current) observer.observe(itemRef.current);
+    }
+    return () => {
+      alive = false;
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+    };
+  }, []);
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const accountId = useAppSelector(selectProfile)?.id;

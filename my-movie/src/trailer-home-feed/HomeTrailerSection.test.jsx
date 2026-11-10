@@ -23,7 +23,7 @@ jest.mock('./TrailerHomeCard', () => ({ __esModule: true,
 jest.mock('../components/HorizontalScroll/HorizontalScroll', () => ({ children, onNearEnd }) => (
   <div>{onNearEnd ? <button type="button" onClick={onNearEnd}>near</button> : null}{children}</div>
 ));
-jest.mock('../paged-list/useVisibleCount', () => ({ useVisibleCount: () => mockVisible }));
+jest.mock('../paged-list/visibleCount', () => ({ measureVisibleCount: () => mockVisible }));
 
 const renderFeed = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
@@ -77,8 +77,10 @@ test('one ranked page is read in windows and the four blocks keep that order', a
   expect(fetchTrailerFeedPage).toHaveBeenCalledTimes(2);
   const byOffset = (offset) => fetchTrailerFeedPage.mock.calls.find((call) => call[0].offset === offset);
   expect(byOffset(0)[0].limit).toBe(10);
-  expect(byOffset(0)[0].cursor).toBeUndefined();
-  expect(byOffset(10)[0]).toMatchObject({ limit: 30, cursor: PAGE });
+  expect(byOffset(0)[0].cursor).toBe(PAGE);
+  expect(byOffset(10)[0].limit).toBe(30);
+  expect(byOffset(10)[0].cursor).toBeUndefined();
+  expect(fetchTrailerFeedPage.mock.calls.filter((call) => call[0].cursor == null)).toHaveLength(1);
   const sections = [...container.querySelectorAll('[data-trailer-block]')];
   expect(sections).toHaveLength(4);
   sections.forEach((section, index) => {
@@ -106,7 +108,7 @@ test('lead row asks for the visible slice, then the next slice, and stops at ten
   expect(screen.queryByText('Trailer 11')).toBeNull();
   const lead = fetchTrailerFeedPage.mock.calls.filter((call) => call[0].limit <= 4);
   expect(lead.map((call) => [call[0].offset, call[0].limit])).toEqual([[0, 4], [4, 4], [8, 2]]);
-  expect(lead[0][0].cursor).toBeUndefined();
+  expect(lead[0][0].cursor).toBe(PAGE);
   expect(lead[1][0].cursor).toBe(PAGE);
   expect(lead[2][0].cursor).toBe(PAGE);
   expect(fetchTrailerFeedPage.mock.calls.some((call) => call[0].offset === 10 && call[0].limit === 30)).toBe(true);
