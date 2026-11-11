@@ -71,6 +71,30 @@ const CONCERT_SEARCH_PROJECTION = {
   year: 1,
 };
 
+/**
+ * Odam qidiruvi. User sxemada alohida id yo'q — ochiq id _id.
+ * usernameNormalized ball uchun kerak. email, emailNormalized, passwordHash, bio, role yo'q.
+ */
+const USER_SEARCH_PROJECTION = {
+  _id: 1,
+  username: 1,
+  usernameNormalized: 1,
+  name: 1,
+  avatar: 1,
+};
+
+/**
+ * Kanal qidiruvi. Og'ir maydonlar (profileBanner, biografiya) chiqarilmaydi.
+ */
+const CHANNEL_SEARCH_PROJECTION = {
+  _id: 0,
+  id: 1,
+  username: 1,
+  usernameNormalized: 1,
+  name: 1,
+  avatar: 1,
+};
+
 const ALBUM_SEARCH_PROJECTION = {
   _id: 0,
   id: 1,
@@ -94,4 +118,6 @@ module.exports = {
   CLIP_SEARCH_PROJECTION,
   CONCERT_SEARCH_PROJECTION,
   ALBUM_SEARCH_PROJECTION,
+  USER_SEARCH_PROJECTION,
+  CHANNEL_SEARCH_PROJECTION,
 };

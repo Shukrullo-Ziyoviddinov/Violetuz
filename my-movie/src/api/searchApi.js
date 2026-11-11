@@ -10,12 +10,19 @@ const EMPTY_RESULTS = {
   albums: [],
   clips: [],
   concerts: [],
+  people: [],
+  channels: [],
 };
 
 const EMPTY_SECTION_META = {
   hasMore: false,
   nextCursor: null,
   total: 0,
+};
+
+const EMPTY_IDENTITY_SECTION_META = {
+  ...EMPTY_SECTION_META,
+  topScore: 0,
 };
 
 const EMPTY_META = {
@@ -27,6 +34,8 @@ const EMPTY_META = {
     albums: { ...EMPTY_SECTION_META },
     clips: { ...EMPTY_SECTION_META },
     concerts: { ...EMPTY_SECTION_META },
+    people: { ...EMPTY_IDENTITY_SECTION_META },
+    channels: { ...EMPTY_IDENTITY_SECTION_META },
   },
 };
 
@@ -38,6 +47,8 @@ const cloneEmptyMetaSections = () => ({
   albums: { ...EMPTY_SECTION_META },
   clips: { ...EMPTY_SECTION_META },
   concerts: { ...EMPTY_SECTION_META },
+  people: { ...EMPTY_IDENTITY_SECTION_META },
+  channels: { ...EMPTY_IDENTITY_SECTION_META },
 });
 
 export const fetchSearchResults = async (query, lang = 'uz', options = {}) => {

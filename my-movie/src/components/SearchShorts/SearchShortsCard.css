@@ -10,8 +10,10 @@
 
 .search-shorts-row-title {
   margin: 0 0 0.6rem;
+  padding: 0;
   font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1.2;
   color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.02em;
 }

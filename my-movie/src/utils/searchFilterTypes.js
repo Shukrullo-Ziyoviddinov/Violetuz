@@ -51,6 +51,18 @@ export const SEARCH_FILTER_TYPES = [
     labelKey: 'searchModal.filterMusicArtists',
     labelDefault: 'Musiqachilar',
   },
+  {
+    id: 'people',
+    resultKey: 'people',
+    labelKey: 'searchModal.filterPeople',
+    labelDefault: 'Odamlar',
+  },
+  {
+    id: 'channel',
+    resultKey: 'channels',
+    labelKey: 'searchModal.filterChannel',
+    labelDefault: 'Kanal',
+  },
 ];
 
 /** Natijada mavjud bo'lgan filterlarni qaytaradi */

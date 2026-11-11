@@ -20,6 +20,7 @@ import { formatArtistNames } from '../../pageMusic/useArtistCycle';
 import SearchModalResultsMovieItem from './SearchModalResultsMovieItem';
 import SearchModalResultsActorItem from './SearchModalResultsActorItem';
 import SearchShortsCard from '../SearchShorts/SearchShortsCard';
+import SearchModalIdentityRow from './SearchModalIdentityRow';
 import './SearchModalResults.css';
 import '../../Music/SearchMusicResults/SearchMusicResults.css';
 
@@ -31,6 +32,8 @@ const SECTION_KEYS = [
   'albums',
   'clips',
   'concerts',
+  'people',
+  'channels',
 ];
 
 const mergeUniqueById = (prev = [], next = []) => {
@@ -65,6 +68,8 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     clips: [],
     concerts: [],
     shorts: [],
+    people: [],
+    channels: [],
   });
   const [sectionsMeta, setSectionsMeta] = useState(() => cloneEmptyMetaSections());
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -90,6 +95,8 @@ const SearchModalResults = ({ query, onMovieClick }) => {
       clips: [],
       concerts: [],
       shorts: [],
+      people: [],
+      channels: [],
     });
     setSectionsMeta(cloneEmptyMetaSections());
     setActiveFilter(SEARCH_FILTER_ALL);
@@ -121,11 +128,24 @@ const SearchModalResults = ({ query, onMovieClick }) => {
       clips: firstPage.clips || [],
       concerts: firstPage.concerts || [],
       shorts: firstPage.shorts || [],
+      people: firstPage.people || [],
+      channels: firstPage.channels || [],
     });
     setSectionsMeta(firstPage.meta?.sections || cloneEmptyMetaSections());
   }, [isSuccess, firstPage, debouncedQuery]);
 
-  const { actors, musicArtists, movies, music, albums, clips, concerts, shorts = [] } = accumulated;
+  const {
+    actors,
+    musicArtists,
+    movies,
+    music,
+    albums,
+    clips,
+    concerts,
+    shorts = [],
+    people = [],
+    channels = [],
+  } = accumulated;
 
   const availableFilters = useMemo(
     () =>
@@ -159,6 +179,8 @@ const SearchModalResults = ({ query, onMovieClick }) => {
       album: 'albums',
       klip: 'clips',
       konsert: 'concerts',
+      people: 'people',
+      channel: 'channels',
     };
 
     return SECTION_KEYS.filter((key) => {
@@ -325,6 +347,11 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     closeAndNavigate(`/actor/${actor.id}`);
   };
 
+  const openChannel = (channel) => {
+    if (channel?.id == null || channel.id === '') return;
+    closeAndNavigate(`/channel/${encodeURIComponent(channel.id)}`);
+  };
+
   const handleMusicClick = (item, type) => {
     if (
       type === 'music' ||
@@ -367,10 +394,32 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     { key: 'konsert', items: concerts, label: t('music.searchTypeConcert', 'Konsert') },
   ];
 
+  const identityBlocks = [
+    {
+      id: 'people',
+      items: people,
+      title: t('searchModal.filterPeople', 'Odamlar'),
+      topScore: Number(sectionsMeta?.people?.topScore) || 0,
+    },
+    {
+      id: 'channel',
+      items: channels,
+      title: t('searchModal.filterChannel', 'Kanal'),
+      topScore: Number(sectionsMeta?.channels?.topScore) || 0,
+    },
+  ].sort((a, b) => {
+    if (b.topScore !== a.topScore) return b.topScore - a.topScore;
+    if (a.id === 'people') return -1;
+    if (b.id === 'people') return 1;
+    return 0;
+  });
+
   const hasAny =
     actors.length > 0 ||
     movies.length > 0 ||
     shorts.length > 0 ||
+    people.length > 0 ||
+    channels.length > 0 ||
     musicSections.some((s) => s.items.length > 0);
 
   const hasMoreAny = getSectionsToLoadMore().length > 0;
@@ -510,6 +559,26 @@ const SearchModalResults = ({ query, onMovieClick }) => {
           </ScrollTouch>
         </div>
       ) : null}
+
+      {identityBlocks.map((block) => {
+        if (!show(block.id) || block.items.length === 0) return null;
+        return (
+          <section key={block.id} className="search-modal-identity-block" aria-label={block.title}>
+            <h3 className="search-modal-results-section-title">{block.title}</h3>
+            <div className="search-modal-identity-list">
+              {block.items.map((item) => (
+                <SearchModalIdentityRow
+                  key={`${block.id}-${item.id}`}
+                  name={item.name}
+                  username={item.username}
+                  avatar={item.avatar}
+                  onClick={block.id === 'channel' ? () => openChannel(item) : undefined}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
 
       {!hasAny && (
         <p className="search-modal-results-empty">{t('searchModal.noResults', 'Natija topilmadi')}</p>

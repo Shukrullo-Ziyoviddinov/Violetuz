@@ -9,6 +9,8 @@ const Album = require('../models/Album.model');
 const Clip = require('../models/Clip.model');
 const Concert = require('../models/Concert.model');
 const Artist = require('../models/Artist.model');
+const User = require('../models/User.model');
+const Channel = require('../models/Channel.model');
 const {
   rankAllResults,
   paginateRankedResults,
@@ -17,6 +19,11 @@ const {
   DEFAULT_LIMITS,
   SEARCH_SECTIONS,
 } = require('../utils/searchAlgorithm');
+const {
+  MIN_QUERY_LENGTH: IDENTITY_MIN_QUERY_LENGTH,
+  normalizeIdentityQuery,
+  rankIdentityUsernames,
+} = require('../utils/searchIdentity');
 const { getContentTypes } = require('../utils/searchContentType');
 const { parseMovieSearchFacets } = require('../utils/searchFacets');
 const {
@@ -27,9 +34,115 @@ const {
   CLIP_SEARCH_PROJECTION,
   CONCERT_SEARCH_PROJECTION,
   ALBUM_SEARCH_PROJECTION,
+  USER_SEARCH_PROJECTION,
+  CHANNEL_SEARCH_PROJECTION,
 } = require('../utils/searchProjections');
 const searchCache = require('../utils/searchQueryCache');
 const { attachSearchShorts } = require('./searchShortsAttach.service');
+
+const IDENTITY_SECTIONS = ['people', 'channels'];
+const IDENTITY_LIMITS = {
+  people: 8,
+  channels: 8,
+};
+
+/** Tur filtri («kino», «musiqa», «klip») va juda qisqa so'rovda odam/kanal qo'shilmaydi. */
+const shouldAttachIdentity = (query) =>
+  !parseContentType(query).hasTypeFilter &&
+  normalizeIdentityQuery(query).length >= IDENTITY_MIN_QUERY_LENGTH;
+
+const toSearchUser = (user) => ({
+  id: String(user?._id || ''),
+  username: user?.username || '',
+  usernameNormalized: user?.usernameNormalized || '',
+  name: user?.name || '',
+  avatar: user?.avatar || '',
+});
+
+const toSearchChannel = (channel) => ({
+  id: channel?.id,
+  username: channel?.username || '',
+  usernameNormalized: channel?.usernameNormalized || '',
+  name: channel?.name || '',
+  avatar: channel?.avatar || '',
+});
+
+const loadIdentityCollections = async () => {
+  const [users, channels] = await Promise.all([
+    User.find({}, USER_SEARCH_PROJECTION).lean(),
+    Channel.find({}, CHANNEL_SEARCH_PROJECTION).lean(),
+  ]);
+  return {
+    people: (users || []).map(toSearchUser),
+    channels: (channels || []).map(toSearchChannel),
+  };
+};
+
+const attachIdentityRank = async (ranked, query) => {
+  const { people, channels } = await loadIdentityCollections();
+  const peopleRank = rankIdentityUsernames(people, query);
+  const channelsRank = rankIdentityUsernames(channels, query);
+  return {
+    ...ranked,
+    people: peopleRank.items,
+    channels: channelsRank.items,
+    identityTopScores: {
+      people: peopleRank.topScore,
+      channels: channelsRank.topScore,
+    },
+  };
+};
+
+const sliceIdentityList = (list, cursor, limit) => {
+  const start = Math.max(0, Number(cursor) || 0);
+  const size = Math.max(1, Number(limit) || IDENTITY_LIMITS.people);
+  const items = Array.isArray(list) ? list : [];
+  const slice = items.slice(start, start + size);
+  const next = start + slice.length;
+  const hasMore = next < items.length;
+  return {
+    items: slice,
+    hasMore,
+    nextCursor: hasMore ? String(next) : null,
+    total: items.length,
+  };
+};
+
+/**
+ * Odam va kanal sahifasini mavjud javob yoniga qo'yadi.
+ * identityTopScores yo'q bo'lsa javob o'zgarmaydi.
+ */
+const applyIdentityToPage = (page, ranked, { section = null, cursor = 0, limits = IDENTITY_LIMITS } = {}) => {
+  if (!ranked?.identityTopScores) return page;
+
+  const keys = section && IDENTITY_SECTIONS.includes(section) ? [section] : IDENTITY_SECTIONS;
+  if (!page.data) page.data = {};
+  if (!page.meta) page.meta = {};
+  if (!page.meta.sections) page.meta.sections = {};
+
+  for (const key of keys) {
+    const sliced = sliceIdentityList(ranked[key], section ? cursor : 0, limits[key]);
+    page.data[key] = sliced.items;
+    page.meta.sections[key] = {
+      hasMore: sliced.hasMore,
+      nextCursor: sliced.nextCursor,
+      total: sliced.total,
+      topScore: ranked.identityTopScores[key] ?? 0,
+    };
+  }
+
+  if (section && IDENTITY_SECTIONS.includes(section)) {
+    const other = section === 'people' ? 'channels' : 'people';
+    page.meta.sections[other] = {
+      hasMore: false,
+      nextCursor: null,
+      total: (ranked[other] || []).length,
+      topScore: ranked.identityTopScores[other] ?? 0,
+    };
+  }
+
+  return page;
+};
 
 /**
  * So'rovga qarab qaysi kolleksiyalar kerak.
@@ -164,7 +277,10 @@ const getRankedCached = async (query, lang) => {
 
   const scopes = resolveNeededScopes(query);
   const collections = await loadCollections(scopes);
-  const ranked = rankAllResults(query, collections);
+  let ranked = rankAllResults(query, collections);
+  if (shouldAttachIdentity(query)) {
+    ranked = await attachIdentityRank(ranked, query);
+  }
   searchCache.set(cacheKey, ranked);
   return ranked;
 };
@@ -243,23 +359,41 @@ const searchAll = async (query, contentLang = 'uz', options = {}) => {
     return searchChannel(query, contentLang, { ...options, channelId });
   }
 
-  const section = options.section && SEARCH_SECTIONS.includes(options.section) ? options.section : null;
   const cursor = Math.max(0, Number(options.cursor) || 0);
   const pageLimit = options.limit != null ? Math.max(1, Math.min(40, Number(options.limit))) : null;
 
   const ranked = await getRankedCached(query, contentLang);
+  const identitySection = IDENTITY_SECTIONS.includes(options.section) && ranked.identityTopScores
+    ? options.section
+    : null;
+  const section = !identitySection && options.section && SEARCH_SECTIONS.includes(options.section)
+    ? options.section
+    : null;
 
-  const limits = { ...DEFAULT_LIMITS };
+  const limits = { ...DEFAULT_LIMITS, ...IDENTITY_LIMITS };
   if (pageLimit != null) {
-    for (const key of SEARCH_SECTIONS) {
+    for (const key of [...SEARCH_SECTIONS, ...IDENTITY_SECTIONS]) {
       limits[key] = pageLimit;
     }
   }
 
-  // Section load-more: faqat shu bo'limdan cursor dan boshlab. Shorts qatori qayta hisoblanmaydi.
+  // Katalog bo'limi: odam/kanal qo'shilmaydi, eski sahifa shakli qoladi.
   if (section) {
     return paginateRankedResults(ranked, {
       section,
+      cursor,
+      limits,
+    });
+  }
+
+  if (identitySection) {
+    const identityPage = paginateRankedResults(ranked, {
+      section: identitySection,
+      cursor: 0,
+      limits,
+    });
+    return applyIdentityToPage(identityPage, ranked, {
+      section: identitySection,
       cursor,
       limits,
     });
@@ -271,13 +405,15 @@ const searchAll = async (query, contentLang = 'uz', options = {}) => {
     limits,
   });
   page.data.shorts = await attachSearchShorts(query, ranked);
-  return page;
+  return applyIdentityToPage(page, ranked, { section: null, cursor: 0, limits });
 };
 
 module.exports = {
   searchAll,
   resolveNeededScopes,
   loadCollections,
+  shouldAttachIdentity,
+  applyIdentityToPage,
   DEFAULT_LIMITS,
   SEARCH_SECTIONS,
 };

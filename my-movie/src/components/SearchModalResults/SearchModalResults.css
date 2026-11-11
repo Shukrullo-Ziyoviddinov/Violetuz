@@ -4,8 +4,10 @@
 
 .search-modal-results-section-title {
   margin: 0 0 0.6rem 0;
+  padding: 0;
   font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1.2;
   color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.02em;
 }
@@ -110,6 +112,80 @@
 
 .search-modal-results-movies-block--after-actors {
   margin-top: 0.25rem;
+}
+
+.search-modal-identity-block {
+  margin-top: 1rem;
+}
+
+.search-modal-identity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.search-modal-identity-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.4rem 0.35rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+}
+
+.search-modal-identity-row--link {
+  cursor: pointer;
+}
+
+.search-modal-identity-row--link:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.search-modal-identity-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-modal-identity-avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.search-modal-identity-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.search-modal-identity-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-modal-identity-username {
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.58);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .search-modal-results-grid {
