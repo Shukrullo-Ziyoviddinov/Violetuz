@@ -34,6 +34,9 @@ const HorizontalScroll = ({
   const translateX = useRef(0);
   const onNearEndRef = useRef(onNearEnd);
   const wasNearEndRef = useRef(false);
+  const flightRef = useRef(null);
+  const glidingRef = useRef(false);
+  const extendFlightRef = useRef(() => false);
   onNearEndRef.current = onNearEnd;
   const dragStartX = useRef(0);
   const dragStartY = useRef(0);
@@ -194,6 +197,7 @@ const HorizontalScroll = ({
   };
 
   const cancelMotion = () => {
+    glidingRef.current = false;
     if (animTimerRef.current) {
       clearTimeout(animTimerRef.current);
       animTimerRef.current = null;
@@ -219,6 +223,12 @@ const HorizontalScroll = ({
   useEffect(() => {
     const runCheck = () => {
       wasNearEndRef.current = false;
+      if (glidingRef.current) {
+        checkScrollability();
+        notifyIndexChange();
+        return;
+      }
+      if (extendFlightRef.current()) return;
       checkScrollability();
       notifyIndexChange();
     };
@@ -266,19 +276,45 @@ const HorizontalScroll = ({
     }, duration);
   }, []);
 
-  /** Native scrolldek: tezlik bilan sirg‘anish, keyin snap */
-  const glideWithVelocity = (initialVelocity, finalTarget) => {
+  extendFlightRef.current = () => {
+    const flight = flightRef.current;
+    if (!flight) return false;
+    if (performance.now() - flight.at > 2500) {
+      flightRef.current = null;
+      return false;
+    }
+    const maxScroll = getMaxScroll();
+    const itemWidth = getItemWidth();
+    if (!(maxScroll > flight.maxScroll + itemWidth * 0.5)) return false;
+    const desired = Math.max(-maxScroll, Math.min(0, flight.intended));
+    if (desired >= translateX.current - 1) {
+      if (flight.intended >= -maxScroll - 1) flightRef.current = null;
+      return false;
+    }
+    flightRef.current = { ...flight, maxScroll };
+    const distance = Math.abs(desired - translateX.current);
+    animateTo(desired, Math.min(900, Math.max(280, distance * 0.55)));
+    return true;
+  };
+
+  /** Native scrolldek: tezlik bilan sirg‘anish, keyin snap.
+   *  Yangi kartalar kelganda eski oxirda qotmaslik uchun uzunlik har kadrda o‘qiladi.
+   */
+  const glideWithVelocity = (initialVelocity) => {
     cancelMotion();
+    glidingRef.current = true;
     if (trackRef.current) trackRef.current.style.transition = 'none';
     setMotionClass(true);
 
     let v = initialVelocity;
     let last = performance.now();
-    const maxScroll = getMaxScroll();
 
     const settle = () => {
+      glidingRef.current = false;
+      const maxScroll = getMaxScroll();
+      const intended = flightRef.current ? flightRef.current.intended : translateX.current;
+      const finalTarget = Math.max(-maxScroll, Math.min(0, intended));
       const distance = Math.abs(finalTarget - translateX.current);
-      // Tezlik qolgan bo‘lsa — biroz tezroq settle; sekin bo‘lsa — yumshoq
       const boost = Math.min(120, Math.abs(v) * 180);
       const duration = Math.min(480, Math.max(200, distance * 0.48 + 160 - boost));
       animateTo(finalTarget, duration);
@@ -294,6 +330,7 @@ const HorizontalScroll = ({
       last = now;
 
       v *= Math.exp(-FRICTION * dt);
+      const maxScroll = getMaxScroll();
       const next = translateX.current - v * dt;
       const clamped = Math.max(-maxScroll, Math.min(0, next));
       applyTransform(clamped);
@@ -315,6 +352,7 @@ const HorizontalScroll = ({
   const handleScroll = (direction, e) => {
     e.preventDefault();
     e.stopPropagation();
+    flightRef.current = null;
     const currentIndex = getCurrentIndex();
     const nextIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
     animateTo(translateFromIndex(nextIndex));
@@ -330,38 +368,6 @@ const HorizontalScroll = ({
     }
     lastMoveTime.current = now;
     lastPointX.current = clientX;
-  };
-
-  const resolveTargetIndex = (velocity, delta) => {
-    const itemWidth = getItemWidth();
-    const maxIndex = getMaxIndex();
-    const startIndex = indexFromTranslate(dragStartTranslate.current);
-
-    const flingPx = velocity * FLING_MS;
-    const projected = translateX.current - flingPx;
-    let targetIndex = indexFromTranslate(snapToItemBoundary(projected));
-
-    const direction =
-      Math.sign(delta) ||
-      Math.sign(velocity) ||
-      (projected < dragStartTranslate.current ? 1 : -1);
-
-    if (direction > 0 && targetIndex <= startIndex) {
-      targetIndex = startIndex + 1;
-    } else if (direction < 0 && targetIndex >= startIndex) {
-      targetIndex = startIndex - 1;
-    }
-
-    const dragItems = Math.abs(delta) / Math.max(itemWidth, 1);
-    const flingItems = Math.abs(flingPx) / Math.max(itemWidth, 1);
-    const maxSteps = Math.max(1, Math.min(maxIndex, Math.ceil(dragItems + flingItems)));
-    if (direction > 0) {
-      targetIndex = Math.min(targetIndex, startIndex + maxSteps, maxIndex);
-    } else {
-      targetIndex = Math.max(targetIndex, startIndex - maxSteps, 0);
-    }
-
-    return targetIndex;
   };
 
   const finishDrag = () => {
@@ -388,21 +394,26 @@ const HorizontalScroll = ({
 
     // Foizga yetmasa va sekin → silkinib joyiga qaytadi (saqlanadi)
     if (!passedThreshold && !isFastDrag) {
+      flightRef.current = null;
       const distance = Math.abs(translateFromIndex(startIndex) - translateX.current);
       animateTo(translateFromIndex(startIndex), Math.min(360, Math.max(200, 160 + distance * 0.55)));
       setTimeout(() => { justFinishedDrag.current = false; }, 150);
       return;
     }
 
-    const targetTranslate = translateFromIndex(resolveTargetIndex(velocity, delta));
-
-    // Sekin yoki tez — tezlikka qarab silliq glide, keyin snap
-    glideWithVelocity(velocity, targetTranslate);
+    // Chegaraga urilgan masofa saqlanadi. Kartalar kelganda shu yerga qadar davom etadi.
+    flightRef.current = {
+      intended: translateX.current - velocity * FLING_MS,
+      at: performance.now(),
+      maxScroll: getMaxScroll(),
+    };
+    glideWithVelocity(velocity);
     setTimeout(() => { justFinishedDrag.current = false; }, 150);
   };
 
   const beginDrag = (clientX, clientY) => {
     cancelMotion();
+    flightRef.current = null;
     syncTranslateFromDOM();
     setMotionClass(true);
     isDraggingRef.current = true;
