@@ -13,6 +13,7 @@ import TrillerRecommendedPage from './components/Triller/TrillerRecommendedPage'
 import { TrailerFeedProvider } from './trailer-home-feed/TrailerFeedContext';
 import WishlistPage from './pages/WishlistPage';
 import ProfilePage from './pages/ProfilePage';
+import PublicProfilePage from './pages/PublicProfilePage';
 import ShortsPage from './pages/ShortsPage';
 import MusicPage from './pageMusic/MusicPage';
 import MusicShortsPage from './pageMusic/MusicShortsPage';
@@ -99,6 +100,7 @@ function AppShell() {
             <Route path="/recommended/hozir-trendda" element={<RecommendedPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/user/:id" element={<PublicProfilePage />} />
             <Route path="/shorts" element={<ShortsPage />} />
             <Route path="/music" element={<MusicPage />} />
             <Route path="/music/shorts" element={<MusicShortsPage />} />

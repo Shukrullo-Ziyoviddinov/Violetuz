@@ -352,6 +352,11 @@ const SearchModalResults = ({ query, onMovieClick }) => {
     closeAndNavigate(`/channel/${encodeURIComponent(channel.id)}`);
   };
 
+  const openPerson = (person) => {
+    if (person?.id == null || person.id === '') return;
+    closeAndNavigate(`/user/${encodeURIComponent(person.id)}`);
+  };
+
   const handleMusicClick = (item, type) => {
     if (
       type === 'music' ||
@@ -572,7 +577,13 @@ const SearchModalResults = ({ query, onMovieClick }) => {
                   name={item.name}
                   username={item.username}
                   avatar={item.avatar}
-                  onClick={block.id === 'channel' ? () => openChannel(item) : undefined}
+                  onClick={
+                    block.id === 'channel'
+                      ? () => openChannel(item)
+                      : block.id === 'people'
+                        ? () => openPerson(item)
+                        : undefined
+                  }
                 />
               ))}
             </div>
