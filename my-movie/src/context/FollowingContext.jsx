@@ -9,7 +9,7 @@ import {
   selectFollowingItems,
   selectIsFollowing,
 } from '../store/slices/followingSlice';
-import { selectIsLoggedIn } from '../store/slices/userSlice';
+import { selectIsLoggedIn, selectProfile } from '../store/slices/userSlice';
 import { sameFollowId } from '../store/slices/followingUtils';
 import {
   addFollowRequest,
@@ -35,11 +35,12 @@ export const useFollowing = () => {
   const followingIds = useFollowingIds();
   const followingItems = useFollowingItems();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const profileId = useAppSelector((state) => selectProfile(state)?.id);
 
   const follow = useCallback(
     async (id, type = null) => {
       if (!requireAuthOrOpenRegister(isLoggedIn)) return;
-      if (!type) return;
+      if (!type || (type === 'user' && profileId != null && String(id) === String(profileId))) return;
       const payload = { id, type };
       dispatch(followAction(payload));
       try {
@@ -49,7 +50,7 @@ export const useFollowing = () => {
         dispatch(unfollowAction(payload));
       }
     },
-    [dispatch, isLoggedIn]
+    [dispatch, isLoggedIn, profileId]
   );
 
   const unfollow = useCallback(
@@ -70,7 +71,7 @@ export const useFollowing = () => {
   const toggleFollowing = useCallback(
     async (id, type = null) => {
       if (!requireAuthOrOpenRegister(isLoggedIn)) return;
-      if (!type) return;
+      if (!type || (type === 'user' && profileId != null && String(id) === String(profileId))) return;
       const payload = { id, type };
       const had = followingItems.some(
         (x) => sameFollowId(x.id, id) && (x.type == null || x.type === type)
@@ -86,7 +87,7 @@ export const useFollowing = () => {
         else dispatch(unfollowAction(payload));
       }
     },
-    [dispatch, isLoggedIn, followingItems]
+    [dispatch, isLoggedIn, followingItems, profileId]
   );
 
   const isFollowing = useCallback(

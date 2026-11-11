@@ -68,6 +68,25 @@ export const mapUserFollowRows = (rows = []) =>
       .map(userFollowRow)
   );
 
+export const isOwnUserFollow = (person, profileId) =>
+  person?.entityType === 'user' &&
+  profileId != null &&
+  profileId !== '' &&
+  String(person.followId) === String(profileId);
+
+/** Ko‘rayotgan odam ro‘yxatda bo‘lsa, o‘zini tepaga chiqaradi. Qolgan tartib saqlanadi. */
+export const pinViewerFirst = (people = [], profileId) => {
+  if (profileId == null || profileId === '' || !Array.isArray(people) || people.length < 2) {
+    return people;
+  }
+  const index = people.findIndex((person) => isOwnUserFollow(person, profileId));
+  if (index <= 0) return people;
+  const next = people.slice();
+  const [viewer] = next.splice(index, 1);
+  next.unshift(viewer);
+  return next;
+};
+
 /** Profil sahifasi — obuna bo'lgan aktyor/artist/kanal/odam ro'yxati */
 export const getFollowedPeople = (following = [], lang = 'uz', actorsList = [], artistsList = []) => {
   const entries = normalizeEntries(following);

@@ -14,7 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { fetchPublicProfile } from '../api/publicProfileApi';
-import { followButtonType, getFollowedPeople, mapUserFollowRows } from '../store/slices/followingUtils';
+import { followButtonType, getFollowedPeople, isOwnUserFollow, mapUserFollowRows, pinViewerFirst } from '../store/slices/followingUtils';
 import { normalizeUsername } from '../store/slices/userUtils';
 import { useImageReady } from '../utils/useImageReady';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
@@ -168,17 +168,20 @@ const PublicProfilePage = () => {
   const repostItems = profileData?.reposts || [];
   const followedPeople = useMemo(
     () =>
-      getFollowedPeople(
-        profileData?.following || [],
-        currentLanguage,
-        allActors,
-        allArtists
+      pinViewerFirst(
+        getFollowedPeople(
+          profileData?.following || [],
+          currentLanguage,
+          allActors,
+          allArtists
+        ),
+        profile?.id
       ),
-    [profileData, currentLanguage, allActors, allArtists]
+    [profileData, currentLanguage, allActors, allArtists, profile?.id]
   );
   const followersPeople = useMemo(
-    () => mapUserFollowRows(profileData?.followers || []),
-    [profileData]
+    () => pinViewerFirst(mapUserFollowRows(profileData?.followers || []), profile?.id),
+    [profileData, profile?.id]
   );
 
   const shortsRepostScope = useMemo(
@@ -433,12 +436,14 @@ const PublicProfilePage = () => {
                   </div>
                   <div className="profile-following-type">{person.type}</div>
                 </div>
-                <FollowingButton
-                  artistId={person.followId}
-                  entityType={followButtonType(person.entityType)}
-                  wrapperClassName="profile-following-action"
-                  stopPropagation
-                />
+                {isOwnUserFollow(person, profile?.id) ? null : (
+                  <FollowingButton
+                    artistId={person.followId}
+                    entityType={followButtonType(person.entityType)}
+                    wrapperClassName="profile-following-action"
+                    stopPropagation
+                  />
+                )}
               </div>
             ))
           )}

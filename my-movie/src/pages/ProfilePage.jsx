@@ -11,7 +11,7 @@ import ProfileInfoModal from '../components/Profile/ProfileInfoModal';
 import GlobalModal from '../components/GlobalModal/GlobalModal';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import { useFollowingItems } from '../context/FollowingContext';
-import { followButtonType, getFollowedPeople, mapUserFollowRows } from '../store/slices/followingUtils';
+import { followButtonType, getFollowedPeople, isOwnUserFollow, mapUserFollowRows, pinViewerFirst } from '../store/slices/followingUtils';
 import { fetchFollowers } from '../api/followingApi';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
@@ -162,8 +162,14 @@ const ProfilePage = () => {
     return () => clearProfileInfoMenuHandler(open);
   }, []);
 
-  const followedPeople = getFollowedPeople(followingItems, currentLanguage, allActors, allArtists);
-  const followersPeople = useMemo(() => mapUserFollowRows(followerRows), [followerRows]);
+  const followedPeople = pinViewerFirst(
+    getFollowedPeople(followingItems, currentLanguage, allActors, allArtists),
+    profile?.id
+  );
+  const followersPeople = useMemo(
+    () => pinViewerFirst(mapUserFollowRows(followerRows), profile?.id),
+    [followerRows, profile?.id]
+  );
 
   /** Kino + musiqa shortslari profil tartibida (scroll ikkalasini ham o‘z ichiga oladi) */
   const shortsRepostScope = useMemo(
@@ -577,12 +583,14 @@ const ProfilePage = () => {
                   </div>
                   <div className="profile-following-type">{person.type}</div>
                 </div>
-                <FollowingButton
-                  artistId={person.followId}
-                  entityType={followButtonType(person.entityType)}
-                  wrapperClassName="profile-following-action"
-                  stopPropagation
-                />
+                {isOwnUserFollow(person, profile?.id) ? null : (
+                  <FollowingButton
+                    artistId={person.followId}
+                    entityType={followButtonType(person.entityType)}
+                    wrapperClassName="profile-following-action"
+                    stopPropagation
+                  />
+                )}
               </div>
             ))
           )}
