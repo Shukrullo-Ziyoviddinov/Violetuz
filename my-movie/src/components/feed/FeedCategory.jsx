@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ScrollTouch from '../ScrollTouch/ScrollTouch';
 import './FeedCategory.css';
@@ -11,7 +12,7 @@ const categories = [
   { id: 'konsert', labelKey: 'feed.categories.konsert', icon: 'fa-microphone-lines' },
 ];
 
-const FeedCategory = ({ activeCategory, onChangeCategory, onOpenMessages }) => {
+const FeedCategory = ({ activeCategory, onChangeCategory }) => {
   const { t } = useTranslation();
 
   return (
@@ -28,10 +29,10 @@ const FeedCategory = ({ activeCategory, onChangeCategory, onOpenMessages }) => {
             <span>{t(category.labelKey)}</span>
           </button>
         ))}
-        <button type="button" className="feed-category-messages-entry" onClick={onOpenMessages}>
+        <Link to="/messages" className="feed-category-messages-entry">
           <i className="fa-solid fa-comments feed-category-messages-entry-icon" aria-hidden="true" />
           <span>{t('feed.messages')}</span>
-        </button>
+        </Link>
       </ScrollTouch>
     </div>
   );

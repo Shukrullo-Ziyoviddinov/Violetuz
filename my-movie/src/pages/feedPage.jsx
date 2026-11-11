@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import FeedHeader from '../components/feed/FeedHeader';
 import FeedCategory from '../components/feed/FeedCategory';
 import FeedList from '../components/feed/FeedList';
-import MessageModal from '../components/Messages/MessageModal';
-import { OPEN_MESSAGES_EVENT } from '../messagesModalBridge';
 import { useFeedProfile } from '../context/AuthContext';
 import { useFollowingItems } from '../context/FollowingContext';
 import { getFeedHeaderFromFollowingItems } from '../store/slices/followingUtils';
@@ -22,7 +20,6 @@ const FeedPage = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const followingItems = useFollowingItems();
   const feedProfileUser = useFeedProfile();
-  const [messagesOpen, setMessagesOpen] = useState(false);
   const authReady = useAppSelector(selectAuthReady);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const sentinelRef = useRef(null);
@@ -35,14 +32,6 @@ const FeedPage = () => {
         .join('|'),
     [followingItems]
   );
-
-  const openMessages = useCallback(() => setMessagesOpen(true), []);
-
-  useEffect(() => {
-    const onOpen = () => setMessagesOpen(true);
-    window.addEventListener(OPEN_MESSAGES_EVENT, onOpen);
-    return () => window.removeEventListener(OPEN_MESSAGES_EVENT, onOpen);
-  }, []);
 
   const headerFollowedPeople = useMemo(
     () => getFeedHeaderFromFollowingItems(followingItems, feedLang),
@@ -102,7 +91,6 @@ const FeedPage = () => {
       <FeedCategory
         activeCategory={activeCategory}
         onChangeCategory={setActiveCategory}
-        onOpenMessages={openMessages}
       />
       <FeedList
         items={feedItems}
@@ -117,7 +105,6 @@ const FeedPage = () => {
           <span className="feed-page-load-more-arc" />
         </div>
       ) : null}
-      <MessageModal open={messagesOpen} onClose={() => setMessagesOpen(false)} />
     </div>
   );
 };

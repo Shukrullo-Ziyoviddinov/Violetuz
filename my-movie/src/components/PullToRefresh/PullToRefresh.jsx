@@ -29,8 +29,6 @@ const MODAL_SELECTOR = [
   '.like-history-filter-modal-overlay',
   '.like-history-filter-modal',
   '.global-modal-dialog',
-  '.message-modal--open',
-  '.message-search-modal--open',
   '.music-detail-lyrics-modal',
   '.music-mix-sheet',
   '.music-mix-sheet-dock',

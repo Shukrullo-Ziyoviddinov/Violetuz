@@ -5,7 +5,6 @@ import LanguageModal from './LanguageModal';
 import ChannelMoreDropdown from './ChannelMoreDropdown';
 import SearchModalBody from '../SearchModalBody/SearchModalBody';
 import { requestOpenProfileInfoMenu } from '../../profileInfoMenuBridge';
-import { requestOpenMessagesModal } from '../../messagesModalBridge';
 import { requestOpenAuthModal } from '../../authModalBridge';
 import { requestOpenSearchModal } from '../../searchModalBridge';
 import { requestOpenChannelSearch } from '../../channelSearchBridge';
@@ -415,17 +414,6 @@ const Navbar = () => {
               aria-label={t('navbar.search')}
             >
               <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
-            </button>
-          ) : null}
-
-          {isFeedPage ? (
-            <button
-              type="button"
-              className="navbar-feed-messages-mobile"
-              onClick={requestOpenMessagesModal}
-              aria-label={t('feed.messages')}
-            >
-              <i className="fa-solid fa-comments" aria-hidden="true" />
             </button>
           ) : null}
 
