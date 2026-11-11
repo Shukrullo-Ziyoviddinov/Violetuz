@@ -1,8 +1,11 @@
 export const FOLLOWING_STORAGE_KEY = 'violet_following_artists';
 
-export const FOLLOW_TYPES = ['actor', 'artist', 'channel'];
+export const FOLLOW_TYPES = ['actor', 'artist', 'channel', 'user'];
 
 export const normalizeFollowType = (type) => (FOLLOW_TYPES.includes(type) ? type : null);
+
+export const followButtonType = (entityType) =>
+  entityType === 'actor' || entityType === 'channel' || entityType === 'user' ? entityType : 'artist';
 
 export const sameFollowId = (a, b) => String(a) === String(b);
 
@@ -44,7 +47,28 @@ const normalizeEntries = (following = []) =>
     return { id: String(x), type: null };
   });
 
-/** Profil sahifasi — obuna bo'lgan aktyor/artist ro'yxati */
+const userFollowRow = (row) => {
+  const snap = row.snapshot && typeof row.snapshot === 'object' ? row.snapshot : {};
+  const username = String(snap.username || '').trim().replace(/^@+/, '');
+  return {
+    id: `user-${row.id}`,
+    followId: row.id,
+    entityType: 'user',
+    name: snap.name || username || '',
+    image: snap.avatar || '',
+    type: username ? `@${username}` : 'Foydalanuvchi',
+  };
+};
+
+/** Foydalanuvchi obunalari yoki obunachilari — snapshotdan. */
+export const mapUserFollowRows = (rows = []) =>
+  uniqueById(
+    (Array.isArray(rows) ? rows : [])
+      .filter((row) => row && row.type === 'user' && row.id != null)
+      .map(userFollowRow)
+  );
+
+/** Profil sahifasi — obuna bo'lgan aktyor/artist/kanal/odam ro'yxati */
 export const getFollowedPeople = (following = [], lang = 'uz', actorsList = [], artistsList = []) => {
   const entries = normalizeEntries(following);
   const actors = Array.isArray(actorsList) ? actorsList : [];
@@ -104,7 +128,7 @@ export const getFollowedPeople = (following = [], lang = 'uz', actorsList = [], 
       })
   );
 
-  return [...followedActors, ...followedArtists, ...followedChannels];
+  return [...followedActors, ...followedArtists, ...followedChannels, ...mapUserFollowRows(following)];
 };
 
 /** Feed header — obuna bo'lganlar avatari */

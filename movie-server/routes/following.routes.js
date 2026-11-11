@@ -3,7 +3,7 @@ const followingController = require('../controllers/following.controller');
 const { requireAuth } = require('../middleware/auth.middleware');
 
 /**
- * Following — actor / artist / channel obunalari.
+ * Following — actor / artist / channel / user obunalari.
  * Base: /api/following
  */
 const router = Router();
@@ -11,6 +11,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.get('/', followingController.listFollowing);
+router.get('/followers', followingController.listFollowers);
 router.put('/', followingController.replaceFollowing);
 router.post('/', followingController.addFollow);
 router.delete('/', followingController.removeFollow);

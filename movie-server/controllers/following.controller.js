@@ -9,6 +9,11 @@ const listFollowing = asyncHandler(async (req, res) => {
   return sendSuccess(res, { data: { items } });
 });
 
+const listFollowers = asyncHandler(async (req, res) => {
+  const items = await followingService.listUserFollowers(req.authUser._id);
+  return sendSuccess(res, { data: { items } });
+});
+
 const replaceFollowing = asyncHandler(async (req, res) => {
   const items = await followingService.replaceFollowing(
     req.authUser._id,
@@ -43,6 +48,7 @@ const toggleFollow = asyncHandler(async (req, res) => {
 
 module.exports = {
   listFollowing,
+  listFollowers,
   replaceFollowing,
   addFollow,
   removeFollow,

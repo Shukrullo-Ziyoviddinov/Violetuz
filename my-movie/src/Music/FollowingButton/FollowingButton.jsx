@@ -14,7 +14,7 @@ const stopEventBubble = (e) => {
  * FollowingButton — aktyor / artist / kanal obuna.
  *
  * @param {string|number} artistId — target id
- * @param {'actor'|'artist'|'channel'} [entityType='artist'] — DB type
+ * @param {'actor'|'artist'|'channel'|'user'} [entityType='artist'] — DB type
  */
 const FollowingButton = ({
   artistId,
@@ -27,7 +27,9 @@ const FollowingButton = ({
   const { isLoggedIn } = useAuth();
   const { follow, unfollow } = useFollowing();
   const type =
-    entityType === 'actor' || entityType === 'channel' ? entityType : 'artist';
+    entityType === 'actor' || entityType === 'channel' || entityType === 'user'
+      ? entityType
+      : 'artist';
   const isFollowing = useIsFollowing(artistId, type);
   const [showToast, setShowToast] = useState(false);
 

@@ -16,7 +16,7 @@ const toItem = (raw) => {
 };
 
 const initialState = {
-  /** @type {Array<{ id: string|number, type: 'actor'|'artist'|'channel'|null, snapshot?: object }>} */
+  /** @type {Array<{ id: string|number, type: 'actor'|'artist'|'channel'|'user'|null, snapshot?: object }>} */
   items: [],
   status: 'idle',
   synced: false,

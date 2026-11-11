@@ -1,9 +1,13 @@
+const mongoose = require('mongoose');
 const Following = require('../models/Following.model');
 const { FOLLOWING_TYPES } = Following;
 const Actor = require('../models/Actor.model');
 const Artist = require('../models/Artist.model');
+const User = require('../models/User.model');
 const channelService = require('./channel.service');
 const { badRequest, notFound } = require('../utils/errors');
+
+const USER_ID_RE = /^[a-f0-9]{24}$/i;
 
 const stripMongoMeta = (doc) => {
   if (!doc) return null;
@@ -17,7 +21,7 @@ const assertType = (raw) => {
     .trim()
     .toLowerCase();
   if (!FOLLOWING_TYPES.includes(type)) {
-    throw badRequest('type faqat actor, artist yoki channel bo‘lishi kerak', {
+    throw badRequest('type faqat actor, artist, channel yoki user bo‘lishi kerak', {
       allowedTypes: [...FOLLOWING_TYPES],
     });
   }
@@ -32,7 +36,7 @@ const normalizeTargetId = (id) => {
 };
 
 const toFrontendId = (targetId, type) => {
-  if (type === 'artist' || type === 'channel') return String(targetId);
+  if (type === 'artist' || type === 'channel' || type === 'user') return String(targetId);
   const num = parseInt(targetId, 10);
   return Number.isNaN(num) || String(num) !== String(targetId) ? targetId : num;
 };
@@ -43,6 +47,49 @@ const toClientItem = (row) => ({
   snapshot: row.snapshot || null,
   createdAt: row.createdAt,
 });
+
+const publicUserSnapshot = (user) => ({
+  id: String(user._id),
+  name: user.name || '',
+  username: user.username || '',
+  avatar: user.avatar || '',
+});
+
+const loadPublicUsers = async (ids) => {
+  const unique = [...new Set(ids.map((id) => String(id)).filter((id) => USER_ID_RE.test(id)))];
+  if (!unique.length) return new Map();
+  const docs = await User.find({ _id: { $in: unique } })
+    .select('name username avatar')
+    .lean();
+  return new Map(docs.map((doc) => [String(doc._id), doc]));
+};
+
+const withFreshUserSnapshots = async (items) => {
+  const byId = await loadPublicUsers(
+    items.filter((item) => item.type === 'user').map((item) => item.id)
+  );
+  return items.flatMap((item) => {
+    if (item.type !== 'user') return [item];
+    const user = byId.get(String(item.id));
+    if (!user) return [];
+    return [{ ...item, snapshot: publicUserSnapshot(user) }];
+  });
+};
+
+const resolveUserFollow = async (idStr) => {
+  if (!USER_ID_RE.test(idStr) || !mongoose.Types.ObjectId.isValid(idStr)) {
+    throw notFound('Foydalanuvchi topilmadi');
+  }
+  const user = await User.findById(idStr).select('name username avatar').lean();
+  if (!user) throw notFound('Foydalanuvchi topilmadi');
+  return { type: 'user', targetId: String(user._id), snapshot: publicUserSnapshot(user) };
+};
+
+const assertNotSelfFollow = (userId, type, targetId) => {
+  if (type === 'user' && String(userId) === String(targetId)) {
+    throw badRequest('O‘zingizga obuna bo‘la olmaysiz');
+  }
+};
 
 /**
  * type berilsa shu katalogdan; berilmasa artist → actor tartibida qidiradi
@@ -55,6 +102,9 @@ const resolveFollowSnapshot = async (targetId, typeHint = null) => {
 
   if (typeHint) {
     const type = assertType(typeHint);
+    if (type === 'user') {
+      return resolveUserFollow(idStr);
+    }
     if (type === 'channel') {
       const snapshot = await channelService.getFollowSnapshot(idStr);
       return { type, targetId: snapshot.id, snapshot };
@@ -87,11 +137,25 @@ const listFollowing = async (userId, { type } = {}) => {
   const query = { userId };
   if (type) query.type = assertType(type);
   const rows = await Following.find(query).sort({ createdAt: -1 }).lean();
-  return rows.map(toClientItem);
+  return withFreshUserSnapshots(rows.map(toClientItem));
+};
+
+/** Shu foydalanuvchiga user turi bilan obuna bo‘lganlar. */
+const listUserFollowers = async (targetUserId) => {
+  const targetId = String(targetUserId || '').trim();
+  const rows = await Following.find({ type: 'user', targetId }).sort({ createdAt: -1 }).lean();
+  const items = rows.map((row) => ({
+    id: String(row.userId),
+    type: 'user',
+    snapshot: null,
+    createdAt: row.createdAt,
+  }));
+  return withFreshUserSnapshots(items);
 };
 
 const addFollow = async (userId, { id, type }) => {
   const resolved = await resolveFollowSnapshot(id, type);
+  assertNotSelfFollow(userId, resolved.type, resolved.targetId);
   const row = await Following.findOneAndUpdate(
     { userId, type: resolved.type, targetId: resolved.targetId },
     {
@@ -124,6 +188,7 @@ const removeFollow = async (userId, { id, type }) => {
 const toggleFollow = async (userId, { id, type }) => {
   const safeType = assertType(type || 'artist');
   const targetId = normalizeTargetId(id);
+  assertNotSelfFollow(userId, safeType, targetId);
   const existing = await Following.findOne({
     userId,
     type: safeType,
@@ -183,6 +248,7 @@ const replaceFollowing = async (userId, itemsInput = []) => {
 module.exports = {
   FOLLOWING_TYPES,
   listFollowing,
+  listUserFollowers,
   addFollow,
   removeFollow,
   toggleFollow,

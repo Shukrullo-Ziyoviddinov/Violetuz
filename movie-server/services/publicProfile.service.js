@@ -18,7 +18,7 @@ const toPublicUser = (user) => ({
 /**
  * Boshqa odam profilini o‘qish.
  * Email, parol va rol chiqmaydi. Yozish yo‘q.
- * Obunachilar hali yo‘q: ro‘yxat bo‘sh, son 0.
+ * Obunachilar — shu foydalanuvchiga user turi bilan yozilgan obunalar.
  */
 const getPublicProfile = async (rawId) => {
   const id = String(rawId || '').trim();
@@ -32,17 +32,18 @@ const getPublicProfile = async (rawId) => {
   }
 
   const userId = user._id;
-  const [reposts, following] = await Promise.all([
+  const [reposts, following, followers] = await Promise.all([
     repostService.listReposts(userId),
     followingService.listFollowing(userId),
+    followingService.listUserFollowers(userId),
   ]);
 
   return {
     user: toPublicUser(user),
     reposts,
     following,
-    followers: [],
-    followersCount: 0,
+    followers,
+    followersCount: followers.length,
   };
 };
 

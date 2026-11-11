@@ -11,7 +11,8 @@ import ProfileInfoModal from '../components/Profile/ProfileInfoModal';
 import GlobalModal from '../components/GlobalModal/GlobalModal';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import { useFollowingItems } from '../context/FollowingContext';
-import { getFollowedPeople } from '../store/slices/followingUtils';
+import { followButtonType, getFollowedPeople, mapUserFollowRows } from '../store/slices/followingUtils';
+import { fetchFollowers } from '../api/followingApi';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { useRepostItems } from '../context/RepostsContext';
@@ -126,6 +127,7 @@ const ProfilePage = () => {
   const { allArtists } = useMusicApi();
   const repostItems = useRepostItems();
   const [repostFilter, setRepostFilter] = useState('all');
+  const [followerRows, setFollowerRows] = useState([]);
 
   useEffect(() => {
     if (!authReady) return;
@@ -140,13 +142,28 @@ const ProfilePage = () => {
   }, [i18n.language]);
 
   useEffect(() => {
+    if (!authReady || !isLoggedIn) return undefined;
+    let cancelled = false;
+    fetchFollowers()
+      .then((data) => {
+        if (!cancelled) setFollowerRows(Array.isArray(data?.items) ? data.items : []);
+      })
+      .catch(() => {
+        if (!cancelled) setFollowerRows([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authReady, isLoggedIn]);
+
+  useEffect(() => {
     const open = () => setShowInfoModal(true);
     setProfileInfoMenuHandler(open);
     return () => clearProfileInfoMenuHandler(open);
   }, []);
 
   const followedPeople = getFollowedPeople(followingItems, currentLanguage, allActors, allArtists);
-  const followersPeople = [];
+  const followersPeople = useMemo(() => mapUserFollowRows(followerRows), [followerRows]);
 
   /** Kino + musiqa shortslari profil tartibida (scroll ikkalasini ham o‘z ichiga oladi) */
   const shortsRepostScope = useMemo(
@@ -249,6 +266,8 @@ const ProfilePage = () => {
       navigate(`/actor/${person.followId}`);
     } else if (person.entityType === 'channel') {
       navigate(`/channel/${encodeURIComponent(person.followId)}`);
+    } else if (person.entityType === 'user') {
+      navigate(`/user/${encodeURIComponent(person.followId)}`);
     } else {
       navigate(`/music/artist/${person.followId}`);
     }
@@ -359,7 +378,7 @@ const ProfilePage = () => {
                     setShowFollowingModal(true);
                   }}
                 >
-                  <span className="profile-page-stat-value">0</span>
+                  <span className="profile-page-stat-value">{followersPeople.length}</span>
                   <span className="profile-page-stat-label">{t('profilePage.stats.followers')}</span>
                 </button>
                 <button
@@ -537,26 +556,30 @@ const ProfilePage = () => {
                   }
                 }}
               >
-                <img src={person.image} alt={person.name} className="profile-following-avatar" />
+                {person.image ? (
+                  <img src={person.image} alt={person.name} className="profile-following-avatar" />
+                ) : (
+                  <span className="profile-following-avatar profile-following-avatar--fallback" aria-hidden="true">
+                    {(person.name || '?').charAt(0).toUpperCase()}
+                  </span>
+                )}
                 <div className="profile-following-main">
                   <div className="profile-following-name">
                     <span className="profile-following-name-text">{person.name}</span>
-                    <img
-                      src={person.entityType === 'actor' ? '/img/galichka2.png' : '/img/galichka.png'}
-                      alt=""
-                      className="profile-following-name-verified"
-                      aria-hidden
-                    />
+                    {person.entityType !== 'user' && (
+                      <img
+                        src={person.entityType === 'actor' ? '/img/galichka2.png' : '/img/galichka.png'}
+                        alt=""
+                        className="profile-following-name-verified"
+                        aria-hidden
+                      />
+                    )}
                   </div>
                   <div className="profile-following-type">{person.type}</div>
                 </div>
                 <FollowingButton
                   artistId={person.followId}
-                  entityType={
-                    person.entityType === 'actor' || person.entityType === 'channel'
-                      ? person.entityType
-                      : 'artist'
-                  }
+                  entityType={followButtonType(person.entityType)}
                   wrapperClassName="profile-following-action"
                   stopPropagation
                 />

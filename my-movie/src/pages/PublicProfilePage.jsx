@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GlobalModal from '../components/GlobalModal/GlobalModal';
@@ -14,7 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { fetchPublicProfile } from '../api/publicProfileApi';
-import { getFollowedPeople } from '../store/slices/followingUtils';
+import { followButtonType, getFollowedPeople, mapUserFollowRows } from '../store/slices/followingUtils';
 import { normalizeUsername } from '../store/slices/userUtils';
 import { useImageReady } from '../utils/useImageReady';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
@@ -176,7 +176,10 @@ const PublicProfilePage = () => {
       ),
     [profileData, currentLanguage, allActors, allArtists]
   );
-  const followersCount = Array.isArray(profileData?.followers) ? profileData.followers.length : 0;
+  const followersPeople = useMemo(
+    () => mapUserFollowRows(profileData?.followers || []),
+    [profileData]
+  );
 
   const shortsRepostScope = useMemo(
     () =>
@@ -227,11 +230,45 @@ const PublicProfilePage = () => {
       navigate(`/actor/${person.followId}`);
     } else if (person.entityType === 'channel') {
       navigate(`/channel/${encodeURIComponent(person.followId)}`);
+    } else if (person.entityType === 'user') {
+      navigate(`/user/${encodeURIComponent(person.followId)}`);
     } else {
       navigate(`/music/artist/${person.followId}`);
     }
     setShowFollowingModal(false);
   };
+
+  const handleVisitorSubscribe = useCallback((active) => {
+    if (!profile?.id) return;
+    const mine = String(profile.id);
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      const rows = Array.isArray(prev.followers) ? prev.followers : [];
+      const has = rows.some((row) => String(row.id) === mine);
+      if (active && !has) {
+        return {
+          ...prev,
+          followers: [
+            {
+              id: mine,
+              type: 'user',
+              snapshot: {
+                id: mine,
+                name: profile.name || '',
+                username: profile.username || '',
+                avatar: profile.avatar || '',
+              },
+            },
+            ...rows,
+          ],
+        };
+      }
+      if (!active && has) {
+        return { ...prev, followers: rows.filter((row) => String(row.id) !== mine) };
+      }
+      return prev;
+    });
+  }, [profile?.id, profile?.name, profile?.username, profile?.avatar]);
 
   const openStats = (type) => {
     setStatsModalType(type);
@@ -258,7 +295,7 @@ const PublicProfilePage = () => {
   }
 
   const user = profileData.user;
-  const modalPeople = statsModalType === 'followers' ? [] : followedPeople;
+  const modalPeople = statsModalType === 'followers' ? followersPeople : followedPeople;
 
   return (
     <div className="profile-page">
@@ -297,7 +334,7 @@ const PublicProfilePage = () => {
               className="profile-page-stat profile-page-stat--clickable"
               onClick={() => openStats('followers')}
             >
-              <span className="profile-page-stat-value">{followersCount}</span>
+              <span className="profile-page-stat-value">{followersPeople.length}</span>
               <span className="profile-page-stat-label">{t('profilePage.stats.followers')}</span>
             </button>
             <button
@@ -307,6 +344,18 @@ const PublicProfilePage = () => {
             >
               <span className="profile-page-stat-value">{followedPeople.length}</span>
               <span className="profile-page-stat-label">{t('profilePage.stats.following')}</span>
+            </button>
+          </div>
+
+          <div className="profile-page-visitor-actions">
+            <FollowingButton
+              artistId={user.id}
+              entityType="user"
+              onSubscribeChange={handleVisitorSubscribe}
+            />
+            <button type="button" className="profile-page-visitor-message">
+              <i className="fa-solid fa-message" aria-hidden="true" />
+              Xabar
             </button>
           </div>
 
@@ -363,26 +412,30 @@ const PublicProfilePage = () => {
                   }
                 }}
               >
-                <img src={person.image} alt={person.name} className="profile-following-avatar" />
+                {person.image ? (
+                  <img src={person.image} alt={person.name} className="profile-following-avatar" />
+                ) : (
+                  <span className="profile-following-avatar profile-following-avatar--fallback" aria-hidden="true">
+                    {(person.name || '?').charAt(0).toUpperCase()}
+                  </span>
+                )}
                 <div className="profile-following-main">
                   <div className="profile-following-name">
                     <span className="profile-following-name-text">{person.name}</span>
-                    <img
-                      src={person.entityType === 'actor' ? '/img/galichka2.png' : '/img/galichka.png'}
-                      alt=""
-                      className="profile-following-name-verified"
-                      aria-hidden
-                    />
+                    {person.entityType !== 'user' && (
+                      <img
+                        src={person.entityType === 'actor' ? '/img/galichka2.png' : '/img/galichka.png'}
+                        alt=""
+                        className="profile-following-name-verified"
+                        aria-hidden
+                      />
+                    )}
                   </div>
                   <div className="profile-following-type">{person.type}</div>
                 </div>
                 <FollowingButton
                   artistId={person.followId}
-                  entityType={
-                    person.entityType === 'actor' || person.entityType === 'channel'
-                      ? person.entityType
-                      : 'artist'
-                  }
+                  entityType={followButtonType(person.entityType)}
                   wrapperClassName="profile-following-action"
                   stopPropagation
                 />

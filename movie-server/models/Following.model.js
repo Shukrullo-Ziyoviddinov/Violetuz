@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-/** Obuna: aktyor, artist yoki kanal. Tur hujjatlarni aralashtirmaydi. */
-const FOLLOWING_TYPES = Object.freeze(['actor', 'artist', 'channel']);
+/** Obuna: aktyor, artist, kanal yoki foydalanuvchi. Turlar aralashmaydi. */
+const FOLLOWING_TYPES = Object.freeze(['actor', 'artist', 'channel', 'user']);
 
 const followingSchema = new mongoose.Schema(
   {
@@ -17,7 +17,7 @@ const followingSchema = new mongoose.Schema(
       enum: FOLLOWING_TYPES,
       index: true,
     },
-    /** Actor (number), Artist yoki Channel id — string sifatida */
+    /** Actor (number), Artist, Channel yoki User id — string sifatida */
     targetId: {
       type: String,
       required: true,
@@ -37,6 +37,7 @@ const followingSchema = new mongoose.Schema(
 
 followingSchema.index({ userId: 1, type: 1, targetId: 1 }, { unique: true });
 followingSchema.index({ userId: 1, createdAt: -1 });
+followingSchema.index({ type: 1, targetId: 1 });
 
 module.exports = mongoose.model('Following', followingSchema);
 module.exports.FOLLOWING_TYPES = FOLLOWING_TYPES;

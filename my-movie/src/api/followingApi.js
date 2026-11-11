@@ -28,6 +28,11 @@ const parseJson = async (response) => {
   return body?.data ?? body;
 };
 
+export const fetchFollowers = async () => {
+  const res = await followingFetch('/following/followers');
+  return parseJson(res);
+};
+
 export const fetchFollowing = async ({ type } = {}) => {
   const q = type ? `?type=${encodeURIComponent(type)}` : '';
   const res = await followingFetch(`/following${q}`);
