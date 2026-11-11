@@ -180,7 +180,7 @@ const removeFollow = async (userId, { id, type }) => {
     targetId,
   }).lean();
   if (!deleted) {
-    throw notFound('Obuna topilmadi');
+    return null;
   }
   return toClientItem(deleted);
 };

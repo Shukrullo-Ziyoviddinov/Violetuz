@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   follow as followAction,
@@ -36,37 +36,62 @@ export const useFollowing = () => {
   const followingItems = useFollowingItems();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const profileId = useAppSelector((state) => selectProfile(state)?.id);
+  const jobsRef = useRef(new Map());
 
-  const follow = useCallback(
-    async (id, type = null) => {
+  const isSelfUser = (id, type) =>
+    type === 'user' && profileId != null && String(id) === String(profileId);
+
+  const syncFollow = useCallback(
+    (id, type, want) => {
       if (!requireAuthOrOpenRegister(isLoggedIn)) return;
-      if (!type || (type === 'user' && profileId != null && String(id) === String(profileId))) return;
+      if (!type || isSelfUser(id, type)) return;
+
+      const key = `${type}:${String(id)}`;
       const payload = { id, type };
-      dispatch(followAction(payload));
-      try {
-        const data = await addFollowRequest(payload);
-        if (data?.item) dispatch(followAction(data.item));
-      } catch {
-        dispatch(unfollowAction(payload));
+      let job = jobsRef.current.get(key);
+      if (!job) {
+        job = { desired: want, applied: !want, running: false };
+        jobsRef.current.set(key, job);
+      } else {
+        job.desired = want;
       }
+      dispatch(want ? followAction(payload) : unfollowAction(payload));
+
+      const pump = async () => {
+        if (job.running) return;
+        job.running = true;
+        try {
+          while (job.desired !== job.applied) {
+            const next = job.desired;
+            try {
+              if (next) await addFollowRequest(payload);
+              else await removeFollowRequest(payload);
+              job.applied = next;
+            } catch (err) {
+              if (!next && err?.status === 404) {
+                job.applied = false;
+                continue;
+              }
+              if (job.desired !== next) continue;
+              job.desired = !next;
+              job.applied = !next;
+              dispatch(next ? unfollowAction(payload) : followAction(payload));
+            }
+          }
+        } finally {
+          job.running = false;
+        }
+        if (job.desired !== job.applied) pump();
+      };
+
+      pump();
     },
     [dispatch, isLoggedIn, profileId]
   );
 
-  const unfollow = useCallback(
-    async (id, type = null) => {
-      if (!requireAuthOrOpenRegister(isLoggedIn)) return;
-      if (!type) return;
-      const payload = { id, type };
-      dispatch(unfollowAction(payload));
-      try {
-        await removeFollowRequest(payload);
-      } catch {
-        dispatch(followAction(payload));
-      }
-    },
-    [dispatch, isLoggedIn]
-  );
+  const follow = useCallback((id, type = null) => syncFollow(id, type, true), [syncFollow]);
+
+  const unfollow = useCallback((id, type = null) => syncFollow(id, type, false), [syncFollow]);
 
   const toggleFollowing = useCallback(
     async (id, type = null) => {
