@@ -31,13 +31,18 @@ const Navbar = () => {
   const isShortsPage =
     location.pathname === '/shorts' || location.pathname === '/music/shorts';
   const isProfilePage = location.pathname === '/profile';
+  const isPublicProfilePage = location.pathname.startsWith('/user/');
   const isChannelProfile = /^\/channel\/[^/]+$/.test(location.pathname);
   const isMovieDetailPage = /^\/movie\/\d+$/.test(location.pathname);
   const isMusicDetailPage = /^\/music\/\d+$/.test(location.pathname);
   const isVideoDetailPage = /^\/music\/video\/[^/]+$/.test(location.pathname);
   const isMusicAlbumDetailPage = /^\/music\/album\/[^/]+$/.test(location.pathname);
   const hideTopNavbarOnMobile =
-    isMovieDetailPage || isMusicDetailPage || isVideoDetailPage || isMusicAlbumDetailPage;
+    isMovieDetailPage ||
+    isMusicDetailPage ||
+    isVideoDetailPage ||
+    isMusicAlbumDetailPage ||
+    isPublicProfilePage;
   const [searchQuery, setSearchQuery] = useState('');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
