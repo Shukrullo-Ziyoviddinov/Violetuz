@@ -826,8 +826,127 @@
     left: max(0.75rem, env(safe-area-inset-left, 0px));
     right: max(0.75rem, env(safe-area-inset-right, 0px));
     height: 30px;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: transparent;
     z-index: 1305;
     cursor: default;
+    transition:
+      background-color 0.3s ease,
+      left 0.3s ease,
+      right 0.3s ease,
+      top 0.3s ease,
+      height 0.3s ease,
+      padding 0.3s ease;
+  }
+
+  .profile-page-visitor-name.is-scrolled {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    background-color: #121214;
+  }
+
+  .profile-bar-leading {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 30px;
+    align-self: center;
+  }
+
+  .navbar-profile-mobile-actions .profile-bar-leading {
+    order: -1;
+  }
+
+  .navbar-profile-mobile-actions.is-scrolled .profile-bar-leading,
+  .profile-page-visitor-name.is-scrolled .profile-bar-leading {
+    height: 36px;
+  }
+
+  .profile-bar-leading > .profile-page-mobile-name,
+  .profile-bar-leading > .profile-page-mobile-name-text,
+  .profile-bar-leading > .profile-mobile-bar-identity {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    margin: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  }
+
+  .profile-bar-leading > .profile-page-mobile-name,
+  .profile-bar-leading > .profile-page-mobile-name-text {
+    transform: translateY(-50%);
+  }
+
+  .profile-bar-leading > .profile-mobile-bar-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(calc(-50% + 8px));
+  }
+
+  .navbar-profile-mobile-actions.is-scrolled .profile-bar-leading > .profile-page-mobile-name,
+  .profile-page-visitor-name.is-scrolled .profile-bar-leading > .profile-page-mobile-name-text {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(calc(-50% - 8px));
+  }
+
+  .navbar-profile-mobile-actions.is-scrolled .profile-mobile-bar-identity,
+  .profile-page-visitor-name.is-scrolled .profile-mobile-bar-identity {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(-50%);
+  }
+
+  .profile-mobile-bar-avatar {
+    width: 34px;
+    height: 34px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 2px solid #0313ea;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .profile-mobile-bar-avatar .profile-avatar-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .profile-mobile-bar-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.05rem;
+  }
+
+  .profile-mobile-bar-meta .profile-name {
+    font-size: 0.92rem;
+    line-height: 1.15;
+    font-weight: 600;
+  }
+
+  .profile-mobile-bar-meta .profile-username {
+    margin: 0;
+    font-size: 0.72rem;
+    line-height: 1.15;
   }
 
   .profile-page-visitor-back {

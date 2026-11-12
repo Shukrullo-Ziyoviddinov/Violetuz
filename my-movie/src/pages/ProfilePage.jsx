@@ -30,6 +30,8 @@ import { requestOpenAuthModal } from '../authModalBridge';
 import { normalizeUsername } from '../store/slices/userUtils';
 import { useImageReady } from '../utils/useImageReady';
 import UserAvatar from '../components/UserAvatar/UserAvatar';
+import { useProfileCompactBar } from '../hooks/useProfileCompactBar';
+import ProfileCompactIdentity from './ProfileCompactIdentity';
 import './ProfilePage.css';
 
 const REPOST_EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
@@ -131,6 +133,7 @@ const ProfilePage = () => {
   const [followerRows, setFollowerRows] = useState([]);
 
   const [profileMenuSlot, setProfileMenuSlot] = useState(null);
+  const compactBar = useProfileCompactBar('.navbar-profile-mobile-actions', isLoggedIn);
 
   useEffect(() => {
     if (!authReady) return;
@@ -295,30 +298,40 @@ const ProfilePage = () => {
     <div className="profile-page">
       {profileMenuSlot
         ? createPortal(
-            <button
-              type="button"
-              className="profile-page-mobile-name"
-              onClick={() => setShowAddAccountModal(true)}
-              aria-label="Hisoblar"
-            >
-              <span className="profile-page-mobile-name-text">{profile.name}</span>
-              <svg
-                className="profile-name-chevron"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                fill="none"
+            <div className="profile-bar-leading">
+              <button
+                type="button"
+                className="profile-page-mobile-name"
+                onClick={() => setShowAddAccountModal(true)}
+                aria-label="Hisoblar"
+                aria-hidden={compactBar}
+                tabIndex={compactBar ? -1 : 0}
               >
-                <path
-                  d="M6 9l6 6 6-6"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>,
+                <span className="profile-page-mobile-name-text">{profile.name}</span>
+                <svg
+                  className="profile-name-chevron"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                >
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <ProfileCompactIdentity
+                name={profile.name}
+                username={formatUsernameDisplay(profile.username)}
+                avatar={profile.avatar}
+                visible={compactBar}
+              />
+            </div>,
             profileMenuSlot
           )
         : null}

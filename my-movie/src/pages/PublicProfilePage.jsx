@@ -19,6 +19,8 @@ import { followButtonType, getFollowedPeople, isOwnUserFollow, mapUserFollowRows
 import { normalizeUsername } from '../store/slices/userUtils';
 import { useImageReady } from '../utils/useImageReady';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import { useProfileCompactBar } from '../hooks/useProfileCompactBar';
+import ProfileCompactIdentity from './ProfileCompactIdentity';
 import './ProfilePage.css';
 
 const REPOST_EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
@@ -122,6 +124,7 @@ const PublicProfilePage = () => {
   const [repostFilter, setRepostFilter] = useState('all');
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [statsModalType, setStatsModalType] = useState('following');
+  const compactBar = useProfileCompactBar(null, status);
 
   const userId = String(id || '').trim();
   const isOwn =
@@ -303,7 +306,7 @@ const PublicProfilePage = () => {
 
   return (
     <div className="profile-page">
-      <div className="profile-page-mobile-name profile-page-visitor-name">
+      <div className={`profile-page-mobile-name profile-page-visitor-name${compactBar ? ' is-scrolled' : ''}`}>
         <button
           type="button"
           className="profile-page-visitor-back"
@@ -320,7 +323,15 @@ const PublicProfilePage = () => {
             />
           </svg>
         </button>
-        <span className="profile-page-mobile-name-text">{user.name}</span>
+        <div className="profile-bar-leading">
+          <span className="profile-page-mobile-name-text" aria-hidden={compactBar}>{user.name}</span>
+          <ProfileCompactIdentity
+            name={user.name}
+            username={formatUsernameDisplay(user.username)}
+            avatar={user.avatar}
+            visible={compactBar}
+          />
+        </div>
         <ShareButton
           icon="send"
           className="profile-page-visitor-share"
