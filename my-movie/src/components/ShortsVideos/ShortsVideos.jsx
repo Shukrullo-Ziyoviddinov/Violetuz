@@ -706,7 +706,20 @@ const ShortsVideos = ({
     }
   }, [onCloseFromHome]);
 
+  const stopModalPlayback = useCallback(() => {
+    const stop = (el) => {
+      if (!el || typeof el.pause !== 'function') return;
+      try { el.pause(); } catch (err) { /* element yopilishda yo'qolgan bo'lishi mumkin */ }
+    };
+    desktopVideoRefs.current.forEach(stop);
+    mobileVideoRefs.current.forEach(stop);
+    stop(modalVideoRef.current);
+    stop(musicAudioRef.current);
+    stop(musicClipVideoRef.current);
+  }, []);
+
   const finishCloseModal = useCallback(() => {
+    stopModalPlayback();
     setModalOpen(false);
     setOpenedFocus(null);
     recoOpenedRef.current = null;
@@ -714,10 +727,11 @@ const ShortsVideos = ({
     setSlideState(null);
     setMusicModalOpen(false);
     setModalVideoMuted(false);
-  }, []);
+  }, [stopModalPlayback]);
 
   const closeModal = useCallback(() => {
     if (onCloseFromHome) {
+      stopModalPlayback();
       flushWatchesRef.current({ refresh: false });
       onCloseFromHome();
       return;
@@ -730,7 +744,7 @@ const ShortsVideos = ({
     }
     flushWatchesRef.current({ refresh: true });
     finishCloseModal();
-  }, [onCloseFromHome, finishCloseModal]);
+  }, [onCloseFromHome, finishCloseModal, stopModalPlayback]);
 
   // Shorts grid dan ochilgan modal: qurilma «ortga» → faqat modal yopilsin
   useEffect(() => {
@@ -859,6 +873,7 @@ const ShortsVideos = ({
     setClipControlsVisible(false);
     setClipVideoFullscreen(false);
     setMobilePlayOverlayVisible(false);
+    if (!modalOpen) return;
 
     const v = modalVideoRef.current;
     if (!v) return;
