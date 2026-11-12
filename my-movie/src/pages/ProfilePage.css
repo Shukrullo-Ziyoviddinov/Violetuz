@@ -710,6 +710,10 @@
   text-align: left;
 }
 
+.profile-page-mobile-name {
+  display: none;
+}
+
 .profile-name-text {
   min-width: 0;
   overflow: hidden;
@@ -782,6 +786,21 @@
 }
 
 @media (max-width: 768px) {
+  .profile-page-mobile-name {
+    display: block;
+    order: -1;
+    flex: 1;
+    min-width: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 30px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+  }
+
   .profile-page-menu-btn {
     display: none !important;
   }

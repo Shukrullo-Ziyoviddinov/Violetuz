@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ProfileEditModal from '../components/Profile/ProfileEditModal';
@@ -129,6 +130,8 @@ const ProfilePage = () => {
   const [repostFilter, setRepostFilter] = useState('all');
   const [followerRows, setFollowerRows] = useState([]);
 
+  const [profileMenuSlot, setProfileMenuSlot] = useState(null);
+
   useEffect(() => {
     if (!authReady) return;
     if (!isLoggedIn) {
@@ -136,6 +139,10 @@ const ProfilePage = () => {
       requestOpenAuthModal('register');
     }
   }, [authReady, isLoggedIn, navigate]);
+
+  useLayoutEffect(() => {
+    setProfileMenuSlot(document.querySelector('.navbar-profile-mobile-actions'));
+  }, [authReady, isLoggedIn]);
 
   useEffect(() => {
     setCurrentLanguage(getCurrentLanguage());
@@ -286,6 +293,12 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-page">
+      {profileMenuSlot
+        ? createPortal(
+            <span className="profile-page-mobile-name">{profile.name}</span>,
+            profileMenuSlot
+          )
+        : null}
       <div className="profile-page-header">
         <div
           className="profile-page-bg"
