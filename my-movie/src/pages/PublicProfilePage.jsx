@@ -22,6 +22,7 @@ import { useImageReady } from '../utils/useImageReady';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useProfileCompactBar } from '../hooks/useProfileCompactBar';
 import ProfileCompactIdentity from './ProfileCompactIdentity';
+import ProfileAvatarPreview from './ProfileAvatarPreview';
 import './ProfilePage.css';
 
 const REPOST_EMPTY_IMG_SRC = '/img/wishlist_preview_rev_1.png';
@@ -125,12 +126,17 @@ const PublicProfilePage = () => {
   const [repostFilter, setRepostFilter] = useState('all');
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [statsModalType, setStatsModalType] = useState('following');
+  const [avatarPreview, setAvatarPreview] = useState(false);
   const compactBar = useProfileCompactBar(null, status);
 
   const userId = String(id || '').trim();
   const visitorFollowed = useIsFollowing(userId, 'user');
   const isOwn =
     authReady && isLoggedIn && profile?.id && String(profile.id) === userId;
+
+  useEffect(() => {
+    setAvatarPreview(false);
+  }, [userId]);
 
   useEffect(() => {
     if (!isOwn) return;
@@ -362,13 +368,18 @@ const PublicProfilePage = () => {
       <div className="profile-page-content">
         <div className="profile-page-top-card">
           <div className="profile-page-top">
-            <div className="profile-avatar-wrap" aria-hidden="true">
+            <button
+              type="button"
+              className="profile-avatar-wrap"
+              onClick={() => setAvatarPreview(true)}
+              aria-label={user.name || 'Avatar'}
+            >
               <UserAvatar
                 src={user.avatar}
                 className="profile-avatar-img"
                 fallback={<AvatarFallback />}
               />
-            </div>
+            </button>
             <div className="profile-info">
               <div className="profile-name-row">
                 <div className="profile-name">
@@ -436,6 +447,14 @@ const PublicProfilePage = () => {
           </div>
         </div>
       </div>
+
+      {avatarPreview ? (
+        <ProfileAvatarPreview
+          user={user}
+          onClose={() => setAvatarPreview(false)}
+          onSubscribeChange={handleVisitorSubscribe}
+        />
+      ) : null}
 
       <GlobalModal
         isOpen={showFollowingModal}

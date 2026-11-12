@@ -665,6 +665,15 @@
   overflow: hidden;
 }
 
+button.profile-avatar-wrap {
+  padding: 0;
+  margin: 0;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 .profile-avatar-img {
   width: 100%;
   height: 100%;
@@ -1225,4 +1234,209 @@
   .profile-page-quick-links {
     gap: 0.4rem;
   }
+}
+
+body.profile-avatar-preview-open {
+  overflow: hidden !important;
+}
+
+.profile-avatar-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  overflow: hidden;
+}
+
+.profile-avatar-preview-bg {
+  position: absolute;
+  inset: -48px;
+  background-position: center;
+  background-size: cover;
+  filter: blur(28px);
+  transform: scale(1.12);
+}
+
+.profile-avatar-preview-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.profile-avatar-preview-header,
+.profile-avatar-preview-stage,
+.profile-avatar-preview-dock {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-avatar-preview-header {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  min-height: 52px;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.profile-avatar-preview-back {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.profile-avatar-preview-back svg {
+  display: block;
+}
+
+.profile-avatar-preview-handle {
+  min-width: 0;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-avatar-preview-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.profile-avatar-preview-watermark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  z-index: 0;
+  transform: translateY(calc(-50% - 7.5rem));
+  text-align: center;
+  font-size: clamp(2.6rem, 13vw, 3.8rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.34);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.profile-avatar-preview-circle {
+  position: relative;
+  z-index: 1;
+  width: min(68vw, 280px);
+  height: min(68vw, 280px);
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.profile-avatar-preview-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-preview-dock {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.9rem;
+  width: min(480px, 100%);
+  margin: 0 auto;
+  padding: 0 1rem calc(2.4rem + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+.profile-avatar-preview-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+.profile-avatar-preview-follow,
+.profile-avatar-preview-message {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  height: 40px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.profile-avatar-preview-follow {
+  display: flex;
+}
+
+.profile-avatar-preview-follow .following-btn {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.profile-avatar-preview-message {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+}
+
+.profile-avatar-preview-share.share-button-wrapper {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-avatar-preview-share .share-button.profile-avatar-preview-share-btn {
+  width: auto;
+  height: auto;
+  min-height: 0;
+  padding: 0.2rem 0.6rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  color: #5aa7ff;
+}
+
+.profile-avatar-preview-share .share-button.profile-avatar-preview-share-btn:hover,
+.profile-avatar-preview-share .share-button.profile-avatar-preview-share-btn:active {
+  background: transparent;
+  border: none;
+  color: #8ec2ff;
+  transform: none;
+}
+
+.profile-avatar-preview-share .share-button svg {
+  display: none;
+}
+
+.profile-avatar-preview-share .share-button.share-button--labeled .share-button-label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: inherit;
 }
