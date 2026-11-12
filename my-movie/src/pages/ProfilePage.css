@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@600;700&display=swap');
 
 .profile-page {
   min-height: calc(100vh - 80px);
@@ -792,10 +792,10 @@
     order: -1;
     flex: 1;
     min-width: 0;
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "Oxanium", "Segoe UI", sans-serif;
     font-size: 1.3rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     line-height: 1.15;
     color: #fff;
     white-space: nowrap;
