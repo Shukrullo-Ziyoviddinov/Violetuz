@@ -101,14 +101,14 @@ const ProfileAvatarPreview = ({ user, onClose, onSubscribeChange }) => {
           <button type="button" className="profile-avatar-preview-message">
             Xabar
           </button>
+          <ShareButton
+            icon="send"
+            className="profile-avatar-preview-share"
+            buttonClassName="profile-avatar-preview-share-btn"
+            movie={{ title: user?.name || handle }}
+            sharePath={`/user/${encodeURIComponent(user?.id || '')}`}
+          />
         </div>
-        <ShareButton
-          label="Yuborish"
-          className="profile-avatar-preview-share"
-          buttonClassName="profile-avatar-preview-share-btn"
-          movie={{ title: user?.name || handle }}
-          sharePath={`/user/${encodeURIComponent(user?.id || '')}`}
-        />
       </div>
     </div>,
     document.body
