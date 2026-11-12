@@ -12,6 +12,7 @@ import RepostVideoCard from '../components/Repost/RepostVideoCard';
 import RepostShortsCard from '../components/Repost/RepostShortsCard';
 import { normalizeRepostType, repostMatchesFilter } from '../components/Repost/repostTypes';
 import { useAuth } from '../context/AuthContext';
+import { useIsFollowing } from '../context/FollowingContext';
 import { useActorsApi } from '../context/ActorsApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { fetchPublicProfile } from '../api/publicProfileApi';
@@ -127,6 +128,7 @@ const PublicProfilePage = () => {
   const compactBar = useProfileCompactBar(null, status);
 
   const userId = String(id || '').trim();
+  const visitorFollowed = useIsFollowing(userId, 'user');
   const isOwn =
     authReady && isLoggedIn && profile?.id && String(profile.id) === userId;
 
@@ -332,6 +334,19 @@ const PublicProfilePage = () => {
             visible={compactBar}
           />
         </div>
+        {visitorFollowed ? (
+          <button type="button" className="profile-mobile-bar-action">
+            <i className="fa-solid fa-message" aria-hidden="true" />
+            Xabar
+          </button>
+        ) : (
+          <FollowingButton
+            artistId={user.id}
+            entityType="user"
+            wrapperClassName="profile-mobile-bar-action"
+            onSubscribeChange={handleVisitorSubscribe}
+          />
+        )}
         <ShareButton
           icon="send"
           className="profile-page-visitor-share"
