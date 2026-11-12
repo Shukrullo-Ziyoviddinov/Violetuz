@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GlobalModal from '../components/GlobalModal/GlobalModal';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
+import ShareButton from '../components/ShareButton/ShareButton';
 import UserAvatar from '../components/UserAvatar/UserAvatar';
 import RepostFilter from '../components/Repost/RepostFilter';
 import RepostMovieCard from '../components/Repost/RepostMovieCard';
@@ -302,6 +303,32 @@ const PublicProfilePage = () => {
 
   return (
     <div className="profile-page">
+      <div className="profile-page-mobile-name profile-page-visitor-name">
+        <button
+          type="button"
+          className="profile-page-visitor-back"
+          onClick={() => navigate(-1)}
+          aria-label="Ortga"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+            <path
+              d="M15 6l-6 6 6 6"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <span className="profile-page-mobile-name-text">{user.name}</span>
+        <ShareButton
+          icon="send"
+          className="profile-page-visitor-share"
+          buttonClassName="profile-page-visitor-share-btn"
+          movie={{ title: user.name }}
+          sharePath={`/user/${encodeURIComponent(user.id)}`}
+        />
+      </div>
       <div className="profile-page-header">
         <div className="profile-page-bg" style={{ backgroundImage: 'url(/img/profilfoto.jpg)' }} />
       </div>
