@@ -823,8 +823,8 @@
   .profile-page-visitor-name {
     position: fixed;
     top: 8px;
-    left: max(1.25rem, env(safe-area-inset-left, 0px));
-    right: max(1rem, env(safe-area-inset-right, 0px));
+    left: max(0.75rem, env(safe-area-inset-left, 0px));
+    right: max(0.75rem, env(safe-area-inset-right, 0px));
     height: 30px;
     z-index: 1305;
     cursor: default;
@@ -854,25 +854,35 @@
   }
 
   .profile-page-visitor-name .profile-page-visitor-share-btn.share-button {
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    background: rgba(0, 0, 0, 0.45);
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     backdrop-filter: none;
     transform: none;
   }
 
   .profile-page-visitor-name .profile-page-visitor-share-btn.share-button svg {
-    width: 16px;
-    height: 16px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .profile-page-visitor-name .profile-page-visitor-share-btn.share-button svg path {
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
   }
 
   .profile-page-visitor-name .profile-page-visitor-share-btn.share-button:hover,
   .profile-page-visitor-name .profile-page-visitor-share-btn.share-button:active {
     transform: none;
-    background: rgba(0, 0, 0, 0.6);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
 
   .profile-page-mobile-name .profile-name-chevron {
