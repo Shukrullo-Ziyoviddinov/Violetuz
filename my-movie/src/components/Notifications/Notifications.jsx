@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
+import NotificationsFilter from './NotificationsFilter';
 import './Notifications.css';
 
 const MOBILE_QUERY = '(max-width: 768px)';
@@ -127,6 +128,7 @@ export const NotificationsModal = ({ onClose }) => {
             </button>
           )}
         </header>
+        <NotificationsFilter />
         <div className="notifications-modal-body" />
       </div>
     </div>,
