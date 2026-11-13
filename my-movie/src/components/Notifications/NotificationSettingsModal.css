@@ -16,7 +16,7 @@
   max-height: min(90dvh, calc(100vh - 2rem));
   display: flex;
   flex-direction: column;
-  background: #12121a;
+  background: #0f0f12;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
@@ -26,7 +26,7 @@
 }
 
 .notification-settings-header {
-  background: #12121a;
+  background: #0f0f12;
 }
 
 .notification-settings-body {
@@ -97,7 +97,7 @@
 }
 
 .notification-settings-switch.is-on {
-  background: #7b4dff;
+  background: #0313ea;
 }
 
 .notification-settings-switch.is-on span {
@@ -121,7 +121,7 @@
     border: none;
     border-radius: 0;
     box-shadow: none;
-    background: #0c0c12;
+    background: #0a0a0a;
     transform: translate3d(100%, 0, 0);
     transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
     will-change: transform;
@@ -140,7 +140,7 @@
   }
 
   .notification-settings-header {
-    background: #0c0c12;
+    background: #0a0a0a;
   }
 
   .notification-settings-body {
