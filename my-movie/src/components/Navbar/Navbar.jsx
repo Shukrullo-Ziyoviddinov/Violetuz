@@ -405,22 +405,20 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-mobile-actions">
-          {!isFeedPage ? (
-            <button
-              type="button"
-              className="navbar-mobile-action-btn navbar-mobile-search-btn"
-              onClick={() => {
-                if (isChannelProfile && window.innerWidth <= MOBILE_NAV_MAX) {
-                  requestOpenChannelSearch();
-                  return;
-                }
-                openSearchBrowse();
-              }}
-              aria-label={t('navbar.search')}
-            >
-              <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className="navbar-mobile-action-btn navbar-mobile-search-btn"
+            onClick={() => {
+              if (isChannelProfile && window.innerWidth <= MOBILE_NAV_MAX) {
+                requestOpenChannelSearch();
+                return;
+              }
+              openSearchBrowse();
+            }}
+            aria-label={t('navbar.search')}
+          >
+            <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+          </button>
 
           <button
             type="button"

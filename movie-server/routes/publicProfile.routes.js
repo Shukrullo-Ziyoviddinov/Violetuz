@@ -7,7 +7,6 @@ const publicProfileController = require('../controllers/publicProfile.controller
  */
 const router = Router();
 
-router.get('/:id/share-image', publicProfileController.getPublicProfileShareImage);
 router.get('/:id/share', publicProfileController.getPublicProfileShare);
 router.get('/:id', publicProfileController.getPublicProfile);
 

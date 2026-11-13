@@ -35,7 +35,6 @@ const NavbarMobile = () => {
   const voiceSearchSupported = isVoiceSearchAvailable();
 
   const isHomeActive = pathname === '/feed';
-  const isSearchActive = pathname.startsWith('/search');
   const isMusicActive = pathname === '/music';
   const isMoviesActive = pathname === '/' || pathname.startsWith('/movie/');
   const isShortsActive = pathname === '/shorts' || pathname === '/music/shorts';
@@ -229,15 +228,6 @@ const NavbarMobile = () => {
         >
           <i className="fa-solid fa-house" aria-hidden="true" />
           <span>{t('navbar.mobileHome')}</span>
-        </button>
-
-        <button
-          className={`navbar-mobile-item ${isSearchActive ? 'navbar-mobile-item-active' : ''}`}
-          onClick={openSearchBrowse}
-          aria-label={t('navbar.mobileSearch')}
-        >
-          <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
-          <span>{t('navbar.mobileSearch')}</span>
         </button>
 
         <button

@@ -60,8 +60,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
     "morgan": "^1.11.0",
-    "multer": "^2.0.2",
-    "sharp": "^0.35.5"
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
