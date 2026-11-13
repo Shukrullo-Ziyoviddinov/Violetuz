@@ -19,6 +19,28 @@ import './Notifications.css';
 
 const MOBILE_QUERY = '(max-width: 768px)';
 
+const showOsNotice = (item) => {
+  if (item?.type !== 'subscriber') return;
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  if (document.visibilityState !== 'visible') return;
+  const name = String(item.actor?.name || item.actor?.username || '').trim();
+  const avatar = String(item.actor?.avatar || '');
+  const icon = /^https?:\/\//i.test(avatar) ? avatar : '/img/newlogo.jpg';
+  try {
+    const notice = new Notification('VioletPlay', {
+      body: name ? `${name} sizga obuna bo‘ldi` : 'sizga obuna bo‘ldi',
+      icon,
+      tag: `subscriber-${item.id}`,
+    });
+    notice.onclick = () => {
+      window.focus();
+      notice.close();
+    };
+  } catch {
+    // Qo‘ng‘iroqcha yozuvi saqlanadi.
+  }
+};
+
 const useMobileNotifications = () => {
   const [mobile, setMobile] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches
@@ -283,6 +305,7 @@ const NotificationsBell = () => {
       onItem: (item) => {
         if (!item?.id || seenLiveIds.current.has(item.id)) return;
         seenLiveIds.current.add(item.id);
+        showOsNotice(item);
         if (registry.current) {
           registry.current.push(item);
           return;
@@ -297,13 +320,10 @@ const NotificationsBell = () => {
     document.addEventListener('visibilitychange', onVisible);
     fetchNotificationSettings()
       .then((settings) => {
-        if (cancelled || settings?.subscribers === false) return null;
+        if (settings?.subscribers === false) return null;
         return askDevicePermission();
       })
-      .then((permission) => {
-        if (cancelled || permission !== 'granted') return null;
-        return ensureDevicePush();
-      })
+      .then((permission) => (permission === 'granted' ? ensureDevicePush() : null))
       .catch(() => {});
     return () => {
       cancelled = true;

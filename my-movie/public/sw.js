@@ -6,10 +6,15 @@ self.addEventListener('push', (event) => {
     data = {};
   }
   const title = data.title || 'VioletPlay';
-  event.waitUntil(self.registration.showNotification(title, {
-    body: data.body || '',
-    icon: data.icon || '/img/newlogo.jpg',
-  }));
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    if (windows.some((client) => client.visibilityState === 'visible')) return;
+    await self.registration.showNotification(title, {
+      body: data.body || '',
+      icon: data.icon || '/img/newlogo.jpg',
+      tag: data.tag || 'violet-subscriber',
+    });
+  })());
 });
 
 self.addEventListener('notificationclick', (event) => {
