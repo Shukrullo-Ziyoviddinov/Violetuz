@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
 import NotificationsFilter from './NotificationsFilter';
+import NotificationsEmpty from './NotificationsEmpty';
 import './Notifications.css';
 
 const MOBILE_QUERY = '(max-width: 768px)';
@@ -27,6 +28,7 @@ export const NotificationsModal = ({ onClose }) => {
   const { t } = useTranslation();
   const mobile = useMobileNotifications();
   const title = t('navbar.notifications', 'Bildirishnomalar');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [slideReady, setSlideReady] = useState(false);
   const [exiting, setExiting] = useState(false);
   const closingRef = useRef(false);
@@ -128,8 +130,10 @@ export const NotificationsModal = ({ onClose }) => {
             </button>
           )}
         </header>
-        <NotificationsFilter />
-        <div className="notifications-modal-body" />
+        <NotificationsFilter active={activeFilter} onChange={setActiveFilter} />
+        <div className="notifications-modal-body">
+          <NotificationsEmpty filterId={activeFilter} />
+        </div>
       </div>
     </div>,
     document.body

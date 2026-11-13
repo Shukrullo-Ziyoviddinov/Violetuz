@@ -25,6 +25,12 @@
   cursor: pointer;
 }
 
+.notifications-filter-btn--active {
+  background: #1e03d24d;
+  border-color: #0313ea;
+  color: #fff;
+}
+
 @media (max-width: 768px) {
   .notifications-filter {
     padding-left: max(0.85rem, env(safe-area-inset-left, 0px));
