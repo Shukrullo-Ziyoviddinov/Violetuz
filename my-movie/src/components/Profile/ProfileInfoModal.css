@@ -30,7 +30,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.15rem;
   padding: 0.85rem 0.75rem;
   padding-top: max(0.85rem, env(safe-area-inset-top, 0));
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -60,7 +60,8 @@
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  text-align: center;
+  text-align: left;
+  justify-self: start;
   line-height: 1.25;
 }
 
