@@ -17,7 +17,7 @@ import { useActorsApi } from '../context/ActorsApiContext';
 import { useMusicApi } from '../context/MusicApiContext';
 import { fetchPublicProfile } from '../api/publicProfileApi';
 import { followButtonType, getFollowedPeople, isOwnUserFollow, mapUserFollowRows, pinViewerFirst } from '../store/slices/followingUtils';
-import { normalizeUsername } from '../store/slices/userUtils';
+import { normalizeUsername, profileShareText } from '../store/slices/userUtils';
 import { useImageReady } from '../utils/useImageReady';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import { useProfileCompactBar } from '../hooks/useProfileCompactBar';
@@ -357,7 +357,7 @@ const PublicProfilePage = () => {
           icon="send"
           className="profile-page-visitor-share"
           buttonClassName="profile-page-visitor-share-btn"
-          movie={{ title: user.name }}
+          movie={{ title: profileShareText(user) }}
           sharePath={`/user/${encodeURIComponent(user.id)}`}
         />
       </div>

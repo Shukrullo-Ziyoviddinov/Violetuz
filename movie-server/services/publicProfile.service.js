@@ -20,7 +20,7 @@ const toPublicUser = (user) => ({
  * Email, parol va rol chiqmaydi. Yozish yo‘q.
  * Obunachilar — shu foydalanuvchiga user turi bilan yozilgan obunalar.
  */
-const getPublicProfile = async (rawId) => {
+const loadPublicUser = async (rawId) => {
   const id = String(rawId || '').trim();
   if (!USER_ID_RE.test(id) || !mongoose.Types.ObjectId.isValid(id)) {
     throw notFound('Foydalanuvchi topilmadi');
@@ -30,6 +30,13 @@ const getPublicProfile = async (rawId) => {
   if (!user) {
     throw notFound('Foydalanuvchi topilmadi');
   }
+  return user;
+};
+
+const getPublicUserCard = async (rawId) => toPublicUser(await loadPublicUser(rawId));
+
+const getPublicProfile = async (rawId) => {
+  const user = await loadPublicUser(rawId);
 
   const userId = user._id;
   const [reposts, following, followers] = await Promise.all([
@@ -49,4 +56,5 @@ const getPublicProfile = async (rawId) => {
 
 module.exports = {
   getPublicProfile,
+  getPublicUserCard,
 };

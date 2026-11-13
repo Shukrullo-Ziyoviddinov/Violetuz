@@ -13,6 +13,13 @@ export const DEFAULT_PROFILE = {
 /** @siz saqlanadi; ko‘rinishda @ qo‘shiladi */
 export const normalizeUsername = (raw) => (raw ?? '').trim().replace(/^@+/, '').trim();
 
+/** Ulashish matni: avval ism, keyin bio. Bio bo‘lmasa faqat ism. */
+export const profileShareText = (user) => {
+  const name = String(user?.name || '').trim();
+  const bio = String(user?.bio || '').trim();
+  return [name, bio].filter(Boolean).join('\n');
+};
+
 export const parseStoredProfile = (parsed) => {
   if (!parsed || typeof parsed !== 'object') {
     return { ...DEFAULT_PROFILE };

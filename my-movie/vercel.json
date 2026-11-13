@@ -17,6 +17,21 @@
     {
       "source": "/channel/:id",
       "destination": "/index.html"
+    },
+    {
+      "source": "/user/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([Tt]elegram[Bb]ot|[Ff]acebook[Ee]xternal[Hh]it|[Ff]acebot|[Tt]witterbot|[Ww]hats[Aa]pp|[Ll]inked[Ii]n[Bb]ot|[Ss]lackbot|[Dd]iscordbot|[Vv]iber|[Pp]interest|[Gg]ooglebot|[Bb]ingbot).*"
+        }
+      ],
+      "destination": "/api/user-preview?id=:id"
+    },
+    {
+      "source": "/user/:id",
+      "destination": "/index.html"
     }
   ]
 }

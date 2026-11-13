@@ -4,7 +4,7 @@ import FollowingButton from '../Music/FollowingButton/FollowingButton';
 import ShareButton from '../components/ShareButton/ShareButton';
 import UserAvatar from '../components/UserAvatar/UserAvatar';
 import { useModalHardwareBack } from '../useModalHardwareBack';
-import { normalizeUsername } from '../store/slices/userUtils';
+import { normalizeUsername, profileShareText } from '../store/slices/userUtils';
 
 const COVER = '/img/profilfoto.jpg';
 
@@ -105,7 +105,7 @@ const ProfileAvatarPreview = ({ user, onClose, onSubscribeChange }) => {
             icon="send"
             className="profile-avatar-preview-share"
             buttonClassName="profile-avatar-preview-share-btn"
-            movie={{ title: user?.name || handle }}
+            movie={{ title: profileShareText(user) }}
             sharePath={`/user/${encodeURIComponent(user?.id || '')}`}
           />
         </div>

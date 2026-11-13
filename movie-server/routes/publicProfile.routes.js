@@ -7,6 +7,7 @@ const publicProfileController = require('../controllers/publicProfile.controller
  */
 const router = Router();
 
+router.get('/:id/share', publicProfileController.getPublicProfileShare);
 router.get('/:id', publicProfileController.getPublicProfile);
 
 module.exports = router;
