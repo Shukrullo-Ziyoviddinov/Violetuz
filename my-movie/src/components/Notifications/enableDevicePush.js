@@ -9,12 +9,47 @@ const urlBase64ToUint8Array = (value) => {
   return output;
 };
 
+let pendingSave = null;
+
+export const askDevicePermission = () => {
+  if (typeof Notification === 'undefined') return Promise.resolve('denied');
+  if (Notification.permission !== 'default') return Promise.resolve(Notification.permission);
+  return Notification.requestPermission();
+};
+
+export const browserHasPushSubscription = async () => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+  const registration = await navigator.serviceWorker.getRegistration();
+  if (!registration) return false;
+  const subscription = await registration.pushManager.getSubscription();
+  return Boolean(subscription);
+};
+
+export const ensureDevicePush = () => {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') {
+    return Promise.resolve(false);
+  }
+  if (!pendingSave) {
+    pendingSave = enableDevicePush()
+      .then((saved) => {
+        if (!saved) pendingSave = null;
+        return Boolean(saved);
+      })
+      .catch((err) => {
+        pendingSave = null;
+        throw err;
+      });
+  }
+  return pendingSave;
+};
+
 export const enableDevicePush = async () => {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  const registration = await navigator.serviceWorker.register('/sw.js');
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
+  await navigator.serviceWorker.register('/sw.js');
   const ready = await navigator.serviceWorker.ready;
   const { publicKey } = await fetchPushPublicKey();
-  if (!publicKey) return;
+  if (!publicKey) return false;
   const applicationServerKey = urlBase64ToUint8Array(publicKey);
   const sameKey = (subscription) => {
     const raw = subscription?.options?.applicationServerKey;
@@ -32,15 +67,16 @@ export const enableDevicePush = async () => {
     subscription = null;
   }
   if (!subscription) {
-    subscription = await registration.pushManager.subscribe({
+    subscription = await ready.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey,
     });
   }
   const json = subscription.toJSON();
-  if (!json?.endpoint || !json.keys?.p256dh || !json.keys?.auth) return;
+  if (!json?.endpoint || !json.keys?.p256dh || !json.keys?.auth) return false;
   await saveNotificationDevice({
     endpoint: json.endpoint,
     keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
   });
+  return true;
 };

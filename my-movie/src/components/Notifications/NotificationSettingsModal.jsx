@@ -4,7 +4,7 @@ import {
   fetchNotificationSettings,
   saveNotificationSettings,
 } from '../../api/notificationsApi';
-import { enableDevicePush } from './enableDevicePush';
+import { askDevicePermission, browserHasPushSubscription, ensureDevicePush } from './enableDevicePush';
 import './NotificationSettingsModal.css';
 
 const SECTIONS = [
@@ -105,6 +105,8 @@ const NotificationSettingsModal = ({ closing = false, onClose, onExited }) => {
       .then((settings) => {
         if (cancelled || typeof settings?.subscribers !== 'boolean') return;
         setToggles((current) => ({ ...current, subscribers: settings.subscribers }));
+        if (settings.subscribers) return ensureDevicePush();
+        return null;
       })
       .catch(() => {});
     return () => {
@@ -118,17 +120,38 @@ const NotificationSettingsModal = ({ closing = false, onClose, onExited }) => {
       return;
     }
     if (savingRef.current) return;
+    const permission = typeof Notification === 'undefined' ? 'denied' : Notification.permission;
+    if (toggles.subscribers && permission === 'default') {
+      askDevicePermission()
+        .then((result) => (result === 'granted' ? ensureDevicePush() : null))
+        .catch(() => {});
+      return;
+    }
+    if (toggles.subscribers && permission === 'granted') {
+      savingRef.current = true;
+      browserHasPushSubscription()
+        .then((subscribed) => {
+          if (!subscribed) return ensureDevicePush();
+          setToggles((current) => ({ ...current, subscribers: false }));
+          return saveNotificationSettings({ subscribers: false }).catch(() => {
+            setToggles((current) => ({ ...current, subscribers: true }));
+          });
+        })
+        .catch(() => {})
+        .finally(() => {
+          savingRef.current = false;
+        });
+      return;
+    }
     const next = !toggles.subscribers;
     savingRef.current = true;
     setToggles((current) => ({ ...current, subscribers: next }));
-    const permissionPromise = next && typeof Notification !== 'undefined'
-      ? Notification.requestPermission()
-      : null;
+    const permissionPromise = next ? askDevicePermission() : null;
     saveNotificationSettings({ subscribers: next })
       .then(() => {
         if (!permissionPromise) return null;
         return permissionPromise
-          .then((permission) => (permission === 'granted' ? enableDevicePush() : null))
+          .then((result) => (result === 'granted' ? ensureDevicePush() : null))
           .catch(() => null);
       })
       .catch(() => {

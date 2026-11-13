@@ -5,6 +5,8 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
 import MiniGlobalModal from '../MiniGlobalModal/MiniGlobalModal';
 import NotificationSettingsModal from '../Notifications/NotificationSettingsModal';
+import { askDevicePermission, ensureDevicePush } from '../Notifications/enableDevicePush';
+import { fetchNotificationSettings } from '../../api/notificationsApi';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
 import './ProfileInfoModal.css';
 
@@ -279,7 +281,17 @@ const ProfileInfoModal = ({
           <button
             type="button"
             className="profile-wishlist-block profile-info-action"
-            onClick={() => setShowNotifications(true)}
+            onClick={() => {
+              setShowNotifications(true);
+              askDevicePermission()
+                .then(async (permission) => {
+                  if (permission !== 'granted') return null;
+                  const settings = await fetchNotificationSettings();
+                  if (settings?.subscribers === false) return null;
+                  return ensureDevicePush();
+                })
+                .catch(() => {});
+            }}
           >
             <div className="profile-wishlist-left">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

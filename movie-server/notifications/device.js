@@ -67,6 +67,8 @@ async function sendToDevices({ userId, notification } = {}) {
       const status = err?.statusCode;
       if (status === 404 || status === 410) {
         await NotificationDevice.deleteOne({ endpoint: device.endpoint });
+      } else {
+        console.error('device-push failed', status || err?.message || 'unknown');
       }
     }
   }));

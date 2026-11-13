@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
 import {
+  fetchNotificationSettings,
   fetchNotifications,
   fetchUnreadCount,
   markNotificationsRead,
   openNotificationStream,
 } from '../../api/notificationsApi';
+import { ensureDevicePush } from './enableDevicePush';
 import NotificationsFilter from './NotificationsFilter';
 import NotificationsEmpty from './NotificationsEmpty';
 import NotificationsList from './NotificationsList';
@@ -293,6 +295,12 @@ const NotificationsBell = () => {
       if (document.visibilityState === 'visible') catchUp();
     };
     document.addEventListener('visibilitychange', onVisible);
+    fetchNotificationSettings()
+      .then((settings) => {
+        if (cancelled || settings?.subscribers === false) return null;
+        return ensureDevicePush();
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
       closeStream();
