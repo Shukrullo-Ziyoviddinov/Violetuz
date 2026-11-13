@@ -16,7 +16,8 @@ const shareImageUrl = (avatar, base) => {
 
 /**
  * Crawler preview for /user/:id.
- * Title is the profile name. Bio and avatar are included only when that user has them.
+ * Title is the profile name. Bio is included only when that user has one.
+ * The picture is a small JPEG on the same site, so chat apps can show the avatar.
  */
 const buildUserSharePage = (user, baseUrl) => {
   const base = new URL(baseUrl).origin;
@@ -25,7 +26,10 @@ const buildUserSharePage = (user, baseUrl) => {
   const bio = String(user?.bio || '').trim();
   const title = escapeHtml(name);
   const description = escapeHtml(bio);
-  const image = escapeHtml(shareImageUrl(user?.avatar, base));
+  const sourceImage = shareImageUrl(user?.avatar, base);
+  const image = sourceImage
+    ? escapeHtml(`${base}/api/user-avatar?id=${encodeURIComponent(user.id)}`)
+    : '';
   const url = escapeHtml(target);
   const scriptUrl = JSON.stringify(target).replace(/</g, '\\u003c');
 
@@ -34,12 +38,17 @@ const buildUserSharePage = (user, baseUrl) => {
 <meta charset="utf-8" />
 <title>${title}</title>
 ${description ? `<meta name="description" content="${description}" />` : ''}
-<meta property="og:type" content="profile" />
+<meta property="og:type" content="website" />
 <meta property="og:title" content="${title}" />
 ${description ? `<meta property="og:description" content="${description}" />` : ''}
 <meta property="og:url" content="${url}" />
-${image ? `<meta property="og:image" content="${image}" />` : ''}
-<meta name="twitter:card" content="summary" />
+${image ? `<meta property="og:image" content="${image}" />
+<meta property="og:image:secure_url" content="${image}" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="512" />
+<meta property="og:image:height" content="512" />
+<meta property="og:image:alt" content="${title}" />` : ''}
+<meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}" />
 <meta name="twitter:title" content="${title}" />
 ${description ? `<meta name="twitter:description" content="${description}" />` : ''}
 ${image ? `<meta name="twitter:image" content="${image}" />` : ''}
@@ -53,4 +62,4 @@ ${description ? `<p>${description}</p>` : ''}
 </body></html>`;
 };
 
-module.exports = { buildUserSharePage };
+module.exports = { buildUserSharePage, shareImageUrl };
