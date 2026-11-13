@@ -1,9 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
+import {
+  fetchNotifications,
+  fetchUnreadCount,
+  markNotificationsRead,
+  openNotificationStream,
+} from '../../api/notificationsApi';
 import NotificationsFilter from './NotificationsFilter';
 import NotificationsEmpty from './NotificationsEmpty';
+import NotificationsList from './NotificationsList';
+import { itemsForFilter } from './notificationView';
 import './Notifications.css';
 
 const MOBILE_QUERY = '(max-width: 768px)';
@@ -24,11 +33,20 @@ const useMobileNotifications = () => {
   return mobile;
 };
 
-export const NotificationsModal = ({ onClose }) => {
+export const NotificationsModal = ({ onClose, onMarked, registerLive }) => {
   const { t } = useTranslation();
+  const { isLoggedIn } = useAuth();
   const mobile = useMobileNotifications();
   const title = t('navbar.notifications', 'Bildirishnomalar');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [items, setItems] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  const markedRef = useRef(new Set());
+  const arrivedLive = useRef(new Set());
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+  const onMarkedRef = useRef(onMarked);
+  onMarkedRef.current = onMarked;
   const [slideReady, setSlideReady] = useState(false);
   const [exiting, setExiting] = useState(false);
   const closingRef = useRef(false);
@@ -85,6 +103,82 @@ export const NotificationsModal = ({ onClose }) => {
   }, [exiting]);
 
   useEffect(() => {
+    if (!registerLive) return undefined;
+    registerLive({
+      push(item) {
+        if (!item?.id) return;
+        arrivedLive.current.add(item.id);
+        setItems((current) => (
+          current.some((row) => row.id === item.id) ? current : [item, ...current]
+        ));
+      },
+      replace(next) {
+        const list = Array.isArray(next) ? next : [];
+        const known = new Set(itemsRef.current.map((row) => row.id));
+        list.forEach((item) => {
+          if (item?.id && !item.readAt && !known.has(item.id)) arrivedLive.current.add(item.id);
+        });
+        setItems((current) => {
+          const ids = new Set(list.map((item) => item.id));
+          const extra = current.filter((item) => arrivedLive.current.has(item.id) && item.id && !ids.has(item.id));
+          return [...extra, ...list];
+        });
+      },
+    });
+    return () => registerLive(null);
+  }, [registerLive]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setItems([]);
+      setLoaded(true);
+      return undefined;
+    }
+    let cancelled = false;
+    fetchNotifications()
+      .then((data) => {
+        if (cancelled) return;
+        const fetched = Array.isArray(data?.items) ? data.items : [];
+        setItems((current) => {
+          const ids = new Set(fetched.map((item) => item.id));
+          const extra = current.filter((item) => item?.id && !ids.has(item.id));
+          return [...extra, ...fetched];
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn]);
+
+  const visible = itemsForFilter(items, activeFilter);
+
+  useEffect(() => {
+    if (!loaded || !isLoggedIn) return undefined;
+    const ids = itemsForFilter(items, activeFilter)
+      .filter((item) => item?.id && !item.readAt && !markedRef.current.has(item.id))
+      .map((item) => item.id);
+    if (!ids.length) return undefined;
+    const badgeIds = ids.filter((id) => !arrivedLive.current.has(id));
+    let cancelled = false;
+    markNotificationsRead(ids)
+      .then(() => {
+        if (cancelled) return;
+        ids.forEach((id) => markedRef.current.add(id));
+        if (badgeIds.length) onMarkedRef.current?.(badgeIds);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [loaded, isLoggedIn, items, activeFilter]);
+
+  useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const onKeyDown = (event) => {
@@ -132,7 +226,8 @@ export const NotificationsModal = ({ onClose }) => {
         </header>
         <NotificationsFilter active={activeFilter} onChange={setActiveFilter} />
         <div className="notifications-modal-body">
-          <NotificationsEmpty filterId={activeFilter} />
+          {loaded && visible.length === 0 ? <NotificationsEmpty filterId={activeFilter} /> : null}
+          {visible.length > 0 ? <NotificationsList items={visible} /> : null}
         </div>
       </div>
     </div>,
@@ -142,20 +237,115 @@ export const NotificationsModal = ({ onClose }) => {
 
 const NotificationsBell = () => {
   const { t } = useTranslation();
+  const { isLoggedIn } = useAuth();
   const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
+  const markedIds = useRef(new Set());
+  const seenLiveIds = useRef(new Set());
+  const unreadToken = useRef(0);
+  const registry = useRef(null);
+  const title = t('navbar.notifications', 'Bildirishnomalar');
+  const registerLive = useCallback((api) => {
+    registry.current = api;
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setUnread(0);
+      return undefined;
+    }
+    let cancelled = false;
+    const loadUnread = () => {
+      const token = unreadToken.current + 1;
+      unreadToken.current = token;
+      fetchUnreadCount()
+        .then((data) => {
+          if (cancelled || token !== unreadToken.current) return;
+          setUnread(Number(data?.count) || 0);
+        })
+        .catch(() => {});
+    };
+    const catchUp = () => {
+      if (cancelled || document.visibilityState === 'hidden') return;
+      if (registry.current) {
+        fetchNotifications()
+          .then((data) => {
+            if (!cancelled) registry.current?.replace(data?.items || []);
+          })
+          .catch(() => {});
+        return;
+      }
+      loadUnread();
+    };
+    const closeStream = openNotificationStream({
+      onItem: (item) => {
+        if (!item?.id || seenLiveIds.current.has(item.id)) return;
+        seenLiveIds.current.add(item.id);
+        if (registry.current) {
+          registry.current.push(item);
+          return;
+        }
+        loadUnread();
+      },
+      onReconnect: catchUp,
+    });
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') catchUp();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      cancelled = true;
+      closeStream();
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn || open) {
+      if (!isLoggedIn) setUnread(0);
+      return undefined;
+    }
+    let cancelled = false;
+    const token = unreadToken.current + 1;
+    unreadToken.current = token;
+    fetchUnreadCount()
+      .then((data) => {
+        if (cancelled || token !== unreadToken.current) return;
+        setUnread(Number(data?.count) || 0);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, open]);
+
+  const onMarked = (ids) => {
+    const fresh = ids.filter((id) => id && !markedIds.current.has(id));
+    fresh.forEach((id) => markedIds.current.add(id));
+    if (fresh.length) setUnread((count) => Math.max(0, count - fresh.length));
+  };
+
+  const badge = unread > 99 ? '99+' : String(unread);
 
   return (
     <>
       <button
         type="button"
         className="navbar-mobile-action-btn navbar-mobile-bell-btn"
-        aria-label={t('navbar.notifications', 'Bildirishnomalar')}
+        aria-label={unread > 0 ? `${title}, ${badge}` : title}
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
         <i className="fa-solid fa-bell" aria-hidden="true" />
+        {unread > 0 ? <span className="notifications-badge">{badge}</span> : null}
       </button>
-      {open ? <NotificationsModal onClose={() => setOpen(false)} /> : null}
+      {open ? (
+        <NotificationsModal
+          onClose={() => setOpen(false)}
+          onMarked={onMarked}
+          registerLive={registerLive}
+        />
+      ) : null}
     </>
   );
 };

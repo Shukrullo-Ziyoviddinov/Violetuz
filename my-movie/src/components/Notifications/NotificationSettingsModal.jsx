@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  fetchNotificationSettings,
+  saveNotificationSettings,
+} from '../../api/notificationsApi';
+import { enableDevicePush } from './enableDevicePush';
 import './NotificationSettingsModal.css';
 
 const SECTIONS = [
@@ -90,8 +95,49 @@ const NotificationSettingsModal = ({ closing = false, onClose, onExited }) => {
   const [entered, setEntered] = useState(false);
   const slideIn = entered && !closing;
   const exitedRef = useRef(false);
+  const savingRef = useRef(false);
   const onExitedRef = useRef(onExited);
   onExitedRef.current = onExited;
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchNotificationSettings()
+      .then((settings) => {
+        if (cancelled || typeof settings?.subscribers !== 'boolean') return;
+        setToggles((current) => ({ ...current, subscribers: settings.subscribers }));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const toggleItem = (id) => {
+    if (id !== 'subscribers') {
+      setToggles((current) => ({ ...current, [id]: !current[id] }));
+      return;
+    }
+    if (savingRef.current) return;
+    const next = !toggles.subscribers;
+    savingRef.current = true;
+    setToggles((current) => ({ ...current, subscribers: next }));
+    const permissionPromise = next && typeof Notification !== 'undefined'
+      ? Notification.requestPermission()
+      : null;
+    saveNotificationSettings({ subscribers: next })
+      .then(() => {
+        if (!permissionPromise) return null;
+        return permissionPromise
+          .then((permission) => (permission === 'granted' ? enableDevicePush() : null))
+          .catch(() => null);
+      })
+      .catch(() => {
+        setToggles((current) => ({ ...current, subscribers: !next }));
+      })
+      .finally(() => {
+        savingRef.current = false;
+      });
+  };
 
   const finishExit = () => {
     if (exitedRef.current) return;
@@ -165,7 +211,7 @@ const NotificationSettingsModal = ({ closing = false, onClose, onExited }) => {
                   type="button"
                   className="notification-settings-row"
                   aria-pressed={on}
-                  onClick={() => setToggles((current) => ({ ...current, [item.id]: !current[item.id] }))}
+                  onClick={() => toggleItem(item.id)}
                 >
                   <span className="notification-settings-copy">
                     <span className="notification-settings-title">{lang === 'ru' ? item.ru : item.uz}</span>

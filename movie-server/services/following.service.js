@@ -5,6 +5,7 @@ const Actor = require('../models/Actor.model');
 const Artist = require('../models/Artist.model');
 const User = require('../models/User.model');
 const channelService = require('./channel.service');
+const { sendNotification } = require('../notifications');
 const { badRequest, notFound } = require('../utils/errors');
 
 const USER_ID_RE = /^[a-f0-9]{24}$/i;
@@ -153,10 +154,25 @@ const listUserFollowers = async (targetUserId) => {
   return withFreshUserSnapshots(items);
 };
 
+const followWasInserted = (result) => {
+  const meta = result?.lastErrorObject;
+  if (!meta) return false;
+  if (meta.upserted) return true;
+  return meta.updatedExisting === false;
+};
+
+const notifyNewUserFollow = async (followerId, targetId) => {
+  try {
+    await sendNotification(targetId, 'subscriber', String(followerId));
+  } catch (_err) {
+    // Obuna saqlangan. Bildirishnoma xatosi obunani bekor qilmaydi.
+  }
+};
+
 const addFollow = async (userId, { id, type }) => {
   const resolved = await resolveFollowSnapshot(id, type);
   assertNotSelfFollow(userId, resolved.type, resolved.targetId);
-  const row = await Following.findOneAndUpdate(
+  const result = await Following.findOneAndUpdate(
     { userId, type: resolved.type, targetId: resolved.targetId },
     {
       $set: { snapshot: resolved.snapshot },
@@ -166,8 +182,12 @@ const addFollow = async (userId, { id, type }) => {
         targetId: resolved.targetId,
       },
     },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
+    { upsert: true, new: true, setDefaultsOnInsert: true, includeResultMetadata: true }
   ).lean();
+  const row = result?.value || result;
+  if (resolved.type === 'user' && followWasInserted(result)) {
+    await notifyNewUserFollow(userId, resolved.targetId);
+  }
   return toClientItem(row);
 };
 

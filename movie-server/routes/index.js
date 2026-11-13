@@ -35,6 +35,7 @@ const trailerHomeSignalRoutes = require('../trailer-home-feed/routes/signals.rou
 const wishlistRoutes = require('./wishlist.routes');
 const searchPoiscHistoryRoutes = require('./searchPoiscHistory.routes');
 const followingRoutes = require('./following.routes');
+const notificationRoutes = require('../notifications/routes');
 const reactionRoutes = require('./reaction.routes');
 const movieRatingRoutes = require('./movieRating.routes');
 const commentRoutes = require('./comment.routes');
@@ -70,6 +71,7 @@ router.use('/admin', adminRoutes);
 router.use('/wishlist', wishlistRoutes);
 router.use('/search-poisc-history', searchPoiscHistoryRoutes);
 router.use('/following', followingRoutes);
+router.use('/notifications', notificationRoutes);
 router.use('/reactions', reactionRoutes);
 router.use('/movie-ratings', movieRatingRoutes);
 router.use('/comments', commentRoutes);

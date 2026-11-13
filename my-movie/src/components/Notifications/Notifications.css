@@ -65,6 +65,94 @@
   flex: 1;
   min-height: 0;
   display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.navbar-mobile-bell-btn {
+  position: relative;
+}
+
+.notifications-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #0a0a0a;
+}
+
+.notifications-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem 0;
+  width: 100%;
+}
+
+.notifications-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+}
+
+.notifications-row-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.notifications-row-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.notifications-row-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.notifications-row-text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.notifications-row-text strong {
+  font-weight: 700;
+}
+
+.notifications-row-time {
+  display: block;
+  margin-top: 0.15rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+}
+
+.notifications-row-follow {
+  flex-shrink: 0;
+}
+
+.notifications-row-follow .following-btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .notifications-empty {
