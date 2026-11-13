@@ -10,11 +10,17 @@ const urlBase64ToUint8Array = (value) => {
 };
 
 let pendingSave = null;
+let pendingPermission = null;
 
 export const askDevicePermission = () => {
   if (typeof Notification === 'undefined') return Promise.resolve('denied');
   if (Notification.permission !== 'default') return Promise.resolve(Notification.permission);
-  return Notification.requestPermission();
+  if (!pendingPermission) {
+    pendingPermission = Promise.resolve(Notification.requestPermission()).finally(() => {
+      pendingPermission = null;
+    });
+  }
+  return pendingPermission;
 };
 
 export const browserHasPushSubscription = async () => {
