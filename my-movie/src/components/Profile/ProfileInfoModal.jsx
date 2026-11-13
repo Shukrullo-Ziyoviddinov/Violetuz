@@ -26,6 +26,7 @@ const ProfileInfoModal = ({
   const { appStoreLinks } = useMoviesApi();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationsExiting, setNotificationsExiting] = useState(false);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -60,12 +61,26 @@ const ProfileInfoModal = ({
     hasNested: showLogoutConfirm || showNotifications,
     onNestedBack: () => {
       if (showNotifications) {
-        setShowNotifications(false);
+        closeNotifications();
         return;
       }
       if (!logoutBusy) setShowLogoutConfirm(false);
     },
   });
+
+  const closeNotifications = () => {
+    if (!showNotifications || notificationsExiting) return;
+    if (!isMobileSlideViewport()) {
+      setShowNotifications(false);
+      return;
+    }
+    setNotificationsExiting(true);
+  };
+
+  const finishCloseNotifications = () => {
+    setNotificationsExiting(false);
+    setShowNotifications(false);
+  };
 
   /** Ortga / overlay — mobile’da slide-out, desktop’da darhol */
   const requestClose = () => {
@@ -147,10 +162,11 @@ const ProfileInfoModal = ({
     <>
       <div className="profile-info-overlay" onClick={requestClose} />
       {showNotifications ? (
-        <>
-          <div className="notification-settings-backdrop" onClick={() => setShowNotifications(false)} />
-          <NotificationSettingsModal onClose={() => setShowNotifications(false)} />
-        </>
+        <NotificationSettingsModal
+          closing={notificationsExiting}
+          onClose={closeNotifications}
+          onExited={finishCloseNotifications}
+        />
       ) : null}
       <div
         className={`profile-info-modal${slideIn ? ' profile-info-modal--in' : ''}`}

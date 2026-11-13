@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './NotificationSettingsModal.css';
 
@@ -80,13 +80,62 @@ const initialToggles = () =>
     SECTIONS.flatMap((section) => section.items.map((item) => [item.id, item.defaultOn]))
   );
 
-const NotificationSettingsModal = ({ onClose }) => {
+const isMobileSlide = () =>
+  typeof window !== 'undefined' && window.innerWidth <= 768;
+
+const NotificationSettingsModal = ({ closing = false, onClose, onExited }) => {
   const { t, i18n } = useTranslation();
   const lang = String(i18n.language || '').startsWith('ru') ? 'ru' : 'uz';
   const [toggles, setToggles] = useState(initialToggles);
+  const [entered, setEntered] = useState(false);
+  const slideIn = entered && !closing;
+  const exitedRef = useRef(false);
+  const onExitedRef = useRef(onExited);
+  onExitedRef.current = onExited;
+
+  const finishExit = () => {
+    if (exitedRef.current) return;
+    exitedRef.current = true;
+    onExitedRef.current?.();
+  };
+
+  useEffect(() => {
+    let innerId = 0;
+    const outerId = window.requestAnimationFrame(() => {
+      innerId = window.requestAnimationFrame(() => setEntered(true));
+    });
+    return () => {
+      window.cancelAnimationFrame(outerId);
+      window.cancelAnimationFrame(innerId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!closing) return undefined;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const id = window.setTimeout(finishExit, reduced || !isMobileSlide() ? 0 : 380);
+    return () => window.clearTimeout(id);
+  }, [closing]);
+
+  const handleTransitionEnd = (event) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== 'transform') return;
+    if (!closing || !isMobileSlide()) return;
+    finishExit();
+  };
 
   return (
-    <div className="notification-settings" role="dialog" aria-modal="true" aria-labelledby="notification-settings-title">
+    <>
+      <div className="notification-settings-backdrop" onClick={onClose} />
+      <div
+        className={`notification-settings${slideIn ? ' notification-settings--in' : ''}`}
+        onTransitionEnd={handleTransitionEnd}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="notification-settings-title"
+      >
       <div className="profile-info-modal-header notification-settings-header">
         <button
           type="button"
@@ -131,7 +180,8 @@ const NotificationSettingsModal = ({ onClose }) => {
           </section>
         ))}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

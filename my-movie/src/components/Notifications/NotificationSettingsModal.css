@@ -105,6 +105,10 @@
 }
 
 @media (max-width: 768px) {
+  .notification-settings-backdrop {
+    background: transparent;
+  }
+
   .notification-settings {
     top: 0;
     left: 0;
@@ -114,11 +118,25 @@
     max-width: none;
     height: 100%;
     max-height: none;
-    transform: none;
     border: none;
     border-radius: 0;
     box-shadow: none;
     background: #0c0c12;
+    transform: translate3d(100%, 0, 0);
+    transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+  }
+
+  .notification-settings--in {
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.42s cubic-bezier(0.22, 0.8, 0.2, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .notification-settings,
+    .notification-settings--in {
+      transition: none;
+    }
   }
 
   .notification-settings-header {
