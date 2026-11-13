@@ -240,6 +240,15 @@ const NavbarMobile = () => {
         </button>
 
         <button
+          type="button"
+          className="navbar-mobile-item"
+          aria-label={t('navbar.mobileChats')}
+        >
+          <i className="fa-solid fa-comments" aria-hidden="true" />
+          <span>{t('navbar.mobileChats')}</span>
+        </button>
+
+        <button
           className={`navbar-mobile-item ${isMoviesActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => navigate('/')}
           aria-label={t('navbar.mobileMovies')}

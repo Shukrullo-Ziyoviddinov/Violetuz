@@ -15,6 +15,7 @@ import {
 import { useSearchHardwareBack } from '../../useSearchHardwareBack';
 import { useAuth } from '../../context/AuthContext';
 import UserAvatar from '../UserAvatar/UserAvatar';
+import NotificationsBell from '../Notifications/Notifications';
 import './Navbar.css';
 
 const MOBILE_NAV_MAX = 768;
@@ -420,13 +421,7 @@ const Navbar = () => {
             <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
           </button>
 
-          <button
-            type="button"
-            className="navbar-mobile-action-btn navbar-mobile-bell-btn"
-            aria-label={t('navbar.notifications', 'Bildirishnomalar')}
-          >
-            <i className="fa-solid fa-bell" aria-hidden="true" />
-          </button>
+          <NotificationsBell />
 
           {isChannelProfile ? (
             <ChannelMoreDropdown key={location.pathname} channelId={channelMatch?.params.id} />

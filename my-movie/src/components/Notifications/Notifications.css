@@ -1,0 +1,121 @@
+.notifications-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(0, 0, 0, 0.72);
+  box-sizing: border-box;
+}
+
+.notifications-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(480px, 100%);
+  min-height: 320px;
+  max-height: min(80vh, 640px);
+  background: #121214;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.notifications-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: 1rem 1rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notifications-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.notifications-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.notifications-modal-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.notifications-modal-body {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .notifications-overlay {
+    padding: 0;
+    background: transparent;
+  }
+
+  .notifications-modal {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: #0a0a0a;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .notifications-modal--open {
+    transform: translateX(0);
+  }
+
+  .notifications-modal--closing {
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .notifications-modal-header {
+    justify-content: flex-start;
+    gap: 0.25rem;
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+    padding-left: max(0.35rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  }
+
+  .notifications-modal .ib {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-right: -6px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1.85rem;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-1px);
+  }
+}
