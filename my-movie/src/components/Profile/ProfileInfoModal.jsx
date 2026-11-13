@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
 import MiniGlobalModal from '../MiniGlobalModal/MiniGlobalModal';
+import NotificationSettingsModal from '../Notifications/NotificationSettingsModal';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
 import './ProfileInfoModal.css';
 
@@ -24,6 +25,7 @@ const ProfileInfoModal = ({
   const { logout } = useAuth();
   const { appStoreLinks } = useMoviesApi();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -55,8 +57,12 @@ const ProfileInfoModal = ({
     historyKey: 'violetProfileInfo',
     isOpen: logicalOpen,
     onCloseFromHardware: beginCloseFromHardware,
-    hasNested: showLogoutConfirm,
+    hasNested: showLogoutConfirm || showNotifications,
     onNestedBack: () => {
+      if (showNotifications) {
+        setShowNotifications(false);
+        return;
+      }
       if (!logoutBusy) setShowLogoutConfirm(false);
     },
   });
@@ -140,6 +146,12 @@ const ProfileInfoModal = ({
   return (
     <>
       <div className="profile-info-overlay" onClick={requestClose} />
+      {showNotifications ? (
+        <>
+          <div className="notification-settings-backdrop" onClick={() => setShowNotifications(false)} />
+          <NotificationSettingsModal onClose={() => setShowNotifications(false)} />
+        </>
+      ) : null}
       <div
         className={`profile-info-modal${slideIn ? ' profile-info-modal--in' : ''}`}
         onClick={(e) => e.stopPropagation()}
@@ -242,6 +254,23 @@ const ProfileInfoModal = ({
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
               </svg>
               <span>{t('profile.socialNetworks')}</span>
+            </div>
+            <svg className="profile-wishlist-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className="profile-wishlist-block profile-info-action"
+            onClick={() => setShowNotifications(true)}
+          >
+            <div className="profile-wishlist-left">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <span>{t('navbar.notifications', 'Bildirishnomalar')}</span>
             </div>
             <svg className="profile-wishlist-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9 18 15 12 9 6" />
