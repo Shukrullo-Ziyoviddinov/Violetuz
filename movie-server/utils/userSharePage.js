@@ -28,7 +28,7 @@ const buildUserSharePage = (user, baseUrl) => {
   const description = escapeHtml(bio);
   const sourceImage = shareImageUrl(user?.avatar, base);
   const image = sourceImage
-    ? escapeHtml(`${base}/api/user-avatar?id=${encodeURIComponent(user.id)}`)
+    ? escapeHtml(`${base}/user-avatar/${encodeURIComponent(user.id)}.jpg`)
     : '';
   const url = escapeHtml(target);
   const scriptUrl = JSON.stringify(target).replace(/</g, '\\u003c');

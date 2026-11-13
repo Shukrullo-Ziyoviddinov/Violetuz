@@ -15,7 +15,8 @@ test('user share card leads with the name, then bio and avatar, and keeps the us
   const titleAt = html.indexOf('og:title" content="Shokhruz"');
   const bioAt = html.indexOf('og:description" content="Kinolar bu ber dunyo"');
   assert.ok(titleAt > -1 && bioAt > titleAt);
-  assert.ok(html.includes('content="https://www.violetplay.uz/api/user-avatar?id=6a6826b38e66e2b6f64b25ac"'));
+  assert.ok(html.includes('content="https://www.violetplay.uz/user-avatar/6a6826b38e66e2b6f64b25ac.jpg"'));
+  assert.ok(!html.includes('user-avatar?id='));
   assert.ok(html.includes('og:image:width" content="512"'));
   assert.ok(html.includes('og:image:height" content="512"'));
   assert.ok(html.includes('og:image:type" content="image/jpeg"'));

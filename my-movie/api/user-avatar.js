@@ -4,8 +4,9 @@ module.exports = async function userAvatar(req, res) {
   res.setHeader('Cache-Control', 'public, max-age=86400');
   res.setHeader('Content-Type', 'image/jpeg');
 
-  const id = req.query?.id;
-  if (typeof id !== 'string' || !/^[a-f0-9]{24}$/i.test(id)) {
+  const raw = String(req.query?.file || req.query?.id || '');
+  const id = raw.replace(/\.jpe?g$/i, '');
+  if (!/^[a-f0-9]{24}$/i.test(id)) {
     return res.status(400).end();
   }
 

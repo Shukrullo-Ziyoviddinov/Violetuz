@@ -4,6 +4,10 @@
   "outputDirectory": "build",
   "rewrites": [
     {
+      "source": "/user-avatar/:file(.*)",
+      "destination": "/api/user-avatar?file=:file"
+    },
+    {
       "source": "/channel/:id",
       "has": [
         {
