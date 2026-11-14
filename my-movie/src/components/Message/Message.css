@@ -18,6 +18,12 @@
   letter-spacing: -0.02em;
 }
 
+@media (max-width: 768px) {
+  .message-title {
+    font-size: 20px;
+  }
+}
+
 .message-actions {
   display: flex;
   align-items: center;

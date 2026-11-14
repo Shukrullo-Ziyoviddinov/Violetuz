@@ -11,8 +11,8 @@
     min-height: 100vh;
     background: #000;
     padding:
-      max(1.15rem, env(safe-area-inset-top, 0px))
-      1.05rem
+      max(0.45rem, env(safe-area-inset-top, 0px))
+      0.7rem
       calc(6.5rem + env(safe-area-inset-bottom, 0px));
   }
 }

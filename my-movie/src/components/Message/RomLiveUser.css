@@ -10,25 +10,27 @@
   margin-bottom: 0.85rem;
 }
 
-.rom-live-title {
-  margin: 0;
-  color: #fff;
-  font-size: 1.02rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
+.rom-live-title,
 .rom-live-count {
+  margin: 0;
   color: rgba(255, 255, 255, 0.46);
   font-size: 0.92rem;
   font-weight: 500;
+  line-height: 1.2;
   white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .rom-live {
+    margin-top: 0.55rem;
+  }
 }
 
 .rom-live-row {
   display: flex;
   align-items: flex-start;
   gap: 0.85rem;
+  padding: 6px 2px 2px;
 }
 
 .rom-live-user {
@@ -54,6 +56,44 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   overflow: visible;
+}
+
+.rom-live-face::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  padding: 2.5px;
+  background: conic-gradient(
+    from 200deg,
+    #ff4b6e 0deg,
+    #ffb59a 80deg,
+    #ff6a45 150deg,
+    #ff2f5a 230deg,
+    #ffd0c2 300deg,
+    #ff4b6e 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.rom-live-user--self .rom-live-face::before {
+  background: conic-gradient(
+    from 200deg,
+    rgba(255, 255, 255, 0.78) 0deg,
+    rgba(255, 255, 255, 0.16) 90deg,
+    rgba(255, 255, 255, 0.62) 170deg,
+    rgba(255, 255, 255, 0.1) 250deg,
+    rgba(255, 255, 255, 0.84) 330deg,
+    rgba(255, 255, 255, 0.78) 360deg
+  );
 }
 
 .rom-live-face img {
@@ -106,6 +146,7 @@
   font-size: 18px;
   font-weight: 700;
   line-height: 1;
+  z-index: 1;
   box-shadow: 0 0 0 3px #000;
 }
 
