@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { fetchMessageSelf } from '../../api/messagesApi';
 import MessageFilter from './MessageFilter';
+import MessageInbox from './MessageInbox';
 import RomLiveUser from './RomLiveUser';
 import {
   getNotificationUnread,
@@ -14,6 +15,7 @@ import './Message.css';
 const Message = () => {
   const { t } = useTranslation();
   const { isLoggedIn, authReady } = useAuth();
+  const [filter, setFilter] = useState('chats');
   const [self, setSelf] = useState(null);
   const [unread, setUnread] = useState(getNotificationUnread);
   const badge = unread > 99 ? '99+' : String(unread);
@@ -68,7 +70,8 @@ const Message = () => {
         </div>
       </header>
       <RomLiveUser self={self} />
-      <MessageFilter />
+      <MessageFilter active={filter} onChange={setFilter} />
+      {filter === 'chats' ? <MessageInbox /> : null}
     </section>
   );
 };

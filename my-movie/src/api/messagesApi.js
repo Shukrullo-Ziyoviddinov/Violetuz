@@ -23,3 +23,43 @@ export const fetchMessageSelf = async () => {
   });
   return parseJson(response);
 };
+
+export const fetchChatInbox = async () => {
+  const response = await fetch(`${API_BASE_URL}/messages/inbox`, {
+    credentials: 'include',
+  });
+  return parseJson(response);
+};
+
+export const sendChatMessage = async (userId, text) => {
+  const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  return parseJson(response);
+};
+
+export const fetchChatThread = async (userId) => {
+  const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}`, {
+    credentials: 'include',
+  });
+  return parseJson(response);
+};
+
+export const openChatStream = ({ onItem, onReconnect }) => {
+  const source = new EventSource(`${API_BASE_URL}/messages/stream`, { withCredentials: true });
+  source.onopen = () => {
+    onReconnect?.();
+  };
+  source.addEventListener('chat', (event) => {
+    try {
+      const item = JSON.parse(event.data);
+      if (item?.id) onItem?.(item);
+    } catch {
+      // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
+    }
+  });
+  return () => source.close();
+};

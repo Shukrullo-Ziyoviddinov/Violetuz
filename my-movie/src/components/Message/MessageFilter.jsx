@@ -11,10 +11,15 @@ const FILTERS = [
   { id: 'actors', uz: 'Aktyorlar', ru: 'Актёры' },
 ];
 
-const MessageFilter = () => {
+const MessageFilter = ({ active: activeProp, onChange }) => {
   const { i18n } = useTranslation();
   const lang = String(i18n.language || '').startsWith('ru') ? 'ru' : 'uz';
-  const [active, setActive] = useState('chats');
+  const [innerActive, setInnerActive] = useState('chats');
+  const active = activeProp || innerActive;
+  const setActive = (id) => {
+    if (!activeProp) setInnerActive(id);
+    onChange?.(id);
+  };
   const trackRef = useRef(null);
   const skipScrollRef = useRef(true);
   const [pill, setPill] = useState({ x: 0, width: 0, ready: false });

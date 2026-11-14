@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GlobalModal from '../components/GlobalModal/GlobalModal';
 import FollowingButton from '../Music/FollowingButton/FollowingButton';
+import ChatOpenButton from '../components/Message/Chat/ChatOpenButton';
 import ShareButton from '../components/ShareButton/ShareButton';
 import UserAvatar from '../components/UserAvatar/UserAvatar';
 import RepostFilter from '../components/Repost/RepostFilter';
@@ -341,10 +342,10 @@ const PublicProfilePage = () => {
           />
         </div>
         {visitorFollowed ? (
-          <button type="button" className="profile-mobile-bar-action">
+          <ChatOpenButton userId={user.id} className="profile-mobile-bar-action">
             <i className="fa-solid fa-message" aria-hidden="true" />
             Xabar
-          </button>
+          </ChatOpenButton>
         ) : (
           <FollowingButton
             artistId={user.id}
@@ -420,10 +421,10 @@ const PublicProfilePage = () => {
               entityType="user"
               onSubscribeChange={handleVisitorSubscribe}
             />
-            <button type="button" className="profile-page-visitor-message">
+            <ChatOpenButton userId={user.id} className="profile-page-visitor-message">
               <i className="fa-solid fa-message" aria-hidden="true" />
               Xabar
-            </button>
+            </ChatOpenButton>
           </div>
 
           <div className="profile-page-repost">

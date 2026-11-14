@@ -1,0 +1,15 @@
+.chats-page {
+  width: 100%;
+  height: calc(100vh - 72px);
+  min-height: 0;
+  background: #12111a;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .chats-page {
+    height: 100vh;
+    height: 100dvh;
+    background: #0e0d14;
+  }
+}

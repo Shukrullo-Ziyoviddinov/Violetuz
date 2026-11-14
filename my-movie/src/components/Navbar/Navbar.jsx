@@ -29,6 +29,7 @@ const Navbar = () => {
   const isMusicPage = location.pathname === '/music';
   const isFeedPage = location.pathname === '/feed';
   const isMessagesPage = location.pathname === '/messages';
+  const isChatPage = location.pathname.startsWith('/chats/');
   const isMoviesPage = location.pathname === '/' || location.pathname.startsWith('/movie/');
   const isShortsPage =
     location.pathname === '/shorts' || location.pathname === '/music/shorts';
@@ -45,7 +46,8 @@ const Navbar = () => {
     isVideoDetailPage ||
     isMusicAlbumDetailPage ||
     isPublicProfilePage ||
-    isMessagesPage;
+    isMessagesPage ||
+    isChatPage;
   const [searchQuery, setSearchQuery] = useState('');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);

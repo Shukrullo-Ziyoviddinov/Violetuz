@@ -16,7 +16,7 @@
   left: 0;
   height: calc(100% - 8px);
   border-radius: 999px;
-  background: #7c3aed;
+  background: rgba(30, 3, 210, 0.3);
   z-index: 0;
   pointer-events: none;
 }

@@ -26,6 +26,7 @@ import ActorsPage from './pages/ActorsPage';
 import ChanelPage from './pages/ChanelPage';
 import LikeHistoryPage from './pages/LikeHistoryPage';
 import MessagePage from './pages/MessagePage';
+import ChatsPage from './pages/ChatsPage';
 import RatingPage from './pages/RatingPage';
 import TrailerPage from './pages/TrailerPage';
 import TrillerPage from './pages/TrillerPage';
@@ -115,6 +116,7 @@ function AppShell() {
             <Route path="/channel/:id" element={<ChanelPage />} />
             <Route path="/like-history" element={<LikeHistoryPage />} />
             <Route path="/messages" element={<MessagePage />} />
+            <Route path="/chats/:userId" element={<ChatsPage />} />
             <Route path="/rating-page" element={<RatingPage />} />
           </Routes>
         </main>

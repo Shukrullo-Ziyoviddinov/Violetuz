@@ -36,6 +36,7 @@ const NavbarMobile = () => {
 
   const isHomeActive = pathname === '/feed';
   const isChatsActive = pathname === '/messages';
+  const isOpenChat = pathname.startsWith('/chats/');
   const isMusicActive = pathname === '/music';
   const isMoviesActive = pathname === '/' || pathname.startsWith('/movie/');
   const isShortsActive = pathname === '/shorts' || pathname === '/music/shorts';
@@ -221,7 +222,7 @@ const NavbarMobile = () => {
 
   return (
     <>
-      <nav className={`navbar-mobile${isChannelPage ? ' navbar-mobile--channel-page' : ''}`}>
+      <nav className={`navbar-mobile${isChannelPage ? ' navbar-mobile--channel-page' : ''}${isOpenChat ? ' navbar-mobile--hidden' : ''}`}>
         <button
           className={`navbar-mobile-item ${isHomeActive ? 'navbar-mobile-item-active' : ''}`}
           onClick={() => navigate('/feed')}
