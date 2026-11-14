@@ -15,6 +15,7 @@ import NotificationsFilter from './NotificationsFilter';
 import NotificationsEmpty from './NotificationsEmpty';
 import NotificationsList from './NotificationsList';
 import { itemsForFilter } from './notificationView';
+import { OPEN_NOTIFICATIONS_EVENT, publishNotificationUnread } from '../../notificationModalBridge';
 import './Notifications.css';
 
 const MOBILE_QUERY = '(max-width: 768px)';
@@ -333,6 +334,16 @@ const NotificationsBell = () => {
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    const openFromOutside = () => setOpen(true);
+    window.addEventListener(OPEN_NOTIFICATIONS_EVENT, openFromOutside);
+    return () => window.removeEventListener(OPEN_NOTIFICATIONS_EVENT, openFromOutside);
+  }, []);
+
+  useEffect(() => {
+    publishNotificationUnread(unread);
+  }, [unread]);
 
   useEffect(() => {
     if (!isLoggedIn || open) {

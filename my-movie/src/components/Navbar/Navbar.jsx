@@ -28,6 +28,7 @@ const Navbar = () => {
   const { isLoggedIn, profile } = useAuth();
   const isMusicPage = location.pathname === '/music';
   const isFeedPage = location.pathname === '/feed';
+  const isMessagesPage = location.pathname === '/messages';
   const isMoviesPage = location.pathname === '/' || location.pathname.startsWith('/movie/');
   const isShortsPage =
     location.pathname === '/shorts' || location.pathname === '/music/shorts';
@@ -43,7 +44,8 @@ const Navbar = () => {
     isMusicDetailPage ||
     isVideoDetailPage ||
     isMusicAlbumDetailPage ||
-    isPublicProfilePage;
+    isPublicProfilePage ||
+    isMessagesPage;
   const [searchQuery, setSearchQuery] = useState('');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);

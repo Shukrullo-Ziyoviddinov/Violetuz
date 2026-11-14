@@ -1,0 +1,67 @@
+.message-filter {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: max-content;
+  max-width: 100%;
+  margin-top: 1.15rem;
+  padding: 4px;
+  border-radius: 16px;
+  background: #14141c;
+}
+
+.message-filter-pill {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: calc(100% - 8px);
+  border-radius: 999px;
+  background: #7c3aed;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.message-filter-pill.is-ready {
+  transition:
+    transform 0.38s cubic-bezier(0.22, 0.8, 0.24, 1),
+    width 0.38s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.message-filter-btn {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0.62rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.message-filter-btn.is-active {
+  color: #fff;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .message-filter {
+    width: 100%;
+  }
+
+  .message-filter-btn {
+    font-size: 0.92rem;
+    padding: 0.62rem 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message-filter-pill.is-ready {
+    transition: none;
+  }
+}

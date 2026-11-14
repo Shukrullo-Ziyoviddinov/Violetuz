@@ -1,12 +1,18 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, forwardRef } from 'react';
 import './ScrollTouch.css';
 
 const DRAG_THRESHOLD = 3;
 const MOMENTUM_MIN_VELOCITY = 0.3;
 const MOMENTUM_FRICTION = 0.92;
 
-const ScrollTouch = ({ children, className = '', ...props }) => {
+const ScrollTouch = forwardRef(({ children, className = '', ...props }, ref) => {
   const scrollRef = useRef(null);
+
+  const setScrollNode = (node) => {
+    scrollRef.current = node;
+    if (typeof ref === 'function') ref(node);
+    else if (ref) ref.current = node;
+  };
   const isDown = useRef(false);
   const lastClientX = useRef(0);
   const hasDragged = useRef(false);
@@ -197,13 +203,13 @@ const ScrollTouch = ({ children, className = '', ...props }) => {
 
   return (
     <div
-      ref={scrollRef}
+      ref={setScrollNode}
       className={`scroll-touch ${className}`}
       {...props}
     >
       {children}
     </div>
   );
-};
+});
 
 export default ScrollTouch;

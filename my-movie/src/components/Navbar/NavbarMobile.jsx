@@ -35,6 +35,7 @@ const NavbarMobile = () => {
   const voiceSearchSupported = isVoiceSearchAvailable();
 
   const isHomeActive = pathname === '/feed';
+  const isChatsActive = pathname === '/messages';
   const isMusicActive = pathname === '/music';
   const isMoviesActive = pathname === '/' || pathname.startsWith('/movie/');
   const isShortsActive = pathname === '/shorts' || pathname === '/music/shorts';
@@ -241,7 +242,8 @@ const NavbarMobile = () => {
 
         <button
           type="button"
-          className="navbar-mobile-item"
+          className={`navbar-mobile-item ${isChatsActive ? 'navbar-mobile-item-active' : ''}`}
+          onClick={() => navigate('/messages')}
           aria-label={t('navbar.mobileChats')}
         >
           <i className="fa-solid fa-comments" aria-hidden="true" />
