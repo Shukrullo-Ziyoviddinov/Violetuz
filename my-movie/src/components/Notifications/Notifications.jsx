@@ -25,11 +25,13 @@ const showOsNotice = (item) => {
   if (document.visibilityState !== 'visible') return;
   const name = String(item.actor?.name || item.actor?.username || '').trim();
   const avatar = String(item.actor?.avatar || '');
-  const icon = /^https?:\/\//i.test(avatar) ? avatar : '/img/newlogo.jpg';
+  const icon = /^https:\/\//i.test(avatar) ? avatar : '/img/newlogo.jpg';
   try {
     const notice = new Notification('VioletPlay', {
       body: name ? `${name} sizga obuna bo‘ldi` : 'sizga obuna bo‘ldi',
       icon,
+      image: /^https:\/\//i.test(avatar) ? avatar : undefined,
+      badge: '/img/newlogo.jpg',
       tag: `subscriber-${item.id}`,
     });
     notice.onclick = () => {

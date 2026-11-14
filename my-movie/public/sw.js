@@ -6,9 +6,12 @@ self.addEventListener('push', (event) => {
     data = {};
   }
   const title = data.title || 'VioletPlay';
+  const logo = '/img/newlogo.jpg';
   event.waitUntil(self.registration.showNotification(title, {
     body: data.body || '',
-    icon: data.icon || '/img/newlogo.jpg',
+    icon: data.icon || logo,
+    image: data.image || undefined,
+    badge: data.badge || logo,
     tag: data.tag || 'violet-subscriber',
   }));
 });

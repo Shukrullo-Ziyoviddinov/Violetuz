@@ -74,6 +74,8 @@ test('qurilma xabari VioletPlay, avatar va obuna matni', async () => {
   assert.equal(message.title, 'VioletPlay');
   assert.equal(message.body, 'Malika sizga obuna bo‘ldi');
   assert.equal(message.icon, 'https://cdn.example/m.jpg');
+  assert.equal(message.image, 'https://cdn.example/m.jpg');
+  assert.equal(message.badge, 'https://www.violetplay.uz/img/newlogo.jpg');
   assert.equal(JSON.stringify(message).includes('secret'), false);
 
   const logo = loadDevice({}).device.buildDeviceMessage({

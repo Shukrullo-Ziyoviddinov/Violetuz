@@ -32,14 +32,23 @@ const ensureVapid = () => {
   return true;
 };
 
+const absoluteHttps = (value) => {
+  const raw = String(value || '').trim();
+  if (/^https:\/\//i.test(raw)) return raw;
+  if (raw.startsWith('/')) return `${siteOrigin()}${raw}`;
+  return '';
+};
+
 const buildDeviceMessage = (notification) => {
   const name = String(notification?.actor?.name || notification?.actor?.username || '').trim();
-  const avatar = String(notification?.actor?.avatar || '').trim();
-  const icon = /^https?:\/\//i.test(avatar) ? avatar : `${siteOrigin()}/img/newlogo.jpg`;
+  const logo = `${siteOrigin()}/img/newlogo.jpg`;
+  const avatar = absoluteHttps(notification?.actor?.avatar);
   return {
     title: SITE_NAME,
     body: name ? `${name} sizga obuna bo‘ldi` : 'sizga obuna bo‘ldi',
-    icon,
+    icon: avatar || logo,
+    image: avatar || undefined,
+    badge: logo,
   };
 };
 
