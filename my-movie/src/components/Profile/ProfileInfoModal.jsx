@@ -282,8 +282,9 @@ const ProfileInfoModal = ({
             type="button"
             className="profile-wishlist-block profile-info-action"
             onClick={() => {
+              const permissionAsk = askDevicePermission();
               setShowNotifications(true);
-              askDevicePermission()
+              permissionAsk
                 .then(async (permission) => {
                   if (permission !== 'granted') return null;
                   const settings = await fetchNotificationSettings();

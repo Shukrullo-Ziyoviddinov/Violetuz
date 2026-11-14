@@ -10,7 +10,7 @@ import {
   markNotificationsRead,
   openNotificationStream,
 } from '../../api/notificationsApi';
-import { askDevicePermission, ensureDevicePush } from './enableDevicePush';
+import { ensureDevicePush } from './enableDevicePush';
 import NotificationsFilter from './NotificationsFilter';
 import NotificationsEmpty from './NotificationsEmpty';
 import NotificationsList from './NotificationsList';
@@ -321,9 +321,9 @@ const NotificationsBell = () => {
     fetchNotificationSettings()
       .then((settings) => {
         if (settings?.subscribers === false) return null;
-        return askDevicePermission();
+        if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return null;
+        return ensureDevicePush();
       })
-      .then((permission) => (permission === 'granted' ? ensureDevicePush() : null))
       .catch(() => {});
     return () => {
       cancelled = true;
