@@ -21,6 +21,7 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited, closeColorRef }
   const [bubble, setBubble] = useState(readBubbleChoice);
   const [showColor, setShowColor] = useState(false);
   const [colorClosing, setColorClosing] = useState(false);
+  const closePickerRef = useRef(null);
   const pickedRef = useRef(false);
   const slideIn = entered && !closing;
   const exitedRef = useRef(false);
@@ -58,6 +59,10 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited, closeColorRef }
   }, []);
 
   const closeColor = () => {
+    if (closePickerRef.current) {
+      closePickerRef.current();
+      return;
+    }
     if (!showColor || colorClosing) return;
     if (!isMobileSlide()) {
       setShowColor(false);
@@ -267,6 +272,7 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited, closeColorRef }
             setShowColor(false);
           }}
           onApply={setBubble}
+          closePickerRef={closePickerRef}
         />
       ) : null}
     </>

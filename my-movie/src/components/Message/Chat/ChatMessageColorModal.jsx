@@ -6,6 +6,7 @@ import {
   darkenHex,
   writeBubbleChoice,
 } from './chatBubbles';
+import ChatColorModal from './ChatColorModal';
 import './ChatSettingsModal.css';
 
 const isMobileSlide = () =>
@@ -18,6 +19,7 @@ const ChatMessageColorModal = ({
   onClose,
   onExited,
   onApply,
+  closePickerRef,
 }) => {
   const { t } = useTranslation();
   const [entered, setEntered] = useState(false);
@@ -25,6 +27,8 @@ const ChatMessageColorModal = ({
   const [selectedId, setSelectedId] = useState(initial?.id || 'purple');
   const [incoming, setIncoming] = useState(initial?.incoming || BUBBLE_PRESETS[0].incoming);
   const [outgoing, setOutgoing] = useState(initial?.outgoing || BUBBLE_PRESETS[0].outgoing);
+  const [showPicker, setShowPicker] = useState(false);
+  const pickerCloseRef = useRef(null);
   const slideIn = entered && !closing;
   const exitedRef = useRef(false);
   const onExitedRef = useRef(onExited);
@@ -82,6 +86,10 @@ const ChatMessageColorModal = ({
     onApply?.(saved);
     onClose?.();
   };
+
+  if (closePickerRef) {
+    closePickerRef.current = showPicker ? () => pickerCloseRef.current?.() : null;
+  }
 
   const inFill = { background: bubbleFill(incoming, mode) };
   const outFill = { background: bubbleFill(outgoing, mode) };
@@ -195,20 +203,13 @@ const ChatMessageColorModal = ({
             </div>
 
             <h3 className="chat-settings-section">Maxsus rang</h3>
-            <label className="chat-color-custom">
+            <button type="button" className="chat-color-custom" onClick={() => setShowPicker(true)}>
               <span className="chat-color-rainbow" aria-hidden="true" />
               <span className="chat-color-custom-copy">O‘zingiz xohlagan rangni tanlang</span>
-              <input
-                className="chat-color-input"
-                type="color"
-                value={/^#[0-9a-f]{6}$/i.test(outgoing) ? outgoing : '#7c3aed'}
-                aria-label="Maxsus rang"
-                onChange={(event) => chooseCustom(event.target.value)}
-              />
               <svg className="chat-settings-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
-            </label>
+            </button>
 
             <h3 className="chat-settings-section">Xabar namunasi</h3>
             <div className="chat-color-sample">
@@ -233,6 +234,16 @@ const ChatMessageColorModal = ({
           </div>
         </div>
       </div>
+      {showPicker ? (
+        <ChatColorModal
+          initialHex={outgoing}
+          mode={mode}
+          previewImage={previewImage}
+          closeRef={pickerCloseRef}
+          onApply={chooseCustom}
+          onClose={() => setShowPicker(false)}
+        />
+      ) : null}
     </>
   );
 };
