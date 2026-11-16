@@ -13,6 +13,7 @@ const BLOCKED_PATHS = [
   /^\/movie\/[^/]+$/,
   /^\/movie\/[^/]+\/trailer$/,
   /^\/triller(?:\/[^/]+)?$/,
+  /^\/chats\/[^/]+$/,
 ];
 
 const MODAL_SELECTOR = [
