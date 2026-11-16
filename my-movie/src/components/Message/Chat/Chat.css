@@ -272,7 +272,7 @@
 
 .chat-composer-back {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 0;
   width: 36px;
   height: 52px;
@@ -286,13 +286,13 @@
   line-height: 1;
   padding: 0;
   cursor: pointer;
-  transform: translateX(calc(100% + 1.4rem));
+  opacity: 0;
   pointer-events: none;
-  transition: transform 0.72s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.72s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chat-composer.is-open .chat-composer-back {
-  transform: translateX(0);
+  opacity: 1;
   pointer-events: auto;
 }
 
