@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
 import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage } from '../../../api/messagesApi';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
+import { readTextChoice, textLookClass, textVars } from './chatTextFont';
 import ChatHeader from './ChatHeader';
 import ChatThread from './ChatThread';
 import ChatComposer from './ChatComposer';
@@ -23,6 +24,7 @@ const Chat = ({ userId }) => {
   const [ready, setReady] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(DEFAULT_CHAT_BG);
   const [bubbles, setBubbles] = useState(readBubbleChoice);
+  const [textChoice, setTextChoice] = useState(readTextChoice);
   const loadToken = useRef(0);
 
   const load = useCallback(() => {
@@ -102,6 +104,14 @@ const Chat = ({ userId }) => {
   }, []);
 
   useEffect(() => {
+    const onText = (event) => {
+      if (event.detail?.color) setTextChoice(event.detail);
+    };
+    window.addEventListener('violet-chat-text', onText);
+    return () => window.removeEventListener('violet-chat-text', onText);
+  }, []);
+
+  useEffect(() => {
     if (!authReady || !isLoggedIn || !userId) return undefined;
     let closed = false;
     const close = openChatStream({
@@ -148,10 +158,11 @@ const Chat = ({ userId }) => {
 
   return (
     <section
-      className="chat"
+      className={`chat ${textLookClass(textChoice.look)}`.trim()}
       style={{
         ...(backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}),
         ...bubbleVars(bubbles),
+        ...textVars(textChoice),
       }}
       aria-label={peer?.name || (lang === 'ru' ? 'Чат' : 'Suhbat')}
     >

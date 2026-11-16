@@ -162,7 +162,7 @@
   padding: 0.65rem 0.75rem;
   border-radius: 8px;
   background: var(--chat-bubble-in-fill, #2a2140);
-  color: #fff;
+  color: var(--chat-text-color, #fff);
   font-size: 0.95rem;
   line-height: 1.35;
   white-space: pre-wrap;
@@ -172,6 +172,15 @@
 .chat-block.is-mine {
   align-self: flex-end;
   background: var(--chat-bubble-out-fill, #7c3aed);
+}
+
+.chat.is-text-glow .chat-block {
+  text-shadow: 0 0 8px var(--chat-text-color), 0 0 18px var(--chat-text-color);
+}
+
+.chat.is-text-outline .chat-block {
+  -webkit-text-stroke: 1px var(--chat-text-color);
+  text-shadow: 0 0 6px var(--chat-text-color);
 }
 
 .chat-composer-wrap {
