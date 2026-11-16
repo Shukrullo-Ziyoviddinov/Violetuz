@@ -13,7 +13,7 @@ import './Chat.css';
 
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
 const HEADER_FALLBACK = { r: 20, g: 16, b: 31 };
-const HEADER_ALPHA = 0.5;
+const HEADER_ALPHA = 0.62;
 
 const sameId = (left, right) => String(left || '').trim().toLowerCase() === String(right || '').trim().toLowerCase();
 
