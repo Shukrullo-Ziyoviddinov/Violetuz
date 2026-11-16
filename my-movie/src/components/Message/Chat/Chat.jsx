@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
 import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage } from '../../../api/messagesApi';
+import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
 import { readTextChoice, textLookClass, textVars } from './chatTextFont';
 import ChatHeader from './ChatHeader';
@@ -11,6 +12,8 @@ import ChatComposer from './ChatComposer';
 import './Chat.css';
 
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
+const HEADER_FALLBACK = { r: 20, g: 16, b: 31 };
+const HEADER_ALPHA = 0.5;
 
 const sameId = (left, right) => String(left || '').trim().toLowerCase() === String(right || '').trim().toLowerCase();
 
@@ -23,6 +26,7 @@ const Chat = ({ userId }) => {
   const [messages, setMessages] = useState([]);
   const [ready, setReady] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(DEFAULT_CHAT_BG);
+  const [headerColor, setHeaderColor] = useState(null);
   const [bubbles, setBubbles] = useState(readBubbleChoice);
   const [textChoice, setTextChoice] = useState(readTextChoice);
   const loadToken = useRef(0);
@@ -96,6 +100,20 @@ const Chat = ({ userId }) => {
   }, [authReady, isLoggedIn]);
 
   useEffect(() => {
+    if (!backgroundImage) return undefined;
+    let cancelled = false;
+    const imgSrc = backgroundImage.startsWith('http')
+      ? backgroundImage
+      : `${window.location.origin}${backgroundImage.startsWith('/') ? backgroundImage : `/${backgroundImage}`}`;
+    getDominantColor(imgSrc).then((color) => {
+      if (!cancelled && color) setHeaderColor(color);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [backgroundImage]);
+
+  useEffect(() => {
     const onBubbles = (event) => {
       if (event.detail?.outgoing && event.detail?.incoming) setBubbles(event.detail);
     };
@@ -148,6 +166,8 @@ const Chat = ({ userId }) => {
     };
   }, [authReady, isLoggedIn, load, userId]);
 
+  const headerRgb = headerColor || HEADER_FALLBACK;
+
   const notice = !authReady || !ready
     ? ''
     : !isLoggedIn
@@ -163,6 +183,8 @@ const Chat = ({ userId }) => {
         ...(backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}),
         ...bubbleVars(bubbles),
         ...textVars(textChoice),
+        '--chat-header-fill': `rgba(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}, ${HEADER_ALPHA})`,
+        '--chat-header-ring': `rgb(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b})`,
       }}
       aria-label={peer?.name || (lang === 'ru' ? 'Чат' : 'Suhbat')}
     >

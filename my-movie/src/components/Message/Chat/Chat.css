@@ -20,7 +20,7 @@
   gap: 0.2rem;
   min-height: 64px;
   padding: 0.55rem 0.85rem 0.55rem 0.25rem;
-  background: #14101f;
+  background: var(--chat-header-fill, rgba(20, 16, 31, 0.5));
 }
 
 .chat-back {
@@ -81,7 +81,7 @@
   height: 12px;
   border-radius: 50%;
   background: #22c55e;
-  box-shadow: 0 0 0 2px #14101f;
+  box-shadow: 0 0 0 2px var(--chat-header-ring, #14101f);
 }
 
 .chat-header-tools {
