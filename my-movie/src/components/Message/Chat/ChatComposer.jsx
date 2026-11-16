@@ -26,9 +26,12 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
     }
   };
 
+  const keepKeyboard = (event) => {
+    event.preventDefault();
+  };
+
   const close = () => {
     setOpen(false);
-    inputRef.current?.blur();
   };
 
   return (
@@ -67,7 +70,15 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
           </span>
         </div>
         <div className="chat-composer-tools">
-          <button type="button" className="chat-composer-back" aria-label={backLabel} tabIndex={open ? 0 : -1} onClick={close}>
+          <button
+            type="button"
+            className="chat-composer-back"
+            aria-label={backLabel}
+            tabIndex={open ? 0 : -1}
+            onPointerDown={keepKeyboard}
+            onMouseDown={keepKeyboard}
+            onClick={close}
+          >
             ‹
           </button>
           <div className="chat-composer-media" aria-hidden="true">
