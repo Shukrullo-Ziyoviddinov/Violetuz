@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const ChatComposer = ({ lang, onSend, disabled = false }) => {
   const inputRef = useRef(null);
@@ -6,6 +6,7 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
   const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [lockInput, setLockInput] = useState(false);
   const placeholder = lang === 'ru' ? 'Сообщение' : 'Xabar';
   const failedLabel = lang === 'ru' ? 'Не отправилось' : 'Yuborilmadi';
   const backLabel = lang === 'ru' ? 'Назад' : 'Orqaga';
@@ -27,29 +28,57 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
   };
 
   const closingRef = useRef(false);
-  const wasFocusedRef = useRef(false);
+  const keyboardWasOpenRef = useRef(false);
+  const backRef = useRef(null);
+
+  const keyboardInset = () => {
+    const fromKeyboard = navigator.virtualKeyboard?.boundingRect?.height || 0;
+    const viewport = window.visualViewport;
+    const fromViewport = viewport
+      ? Math.max(0, window.innerHeight - viewport.offsetTop - viewport.height)
+      : 0;
+    const fromVar = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--chat-visible-bottom'),
+    ) || 0;
+    return Math.max(fromKeyboard, fromViewport, fromVar);
+  };
+
+  const holdKeyboardClosed = () => {
+    setLockInput(true);
+    inputRef.current?.blur();
+    window.setTimeout(() => setLockInput(false), 450);
+  };
 
   const beginClose = (event) => {
     event.preventDefault();
     event.stopPropagation();
     closingRef.current = true;
-    wasFocusedRef.current = document.activeElement === inputRef.current;
+    keyboardWasOpenRef.current = keyboardInset() > 80;
+    if (!keyboardWasOpenRef.current) holdKeyboardClosed();
   };
 
   const close = (event) => {
     event.preventDefault();
     event.stopPropagation();
     setOpen(false);
-    if (!wasFocusedRef.current && inputRef.current) {
-      const stopFocus = () => {
-        if (document.activeElement === inputRef.current) inputRef.current.blur();
-      };
-      [0, 40, 120, 240].forEach((delay) => window.setTimeout(stopFocus, delay));
-    }
+    if (!keyboardWasOpenRef.current) holdKeyboardClosed();
     window.setTimeout(() => {
       closingRef.current = false;
-    }, 400);
+    }, 450);
   };
+
+  useEffect(() => {
+    const button = backRef.current;
+    if (!button) return undefined;
+    const onTouchStart = (event) => {
+      event.preventDefault();
+      closingRef.current = true;
+      keyboardWasOpenRef.current = keyboardInset() > 80;
+      if (!keyboardWasOpenRef.current) holdKeyboardClosed();
+    };
+    button.addEventListener('touchstart', onTouchStart, { passive: false });
+    return () => button.removeEventListener('touchstart', onTouchStart);
+  }, []);
 
   const openComposer = () => {
     if (disabled || closingRef.current) return;
@@ -69,10 +98,10 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
             placeholder={placeholder}
             aria-label={placeholder}
             disabled={disabled}
+            readOnly={lockInput}
             onFocus={(event) => {
-              if (closingRef.current && !wasFocusedRef.current) {
-                const node = event.target;
-                window.setTimeout(() => node.blur(), 0);
+              if (closingRef.current && !keyboardWasOpenRef.current) {
+                event.target.blur();
                 return;
               }
               openComposer();
@@ -99,6 +128,7 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
         <div className="chat-composer-tools">
           <button
             type="button"
+            ref={backRef}
             className="chat-composer-back"
             aria-label={backLabel}
             tabIndex={open ? 0 : -1}
