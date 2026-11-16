@@ -34,11 +34,15 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
     setOpen(false);
   };
 
+  const openComposer = () => {
+    if (!disabled) setOpen(true);
+  };
+
   return (
     <div className="chat-composer-wrap">
       {failed ? <p className="chat-composer-error" role="alert">{failedLabel}</p> : null}
       <form className={`chat-composer${open ? ' is-open' : ''}`} onSubmit={submit}>
-        <div className="chat-composer-field">
+        <div className="chat-composer-field" onPointerDown={openComposer}>
           <input
             ref={inputRef}
             className="chat-composer-input"
@@ -47,9 +51,7 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
             placeholder={placeholder}
             aria-label={placeholder}
             disabled={disabled}
-            onFocus={() => {
-              if (!disabled) setOpen(true);
-            }}
+            onFocus={openComposer}
             onChange={(event) => {
               setFailed(false);
               setText(event.target.value);
