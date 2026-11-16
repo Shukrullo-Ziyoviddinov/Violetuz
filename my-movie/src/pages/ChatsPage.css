@@ -8,13 +8,20 @@ body.chat-page-active {
 body.chat-page-active .App {
   position: fixed;
   top: var(--chat-visible-top, 0px);
+  right: 0;
+  bottom: var(--chat-visible-bottom, 0px);
   left: 0;
-  width: 100%;
-  height: var(--chat-visible-height, 100svh);
-  max-height: var(--chat-visible-height, 100svh);
+  height: auto;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  body.chat-page-active .App {
+    bottom: max(var(--chat-visible-bottom, 0px), 48px, env(safe-area-inset-bottom, 0px));
+  }
 }
 
 body.chat-page-active .App-main {

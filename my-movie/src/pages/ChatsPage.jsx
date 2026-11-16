@@ -10,10 +10,11 @@ const ChatsPage = () => {
     const root = document.documentElement;
     const syncVisibleHeight = () => {
       const viewport = window.visualViewport;
-      const height = viewport ? viewport.height : window.innerHeight;
       const top = viewport ? viewport.offsetTop : 0;
-      root.style.setProperty('--chat-visible-height', `${height}px`);
+      const visibleBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
+      const bottom = Math.max(0, window.innerHeight - visibleBottom);
       root.style.setProperty('--chat-visible-top', `${top}px`);
+      root.style.setProperty('--chat-visible-bottom', `${bottom}px`);
     };
 
     root.classList.add('chat-page-lock');
@@ -29,8 +30,8 @@ const ChatsPage = () => {
       window.removeEventListener('resize', syncVisibleHeight);
       root.classList.remove('chat-page-lock');
       document.body.classList.remove('chat-page-active');
-      root.style.removeProperty('--chat-visible-height');
       root.style.removeProperty('--chat-visible-top');
+      root.style.removeProperty('--chat-visible-bottom');
     };
   }, []);
 
