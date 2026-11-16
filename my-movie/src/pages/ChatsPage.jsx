@@ -7,11 +7,30 @@ const ChatsPage = () => {
   const { userId } = useParams();
 
   useEffect(() => {
-    document.documentElement.classList.add('chat-page-lock');
+    const root = document.documentElement;
+    const syncVisibleHeight = () => {
+      const viewport = window.visualViewport;
+      const height = viewport ? viewport.height : window.innerHeight;
+      const top = viewport ? viewport.offsetTop : 0;
+      root.style.setProperty('--chat-visible-height', `${height}px`);
+      root.style.setProperty('--chat-visible-top', `${top}px`);
+    };
+
+    root.classList.add('chat-page-lock');
     document.body.classList.add('chat-page-active');
+    syncVisibleHeight();
+    window.visualViewport?.addEventListener('resize', syncVisibleHeight);
+    window.visualViewport?.addEventListener('scroll', syncVisibleHeight);
+    window.addEventListener('resize', syncVisibleHeight);
+
     return () => {
-      document.documentElement.classList.remove('chat-page-lock');
+      window.visualViewport?.removeEventListener('resize', syncVisibleHeight);
+      window.visualViewport?.removeEventListener('scroll', syncVisibleHeight);
+      window.removeEventListener('resize', syncVisibleHeight);
+      root.classList.remove('chat-page-lock');
       document.body.classList.remove('chat-page-active');
+      root.style.removeProperty('--chat-visible-height');
+      root.style.removeProperty('--chat-visible-top');
     };
   }, []);
 

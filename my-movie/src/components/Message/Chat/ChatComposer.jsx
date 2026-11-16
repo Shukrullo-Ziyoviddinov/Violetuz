@@ -65,23 +65,25 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
               <path d="M4.5 16.2l4.2-3.6 3 2.5 2.2-1.8 5.6 4.2" strokeLinejoin="round" />
             </svg>
           </span>
+        </div>
+        <div className="chat-composer-tools">
           <button type="button" className="chat-composer-back" aria-label={backLabel} tabIndex={open ? 0 : -1} onClick={close}>
             ‹
           </button>
-        </div>
-        <div className="chat-composer-media" aria-hidden="true">
-          <span className="chat-composer-cam">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <rect x="3" y="7" width="11" height="10" rx="2" />
-              <path d="M14 11.2l6.2-3.2v8.2L14 13" strokeLinejoin="round" />
-            </svg>
-          </span>
-          <span className="chat-composer-mic">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="9" y="3" width="6" height="11" rx="3" />
-              <path d="M7 11a5 5 0 0 0 10 0M12 16v4M9 20h6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
-          </span>
+          <div className="chat-composer-media" aria-hidden="true">
+            <span className="chat-composer-cam">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                <rect x="3" y="7" width="11" height="10" rx="2" />
+                <path d="M14 11.2l6.2-3.2v8.2L14 13" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <span className="chat-composer-mic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="9" y="3" width="6" height="11" rx="3" />
+                <path d="M7 11a5 5 0 0 0 10 0M12 16v4M9 20h6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </span>
+          </div>
         </div>
       </form>
     </div>

@@ -6,9 +6,12 @@ body.chat-page-active {
 }
 
 body.chat-page-active .App {
-  height: 100vh;
-  height: 100dvh;
-  max-height: 100dvh;
+  position: fixed;
+  top: var(--chat-visible-top, 0px);
+  left: 0;
+  width: 100%;
+  height: var(--chat-visible-height, 100svh);
+  max-height: var(--chat-visible-height, 100svh);
   overflow: hidden;
   display: flex;
   flex-direction: column;
