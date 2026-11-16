@@ -6,7 +6,10 @@
   min-height: 0;
   overflow: hidden;
   box-sizing: border-box;
-  background: #12111a;
+  background-color: #12111a;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: #fff;
 }
 
@@ -142,10 +145,7 @@
   flex-direction: column;
   gap: 0.7rem;
   padding: 1rem 0.85rem 1.2rem;
-  background-color: #0e0d14;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: transparent;
 }
 
 .chat-notice {
@@ -177,6 +177,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  background: transparent;
 }
 
 .chat-composer-error {
@@ -314,7 +315,7 @@
 @media (max-width: 768px) {
   .chat {
     height: 100%;
-    background: #0e0d14;
+    background-color: #0e0d14;
   }
 
   .chat-header {

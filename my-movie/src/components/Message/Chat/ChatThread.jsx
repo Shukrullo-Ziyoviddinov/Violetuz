@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import ChatMessageBlock from './ChatMessageBlock';
 
-const ChatThread = ({ messages, selfId, notice, backgroundImage }) => {
+const ChatThread = ({ messages, selfId, notice }) => {
   const threadRef = useRef(null);
 
   useEffect(() => {
@@ -10,11 +10,7 @@ const ChatThread = ({ messages, selfId, notice, backgroundImage }) => {
   }, [messages]);
 
   return (
-    <div
-      className="chat-thread"
-      ref={threadRef}
-      style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : undefined}
-    >
+    <div className="chat-thread" ref={threadRef}>
       {notice ? <p className="chat-notice">{notice}</p> : null}
       {messages.map((item) => {
         const mine = String(item.senderId || '').trim().toLowerCase() === String(selfId || '').trim().toLowerCase();

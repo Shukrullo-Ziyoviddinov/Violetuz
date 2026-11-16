@@ -137,18 +137,17 @@ const Chat = ({ userId }) => {
         : '';
 
   return (
-    <section className="chat" aria-label={peer?.name || (lang === 'ru' ? 'Чат' : 'Suhbat')}>
+    <section
+      className="chat"
+      style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : undefined}
+      aria-label={peer?.name || (lang === 'ru' ? 'Чат' : 'Suhbat')}
+    >
       <ChatHeader
         lang={lang}
         peer={peer}
         onBack={() => navigate(-1)}
       />
-      <ChatThread
-        messages={messages}
-        selfId={profile?.id}
-        notice={notice}
-        backgroundImage={backgroundImage}
-      />
+      <ChatThread messages={messages} selfId={profile?.id} notice={notice} />
       <ChatComposer
         lang={lang}
         disabled={!isLoggedIn || !peer}
