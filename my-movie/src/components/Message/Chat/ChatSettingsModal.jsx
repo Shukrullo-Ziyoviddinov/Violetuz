@@ -11,7 +11,6 @@ const isMobileSlide = () =>
 const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
   const { t } = useTranslation();
   const [entered, setEntered] = useState(false);
-  const [textLight, setTextLight] = useState(false);
   const [backgrounds, setBackgrounds] = useState([]);
   const [selectedId, setSelectedId] = useState(1);
   const [previewImage, setPreviewImage] = useState(DEFAULT_PREVIEW);
@@ -123,17 +122,10 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
             </svg>
           </button>
           <div className="chat-settings-heading">
-            <span className="chat-settings-mark" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-2.9-.4-4.1-1.1L4 21l1.6-4.2A8.4 8.4 0 0 1 4.5 12 8.5 8.5 0 0 1 13 3.5h.5A8.5 8.5 0 0 1 21 12z" />
-              </svg>
-            </span>
-            <span className="chat-settings-heading-copy">
-              <h2 id="chat-settings-title" className="profile-info-modal-title chat-settings-title">
-                Chat Fonlari
-              </h2>
-              <p className="chat-settings-subtitle">Chat uchun orqa fonni tanlang</p>
-            </span>
+            <h2 id="chat-settings-title" className="profile-info-modal-title chat-settings-title">
+              Chat Fonlari
+            </h2>
+            <p className="chat-settings-subtitle">Chat uchun orqa fonni tanlang</p>
           </div>
           <span className="profile-info-header-spacer" aria-hidden="true" />
         </div>
@@ -145,7 +137,12 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
               style={{ backgroundImage: `url(${previewImage})` }}
             >
               <div className="chat-settings-bubble chat-settings-bubble--in">
-                <span className="chat-settings-avatar" aria-hidden="true" />
+                <span className="chat-settings-avatar" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21a8 8 0 0 0-16 0" />
+                    <circle cx="12" cy="8" r="4" />
+                  </svg>
+                </span>
                 <span className="chat-settings-bubble-card">
                   Salom! <span aria-hidden="true">👋</span>
                   <span className="chat-settings-bubble-time">20:45</span>
@@ -181,12 +178,7 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
               </svg>
             </div>
 
-            <button
-              type="button"
-              className="chat-settings-row"
-              aria-pressed={textLight}
-              onClick={() => setTextLight((on) => !on)}
-            >
+            <div className="chat-settings-row chat-settings-row--static" aria-disabled="true">
               <span className="chat-settings-row-icon" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -196,13 +188,11 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
                 <span className="chat-settings-row-title">Xabar matni rangi</span>
                 <span className="chat-settings-row-hint">Matn rangi tanlovi</span>
               </span>
-              <span className={`chat-settings-switch${textLight ? ' is-on' : ''}`} aria-hidden="true">
-                <span />
-              </span>
+              <span className="chat-settings-swatch chat-settings-swatch--text" aria-hidden="true" />
               <svg className="chat-settings-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
-            </button>
+            </div>
 
             <h3 className="chat-settings-section">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
