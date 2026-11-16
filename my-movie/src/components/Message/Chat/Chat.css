@@ -14,10 +14,10 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.2rem;
   min-height: 64px;
-  padding: 0.7rem 0.85rem;
-  background: #16151f;
+  padding: 0.55rem 0.85rem 0.55rem 0.25rem;
+  background: #14101f;
 }
 
 .chat-back {
@@ -33,9 +33,24 @@
   cursor: pointer;
 }
 
+.chat-header-person {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  flex: 1;
+}
+
 .chat-header-avatar {
-  width: 42px;
-  height: 42px;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.chat-header-avatar-face {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -45,15 +60,49 @@
   color: #fff;
   font-size: 0.85rem;
   font-weight: 700;
-  flex-shrink: 0;
 }
 
 .chat-header-avatar-img,
-.chat-header-avatar img {
+.chat-header-avatar-face img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+.chat-header-dot,
+.chat-header-delete-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px #14101f;
+}
+
+.chat-header-dot {
+  right: -1px;
+  bottom: -1px;
+}
+
+.chat-header-delete {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin-left: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #4c1d95;
+  color: #fff;
+  font-size: 16px;
+}
+
+.chat-header-delete-dot {
+  top: -1px;
+  right: -1px;
 }
 
 .chat-header-text {
@@ -69,7 +118,7 @@
 }
 
 .chat-header-status {
-  color: #3dd68c;
+  color: #22c55e;
   font-size: 0.78rem;
   font-weight: 600;
   line-height: 1.2;

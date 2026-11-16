@@ -16,17 +16,30 @@ const ChatHeader = ({ peer, onBack, lang }) => {
       <button type="button" className="chat-back" onClick={onBack} aria-label={lang === 'ru' ? 'Назад' : 'Orqaga'}>
         ‹
       </button>
-      <span className="chat-header-avatar" aria-hidden="true">
-        <UserAvatar
-          src={peer?.avatar}
-          className="chat-header-avatar-img"
-          fallback={<span>{initialsOf(name)}</span>}
-        />
-      </span>
-      <span className="chat-header-text">
-        <span className="chat-header-name">{name}</span>
-        {name ? <span className="chat-header-status">{peer?.onlineLabel || ''}</span> : null}
-      </span>
+      {name ? (
+        <span className="chat-header-person">
+          <span className="chat-header-avatar" aria-hidden="true">
+            <span className="chat-header-avatar-face">
+              <UserAvatar
+                src={peer?.avatar}
+                className="chat-header-avatar-img"
+                fallback={<span>{initialsOf(name)}</span>}
+              />
+            </span>
+            <span className="chat-header-dot" />
+          </span>
+          <span className="chat-header-text">
+            <span className="chat-header-name">{name}</span>
+            <span className="chat-header-status">{peer?.onlineLabel || ''}</span>
+          </span>
+        </span>
+      ) : null}
+      {name ? (
+        <span className="chat-header-delete" aria-hidden="true">
+          <i className="fa-solid fa-trash" />
+          <span className="chat-header-delete-dot" />
+        </span>
+      ) : null}
     </header>
   );
 };
