@@ -62,6 +62,7 @@ const MessageInbox = () => {
   const lang = String(i18n.language || '').startsWith('ru') ? 'ru' : 'uz';
   const [items, setItems] = useState([]);
   const [onlineIds, setOnlineIds] = useState({});
+  const [typingIds, setTypingIds] = useState({});
   const loadToken = useRef(0);
   const peerKey = peerIdsOf(items).join(',');
 
@@ -86,9 +87,35 @@ const MessageInbox = () => {
     if (!authReady) return undefined;
     load();
     if (!isLoggedIn) return undefined;
+    const timers = new Map();
+    const stopTyping = (id) => {
+      const timer = timers.get(id);
+      if (timer) window.clearTimeout(timer);
+      timers.delete(id);
+      setTypingIds((prev) => {
+        if (!prev[id]) return prev;
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    };
     const close = openChatStream({
-      onItem: () => {
+      onItem: (item) => {
+        const sender = String(item?.senderId || '').trim().toLowerCase();
+        if (sender) stopTyping(sender);
         load();
+      },
+      onTyping: (item) => {
+        const id = String(item?.userId || '').trim().toLowerCase();
+        if (!/^[a-f0-9]{24}$/.test(id)) return;
+        if (!item.typing) {
+          stopTyping(id);
+          return;
+        }
+        const existing = timers.get(id);
+        if (existing) window.clearTimeout(existing);
+        setTypingIds((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+        timers.set(id, window.setTimeout(() => stopTyping(id), 2500));
       },
       onReconnect: () => {
         load();
@@ -100,6 +127,7 @@ const MessageInbox = () => {
     document.addEventListener('visibilitychange', onVisible);
     return () => {
       close();
+      timers.forEach((timer) => window.clearTimeout(timer));
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [authReady, isLoggedIn, load]);
@@ -144,6 +172,9 @@ const MessageInbox = () => {
       {items.map((item) => {
         const name = item.peer?.name || '';
         const unread = Number(item.unread) || 0;
+        const peerId = String(item.peer?.id || '').trim().toLowerCase();
+        const typing = typingIds[peerId] === true;
+        const typingLabel = lang === 'ru' ? 'Печатает...' : 'Yozmoqda...';
         return (
           <li key={item.id}>
             <button
@@ -163,13 +194,17 @@ const MessageInbox = () => {
                 {unread > 0 ? (
                   <span className="message-inbox-badge">{unread > 99 ? '99+' : unread}</span>
                 ) : null}
-                {onlineIds[String(item.peer?.id || '').trim().toLowerCase()] ? (
+                {onlineIds[peerId] ? (
                   <span className="chat-header-dot" />
                 ) : null}
               </span>
               <span className="message-inbox-copy">
                 <span className="message-inbox-name">{name}</span>
-                <span className="message-inbox-text">{item.text}</span>
+                {typing ? (
+                  <span className="message-inbox-typing">{typingLabel}</span>
+                ) : (
+                  <span className="message-inbox-text">{item.text}</span>
+                )}
               </span>
               <span className="message-inbox-time">{formatWhen(item.createdAt, lang)}</span>
             </button>
