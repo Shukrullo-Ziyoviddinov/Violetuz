@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #14121c;
+  background: #0f0f12;
   color: #fff;
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -28,6 +28,7 @@
 .chat-color-picker-top {
   flex-shrink: 0;
   touch-action: none;
+  background: #0f0f12;
 }
 
 .chat-color-picker-handle {
@@ -147,7 +148,7 @@
   margin-top: 0.85rem;
   padding: 0.4rem 0.45rem 0.4rem 0.4rem;
   border-radius: 14px;
-  background: #1c1830;
+  background: #1c1c1f;
 }
 
 .chat-color-hex-chip {
@@ -283,7 +284,7 @@
   height: 52px;
   border: none;
   border-radius: 16px;
-  background: linear-gradient(90deg, #7c3aed, #6d28d9);
+  background: #9b4fe7;
   color: #fff;
   font: inherit;
   font-size: 1.05rem;
@@ -316,6 +317,7 @@
     max-height: 92dvh;
     border-radius: 22px 22px 0 0;
     border-bottom: none;
+    background: #0a0a0a;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
     transform: translate3d(0, 100%, 0);
     transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
@@ -332,6 +334,10 @@
 
   .chat-color-picker--closing {
     transform: translate3d(0, 100%, 0);
+  }
+
+  .chat-color-picker-top {
+    background: #0a0a0a;
   }
 
   .chat-color-picker-handle {
