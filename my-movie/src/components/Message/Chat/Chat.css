@@ -314,6 +314,6 @@
   }
 
   .chat-composer {
-    margin-bottom: 0.7rem;
+    margin-bottom: calc(7px + env(safe-area-inset-bottom, 0px));
   }
 }
