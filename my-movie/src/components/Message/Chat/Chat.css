@@ -70,9 +70,10 @@
   border-radius: 50%;
 }
 
-.chat-header-dot,
-.chat-header-delete-dot {
+.chat-header-dot {
   position: absolute;
+  right: -1px;
+  bottom: -1px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -80,29 +81,30 @@
   box-shadow: 0 0 0 2px #14101f;
 }
 
-.chat-header-dot {
-  right: -1px;
-  bottom: -1px;
+.chat-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: 0.35rem;
+  flex-shrink: 0;
 }
 
-.chat-header-delete {
-  position: relative;
+.chat-header-popcorn {
   width: 44px;
   height: 44px;
-  margin-left: 0.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   background: #4c1d95;
-  color: #fff;
-  font-size: 16px;
 }
 
-.chat-header-delete-dot {
-  top: -1px;
-  right: -1px;
+.chat-header-more {
+  width: 28px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chat-header-text {
