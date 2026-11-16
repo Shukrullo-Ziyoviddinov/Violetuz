@@ -171,21 +171,54 @@
 }
 
 .chat-block {
+  position: relative;
   align-self: flex-start;
-  max-width: min(78%, 20rem);
-  padding: 0.65rem 0.75rem;
-  border-radius: 8px;
+  max-width: min(82%, 22rem);
+  overflow: hidden;
+  padding: 1.28rem 1.05rem 0.7rem;
+  border-radius: 999px;
   background: var(--chat-bubble-in-fill, #2a2140);
   color: var(--chat-text-color, #fff);
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   line-height: 1.35;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
+.chat-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background-color: #16131f;
+  background-image: repeating-linear-gradient(
+    90deg,
+    #f4f1ff 0 5px,
+    transparent 5px 10px
+  );
+  background-size: auto 5px;
+  background-repeat: repeat-x;
+  background-position: center;
+  pointer-events: none;
+}
+
 .chat-block.is-mine {
   align-self: flex-end;
   background: var(--chat-bubble-out-fill, #7c3aed);
+}
+
+.chat-block.is-mine::before {
+  background-color: rgba(0, 0, 0, 0.28);
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.92) 0 5px,
+    transparent 5px 10px
+  );
+  background-size: auto 5px;
+  background-repeat: repeat-x;
+  background-position: center;
 }
 
 .chat.is-text-glow .chat-block {
