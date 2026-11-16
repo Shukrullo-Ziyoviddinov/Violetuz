@@ -1,5 +1,6 @@
 import React from 'react';
 import UserAvatar from '../../UserAvatar/UserAvatar';
+import { normalizeUsername } from '../../../store/slices/userUtils';
 
 const initialsOf = (name) => {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -10,6 +11,8 @@ const initialsOf = (name) => {
 
 const ChatHeader = ({ peer, onBack, lang }) => {
   const name = peer?.name || '';
+  const username = normalizeUsername(peer?.username);
+  const usernameLabel = username ? `@${username}` : '';
 
   return (
     <header className="chat-header">
@@ -30,7 +33,7 @@ const ChatHeader = ({ peer, onBack, lang }) => {
           </span>
           <span className="chat-header-text">
             <span className="chat-header-name">{name}</span>
-            <span className="chat-header-status">{peer?.onlineLabel || ''}</span>
+            {usernameLabel ? <span className="chat-header-username">{usernameLabel}</span> : null}
           </span>
         </span>
       ) : null}

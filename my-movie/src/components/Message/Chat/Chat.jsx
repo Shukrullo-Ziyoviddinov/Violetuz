@@ -112,7 +112,7 @@ const Chat = ({ userId }) => {
     <section className="chat" aria-label={peer?.name || (lang === 'ru' ? 'Чат' : 'Suhbat')}>
       <ChatHeader
         lang={lang}
-        peer={peer ? { ...peer, onlineLabel: lang === 'ru' ? 'в сети' : 'onlayn' } : null}
+        peer={peer}
         onBack={() => navigate(-1)}
       />
       <ChatThread messages={messages} selfId={profile?.id} notice={notice} />
