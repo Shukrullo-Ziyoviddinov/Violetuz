@@ -31,6 +31,7 @@ const ProfileInfoModal = ({
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationsExiting, setNotificationsExiting] = useState(false);
   const [showChatSettings, setShowChatSettings] = useState(false);
+  const closeChatColorRef = useRef(null);
   const [chatSettingsExiting, setChatSettingsExiting] = useState(false);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const [entered, setEntered] = useState(false);
@@ -65,6 +66,10 @@ const ProfileInfoModal = ({
     onCloseFromHardware: beginCloseFromHardware,
     hasNested: showLogoutConfirm || showNotifications || showChatSettings,
     onNestedBack: () => {
+      if (closeChatColorRef.current) {
+        closeChatColorRef.current();
+        return;
+      }
       if (showChatSettings) {
         closeChatSettings();
         return;
@@ -196,6 +201,7 @@ const ProfileInfoModal = ({
           closing={chatSettingsExiting}
           onClose={closeChatSettings}
           onExited={finishCloseChatSettings}
+          closeColorRef={closeChatColorRef}
         />
       ) : null}
       <div

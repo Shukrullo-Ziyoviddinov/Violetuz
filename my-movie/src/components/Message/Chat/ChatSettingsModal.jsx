@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchChatBackgrounds, fetchMyChatBackground, saveChatBackground } from '../../../api/messagesApi';
+import { bubbleFill, readBubbleChoice } from './chatBubbles';
+import ChatMessageColorModal from './ChatMessageColorModal';
 import './ChatSettingsModal.css';
 
 const DEFAULT_PREVIEW = '/img/chat-backgrounds/chat-bg-1.jpg';
@@ -8,7 +10,7 @@ const DEFAULT_PREVIEW = '/img/chat-backgrounds/chat-bg-1.jpg';
 const isMobileSlide = () =>
   typeof window !== 'undefined' && window.innerWidth <= 768;
 
-const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
+const ChatSettingsModal = ({ closing = false, onClose, onExited, closeColorRef }) => {
   const { t } = useTranslation();
   const [entered, setEntered] = useState(false);
   const [backgrounds, setBackgrounds] = useState([]);
@@ -16,6 +18,9 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
   const [previewImage, setPreviewImage] = useState(DEFAULT_PREVIEW);
   const [choiceReady, setChoiceReady] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [bubble, setBubble] = useState(readBubbleChoice);
+  const [showColor, setShowColor] = useState(false);
+  const [colorClosing, setColorClosing] = useState(false);
   const pickedRef = useRef(false);
   const slideIn = entered && !closing;
   const exitedRef = useRef(false);
@@ -51,6 +56,17 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
       cancelled = true;
     };
   }, []);
+
+  const closeColor = () => {
+    if (!showColor || colorClosing) return;
+    if (!isMobileSlide()) {
+      setShowColor(false);
+      return;
+    }
+    setColorClosing(true);
+  };
+
+  if (closeColorRef) closeColorRef.current = showColor ? closeColor : null;
 
   const chooseBackground = (item) => {
     if (!item?.image || saving) return;
@@ -143,13 +159,13 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
                     <circle cx="12" cy="8" r="4" />
                   </svg>
                 </span>
-                <span className="chat-settings-bubble-card">
+                <span className="chat-settings-bubble-card" style={{ background: bubbleFill(bubble.incoming, bubble.mode) }}>
                   Salom! <span aria-hidden="true">👋</span>
                   <span className="chat-settings-bubble-time">20:45</span>
                 </span>
               </div>
               <div className="chat-settings-bubble chat-settings-bubble--out">
-                <span className="chat-settings-bubble-card">
+                <span className="chat-settings-bubble-card" style={{ background: bubbleFill(bubble.outgoing, bubble.mode) }}>
                   Qanday yangiliklar? <span aria-hidden="true">😎</span>
                   <span className="chat-settings-bubble-time">
                     20:46
@@ -162,7 +178,7 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
               </div>
             </div>
 
-            <div className="chat-settings-row chat-settings-row--static" aria-disabled="true">
+            <button type="button" className="chat-settings-row" onClick={() => setShowColor(true)}>
               <span className="chat-settings-row-icon" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 3.2s5 5.1 5 8.6a5 5 0 0 1-10 0c0-3.5 5-8.6 5-8.6z" />
@@ -172,11 +188,11 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
                 <span className="chat-settings-row-title">Xabarlar rangi</span>
                 <span className="chat-settings-row-hint">Xabarlar fon rangi</span>
               </span>
-              <span className="chat-settings-swatch" aria-hidden="true" />
+              <span className="chat-settings-swatch" style={{ background: bubble.outgoing }} aria-hidden="true" />
               <svg className="chat-settings-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
-            </div>
+            </button>
 
             <div className="chat-settings-row chat-settings-row--static" aria-disabled="true">
               <span className="chat-settings-row-icon" aria-hidden="true">
@@ -240,6 +256,19 @@ const ChatSettingsModal = ({ closing = false, onClose, onExited }) => {
           </div>
         </div>
       </div>
+      {showColor ? (
+        <ChatMessageColorModal
+          closing={colorClosing}
+          initial={bubble}
+          previewImage={previewImage}
+          onClose={closeColor}
+          onExited={() => {
+            setColorClosing(false);
+            setShowColor(false);
+          }}
+          onApply={setBubble}
+        />
+      ) : null}
     </>
   );
 };

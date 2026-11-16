@@ -161,7 +161,7 @@
   max-width: min(78%, 20rem);
   padding: 0.65rem 0.75rem;
   border-radius: 8px;
-  background: #2a2936;
+  background: var(--chat-bubble-in-fill, #2a2140);
   color: #fff;
   font-size: 0.95rem;
   line-height: 1.35;
@@ -171,6 +171,7 @@
 
 .chat-block.is-mine {
   align-self: flex-end;
+  background: var(--chat-bubble-out-fill, #7c3aed);
 }
 
 .chat-composer-wrap {
