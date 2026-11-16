@@ -237,8 +237,14 @@ const Chat = ({ userId }) => {
         selfId={profile?.id}
         notice={notice}
         typing={peerTyping}
-        typingLabel={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}
       />
+      {peerTyping ? (
+        <div className="chat-typing" role="status" aria-label={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}>
+          <span className="chat-typing-dot" />
+          <span className="chat-typing-dot" />
+          <span className="chat-typing-dot" />
+        </div>
+      ) : null}
       <ChatComposer
         lang={lang}
         disabled={!isLoggedIn || !peer}

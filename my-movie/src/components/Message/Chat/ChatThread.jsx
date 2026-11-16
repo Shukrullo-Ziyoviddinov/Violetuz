@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import ChatMessageBlock from './ChatMessageBlock';
 
-const ChatThread = ({ messages, selfId, notice, typing, typingLabel }) => {
+const ChatThread = ({ messages, selfId, notice, typing }) => {
   const threadRef = useRef(null);
 
   useEffect(() => {
@@ -18,13 +18,6 @@ const ChatThread = ({ messages, selfId, notice, typing, typingLabel }) => {
           <ChatMessageBlock key={item.id} text={item.text} mine={mine} />
         );
       })}
-      {typing ? (
-        <div className="chat-typing" role="status" aria-label={typingLabel || 'Yozmoqda'}>
-          <span className="chat-typing-dot" />
-          <span className="chat-typing-dot" />
-          <span className="chat-typing-dot" />
-        </div>
-      ) : null}
     </div>
   );
 };
