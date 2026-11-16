@@ -35,6 +35,7 @@ import MovieDetail from './components/MovieDetail/MovieDetail';
 import PullToRefresh from './components/PullToRefresh/PullToRefresh';
 import AuthModalHost from './components/AuthModal/AuthModalHost';
 import AuthSessionBootstrap from './components/AuthSessionBootstrap';
+import PresenceBootstrap from './components/PresenceBootstrap';
 import WishlistBootstrap from './components/WishlistBootstrap';
 import FollowingBootstrap from './components/FollowingBootstrap';
 import RepostsBootstrap from './components/RepostsBootstrap';
@@ -133,6 +134,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <PersistGate loading={null} persistor={persistor}>
           <AuthSessionBootstrap />
+          <PresenceBootstrap />
           <WishlistBootstrap />
           <FollowingBootstrap />
           <RepostsBootstrap />

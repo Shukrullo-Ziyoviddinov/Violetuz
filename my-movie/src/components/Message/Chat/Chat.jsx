@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
 import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping } from '../../../api/messagesApi';
+import { unwatchPresence, watchPresence } from '../../../api/presenceApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
 import { readTextChoice, textLookClass, textVars } from './chatTextFont';
@@ -31,6 +32,7 @@ const Chat = ({ userId }) => {
   const [bubbles, setBubbles] = useState(readBubbleChoice);
   const [textChoice, setTextChoice] = useState(readTextChoice);
   const [peerTyping, setPeerTyping] = useState(false);
+  const [peerOnline, setPeerOnline] = useState(false);
   const loadToken = useRef(0);
   const typingIdleRef = useRef(null);
   const typingSentRef = useRef(false);
@@ -117,6 +119,32 @@ const Chat = ({ userId }) => {
       cancelled = true;
     };
   }, [backgroundImage]);
+
+  useEffect(() => {
+    if (!authReady || !isLoggedIn || !userId) {
+      setPeerOnline(false);
+      return undefined;
+    }
+    let cancelled = false;
+    setPeerOnline(false);
+    watchPresence(userId)
+      .then((online) => {
+        if (!cancelled) setPeerOnline(online);
+      })
+      .catch(() => {
+        if (!cancelled) setPeerOnline(false);
+      });
+    const onPresence = (event) => {
+      if (cancelled || !sameId(event.detail?.userId, userId)) return;
+      setPeerOnline(event.detail.online === true);
+    };
+    window.addEventListener('violet-presence', onPresence);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('violet-presence', onPresence);
+      unwatchPresence(userId).catch(() => {});
+    };
+  }, [authReady, isLoggedIn, userId]);
 
   useEffect(() => {
     const onBubbles = (event) => {
@@ -231,6 +259,7 @@ const Chat = ({ userId }) => {
         lang={lang}
         peer={peer}
         onBack={() => navigate(-1)}
+        online={peerOnline}
       />
       <ChatThread
         messages={messages}

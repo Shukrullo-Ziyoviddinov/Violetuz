@@ -9,7 +9,7 @@ const initialsOf = (name) => {
   return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
 };
 
-const ChatHeader = ({ peer, onBack, lang }) => {
+const ChatHeader = ({ peer, onBack, lang, online = false }) => {
   const name = peer?.name || '';
   const username = normalizeUsername(peer?.username);
   const usernameLabel = username ? `@${username}` : '';
@@ -29,7 +29,7 @@ const ChatHeader = ({ peer, onBack, lang }) => {
                 fallback={<span>{initialsOf(name)}</span>}
               />
             </span>
-            <span className="chat-header-dot" />
+            {online ? <span className="chat-header-dot" /> : null}
           </span>
           <span className="chat-header-text">
             <span className="chat-header-name">{name}</span>
