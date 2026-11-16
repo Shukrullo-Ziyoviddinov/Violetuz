@@ -37,14 +37,23 @@ const ChatHeader = ({ peer, onBack, lang }) => {
       {name ? (
         <span className="chat-header-tools">
           <span className="chat-header-popcorn" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              <circle cx="8.6" cy="8.2" r="2.35" fill="#fff" />
-              <circle cx="12.1" cy="6.5" r="2.45" fill="#fff" />
-              <circle cx="15.2" cy="8.6" r="2.15" fill="#fff" />
-              <circle cx="11.2" cy="10.1" r="1.7" fill="#fff" />
-              <rect x="14.2" y="3.1" width="5.2" height="5.2" rx="1.4" fill="#22c55e" />
-              <path fill="none" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" d="M6.8 11.4h10.4l-1.35 8.3H8.15L6.8 11.4z" />
-              <path fill="none" stroke="#fff" strokeWidth="1.3" d="M12 11.6v7.7" />
+            <svg width="42" height="42" viewBox="0 0 32 32">
+              <path
+                fill="none"
+                stroke="#fff"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                d="M6.2 14.2c.2-2.8 2.2-4 3.6-2 .4-2.8 3.4-3.4 4.6-.4 1.2-2.4 4-1.8 4.2 1.2 1.8-1.1 3.6.6 3.2 2.6"
+              />
+              <path
+                fill="none"
+                stroke="#fff"
+                strokeWidth="1.7"
+                strokeLinejoin="round"
+                d="M5.4 15.2h21.2L24.2 29.2H7.8L5.4 15.2z"
+              />
+              <path fill="none" stroke="#fff" strokeWidth="1.5" d="M16 15.4V28.6" />
+              <rect x="19.6" y="5.2" width="7.6" height="7.2" rx="2" fill="#22c55e" />
             </svg>
           </span>
           <span className="chat-header-more" aria-hidden="true">
