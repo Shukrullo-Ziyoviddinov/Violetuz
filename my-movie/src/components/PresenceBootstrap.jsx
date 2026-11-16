@@ -4,17 +4,18 @@ import { useAuth } from '../context/AuthContext';
 
 /** Hisob ochiq turgan har bir sahifada odamni onlayn qiladi. */
 const PresenceBootstrap = () => {
-  const { authReady, isLoggedIn } = useAuth();
+  const { authReady, isLoggedIn, profile } = useAuth();
+  const userId = String(profile?.id || '').trim();
 
   useEffect(() => {
-    if (!authReady || !isLoggedIn) return undefined;
+    if (!authReady || !isLoggedIn || !userId) return undefined;
     const close = openPresenceStream({
       onChange: (item) => {
         window.dispatchEvent(new CustomEvent('violet-presence', { detail: item }));
       },
     });
     return close;
-  }, [authReady, isLoggedIn]);
+  }, [authReady, isLoggedIn, userId]);
 
   return null;
 };

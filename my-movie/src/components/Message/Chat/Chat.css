@@ -46,9 +46,10 @@
   align-items: center;
   gap: 0.65rem;
   min-width: 0;
-  flex: 1;
+  flex: 0 1 auto;
+  max-width: 100%;
   min-height: 46px;
-  padding: 0.15rem 0.75rem 0.15rem 0.15rem;
+  padding: 5px;
   border: none;
   border-radius: 999px;
   background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
@@ -57,14 +58,14 @@
 
 .chat-header-avatar {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
 }
 
 .chat-header-avatar-face {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -99,6 +100,7 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  margin-left: auto;
   height: 46px;
   padding: 0 0.15rem;
   border: none;
@@ -136,6 +138,9 @@
   font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chat-header-username {

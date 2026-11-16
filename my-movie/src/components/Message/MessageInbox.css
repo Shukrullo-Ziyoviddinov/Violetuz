@@ -43,6 +43,17 @@
   object-fit: cover;
 }
 
+.message-inbox-avatar .chat-header-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px #0a0a0a;
+}
+
 .message-inbox-badge {
   position: absolute;
   top: -4px;
@@ -90,4 +101,10 @@
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 0.15rem;
+}
+
+@media (max-width: 768px) {
+  .message-inbox-avatar .chat-header-dot {
+    box-shadow: 0 0 0 2px #000;
+  }
 }

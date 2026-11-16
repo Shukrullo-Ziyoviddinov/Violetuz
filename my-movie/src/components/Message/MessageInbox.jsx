@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { fetchChatInbox, openChatStream } from '../../api/messagesApi';
+import { unwatchPresence, watchPresence } from '../../api/presenceApi';
 import UserAvatar from '../UserAvatar/UserAvatar';
 import './MessageInbox.css';
 
@@ -42,13 +43,27 @@ const formatWhen = (value, lang) => {
   return date.toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uz-UZ', { day: 'numeric', month: 'short' });
 };
 
+const peerIdsOf = (rows) => {
+  const ids = [];
+  const seen = new Set();
+  for (const item of rows) {
+    const id = String(item?.peer?.id || '').trim().toLowerCase();
+    if (!/^[a-f0-9]{24}$/.test(id) || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+};
+
 const MessageInbox = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { isLoggedIn, authReady } = useAuth();
   const lang = String(i18n.language || '').startsWith('ru') ? 'ru' : 'uz';
   const [items, setItems] = useState([]);
+  const [onlineIds, setOnlineIds] = useState({});
   const loadToken = useRef(0);
+  const peerKey = peerIdsOf(items).join(',');
 
   const load = useCallback(() => {
     const token = ++loadToken.current;
@@ -89,6 +104,39 @@ const MessageInbox = () => {
     };
   }, [authReady, isLoggedIn, load]);
 
+  useEffect(() => {
+    if (!authReady || !isLoggedIn || !peerKey) {
+      setOnlineIds({});
+      return undefined;
+    }
+    const ids = peerKey.split(',');
+    let cancelled = false;
+    ids.forEach((id) => {
+      watchPresence(id)
+        .then((online) => {
+          if (cancelled) return;
+          setOnlineIds((prev) => ({ ...prev, [id]: online === true }));
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setOnlineIds((prev) => ({ ...prev, [id]: false }));
+        });
+    });
+    const onPresence = (event) => {
+      const id = String(event.detail?.userId || '').trim().toLowerCase();
+      if (!ids.includes(id)) return;
+      setOnlineIds((prev) => ({ ...prev, [id]: event.detail?.online === true }));
+    };
+    window.addEventListener('violet-presence', onPresence);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('violet-presence', onPresence);
+      ids.forEach((id) => {
+        unwatchPresence(id).catch(() => {});
+      });
+    };
+  }, [authReady, isLoggedIn, peerKey]);
+
   if (!isLoggedIn || items.length === 0) return null;
 
   return (
@@ -114,6 +162,9 @@ const MessageInbox = () => {
                 />
                 {unread > 0 ? (
                   <span className="message-inbox-badge">{unread > 99 ? '99+' : unread}</span>
+                ) : null}
+                {onlineIds[String(item.peer?.id || '').trim().toLowerCase()] ? (
+                  <span className="chat-header-dot" />
                 ) : null}
               </span>
               <span className="message-inbox-copy">
