@@ -8,6 +8,7 @@ const { toMessageSelf } = require('./self');
 const { listInbox, openThread } = require('./thread');
 const { sendChatMessage } = require('./send');
 const { attachStream } = require('./live');
+const { listBackgrounds, getMyBackground, saveMyBackground } = require('./background');
 
 /**
  * Xabarlar. Base: /api/messages
@@ -19,6 +20,21 @@ router.use(requireAuth);
 
 router.get('/me', asyncHandler(async (req, res) => {
   return sendSuccess(res, { data: toMessageSelf(req.authUser) });
+}));
+
+router.get('/backgrounds', asyncHandler(async (req, res) => {
+  const items = await listBackgrounds();
+  return sendSuccess(res, { data: { items } });
+}));
+
+router.get('/background', asyncHandler(async (req, res) => {
+  const choice = await getMyBackground(req.authUser._id);
+  return sendSuccess(res, { data: choice });
+}));
+
+router.put('/background', asyncHandler(async (req, res) => {
+  const choice = await saveMyBackground(req.authUser._id, req.body?.backgroundId);
+  return sendSuccess(res, { data: choice });
 }));
 
 router.get('/inbox', asyncHandler(async (req, res) => {

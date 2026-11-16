@@ -1,0 +1,8 @@
+[
+  { "id": 1, "image": "/img/chat-backgrounds/chat-bg-1.jpg", "isDefault": true, "order": 1 },
+  { "id": 2, "image": "/img/chat-backgrounds/chat-bg-2.jpg", "isDefault": false, "order": 2 },
+  { "id": 3, "image": "/img/chat-backgrounds/chat-bg-3.jpg", "isDefault": false, "order": 3 },
+  { "id": 4, "image": "/img/chat-backgrounds/chat-bg-4.jpg", "isDefault": false, "order": 4 },
+  { "id": 5, "image": "/img/chat-backgrounds/chat-bg-5.jpg", "isDefault": false, "order": 5 },
+  { "id": 6, "image": "/img/chat-backgrounds/chat-bg-6.jpg", "isDefault": false, "order": 6 }
+]

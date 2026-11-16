@@ -41,6 +41,30 @@ export const sendChatMessage = async (userId, text) => {
   return parseJson(response);
 };
 
+export const fetchChatBackgrounds = async () => {
+  const response = await fetch(`${API_BASE_URL}/messages/backgrounds`, {
+    credentials: 'include',
+  });
+  return parseJson(response);
+};
+
+export const fetchMyChatBackground = async () => {
+  const response = await fetch(`${API_BASE_URL}/messages/background`, {
+    credentials: 'include',
+  });
+  return parseJson(response);
+};
+
+export const saveChatBackground = async (backgroundId) => {
+  const response = await fetch(`${API_BASE_URL}/messages/background`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ backgroundId }),
+  });
+  return parseJson(response);
+};
+
 export const fetchChatThread = async (userId) => {
   const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}`, {
     credentials: 'include',

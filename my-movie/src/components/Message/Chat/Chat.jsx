@@ -2,11 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
-import { fetchChatThread, openChatStream, sendChatMessage } from '../../../api/messagesApi';
+import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage } from '../../../api/messagesApi';
 import ChatHeader from './ChatHeader';
 import ChatThread from './ChatThread';
 import ChatComposer from './ChatComposer';
 import './Chat.css';
+
+const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
 
 const sameId = (left, right) => String(left || '').trim().toLowerCase() === String(right || '').trim().toLowerCase();
 
@@ -18,6 +20,7 @@ const Chat = ({ userId }) => {
   const [peer, setPeer] = useState(null);
   const [messages, setMessages] = useState([]);
   const [ready, setReady] = useState(false);
+  const [backgroundImage, setBackgroundImage] = useState(DEFAULT_CHAT_BG);
   const loadToken = useRef(0);
 
   const load = useCallback(() => {
@@ -62,6 +65,31 @@ const Chat = ({ userId }) => {
       cancelled = true;
     };
   }, [authReady, isLoggedIn, load]);
+
+  useEffect(() => {
+    if (!authReady) return undefined;
+    if (!isLoggedIn) {
+      setBackgroundImage(DEFAULT_CHAT_BG);
+      return undefined;
+    }
+    let cancelled = false;
+    fetchMyChatBackground()
+      .then((choice) => {
+        if (!cancelled) setBackgroundImage(choice?.image || DEFAULT_CHAT_BG);
+      })
+      .catch(() => {
+        if (!cancelled) setBackgroundImage(DEFAULT_CHAT_BG);
+      });
+    const onSaved = (event) => {
+      const image = event.detail?.image;
+      if (image) setBackgroundImage(image);
+    };
+    window.addEventListener('violet-chat-background', onSaved);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('violet-chat-background', onSaved);
+    };
+  }, [authReady, isLoggedIn]);
 
   useEffect(() => {
     if (!authReady || !isLoggedIn || !userId) return undefined;
@@ -115,7 +143,12 @@ const Chat = ({ userId }) => {
         peer={peer}
         onBack={() => navigate(-1)}
       />
-      <ChatThread messages={messages} selfId={profile?.id} notice={notice} />
+      <ChatThread
+        messages={messages}
+        selfId={profile?.id}
+        notice={notice}
+        backgroundImage={backgroundImage}
+      />
       <ChatComposer
         lang={lang}
         disabled={!isLoggedIn || !peer}

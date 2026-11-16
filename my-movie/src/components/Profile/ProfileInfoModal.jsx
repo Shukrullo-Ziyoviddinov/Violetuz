@@ -5,6 +5,7 @@ import { useMoviesApi } from '../../context/MoviesApiContext';
 import { useAuth } from '../../context/AuthContext';
 import MiniGlobalModal from '../MiniGlobalModal/MiniGlobalModal';
 import NotificationSettingsModal from '../Notifications/NotificationSettingsModal';
+import ChatSettingsModal from '../Message/Chat/ChatSettingsModal';
 import { askDevicePermission, ensureDevicePush } from '../Notifications/enableDevicePush';
 import { fetchNotificationSettings } from '../../api/notificationsApi';
 import { useModalHardwareBack } from '../../useModalHardwareBack';
@@ -29,6 +30,8 @@ const ProfileInfoModal = ({
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationsExiting, setNotificationsExiting] = useState(false);
+  const [showChatSettings, setShowChatSettings] = useState(false);
+  const [chatSettingsExiting, setChatSettingsExiting] = useState(false);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -60,8 +63,12 @@ const ProfileInfoModal = ({
     historyKey: 'violetProfileInfo',
     isOpen: logicalOpen,
     onCloseFromHardware: beginCloseFromHardware,
-    hasNested: showLogoutConfirm || showNotifications,
+    hasNested: showLogoutConfirm || showNotifications || showChatSettings,
     onNestedBack: () => {
+      if (showChatSettings) {
+        closeChatSettings();
+        return;
+      }
       if (showNotifications) {
         closeNotifications();
         return;
@@ -82,6 +89,20 @@ const ProfileInfoModal = ({
   const finishCloseNotifications = () => {
     setNotificationsExiting(false);
     setShowNotifications(false);
+  };
+
+  const closeChatSettings = () => {
+    if (!showChatSettings || chatSettingsExiting) return;
+    if (!isMobileSlideViewport()) {
+      setShowChatSettings(false);
+      return;
+    }
+    setChatSettingsExiting(true);
+  };
+
+  const finishCloseChatSettings = () => {
+    setChatSettingsExiting(false);
+    setShowChatSettings(false);
   };
 
   /** Ortga / overlay — mobile’da slide-out, desktop’da darhol */
@@ -168,6 +189,13 @@ const ProfileInfoModal = ({
           closing={notificationsExiting}
           onClose={closeNotifications}
           onExited={finishCloseNotifications}
+        />
+      ) : null}
+      {showChatSettings ? (
+        <ChatSettingsModal
+          closing={chatSettingsExiting}
+          onClose={closeChatSettings}
+          onExited={finishCloseChatSettings}
         />
       ) : null}
       <div
@@ -300,6 +328,23 @@ const ProfileInfoModal = ({
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
               <span>{t('navbar.notifications', 'Bildirishnomalar')}</span>
+            </div>
+            <svg className="profile-wishlist-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className="profile-wishlist-block profile-info-action"
+            onClick={() => setShowChatSettings(true)}
+          >
+            <div className="profile-wishlist-left">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M16 10a2 2 0 0 1-2 2H6.8a2 2 0 0 0-1.4.6L3.2 14.8A.7.7 0 0 1 2 14.3V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                <path d="M20 9a2 2 0 0 1 2 2v10.3a.7.7 0 0 1-1.2.5l-2.2-2.2a2 2 0 0 0-1.4-.6H10a2 2 0 0 1-2-2v-1" />
+              </svg>
+              <span>Chat sozlamalari</span>
             </div>
             <svg className="profile-wishlist-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9 18 15 12 9 6" />

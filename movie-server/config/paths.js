@@ -33,4 +33,5 @@ module.exports = {
   CLIP_SECTIONS_JSON: path.join(ROOT, 'data', 'clipSections.json'),
   CONCERT_SECTIONS_JSON: path.join(ROOT, 'data', 'concertSections.json'),
   CHANNELS_JSON: path.join(ROOT, 'data', 'channels.json'),
+  CHAT_BACKGROUND_IMG_JSON: path.join(ROOT, 'data', 'chatBackroundImg.json'),
 };

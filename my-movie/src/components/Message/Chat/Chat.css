@@ -142,6 +142,10 @@
   flex-direction: column;
   gap: 0.7rem;
   padding: 1rem 0.85rem 1.2rem;
+  background-color: #0e0d14;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .chat-notice {
