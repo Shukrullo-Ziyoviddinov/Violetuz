@@ -26,16 +26,34 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
     }
   };
 
-  const keepKeyboard = (event) => {
+  const closingRef = useRef(false);
+  const wasFocusedRef = useRef(false);
+
+  const beginClose = (event) => {
     event.preventDefault();
+    event.stopPropagation();
+    closingRef.current = true;
+    wasFocusedRef.current = document.activeElement === inputRef.current;
   };
 
-  const close = () => {
+  const close = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     setOpen(false);
+    if (!wasFocusedRef.current && inputRef.current) {
+      const stopFocus = () => {
+        if (document.activeElement === inputRef.current) inputRef.current.blur();
+      };
+      [0, 40, 120, 240].forEach((delay) => window.setTimeout(stopFocus, delay));
+    }
+    window.setTimeout(() => {
+      closingRef.current = false;
+    }, 400);
   };
 
   const openComposer = () => {
-    if (!disabled) setOpen(true);
+    if (disabled || closingRef.current) return;
+    setOpen(true);
   };
 
   return (
@@ -51,7 +69,14 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
             placeholder={placeholder}
             aria-label={placeholder}
             disabled={disabled}
-            onFocus={openComposer}
+            onFocus={(event) => {
+              if (closingRef.current && !wasFocusedRef.current) {
+                const node = event.target;
+                window.setTimeout(() => node.blur(), 0);
+                return;
+              }
+              openComposer();
+            }}
             onChange={(event) => {
               setFailed(false);
               setText(event.target.value);
@@ -77,8 +102,8 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
             className="chat-composer-back"
             aria-label={backLabel}
             tabIndex={open ? 0 : -1}
-            onPointerDown={keepKeyboard}
-            onMouseDown={keepKeyboard}
+            onPointerDown={beginClose}
+            onMouseDown={beginClose}
             onClick={close}
           >
             ‹
