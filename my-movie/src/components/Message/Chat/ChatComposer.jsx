@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 
-const ChatComposer = ({ lang, onSend, disabled = false }) => {
+const ChatComposer = ({ lang, onSend, onTyping, disabled = false }) => {
   const inputRef = useRef(null);
   const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
@@ -19,6 +19,7 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
     try {
       await onSend(value);
       setText('');
+      onTyping?.(false);
     } catch {
       setFailed(true);
     } finally {
@@ -66,8 +67,10 @@ const ChatComposer = ({ lang, onSend, disabled = false }) => {
             disabled={disabled}
             onFocus={openComposer}
             onChange={(event) => {
+              const next = event.target.value;
               setFailed(false);
-              setText(event.target.value);
+              setText(next);
+              onTyping?.(next.trim().length > 0);
             }}
           />
           <span className="chat-composer-field-icons" aria-hidden="true">

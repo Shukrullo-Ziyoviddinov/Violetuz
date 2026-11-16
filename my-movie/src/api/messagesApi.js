@@ -72,7 +72,17 @@ export const fetchChatThread = async (userId) => {
   return parseJson(response);
 };
 
-export const openChatStream = ({ onItem, onReconnect }) => {
+export const signalChatTyping = async (userId, typing) => {
+  const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}/typing`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ typing: typing === true }),
+  });
+  return parseJson(response);
+};
+
+export const openChatStream = ({ onItem, onTyping, onReconnect }) => {
   const source = new EventSource(`${API_BASE_URL}/messages/stream`, { withCredentials: true });
   source.onopen = () => {
     onReconnect?.();
@@ -81,6 +91,14 @@ export const openChatStream = ({ onItem, onReconnect }) => {
     try {
       const item = JSON.parse(event.data);
       if (item?.id) onItem?.(item);
+    } catch {
+      // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
+    }
+  });
+  source.addEventListener('typing', (event) => {
+    try {
+      const item = JSON.parse(event.data);
+      if (item?.userId) onTyping?.(item);
     } catch {
       // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
     }

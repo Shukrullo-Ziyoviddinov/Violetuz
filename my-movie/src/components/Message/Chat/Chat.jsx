@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
-import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage } from '../../../api/messagesApi';
+import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping } from '../../../api/messagesApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
 import { readTextChoice, textLookClass, textVars } from './chatTextFont';
@@ -30,7 +30,11 @@ const Chat = ({ userId }) => {
   const [headerColor, setHeaderColor] = useState(null);
   const [bubbles, setBubbles] = useState(readBubbleChoice);
   const [textChoice, setTextChoice] = useState(readTextChoice);
+  const [peerTyping, setPeerTyping] = useState(false);
   const loadToken = useRef(0);
+  const typingIdleRef = useRef(null);
+  const typingSentRef = useRef(false);
+  const typingPingRef = useRef(0);
 
   const load = useCallback(() => {
     const token = ++loadToken.current;
@@ -134,12 +138,24 @@ const Chat = ({ userId }) => {
     if (!authReady || !isLoggedIn || !userId) return undefined;
     let closed = false;
     const close = openChatStream({
+      onTyping: (item) => {
+        if (closed || !sameId(item.userId, userId)) return;
+        if (typingIdleRef.current) window.clearTimeout(typingIdleRef.current);
+        if (!item.typing) {
+          setPeerTyping(false);
+          return;
+        }
+        setPeerTyping(true);
+        typingIdleRef.current = window.setTimeout(() => setPeerTyping(false), 2500);
+      },
       onItem: (item) => {
         if (closed || !item?.id) return;
         const fromPeer = sameId(item.senderId, userId);
         const toPeer = sameId(item.recipientId, userId);
         if (!fromPeer && !toPeer) return;
         if (fromPeer) {
+          if (typingIdleRef.current) window.clearTimeout(typingIdleRef.current);
+          setPeerTyping(false);
           load().catch(() => {
             if (closed) return;
             setMessages((current) => (
@@ -162,10 +178,31 @@ const Chat = ({ userId }) => {
     document.addEventListener('visibilitychange', onVisible);
     return () => {
       closed = true;
+      if (typingIdleRef.current) window.clearTimeout(typingIdleRef.current);
       close();
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [authReady, isLoggedIn, load, userId]);
+
+  const reportTyping = (active) => {
+    if (!isLoggedIn || !userId) return;
+    const now = Date.now();
+    if (active) {
+      if (typingSentRef.current && now - typingPingRef.current < 1200) return;
+      typingSentRef.current = true;
+      typingPingRef.current = now;
+      signalChatTyping(userId, true).catch(() => {});
+      return;
+    }
+    if (!typingSentRef.current) return;
+    typingSentRef.current = false;
+    typingPingRef.current = 0;
+    signalChatTyping(userId, false).catch(() => {});
+  };
+
+  useEffect(() => () => {
+    if (typingSentRef.current && userId) signalChatTyping(userId, false).catch(() => {});
+  }, [userId]);
 
   const headerRgb = headerColor || HEADER_FALLBACK;
 
@@ -195,10 +232,17 @@ const Chat = ({ userId }) => {
         peer={peer}
         onBack={() => navigate(-1)}
       />
-      <ChatThread messages={messages} selfId={profile?.id} notice={notice} />
+      <ChatThread
+        messages={messages}
+        selfId={profile?.id}
+        notice={notice}
+        typing={peerTyping}
+        typingLabel={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}
+      />
       <ChatComposer
         lang={lang}
         disabled={!isLoggedIn || !peer}
+        onTyping={reportTyping}
         onSend={async (text) => {
           const saved = await sendChatMessage(userId, text);
           if (!saved?.id) return;

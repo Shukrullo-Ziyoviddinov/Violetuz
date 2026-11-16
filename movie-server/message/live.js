@@ -33,6 +33,26 @@ const addClient = (userId, res) => {
   };
 };
 
+const publishTyping = (userId, payload) => {
+  const key = streamKey(userId);
+  const bucket = clients.get(key);
+  const from = streamKey(payload?.userId);
+  if (!bucket?.size || !from) return 0;
+  const body = { userId: from, typing: payload?.typing === true };
+  const data = `event: typing\ndata: ${JSON.stringify(body)}\n\n`;
+  let sent = 0;
+  for (const res of [...bucket]) {
+    try {
+      res.write(data);
+      sent += 1;
+    } catch (_err) {
+      bucket.delete(res);
+    }
+  }
+  if (!bucket.size) clients.delete(key);
+  return sent;
+};
+
 const publishChatMessage = (userId, item) => {
   const key = streamKey(userId);
   const bucket = clients.get(key);
@@ -86,5 +106,6 @@ module.exports = {
   toLiveMessage,
   addClient,
   publishChatMessage,
+  publishTyping,
   attachStream,
 };

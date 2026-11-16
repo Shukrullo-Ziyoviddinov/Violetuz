@@ -5,9 +5,10 @@ const asyncHandler = require('../middleware/asyncHandler');
 const { requireAuth } = require('../middleware/auth.middleware');
 const { sendSuccess } = require('../utils/response');
 const { toMessageSelf } = require('./self');
-const { listInbox, openThread } = require('./thread');
+const { listInbox, openThread, isUserId, loadPeer } = require('./thread');
 const { sendChatMessage } = require('./send');
-const { attachStream } = require('./live');
+const { attachStream, publishTyping } = require('./live');
+const { badRequest } = require('../utils/errors');
 const { listBackgrounds, getMyBackground, saveMyBackground } = require('./background');
 
 /**
@@ -49,6 +50,17 @@ router.get('/stream', (req, res) => {
 router.get('/with/:userId', asyncHandler(async (req, res) => {
   const thread = await openThread(req.authUser._id, req.params.userId);
   return sendSuccess(res, { data: thread });
+}));
+
+router.post('/with/:userId/typing', asyncHandler(async (req, res) => {
+  const me = String(req.authUser._id || '').trim().toLowerCase();
+  const peer = String(req.params.userId || '').trim().toLowerCase();
+  if (!isUserId(me)) throw badRequest('Hisob topilmadi');
+  if (!isUserId(peer) || me === peer) throw badRequest('Suhbat topilmadi');
+  await loadPeer(peer);
+  const typing = req.body?.typing === true;
+  publishTyping(peer, { userId: me, typing });
+  return sendSuccess(res, { data: { typing } });
 }));
 
 router.post('/with/:userId', asyncHandler(async (req, res) => {
