@@ -9,13 +9,22 @@ body.chat-page-active .App {
   position: fixed;
   top: var(--chat-visible-top, 0px);
   right: 0;
-  bottom: var(--chat-visible-bottom, 0px);
+  bottom: max(var(--chat-visible-bottom, 0px), env(keyboard-inset-height, 0px));
   left: 0;
   height: auto;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition:
+    top 0.32s cubic-bezier(0.22, 0.8, 0.24, 1),
+    bottom 0.32s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.chat-page-active .App {
+    transition: none;
+  }
 }
 
 body.chat-page-active .App-main {

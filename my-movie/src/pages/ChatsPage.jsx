@@ -8,11 +8,18 @@ const ChatsPage = () => {
 
   useEffect(() => {
     const root = document.documentElement;
+    const keyboard = navigator.virtualKeyboard;
+    const previousOverlay = keyboard ? keyboard.overlaysContent : false;
+    if (keyboard) keyboard.overlaysContent = true;
+
     const syncVisibleHeight = () => {
       const viewport = window.visualViewport;
       const top = viewport ? viewport.offsetTop : 0;
-      const visibleBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
-      const bottom = Math.max(0, window.innerHeight - visibleBottom);
+      const fromViewport = viewport
+        ? Math.max(0, window.innerHeight - viewport.offsetTop - viewport.height)
+        : 0;
+      const fromKeyboard = keyboard?.boundingRect?.height || 0;
+      const bottom = Math.max(fromViewport, fromKeyboard);
       root.style.setProperty('--chat-visible-top', `${top}px`);
       root.style.setProperty('--chat-visible-bottom', `${bottom}px`);
     };
@@ -23,11 +30,18 @@ const ChatsPage = () => {
     window.visualViewport?.addEventListener('resize', syncVisibleHeight);
     window.visualViewport?.addEventListener('scroll', syncVisibleHeight);
     window.addEventListener('resize', syncVisibleHeight);
+    keyboard?.addEventListener('geometrychange', syncVisibleHeight);
+    document.addEventListener('focusin', syncVisibleHeight);
+    document.addEventListener('focusout', syncVisibleHeight);
 
     return () => {
       window.visualViewport?.removeEventListener('resize', syncVisibleHeight);
       window.visualViewport?.removeEventListener('scroll', syncVisibleHeight);
       window.removeEventListener('resize', syncVisibleHeight);
+      keyboard?.removeEventListener('geometrychange', syncVisibleHeight);
+      document.removeEventListener('focusin', syncVisibleHeight);
+      document.removeEventListener('focusout', syncVisibleHeight);
+      if (keyboard) keyboard.overlaysContent = previousOverlay;
       root.classList.remove('chat-page-lock');
       document.body.classList.remove('chat-page-active');
       root.style.removeProperty('--chat-visible-top');
