@@ -13,15 +13,21 @@ const ChatsPage = () => {
     if (keyboard) keyboard.overlaysContent = true;
 
     const motionMs = 460;
+    const atBottomPx = 48;
     let lastLift = 0;
     let pinBottom = false;
     let pinFrame = 0;
+    let followLatest = false;
+    let decided = false;
+    let settleTimer = 0;
 
     const stopPin = () => {
       pinBottom = false;
       if (pinFrame) window.cancelAnimationFrame(pinFrame);
       pinFrame = 0;
     };
+
+    const distanceFromBottom = (node) => node.scrollHeight - node.scrollTop - node.clientHeight;
 
     const followBottom = (until) => {
       const step = () => {
@@ -35,8 +41,21 @@ const ChatsPage = () => {
       pinFrame = window.requestAnimationFrame(step);
     };
 
+    const settleDecision = () => {
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => {
+        decided = false;
+        followLatest = false;
+        pinBottom = false;
+      }, motionMs + 80);
+    };
+
     const releasePin = (event) => {
-      if (event.target?.closest?.('.chat-thread')) stopPin();
+      if (!event.target?.closest?.('.chat-thread')) return;
+      stopPin();
+      followLatest = false;
+      decided = true;
+      settleDecision();
     };
 
     const syncVisibleHeight = () => {
@@ -50,19 +69,21 @@ const ChatsPage = () => {
       const keyboardOpen = inset > 120;
       const keyboardLift = keyboardOpen ? Math.round(inset) : 0;
       const thread = document.querySelector('.chat-thread');
-      const nearBottom = thread
-        ? thread.scrollHeight - thread.scrollTop - thread.clientHeight < lastLift + 96
-        : false;
       root.style.setProperty('--chat-visible-top', keyboardOpen ? '0px' : `${Math.round(offsetTop)}px`);
       root.style.setProperty('--chat-visible-bottom', keyboardOpen ? '0px' : `${Math.round(fromViewport)}px`);
       root.style.setProperty('--chat-keyboard-lift', `${keyboardLift}px`);
       if (keyboardLift !== lastLift) {
-        if (thread && (nearBottom || pinBottom)) {
+        if (!decided) {
+          followLatest = thread ? distanceFromBottom(thread) <= atBottomPx : false;
+          decided = true;
+        }
+        if (thread && followLatest) {
           pinBottom = true;
           followBottom(performance.now() + motionMs);
         } else {
           stopPin();
         }
+        settleDecision();
       }
       lastLift = keyboardLift;
     };
@@ -86,6 +107,7 @@ const ChatsPage = () => {
       document.removeEventListener('focusin', syncVisibleHeight);
       document.removeEventListener('focusout', syncVisibleHeight);
       document.removeEventListener('pointerdown', releasePin, true);
+      window.clearTimeout(settleTimer);
       stopPin();
       if (keyboard) keyboard.overlaysContent = previousOverlay;
       root.classList.remove('chat-page-lock');
