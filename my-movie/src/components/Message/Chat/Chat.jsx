@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
@@ -19,6 +19,19 @@ const HEADER_SHADOW_ALPHA = 0.34;
 
 const sameId = (left, right) => String(left || '').trim().toLowerCase() === String(right || '').trim().toLowerCase();
 
+const dropMatchedPending = (rows, incoming) => {
+  const left = [...rows];
+  incoming.forEach((item) => {
+    const index = left.findIndex((row) => (
+      row.status === 'sending'
+      && row.text === item.text
+      && sameId(row.senderId, item.senderId)
+    ));
+    if (index >= 0) left.splice(index, 1);
+  });
+  return left;
+};
+
 const Chat = ({ userId }) => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
@@ -33,10 +46,12 @@ const Chat = ({ userId }) => {
   const [textChoice, setTextChoice] = useState(readTextChoice);
   const [peerTyping, setPeerTyping] = useState(false);
   const [peerOnline, setPeerOnline] = useState(false);
+  const [pending, setPending] = useState([]);
   const loadToken = useRef(0);
   const typingIdleRef = useRef(null);
   const typingSentRef = useRef(false);
   const typingPingRef = useRef(0);
+  const localSeq = useRef(0);
 
   const load = useCallback(() => {
     const token = ++loadToken.current;
@@ -46,7 +61,9 @@ const Chat = ({ userId }) => {
         const stale = token !== loadToken.current;
         if (!stale) {
           setPeer(data?.peer || null);
-          setMessages(Array.isArray(data?.messages) ? data.messages : []);
+          const incoming = Array.isArray(data?.messages) ? data.messages : [];
+          setMessages(incoming);
+          setPending((current) => dropMatchedPending(current, incoming));
         }
         return { stale };
       },
@@ -62,10 +79,12 @@ const Chat = ({ userId }) => {
     if (!isLoggedIn) {
       setPeer(null);
       setMessages([]);
+      setPending([]);
       setReady(true);
       return undefined;
     }
     let cancelled = false;
+    setPending([]);
     setReady(false);
     load()
       .catch((err) => {
@@ -195,6 +214,7 @@ const Chat = ({ userId }) => {
         setMessages((current) => (
           current.some((row) => row.id === item.id) ? current : [...current, item]
         ));
+        setPending((current) => dropMatchedPending(current, [item]));
       },
       onReconnect: () => {
         if (!closed) load().catch(() => {});
@@ -211,6 +231,57 @@ const Chat = ({ userId }) => {
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [authReady, isLoggedIn, load, userId]);
+
+  const deliver = (localId, text) => {
+    sendChatMessage(userId, text)
+      .then((saved) => {
+        if (!saved?.id) {
+          setPending((current) => current.map((row) => (
+            row.id === localId ? { ...row, status: 'failed' } : row
+          )));
+          return;
+        }
+        setPending((current) => current.filter((row) => row.id !== localId));
+        setMessages((current) => (
+          current.some((row) => row.id === saved.id) ? current : [...current, saved]
+        ));
+      })
+      .catch(() => {
+        setPending((current) => current.map((row) => (
+          row.id === localId ? { ...row, status: 'failed' } : row
+        )));
+      });
+  };
+
+  const sendNow = (text) => {
+    const localId = `local-${Date.now()}-${localSeq.current + 1}`;
+    localSeq.current += 1;
+    setPending((current) => [...current, {
+      id: localId,
+      senderId: profile?.id,
+      recipientId: userId,
+      text,
+      createdAt: new Date().toISOString(),
+      status: 'sending',
+    }]);
+    deliver(localId, text);
+  };
+
+  const retrySend = (localId) => {
+    let text = '';
+    setPending((current) => current.map((row) => {
+      if (row.id !== localId) return row;
+      text = row.text;
+      return { ...row, status: 'sending' };
+    }));
+    if (text) deliver(localId, text);
+  };
+
+  const shownMessages = useMemo(() => (
+    [...messages, ...pending].sort((left, right) => (
+      new Date(left.createdAt || 0).getTime() - new Date(right.createdAt || 0).getTime()
+    ))
+  ), [messages, pending]);
 
   const reportTyping = (active) => {
     if (!isLoggedIn || !userId) return;
@@ -262,10 +333,12 @@ const Chat = ({ userId }) => {
         online={peerOnline}
       />
       <ChatThread
-        messages={messages}
+        messages={shownMessages}
         selfId={profile?.id}
         notice={notice}
         typing={peerTyping}
+        lang={lang}
+        onRetry={retrySend}
       />
       {peerTyping ? (
         <div className="chat-typing" role="status">
@@ -276,13 +349,7 @@ const Chat = ({ userId }) => {
         lang={lang}
         disabled={!isLoggedIn || !peer}
         onTyping={reportTyping}
-        onSend={async (text) => {
-          const saved = await sendChatMessage(userId, text);
-          if (!saved?.id) return;
-          setMessages((current) => (
-            current.some((row) => row.id === saved.id) ? current : [...current, saved]
-          ));
-        }}
+        onSend={sendNow}
       />
     </section>
   );

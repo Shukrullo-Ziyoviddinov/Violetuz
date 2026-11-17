@@ -4,27 +4,16 @@ const ChatComposer = ({ lang, onSend, onTyping, disabled = false }) => {
   const inputRef = useRef(null);
   const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [failed, setFailed] = useState(false);
   const placeholder = lang === 'ru' ? 'Сообщение' : 'Xabar';
-  const failedLabel = lang === 'ru' ? 'Не отправилось' : 'Yuborilmadi';
   const backLabel = lang === 'ru' ? 'Назад' : 'Orqaga';
 
-  const submit = async (event) => {
+  const submit = (event) => {
     event.preventDefault();
     const value = text.trim();
-    if (!value || sending || disabled || !onSend) return;
-    setSending(true);
-    setFailed(false);
-    try {
-      await onSend(value);
-      setText('');
-      onTyping?.(false);
-    } catch {
-      setFailed(true);
-    } finally {
-      setSending(false);
-    }
+    if (!value || disabled || !onSend) return;
+    setText('');
+    onTyping?.(false);
+    onSend(value);
   };
 
   const keyboardIsOpen = () => {
@@ -54,7 +43,6 @@ const ChatComposer = ({ lang, onSend, onTyping, disabled = false }) => {
 
   return (
     <div className="chat-composer-wrap">
-      {failed ? <p className="chat-composer-error" role="alert">{failedLabel}</p> : null}
       <form className={`chat-composer${open ? ' is-open' : ''}`} onSubmit={submit}>
         <div className="chat-composer-field" onPointerDown={openComposer}>
           <input
@@ -68,7 +56,6 @@ const ChatComposer = ({ lang, onSend, onTyping, disabled = false }) => {
             onFocus={openComposer}
             onChange={(event) => {
               const next = event.target.value;
-              setFailed(false);
               setText(next);
               onTyping?.(next.trim().length > 0);
             }}

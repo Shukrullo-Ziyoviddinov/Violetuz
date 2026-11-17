@@ -166,6 +166,44 @@
   background: transparent;
 }
 
+.chat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: min(82%, 22rem);
+  gap: 4px;
+}
+
+.chat-item.is-mine {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.chat-item .chat-block {
+  align-self: auto;
+  max-width: 100%;
+}
+
+.chat-send-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 4px 0 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.62);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  cursor: default;
+}
+
+.chat-send-status.is-failed {
+  color: #ff6b6b;
+  cursor: pointer;
+}
+
 .chat-notice {
   margin: 2rem auto 0;
   max-width: 16rem;
