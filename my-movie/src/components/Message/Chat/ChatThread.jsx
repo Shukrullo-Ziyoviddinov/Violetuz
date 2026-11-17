@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import UserAvatar from '../../UserAvatar/UserAvatar';
 import ChatMessageBlock from './ChatMessageBlock';
+import ChatReplySwipe from './ChatReplySwipe';
 
 const clockIcon = (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -43,6 +44,22 @@ const formatClock = (value) => {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
+};
+
+const sameId = (left, right) => String(left || '').trim().toLowerCase() === String(right || '').trim().toLowerCase();
+
+const replyLabel = (item, mine, selfId, lang) => {
+  const quoteMine = sameId(item.replyTo?.senderId, selfId);
+  if (lang === 'ru') {
+    if (mine && quoteMine) return 'Ответ себе';
+    if (mine) return 'Ваш ответ';
+    if (quoteMine) return 'Вам ответили';
+    return 'Ответ себе';
+  }
+  if (mine && quoteMine) return 'O‘zingizga javob';
+  if (mine) return 'Sizning javobingiz';
+  if (quoteMine) return 'Sizga javob berdi';
+  return 'O‘ziga javob';
 };
 
 const sendCopy = (lang) => (lang === 'ru'
@@ -93,7 +110,7 @@ const ChatSendStatus = ({ item, lang, onRetry, peer }) => {
   );
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, peer }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, peer }) => {
   const threadRef = useRef(null);
 
   useEffect(() => {
@@ -107,15 +124,27 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, peer }) =
       {messages.map((item) => {
         const mine = String(item.senderId || '').trim().toLowerCase() === String(selfId || '').trim().toLowerCase();
         const clock = formatClock(item.createdAt);
+        const quote = String(item.replyTo?.text || '').trim();
         return (
           <div key={item.id} className={`chat-item${mine ? ' is-mine' : ''}`}>
-            <ChatMessageBlock
-              text={item.text}
+            {quote ? <p className="chat-reply-label">{replyLabel(item, mine, selfId, lang)}</p> : null}
+            <ChatReplySwipe
               mine={mine}
-              status={mine
-                ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} />
-                : (clock ? <p className="chat-send-status is-in">{clock}</p> : null)}
-            />
+              onReply={() => {
+                if (String(item.id || '').startsWith('local-')) return false;
+                onReply?.(item);
+                return true;
+              }}
+            >
+              <ChatMessageBlock
+                text={item.text}
+                mine={mine}
+                quote={quote}
+                status={mine
+                  ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} />
+                  : (clock ? <p className="chat-send-status is-in">{clock}</p> : null)}
+              />
+            </ChatReplySwipe>
           </div>
         );
       })}

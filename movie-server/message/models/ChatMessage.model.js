@@ -31,6 +31,11 @@ const chatMessageSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    replyTo: {
+      id: { type: String, default: '' },
+      senderId: { type: String, default: '' },
+      text: { type: String, default: '', maxlength: 2000 },
+    },
   },
   {
     timestamps: true,

@@ -47,6 +47,7 @@ const Chat = ({ userId }) => {
   const [peerTyping, setPeerTyping] = useState(false);
   const [peerOnline, setPeerOnline] = useState(false);
   const [pending, setPending] = useState([]);
+  const [replyTarget, setReplyTarget] = useState(null);
   const loadToken = useRef(0);
   const typingIdleRef = useRef(null);
   const typingSentRef = useRef(false);
@@ -101,11 +102,13 @@ const Chat = ({ userId }) => {
       setPeer(null);
       setMessages([]);
       setPending([]);
+      setReplyTarget(null);
       setReady(true);
       return undefined;
     }
     let cancelled = false;
     setPending([]);
+    setReplyTarget(null);
     setReady(false);
     load()
       .catch((err) => {
@@ -260,8 +263,8 @@ const Chat = ({ userId }) => {
     };
   }, [authReady, isLoggedIn, load, userId]);
 
-  const deliver = (localId, text) => {
-    sendChatMessage(userId, text)
+  const deliver = (localId, text, replyTo = null) => {
+    sendChatMessage(userId, text, replyTo)
       .then((saved) => {
         if (!saved?.id) {
           setPending((current) => current.map((row) => (
@@ -281,9 +284,22 @@ const Chat = ({ userId }) => {
       });
   };
 
+  const beginReply = (item) => {
+    const text = String(item?.text || '').trim();
+    if (!item?.id || !text || String(item.id).startsWith('local-')) return false;
+    setReplyTarget({
+      id: item.id,
+      senderId: item.senderId,
+      text,
+    });
+    return true;
+  };
+
   const sendNow = (text) => {
+    const replyTo = replyTarget;
     const localId = `local-${Date.now()}-${localSeq.current + 1}`;
     localSeq.current += 1;
+    setReplyTarget(null);
     setPending((current) => [...current, {
       id: localId,
       senderId: profile?.id,
@@ -291,18 +307,21 @@ const Chat = ({ userId }) => {
       text,
       createdAt: new Date().toISOString(),
       status: 'sending',
+      replyTo: replyTo ? { ...replyTo } : null,
     }]);
-    deliver(localId, text);
+    deliver(localId, text, replyTo);
   };
 
   const retrySend = (localId) => {
     let text = '';
+    let replyTo = null;
     setPending((current) => current.map((row) => {
       if (row.id !== localId) return row;
       text = row.text;
+      replyTo = row.replyTo || null;
       return { ...row, status: 'sending' };
     }));
-    if (text) deliver(localId, text);
+    if (text) deliver(localId, text, replyTo);
   };
 
   const shownMessages = useMemo(() => (
@@ -368,6 +387,7 @@ const Chat = ({ userId }) => {
         typing={peerTyping}
         lang={lang}
         onRetry={retrySend}
+        onReply={beginReply}
         peer={peer}
       />
       {peerTyping ? (
@@ -382,6 +402,8 @@ const Chat = ({ userId }) => {
         disabled={!isLoggedIn || !peer}
         onTyping={reportTyping}
         onSend={sendNow}
+        reply={replyTarget}
+        onCancelReply={() => setReplyTarget(null)}
       />
     </section>
   );

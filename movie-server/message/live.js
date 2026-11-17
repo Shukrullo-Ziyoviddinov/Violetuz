@@ -7,6 +7,16 @@
 
 const clients = new Map();
 
+const toLiveReply = (value) => {
+  const text = String(value?.text || '').trim();
+  if (!text) return null;
+  return {
+    id: String(value.id || ''),
+    senderId: String(value.senderId || ''),
+    text,
+  };
+};
+
 const toLiveMessage = (row) => ({
   id: String(row._id || row.id || ''),
   conversationId: String(row.conversationId || ''),
@@ -15,6 +25,7 @@ const toLiveMessage = (row) => ({
   text: String(row.text || ''),
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
+  replyTo: toLiveReply(row.replyTo),
 });
 
 const streamKey = (userId) => String(userId || '').trim().toLowerCase();

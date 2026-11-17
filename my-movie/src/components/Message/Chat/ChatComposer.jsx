@@ -1,11 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-const ChatComposer = ({ lang, onSend, onTyping, disabled = false }) => {
+const ChatComposer = ({ lang, onSend, onTyping, disabled = false, reply = null, onCancelReply }) => {
   const inputRef = useRef(null);
   const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
   const placeholder = lang === 'ru' ? 'Сообщение' : 'Xabar';
   const backLabel = lang === 'ru' ? 'Назад' : 'Orqaga';
+  const closeLabel = lang === 'ru' ? 'Закрыть' : 'Yopish';
+
+  useEffect(() => {
+    if (reply?.id && !disabled) inputRef.current?.focus();
+  }, [reply?.id, disabled]);
 
   const submit = (event) => {
     event.preventDefault();
@@ -43,6 +48,15 @@ const ChatComposer = ({ lang, onSend, onTyping, disabled = false }) => {
 
   return (
     <div className="chat-composer-wrap">
+      {reply?.text ? (
+        <div className="chat-reply-draft">
+          <span className="chat-reply-film" aria-hidden="true" />
+          <span className="chat-reply-draft-text">{reply.text}</span>
+          <button type="button" className="chat-reply-draft-x" aria-label={closeLabel} onClick={onCancelReply}>
+            ×
+          </button>
+        </div>
+      ) : null}
       <form className={`chat-composer${open ? ' is-open' : ''}`} onSubmit={submit}>
         <div className="chat-composer-field" onPointerDown={openComposer}>
           <input

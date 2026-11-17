@@ -8,7 +8,22 @@ const { badRequest } = require('../utils/errors');
 /**
  * Xabarni saqlaydi, keyin ikkala ochiq sahifaga yuboradi.
  */
-const sendChatMessage = async (meId, peerId, rawText) => {
+const loadReply = async (conversationId, rawReply) => {
+  const replyId = String(rawReply?.id || '').trim();
+  if (!replyId || !isUserId(replyId)) return null;
+  const source = await ChatMessage.findOne({
+    _id: replyId,
+    conversationId,
+  }).select('senderId text').lean();
+  if (!source) throw badRequest('Javob xabari topilmadi');
+  return {
+    id: String(source._id),
+    senderId: String(source.senderId || ''),
+    text: String(source.text || '').slice(0, 2000),
+  };
+};
+
+const sendChatMessage = async (meId, peerId, rawText, rawReply = null) => {
   const me = String(meId || '').trim().toLowerCase();
   const peer = String(peerId || '').trim().toLowerCase();
   if (!isUserId(me)) throw badRequest('Hisob topilmadi');
@@ -16,11 +31,13 @@ const sendChatMessage = async (meId, peerId, rawText) => {
   await loadPeer(peer);
   const text = cleanText(rawText);
   const conversation = await ensureConversation(me, peer);
+  const replyTo = await loadReply(conversation._id, rawReply);
   const row = await ChatMessage.create({
     conversationId: conversation._id,
     senderId: me,
     recipientId: peer,
     text,
+    ...(replyTo ? { replyTo } : {}),
   });
   const item = toClientMessage(row);
   try {

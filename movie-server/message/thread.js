@@ -23,6 +23,16 @@ const toPublicPeer = (user) => ({
   avatar: String(user.avatar || '').trim(),
 });
 
+const toReply = (value) => {
+  const text = String(value?.text || '').trim();
+  if (!text) return null;
+  return {
+    id: String(value.id || ''),
+    senderId: String(value.senderId || ''),
+    text,
+  };
+};
+
 const toClientMessage = (row) => ({
   id: String(row._id || row.id || ''),
   conversationId: String(row.conversationId || ''),
@@ -31,6 +41,7 @@ const toClientMessage = (row) => ({
   text: String(row.text || ''),
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
+  replyTo: toReply(row.replyTo),
 });
 
 const loadPeer = async (peerId) => {
@@ -68,7 +79,7 @@ const listMessages = async (conversationId) => {
   const rows = await ChatMessage.find({ conversationId })
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
-    .select('conversationId senderId recipientId text createdAt readAt')
+    .select('conversationId senderId recipientId text createdAt readAt replyTo')
     .lean();
   return rows.reverse().map(toClientMessage);
 };

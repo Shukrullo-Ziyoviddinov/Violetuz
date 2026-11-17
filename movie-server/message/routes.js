@@ -64,7 +64,12 @@ router.post('/with/:userId/typing', asyncHandler(async (req, res) => {
 }));
 
 router.post('/with/:userId', asyncHandler(async (req, res) => {
-  const message = await sendChatMessage(req.authUser._id, req.params.userId, req.body?.text);
+  const message = await sendChatMessage(
+    req.authUser._id,
+    req.params.userId,
+    req.body?.text,
+    req.body?.replyTo
+  );
   return sendSuccess(res, { data: message }, 201);
 }));
 
