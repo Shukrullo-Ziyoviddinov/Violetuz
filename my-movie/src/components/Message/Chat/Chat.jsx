@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
@@ -52,6 +52,27 @@ const Chat = ({ userId }) => {
   const typingSentRef = useRef(false);
   const typingPingRef = useRef(0);
   const localSeq = useRef(0);
+  const chatRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const root = chatRef.current;
+    if (!root) return undefined;
+    const header = root.querySelector('.chat-header');
+    const composer = root.querySelector('.chat-composer-wrap');
+    const apply = () => {
+      const typing = root.querySelector('.chat-typing');
+      const top = header?.offsetHeight || 0;
+      const bottom = (composer?.offsetHeight || 0) + (typing?.offsetHeight || 0);
+      root.style.setProperty('--chat-overlay-top', `${top}px`);
+      root.style.setProperty('--chat-overlay-bottom', `${bottom}px`);
+    };
+    apply();
+    if (typeof ResizeObserver !== 'function') return undefined;
+    const observer = new ResizeObserver(apply);
+    if (header) observer.observe(header);
+    if (composer) observer.observe(composer);
+    return () => observer.disconnect();
+  }, [peerTyping]);
 
   const load = useCallback(() => {
     const token = ++loadToken.current;
@@ -322,6 +343,7 @@ const Chat = ({ userId }) => {
 
   return (
     <section
+      ref={chatRef}
       className={`chat ${textLookClass(textChoice.look)}`.trim()}
       style={{
         ...(backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}),

@@ -14,14 +14,14 @@ const ChatsPage = () => {
 
     const syncVisibleHeight = () => {
       const viewport = window.visualViewport;
-      const top = viewport ? viewport.offsetTop : 0;
+      const offsetTop = viewport ? viewport.offsetTop : 0;
       const fromViewport = viewport
-        ? Math.max(0, window.innerHeight - viewport.offsetTop - viewport.height)
+        ? Math.max(0, window.innerHeight - offsetTop - viewport.height)
         : 0;
       const fromKeyboard = keyboard?.boundingRect?.height || 0;
-      const bottom = Math.max(fromViewport, fromKeyboard);
-      root.style.setProperty('--chat-visible-top', `${top}px`);
-      root.style.setProperty('--chat-visible-bottom', `${bottom}px`);
+      const keyboardOpen = Math.max(fromViewport, fromKeyboard) > 120;
+      root.style.setProperty('--chat-visible-top', keyboardOpen ? '0px' : `${Math.round(offsetTop)}px`);
+      root.style.setProperty('--chat-visible-bottom', keyboardOpen ? '0px' : `${Math.round(fromViewport)}px`);
     };
 
     root.classList.add('chat-page-lock');

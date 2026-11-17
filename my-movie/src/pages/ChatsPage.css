@@ -9,7 +9,7 @@ body.chat-page-active .App {
   position: fixed;
   top: var(--chat-visible-top, 0px);
   right: 0;
-  bottom: max(var(--chat-visible-bottom, 0px), env(keyboard-inset-height, 0px));
+  bottom: var(--chat-visible-bottom, 0px);
   left: 0;
   height: auto;
   min-height: 0;
