@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User.model');
 const { ChatConversation, ChatMessage } = require('./models');
 const { badRequest, notFound } = require('../utils/errors');
+const { publishRead } = require('./live');
 
 const USER_ID_RE = /^[a-f0-9]{24}$/i;
 const TEXT_MAX = 2000;
@@ -29,6 +30,7 @@ const toClientMessage = (row) => ({
   recipientId: String(row.recipientId || ''),
   text: String(row.text || ''),
   createdAt: row.createdAt || null,
+  readAt: row.readAt || null,
 });
 
 const loadPeer = async (peerId) => {
@@ -66,17 +68,20 @@ const listMessages = async (conversationId) => {
   const rows = await ChatMessage.find({ conversationId })
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
-    .select('conversationId senderId recipientId text createdAt')
+    .select('conversationId senderId recipientId text createdAt readAt')
     .lean();
   return rows.reverse().map(toClientMessage);
 };
 
 const markThreadRead = async (meId, conversationId) => {
-  if (!conversationId) return;
-  await ChatMessage.updateMany(
+  if (!conversationId) return null;
+  const readAt = new Date();
+  const result = await ChatMessage.updateMany(
     { conversationId, recipientId: meId, readAt: null },
-    { $set: { readAt: new Date() } }
+    { $set: { readAt } }
   );
+  if (!result?.modifiedCount) return null;
+  return readAt;
 };
 
 const openThread = async (meId, peerId) => {
@@ -87,7 +92,8 @@ const openThread = async (meId, peerId) => {
   const person = await loadPeer(peer);
   const conversation = await findConversation(me, peer);
   const messages = await listMessages(conversation?._id);
-  await markThreadRead(me, conversation?._id);
+  const readAt = await markThreadRead(me, conversation?._id);
+  if (readAt) publishRead(peer, { userId: me, readAt });
   return {
     peer: toPublicPeer(person),
     messages,

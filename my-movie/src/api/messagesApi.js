@@ -82,7 +82,7 @@ export const signalChatTyping = async (userId, typing) => {
   return parseJson(response);
 };
 
-export const openChatStream = ({ onItem, onTyping, onReconnect }) => {
+export const openChatStream = ({ onItem, onTyping, onRead, onReconnect }) => {
   const source = new EventSource(`${API_BASE_URL}/messages/stream`, { withCredentials: true });
   source.onopen = () => {
     onReconnect?.();
@@ -99,6 +99,14 @@ export const openChatStream = ({ onItem, onTyping, onReconnect }) => {
     try {
       const item = JSON.parse(event.data);
       if (item?.userId) onTyping?.(item);
+    } catch {
+      // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
+    }
+  });
+  source.addEventListener('read', (event) => {
+    try {
+      const item = JSON.parse(event.data);
+      if (item?.userId && item?.readAt) onRead?.(item);
     } catch {
       // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
     }

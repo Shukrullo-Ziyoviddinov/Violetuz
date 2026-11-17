@@ -195,6 +195,13 @@ const Chat = ({ userId }) => {
         setPeerTyping(true);
         typingIdleRef.current = window.setTimeout(() => setPeerTyping(false), 2500);
       },
+      onRead: (item) => {
+        if (closed || !sameId(item.userId, userId) || !item.readAt) return;
+        setMessages((current) => current.map((row) => {
+          if (sameId(row.senderId, userId) || row.readAt) return row;
+          return { ...row, readAt: item.readAt };
+        }));
+      },
       onItem: (item) => {
         if (closed || !item?.id) return;
         const fromPeer = sameId(item.senderId, userId);
@@ -339,6 +346,7 @@ const Chat = ({ userId }) => {
         typing={peerTyping}
         lang={lang}
         onRetry={retrySend}
+        peer={peer}
       />
       {peerTyping ? (
         <div className="chat-typing" role="status">

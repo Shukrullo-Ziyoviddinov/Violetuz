@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 import ChatMessageBlock from './ChatMessageBlock';
 
 const clockIcon = (
@@ -22,6 +23,20 @@ const checkIcon = (
   </svg>
 );
 
+const readIcon = (
+  <svg width="16" height="12" viewBox="0 0 28 14" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+    <path d="M1.5 7.5 5.2 11.2 12.5 3" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 7.5 12.7 11.2 20 3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const initialsOf = (name) => {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+};
+
 const formatClock = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
@@ -31,10 +46,10 @@ const formatClock = (value) => {
 };
 
 const sendCopy = (lang) => (lang === 'ru'
-  ? { sending: 'Отправляется', failed: 'Не отправлено', retry: 'Повторить', delivered: 'Доставлено' }
-  : { sending: 'Yuborilmoqda', failed: 'Yuborilmadi', retry: 'Qayta urinish', delivered: 'Yetkazildi' });
+  ? { sending: 'Отправляется', failed: 'Не отправлено', retry: 'Повторить', delivered: 'Доставлено', read: 'Прочитано' }
+  : { sending: 'Yuborilmoqda', failed: 'Yuborilmadi', retry: 'Qayta urinish', delivered: 'Yetkazildi', read: 'O‘qildi' });
 
-const ChatSendStatus = ({ item, lang, onRetry }) => {
+const ChatSendStatus = ({ item, lang, onRetry, peer }) => {
   const copy = sendCopy(lang);
   const status = item.status || 'sent';
   if (status === 'sending') {
@@ -54,6 +69,22 @@ const ChatSendStatus = ({ item, lang, onRetry }) => {
     );
   }
   const clock = formatClock(item.createdAt);
+  if (item.readAt) {
+    return (
+      <p className="chat-send-status is-read">
+        {readIcon}
+        <span>{clock ? `${clock} · ${copy.read}` : copy.read}</span>
+        <span className="chat-send-avatar">
+          <UserAvatar
+            src={peer?.avatar}
+            className="chat-send-avatar-img"
+            alt=""
+            fallback={<span>{initialsOf(peer?.name)}</span>}
+          />
+        </span>
+      </p>
+    );
+  }
   return (
     <p className="chat-send-status">
       <span>{clock ? `${clock} · ${copy.delivered}` : copy.delivered}</span>
@@ -62,7 +93,7 @@ const ChatSendStatus = ({ item, lang, onRetry }) => {
   );
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, peer }) => {
   const threadRef = useRef(null);
 
   useEffect(() => {
@@ -78,7 +109,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry }) => {
         return (
           <div key={item.id} className={`chat-item${mine ? ' is-mine' : ''}`}>
             <ChatMessageBlock text={item.text} mine={mine} />
-            {mine ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} /> : null}
+            {mine ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} /> : null}
           </div>
         );
       })}
