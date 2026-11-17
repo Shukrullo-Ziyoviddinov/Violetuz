@@ -204,6 +204,10 @@
   cursor: pointer;
 }
 
+.chat-send-status.is-in {
+  margin: 0 0 0 4px;
+}
+
 .chat-send-status.is-read {
   color: #2ee6c7;
 }

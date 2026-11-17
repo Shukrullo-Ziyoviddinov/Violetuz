@@ -106,10 +106,12 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, peer }) =
       {notice ? <p className="chat-notice">{notice}</p> : null}
       {messages.map((item) => {
         const mine = String(item.senderId || '').trim().toLowerCase() === String(selfId || '').trim().toLowerCase();
+        const clock = formatClock(item.createdAt);
         return (
           <div key={item.id} className={`chat-item${mine ? ' is-mine' : ''}`}>
             <ChatMessageBlock text={item.text} mine={mine} />
             {mine ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} /> : null}
+            {!mine && clock ? <p className="chat-send-status is-in">{clock}</p> : null}
           </div>
         );
       })}
