@@ -32,12 +32,9 @@ const chatMessageSchema = new mongoose.Schema(
       default: null,
     },
     replyTo: {
-      type: new mongoose.Schema({
-        messageId: { type: String, default: '' },
-        senderId: { type: String, default: '' },
-        text: { type: String, default: '' },
-      }, { _id: false }),
-      default: undefined,
+      messageId: { type: String, trim: true, maxlength: 64 },
+      senderId: { type: String, trim: true, maxlength: 64 },
+      text: { type: String, trim: true, maxlength: 2000 },
     },
   },
   {

@@ -38,7 +38,7 @@ export const sendChatMessage = async (userId, text, replyTo = null) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       text,
-      ...(replyTo?.id ? { replyTo: { id: replyTo.id } } : {}),
+      ...(replyTo?.id ? { replyTo: { id: String(replyTo.id) } } : {}),
     }),
   });
   return parseJson(response);
