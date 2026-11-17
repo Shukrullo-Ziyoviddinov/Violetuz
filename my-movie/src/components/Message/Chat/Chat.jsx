@@ -349,8 +349,10 @@ const Chat = ({ userId }) => {
         peer={peer}
       />
       {peerTyping ? (
-        <div className="chat-typing" role="status">
-          {lang === 'ru' ? 'Печатает...' : 'Yozmoqda...'}
+        <div className="chat-typing" role="status" aria-label={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}>
+          <span className="chat-typing-dot" />
+          <span className="chat-typing-dot" />
+          <span className="chat-typing-dot" />
         </div>
       ) : null}
       <ChatComposer
