@@ -17,7 +17,7 @@ const loadReply = async (conversationId, rawReply) => {
   }).select('senderId text').lean();
   if (!source) throw badRequest('Javob xabari topilmadi');
   return {
-    id: String(source._id),
+    messageId: String(source._id),
     senderId: String(source.senderId || ''),
     text: String(source.text || '').slice(0, 2000),
   };

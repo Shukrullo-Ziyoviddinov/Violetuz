@@ -19,6 +19,21 @@ const HEADER_SHADOW_ALPHA = 0.34;
 
 const sameId = (left, right) => String(left || '').trim().toLowerCase() === String(right || '').trim().toLowerCase();
 
+const replyOf = (item) => (item?.replyTo?.text ? item.replyTo : null);
+
+const withKeptReply = (item, fallback) => (
+  replyOf(item) ? item : { ...item, replyTo: replyOf(fallback) }
+);
+
+const upsertMessage = (current, item) => {
+  const index = current.findIndex((row) => row.id === item.id);
+  if (index < 0) return [...current, item];
+  const replyTo = replyOf(item) || replyOf(current[index]);
+  const next = current.slice();
+  next[index] = { ...current[index], ...item, replyTo };
+  return next;
+};
+
 const dropMatchedPending = (rows, incoming) => {
   const left = [...rows];
   incoming.forEach((item) => {
@@ -63,7 +78,7 @@ const Chat = ({ userId }) => {
     const apply = () => {
       const typing = root.querySelector('.chat-typing');
       const top = header?.offsetHeight || 0;
-      const bottom = (composer?.offsetHeight || 0) + (typing?.offsetHeight || 0);
+      const bottom = (composer?.offsetHeight || 0) + (typing ? typing.offsetHeight + 18 : 0);
       root.style.setProperty('--chat-overlay-top', `${top}px`);
       root.style.setProperty('--chat-overlay-bottom', `${bottom}px`);
     };
@@ -242,10 +257,17 @@ const Chat = ({ userId }) => {
           });
           return;
         }
-        setMessages((current) => (
-          current.some((row) => row.id === item.id) ? current : [...current, item]
-        ));
-        setPending((current) => dropMatchedPending(current, [item]));
+        let shown = item;
+        setPending((current) => {
+          const index = current.findIndex((row) => (
+            row.status === 'sending'
+            && row.text === item.text
+            && sameId(row.senderId, item.senderId)
+          ));
+          if (index >= 0) shown = withKeptReply(item, current[index]);
+          return dropMatchedPending(current, [shown]);
+        });
+        setMessages((current) => upsertMessage(current, shown));
       },
       onReconnect: () => {
         if (!closed) load().catch(() => {});
@@ -272,10 +294,9 @@ const Chat = ({ userId }) => {
           )));
           return;
         }
+        const shown = withKeptReply(saved, replyTo);
         setPending((current) => current.filter((row) => row.id !== localId));
-        setMessages((current) => (
-          current.some((row) => row.id === saved.id) ? current : [...current, saved]
-        ));
+        setMessages((current) => upsertMessage(current, shown));
       })
       .catch(() => {
         setPending((current) => current.map((row) => (

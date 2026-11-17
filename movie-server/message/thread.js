@@ -27,7 +27,7 @@ const toReply = (value) => {
   const text = String(value?.text || '').trim();
   if (!text) return null;
   return {
-    id: String(value.id || ''),
+    id: String(value.messageId || value.id || ''),
     senderId: String(value.senderId || ''),
     text,
   };
