@@ -1,8 +1,18 @@
+@property --chat-keyboard-lift {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 html.chat-page-lock,
 body.chat-page-active {
   overflow: hidden;
   height: 100%;
   overscroll-behavior: none;
+}
+
+html.chat-page-lock {
+  transition: --chat-keyboard-lift 0.46s cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
 body.chat-page-active .App {
@@ -22,6 +32,7 @@ body.chat-page-active .App {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html.chat-page-lock,
   body.chat-page-active .App {
     transition: none;
   }
