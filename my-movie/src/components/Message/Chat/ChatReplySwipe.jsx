@@ -16,23 +16,29 @@ const ChatReplySwipe = ({ mine, onReply, children }) => {
   const [dragging, setDragging] = useState(false);
   const startRef = useRef(null);
   const lockedRef = useRef('');
-  const firedRef = useRef(false);
+  const dxRef = useRef(0);
+  const armedRef = useRef(false);
 
   const progress = Math.min(1, Math.abs(dx) / TRIGGER);
 
-  const finish = (event) => {
+  const finish = (event, commit) => {
     if (!startRef.current || event.pointerId !== startRef.current.id) return;
+    const filled = Math.abs(dxRef.current) >= TRIGGER;
     startRef.current = null;
     lockedRef.current = '';
+    dxRef.current = 0;
+    armedRef.current = false;
     setDragging(false);
     setDx(0);
+    if (commit && filled) onReply?.();
   };
 
   const onPointerDown = (event) => {
     if (event.button != null && event.button !== 0) return;
     startRef.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
     lockedRef.current = '';
-    firedRef.current = false;
+    dxRef.current = 0;
+    armedRef.current = false;
   };
 
   const onPointerMove = (event) => {
@@ -52,12 +58,14 @@ const ChatReplySwipe = ({ mine, onReply, children }) => {
     if (lockedRef.current !== 'x') return;
     const directed = mine ? Math.min(0, rawX) : Math.max(0, rawX);
     const next = Math.max(-MAX, Math.min(MAX, directed));
+    dxRef.current = next;
     setDx(next);
-    if (!firedRef.current && Math.abs(next) >= TRIGGER) {
-      const accepted = onReply?.();
-      if (accepted === false) return;
-      firedRef.current = true;
+    const filled = Math.abs(next) >= TRIGGER;
+    if (filled && !armedRef.current) {
+      armedRef.current = true;
       navigator.vibrate?.(18);
+    } else if (!filled) {
+      armedRef.current = false;
     }
   };
 
@@ -66,8 +74,8 @@ const ChatReplySwipe = ({ mine, onReply, children }) => {
       className={`chat-swipe${mine ? ' is-mine' : ''}${dragging ? ' is-dragging' : ''}`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={finish}
-      onPointerCancel={finish}
+      onPointerUp={(event) => finish(event, true)}
+      onPointerCancel={(event) => finish(event, false)}
     >
       <span className="chat-reply-cue" style={{ opacity: progress }} aria-hidden="true">
         <svg className="chat-reply-ring" viewBox="0 0 36 36">
