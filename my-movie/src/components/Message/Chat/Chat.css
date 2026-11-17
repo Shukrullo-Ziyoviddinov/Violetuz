@@ -254,8 +254,6 @@
   color: var(--chat-text-color, #fff);
   font-size: 0.98rem;
   line-height: 1.15;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
 .chat-block.is-mine {
@@ -265,22 +263,19 @@
 }
 
 .chat-block.has-status {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 8px;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .chat-block-text {
-  min-width: 0;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .chat-block .chat-send-status {
-  align-self: flex-end;
-  flex-shrink: 0;
-  margin: 0;
+  float: right;
+  margin: 0.12em 0 0 8px;
   white-space: nowrap;
 }
 
