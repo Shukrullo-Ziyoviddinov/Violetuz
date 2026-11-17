@@ -34,6 +34,12 @@ const upsertMessage = (current, item) => {
   return next;
 };
 
+const pendingMatch = (row, item) => (
+  row.status === 'sending'
+  && row.text === item.text
+  && sameId(row.senderId, item.senderId)
+);
+
 const dropMatchedPending = (rows, incoming) => {
   const left = [...rows];
   incoming.forEach((item) => {
@@ -69,6 +75,19 @@ const Chat = ({ userId }) => {
   const typingPingRef = useRef(0);
   const localSeq = useRef(0);
   const chatRef = useRef(null);
+  const pendingRef = useRef(pending);
+  const repliesRef = useRef(new Map());
+  pendingRef.current = pending;
+
+  const rememberReply = (messageId, replyTo) => {
+    if (messageId && replyTo?.text) repliesRef.current.set(messageId, replyTo);
+  };
+
+  const keepReply = (item, fallback = null) => {
+    const shown = withKeptReply(item, fallback || { replyTo: repliesRef.current.get(item?.id) });
+    rememberReply(shown.id, replyOf(shown));
+    return shown;
+  };
 
   useLayoutEffect(() => {
     const root = chatRef.current;
@@ -78,7 +97,7 @@ const Chat = ({ userId }) => {
     const apply = () => {
       const typing = root.querySelector('.chat-typing');
       const top = header?.offsetHeight || 0;
-      const bottom = (composer?.offsetHeight || 0) + (typing ? typing.offsetHeight + 18 : 0);
+      const bottom = (composer?.offsetHeight || 0) + (typing ? typing.offsetHeight + 12 : 0);
       root.style.setProperty('--chat-overlay-top', `${top}px`);
       root.style.setProperty('--chat-overlay-bottom', `${bottom}px`);
     };
@@ -99,8 +118,12 @@ const Chat = ({ userId }) => {
         if (!stale) {
           setPeer(data?.peer || null);
           const incoming = Array.isArray(data?.messages) ? data.messages : [];
-          setMessages(incoming);
-          setPending((current) => dropMatchedPending(current, incoming));
+          const kept = incoming.map((item) => {
+            const local = pendingRef.current.find((row) => pendingMatch(row, item));
+            return keepReply(item, local);
+          });
+          setMessages(kept);
+          setPending((current) => dropMatchedPending(current, kept));
         }
         return { stale };
       },
@@ -257,16 +280,9 @@ const Chat = ({ userId }) => {
           });
           return;
         }
-        let shown = item;
-        setPending((current) => {
-          const index = current.findIndex((row) => (
-            row.status === 'sending'
-            && row.text === item.text
-            && sameId(row.senderId, item.senderId)
-          ));
-          if (index >= 0) shown = withKeptReply(item, current[index]);
-          return dropMatchedPending(current, [shown]);
-        });
+        const local = pendingRef.current.find((row) => pendingMatch(row, item));
+        const shown = keepReply(item, local);
+        setPending((current) => dropMatchedPending(current, [shown]));
         setMessages((current) => upsertMessage(current, shown));
       },
       onReconnect: () => {
@@ -294,7 +310,8 @@ const Chat = ({ userId }) => {
           )));
           return;
         }
-        const shown = withKeptReply(saved, replyTo);
+        const shown = keepReply(withKeptReply(saved, replyTo), replyTo);
+        rememberReply(localId, replyOf(shown));
         setPending((current) => current.filter((row) => row.id !== localId));
         setMessages((current) => upsertMessage(current, shown));
       })
@@ -346,9 +363,11 @@ const Chat = ({ userId }) => {
   };
 
   const shownMessages = useMemo(() => (
-    [...messages, ...pending].sort((left, right) => (
-      new Date(left.createdAt || 0).getTime() - new Date(right.createdAt || 0).getTime()
-    ))
+    [...messages, ...pending]
+      .map((item) => keepReply(item))
+      .sort((left, right) => (
+        new Date(left.createdAt || 0).getTime() - new Date(right.createdAt || 0).getTime()
+      ))
   ), [messages, pending]);
 
   const reportTyping = (active) => {
