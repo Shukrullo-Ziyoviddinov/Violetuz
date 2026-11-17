@@ -12,6 +12,8 @@ const ChatsPage = () => {
     const previousOverlay = keyboard ? keyboard.overlaysContent : false;
     if (keyboard) keyboard.overlaysContent = true;
 
+    let lastLift = 0;
+
     const syncVisibleHeight = () => {
       const viewport = window.visualViewport;
       const offsetTop = viewport ? viewport.offsetTop : 0;
@@ -19,9 +21,22 @@ const ChatsPage = () => {
         ? Math.max(0, window.innerHeight - offsetTop - viewport.height)
         : 0;
       const fromKeyboard = keyboard?.boundingRect?.height || 0;
-      const keyboardOpen = Math.max(fromViewport, fromKeyboard) > 120;
+      const inset = Math.max(fromViewport, fromKeyboard);
+      const keyboardOpen = inset > 120;
+      const keyboardLift = keyboardOpen ? Math.round(inset) : 0;
+      const thread = document.querySelector('.chat-thread');
+      const nearBottom = thread
+        ? thread.scrollHeight - thread.scrollTop - thread.clientHeight < lastLift + 96
+        : false;
       root.style.setProperty('--chat-visible-top', keyboardOpen ? '0px' : `${Math.round(offsetTop)}px`);
       root.style.setProperty('--chat-visible-bottom', keyboardOpen ? '0px' : `${Math.round(fromViewport)}px`);
+      root.style.setProperty('--chat-keyboard-lift', `${keyboardLift}px`);
+      if (thread && nearBottom && keyboardLift !== lastLift) {
+        window.requestAnimationFrame(() => {
+          thread.scrollTop = thread.scrollHeight;
+        });
+      }
+      lastLift = keyboardLift;
     };
 
     root.classList.add('chat-page-lock');
@@ -46,6 +61,7 @@ const ChatsPage = () => {
       document.body.classList.remove('chat-page-active');
       root.style.removeProperty('--chat-visible-top');
       root.style.removeProperty('--chat-visible-bottom');
+      root.style.removeProperty('--chat-keyboard-lift');
     };
   }, []);
 
