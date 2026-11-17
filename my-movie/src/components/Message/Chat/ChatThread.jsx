@@ -112,9 +112,10 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, peer }) =
             <ChatMessageBlock
               text={item.text}
               mine={mine}
-              status={mine ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} /> : null}
+              status={mine
+                ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} />
+                : (clock ? <p className="chat-send-status is-in">{clock}</p> : null)}
             />
-            {!mine && clock ? <p className="chat-send-status is-in">{clock}</p> : null}
           </div>
         );
       })}
