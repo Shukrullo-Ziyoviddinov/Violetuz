@@ -264,6 +264,22 @@
   background: var(--chat-bubble-out-fill, #7c3aed);
 }
 
+.chat-block.has-status {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.chat-block-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-block .chat-send-status {
+  align-self: flex-end;
+  margin: 4px 0 0;
+}
+
 .chat-typing {
   align-self: flex-start;
   flex-shrink: 0;
