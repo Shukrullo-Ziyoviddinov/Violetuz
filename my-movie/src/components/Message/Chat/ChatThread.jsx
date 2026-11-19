@@ -110,6 +110,46 @@ const ChatSendStatus = ({ item, lang, onRetry, peer }) => {
   );
 };
 
+const overlaySpace = (node, name) => {
+  const value = Number.parseFloat(getComputedStyle(node).getPropertyValue(name));
+  return Number.isFinite(value) ? value : 0;
+};
+
+const revealRepliedMessage = (thread, messageId) => {
+  const id = String(messageId || '').trim();
+  if (!thread || !id) return;
+  const escaped = window.CSS?.escape ? CSS.escape(id) : id.replace(/"/g, '');
+  const item = thread.querySelector(`[data-message-id="${escaped}"]`);
+  const block = item?.querySelector('.chat-block');
+  if (!item || !block) return;
+  const chat = thread.parentElement || thread;
+  const viewTop = overlaySpace(chat, '--chat-overlay-top') + 8;
+  const viewBottomGap = overlaySpace(chat, '--chat-overlay-bottom') + 8;
+  const threadRect = thread.getBoundingClientRect();
+  const itemRect = item.getBoundingClientRect();
+  const limitTop = threadRect.top + viewTop;
+  const limitBottom = threadRect.bottom - viewBottomGap;
+  if (itemRect.top < limitTop || itemRect.bottom > limitBottom) {
+    thread.scrollTo({
+      top: Math.max(0, thread.scrollTop + itemRect.top - limitTop),
+      behavior: 'smooth',
+    });
+  }
+  if (block._replyFlashDone) block.removeEventListener('animationend', block._replyFlashDone);
+  const token = {};
+  block._replyFlash = token;
+  block.classList.remove('is-reply-flash');
+  void block.offsetWidth;
+  block.classList.add('is-reply-flash');
+  const done = (event) => {
+    if (event.animationName !== 'chat-reply-flash' || block._replyFlash !== token) return;
+    block.removeEventListener('animationend', done);
+    block.classList.remove('is-reply-flash');
+  };
+  block._replyFlashDone = done;
+  block.addEventListener('animationend', done);
+};
+
 const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, peer }) => {
   const threadRef = useRef(null);
 
@@ -118,15 +158,21 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
     if (node) node.scrollTop = node.scrollHeight;
   }, [messages, typing]);
 
+  const onThreadClick = (event) => {
+    const quote = event.target.closest?.('.chat-reply-quote');
+    if (!quote || !threadRef.current?.contains(quote)) return;
+    revealRepliedMessage(threadRef.current, quote.getAttribute('data-reply-id'));
+  };
+
   return (
-    <div className="chat-thread" ref={threadRef}>
+    <div className="chat-thread" ref={threadRef} onClick={onThreadClick}>
       {notice ? <p className="chat-notice">{notice}</p> : null}
       {messages.map((item) => {
         const mine = String(item.senderId || '').trim().toLowerCase() === String(selfId || '').trim().toLowerCase();
         const clock = formatClock(item.createdAt);
         const quote = String(item.replyTo?.text || '').trim();
         return (
-          <div key={item.id} className={`chat-item${mine ? ' is-mine' : ''}`}>
+          <div key={item.id} className={`chat-item${mine ? ' is-mine' : ''}`} data-message-id={item.id}>
             {quote ? <p className="chat-reply-label">{replyLabel(item, mine, selfId, lang)}</p> : null}
             <ChatReplySwipe
               mine={mine}
@@ -140,6 +186,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                 text={item.text}
                 mine={mine}
                 quote={quote}
+                replyId={item.replyTo?.id || ''}
                 status={mine
                   ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} />
                   : (clock ? <p className="chat-send-status is-in">{clock}</p> : null)}

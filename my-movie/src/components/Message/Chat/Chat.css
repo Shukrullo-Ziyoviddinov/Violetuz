@@ -251,6 +251,7 @@
 }
 
 .chat-block {
+  position: relative;
   align-self: flex-start;
   max-width: min(82%, 22rem);
   overflow: hidden;
@@ -298,9 +299,34 @@
   margin: 0 0 6px;
   min-width: 0;
   padding: 6px 8px;
+  border: 0;
   border-radius: 12px;
   background: var(--chat-quote-in-fill, rgba(255, 255, 255, 0.16));
   color: var(--chat-quote-in-ink, #fff);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.chat-reply-quote:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.72);
+  outline-offset: 2px;
+}
+
+.chat-block.is-reply-flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.46);
+  pointer-events: none;
+  animation: chat-reply-flash 2.4s ease forwards;
+}
+
+@keyframes chat-reply-flash {
+  0% { opacity: 1; }
+  40% { opacity: 0.86; }
+  100% { opacity: 0; }
 }
 
 .chat-block.is-mine .chat-reply-quote {
