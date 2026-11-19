@@ -12,8 +12,10 @@ const ChatMessageBlock = ({ text, mine, status = null, quote = '', replyId = '' 
         <span className="chat-reply-quote-text">{quote}</span>
       </button>
     ) : null}
-    <span className="chat-block-text">{text}</span>
-    {status}
+    <div className="chat-block-main">
+      <span className="chat-block-text">{text}</span>
+      {status}
+    </div>
   </div>
 );
 
