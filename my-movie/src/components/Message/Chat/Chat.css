@@ -304,13 +304,8 @@
 }
 
 .chat-block.is-mine .chat-reply-quote {
-  flex-direction: row-reverse;
-  background: var(--chat-quote-out-fill, rgba(255, 255, 255, 0.16));
+  background: var(--chat-quote-out-fill, rgba(0, 0, 0, 0.18));
   color: var(--chat-quote-out-ink, #fff);
-}
-
-.chat-block.is-mine.is-self-reply .chat-reply-quote {
-  flex-direction: row;
 }
 
 .chat-reply-film {

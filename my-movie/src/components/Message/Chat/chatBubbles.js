@@ -47,14 +47,14 @@ export const bubbleFill = (hex, mode) => {
 
 const quoteTone = (hex, mode) => {
   const base = HEX.test(hex || '') ? hex : DEFAULT_BUBBLE.incoming;
-  const lightBubble = luminance(base) > 0.45;
-  const shifted = mix(base, lightBubble ? 0 : 255, lightBubble ? 0.4 : 0.34);
+  const lightBubble = luminance(base) > 0.55;
+  const shifted = mix(base, lightBubble ? 0 : 255, lightBubble ? 0.22 : 0.14);
   const fill = mode === 'gradient'
-    ? `linear-gradient(135deg, ${mix(shifted, lightBubble ? 0 : 255, 0.2)}, ${shifted})`
+    ? `linear-gradient(135deg, ${mix(shifted, lightBubble ? 0 : 255, 0.1)}, ${shifted})`
     : shifted;
   return {
     fill,
-    ink: luminance(shifted) > 0.28 ? '#24182f' : '#ffffff',
+    ink: luminance(shifted) > 0.62 ? '#24182f' : '#ffffff',
   };
 };
 

@@ -139,7 +139,6 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
               <ChatMessageBlock
                 text={item.text}
                 mine={mine}
-                selfReply={mine && sameId(item.replyTo?.senderId, selfId)}
                 quote={quote}
                 status={mine
                   ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} />
