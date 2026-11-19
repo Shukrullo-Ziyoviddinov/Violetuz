@@ -29,16 +29,52 @@ const mix = (hex, toward, ratio) => {
   return `#${[channel(16), channel(8), channel(0)].map((part) => part.toString(16).padStart(2, '0')).join('')}`;
 };
 
+const luminance = (hex) => {
+  const value = Number.parseInt(hex.slice(1), 16);
+  const channel = (shift) => {
+    const part = (value >> shift) & 255;
+    const tone = part / 255;
+    return tone <= 0.03928 ? tone / 12.92 : ((tone + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(16) + 0.7152 * channel(8) + 0.0722 * channel(0);
+};
+
 export const bubbleFill = (hex, mode) => {
   if (!HEX.test(hex || '')) return DEFAULT_BUBBLE.outgoing;
   if (mode !== 'gradient') return hex;
   return `linear-gradient(135deg, ${mix(hex, 255, 0.42)}, ${hex})`;
 };
 
-export const bubbleVars = (choice) => ({
-  '--chat-bubble-in-fill': bubbleFill(choice?.incoming || DEFAULT_BUBBLE.incoming, choice?.mode),
-  '--chat-bubble-out-fill': bubbleFill(choice?.outgoing || DEFAULT_BUBBLE.outgoing, choice?.mode),
-});
+const quoteTone = (hex, mode) => {
+  const base = HEX.test(hex || '') ? hex : DEFAULT_BUBBLE.incoming;
+  const lightBubble = luminance(base) > 0.45;
+  const shifted = mix(base, lightBubble ? 0 : 255, lightBubble ? 0.4 : 0.34);
+  const fill = mode === 'gradient'
+    ? `linear-gradient(135deg, ${mix(shifted, lightBubble ? 0 : 255, 0.2)}, ${shifted})`
+    : shifted;
+  return {
+    fill,
+    ink: luminance(shifted) > 0.28 ? '#24182f' : '#ffffff',
+  };
+};
+
+export const bubbleVars = (choice) => {
+  const incoming = choice?.incoming || DEFAULT_BUBBLE.incoming;
+  const outgoing = choice?.outgoing || DEFAULT_BUBBLE.outgoing;
+  const mode = choice?.mode;
+  const quoteIn = quoteTone(incoming, mode);
+  const quoteOut = quoteTone(outgoing, mode);
+  return {
+    '--chat-bubble-in-fill': bubbleFill(incoming, mode),
+    '--chat-bubble-out-fill': bubbleFill(outgoing, mode),
+    '--chat-bubble-in-color': HEX.test(incoming) ? incoming : DEFAULT_BUBBLE.incoming,
+    '--chat-bubble-out-color': HEX.test(outgoing) ? outgoing : DEFAULT_BUBBLE.outgoing,
+    '--chat-quote-in-fill': quoteIn.fill,
+    '--chat-quote-out-fill': quoteOut.fill,
+    '--chat-quote-in-ink': quoteIn.ink,
+    '--chat-quote-out-ink': quoteOut.ink,
+  };
+};
 
 export const readBubbleChoice = () => {
   try {

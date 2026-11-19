@@ -1,7 +1,7 @@
 import React from 'react';
 
-const ChatMessageBlock = ({ text, mine, status = null, quote = '' }) => (
-  <div className={`chat-block${mine ? ' is-mine' : ''}${status ? ' has-status' : ''}${quote ? ' has-quote' : ''}`}>
+const ChatMessageBlock = ({ text, mine, status = null, quote = '', selfReply = false }) => (
+  <div className={`chat-block${mine ? ' is-mine' : ''}${selfReply ? ' is-self-reply' : ''}${status ? ' has-status' : ''}${quote ? ' has-quote' : ''}`}>
     {quote ? (
       <div className="chat-reply-quote">
         <span className="chat-reply-film" aria-hidden="true" />
