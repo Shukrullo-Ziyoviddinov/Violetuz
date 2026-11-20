@@ -491,6 +491,27 @@
   white-space: nowrap;
 }
 
+.chat-block.is-emoji {
+  background: transparent;
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+}
+
+.chat-block.is-emoji .chat-block-text {
+  font-size: 4.25rem;
+  line-height: 1;
+}
+
+.chat-block.is-emoji.is-emoji-row .chat-block-text {
+  font-size: 2.35rem;
+  line-height: 1.15;
+}
+
+.chat-block.is-emoji .chat-send-status {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+}
+
 .chat-typing {
   position: relative;
   z-index: 3;

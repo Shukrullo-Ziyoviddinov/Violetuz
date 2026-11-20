@@ -1984,3 +1984,29 @@ export const rememberEmoji = (id) => {
 };
 
 export const emojiFromId = (id) => emojiById.get(id) || null;
+
+const emojiPiece = (part) => {
+  if (/^\s+$/.test(part)) return 'space';
+  if (/^[#*0-9]\uFE0F\u20E3$/.test(part)) return 'emoji';
+  if (/^\p{Regional_Indicator}{2}$/u.test(part)) return 'emoji';
+  const core = part.replace(/[\uFE0F\u200D]/g, '').replace(/\p{Emoji_Modifier}/gu, '');
+  if (!core || /[0-9#*]/.test(core)) return 'text';
+  if (/^[\p{Extended_Pictographic}\p{Regional_Indicator}]+$/u.test(core)) return 'emoji';
+  return 'text';
+};
+
+export const emojiOnlyCount = (value) => {
+  const text = String(value || '').trim();
+  if (!text) return 0;
+  const parts = typeof Intl !== 'undefined' && Intl.Segmenter
+    ? [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((item) => item.segment)
+    : [...text];
+  let count = 0;
+  for (const part of parts) {
+    const kind = emojiPiece(part);
+    if (kind === 'space') continue;
+    if (kind !== 'emoji') return 0;
+    count += 1;
+  }
+  return count;
+};
