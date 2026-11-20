@@ -5,6 +5,7 @@ import './AnimationEmojModal.css';
 
 const CLOSE_MS = 340;
 const CLOSE_DRAG_PX = 80;
+const OPEN_GAP_PX = 10;
 
 const isMobileViewport = () =>
   typeof window !== 'undefined' && window.innerWidth <= 768;
@@ -108,6 +109,60 @@ const EMOJI_CATS = [
       <Icon>
         <path d="M12 21s6-5.1 6-10a6 6 0 1 0-12 0c0 4.9 6 10 6 10Z" />
         <circle cx="12" cy="11" r="1.7" />
+      </Icon>
+    ),
+  },
+  {
+    id: 'activity',
+    icon: (
+      <Icon>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 8.2v7.6M8.2 12h7.6" strokeLinecap="round" />
+      </Icon>
+    ),
+  },
+  {
+    id: 'objects',
+    icon: (
+      <Icon>
+        <path d="M9 18h6M10 21h4" strokeLinecap="round" />
+        <path d="M8.2 14.5a5 5 0 1 1 7.6 0" strokeLinecap="round" />
+      </Icon>
+    ),
+  },
+  {
+    id: 'symbols',
+    icon: (
+      <Icon>
+        <path d="M12 19.2s-5.2-3.2-5.2-7.1A2.9 2.9 0 0 1 12 9.6a2.9 2.9 0 0 1 5.2 2.5c0 3.9-5.2 7.1-5.2 7.1Z" />
+      </Icon>
+    ),
+  },
+  {
+    id: 'flags',
+    icon: (
+      <Icon>
+        <path d="M7 20.5V4.5" strokeLinecap="round" />
+        <path d="M7 5.2h9.2l-1.6 3.1 1.6 3.1H7" strokeLinejoin="round" />
+      </Icon>
+    ),
+  },
+  {
+    id: 'weather',
+    icon: (
+      <Icon>
+        <circle cx="12" cy="12" r="3.2" />
+        <path d="M12 4.2v1.8M12 18v1.8M4.2 12h1.8M18 12h1.8M6.4 6.4l1.3 1.3M16.3 16.3l1.3 1.3M17.6 6.4l-1.3 1.3M7.7 16.3l-1.3 1.3" strokeLinecap="round" />
+      </Icon>
+    ),
+  },
+  {
+    id: 'gesture',
+    icon: (
+      <Icon>
+        <path d="M9.2 11.2V7.4a1.3 1.3 0 0 1 2.6 0V11" strokeLinecap="round" />
+        <path d="M11.8 10.6V6.2a1.3 1.3 0 0 1 2.6 0v5.2" strokeLinecap="round" />
+        <path d="M8 12.2c0 3.4 1.6 6.2 4 6.2s4.2-2.4 4.2-5.2V9.2a1.2 1.2 0 0 0-2.4 0" strokeLinecap="round" />
       </Icon>
     ),
   },
@@ -217,7 +272,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
     const fieldHeight = document.querySelector('.chat-composer')?.offsetHeight || 0;
     if (fieldHeight) root.style.setProperty('--chat-emoji-field', `${fieldHeight}px`);
     const sheetH = sheetRef.current?.offsetHeight || 0;
-    const openLift = Math.max(0, sheetH - gapRef.current);
+    const openLift = Math.max(0, sheetH - gapRef.current + OPEN_GAP_PX);
     if (mobile && openLift) root.style.setProperty('--chat-emoji-span', `${openLift}px`);
     else root.style.setProperty('--chat-emoji-span', '0px');
     const progress = mobile && sheetOpen && !exiting && sheetH > 0

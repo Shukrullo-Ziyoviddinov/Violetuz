@@ -72,7 +72,7 @@
   left: 0.28rem;
   width: calc((100% - 0.56rem) / 3);
   border-radius: 12px;
-  background: #000;
+  background: #1e03d24d;
   pointer-events: none;
   transform: translateX(calc(var(--tab-index, 0) * 100%));
   transition: transform 0.45s cubic-bezier(0.22, 0.8, 0.24, 1);
@@ -143,7 +143,20 @@
   color: #8d8d8d;
 }
 
-.anim-emoji-icons,
+.anim-emoji-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.1rem 0.85rem 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+
 .anim-emoji-chips {
   display: flex;
   align-items: center;
@@ -174,7 +187,7 @@
 }
 
 .anim-emoji-icon-btn.is-on {
-  background: #000;
+  background: #1e03d24d;
   color: #fff;
 }
 
@@ -210,7 +223,7 @@
 }
 
 .anim-emoji-chip.is-on {
-  background: #000;
+  background: #1e03d24d;
 }
 
 .anim-emoji-body {
