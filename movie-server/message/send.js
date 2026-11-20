@@ -16,25 +16,35 @@ const loadReply = async (conversationId, rawReply) => {
   const source = await ChatMessage.findOne({
     _id: replyId,
     conversationId,
-  }).select('senderId text animated').lean();
+  }).select('senderId text animated animationId').lean();
   const sourceText = clip(source?.text, 2000);
   if (!sourceText) return null;
+  const sourceAnimationId = animationIdOf(source?.animationId);
   return {
     messageId: String(source._id),
     senderId: String(source.senderId || ''),
     text: sourceText,
-    ...(source.animated ? { animated: true } : {}),
+    ...(source.animated || sourceAnimationId ? { animated: true } : {}),
+    ...(sourceAnimationId ? { animationId: sourceAnimationId } : {}),
   };
 };
 
-const sendChatMessage = async (meId, peerId, rawText, rawReply = null, rawAnimated = false) => {
+const ANIMATION_ID_RE = /^[0-9]{1,12}$/;
+
+const animationIdOf = (value) => {
+  const id = String(value || '').trim();
+  return ANIMATION_ID_RE.test(id) ? id : '';
+};
+
+const sendChatMessage = async (meId, peerId, rawText, rawReply = null, rawAnimated = false, rawAnimationId = '') => {
   const me = String(meId || '').trim().toLowerCase();
   const peer = String(peerId || '').trim().toLowerCase();
   if (!isUserId(me)) throw badRequest('Hisob topilmadi');
   if (me === peer) throw badRequest('O‘zingizga xabar yozilmaydi');
   await loadPeer(peer);
   const text = cleanText(rawText);
-  const animated = rawAnimated === true && text.length <= 32 && !/\p{L}/u.test(text);
+  const animationId = animationIdOf(rawAnimationId);
+  const animated = Boolean(animationId) || (rawAnimated === true && text.length <= 32 && !/\p{L}/u.test(text));
   const conversation = await ensureConversation(me, peer);
   const replyTo = await loadReply(conversation._id, rawReply);
   let row = await ChatMessage.create({
@@ -43,6 +53,7 @@ const sendChatMessage = async (meId, peerId, rawText, rawReply = null, rawAnimat
     recipientId: peer,
     text,
     ...(animated ? { animated: true } : {}),
+    ...(animationId ? { animationId } : {}),
     ...(replyTo ? { replyTo } : {}),
   });
   if (replyTo && !clip(row.replyTo?.text, 2000)) {

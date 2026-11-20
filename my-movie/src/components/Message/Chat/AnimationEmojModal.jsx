@@ -17,6 +17,7 @@ import {
   readRecentAnimationIds,
   rememberAnimation,
 } from './chatAnimations';
+import ChatLottie from './ChatLottie';
 import './AnimationEmojModal.css';
 
 const CLOSE_MS = 340;
@@ -481,7 +482,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
   const sendStage = () => {
     if (!stage) return;
     setAnimRecent(rememberAnimation(stage.id));
-    onSendAnimation?.(stage.char);
+    onSendAnimation?.(stage);
     setStage(null);
   };
 
@@ -622,10 +623,10 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
                   key={item.id}
                   type="button"
                   className="anim-emoji-cell is-motion"
-                  aria-label={item.char}
+                  aria-label={item.name}
                   onClick={() => setStage(item)}
                 >
-                  <img src={emojiMotion(item.id)} alt="" draggable="false" />
+                  <ChatLottie id={item.id} className="anim-lottie" label={item.name} />
                 </button>
               ))}
             </div>
@@ -641,7 +642,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
           className="anim-stage"
           style={{ background: `radial-gradient(circle at 50% 38%, ${stage.tint} 0%, #14081c 58%, #07060c 100%)` }}
         >
-          <img className="anim-stage-art" src={emojiMotion(stage.id)} alt="" draggable="false" />
+          <ChatLottie id={stage.id} className="anim-stage-art" label={stage.name} />
           <div className="anim-stage-actions">
             <button type="button" className="anim-stage-cancel" aria-label={text.cancel} onClick={() => setStage(null)}>
               ×

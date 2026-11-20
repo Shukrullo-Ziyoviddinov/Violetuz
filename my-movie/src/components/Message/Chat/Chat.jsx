@@ -29,8 +29,14 @@ const upsertMessage = (current, item) => {
   const index = current.findIndex((row) => row.id === item.id);
   if (index < 0) return [...current, item];
   const replyTo = replyOf(item) || replyOf(current[index]);
+  const animationId = item.animationId || current[index].animationId || '';
   const next = current.slice();
-  next[index] = { ...current[index], ...item, replyTo };
+  next[index] = {
+    ...current[index],
+    ...item,
+    replyTo,
+    ...(animationId ? { animationId, animated: true } : {}),
+  };
   return next;
 };
 
@@ -120,7 +126,10 @@ const Chat = ({ userId }) => {
           const incoming = Array.isArray(data?.messages) ? data.messages : [];
           const kept = incoming.map((item) => {
             const local = pendingRef.current.find((row) => pendingMatch(row, item));
-            return keepReply(item, local);
+            const withAnim = item.animationId || !local?.animationId
+              ? item
+              : { ...item, animationId: local.animationId, animated: true };
+            return keepReply(withAnim, local);
           });
           setMessages(kept);
           setPending((current) => dropMatchedPending(current, kept));
@@ -301,8 +310,8 @@ const Chat = ({ userId }) => {
     };
   }, [authReady, isLoggedIn, load, userId]);
 
-  const deliver = (localId, text, replyTo = null, animated = false) => {
-    sendChatMessage(userId, text, replyTo, animated)
+  const deliver = (localId, text, replyTo = null, animationId = '') => {
+    sendChatMessage(userId, text, replyTo, animationId)
       .then((saved) => {
         if (!saved?.id) {
           setPending((current) => current.map((row) => (
@@ -310,7 +319,14 @@ const Chat = ({ userId }) => {
           )));
           return;
         }
-        const shown = keepReply(withKeptReply(saved, replyTo), replyTo);
+        const sentId = String(animationId || '').trim();
+        const mergedBase = sentId && !saved.animationId
+          ? { ...saved, animationId: sentId, animated: true }
+          : saved;
+        const merged = mergedBase.replyTo && replyTo?.animationId && !mergedBase.replyTo.animationId
+          ? { ...mergedBase, replyTo: { ...mergedBase.replyTo, animationId: replyTo.animationId, animated: true } }
+          : mergedBase;
+        const shown = keepReply(withKeptReply(merged, replyTo), replyTo);
         rememberReply(localId, replyOf(shown));
         setPending((current) => current.filter((row) => row.id !== localId));
         setMessages((current) => upsertMessage(current, shown));
@@ -329,7 +345,8 @@ const Chat = ({ userId }) => {
       id: item.id,
       senderId: item.senderId,
       text,
-      ...(item.animated ? { animated: true } : {}),
+      ...(item.animationId ? { animationId: item.animationId } : {}),
+      ...(item.animated || item.animationId ? { animated: true } : {}),
     });
     return true;
   };
@@ -351,9 +368,10 @@ const Chat = ({ userId }) => {
     deliver(localId, text, replyTo);
   };
 
-  const sendAnimation = (char) => {
-    const value = String(char || '').trim();
-    if (!value) return;
+  const sendAnimation = (item) => {
+    const animationId = String(item?.id || '').trim();
+    const name = String(item?.name || '').trim();
+    if (!/^[0-9]{1,12}$/.test(animationId) || !name) return;
     const replyTo = replyTarget;
     const localId = `local-${Date.now()}-${localSeq.current + 1}`;
     localSeq.current += 1;
@@ -362,27 +380,28 @@ const Chat = ({ userId }) => {
       id: localId,
       senderId: profile?.id,
       recipientId: userId,
-      text: value,
+      text: name,
+      animationId,
       animated: true,
       createdAt: new Date().toISOString(),
       status: 'sending',
       replyTo: replyTo ? { ...replyTo } : null,
     }]);
-    deliver(localId, value, replyTo, true);
+    deliver(localId, name, replyTo, animationId);
   };
 
   const retrySend = (localId) => {
     let text = '';
     let replyTo = null;
-    let animated = false;
+    let animationId = '';
     setPending((current) => current.map((row) => {
       if (row.id !== localId) return row;
       text = row.text;
       replyTo = row.replyTo || null;
-      animated = row.animated === true;
+      animationId = row.animationId || '';
       return { ...row, status: 'sending' };
     }));
-    if (text) deliver(localId, text, replyTo, animated);
+    if (text) deliver(localId, text, replyTo, animationId);
   };
 
   const shownMessages = useMemo(() => (

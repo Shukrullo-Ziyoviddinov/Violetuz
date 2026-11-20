@@ -524,10 +524,18 @@
 
 .chat-block.is-emoji.is-anim .chat-anim,
 .chat-reply-quote.is-anim .chat-anim {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 7.5rem;
   height: 7.5rem;
   object-fit: contain;
+}
+
+.chat-anim svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
 .chat-emoji-solo {

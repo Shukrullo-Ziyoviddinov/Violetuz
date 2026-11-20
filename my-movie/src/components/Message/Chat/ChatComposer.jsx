@@ -156,9 +156,9 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onTyping, disabled = fals
           lang={lang}
           onClose={() => setEmojiOpen(false)}
           onPick={insertEmoji}
-          onSendAnimation={(char) => {
+          onSendAnimation={(item) => {
             setEmojiOpen(false);
-            onSendAnimation?.(char);
+            onSendAnimation?.(item);
           }}
         />
       ) : null}

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { emojiMotion, emojiMotionId, emojiOnlyCount } from './chatEmojis';
+import ChatLottie from './ChatLottie';
 
 const PLAY_MS = 1800;
 
@@ -55,11 +56,23 @@ const LoopEmoji = ({ text }) => {
   return <img className="chat-anim" src={emojiMotion(motionId)} alt={text} draggable="false" />;
 };
 
-const ChatMessageBlock = ({ text, mine, status = null, quote = '', replyId = '', animated = false, quoteAnimated = false }) => {
-  const emojiCount = animated ? 1 : emojiOnlyCount(text);
-  const quoteEmoji = quoteAnimated ? 1 : emojiOnlyCount(quote);
-  const emojiClass = `${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${animated ? ' is-anim' : ''}`;
-  const quoteClass = `${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${quoteAnimated ? ' is-anim' : ''}`;
+const ChatMessageBlock = ({
+  text,
+  mine,
+  status = null,
+  quote = '',
+  replyId = '',
+  animated = false,
+  animationId = '',
+  quoteAnimated = false,
+  quoteAnimationId = '',
+}) => {
+  const mineAnim = Boolean(animationId);
+  const quoteAnim = Boolean(quoteAnimationId);
+  const emojiCount = mineAnim || animated ? 1 : emojiOnlyCount(text);
+  const quoteEmoji = quoteAnim || quoteAnimated ? 1 : emojiOnlyCount(quote);
+  const emojiClass = `${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${mineAnim || animated ? ' is-anim' : ''}`;
+  const quoteClass = `${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${quoteAnim || quoteAnimated ? ' is-anim' : ''}`;
   return (
     <div className={`chat-block${mine ? ' is-mine' : ''}${status ? ' has-status' : ''}${quote ? ' has-quote' : ''}${emojiClass}`}>
       {quote ? (
@@ -70,12 +83,12 @@ const ChatMessageBlock = ({ text, mine, status = null, quote = '', replyId = '',
         >
           <span className="chat-reply-film" aria-hidden="true" />
           <span className="chat-reply-quote-text">
-            {quoteAnimated ? <LoopEmoji text={quote} /> : quote}
+            {quoteAnim ? <ChatLottie id={quoteAnimationId} className="chat-anim" label={quote} /> : quoteAnimated ? <LoopEmoji text={quote} /> : quote}
           </span>
         </button>
       ) : null}
       <div className="chat-block-main">
-        {animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} /> : <span className="chat-block-text">{text}</span>}
+        {mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} /> : <span className="chat-block-text">{text}</span>}
         {status}
       </div>
     </div>
