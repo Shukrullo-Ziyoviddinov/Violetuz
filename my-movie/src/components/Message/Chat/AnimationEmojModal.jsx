@@ -280,6 +280,12 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
   const exitingRef = useRef(false);
   const closeTimerRef = useRef(null);
   const sheetRef = useRef(null);
+  const bodyRef = useRef(null);
+  const [scrollRoot, setScrollRoot] = useState(null);
+  const setBody = useCallback((node) => {
+    bodyRef.current = node;
+    setScrollRoot(node);
+  }, []);
   const gapRef = useRef(0);
   const composerSpanRef = useRef(0);
   const burstTimerRef = useRef(null);
@@ -288,6 +294,10 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
   const heldRef = useRef(false);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (tab === 'animation' && bodyRef.current) bodyRef.current.scrollTop = 0;
+  }, [chip, query, tab]);
 
   const finishClose = useCallback(() => {
     onCloseRef.current?.();
@@ -602,7 +612,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
           </div>
         ) : null}
 
-        <div className="anim-emoji-body">
+        <div className="anim-emoji-body" ref={setBody}>
           {tab === 'emoji' ? (
             <>
               <p className="anim-emoji-section">{text.groups[emojiCat] || text.used}</p>
@@ -626,7 +636,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
                   aria-label={item.name}
                   onClick={() => setStage(item)}
                 >
-                  <ChatLottie id={item.id} className="anim-lottie" label={item.name} />
+                  <ChatLottie id={item.id} className="anim-lottie" label={item.name} root={scrollRoot} />
                 </button>
               ))}
             </div>
