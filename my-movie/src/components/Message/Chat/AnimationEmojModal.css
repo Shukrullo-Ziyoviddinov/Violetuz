@@ -258,6 +258,7 @@
 }
 
 .anim-emoji-cell {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -283,6 +284,15 @@
   user-select: none;
 }
 
+.anim-emoji-cell img {
+  position: absolute;
+  opacity: 0;
+}
+
+.anim-emoji-cell img.is-in {
+  opacity: 1;
+}
+
 .anim-emoji-cell span {
   display: flex;
   align-items: center;
@@ -290,6 +300,10 @@
   width: auto;
   height: auto;
   font-size: 1.55rem;
+}
+
+.anim-emoji-cell span.is-hidden {
+  opacity: 0;
 }
 
 .anim-emoji-cell:active {

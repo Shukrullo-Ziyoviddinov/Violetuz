@@ -195,14 +195,21 @@ const EMOJI_CATS = [
 ];
 
 const EmojiCell = ({ emoji, onPick }) => {
-  const [photo, setPhoto] = useState(true);
+  const [photo, setPhoto] = useState('wait');
+  const ready = photo === 'ready';
   return (
     <button type="button" className="anim-emoji-cell" aria-label={emoji.char} onClick={(event) => onPick(emoji, event.currentTarget)}>
-      {photo ? (
-        <img src={emojiStill(emoji.id)} alt="" draggable="false" onError={() => setPhoto(false)} />
-      ) : (
-        <span>{emoji.char}</span>
-      )}
+      <span className={ready ? 'is-hidden' : ''}>{emoji.char}</span>
+      {photo !== 'off' ? (
+        <img
+          src={emojiStill(emoji.id)}
+          alt=""
+          draggable="false"
+          className={ready ? 'is-in' : ''}
+          onLoad={() => setPhoto('ready')}
+          onError={() => setPhoto('off')}
+        />
+      ) : null}
     </button>
   );
 };
