@@ -1,6 +1,15 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useModalHardwareBack } from '../../../useModalHardwareBack';
+import {
+  CHAT_EMOJIS,
+  emojiFromId,
+  emojiMatches,
+  emojiMotion,
+  emojiStill,
+  readRecentEmojiIds,
+  rememberEmoji,
+} from './chatEmojis';
 import './AnimationEmojModal.css';
 
 const CLOSE_MS = 340;
@@ -28,6 +37,23 @@ const copy = (lang) => {
     recent: ru ? 'Недавние' : 'So‘nggi',
     used: ru ? 'ИСПОЛЬЗОВАННЫЕ' : 'ISHLATILGANLAR',
     smiles: ru ? 'УЛЫБКИ' : 'TABASSUMLAR',
+    empty: ru ? 'Ничего не найдено' : 'Topilmadi',
+    emptyRecent: ru ? 'Пока пусто' : 'Hali tanlanmagan',
+    groups: {
+      recent: ru ? 'ИСПОЛЬЗОВАННЫЕ' : 'ISHLATILGANLAR',
+      smile: ru ? 'УЛЫБКИ' : 'TABASSUMLAR',
+      people: ru ? 'ЛЮДИ' : 'ODAMLAR',
+      animals: ru ? 'ЖИВОТНЫЕ' : 'HAYVONLAR',
+      food: ru ? 'ЕДА' : 'OVQAT',
+      travel: ru ? 'ДОРОГА' : 'SAYOHAT',
+      places: ru ? 'МЕСТА' : 'JOYLAR',
+      activity: ru ? 'СПОРТ' : 'SPORT',
+      objects: ru ? 'ПРЕДМЕТЫ' : 'BUYUMLAR',
+      symbols: ru ? 'СИМВОЛЫ' : 'BELGILAR',
+      flags: ru ? 'ФЛАГИ' : 'BAYROQLAR',
+      weather: ru ? 'ПОГОДА' : 'OB-HAVO',
+      gesture: ru ? 'ЖЕСТЫ' : 'IMO-ISHORA',
+    },
     chips: [
       { id: 'recent', label: ru ? 'Недавние' : 'So‘nggi' },
       { id: 'laugh', label: ru ? 'Смех' : 'Kulgi' },
@@ -168,6 +194,19 @@ const EMOJI_CATS = [
   },
 ];
 
+const EmojiCell = ({ emoji, onPick }) => {
+  const [photo, setPhoto] = useState(true);
+  return (
+    <button type="button" className="anim-emoji-cell" aria-label={emoji.char} onClick={(event) => onPick(emoji, event.currentTarget)}>
+      {photo ? (
+        <img src={emojiStill(emoji.id)} alt="" draggable="false" onError={() => setPhoto(false)} />
+      ) : (
+        <span>{emoji.char}</span>
+      )}
+    </button>
+  );
+};
+
 const SearchIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
     <circle cx="11" cy="11" r="6.5" />
@@ -175,11 +214,13 @@ const SearchIcon = () => (
   </svg>
 );
 
-const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
+const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
   const text = copy(lang);
   const [tab, setTab] = useState('animation');
   const [query, setQuery] = useState('');
   const [emojiCat, setEmojiCat] = useState('recent');
+  const [recentIds, setRecentIds] = useState(readRecentEmojiIds);
+  const [burst, setBurst] = useState(null);
   const [chip, setChip] = useState('recent');
   const [dragY, setDragY] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(() => !isMobileViewport());
@@ -192,6 +233,8 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
   const sheetRef = useRef(null);
   const gapRef = useRef(0);
   const composerSpanRef = useRef(0);
+  const burstTimerRef = useRef(null);
+  const burstTokenRef = useRef(0);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -328,6 +371,27 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
     draggedRef.current = false;
   };
 
+  useEffect(() => () => window.clearTimeout(burstTimerRef.current), []);
+
+  const pickEmoji = (emoji, node) => {
+    setRecentIds(rememberEmoji(emoji.id));
+    onPick?.(emoji.char);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const rect = node.getBoundingClientRect();
+    const token = burstTokenRef.current + 1;
+    burstTokenRef.current = token;
+    setBurst({ id: emoji.id, x: rect.left + rect.width / 2, y: rect.top, token });
+    window.clearTimeout(burstTimerRef.current);
+    burstTimerRef.current = window.setTimeout(() => {
+      setBurst((current) => (current?.token === token ? null : current));
+    }, 1800);
+  };
+
+  const emojiPool = emojiCat === 'recent'
+    ? recentIds.map((id) => emojiFromId(id)).filter(Boolean)
+    : CHAT_EMOJIS.filter((item) => item.cat === emojiCat);
+  const shownEmoji = emojiPool.filter((item) => emojiMatches(item, query));
+
   const selectTab = (id) => {
     setTab(id);
     setQuery('');
@@ -415,7 +479,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
                 <button
                   type="button"
                   className={`anim-emoji-icon-btn${emojiCat === item.id ? ' is-on' : ''}`}
-                  aria-label={item.id === 'recent' ? text.recent : item.id}
+                  aria-label={text.groups[item.id] || item.id}
                   aria-selected={emojiCat === item.id}
                   onClick={() => setEmojiCat(item.id)}
                 >
@@ -447,15 +511,31 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
         <div className="anim-emoji-body">
           {tab === 'emoji' ? (
             <>
-              <p className="anim-emoji-section">{text.used}</p>
-              <div className="anim-emoji-grid" />
-              <p className="anim-emoji-section">{text.smiles}</p>
-              <div className="anim-emoji-grid" />
+              <p className="anim-emoji-section">{text.groups[emojiCat] || text.used}</p>
+              {shownEmoji.length ? (
+                <div className="anim-emoji-grid is-emoji">
+                  {shownEmoji.map((emoji) => (
+                    <EmojiCell key={emoji.id} emoji={emoji} onPick={pickEmoji} />
+                  ))}
+                </div>
+              ) : (
+                <p className="anim-emoji-empty">{query.trim() ? text.empty : text.emptyRecent}</p>
+              )}
             </>
           ) : (
             <div className={`anim-emoji-grid${tab === 'animation' ? ' is-large' : ''}`} />
           )}
         </div>
+        {burst ? (
+          <img
+            key={burst.token}
+            className="anim-emoji-burst"
+            style={{ left: burst.x, top: burst.y }}
+            src={emojiMotion(burst.id)}
+            alt=""
+            onError={() => setBurst(null)}
+          />
+        ) : null}
       </div>
     </>,
     document.body

@@ -43,6 +43,14 @@ const ChatComposer = ({ lang, onSend, onTyping, disabled = false, reply = null, 
     if (!keyboardIsOpen()) inputRef.current?.blur();
   };
 
+  const insertEmoji = (char) => {
+    setText((current) => {
+      const next = `${current}${char}`.slice(0, 2000);
+      onTyping?.(next.trim().length > 0);
+      return next;
+    });
+  };
+
   const closeComposer = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -143,7 +151,7 @@ const ChatComposer = ({ lang, onSend, onTyping, disabled = false, reply = null, 
         </div>
       </form>
       {emojiOpen ? (
-        <AnimationEmojModal ref={emojiRef} lang={lang} onClose={() => setEmojiOpen(false)} />
+        <AnimationEmojModal ref={emojiRef} lang={lang} onClose={() => setEmojiOpen(false)} onPick={insertEmoji} />
       ) : null}
     </div>
   );
