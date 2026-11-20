@@ -24,11 +24,13 @@ body.chat-page-active {
 }
 
 html.chat-page-lock {
-  transition: --chat-emoji-progress 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  transition:
+    --chat-keyboard-lift 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    --chat-emoji-progress 0.34s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 html.chat-page-lock.chat-emoji-dragging {
-  transition: none;
+  transition: --chat-keyboard-lift 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.chat-page-active .App {
@@ -43,8 +45,8 @@ body.chat-page-active .App {
   display: flex;
   flex-direction: column;
   transition:
-    top 0.32s cubic-bezier(0.22, 0.8, 0.24, 1),
-    bottom 0.32s cubic-bezier(0.22, 0.8, 0.24, 1);
+    top 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    bottom 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

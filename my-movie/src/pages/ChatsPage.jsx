@@ -12,7 +12,7 @@ const ChatsPage = () => {
     const previousOverlay = keyboard ? keyboard.overlaysContent : false;
     if (keyboard) keyboard.overlaysContent = true;
 
-    const motionMs = 320;
+    const motionMs = 450;
     const atBottomPx = 48;
     let lastLift = 0;
     let pinBottom = false;
@@ -88,45 +88,27 @@ const ChatsPage = () => {
       lastLift = keyboardLift;
     };
 
-    let watchFrame = 0;
-    let watchUntil = 0;
-    const stopWatch = () => {
-      if (watchFrame) window.cancelAnimationFrame(watchFrame);
-      watchFrame = 0;
-    };
-    const watchKeyboard = () => {
-      watchUntil = performance.now() + motionMs;
-      if (watchFrame) return;
-      const tick = () => {
-        syncVisibleHeight();
-        if (performance.now() < watchUntil) watchFrame = window.requestAnimationFrame(tick);
-        else watchFrame = 0;
-      };
-      watchFrame = window.requestAnimationFrame(tick);
-    };
-
     root.classList.add('chat-page-lock');
     document.body.classList.add('chat-page-active');
     syncVisibleHeight();
     window.visualViewport?.addEventListener('resize', syncVisibleHeight);
     window.visualViewport?.addEventListener('scroll', syncVisibleHeight);
     window.addEventListener('resize', syncVisibleHeight);
-    keyboard?.addEventListener('geometrychange', watchKeyboard);
-    document.addEventListener('focusin', watchKeyboard);
-    document.addEventListener('focusout', watchKeyboard);
+    keyboard?.addEventListener('geometrychange', syncVisibleHeight);
+    document.addEventListener('focusin', syncVisibleHeight);
+    document.addEventListener('focusout', syncVisibleHeight);
     document.addEventListener('pointerdown', releasePin, true);
 
     return () => {
       window.visualViewport?.removeEventListener('resize', syncVisibleHeight);
       window.visualViewport?.removeEventListener('scroll', syncVisibleHeight);
       window.removeEventListener('resize', syncVisibleHeight);
-      keyboard?.removeEventListener('geometrychange', watchKeyboard);
-      document.removeEventListener('focusin', watchKeyboard);
-      document.removeEventListener('focusout', watchKeyboard);
+      keyboard?.removeEventListener('geometrychange', syncVisibleHeight);
+      document.removeEventListener('focusin', syncVisibleHeight);
+      document.removeEventListener('focusout', syncVisibleHeight);
       document.removeEventListener('pointerdown', releasePin, true);
       window.clearTimeout(settleTimer);
       stopPin();
-      stopWatch();
       if (keyboard) keyboard.overlaysContent = previousOverlay;
       root.classList.remove('chat-page-lock');
       document.body.classList.remove('chat-page-active');
