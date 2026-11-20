@@ -382,6 +382,15 @@
   line-height: 1.25;
 }
 
+.chat-reply-quote.is-emoji-quote .chat-reply-quote-text {
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.chat-reply-quote.is-emoji-quote.is-emoji-row .chat-reply-quote-text {
+  font-size: 1.15rem;
+}
+
 .chat-swipe {
   position: relative;
   max-width: 100%;
@@ -522,7 +531,7 @@
 }
 
 .chat-block.is-emoji .chat-reply-quote {
-  background: color-mix(in srgb, var(--chat-bubble-in-color, #2a2140) 58%, #fff);
+  background: color-mix(in srgb, var(--chat-bubble-in-color, #2a2140) 84%, #fff);
   color: #fff;
 }
 
