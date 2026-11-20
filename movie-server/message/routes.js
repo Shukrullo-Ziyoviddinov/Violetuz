@@ -68,7 +68,8 @@ router.post('/with/:userId', asyncHandler(async (req, res) => {
     req.authUser._id,
     req.params.userId,
     req.body?.text,
-    req.body?.replyTo
+    req.body?.replyTo,
+    req.body?.animated === true
   );
   return sendSuccess(res, { data: message }, 201);
 }));

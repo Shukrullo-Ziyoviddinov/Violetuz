@@ -31,13 +31,14 @@ export const fetchChatInbox = async () => {
   return parseJson(response);
 };
 
-export const sendChatMessage = async (userId, text, replyTo = null) => {
+export const sendChatMessage = async (userId, text, replyTo = null, animated = false) => {
   const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       text,
+      ...(animated ? { animated: true } : {}),
       ...(replyTo?.id ? { replyTo: { id: String(replyTo.id) } } : {}),
     }),
   });

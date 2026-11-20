@@ -16,23 +16,25 @@ const loadReply = async (conversationId, rawReply) => {
   const source = await ChatMessage.findOne({
     _id: replyId,
     conversationId,
-  }).select('senderId text').lean();
+  }).select('senderId text animated').lean();
   const sourceText = clip(source?.text, 2000);
   if (!sourceText) return null;
   return {
     messageId: String(source._id),
     senderId: String(source.senderId || ''),
     text: sourceText,
+    ...(source.animated ? { animated: true } : {}),
   };
 };
 
-const sendChatMessage = async (meId, peerId, rawText, rawReply = null) => {
+const sendChatMessage = async (meId, peerId, rawText, rawReply = null, rawAnimated = false) => {
   const me = String(meId || '').trim().toLowerCase();
   const peer = String(peerId || '').trim().toLowerCase();
   if (!isUserId(me)) throw badRequest('Hisob topilmadi');
   if (me === peer) throw badRequest('O‘zingizga xabar yozilmaydi');
   await loadPeer(peer);
   const text = cleanText(rawText);
+  const animated = rawAnimated === true && text.length <= 32 && !/\p{L}/u.test(text);
   const conversation = await ensureConversation(me, peer);
   const replyTo = await loadReply(conversation._id, rawReply);
   let row = await ChatMessage.create({
@@ -40,6 +42,7 @@ const sendChatMessage = async (meId, peerId, rawText, rawReply = null) => {
     senderId: me,
     recipientId: peer,
     text,
+    ...(animated ? { animated: true } : {}),
     ...(replyTo ? { replyTo } : {}),
   });
   if (replyTo && !clip(row.replyTo?.text, 2000)) {

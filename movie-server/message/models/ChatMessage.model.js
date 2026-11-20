@@ -27,6 +27,10 @@ const chatMessageSchema = new mongoose.Schema(
       trim: true,
       maxlength: 2000,
     },
+    animated: {
+      type: Boolean,
+      default: false,
+    },
     readAt: {
       type: Date,
       default: null,
@@ -35,6 +39,7 @@ const chatMessageSchema = new mongoose.Schema(
       messageId: { type: String, trim: true, maxlength: 64 },
       senderId: { type: String, trim: true, maxlength: 64 },
       text: { type: String, trim: true, maxlength: 2000 },
+      animated: { type: Boolean, default: false },
     },
   },
   {

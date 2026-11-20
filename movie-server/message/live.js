@@ -14,6 +14,7 @@ const toLiveReply = (value) => {
     id: String(value.messageId || value.id || ''),
     senderId: String(value.senderId || ''),
     text,
+    ...(value.animated ? { animated: true } : {}),
   };
 };
 
@@ -23,6 +24,7 @@ const toLiveMessage = (row) => ({
   senderId: String(row.senderId || ''),
   recipientId: String(row.recipientId || ''),
   text: String(row.text || ''),
+  animated: row.animated === true,
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
   replyTo: toLiveReply(row.replyTo),

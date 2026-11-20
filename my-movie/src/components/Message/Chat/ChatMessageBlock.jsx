@@ -49,11 +49,17 @@ const SoloEmoji = ({ text }) => {
   );
 };
 
-const ChatMessageBlock = ({ text, mine, status = null, quote = '', replyId = '' }) => {
-  const emojiCount = emojiOnlyCount(text);
-  const quoteEmoji = emojiOnlyCount(quote);
-  const emojiClass = emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : '';
-  const quoteClass = quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : '';
+const LoopEmoji = ({ text }) => {
+  const motionId = emojiMotionId(text);
+  if (!motionId) return <span className="chat-block-text">{text}</span>;
+  return <img className="chat-anim" src={emojiMotion(motionId)} alt={text} draggable="false" />;
+};
+
+const ChatMessageBlock = ({ text, mine, status = null, quote = '', replyId = '', animated = false, quoteAnimated = false }) => {
+  const emojiCount = animated ? 1 : emojiOnlyCount(text);
+  const quoteEmoji = quoteAnimated ? 1 : emojiOnlyCount(quote);
+  const emojiClass = `${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${animated ? ' is-anim' : ''}`;
+  const quoteClass = `${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${quoteAnimated ? ' is-anim' : ''}`;
   return (
     <div className={`chat-block${mine ? ' is-mine' : ''}${status ? ' has-status' : ''}${quote ? ' has-quote' : ''}${emojiClass}`}>
       {quote ? (
@@ -63,11 +69,13 @@ const ChatMessageBlock = ({ text, mine, status = null, quote = '', replyId = '' 
           data-reply-id={replyId || undefined}
         >
           <span className="chat-reply-film" aria-hidden="true" />
-          <span className="chat-reply-quote-text">{quote}</span>
+          <span className="chat-reply-quote-text">
+            {quoteAnimated ? <LoopEmoji text={quote} /> : quote}
+          </span>
         </button>
       ) : null}
       <div className="chat-block-main">
-        {emojiCount === 1 ? <SoloEmoji text={text} /> : <span className="chat-block-text">{text}</span>}
+        {animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} /> : <span className="chat-block-text">{text}</span>}
         {status}
       </div>
     </div>

@@ -30,6 +30,7 @@ const toReply = (value) => {
     id: String(value.messageId || value.id || ''),
     senderId: String(value.senderId || ''),
     text,
+    ...(value.animated ? { animated: true } : {}),
   };
 };
 
@@ -39,6 +40,7 @@ const toClientMessage = (row) => ({
   senderId: String(row.senderId || ''),
   recipientId: String(row.recipientId || ''),
   text: String(row.text || ''),
+  animated: row.animated === true,
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
   replyTo: toReply(row.replyTo),
@@ -79,7 +81,7 @@ const listMessages = async (conversationId) => {
   const rows = await ChatMessage.find({ conversationId })
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
-    .select('conversationId senderId recipientId text createdAt readAt replyTo')
+    .select('conversationId senderId recipientId text animated createdAt readAt replyTo')
     .lean();
   return rows.reverse().map(toClientMessage);
 };

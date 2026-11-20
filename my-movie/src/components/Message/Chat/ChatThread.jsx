@@ -187,6 +187,8 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                 mine={mine}
                 quote={quote}
                 replyId={item.replyTo?.id || ''}
+                animated={item.animated === true}
+                quoteAnimated={item.replyTo?.animated === true}
                 status={mine
                   ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} />
                   : (clock ? <p className="chat-send-status is-in">{clock}</p> : null)}

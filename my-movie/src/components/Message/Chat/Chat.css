@@ -391,6 +391,12 @@
   font-size: 1.15rem;
 }
 
+.chat-reply-quote.is-anim .chat-reply-quote-text {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
 .chat-swipe {
   position: relative;
   max-width: 100%;
@@ -514,6 +520,14 @@
 .chat-block.is-emoji .chat-block-text {
   font-size: 4.25rem;
   line-height: 1;
+}
+
+.chat-block.is-emoji.is-anim .chat-anim,
+.chat-reply-quote.is-anim .chat-anim {
+  display: block;
+  width: 7.5rem;
+  height: 7.5rem;
+  object-fit: contain;
 }
 
 .chat-emoji-solo {

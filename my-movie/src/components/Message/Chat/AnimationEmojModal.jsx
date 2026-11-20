@@ -10,6 +10,13 @@ import {
   readRecentEmojiIds,
   rememberEmoji,
 } from './chatEmojis';
+import {
+  CHAT_ANIMATIONS,
+  FEATURED_ANIMATIONS,
+  animationMatches,
+  readRecentAnimationIds,
+  rememberAnimation,
+} from './chatAnimations';
 import './AnimationEmojModal.css';
 
 const CLOSE_MS = 340;
@@ -39,6 +46,8 @@ const copy = (lang) => {
     smiles: ru ? 'УЛЫБКИ' : 'TABASSUMLAR',
     empty: ru ? 'Ничего не найдено' : 'Topilmadi',
     emptyRecent: ru ? 'Пока пусто' : 'Hali tanlanmagan',
+    send: ru ? 'Отправить' : 'Yuborish',
+    cancel: ru ? 'Отмена' : 'Bekor qilish',
     groups: {
       recent: ru ? 'ИСПОЛЬЗОВАННЫЕ' : 'ISHLATILGANLAR',
       smile: ru ? 'УЛЫБКИ' : 'TABASSUMLAR',
@@ -251,7 +260,7 @@ const SearchIcon = () => (
   </svg>
 );
 
-const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
+const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation }, ref) => {
   const text = copy(lang);
   const [tab, setTab] = useState('animation');
   const [query, setQuery] = useState('');
@@ -259,6 +268,8 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
   const [recentIds, setRecentIds] = useState(readRecentEmojiIds);
   const [burst, setBurst] = useState(null);
   const [chip, setChip] = useState('recent');
+  const [animRecent, setAnimRecent] = useState(readRecentAnimationIds);
+  const [stage, setStage] = useState(null);
   const [dragY, setDragY] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(() => !isMobileViewport());
   const [exiting, setExiting] = useState(false);
@@ -299,6 +310,8 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
     historyKey: 'animationEmoj',
     isOpen: true,
     onCloseFromHardware: requestClose,
+    hasNested: Boolean(stage),
+    onNestedBack: () => setStage(null),
   });
 
   const closeFromUi = useCallback(() => {
@@ -328,11 +341,16 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
 
   useEffect(() => {
     const onKey = (event) => {
-      if (event.key === 'Escape') closeFromUi();
+      if (event.key !== 'Escape') return;
+      if (stage) {
+        setStage(null);
+        return;
+      }
+      closeFromUi();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [closeFromUi]);
+  }, [closeFromUi, stage]);
 
   useLayoutEffect(() => {
     const root = document.documentElement;
@@ -453,6 +471,19 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
     ? recentIds.map((id) => emojiFromId(id)).filter(Boolean)
     : CHAT_EMOJIS.filter((item) => item.cat === emojiCat);
   const shownEmoji = emojiPool.filter((item) => emojiMatches(item, query));
+  const animPool = chip === 'recent'
+    ? (animRecent.length
+      ? animRecent.map((id) => CHAT_ANIMATIONS.find((item) => item.id === id)).filter(Boolean)
+      : FEATURED_ANIMATIONS)
+    : CHAT_ANIMATIONS.filter((item) => item.cat === chip);
+  const shownAnim = animPool.filter((item) => animationMatches(item, query));
+
+  const sendStage = () => {
+    if (!stage) return;
+    setAnimRecent(rememberAnimation(stage.id));
+    onSendAnimation?.(stage.char);
+    setStage(null);
+  };
 
   const selectTab = (id) => {
     setTab(id);
@@ -584,11 +615,43 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
                 <p className="anim-emoji-empty">{query.trim() ? text.empty : text.emptyRecent}</p>
               )}
             </>
+          ) : tab === 'animation' && shownAnim.length ? (
+            <div className="anim-emoji-grid is-large">
+              {shownAnim.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="anim-emoji-cell is-motion"
+                  aria-label={item.char}
+                  onClick={() => setStage(item)}
+                >
+                  <img src={emojiMotion(item.id)} alt="" draggable="false" />
+                </button>
+              ))}
+            </div>
+          ) : tab === 'animation' ? (
+            <p className="anim-emoji-empty">{query.trim() ? text.empty : text.emptyRecent}</p>
           ) : (
-            <div className={`anim-emoji-grid${tab === 'animation' ? ' is-large' : ''}`} />
+            <div className="anim-emoji-grid" />
           )}
         </div>
       </div>
+      {stage ? (
+        <div
+          className="anim-stage"
+          style={{ background: `radial-gradient(circle at 50% 38%, ${stage.tint} 0%, #14081c 58%, #07060c 100%)` }}
+        >
+          <img className="anim-stage-art" src={emojiMotion(stage.id)} alt="" draggable="false" />
+          <div className="anim-stage-actions">
+            <button type="button" className="anim-stage-cancel" aria-label={text.cancel} onClick={() => setStage(null)}>
+              ×
+            </button>
+            <button type="button" className="anim-stage-send" style={{ background: stage.tint }} onClick={sendStage}>
+              {text.send}
+            </button>
+          </div>
+        </div>
+      ) : null}
       {burst ? (
         <img
           key={burst.token}

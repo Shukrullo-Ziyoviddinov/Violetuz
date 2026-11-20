@@ -316,6 +316,76 @@
   font-size: 0.92rem;
 }
 
+.anim-emoji-grid.is-large {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0.35rem 0.85rem 1rem;
+}
+
+.anim-emoji-cell.is-motion {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+}
+
+.anim-emoji-cell.is-motion img {
+  position: static;
+  opacity: 1;
+  width: 78%;
+  height: 78%;
+}
+
+.anim-stage {
+  position: fixed;
+  z-index: 1450;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.anim-stage-art {
+  width: min(68vw, 260px);
+  height: min(68vw, 260px);
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+.anim-stage-actions {
+  position: absolute;
+  left: 1.3rem;
+  right: 1.3rem;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.anim-stage-cancel {
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(10, 8, 18, 0.28);
+  color: #fff;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.anim-stage-send {
+  height: 58px;
+  padding: 0 1.45rem;
+  border: 0;
+  border-radius: 999px;
+  color: #1a1024;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .anim-emoji-burst {
   position: fixed;
   z-index: 1405;

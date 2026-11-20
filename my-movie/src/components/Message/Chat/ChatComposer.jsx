@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AnimationEmojModal from './AnimationEmojModal';
 
-const ChatComposer = ({ lang, onSend, onTyping, disabled = false, reply = null, onCancelReply }) => {
+const ChatComposer = ({ lang, onSend, onSendAnimation, onTyping, disabled = false, reply = null, onCancelReply }) => {
   const inputRef = useRef(null);
   const emojiRef = useRef(null);
   const [text, setText] = useState('');
@@ -151,7 +151,16 @@ const ChatComposer = ({ lang, onSend, onTyping, disabled = false, reply = null, 
         </div>
       </form>
       {emojiOpen ? (
-        <AnimationEmojModal ref={emojiRef} lang={lang} onClose={() => setEmojiOpen(false)} onPick={insertEmoji} />
+        <AnimationEmojModal
+          ref={emojiRef}
+          lang={lang}
+          onClose={() => setEmojiOpen(false)}
+          onPick={insertEmoji}
+          onSendAnimation={(char) => {
+            setEmojiOpen(false);
+            onSendAnimation?.(char);
+          }}
+        />
       ) : null}
     </div>
   );

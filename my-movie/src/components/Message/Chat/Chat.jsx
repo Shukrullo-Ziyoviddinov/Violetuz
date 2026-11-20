@@ -301,8 +301,8 @@ const Chat = ({ userId }) => {
     };
   }, [authReady, isLoggedIn, load, userId]);
 
-  const deliver = (localId, text, replyTo = null) => {
-    sendChatMessage(userId, text, replyTo)
+  const deliver = (localId, text, replyTo = null, animated = false) => {
+    sendChatMessage(userId, text, replyTo, animated)
       .then((saved) => {
         if (!saved?.id) {
           setPending((current) => current.map((row) => (
@@ -329,6 +329,7 @@ const Chat = ({ userId }) => {
       id: item.id,
       senderId: item.senderId,
       text,
+      ...(item.animated ? { animated: true } : {}),
     });
     return true;
   };
@@ -350,16 +351,38 @@ const Chat = ({ userId }) => {
     deliver(localId, text, replyTo);
   };
 
+  const sendAnimation = (char) => {
+    const value = String(char || '').trim();
+    if (!value) return;
+    const replyTo = replyTarget;
+    const localId = `local-${Date.now()}-${localSeq.current + 1}`;
+    localSeq.current += 1;
+    setReplyTarget(null);
+    setPending((current) => [...current, {
+      id: localId,
+      senderId: profile?.id,
+      recipientId: userId,
+      text: value,
+      animated: true,
+      createdAt: new Date().toISOString(),
+      status: 'sending',
+      replyTo: replyTo ? { ...replyTo } : null,
+    }]);
+    deliver(localId, value, replyTo, true);
+  };
+
   const retrySend = (localId) => {
     let text = '';
     let replyTo = null;
+    let animated = false;
     setPending((current) => current.map((row) => {
       if (row.id !== localId) return row;
       text = row.text;
       replyTo = row.replyTo || null;
+      animated = row.animated === true;
       return { ...row, status: 'sending' };
     }));
-    if (text) deliver(localId, text, replyTo);
+    if (text) deliver(localId, text, replyTo, animated);
   };
 
   const shownMessages = useMemo(() => (
@@ -442,6 +465,7 @@ const Chat = ({ userId }) => {
         disabled={!isLoggedIn || !peer}
         onTyping={reportTyping}
         onSend={sendNow}
+        onSendAnimation={sendAnimation}
         reply={replyTarget}
         onCancelReply={() => setReplyTarget(null)}
       />
