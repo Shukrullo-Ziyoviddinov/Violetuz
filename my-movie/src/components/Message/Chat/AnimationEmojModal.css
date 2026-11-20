@@ -45,18 +45,48 @@
 }
 
 .anim-emoji-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem 0.45rem;
+}
+
+.anim-emoji-tab-row {
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  min-width: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
-  padding: 0.85rem 0.75rem 0.35rem;
+  padding: 0.28rem;
+  border-radius: 16px;
+  background: #1a1a1f;
+}
+
+.anim-emoji-tab-glide {
+  position: absolute;
+  z-index: 0;
+  top: 0.28rem;
+  bottom: 0.28rem;
+  left: 0.28rem;
+  width: calc((100% - 0.56rem) / 3);
+  border-radius: 12px;
+  background: #000;
+  pointer-events: none;
+  transform: translateX(calc(var(--tab-index, 0) * 100%));
+  transition: transform 0.45s cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
 .anim-emoji-tab {
-  justify-self: center;
+  position: relative;
+  z-index: 1;
+  justify-self: stretch;
+  width: 100%;
   margin: 0;
-  padding: 0.42rem 0.95rem;
+  padding: 0.48rem 0.4rem;
   border: 0;
-  border-radius: 999px;
+  border-radius: 12px;
   background: transparent;
   color: #fff;
   font: inherit;
@@ -67,13 +97,12 @@
 }
 
 .anim-emoji-tab.is-on {
-  background: #7c3aed;
+  background: transparent;
 }
 
 .anim-emoji-close {
-  position: absolute;
-  top: 0.55rem;
-  right: 0.7rem;
+  position: static;
+  flex-shrink: 0;
   width: 36px;
   height: 36px;
   display: flex;
@@ -145,7 +174,7 @@
 }
 
 .anim-emoji-icon-btn.is-on {
-  background: #7c3aed;
+  background: #000;
   color: #fff;
 }
 
@@ -181,7 +210,7 @@
 }
 
 .anim-emoji-chip.is-on {
-  background: #7c3aed;
+  background: #000;
 }
 
 .anim-emoji-body {
@@ -217,16 +246,9 @@
 @media (max-width: 768px) {
   .anim-emoji-overlay {
     bottom: calc(var(--chat-emoji-lift, 0px) + var(--chat-emoji-composer, 0px));
-    opacity: 0;
-    transition: opacity 0.34s ease;
-  }
-
-  .anim-emoji-overlay--open {
+    background: transparent;
+    backdrop-filter: none;
     opacity: 1;
-  }
-
-  .anim-emoji-overlay--closing {
-    opacity: 0;
   }
 
   .anim-emoji-modal {
@@ -235,10 +257,10 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: calc(100vh - 9.5rem);
-    max-height: calc(100vh - 9.5rem);
+    height: calc(50vh - var(--chat-emoji-field, 3.25rem));
+    max-height: calc(50vh - var(--chat-emoji-field, 3.25rem));
     border-radius: 22px 22px 0 0;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
     transform: translate3d(0, 100%, 0);
     transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
     will-change: transform;
@@ -271,7 +293,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .anim-emoji-overlay,
-  .anim-emoji-modal {
+  .anim-emoji-modal,
+  .anim-emoji-tab-glide {
     transition: none;
   }
 }

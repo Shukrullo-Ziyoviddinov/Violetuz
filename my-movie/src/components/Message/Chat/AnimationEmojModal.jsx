@@ -210,9 +210,12 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
         const tail = Math.max(0, rect.bottom - fieldRect.bottom);
         gapRef.current = Math.max(0, window.innerHeight - (rect.bottom + keyboardLift)) + tail;
         composerSpanRef.current = field.offsetHeight + gapRef.current;
+        root.style.setProperty('--chat-emoji-field', `${field.offsetHeight}px`);
       }
     }
     root.style.setProperty('--chat-emoji-composer', `${composerSpanRef.current}px`);
+    const fieldHeight = document.querySelector('.chat-composer')?.offsetHeight || 0;
+    if (fieldHeight) root.style.setProperty('--chat-emoji-field', `${fieldHeight}px`);
     const sheetH = sheetRef.current?.offsetHeight || 0;
     const lift = mobile && sheetOpen && !exiting ? Math.max(0, sheetH - gapRef.current - dragY) : 0;
     if (mobile && dragY > 0 && !exiting) root.classList.add('chat-emoji-dragging');
@@ -225,6 +228,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
       const root = document.documentElement;
       root.style.removeProperty('--chat-emoji-lift');
       root.style.removeProperty('--chat-emoji-composer');
+      root.style.removeProperty('--chat-emoji-field');
       root.classList.remove('chat-emoji-dragging');
     },
     []
@@ -308,23 +312,30 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
           onClickCapture={swallowDragClick}
         >
           <div className="anim-emoji-handle" aria-hidden="true" />
-          <div className="anim-emoji-tabs" role="tablist">
-            {text.tabs.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={tab === item.id}
-                className={`anim-emoji-tab${tab === item.id ? ' is-on' : ''}`}
-                onClick={() => selectTab(item.id)}
-              >
-                {item.label}
-              </button>
-            ))}
+          <div className="anim-emoji-tabs">
+            <div
+              className="anim-emoji-tab-row"
+              role="tablist"
+              style={{ '--tab-index': text.tabs.findIndex((item) => item.id === tab) }}
+            >
+              <span className="anim-emoji-tab-glide" aria-hidden="true" />
+              {text.tabs.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === item.id}
+                  className={`anim-emoji-tab${tab === item.id ? ' is-on' : ''}`}
+                  onClick={() => selectTab(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <button type="button" className="anim-emoji-close" aria-label={text.close} onClick={closeFromUi}>
+              ×
+            </button>
           </div>
-          <button type="button" className="anim-emoji-close" aria-label={text.close} onClick={closeFromUi}>
-            ×
-          </button>
         </div>
 
         <label className="anim-emoji-search">
