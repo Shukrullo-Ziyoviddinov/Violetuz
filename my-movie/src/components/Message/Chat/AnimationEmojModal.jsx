@@ -341,7 +341,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
       const composer = document.querySelector('.chat-composer-wrap');
       const field = composer?.querySelector('.chat-composer');
       if (composer && field) {
-        const keyboardLift = parseFloat(getComputedStyle(root).getPropertyValue('--chat-keyboard-lift')) || 0;
+        const keyboardLift = parseFloat(getComputedStyle(root).getPropertyValue('--chat-input-lift')) || 0;
         const rect = composer.getBoundingClientRect();
         const fieldRect = field.getBoundingClientRect();
         const tail = Math.max(0, rect.bottom - fieldRect.bottom);

@@ -577,7 +577,7 @@
   align-items: center;
   gap: 5px;
   margin: auto 0.7rem 14px;
-  transform: translateY(calc(-1 * (var(--chat-keyboard-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px))));
+  transform: translateY(calc(-1 * (var(--chat-input-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px))));
   padding: 12px 16px;
   border-radius: 20px 20px 20px 6px;
   background: #241c38;
@@ -617,12 +617,12 @@
 @keyframes chat-typing-in {
   from {
     opacity: 0;
-    transform: translateY(calc(-1 * (var(--chat-keyboard-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px)) + 12px));
+    transform: translateY(calc(-1 * (var(--chat-input-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px)) + 12px));
   }
 
   to {
     opacity: 1;
-    transform: translateY(calc(-1 * (var(--chat-keyboard-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px))));
+    transform: translateY(calc(-1 * (var(--chat-input-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px))));
   }
 }
 
@@ -659,7 +659,7 @@
   flex-direction: column;
   margin-top: auto;
   background: transparent;
-  transform: translateY(calc(-1 * (var(--chat-keyboard-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px))));
+  transform: translateY(calc(-1 * (var(--chat-input-lift, 0px) + var(--chat-emoji-progress, 0) * var(--chat-emoji-span, 0px))));
 }
 
 .chat-typing + .chat-composer-wrap {

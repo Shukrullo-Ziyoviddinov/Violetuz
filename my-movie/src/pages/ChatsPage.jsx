@@ -72,6 +72,7 @@ const ChatsPage = () => {
       root.style.setProperty('--chat-visible-top', keyboardOpen ? '0px' : `${Math.round(offsetTop)}px`);
       root.style.setProperty('--chat-visible-bottom', keyboardOpen ? '0px' : `${Math.round(fromViewport)}px`);
       root.style.setProperty('--chat-keyboard-lift', `${keyboardLift}px`);
+      root.style.setProperty('--chat-input-lift', `${keyboardLift}px`);
       if (keyboardLift !== lastLift) {
         if (!decided) {
           followLatest = thread ? distanceFromBottom(thread) <= atBottomPx : false;
@@ -115,6 +116,7 @@ const ChatsPage = () => {
       root.style.removeProperty('--chat-visible-top');
       root.style.removeProperty('--chat-visible-bottom');
       root.style.removeProperty('--chat-keyboard-lift');
+      root.style.removeProperty('--chat-input-lift');
     };
   }, []);
 
