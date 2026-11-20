@@ -281,16 +281,11 @@
   align-items: stretch;
   width: fit-content;
   max-width: 100%;
-  padding: 0;
 }
 
 .chat-block-main {
   min-width: 0;
   max-width: 100%;
-}
-
-.chat-block.has-quote .chat-block-main {
-  padding: 4px 16px 8px;
 }
 
 .chat-block-text {
@@ -317,8 +312,7 @@
   box-sizing: border-box;
   width: 100%;
   gap: 8px;
-  margin: 0;
-  border-radius: 20px 20px 10px 10px;
+  margin: 0 0 6px;
   min-width: 0;
   padding: 6px 8px;
   border: 0;
