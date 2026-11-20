@@ -2010,3 +2010,19 @@ export const emojiOnlyCount = (value) => {
   }
   return count;
 };
+
+export const emojiMotionId = (value) => {
+  const text = String(value || '').trim();
+  if (emojiOnlyCount(text) !== 1) return '';
+  const parts = typeof Intl !== 'undefined' && Intl.Segmenter
+    ? [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((item) => item.segment)
+    : [...text];
+  const piece = parts.find((part) => emojiPiece(part) === 'emoji');
+  if (!piece) return '';
+  const codes = [];
+  for (const char of piece) {
+    const point = char.codePointAt(0);
+    if (point !== 0xfe0f) codes.push(point.toString(16));
+  }
+  return codes.join('_');
+};

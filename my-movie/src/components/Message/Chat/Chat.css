@@ -507,9 +507,37 @@
   border-radius: 0;
 }
 
+.chat-block.is-emoji.is-reply-flash::after {
+  border-radius: 28px;
+}
+
 .chat-block.is-emoji .chat-block-text {
   font-size: 4.25rem;
   line-height: 1;
+}
+
+.chat-emoji-solo {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.chat-emoji-still {
+  display: block;
+}
+
+.chat-emoji-motion {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.chat-emoji-solo.is-playing .chat-emoji-still {
+  opacity: 0;
 }
 
 .chat-block.is-emoji.is-emoji-row .chat-block-text {
