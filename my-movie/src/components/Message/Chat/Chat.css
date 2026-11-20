@@ -508,7 +508,7 @@
 }
 
 .chat-block.is-emoji.is-reply-flash::after {
-  border-radius: 28px;
+  border-radius: 1px;
 }
 
 .chat-block.is-emoji .chat-block-text {
