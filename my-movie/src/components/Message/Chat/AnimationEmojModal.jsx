@@ -194,11 +194,41 @@ const EMOJI_CATS = [
   },
 ];
 
-const EmojiCell = ({ emoji, onPick }) => {
+const EmojiCell = ({ emoji, onPick, onHold, onRelease }) => {
   const [photo, setPhoto] = useState('wait');
   const ready = photo === 'ready';
+  const holdTimerRef = useRef(null);
+  const clearHold = () => {
+    window.clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = null;
+  };
+  const pressEmoji = (event) => {
+    if (event.button != null && event.button !== 0) return;
+    const startX = event.clientX;
+    const startY = event.clientY;
+    let moved = false;
+    clearHold();
+    holdTimerRef.current = window.setTimeout(() => {
+      if (!moved) onHold(emoji);
+    }, 160);
+    const move = (next) => {
+      if (Math.hypot(next.clientX - startX, next.clientY - startY) <= 12) return;
+      moved = true;
+      clearHold();
+    };
+    const end = () => {
+      clearHold();
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', end);
+      window.removeEventListener('pointercancel', end);
+      onRelease();
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+  };
   return (
-    <button type="button" className="anim-emoji-cell" aria-label={emoji.char} onClick={(event) => onPick(emoji, event.currentTarget)}>
+    <button type="button" className="anim-emoji-cell" aria-label={emoji.char} onPointerDown={pressEmoji} onClick={() => onPick(emoji)}>
       <span className={ready ? 'is-hidden' : ''}>{emoji.char}</span>
       {photo !== 'off' ? (
         <img
@@ -242,6 +272,8 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
   const composerSpanRef = useRef(0);
   const burstTimerRef = useRef(null);
   const burstTokenRef = useRef(0);
+  const burstEmojiRef = useRef('');
+  const heldRef = useRef(false);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -380,18 +412,41 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
 
   useEffect(() => () => window.clearTimeout(burstTimerRef.current), []);
 
-  const pickEmoji = (emoji, node) => {
-    setRecentIds(rememberEmoji(emoji.id));
-    onPick?.(emoji.char);
+  const openBurst = (emoji) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const rect = node.getBoundingClientRect();
+    if (burstEmojiRef.current === emoji.id) return;
     const token = burstTokenRef.current + 1;
     burstTokenRef.current = token;
-    setBurst({ id: emoji.id, x: rect.left + rect.width / 2, y: rect.top, token });
+    burstEmojiRef.current = emoji.id;
+    setBurst({ id: emoji.id, token, leaving: false });
     window.clearTimeout(burstTimerRef.current);
-    burstTimerRef.current = window.setTimeout(() => {
-      setBurst((current) => (current?.token === token ? null : current));
-    }, 1800);
+    const leave = () => {
+      if (heldRef.current && burstTokenRef.current === token) {
+        burstTimerRef.current = window.setTimeout(leave, 120);
+        return;
+      }
+      setBurst((current) => (current?.token === token ? { ...current, leaving: true } : current));
+      burstTimerRef.current = window.setTimeout(() => {
+        if (burstTokenRef.current === token) burstEmojiRef.current = '';
+        setBurst((current) => (current?.token === token ? null : current));
+      }, 320);
+    };
+    burstTimerRef.current = window.setTimeout(leave, 1500);
+  };
+
+  const previewEmoji = (emoji) => {
+    heldRef.current = true;
+    openBurst(emoji);
+  };
+
+  const releaseEmoji = () => {
+    heldRef.current = false;
+  };
+
+  const pickEmoji = (emoji) => {
+    setRecentIds(rememberEmoji(emoji.id));
+    onPick?.(emoji.char);
+    openBurst(emoji);
   };
 
   const emojiPool = emojiCat === 'recent'
@@ -522,7 +577,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
               {shownEmoji.length ? (
                 <div className="anim-emoji-grid is-emoji">
                   {shownEmoji.map((emoji) => (
-                    <EmojiCell key={emoji.id} emoji={emoji} onPick={pickEmoji} />
+                    <EmojiCell key={emoji.id} emoji={emoji} onPick={pickEmoji} onHold={previewEmoji} onRelease={releaseEmoji} />
                   ))}
                 </div>
               ) : (
@@ -533,17 +588,16 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick }, ref) => {
             <div className={`anim-emoji-grid${tab === 'animation' ? ' is-large' : ''}`} />
           )}
         </div>
-        {burst ? (
-          <img
-            key={burst.token}
-            className="anim-emoji-burst"
-            style={{ left: burst.x, top: burst.y }}
-            src={emojiMotion(burst.id)}
-            alt=""
-            onError={() => setBurst(null)}
-          />
-        ) : null}
       </div>
+      {burst ? (
+        <img
+          key={burst.token}
+          className={`anim-emoji-burst${burst.leaving ? ' is-leaving' : ''}`}
+          src={emojiMotion(burst.id)}
+          alt=""
+          onError={() => setBurst(null)}
+        />
+      ) : null}
     </>,
     document.body
   );

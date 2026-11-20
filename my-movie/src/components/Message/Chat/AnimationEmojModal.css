@@ -318,12 +318,45 @@
 
 .anim-emoji-burst {
   position: fixed;
-  z-index: 1402;
-  width: 104px;
-  height: 104px;
-  transform: translate(-50%, calc(-100% - 8px));
+  z-index: 1405;
+  left: 50%;
+  top: 50%;
+  width: 168px;
+  height: 168px;
   pointer-events: none;
   user-select: none;
+  transform: translate(-50%, -50%);
+  animation: anim-emoji-pop-in 0.42s cubic-bezier(0.22, 0.8, 0.24, 1) forwards;
+}
+
+.anim-emoji-burst.is-leaving {
+  animation: anim-emoji-pop-out 0.32s ease forwards;
+}
+
+@keyframes anim-emoji-pop-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes anim-emoji-pop-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.86);
+  }
 }
 
 @media (min-width: 769px) {
