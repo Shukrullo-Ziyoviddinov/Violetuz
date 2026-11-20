@@ -24,13 +24,11 @@ body.chat-page-active {
 }
 
 html.chat-page-lock {
-  transition:
-    --chat-keyboard-lift 0.46s cubic-bezier(0.22, 0.8, 0.24, 1),
-    --chat-emoji-progress 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: --chat-emoji-progress 0.34s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 html.chat-page-lock.chat-emoji-dragging {
-  transition: --chat-keyboard-lift 0.46s cubic-bezier(0.22, 0.8, 0.24, 1);
+  transition: none;
 }
 
 body.chat-page-active .App {
