@@ -217,16 +217,21 @@ const AnimationEmojModal = forwardRef(({ lang, onClose }, ref) => {
     const fieldHeight = document.querySelector('.chat-composer')?.offsetHeight || 0;
     if (fieldHeight) root.style.setProperty('--chat-emoji-field', `${fieldHeight}px`);
     const sheetH = sheetRef.current?.offsetHeight || 0;
-    const lift = mobile && sheetOpen && !exiting ? Math.max(0, sheetH - gapRef.current - dragY) : 0;
-    if (mobile && dragY > 0 && !exiting) root.classList.add('chat-emoji-dragging');
-    else root.classList.remove('chat-emoji-dragging');
-    root.style.setProperty('--chat-emoji-lift', `${lift}px`);
+    const openLift = Math.max(0, sheetH - gapRef.current);
+    if (mobile && openLift) root.style.setProperty('--chat-emoji-span', `${openLift}px`);
+    else root.style.setProperty('--chat-emoji-span', '0px');
+    const progress = mobile && sheetOpen && !exiting && sheetH > 0
+      ? Math.max(0, Math.min(1, 1 - dragY / sheetH))
+      : 0;
+    root.classList.toggle('chat-emoji-dragging', mobile && dragY > 0 && !exiting);
+    root.style.setProperty('--chat-emoji-progress', String(progress));
   }, [sheetOpen, exiting, dragY]);
 
   useEffect(
     () => () => {
       const root = document.documentElement;
-      root.style.removeProperty('--chat-emoji-lift');
+      root.style.removeProperty('--chat-emoji-progress');
+      root.style.removeProperty('--chat-emoji-span');
       root.style.removeProperty('--chat-emoji-composer');
       root.style.removeProperty('--chat-emoji-field');
       root.classList.remove('chat-emoji-dragging');
