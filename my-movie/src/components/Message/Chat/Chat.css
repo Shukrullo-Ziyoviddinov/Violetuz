@@ -24,7 +24,6 @@
   min-height: 64px;
   padding: 0.45rem 0.7rem;
   background: transparent;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
 }
 
 .chat-header::before {
@@ -33,27 +32,22 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: var(--chat-header-shadow, rgba(20, 16, 31, 0.34));
-  -webkit-mask-image:
-    radial-gradient(ellipse 62% 86% at -4% -18%, #000 20%, transparent 74%),
-    radial-gradient(ellipse 48% 74% at 32% -28%, #000 12%, transparent 70%),
-    radial-gradient(ellipse 54% 92% at 68% -16%, #000 16%, transparent 76%),
-    radial-gradient(ellipse 46% 70% at 104% -8%, #000 10%, transparent 72%),
-    radial-gradient(ellipse 24% 58% at 16% 72%, rgba(0, 0, 0, 0.55) 0%, transparent 78%),
-    radial-gradient(ellipse 32% 46% at 48% 96%, rgba(0, 0, 0, 0.34) 0%, transparent 80%),
-    radial-gradient(ellipse 22% 52% at 84% 78%, rgba(0, 0, 0, 0.42) 0%, transparent 76%);
-  mask-image:
-    radial-gradient(ellipse 62% 86% at -4% -18%, #000 20%, transparent 74%),
-    radial-gradient(ellipse 48% 74% at 32% -28%, #000 12%, transparent 70%),
-    radial-gradient(ellipse 54% 92% at 68% -16%, #000 16%, transparent 76%),
-    radial-gradient(ellipse 46% 70% at 104% -8%, #000 10%, transparent 72%),
-    radial-gradient(ellipse 24% 58% at 16% 72%, rgba(0, 0, 0, 0.55) 0%, transparent 78%),
-    radial-gradient(ellipse 32% 46% at 48% 96%, rgba(0, 0, 0, 0.34) 0%, transparent 80%),
-    radial-gradient(ellipse 22% 52% at 84% 78%, rgba(0, 0, 0, 0.42) 0%, transparent 76%);
+  --chat-haze: var(--chat-header-rgb, 20, 16, 31);
+  background-image:
+    radial-gradient(ellipse 46% 90% at -2% -8%, rgba(var(--chat-haze), 0.84) 0%, rgba(var(--chat-haze), 0.36) 34%, transparent 62%),
+    radial-gradient(ellipse 40% 78% at 28% -16%, rgba(var(--chat-haze), 0.78) 0%, transparent 56%),
+    radial-gradient(ellipse 42% 84% at 58% -14%, rgba(var(--chat-haze), 0.8) 0%, rgba(var(--chat-haze), 0.3) 38%, transparent 60%),
+    radial-gradient(ellipse 44% 80% at 104% -10%, rgba(var(--chat-haze), 0.82) 0%, rgba(var(--chat-haze), 0.28) 40%, transparent 64%),
+    linear-gradient(to bottom, transparent 0%, transparent 18%, rgba(var(--chat-haze), 0.62) 34%, rgba(var(--chat-haze), 0.5) 100%);
+  background-repeat: no-repeat;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 64' preserveAspectRatio='none'><filter id='b'><feGaussianBlur stdDeviation='1.2 1.8'/></filter><path filter='url(%23b)' fill='%23fff' d='M0 0H100V44L96 38L93 63L89 60L85 28L79 26L75 50L72 64L68 61L64 32L58 28L54 54L50 64L46 56L42 30L36 26L32 48L28 63L24 59L20 33L14 27L10 52L6 64L2 52L0 46Z'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 64' preserveAspectRatio='none'><filter id='b'><feGaussianBlur stdDeviation='1.2 1.8'/></filter><path filter='url(%23b)' fill='%23fff' d='M0 0H100V44L96 38L93 63L89 60L85 28L79 26L75 50L72 64L68 61L64 32L58 28L54 54L50 64L46 56L42 30L36 26L32 48L28 63L24 59L20 33L14 27L10 52L6 64L2 52L0 46Z'/></svg>");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  -webkit-mask-composite: source-over;
-  mask-composite: add;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
 }
 
 .chat-header > * {

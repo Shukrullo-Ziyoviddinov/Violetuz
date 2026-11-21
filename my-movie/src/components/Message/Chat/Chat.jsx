@@ -487,6 +487,7 @@ const Chat = ({ userId }) => {
         ...(backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}),
         ...bubbleVars(bubbles),
         ...textVars(textChoice),
+        '--chat-header-rgb': `${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}`,
         '--chat-header-fill': `rgba(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}, ${HEADER_ALPHA})`,
         '--chat-header-pill': `rgba(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}, ${HEADER_PILL_ALPHA})`,
         '--chat-header-shadow': `rgba(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}, ${HEADER_SHADOW_ALPHA})`,
