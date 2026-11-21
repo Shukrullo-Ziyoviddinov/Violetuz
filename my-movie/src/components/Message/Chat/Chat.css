@@ -542,7 +542,7 @@
 .chat-thread > .chat-item:has(.chat-block.is-gif) {
   align-self: flex-start;
   width: fit-content;
-  max-width: min(78%, 280px);
+  max-width: min(78%, 200px);
   margin-right: auto;
   margin-left: 0;
 }

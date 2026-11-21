@@ -59,7 +59,7 @@ const safeGifFile = (file) => {
   return name;
 };
 
-const ChatGif = ({ file, className = '', label = '', root = null, fit = false, max = 280, onColor = null }) => {
+const ChatGif = ({ file, className = '', label = '', root = null, fit = false, max = 200, onColor = null }) => {
   const hostRef = useRef(null);
   const videoRef = useRef(null);
   const visibleRef = useRef(false);

@@ -88,7 +88,7 @@ const ChatMessageBlock = ({
         >
           <span className="chat-reply-film" aria-hidden="true" />
           <span className="chat-reply-quote-text">
-            {quoteGifOn ? <ChatGif file={quoteGif} fit max={148} label={quote} /> : quoteAnim ? <ChatLottie id={quoteAnimationId} className="chat-anim" label={quote} /> : quoteAnimated ? <LoopEmoji text={quote} /> : quote}
+            {quoteGifOn ? <ChatGif file={quoteGif} fit max={106} label={quote} /> : quoteAnim ? <ChatLottie id={quoteAnimationId} className="chat-anim" label={quote} /> : quoteAnimated ? <LoopEmoji text={quote} /> : quote}
           </span>
         </button>
       ) : null}
