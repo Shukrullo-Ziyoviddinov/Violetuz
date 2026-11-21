@@ -288,6 +288,8 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
   const [animRecent, setAnimRecent] = useState(readRecentAnimationIds);
   const [gifRecent, setGifRecent] = useState(readRecentGifIds);
   const [stage, setStage] = useState(null);
+  const [liveTint, setLiveTint] = useState('');
+  const stageAtRef = useRef(0);
   const [dragY, setDragY] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(() => !isMobileViewport());
   const [exiting, setExiting] = useState(false);
@@ -510,8 +512,14 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
     : CHAT_GIFS.filter((item) => item.cat === gifChip);
   const shownGif = gifPool.filter((item) => gifMatches(item, query));
 
+  const openStage = (item) => {
+    stageAtRef.current = Date.now();
+    setLiveTint('');
+    setStage(item);
+  };
+
   const sendStage = () => {
-    if (!stage) return;
+    if (!stage || Date.now() - stageAtRef.current < 450) return;
     if (stage.kind === 'gif') {
       setGifRecent(rememberGif(stage.file));
       onSendGif?.(stage);
@@ -660,7 +668,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
                   type="button"
                   className="anim-emoji-cell is-motion"
                   aria-label={item.name}
-                  onClick={() => setStage(item)}
+                  onClick={() => openStage(item)}
                 >
                   <ChatLottie id={item.id} className="anim-lottie" label={item.name} root={scrollRoot} />
                 </button>
@@ -676,7 +684,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
                   type="button"
                   className="anim-emoji-cell is-motion"
                   aria-label={item.name}
-                  onClick={() => setStage({ ...item, kind: 'gif' })}
+                  onClick={() => openStage({ ...item, kind: 'gif' })}
                 >
                   <ChatGif file={item.file} className="anim-lottie" label={item.name} root={scrollRoot} />
                 </button>
@@ -690,16 +698,16 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
       {stage ? (
         <div
           className="anim-stage"
-          style={{ background: `radial-gradient(circle at 50% 38%, ${stage.tint} 0%, #14081c 58%, #07060c 100%)` }}
+          style={{ background: `radial-gradient(circle at 50% 38%, ${(stage.kind === 'gif' && liveTint) || stage.tint} 0%, #14081c 58%, #07060c 100%)` }}
         >
           {stage.kind === 'gif'
-            ? <ChatGif file={stage.file} className="anim-stage-art" label={stage.name} />
+            ? <ChatGif file={stage.file} className="anim-stage-art" label={stage.name} onColor={setLiveTint} />
             : <ChatLottie id={stage.id} className="anim-stage-art" label={stage.name} />}
           <div className="anim-stage-actions">
             <button type="button" className="anim-stage-cancel" aria-label={text.cancel} onClick={() => setStage(null)}>
               ×
             </button>
-            <button type="button" className="anim-stage-send" style={{ background: stage.tint }} onClick={sendStage}>
+            <button type="button" className="anim-stage-send" style={{ background: (stage.kind === 'gif' && liveTint) || stage.tint }} onClick={sendStage}>
               {text.send}
             </button>
           </div>
