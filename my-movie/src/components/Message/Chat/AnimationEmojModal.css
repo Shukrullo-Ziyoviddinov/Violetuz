@@ -347,7 +347,7 @@
   height: 78%;
 }
 
-.anim-emoji-cell.is-motion .chat-gif-still {
+.anim-emoji-cell.is-motion img.chat-gif-still {
   position: relative;
   opacity: 1;
 }

@@ -91,6 +91,28 @@ const gifBlobUrl = (file) => {
   return job;
 };
 
+const waitMedia = (video, event) => new Promise((resolve, reject) => {
+  const timer = window.setTimeout(() => reject(new Error('gif')), 8000);
+  const finish = (ok) => {
+    window.clearTimeout(timer);
+    if (ok) resolve();
+    else reject(new Error('gif'));
+  };
+  video.addEventListener(event, () => finish(true), { once: true });
+  video.addEventListener('error', () => finish(false), { once: true });
+});
+
+const frameScore = (ctx, width, height) => {
+  const data = ctx.getImageData(0, 0, width, height).data;
+  let total = 0;
+  let count = 0;
+  for (let i = 0; i < data.length; i += 32) {
+    total += data[i] + data[i + 1] + data[i + 2];
+    count += 1;
+  }
+  return count ? total / count : 0;
+};
+
 const capturePoster = async (file) => {
   if (posters.has(file)) return posters.get(file);
   const url = await gifBlobUrl(file);
@@ -101,24 +123,7 @@ const capturePoster = async (file) => {
   video.playsInline = true;
   video.preload = 'auto';
   video.src = url;
-  await new Promise((resolve, reject) => {
-    const timer = window.setTimeout(() => reject(new Error('gif')), 8000);
-    const done = (ok) => {
-      window.clearTimeout(timer);
-      if (ok) resolve();
-      else reject(new Error('gif'));
-    };
-    video.addEventListener('loadeddata', () => done(true), { once: true });
-    video.addEventListener('error', () => done(false), { once: true });
-  });
-  try {
-    await video.play();
-  } catch (_err) {
-    // Birinchi kadr o‘qilgan bo‘lsa, rasm baribir olinadi.
-  }
-  await new Promise((resolve) => {
-    window.requestAnimationFrame(() => window.requestAnimationFrame(resolve));
-  });
+  await waitMedia(video, 'loadeddata');
   const width = video.videoWidth;
   const height = video.videoHeight;
   if (!width || !height) throw new Error('gif');
@@ -128,13 +133,36 @@ const capturePoster = async (file) => {
   canvas.height = Math.max(1, Math.round(height * scale));
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('gif');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const poster = canvas.toDataURL('image/jpeg', 0.74);
-  posters.set(file, poster);
+  const duration = Number.isFinite(video.duration) ? video.duration : 0;
+  const marks = [0.12];
+  if (duration > 0.35) marks.push(Math.min(duration * 0.4, 0.6));
+  let best = '';
+  let bestScore = -1;
+  for (const mark of marks) {
+    if (!wantedPosters.has(file)) return posters.get(file) || best;
+    const time = duration > 0 ? Math.min(mark, Math.max(0, duration - 0.05)) : mark;
+    try {
+      if (Math.abs(video.currentTime - time) > 0.03) {
+        video.currentTime = time;
+        await waitMedia(video, 'seeked');
+      }
+    } catch (_err) {
+      // Qidirish bo‘lmasa, turgan kadr olinadi.
+    }
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const score = frameScore(ctx, canvas.width, canvas.height);
+    if (score > bestScore) {
+      bestScore = score;
+      best = canvas.toDataURL('image/jpeg', 0.74);
+    }
+    if (score > 45) break;
+  }
+  if (!best) throw new Error('gif');
+  posters.set(file, best);
   video.pause();
   video.removeAttribute('src');
   video.load();
-  return poster;
+  return best;
 };
 
 const notifyPoster = (file, poster) => {
