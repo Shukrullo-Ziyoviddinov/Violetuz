@@ -5,6 +5,13 @@ const RECENT_MAX = 24;
 
 export const CHAT_GIFS = [
   {
+    "file": "-_-.mp4",
+    "name": "Bezovta",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Bezovta bezovta rolling eyes"
+  },
+  {
     "file": "@VideoToGifConverterBot(7) (4).mp4",
     "name": "Reaksiya",
     "cat": "shock",
@@ -17,6 +24,13 @@ export const CHAT_GIFS = [
     "cat": "shock",
     "tint": "#38bdf8",
     "q": "Xafa xafa yiglamoq sad cry reactiongif"
+  },
+  {
+    "file": "#reactiongif 🙄.mp4",
+    "name": "Bezovta",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Bezovta bezovta rolling eyes reactiongif"
   },
   {
     "file": "🤨6.mp4",
@@ -96,6 +110,13 @@ export const CHAT_GIFS = [
     "q": "Reaksiya reaksiya hayron 11edc"
   },
   {
+    "file": "16.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron 16"
+  },
+  {
     "file": "18.mp4",
     "name": "Reaksiya",
     "cat": "shock",
@@ -117,6 +138,13 @@ export const CHAT_GIFS = [
     "q": "Reaksiya reaksiya hayron 20 5"
   },
   {
+    "file": "21_слеза.mp4",
+    "name": "Xafa",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Xafa xafa yiglamoq sad cry 21 слеза"
+  },
+  {
     "file": "21.mp4",
     "name": "Reaksiya",
     "cat": "shock",
@@ -136,6 +164,13 @@ export const CHAT_GIFS = [
     "cat": "shock",
     "tint": "#38bdf8",
     "q": "Reaksiya reaksiya hayron 234 52"
+  },
+  {
+    "file": "26.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron 26"
   },
   {
     "file": "28 (2).mp4",
@@ -166,11 +201,32 @@ export const CHAT_GIFS = [
     "q": "Reaksiya reaksiya hayron 31"
   },
   {
+    "file": "4.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron 4"
+  },
+  {
+    "file": "440ScreenRecorderProject161 (online-video-cutter.com).mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron 440ScreenRecorderProject161 online video cutter com"
+  },
+  {
     "file": "54.mp4",
     "name": "Reaksiya",
     "cat": "shock",
     "tint": "#38bdf8",
     "q": "Reaksiya reaksiya hayron 54"
+  },
+  {
+    "file": "6.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron 6"
   },
   {
     "file": "61_panic.mp4",
@@ -192,6 +248,13 @@ export const CHAT_GIFS = [
     "cat": "shock",
     "tint": "#38bdf8",
     "q": "Reaksiya reaksiya hayron 67"
+  },
+  {
+    "file": "8_рука_лицо.mp4",
+    "name": "Yuz",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Yuz yuz facepalm afsus 8 рука лицо"
   },
   {
     "file": "9 (11).mp4",
@@ -341,11 +404,25 @@ export const CHAT_GIFS = [
     "q": "Kulgi kulgi kulish jilmayish laugh smile joy Crazy face"
   },
   {
+    "file": "crf27.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron crf27"
+  },
+  {
     "file": "D17.mp4",
     "name": "Reaksiya",
     "cat": "shock",
     "tint": "#38bdf8",
     "q": "Reaksiya reaksiya hayron D17"
+  },
+  {
+    "file": "dawq.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron dawq"
   },
   {
     "file": "dde.mp4",
@@ -474,6 +551,27 @@ export const CHAT_GIFS = [
     "q": "Reaksiya reaksiya hayron edd"
   },
   {
+    "file": "Estu_KPS01_😡_SCut_H264High_BR107_C61_SP100_Q80_R1280x960_F24_AS4x3.mp4",
+    "name": "Jahldor",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Jahldor jahldor ghazab angry Estu KPS01 SCut H264High BR107 C61 SP100 Q80 R1280x960 F24 AS4x3"
+  },
+  {
+    "file": "facepalmst1-converted.mp4",
+    "name": "Yuz",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Yuz yuz facepalm afsus facepalmst1 converted"
+  },
+  {
+    "file": "final_618a6510a9e46c002993077f_237153.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron final 618a6510a9e46c002993077f 237153"
+  },
+  {
     "file": "final_618a7513d1d8c700442ee98e_246835.mp4",
     "name": "Reaksiya",
     "cat": "shock",
@@ -579,11 +677,39 @@ export const CHAT_GIFS = [
     "q": "Reaksiya reaksiya hayron Gravity Falls S02E07 Society of The Blind Eye 1080p WEB DL AAC2"
   },
   {
+    "file": "Grimace 1.mp4",
+    "name": "Hayron",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Hayron hayron hayrat surprise flushed Grimace 1"
+  },
+  {
+    "file": "hugo gifs17.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron hugo gifs17"
+  },
+  {
     "file": "IMG_5426.MOV",
     "name": "Reaksiya",
     "cat": "shock",
     "tint": "#38bdf8",
     "q": "Reaksiya reaksiya hayron IMG 5426"
+  },
+  {
+    "file": "IMG_6670.MP4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron IMG 6670"
+  },
+  {
+    "file": "IMG_8276.MP4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron IMG 8276"
   },
   {
     "file": "Index Up.mp4",
@@ -598,6 +724,13 @@ export const CHAT_GIFS = [
     "cat": "laugh",
     "tint": "#f5c542",
     "q": "Kulgi kulgi kulish jilmayish laugh smile joy joy 6"
+  },
+  {
+    "file": "korra cry.mp4",
+    "name": "Xafa",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Xafa xafa yiglamoq sad cry korra cry"
   },
   {
     "file": "look.mp4",
@@ -619,6 +752,13 @@ export const CHAT_GIFS = [
     "cat": "love",
     "tint": "#fb7185",
     "q": "Sevgi sevgi yurak busa kiss love LovedEyes16"
+  },
+  {
+    "file": "luca gifs7.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron luca gifs7"
   },
   {
     "file": "Miyang_OKE_CS2_😞_SCut_H264High_BR151_C49_SP80_Q80_R1280x960_F24.mp4",
@@ -684,6 +824,13 @@ export const CHAT_GIFS = [
     "q": "Reaksiya reaksiya hayron RENDER"
   },
   {
+    "file": "Rolling eyes 2.mp4",
+    "name": "Bezovta",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Bezovta bezovta rolling eyes Rolling eyes 2"
+  },
+  {
     "file": "rtn54.mp4",
     "name": "Reaksiya",
     "cat": "shock",
@@ -717,6 +864,13 @@ export const CHAT_GIFS = [
     "cat": "fear",
     "tint": "#a78bfa",
     "q": "Qo'rquv qorquv qoqinchli vahima scream scare panic Scary6"
+  },
+  {
+    "file": "Scary8.mp4",
+    "name": "Qo'rquv",
+    "cat": "fear",
+    "tint": "#a78bfa",
+    "q": "Qo'rquv qorquv qoqinchli vahima scream scare panic Scary8"
   },
   {
     "file": "Screaming (3).mp4",
@@ -754,6 +908,13 @@ export const CHAT_GIFS = [
     "q": "Kulgi kulgi kulish jilmayish laugh smile joy smirk2"
   },
   {
+    "file": "SpiderMan2002-1.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron SpiderMan2002 1"
+  },
+  {
     "file": "Surprise5.mp4",
     "name": "Hayron",
     "cat": "shock",
@@ -780,6 +941,13 @@ export const CHAT_GIFS = [
     "cat": "laugh",
     "tint": "#f5c542",
     "q": "Ma'qul maqul thumb like Thumb up 2 1"
+  },
+  {
+    "file": "Tom And Jerry.2021 51.07.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron Tom And Jerry 2021 51 07"
   },
   {
     "file": "tom wave hand.mp4",
@@ -824,6 +992,20 @@ export const CHAT_GIFS = [
     "q": "Charchagan charchagan weary weary1"
   },
   {
+    "file": "weg9_4.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron weg9 4"
+  },
+  {
+    "file": "WHYHIM (11)_H.264.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron WHYHIM 11 H 264"
+  },
+  {
     "file": "WHYHIM (12)_H.264.mp4",
     "name": "Reaksiya",
     "cat": "shock",
@@ -845,6 +1027,13 @@ export const CHAT_GIFS = [
     "q": "Reaksiya reaksiya hayron Wolf Of39 33"
   },
   {
+    "file": "shgakehand.mp4",
+    "name": "Reaksiya",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Reaksiya reaksiya hayron shgakehand"
+  },
+  {
     "file": "Shocked13.mp4",
     "name": "Hayron",
     "cat": "shock",
@@ -857,6 +1046,13 @@ export const CHAT_GIFS = [
     "cat": "love",
     "tint": "#fb7185",
     "q": "Sevgi sevgi yurak busa kiss love shrek kiss"
+  },
+  {
+    "file": "Shutter Island2 🤦.mp4",
+    "name": "Yuz",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Yuz yuz facepalm afsus Shutter Island2"
   },
   {
     "file": "злость_2.mp4",
@@ -892,6 +1088,13 @@ export const CHAT_GIFS = [
     "cat": "shock",
     "tint": "#38bdf8",
     "q": "Reaksiya reaksiya hayron экспортировать 08"
+  },
+  {
+    "file": "がっかり２.mp4",
+    "name": "Xafa",
+    "cat": "shock",
+    "tint": "#38bdf8",
+    "q": "Xafa xafa yiglamoq sad cry がっかり２"
   }
 ];
 
