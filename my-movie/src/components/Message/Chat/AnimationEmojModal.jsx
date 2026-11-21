@@ -284,7 +284,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
   const [recentIds, setRecentIds] = useState(readRecentEmojiIds);
   const [burst, setBurst] = useState(null);
   const [chip, setChip] = useState('recent');
-  const [gifChip, setGifChip] = useState('laugh');
+  const [gifChip, setGifChip] = useState('shock');
   const [animRecent, setAnimRecent] = useState(readRecentAnimationIds);
   const [gifRecent, setGifRecent] = useState(readRecentGifIds);
   const [stage, setStage] = useState(null);
@@ -683,7 +683,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
               ))}
             </div>
           ) : (
-            <p className="anim-emoji-empty">{query.trim() ? text.empty : text.emptyRecent}</p>
+            <p className="anim-emoji-empty">{query.trim() || gifChip !== 'recent' ? text.empty : text.emptyRecent}</p>
           )}
         </div>
       </div>

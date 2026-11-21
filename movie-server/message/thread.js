@@ -44,6 +44,7 @@ const toClientMessage = (row) => ({
   text: String(row.text || ''),
   animated: row.animated === true || Boolean(row.animationId),
   ...(row.animationId ? { animationId: String(row.animationId) } : {}),
+  ...(row.gif ? { gif: String(row.gif) } : {}),
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
   replyTo: toReply(row.replyTo),
@@ -84,7 +85,6 @@ const listMessages = async (conversationId) => {
   const rows = await ChatMessage.find({ conversationId })
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
-    .select('conversationId senderId recipientId text animated animationId createdAt readAt replyTo')
     .select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo')
   return rows.reverse().map(toClientMessage);
 };

@@ -50,9 +50,10 @@ const ChatGif = ({ file, className = '', label = '', root = null, fit = false, m
       if (gone || !visibleRef.current) return;
       node.play().catch(() => {});
     };
-    const mark = () => {
+    const mark = (event) => {
       if (gone) return;
       setReady(true);
+      if (event?.type === 'error') return;
       play();
     };
     const sizeToFrame = () => {
@@ -71,7 +72,7 @@ const ChatGif = ({ file, className = '', label = '', root = null, fit = false, m
       });
     };
     const resume = () => {
-      if (gone || !visibleRef.current || !fit) return;
+      if (gone || !visibleRef.current || !fit || node.error) return;
       play();
     };
     node.src = `/Gif/${encodeURIComponent(safe)}`;
