@@ -70,7 +70,8 @@ router.post('/with/:userId', asyncHandler(async (req, res) => {
     req.body?.text,
     req.body?.replyTo,
     req.body?.animated === true,
-    req.body?.animationId
+    req.body?.animationId,
+    req.body?.gif
   );
   return sendSuccess(res, { data: message }, 201);
 }));

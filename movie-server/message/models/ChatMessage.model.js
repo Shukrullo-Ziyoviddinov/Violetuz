@@ -37,6 +37,12 @@ const chatMessageSchema = new mongoose.Schema(
       maxlength: 16,
       default: '',
     },
+    gif: {
+      type: String,
+      trim: true,
+      maxlength: 180,
+      default: '',
+    },
     readAt: {
       type: Date,
       default: null,
@@ -47,6 +53,7 @@ const chatMessageSchema = new mongoose.Schema(
       text: { type: String, trim: true, maxlength: 2000 },
       animated: { type: Boolean, default: false },
       animationId: { type: String, trim: true, maxlength: 16, default: '' },
+      gif: { type: String, trim: true, maxlength: 180, default: '' },
     },
   },
   {

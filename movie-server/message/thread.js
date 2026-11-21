@@ -32,6 +32,7 @@ const toReply = (value) => {
     text,
     ...(value.animated || value.animationId ? { animated: true } : {}),
     ...(value.animationId ? { animationId: String(value.animationId) } : {}),
+    ...(value.gif ? { gif: String(value.gif) } : {}),
   };
 };
 
@@ -84,7 +85,7 @@ const listMessages = async (conversationId) => {
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
     .select('conversationId senderId recipientId text animated animationId createdAt readAt replyTo')
-    .lean();
+    .select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo')
   return rows.reverse().map(toClientMessage);
 };
 

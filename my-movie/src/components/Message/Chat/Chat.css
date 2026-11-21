@@ -532,10 +532,52 @@
   object-fit: contain;
 }
 
-.chat-anim svg {
+.chat-anim svg,
+.anim-stage-art .chat-gif-video {
   width: 100% !important;
   height: 100% !important;
   display: block;
+}
+
+.chat-block.is-gif,
+.chat-block.is-gif.is-mine {
+  background: transparent;
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+  box-shadow: none;
+  width: fit-content;
+  max-width: min(78%, 280px);
+}
+
+.chat-block.is-gif .chat-block-main {
+  display: flow-root;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.chat-gif.is-fit {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  line-height: 0;
+  max-width: 100%;
+  border-radius: 20px;
+}
+
+.chat-gif.is-fit .chat-gif-video {
+  display: block;
+  max-width: none;
+  object-fit: contain;
+  pointer-events: none;
+  background: transparent;
+  border-radius: 20px;
+}
+
+.chat-reply-quote.is-gif .chat-reply-quote-text {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
 }
 
 .chat-emoji-solo {

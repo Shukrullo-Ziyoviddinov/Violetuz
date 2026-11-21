@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { emojiMotion, emojiMotionId, emojiOnlyCount } from './chatEmojis';
 import ChatLottie from './ChatLottie';
+import ChatGif from './ChatGif';
 
 const PLAY_MS = 1800;
 
@@ -64,15 +65,19 @@ const ChatMessageBlock = ({
   replyId = '',
   animated = false,
   animationId = '',
+  gif = '',
   quoteAnimated = false,
   quoteAnimationId = '',
+  quoteGif = '',
 }) => {
+  const mineGif = Boolean(gif);
+  const quoteGifOn = Boolean(quoteGif);
   const mineAnim = Boolean(animationId);
   const quoteAnim = Boolean(quoteAnimationId);
-  const emojiCount = mineAnim || animated ? 1 : emojiOnlyCount(text);
-  const quoteEmoji = quoteAnim || quoteAnimated ? 1 : emojiOnlyCount(quote);
-  const emojiClass = `${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${mineAnim || animated ? ' is-anim' : ''}`;
-  const quoteClass = `${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${quoteAnim || quoteAnimated ? ' is-anim' : ''}`;
+  const emojiCount = mineGif ? 0 : (mineAnim || animated ? 1 : emojiOnlyCount(text));
+  const quoteEmoji = quoteGifOn ? 0 : (quoteAnim || quoteAnimated ? 1 : emojiOnlyCount(quote));
+  const emojiClass = `${mineGif ? ' is-gif' : ''}${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${!mineGif && (mineAnim || animated) ? ' is-anim' : ''}`;
+  const quoteClass = `${quoteGifOn ? ' is-gif' : ''}${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${!quoteGifOn && (quoteAnim || quoteAnimated) ? ' is-anim' : ''}`;
   return (
     <div className={`chat-block${mine ? ' is-mine' : ''}${status ? ' has-status' : ''}${quote ? ' has-quote' : ''}${emojiClass}`}>
       {quote ? (
@@ -83,12 +88,12 @@ const ChatMessageBlock = ({
         >
           <span className="chat-reply-film" aria-hidden="true" />
           <span className="chat-reply-quote-text">
-            {quoteAnim ? <ChatLottie id={quoteAnimationId} className="chat-anim" label={quote} /> : quoteAnimated ? <LoopEmoji text={quote} /> : quote}
+            {quoteGifOn ? <ChatGif file={quoteGif} fit max={148} label={quote} /> : quoteAnim ? <ChatLottie id={quoteAnimationId} className="chat-anim" label={quote} /> : quoteAnimated ? <LoopEmoji text={quote} /> : quote}
           </span>
         </button>
       ) : null}
       <div className="chat-block-main">
-        {mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} /> : <span className="chat-block-text">{text}</span>}
+        {mineGif ? <ChatGif file={gif} fit label={text} /> : mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} /> : <span className="chat-block-text">{text}</span>}
         {status}
       </div>
     </div>

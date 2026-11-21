@@ -16,6 +16,7 @@ const toLiveReply = (value) => {
     text,
     ...(value.animated || value.animationId ? { animated: true } : {}),
     ...(value.animationId ? { animationId: String(value.animationId) } : {}),
+    ...(value.gif ? { gif: String(value.gif) } : {}),
   };
 };
 
@@ -27,6 +28,7 @@ const toLiveMessage = (row) => ({
   text: String(row.text || ''),
   animated: row.animated === true || Boolean(row.animationId),
   ...(row.animationId ? { animationId: String(row.animationId) } : {}),
+  ...(row.gif ? { gif: String(row.gif) } : {}),
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
   replyTo: toLiveReply(row.replyTo),

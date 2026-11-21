@@ -10,6 +10,7 @@ import { readTextChoice, textLookClass, textVars } from './chatTextFont';
 import ChatHeader from './ChatHeader';
 import ChatThread from './ChatThread';
 import ChatComposer from './ChatComposer';
+import { gifByFile } from './chatGifs';
 import './Chat.css';
 
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
@@ -30,12 +31,14 @@ const upsertMessage = (current, item) => {
   if (index < 0) return [...current, item];
   const replyTo = replyOf(item) || replyOf(current[index]);
   const animationId = item.animationId || current[index].animationId || '';
+  const gif = item.gif || current[index].gif || '';
   const next = current.slice();
   next[index] = {
     ...current[index],
     ...item,
     replyTo,
     ...(animationId ? { animationId, animated: true } : {}),
+    ...(gif ? { gif } : {}),
   };
   return next;
 };
@@ -129,7 +132,10 @@ const Chat = ({ userId }) => {
             const withAnim = item.animationId || !local?.animationId
               ? item
               : { ...item, animationId: local.animationId, animated: true };
-            return keepReply(withAnim, local);
+            const withGif = withAnim.gif || !local?.gif
+              ? withAnim
+              : { ...withAnim, gif: local.gif };
+            return keepReply(withGif, local);
           });
           setMessages(kept);
           setPending((current) => dropMatchedPending(current, kept));
@@ -310,8 +316,8 @@ const Chat = ({ userId }) => {
     };
   }, [authReady, isLoggedIn, load, userId]);
 
-  const deliver = (localId, text, replyTo = null, animationId = '') => {
-    sendChatMessage(userId, text, replyTo, animationId)
+  const deliver = (localId, text, replyTo = null, animationId = '', gif = '') => {
+    sendChatMessage(userId, text, replyTo, animationId, gif)
       .then((saved) => {
         if (!saved?.id) {
           setPending((current) => current.map((row) => (
@@ -320,12 +326,17 @@ const Chat = ({ userId }) => {
           return;
         }
         const sentId = String(animationId || '').trim();
-        const mergedBase = sentId && !saved.animationId
-          ? { ...saved, animationId: sentId, animated: true }
-          : saved;
-        const merged = mergedBase.replyTo && replyTo?.animationId && !mergedBase.replyTo.animationId
-          ? { ...mergedBase, replyTo: { ...mergedBase.replyTo, animationId: replyTo.animationId, animated: true } }
-          : mergedBase;
+        const sentGif = String(gif || '').trim();
+        let mergedBase = saved;
+        if (sentId && !mergedBase.animationId) mergedBase = { ...mergedBase, animationId: sentId, animated: true };
+        if (sentGif && !mergedBase.gif) mergedBase = { ...mergedBase, gif: sentGif };
+        if (mergedBase.replyTo && replyTo?.animationId && !mergedBase.replyTo.animationId) {
+          mergedBase = { ...mergedBase, replyTo: { ...mergedBase.replyTo, animationId: replyTo.animationId, animated: true } };
+        }
+        if (mergedBase.replyTo && replyTo?.gif && !mergedBase.replyTo.gif) {
+          mergedBase = { ...mergedBase, replyTo: { ...mergedBase.replyTo, gif: replyTo.gif } };
+        }
+        const merged = mergedBase;
         const shown = keepReply(withKeptReply(merged, replyTo), replyTo);
         rememberReply(localId, replyOf(shown));
         setPending((current) => current.filter((row) => row.id !== localId));
@@ -346,6 +357,7 @@ const Chat = ({ userId }) => {
       senderId: item.senderId,
       text,
       ...(item.animationId ? { animationId: item.animationId } : {}),
+      ...(item.gif ? { gif: item.gif } : {}),
       ...(item.animated || item.animationId ? { animated: true } : {}),
     });
     return true;
@@ -390,18 +402,42 @@ const Chat = ({ userId }) => {
     deliver(localId, name, replyTo, animationId);
   };
 
+  const sendGif = (item) => {
+    const file = String(item?.file || '').trim();
+    const known = gifByFile(file);
+    const name = String(known?.name || item?.name || '').trim();
+    if (!known || !name) return;
+    const replyTo = replyTarget;
+    const localId = `local-${Date.now()}-${localSeq.current + 1}`;
+    localSeq.current += 1;
+    setReplyTarget(null);
+    setPending((current) => [...current, {
+      id: localId,
+      senderId: profile?.id,
+      recipientId: userId,
+      text: name,
+      gif: file,
+      createdAt: new Date().toISOString(),
+      status: 'sending',
+      replyTo: replyTo ? { ...replyTo } : null,
+    }]);
+    deliver(localId, name, replyTo, '', file);
+  };
+
   const retrySend = (localId) => {
     let text = '';
     let replyTo = null;
     let animationId = '';
+    let gif = '';
     setPending((current) => current.map((row) => {
       if (row.id !== localId) return row;
       text = row.text;
       replyTo = row.replyTo || null;
       animationId = row.animationId || '';
+      gif = row.gif || '';
       return { ...row, status: 'sending' };
     }));
-    if (text) deliver(localId, text, replyTo, animationId);
+    if (text) deliver(localId, text, replyTo, animationId, gif);
   };
 
   const shownMessages = useMemo(() => (
@@ -485,6 +521,7 @@ const Chat = ({ userId }) => {
         onTyping={reportTyping}
         onSend={sendNow}
         onSendAnimation={sendAnimation}
+        onSendGif={sendGif}
         reply={replyTarget}
         onCancelReply={() => setReplyTarget(null)}
       />

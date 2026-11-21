@@ -31,8 +31,9 @@ export const fetchChatInbox = async () => {
   return parseJson(response);
 };
 
-export const sendChatMessage = async (userId, text, replyTo = null, animationId = '') => {
+export const sendChatMessage = async (userId, text, replyTo = null, animationId = '', gif = '') => {
   const id = String(animationId || '').trim();
+  const gifFile = String(gif || '').trim();
   const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}`, {
     method: 'POST',
     credentials: 'include',
@@ -40,6 +41,7 @@ export const sendChatMessage = async (userId, text, replyTo = null, animationId 
     body: JSON.stringify({
       text,
       ...(id ? { animationId: id, animated: true } : {}),
+      ...(gifFile ? { gif: gifFile } : {}),
       ...(replyTo?.id ? { replyTo: { id: String(replyTo.id) } } : {}),
     }),
   });

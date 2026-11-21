@@ -18,6 +18,14 @@ import {
   rememberAnimation,
 } from './chatAnimations';
 import ChatLottie from './ChatLottie';
+import ChatGif from './ChatGif';
+import {
+  CHAT_GIFS,
+  gifByFile,
+  gifMatches,
+  readRecentGifIds,
+  rememberGif,
+} from './chatGifs';
 import './AnimationEmojModal.css';
 
 const CLOSE_MS = 340;
@@ -70,6 +78,13 @@ const copy = (lang) => {
       { id: 'love', label: ru ? 'Любовь' : 'Sevgi' },
       { id: 'cinema', label: ru ? 'Кино' : 'Kino' },
       { id: 'emotion', label: ru ? 'Эмоции' : 'Hayajon' },
+    ],
+    gifChips: [
+      { id: 'recent', label: ru ? 'Недавние' : 'So‘nggi' },
+      { id: 'laugh', label: ru ? 'Смех' : 'Kulgi' },
+      { id: 'shock', label: ru ? 'Удивление' : 'Hayron' },
+      { id: 'love', label: ru ? 'Любовь' : 'Sevgi' },
+      { id: 'fear', label: ru ? 'Страх' : 'Qo‘rquv' },
     ],
   };
 };
@@ -261,7 +276,7 @@ const SearchIcon = () => (
   </svg>
 );
 
-const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation }, ref) => {
+const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation, onSendGif }, ref) => {
   const text = copy(lang);
   const [tab, setTab] = useState('animation');
   const [query, setQuery] = useState('');
@@ -269,7 +284,9 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
   const [recentIds, setRecentIds] = useState(readRecentEmojiIds);
   const [burst, setBurst] = useState(null);
   const [chip, setChip] = useState('recent');
+  const [gifChip, setGifChip] = useState('laugh');
   const [animRecent, setAnimRecent] = useState(readRecentAnimationIds);
+  const [gifRecent, setGifRecent] = useState(readRecentGifIds);
   const [stage, setStage] = useState(null);
   const [dragY, setDragY] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(() => !isMobileViewport());
@@ -296,8 +313,8 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
   onCloseRef.current = onClose;
 
   useEffect(() => {
-    if (tab === 'animation' && bodyRef.current) bodyRef.current.scrollTop = 0;
-  }, [chip, query, tab]);
+    if ((tab === 'animation' || tab === 'gif') && bodyRef.current) bodyRef.current.scrollTop = 0;
+  }, [chip, gifChip, query, tab]);
 
   const finishClose = useCallback(() => {
     onCloseRef.current?.();
@@ -488,11 +505,20 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
       : FEATURED_ANIMATIONS)
     : CHAT_ANIMATIONS.filter((item) => item.cat === chip);
   const shownAnim = animPool.filter((item) => animationMatches(item, query));
+  const gifPool = gifChip === 'recent'
+    ? gifRecent.map((file) => gifByFile(file)).filter(Boolean)
+    : CHAT_GIFS.filter((item) => item.cat === gifChip);
+  const shownGif = gifPool.filter((item) => gifMatches(item, query));
 
   const sendStage = () => {
     if (!stage) return;
-    setAnimRecent(rememberAnimation(stage.id));
-    onSendAnimation?.(stage);
+    if (stage.kind === 'gif') {
+      setGifRecent(rememberGif(stage.file));
+      onSendGif?.(stage);
+    } else {
+      setAnimRecent(rememberAnimation(stage.id));
+      onSendAnimation?.(stage);
+    }
     setStage(null);
   };
 
@@ -595,15 +621,15 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
           </div>
         ) : null}
 
-        {tab === 'animation' ? (
+        {tab === 'animation' || tab === 'gif' ? (
           <div className="anim-emoji-chips" role="tablist">
-            {text.chips.map((item) => (
+            {(tab === 'gif' ? text.gifChips : text.chips).map((item) => (
               <button
                 key={item.id}
                 type="button"
-                className={`anim-emoji-chip${chip === item.id ? ' is-on' : ''}`}
-                aria-selected={chip === item.id}
-                onClick={() => setChip(item.id)}
+                className={`anim-emoji-chip${(tab === 'gif' ? gifChip : chip) === item.id ? ' is-on' : ''}`}
+                aria-selected={(tab === 'gif' ? gifChip : chip) === item.id}
+                onClick={() => (tab === 'gif' ? setGifChip(item.id) : setChip(item.id))}
               >
                 {item.id === 'recent' ? <ClockIcon /> : null}
                 {item.label}
@@ -642,8 +668,22 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
             </div>
           ) : tab === 'animation' ? (
             <p className="anim-emoji-empty">{query.trim() ? text.empty : text.emptyRecent}</p>
+          ) : tab === 'gif' && shownGif.length ? (
+            <div className="anim-emoji-grid is-large">
+              {shownGif.map((item) => (
+                <button
+                  key={item.file}
+                  type="button"
+                  className="anim-emoji-cell is-motion"
+                  aria-label={item.name}
+                  onClick={() => setStage({ ...item, kind: 'gif' })}
+                >
+                  <ChatGif file={item.file} className="anim-lottie" label={item.name} root={scrollRoot} />
+                </button>
+              ))}
+            </div>
           ) : (
-            <div className="anim-emoji-grid" />
+            <p className="anim-emoji-empty">{query.trim() ? text.empty : text.emptyRecent}</p>
           )}
         </div>
       </div>
@@ -652,7 +692,9 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation 
           className="anim-stage"
           style={{ background: `radial-gradient(circle at 50% 38%, ${stage.tint} 0%, #14081c 58%, #07060c 100%)` }}
         >
-          <ChatLottie id={stage.id} className="anim-stage-art" label={stage.name} />
+          {stage.kind === 'gif'
+            ? <ChatGif file={stage.file} className="anim-stage-art" label={stage.name} />
+            : <ChatLottie id={stage.id} className="anim-stage-art" label={stage.name} />}
           <div className="anim-stage-actions">
             <button type="button" className="anim-stage-cancel" aria-label={text.cancel} onClick={() => setStage(null)}>
               ×
