@@ -222,7 +222,7 @@ const listenPoster = (file, listener) => {
   };
 };
 
-const ChatGif = ({ file, className = '', label = '', root = null, fit = false, max = 200, still = false, onColor = null }) => {
+const ChatGif = ({ file, className = '', label = '', root = null, fit = false, max = 200, still = false, armed = true, onColor = null }) => {
   const hostRef = useRef(null);
   const videoRef = useRef(null);
   const visibleRef = useRef(false);
@@ -236,7 +236,7 @@ const ChatGif = ({ file, className = '', label = '', root = null, fit = false, m
 
   useEffect(() => {
     const node = hostRef.current;
-    if (!node) return undefined;
+    if (!node || !armed) return undefined;
     if (still && !root) {
       visibleRef.current = false;
       setVisible(false);
@@ -253,18 +253,18 @@ const ChatGif = ({ file, className = '', label = '', root = null, fit = false, m
     }, { root: root || null, rootMargin: '48px' });
     observer.observe(node);
     return () => observer.disconnect();
-  }, [root, still]);
+  }, [armed, root, still]);
 
   useEffect(() => {
-    if (!still || !visible || !safe || poster) return undefined;
+    if (!armed || !still || !visible || !safe || poster) return undefined;
     return listenPoster(safe, (next) => {
       if (next) setPoster(next);
       setReady(true);
     });
-  }, [poster, safe, still, visible]);
+  }, [armed, poster, safe, still, visible]);
 
   useEffect(() => {
-    if (still) return undefined;
+    if (!armed || still) return undefined;
     const node = videoRef.current;
     if (!node) return undefined;
     if (!visible || !safe) {
@@ -337,7 +337,7 @@ const ChatGif = ({ file, className = '', label = '', root = null, fit = false, m
       node.removeEventListener('error', show);
       node.removeEventListener('pause', resume);
     };
-  }, [fit, max, safe, still, visible]);
+  }, [armed, fit, max, safe, still, visible]);
 
   const frame = fit ? (box || { w: Math.min(max, 168), h: Math.min(Math.round(max * 0.75), 126) }) : null;
 

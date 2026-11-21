@@ -167,9 +167,14 @@
   overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
   padding: calc(var(--chat-overlay-top, 76px) + 0.75rem) 0.85rem calc(var(--chat-overlay-bottom, 84px) + var(--chat-keyboard-lift, 0px) + 0.85rem);
   background: transparent;
+}
+
+.chat-thread-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
 .chat-item {

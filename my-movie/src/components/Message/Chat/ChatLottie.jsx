@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import lottie from 'lottie-web/build/player/lottie_svg';
 import SkeletonLoader from '../../SkeletonLoader/SkeletonLoader';
 
-const ChatLottie = ({ id, className = '', label = '', root = null }) => {
+const ChatLottie = ({ id, className = '', label = '', root = null, armed = true }) => {
   const hostRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [ready, setReady] = useState(false);
@@ -10,7 +10,7 @@ const ChatLottie = ({ id, className = '', label = '', root = null }) => {
 
   useEffect(() => {
     const node = hostRef.current;
-    if (!node) return undefined;
+    if (!node || !armed) return undefined;
     if (typeof IntersectionObserver !== 'function') {
       setVisible(true);
       return undefined;
@@ -20,11 +20,11 @@ const ChatLottie = ({ id, className = '', label = '', root = null }) => {
     }, { root: root || null, rootMargin: '48px' });
     observer.observe(node);
     return () => observer.disconnect();
-  }, [root]);
+  }, [armed, root]);
 
   useEffect(() => {
     const node = hostRef.current;
-    if (!node || !visible || !safeId) return undefined;
+    if (!armed || !node || !visible || !safeId) return undefined;
     let gone = false;
     setReady(false);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -47,7 +47,7 @@ const ChatLottie = ({ id, className = '', label = '', root = null }) => {
       anim.destroy();
       setReady(false);
     };
-  }, [safeId, visible]);
+  }, [armed, safeId, visible]);
 
   return (
     <span className={`chat-lottie ${className}`.trim()} role="img" aria-label={label || undefined}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import UserAvatar from '../../UserAvatar/UserAvatar';
 import ChatMessageBlock from './ChatMessageBlock';
 import ChatReplySwipe from './ChatReplySwipe';
@@ -152,10 +152,32 @@ const revealRepliedMessage = (thread, messageId) => {
 
 const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, peer }) => {
   const threadRef = useRef(null);
+  const listRef = useRef(null);
+  const stickRef = useRef(true);
 
-  useEffect(() => {
+  const pinBottom = () => {
     const node = threadRef.current;
-    if (node) node.scrollTop = node.scrollHeight;
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
+    stickRef.current = true;
+  };
+
+  const onThreadScroll = () => {
+    const node = threadRef.current;
+    if (!node) return;
+    const gap = node.scrollHeight - node.scrollTop - node.clientHeight;
+    stickRef.current = gap < 64;
+  };
+
+  useLayoutEffect(() => {
+    pinBottom();
+    const list = listRef.current;
+    if (!list || typeof ResizeObserver !== 'function') return undefined;
+    const observer = new ResizeObserver(() => {
+      if (stickRef.current) pinBottom();
+    });
+    observer.observe(list);
+    return () => observer.disconnect();
   }, [messages, typing]);
 
   const onThreadClick = (event) => {
@@ -165,7 +187,8 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
   };
 
   return (
-    <div className="chat-thread" ref={threadRef} onClick={onThreadClick}>
+    <div className="chat-thread" ref={threadRef} onClick={onThreadClick} onScroll={onThreadScroll}>
+      <div className="chat-thread-list" ref={listRef}>
       {notice ? <p className="chat-notice">{notice}</p> : null}
       {messages.map((item) => {
         const mine = String(item.senderId || '').trim().toLowerCase() === String(selfId || '').trim().toLowerCase();
@@ -201,6 +224,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
           </div>
         );
       })}
+      </div>
     </div>
   );
 };

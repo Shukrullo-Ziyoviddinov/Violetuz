@@ -292,6 +292,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
   const stageAtRef = useRef(0);
   const [dragY, setDragY] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(() => !isMobileViewport());
+  const [sheetSettled, setSheetSettled] = useState(() => !isMobileViewport());
   const [exiting, setExiting] = useState(false);
   const startYRef = useRef(0);
   const dragYRef = useRef(0);
@@ -361,6 +362,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
   useEffect(() => {
     if (!isMobileViewport()) {
       setSheetOpen(true);
+      setSheetSettled(true);
       return undefined;
     }
     const id = window.requestAnimationFrame(() => {
@@ -368,6 +370,33 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
     });
     return () => window.cancelAnimationFrame(id);
   }, []);
+
+  useEffect(() => {
+    if (!sheetOpen || exiting) {
+      setSheetSettled(false);
+      return undefined;
+    }
+    if (!isMobileViewport()) {
+      setSheetSettled(true);
+      return undefined;
+    }
+    const root = document.documentElement;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      setSheetSettled(true);
+    };
+    const onEnd = (event) => {
+      if (event.propertyName === '--chat-emoji-progress') finish();
+    };
+    root.addEventListener('transitionend', onEnd);
+    const timer = window.setTimeout(finish, 380);
+    return () => {
+      root.removeEventListener('transitionend', onEnd);
+      window.clearTimeout(timer);
+    };
+  }, [exiting, sheetOpen]);
 
   useEffect(() => {
     const onKey = (event) => {
@@ -670,7 +699,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
                   aria-label={item.name}
                   onClick={() => openStage(item)}
                 >
-                  <ChatLottie id={item.id} className="anim-lottie" label={item.name} root={scrollRoot} />
+                  <ChatLottie id={item.id} className="anim-lottie" label={item.name} root={scrollRoot} armed={sheetSettled} />
                 </button>
               ))}
             </div>
@@ -686,7 +715,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
                   aria-label={item.name}
                   onClick={() => openStage({ ...item, kind: 'gif' })}
                 >
-                  <ChatGif file={item.file} className="anim-lottie" label={item.name} root={scrollRoot} still />
+                  <ChatGif file={item.file} className="anim-lottie" label={item.name} root={scrollRoot} still armed={sheetSettled} />
                 </button>
               ))}
             </div>
