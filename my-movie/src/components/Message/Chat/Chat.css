@@ -36,7 +36,7 @@
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
+  background: var(--chat-header-pill, rgba(20, 16, 31, 0.92));
   color: #fff;
   font-size: 34px;
   line-height: 1;
@@ -54,7 +54,7 @@
   padding: 5px;
   border: none;
   border-radius: 999px;
-  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
+  background: var(--chat-header-pill, rgba(20, 16, 31, 0.92));
   box-sizing: border-box;
 }
 
@@ -106,7 +106,7 @@
   padding: 0 0.15rem;
   border: none;
   border-radius: 999px;
-  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
+  background: var(--chat-header-pill, rgba(20, 16, 31, 0.92));
   box-sizing: border-box;
 }
 
@@ -776,7 +776,7 @@
   min-height: 52px;
   padding: 0 0.75rem 0 1rem;
   border-radius: 999px;
-  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
+  background: var(--chat-header-pill, rgba(20, 16, 31, 0.92));
 }
 
 .chat-composer-input {
@@ -822,7 +822,7 @@
 html:has(.anim-emoji-modal) .chat-composer-field,
 html:has(.anim-emoji-modal) .chat-composer-cam {
   background-color: #0a0a0a;
-  background-image: linear-gradient(var(--chat-header-fill, rgba(20, 16, 31, 0.8)), var(--chat-header-fill, rgba(20, 16, 31, 0.8)));
+  background-image: linear-gradient(var(--chat-header-pill, rgba(20, 16, 31, 0.92)), var(--chat-header-pill, rgba(20, 16, 31, 0.92)));
 }
 
 .chat-composer-tools {
@@ -867,7 +867,7 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
 }
 
 .chat-composer-cam {
-  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
+  background: var(--chat-header-pill, rgba(20, 16, 31, 0.92));
   color: #d4ceea;
 }
 

@@ -16,6 +16,7 @@ import './Chat.css';
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
 const HEADER_FALLBACK = { r: 20, g: 16, b: 31 };
 const HEADER_ALPHA = 0.8;
+const HEADER_PILL_ALPHA = 0.92;
 const HEADER_SHADOW_ALPHA = 0.34;
 
 const sameId = (left, right) => String(left || '').trim().toLowerCase() === String(right || '').trim().toLowerCase();
@@ -487,6 +488,7 @@ const Chat = ({ userId }) => {
         ...bubbleVars(bubbles),
         ...textVars(textChoice),
         '--chat-header-fill': `rgba(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}, ${HEADER_ALPHA})`,
+        '--chat-header-pill': `rgba(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}, ${HEADER_PILL_ALPHA})`,
         '--chat-header-shadow': `rgba(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b}, ${HEADER_SHADOW_ALPHA})`,
         '--chat-header-ring': `rgb(${headerRgb.r}, ${headerRgb.g}, ${headerRgb.b})`,
       }}
