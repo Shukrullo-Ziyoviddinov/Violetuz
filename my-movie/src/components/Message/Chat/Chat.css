@@ -539,15 +539,34 @@
   display: block;
 }
 
-.chat-block.is-gif,
-.chat-block.is-gif.is-mine {
+.chat-thread > .chat-item:has(.chat-block.is-gif) {
+  align-self: flex-start;
+  width: fit-content;
+  max-width: min(78%, 280px);
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.chat-thread > .chat-item.is-mine:has(.chat-block.is-gif) {
+  align-self: flex-end;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.chat-item .chat-block.is-gif,
+.chat-item .chat-block.is-gif.is-mine {
+  align-self: flex-start;
   background: transparent;
   padding: 0;
   overflow: visible;
   border-radius: 0;
   box-shadow: none;
-  width: fit-content;
-  max-width: min(78%, 280px);
+  width: max-content;
+  max-width: 100%;
+}
+
+.chat-item.is-mine .chat-block.is-gif {
+  align-self: flex-end;
 }
 
 .chat-block.is-gif .chat-block-main {
