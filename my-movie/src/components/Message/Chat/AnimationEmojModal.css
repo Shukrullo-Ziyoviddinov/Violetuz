@@ -341,9 +341,15 @@
 }
 
 .anim-emoji-cell.is-motion .chat-lottie-host,
-.anim-emoji-cell.is-motion .chat-gif-video {
+.anim-emoji-cell.is-motion .chat-gif-video,
+.anim-emoji-cell.is-motion .chat-gif-still {
   width: 78%;
   height: 78%;
+}
+
+.anim-emoji-cell.is-motion .chat-gif-still {
+  position: relative;
+  opacity: 1;
 }
 
 .anim-emoji-cell.is-motion .chat-gif {
@@ -361,7 +367,8 @@
   height: 100%;
 }
 
-.chat-gif-video {
+.chat-gif-video,
+.chat-gif-still {
   display: block;
   width: 100%;
   height: 100%;

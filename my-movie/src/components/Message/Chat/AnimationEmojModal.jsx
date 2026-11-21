@@ -686,7 +686,7 @@ const AnimationEmojModal = forwardRef(({ lang, onClose, onPick, onSendAnimation,
                   aria-label={item.name}
                   onClick={() => openStage({ ...item, kind: 'gif' })}
                 >
-                  <ChatGif file={item.file} className="anim-lottie" label={item.name} root={scrollRoot} />
+                  <ChatGif file={item.file} className="anim-lottie" label={item.name} root={scrollRoot} still />
                 </button>
               ))}
             </div>
