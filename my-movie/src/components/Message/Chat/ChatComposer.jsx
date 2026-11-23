@@ -117,15 +117,15 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
     <div className="chat-composer-wrap">
       {edit?.id ? (
         <div className="chat-reply-draft is-edit">
+          <svg className="chat-reply-draft-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            <path d="M4 20h4.2L19 9.2a1.6 1.6 0 0 0 0-2.3l-1.9-1.9a1.6 1.6 0 0 0-2.3 0L4 15.8V20Z" strokeLinejoin="round" />
+            <path d="M12.6 6.4l5 5" strokeLinecap="round" />
+          </svg>
           <div className="chat-reply-draft-main">
             <p className="chat-reply-draft-who">
               <strong>{editLabel}</strong>
             </p>
             <div className="chat-reply-draft-body">
-              <svg className="chat-reply-draft-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                <path d="M4 20h4.2L19 9.2a1.6 1.6 0 0 0 0-2.3l-1.9-1.9a1.6 1.6 0 0 0-2.3 0L4 15.8V20Z" strokeLinejoin="round" />
-                <path d="M12.6 6.4l5 5" strokeLinecap="round" />
-              </svg>
               {edit.quoteEditable ? (
                 <input
                   className="chat-reply-draft-text"
