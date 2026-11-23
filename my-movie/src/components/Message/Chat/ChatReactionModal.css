@@ -1,11 +1,23 @@
+@property --chat-react-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 .chat-react-modal {
+  --chat-react-progress: 0;
   position: fixed;
   inset: 0;
   z-index: 80;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(8, 6, 16, 0.46);
+  background: rgba(8, 6, 16, calc(0.46 * var(--chat-react-progress, 0)));
+  transition: --chat-react-progress 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.chat-react-modal.is-dragging {
+  transition: none;
 }
 
 .chat-react-sheet {
@@ -18,6 +30,12 @@
   background: #0a0a0a;
   color: #fff;
   box-sizing: border-box;
+  transform: translate3d(0, calc((1 - var(--chat-react-progress, 0)) * 100%), 0);
+}
+
+.chat-react-sheet-top {
+  flex-shrink: 0;
+  touch-action: none;
 }
 
 .chat-react-grab {
@@ -167,4 +185,10 @@
 
 .chat-react-recent button {
   font-size: 1.7rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-react-modal {
+    transition: none;
+  }
 }

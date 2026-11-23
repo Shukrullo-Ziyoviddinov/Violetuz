@@ -98,6 +98,7 @@ const Chat = ({ userId }) => {
   const repliesRef = useRef(new Map());
   const holdRef = useRef(null);
   const holdUiRef = useRef(null);
+  const reactionUiRef = useRef(null);
   const closeHoldRef = useRef(() => {});
   const dismissHoldRef = useRef(() => {});
   pendingRef.current = pending;
@@ -123,6 +124,10 @@ const Chat = ({ userId }) => {
     isOpen: Boolean(hold),
     hasNested: reactionOpen || deleteOpen,
     onNestedBack: () => {
+      if (reactionUiRef.current?.close) {
+        reactionUiRef.current.close();
+        return;
+      }
       setReactionOpen(false);
       setDeleteOpen(false);
     },
@@ -468,8 +473,11 @@ const Chat = ({ userId }) => {
     if (!hold) return undefined;
     const onKey = (event) => {
       if (event.key !== 'Escape') return;
-      if (reactionOpen || deleteOpen) {
-        setReactionOpen(false);
+      if (reactionUiRef.current?.close) {
+        reactionUiRef.current.close();
+        return;
+      }
+      if (deleteOpen) {
         setDeleteOpen(false);
         return;
       }
@@ -477,7 +485,7 @@ const Chat = ({ userId }) => {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [hold, reactionOpen, deleteOpen, releaseAll]);
+  }, [hold, deleteOpen, releaseAll]);
 
   const sendNow = (text) => {
     const replyTo = replyTarget;
@@ -667,6 +675,7 @@ const Chat = ({ userId }) => {
       ) : null}
       {hold && reactionOpen ? (
         <ChatReactionModal
+          ref={reactionUiRef}
           lang={lang}
           onClose={() => setReactionOpen(false)}
           onPick={() => dismissHoldRef.current(releaseAll)}
