@@ -870,19 +870,19 @@
 .chat-composer-field-end {
   position: relative;
   width: calc(28px + 28px + 0.75rem);
-  height: 34px;
+  height: 40px;
   flex-shrink: 0;
   overflow: hidden;
   transition: width 0.22s cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
 .chat-composer-field-end.is-send {
-  width: 34px;
+  width: 40px;
 }
 
 .chat-composer-field-icons {
   position: absolute;
-  top: 3px;
+  top: 6px;
   right: 0;
   display: flex;
   align-items: center;
@@ -903,8 +903,8 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1001,7 +1001,7 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
 }
 
 .chat-composer-mic {
-  background: #7c3aed;
+  background: #9b4fe7;
   color: #fff;
 }
 
