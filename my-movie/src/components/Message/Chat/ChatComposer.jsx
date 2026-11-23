@@ -14,6 +14,8 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
   const replyName = String(peerName || '').trim();
   const selfReplyLabel = lang === 'ru' ? 'Ответ себе' : 'O‘zingizga javob';
   const replySuffix = lang === 'ru' ? 'ответ' : 'ga javob';
+  const sendLabel = lang === 'ru' ? 'Отправить' : 'Yuborish';
+  const canSend = text.trim().length > 0;
 
   useEffect(() => {
     if (reply?.id && !disabled) inputRef.current?.focus();
@@ -78,7 +80,7 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
             </p>
             <div className="chat-reply-draft-body">
               <span className="chat-reply-film" aria-hidden="true" />
-              <span className="chat-reply-draft-text">{reply.text}</span>
+              <span className="chat-reply-draft-text">{String(reply.text).replace(/\s+/g, ' ').trim()}</span>
             </div>
           </div>
           <button type="button" className="chat-reply-draft-x" aria-label={closeLabel} onClick={onCancelReply}>
@@ -87,7 +89,7 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
         </div>
       ) : null}
       <form className={`chat-composer${open ? ' is-open' : ''}`} onSubmit={submit}>
-        <div className="chat-composer-field" onPointerDown={openComposer}>
+        <div className={`chat-composer-field${canSend ? ' has-text' : ''}`} onPointerDown={openComposer}>
           <input
             ref={inputRef}
             className="chat-composer-input"
@@ -106,38 +108,55 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
               onTyping?.(next.trim().length > 0);
             }}
           />
-          <span className="chat-composer-field-icons">
+          <span className={`chat-composer-field-end${canSend ? ' is-send' : ''}`}>
+            <span className="chat-composer-field-icons" aria-hidden={canSend}>
+              <button
+                type="button"
+                className="chat-composer-emoji"
+                aria-label={lang === 'ru' ? 'Эмодзи' : 'Emoji'}
+                aria-expanded={emojiOpen}
+                disabled={disabled}
+                tabIndex={canSend ? -1 : 0}
+                onPointerDown={(event) => event.stopPropagation()}
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (disabled || canSend) return;
+                  if (emojiOpen) {
+                    emojiRef.current?.close();
+                    return;
+                  }
+                  inputRef.current?.blur();
+                  setEmojiOpen(true);
+                }}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                  <circle cx="12" cy="12" r="8.2" />
+                  <path d="M8.6 13.6c.7 1.3 1.9 2 3.4 2s2.7-.7 3.4-2" strokeLinecap="round" />
+                  <circle cx="9.2" cy="10.2" r="0.9" fill="currentColor" stroke="none" />
+                  <circle cx="14.8" cy="10.2" r="0.9" fill="currentColor" stroke="none" />
+                </svg>
+              </button>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                <rect x="4" y="5.5" width="16" height="13" rx="2" />
+                <circle cx="9" cy="10" r="1.3" fill="currentColor" stroke="none" />
+                <path d="M4.5 16.2l4.2-3.6 3 2.5 2.2-1.8 5.6 4.2" strokeLinejoin="round" />
+              </svg>
+            </span>
             <button
-              type="button"
-              className="chat-composer-emoji"
-              aria-label={lang === 'ru' ? 'Эмодзи' : 'Emoji'}
-              aria-expanded={emojiOpen}
-              disabled={disabled}
+              type="submit"
+              className="chat-composer-send"
+              aria-label={sendLabel}
+              aria-hidden={!canSend}
+              disabled={disabled || !canSend}
+              tabIndex={canSend ? 0 : -1}
               onPointerDown={(event) => event.stopPropagation()}
               onMouseDown={(event) => event.stopPropagation()}
-              onClick={(event) => {
-                event.stopPropagation();
-                if (disabled) return;
-                if (emojiOpen) {
-                  emojiRef.current?.close();
-                  return;
-                }
-                inputRef.current?.blur();
-                setEmojiOpen(true);
-              }}
             >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-                <circle cx="12" cy="12" r="8.2" />
-                <path d="M8.6 13.6c.7 1.3 1.9 2 3.4 2s2.7-.7 3.4-2" strokeLinecap="round" />
-                <circle cx="9.2" cy="10.2" r="0.9" fill="currentColor" stroke="none" />
-                <circle cx="14.8" cy="10.2" r="0.9" fill="currentColor" stroke="none" />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3.4 11.2 20.4 3.6c.7-.3 1.4.4 1.1 1.1l-7.6 17c-.3.8-1.5.7-1.7-.1l-2.1-7.2-7.2-2.1c-.8-.2-.9-1.4-.1-1.7Z" />
               </svg>
             </button>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
-              <rect x="4" y="5.5" width="16" height="13" rx="2" />
-              <circle cx="9" cy="10" r="1.3" fill="currentColor" stroke="none" />
-              <path d="M4.5 16.2l4.2-3.6 3 2.5 2.2-1.8 5.6 4.2" strokeLinejoin="round" />
-            </svg>
           </span>
         </div>
         <div className="chat-composer-tools">

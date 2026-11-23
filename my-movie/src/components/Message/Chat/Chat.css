@@ -499,6 +499,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
   margin: 0 0.7rem 8px;
   padding: 8px 6px 8px 10px;
   border-radius: 16px;
@@ -543,6 +545,7 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .chat-reply-draft .chat-reply-film {
@@ -550,11 +553,14 @@
 }
 
 .chat-reply-draft-text {
+  display: block;
   flex: 1;
   min-width: 0;
   overflow: hidden;
   font-weight: 400;
   white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
   text-overflow: ellipsis;
   color: rgba(255, 255, 255, 0.88);
   font-size: 0.86rem;
@@ -861,12 +867,67 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+.chat-composer-field-end {
+  position: relative;
+  width: calc(28px + 28px + 0.75rem);
+  height: 28px;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.22s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.chat-composer-field-end.is-send {
+  width: 28px;
+}
+
 .chat-composer-field-icons {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  height: 28px;
   color: #d4ceea;
-  flex-shrink: 0;
+  transform-origin: right center;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.chat-composer-field-end.is-send .chat-composer-field-icons {
+  opacity: 0;
+  transform: scale(0.72);
+  pointer-events: none;
+}
+
+.chat-composer-send {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.72);
+  transform-origin: center;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.chat-composer-field-end.is-send .chat-composer-send {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.chat-composer-send:disabled {
+  cursor: default;
 }
 
 .chat-composer-emoji {
@@ -971,7 +1032,10 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
 
 @media (prefers-reduced-motion: reduce) {
   .chat-composer-media,
-  .chat-composer-back {
+  .chat-composer-back,
+  .chat-composer-field-end,
+  .chat-composer-field-icons,
+  .chat-composer-send {
     transition: none;
   }
 }
