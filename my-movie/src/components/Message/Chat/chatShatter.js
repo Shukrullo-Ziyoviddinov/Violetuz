@@ -1,4 +1,4 @@
-export const SHATTER_MS = 680;
+export const SHATTER_MS = 1180;
 
 const CELL = 6;
 const MAX_PIECES = 240;
@@ -142,18 +142,18 @@ export const shatterElement = (bubble) => {
       const len = Math.hypot(vx, vy) || 1;
       vx /= len;
       vy /= len;
-      const speed = 110 + Math.random() * 170;
-      const dx = vx * speed + (Math.random() - 0.5) * 36;
-      const dy = vy * speed + (Math.random() - 0.45) * 70;
-      const rot = (Math.random() - 0.5) * 280;
-      const duration = SHATTER_MS - Math.round(Math.random() * 120);
+      const speed = 62 + Math.random() * 58;
+      const dx = vx * speed + (Math.random() - 0.5) * 18;
+      const dy = vy * speed + (Math.random() - 0.45) * 28;
+      const rot = (Math.random() - 0.5) * 120;
+      const duration = SHATTER_MS - Math.round(Math.random() * 160);
       bit.animate(
         [
           { transform: 'translate(0px, 0px) rotate(0deg) scale(1)', opacity: 1 },
-          { transform: `translate(${dx * 0.42}px, ${dy * 0.42}px) rotate(${rot * 0.45}deg) scale(0.9)`, opacity: 1, offset: 0.18 },
-          { transform: `translate(${dx}px, ${dy + 28}px) rotate(${rot}deg) scale(0.35)`, opacity: 0 },
+          { transform: `translate(${dx * 0.34}px, ${dy * 0.34}px) rotate(${rot * 0.35}deg) scale(0.94)`, opacity: 1, offset: 0.42 },
+          { transform: `translate(${dx}px, ${dy + 16}px) rotate(${rot}deg) scale(0.45)`, opacity: 0 },
         ],
-        { duration, easing: 'cubic-bezier(0.12, 0.7, 0.2, 1)', fill: 'forwards' }
+        { duration, easing: 'cubic-bezier(0.33, 0.15, 0.28, 1)', fill: 'forwards' }
       );
     }
   }
