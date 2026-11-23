@@ -1010,6 +1010,24 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
   transform: translateY(0);
 }
 
+.chat-hold-stage.is-narrow .chat-hold-reactions,
+.chat-hold-stage.is-narrow .chat-hold-menu {
+  left: 50%;
+}
+
+.chat-hold-stage.is-narrow .chat-hold-reactions {
+  transform: translate(-50%, 8px);
+}
+
+.chat-hold-stage.is-narrow .chat-hold-menu {
+  transform: translate(-50%, 10px);
+}
+
+.chat-hold-stage.is-narrow.is-shown .chat-hold-reactions,
+.chat-hold-stage.is-narrow.is-shown .chat-hold-menu {
+  transform: translate(-50%, 0);
+}
+
 .chat-hold-reactions button {
   width: 36px;
   height: 36px;
@@ -1050,6 +1068,18 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
 .chat-hold-stage.is-flip .chat-hold-menu {
   top: auto;
   bottom: calc(100% + 58px);
+}
+
+.chat-hold-bubble {
+  width: max-content;
+  max-width: min(78vw, 22rem);
+}
+
+.chat-hold-bubble .chat-block:not(.is-gif),
+.chat-hold-bubble .chat-block.has-status:not(.is-gif),
+.chat-hold-bubble .chat-block.has-quote:not(.is-gif) {
+  width: max-content;
+  max-width: min(78vw, 22rem);
 }
 
 .chat-hold-bubble .chat-block.is-gif,

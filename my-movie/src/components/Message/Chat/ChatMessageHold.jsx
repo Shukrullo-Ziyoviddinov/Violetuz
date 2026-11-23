@@ -50,7 +50,9 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     const above = (reactions?.offsetHeight || 44) + 8;
     const below = (menu?.offsetHeight || 156) + 8;
     const bubbleH = bubble?.offsetHeight || node.offsetHeight || 48;
-    const groupW = Math.max(node.offsetWidth, menu?.offsetWidth || 228, reactions?.offsetWidth || 0);
+    const bubbleW = bubble?.offsetWidth || node.offsetWidth || 0;
+    const groupW = Math.max(bubbleW, menu?.offsetWidth || 228, reactions?.offsetWidth || 0);
+    const narrow = node.classList.contains('is-narrow');
     const total = above + bubbleH + below;
     const page = document.querySelector('.chat')?.getBoundingClientRect();
     const pageLeft = page?.left || 0;
@@ -63,7 +65,10 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     const centerX = pageLeft + pageWidth / 4;
     const minLeft = pageLeft + inset;
     const maxLeft = Math.max(minLeft, pageLeft + pageWidth - groupW - inset);
-    const left = Math.min(maxLeft, Math.max(minLeft, Math.round(centerX - groupW / 2)));
+    const axis = Math.min(Math.max(minLeft + groupW / 2, centerX), maxLeft + groupW / 2);
+    const left = narrow
+      ? Math.round(axis - bubbleW / 2)
+      : Math.min(maxLeft, Math.max(minLeft, Math.round(centerX - groupW / 2)));
     setSpot({
       left,
       top,
@@ -199,7 +204,7 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     <div className={`chat-hold${bursting ? ' is-burst' : ''}`} role="presentation" onClick={() => { if (!bursting) settle(onClose); }}>
       <div
         ref={stageRef}
-        className={`chat-hold-stage${mine ? ' is-mine' : ''}${mediaMessage(message) ? ' is-compact' : ''}${ready ? ' is-set' : ''}${shown ? ' is-shown' : ''}`}
+        className={`chat-hold-stage${mine ? ' is-mine' : ''}${mediaMessage(message) ? ' is-compact' : ''}${!message.gif && (message.animationId || message.animated || emojiOnlyCount(message.text)) ? ' is-narrow' : ''}${ready ? ' is-set' : ''}${shown ? ' is-shown' : ''}`}
         style={spot ? { left: spot.left, top: spot.top } : { visibility: 'hidden' }}
         onClick={(event) => event.stopPropagation()}
       >
