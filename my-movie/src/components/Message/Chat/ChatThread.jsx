@@ -209,7 +209,12 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
               const timer = window.setTimeout(() => {
                 if (!node.isConnected) return;
                 const block = node.querySelector('.chat-block') || node;
-                const rect = block.getBoundingClientRect();
+                const glyph = block.classList?.contains('is-emoji')
+                  && !block.classList.contains('is-anim')
+                  && !block.classList.contains('is-gif')
+                  ? block.querySelector('.chat-emoji-still, .chat-emoji-solo, .chat-block-text')
+                  : null;
+                const rect = (glyph || block).getBoundingClientRect();
                 onHold?.({
                   item,
                   mine,
@@ -251,6 +256,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
               <ChatMessageBlock
                 text={item.text}
                 mine={mine}
+                held={heldId === item.id}
                 quote={quote}
                 replyId={item.replyTo?.id || ''}
                 animated={item.animated === true}

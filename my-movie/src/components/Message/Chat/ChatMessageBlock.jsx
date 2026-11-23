@@ -5,13 +5,20 @@ import ChatGif from './ChatGif';
 
 const PLAY_MS = 1800;
 
-const SoloEmoji = ({ text }) => {
+const SoloEmoji = ({ text, held = false }) => {
   const [token, setToken] = useState(0);
   const timerRef = useRef(null);
   const startRef = useRef(null);
   const motionId = emojiMotionId(text);
 
   useEffect(() => () => window.clearTimeout(timerRef.current), []);
+
+  useEffect(() => {
+    if (!held) return undefined;
+    window.clearTimeout(timerRef.current);
+    setToken(0);
+    return undefined;
+  }, [held]);
 
   const stop = () => {
     window.clearTimeout(timerRef.current);
@@ -60,6 +67,7 @@ const LoopEmoji = ({ text }) => {
 const ChatMessageBlock = ({
   text,
   mine,
+  held = false,
   status = null,
   quote = '',
   replyId = '',
@@ -93,7 +101,7 @@ const ChatMessageBlock = ({
         </button>
       ) : null}
       <div className="chat-block-main">
-        {mineGif ? <ChatGif file={gif} fit label={text} /> : mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} /> : <span className="chat-block-text">{text}</span>}
+        {mineGif ? <ChatGif file={gif} fit label={text} /> : mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} held={held} /> : <span className="chat-block-text">{text}</span>}
         {status}
       </div>
     </div>
