@@ -19,9 +19,9 @@ const removeChatMessage = async (meId, messageId, forPeer) => {
   const recipient = normalizeId(row.recipientId);
   if (me !== sender && me !== recipient) throw notFound('Xabar topilmadi');
   if (forPeer) {
-    await ChatMessage.deleteOne({ _id: row._id });
     const other = me === sender ? recipient : sender;
     publishDelete(other, { id: String(row._id) });
+    await ChatMessage.deleteOne({ _id: row._id });
     return { id: String(row._id), forPeer: true };
   }
   await ChatMessage.updateOne(

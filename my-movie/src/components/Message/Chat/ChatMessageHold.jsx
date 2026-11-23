@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, use
 import { createPortal } from 'react-dom';
 import { emojiFromId, emojiOnlyCount } from './chatEmojis';
 import ChatMessageBlock from './ChatMessageBlock';
+import { shatterElement, SHATTER_MS } from './chatShatter';
 
 const QUICK = ['1f44d', '2764', '1f602', '1f62e', '1f37f', '1f525'];
 const MOVE_MS = 340;
@@ -34,7 +35,9 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
   const [ready, setReady] = useState(false);
   const [moved, setMoved] = useState(false);
   const [shown, setShown] = useState(false);
+  const [bursting, setBursting] = useState(false);
   const shownRef = useRef(false);
+  const burstLayerRef = useRef(null);
   onCloseRef.current = onClose;
   shownRef.current = shown;
 
@@ -167,12 +170,33 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     panels?.addEventListener('transitionend', go);
   };
 
+  const shatter = (done) => {
+    if (closingRef.current) {
+      done?.();
+      return;
+    }
+    closingRef.current = true;
+    shownRef.current = false;
+    setShown(false);
+    setBursting(true);
+    const bubble = stageRef.current?.querySelector('.chat-hold-bubble');
+    if (!bubble || reducedMotion()) {
+      done?.();
+      return;
+    }
+    burstLayerRef.current = shatterElement(bubble);
+    window.setTimeout(() => done?.(), SHATTER_MS);
+  };
+
+  useEffect(() => () => burstLayerRef.current?.remove(), []);
+
   useImperativeHandle(ref, () => ({
     close: (done) => settle(done || onCloseRef.current),
+    shatter: (done) => shatter(done || onCloseRef.current),
   }), []);
 
   return createPortal(
-    <div className="chat-hold" role="presentation" onClick={() => settle(onClose)}>
+    <div className={`chat-hold${bursting ? ' is-burst' : ''}`} role="presentation" onClick={() => { if (!bursting) settle(onClose); }}>
       <div
         ref={stageRef}
         className={`chat-hold-stage${mine ? ' is-mine' : ''}${mediaMessage(message) ? ' is-compact' : ''}${ready ? ' is-set' : ''}${shown ? ' is-shown' : ''}`}
@@ -198,6 +222,7 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
             transform: moved
               ? 'translate(0px, 0px)'
               : `translate(${spot.fromX}px, ${spot.fromY}px)`,
+            visibility: bursting ? 'hidden' : undefined,
           } : undefined}
         >
           <ChatMessageBlock

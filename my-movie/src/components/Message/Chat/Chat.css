@@ -206,7 +206,8 @@
   -webkit-touch-callout: none;
 }
 
-.chat-item.is-held {
+.chat-item.is-held,
+.chat-item.is-shattering {
   visibility: hidden;
 }
 
@@ -955,6 +956,24 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
   z-index: 70;
   background: rgba(8, 6, 16, 0.55);
   animation: chat-hold-fade 0.28s ease;
+}
+
+.chat-hold.is-burst {
+  background: transparent;
+  transition: background 0.42s ease;
+}
+
+.chat-hold-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 76;
+  pointer-events: none;
+}
+
+.chat-hold-shard {
+  position: fixed;
+  margin: 0;
+  pointer-events: none;
 }
 
 .chat-hold-stage {

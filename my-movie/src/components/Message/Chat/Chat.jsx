@@ -16,6 +16,7 @@ import ChatMessageHold from './ChatMessageHold';
 import ChatReactionModal from './ChatReactionModal';
 import ChatDeleteMessageModal from './ChatDeleteMessageModal';
 import { gifByFile } from './chatGifs';
+import { shatterElement, SHATTER_MS } from './chatShatter';
 import './Chat.css';
 
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
@@ -101,6 +102,7 @@ const Chat = ({ userId }) => {
   const reactionUiRef = useRef(null);
   const closeHoldRef = useRef(() => {});
   const dismissHoldRef = useRef(() => {});
+  const flyMessageAwayRef = useRef(() => {});
   pendingRef.current = pending;
   holdRef.current = hold;
 
@@ -305,6 +307,34 @@ const Chat = ({ userId }) => {
     return () => window.removeEventListener('violet-chat-text', onText);
   }, []);
 
+  flyMessageAwayRef.current = (id, after) => {
+    const finish = () => {
+      setMessages((current) => current.filter((row) => row.id !== id));
+      setPending((current) => current.filter((row) => row.id !== id));
+      after?.();
+    };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      finish();
+      return;
+    }
+    if (holdRef.current?.id === id && holdUiRef.current?.shatter) {
+      holdUiRef.current.shatter(finish);
+      return;
+    }
+    const row = document.querySelector(`[data-message-id="${CSS.escape(String(id))}"]`);
+    const block = row?.querySelector('.chat-block') || row;
+    const layer = block ? shatterElement(block) : null;
+    if (!row || !layer) {
+      finish();
+      return;
+    }
+    row.classList.add('is-shattering');
+    window.setTimeout(() => {
+      layer.remove();
+      finish();
+    }, SHATTER_MS);
+  };
+
   useEffect(() => {
     if (!authReady || !isLoggedIn || !userId) return undefined;
     let closed = false;
@@ -349,9 +379,11 @@ const Chat = ({ userId }) => {
       },
       onDelete: (item) => {
         if (closed || !item?.id) return;
-        setMessages((current) => current.filter((row) => row.id !== item.id));
-        setPending((current) => current.filter((row) => row.id !== item.id));
-        if (holdRef.current?.id === item.id) closeHoldRef.current();
+        const id = item.id;
+        const held = holdRef.current?.id === id;
+        flyMessageAwayRef.current(id, () => {
+          if (held) closeHoldRef.current();
+        });
       },
       onReconnect: () => {
         if (!closed) load().catch(() => {});
@@ -453,20 +485,27 @@ const Chat = ({ userId }) => {
     dismissHoldRef.current(releaseAll);
   };
 
-  const confirmDelete = async (forPeer) => {
+  const confirmDelete = (forPeer) => {
     const id = hold?.id;
     if (!id || deleteBusy) return;
+    const kept = messages.find((row) => row.id === id) || pending.find((row) => row.id === id) || null;
     setDeleteBusy(true);
-    try {
-      await deleteChatMessage(id, forPeer);
-      setMessages((current) => current.filter((row) => row.id !== id));
-      setPending((current) => current.filter((row) => row.id !== id));
-      setDeleteBusy(false);
-      setDeleteOpen(false);
-      dismissHoldRef.current(releaseAll);
-    } catch {
-      setDeleteBusy(false);
-    }
+    setDeleteOpen(false);
+    let failed = false;
+    const request = deleteChatMessage(id, forPeer).catch(() => {
+      failed = true;
+    }).finally(() => setDeleteBusy(false));
+    flyMessageAwayRef.current(id, () => {
+      releaseAll();
+      request.then(() => {
+        if (!failed || !kept) return;
+        setMessages((current) => (
+          current.some((row) => row.id === id)
+            ? current
+            : [...current, kept].sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0))
+        ));
+      });
+    });
   };
 
   useEffect(() => {
