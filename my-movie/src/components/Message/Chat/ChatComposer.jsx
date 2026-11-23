@@ -21,13 +21,35 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
     if (reply?.id && !disabled) inputRef.current?.focus();
   }, [reply?.id, disabled]);
 
+  const sentGuard = useRef(0);
+
+  const keepKeyboard = () => {
+    const field = inputRef.current;
+    if (!field || field.disabled) return;
+    field.focus({ preventScroll: true });
+  };
+
   const submit = (event) => {
-    event.preventDefault();
+    event?.preventDefault?.();
+    const now = Date.now();
+    if (now - sentGuard.current < 350) {
+      keepKeyboard();
+      return;
+    }
     const value = text.trim();
     if (!value || disabled || !onSend) return;
+    sentGuard.current = now;
     setText('');
     onTyping?.(false);
     onSend(value);
+    keepKeyboard();
+    requestAnimationFrame(keepKeyboard);
+  };
+
+  const holdKeyboard = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    keepKeyboard();
   };
 
   const keyboardIsOpen = () => {
@@ -150,8 +172,9 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
               aria-hidden={!canSend}
               disabled={disabled || !canSend}
               tabIndex={canSend ? 0 : -1}
-              onPointerDown={(event) => event.stopPropagation()}
-              onMouseDown={(event) => event.stopPropagation()}
+              onPointerDown={holdKeyboard}
+              onMouseDown={holdKeyboard}
+              onPointerUp={submit}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M3.4 11.2 20.4 3.6c.7-.3 1.4.4 1.1 1.1l-7.6 17c-.3.8-1.5.7-1.7-.1l-2.1-7.2-7.2-2.1c-.8-.2-.9-1.4-.1-1.7Z" />
