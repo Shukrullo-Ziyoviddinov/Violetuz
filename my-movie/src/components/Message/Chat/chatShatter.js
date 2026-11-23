@@ -1,7 +1,11 @@
 export const SHATTER_MS = 1180;
 
-const CELL = 6;
-const MAX_PIECES = 240;
+const EMOJI_CELL = 6;
+const EMOJI_MAX = 240;
+const ANIM_CELL = 5;
+const ANIM_MAX = 520;
+const FINE_CELL = 3.5;
+const FINE_MAX = 1100;
 
 const roundRect = (ctx, x, y, width, height, radius) => {
   const r = Math.max(0, Math.min(radius, width / 2, height / 2));
@@ -93,6 +97,13 @@ const visualOf = (bubble) => (
   bubble.matches?.('.chat-block') ? bubble : (bubble.querySelector('.chat-block') || bubble)
 );
 
+const kindOf = (visual) => {
+  if (visual.classList?.contains('is-gif')) return 'gif';
+  if (visual.classList?.contains('is-anim')) return 'anim';
+  if (visual.classList?.contains('is-emoji')) return 'emoji';
+  return 'text';
+};
+
 export const shatterElement = (bubble) => {
   if (!bubble) return null;
   const visual = visualOf(bubble);
@@ -100,14 +111,20 @@ export const shatterElement = (bubble) => {
   if (rect.width < 2 || rect.height < 2) return null;
   const shot = snapshot(visual, rect.width, rect.height);
   if (!shot) return null;
-  let cols = Math.max(8, Math.ceil(rect.width / CELL));
-  let rows = Math.max(5, Math.ceil(rect.height / CELL));
-  while (cols * rows > MAX_PIECES) {
+  const kind = kindOf(visual);
+  const fine = kind === 'gif' || kind === 'text';
+  const cell = kind === 'anim' ? ANIM_CELL : (fine ? FINE_CELL : EMOJI_CELL);
+  const maxPieces = kind === 'anim' ? ANIM_MAX : (fine ? FINE_MAX : EMOJI_MAX);
+  const minCols = kind === 'anim' ? 10 : (fine ? 12 : 8);
+  const minRows = kind === 'anim' ? 7 : (fine ? 8 : 5);
+  let cols = Math.max(minCols, Math.ceil(rect.width / cell));
+  let rows = Math.max(minRows, Math.ceil(rect.height / cell));
+  while (cols * rows > maxPieces) {
     if (cols >= rows) cols -= 1;
     else rows -= 1;
   }
-  cols = Math.max(6, cols);
-  rows = Math.max(4, rows);
+  cols = Math.max(kind === 'anim' ? 8 : (fine ? 10 : 6), cols);
+  rows = Math.max(kind === 'anim' ? 6 : (fine ? 6 : 4), rows);
   const cellW = rect.width / cols;
   const cellH = rect.height / rows;
   const layer = document.createElement('div');
@@ -142,9 +159,9 @@ export const shatterElement = (bubble) => {
       const len = Math.hypot(vx, vy) || 1;
       vx /= len;
       vy /= len;
-      const speed = 62 + Math.random() * 58;
-      const dx = vx * speed + (Math.random() - 0.5) * 18;
-      const dy = vy * speed + (Math.random() - 0.45) * 28;
+      const speed = fine ? 118 + Math.random() * 84 : 62 + Math.random() * 58;
+      const dx = vx * speed + (Math.random() - 0.5) * (fine ? 36 : 18);
+      const dy = vy * speed + (Math.random() - 0.45) * (fine ? 52 : 28);
       const rot = (Math.random() - 0.5) * 120;
       const duration = SHATTER_MS - Math.round(Math.random() * 160);
       bit.animate(
