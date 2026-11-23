@@ -23,31 +23,39 @@
   gap: 0.5rem;
   min-height: 64px;
   padding: 0.45rem 0.7rem;
-  background: transparent;
-  --chat-haze: var(--chat-header-rgb, 20, 16, 31);
+  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
 }
 
 .chat-header::before {
   content: '';
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 12px;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgba(var(--chat-haze), 0.88) 0%,
-    rgba(var(--chat-haze), 0.5) 46%,
-    rgba(var(--chat-haze), 0.22) 78%,
-    rgba(var(--chat-haze), 0.06) 100%
-  );
-  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 64' preserveAspectRatio='none'><filter id='b'><feGaussianBlur stdDeviation='2.4 4.5'/></filter><rect x='0' y='0' width='100' height='36' fill='%23fff'/><path filter='url(%23b)' fill='%23fff' d='M0 28H100V46C90 54 78 40 66 50C54 60 42 38 30 49C18 60 8 42 0 52Z'/></svg>");
-  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 64' preserveAspectRatio='none'><filter id='b'><feGaussianBlur stdDeviation='2.4 4.5'/></filter><rect x='0' y='0' width='100' height='36' fill='%23fff'/><path filter='url(%23b)' fill='%23fff' d='M0 28H100V46C90 54 78 40 66 50C54 60 42 38 30 49C18 60 8 42 0 52Z'/></svg>");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
   -webkit-mask-mode: alpha;
   mask-mode: alpha;
+  -webkit-mask-image:
+    radial-gradient(ellipse 24% 160% at 4% -30%, #000 0 42%, transparent 78%),
+    radial-gradient(ellipse 14% 110% at 24% -40%, #000 0 30%, transparent 70%),
+    radial-gradient(ellipse 22% 180% at 44% -20%, #000 0 40%, transparent 76%),
+    radial-gradient(ellipse 12% 90% at 62% -50%, #000 0 26%, transparent 68%),
+    radial-gradient(ellipse 20% 150% at 80% -24%, #000 0 38%, transparent 74%),
+    radial-gradient(ellipse 16% 120% at 98% -36%, #000 0 32%, transparent 72%);
+  mask-image:
+    radial-gradient(ellipse 24% 160% at 4% -30%, #000 0 42%, transparent 78%),
+    radial-gradient(ellipse 14% 110% at 24% -40%, #000 0 30%, transparent 70%),
+    radial-gradient(ellipse 22% 180% at 44% -20%, #000 0 40%, transparent 76%),
+    radial-gradient(ellipse 12% 90% at 62% -50%, #000 0 26%, transparent 68%),
+    radial-gradient(ellipse 20% 150% at 80% -24%, #000 0 38%, transparent 74%),
+    radial-gradient(ellipse 16% 120% at 98% -36%, #000 0 32%, transparent 72%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
 }
 
 .chat-header > * {
