@@ -50,7 +50,15 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     const above = (reactions?.offsetHeight || 44) + 8;
     const below = (menu?.offsetHeight || 156) + 8;
     const bubbleH = bubble?.offsetHeight || node.offsetHeight || 48;
+    const bubbleW = bubble?.offsetWidth || node.offsetWidth || 0;
     const groupW = Math.max(node.offsetWidth, menu?.offsetWidth || 228, reactions?.offsetWidth || 0);
+    const block = bubble?.querySelector('.chat-block');
+    const centerMedia = Boolean(
+      block
+      && !block.classList.contains('is-gif')
+      && (block.classList.contains('is-emoji') || block.classList.contains('is-anim'))
+    );
+    const center = centerMedia ? Math.max(0, Math.round((groupW - bubbleW) / 2)) : 0;
     const total = above + bubbleH + below;
     const page = document.querySelector('.chat')?.getBoundingClientRect();
     const pageLeft = page?.left || 0;
@@ -69,6 +77,7 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
       top,
       fromX: (anchor?.left ?? left) - left,
       fromY: (anchor?.top ?? top) - top,
+      center,
     });
     return undefined;
   }, [anchor]);
@@ -220,7 +229,7 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
           className="chat-hold-bubble"
           style={spot ? {
             transform: moved
-              ? 'translate(0px, 0px)'
+              ? `translate(${spot.center || 0}px, 0px)`
               : `translate(${spot.fromX}px, ${spot.fromY}px)`,
             visibility: bursting ? 'hidden' : undefined,
           } : undefined}
