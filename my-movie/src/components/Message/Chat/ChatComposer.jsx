@@ -153,7 +153,7 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
               onPointerDown={(event) => event.stopPropagation()}
               onMouseDown={(event) => event.stopPropagation()}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M3.4 11.2 20.4 3.6c.7-.3 1.4.4 1.1 1.1l-7.6 17c-.3.8-1.5.7-1.7-.1l-2.1-7.2-7.2-2.1c-.8-.2-.9-1.4-.1-1.7Z" />
               </svg>
             </button>
