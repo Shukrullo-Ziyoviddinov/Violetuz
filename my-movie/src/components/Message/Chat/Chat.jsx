@@ -103,6 +103,7 @@ const Chat = ({ userId }) => {
   const closeHoldRef = useRef(() => {});
   const dismissHoldRef = useRef(() => {});
   const flyMessageAwayRef = useRef(() => {});
+  const flyQuotesAwayRef = useRef(() => {});
   pendingRef.current = pending;
   holdRef.current = hold;
 
@@ -307,6 +308,26 @@ const Chat = ({ userId }) => {
     return () => window.removeEventListener('violet-chat-text', onText);
   }, []);
 
+  const dropQuotedReply = (id) => {
+    for (const [key, value] of repliesRef.current) {
+      if (sameId(value?.id, id)) repliesRef.current.delete(key);
+    }
+    const strip = (row) => (sameId(row?.replyTo?.id, id) ? { ...row, replyTo: null } : row);
+    setMessages((current) => current.map(strip));
+    setPending((current) => current.map(strip));
+    setReplyTarget((current) => (sameId(current?.id, id) ? null : current));
+  };
+
+  const flyQuotesAway = (id) => {
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && typeof CSS !== 'undefined' && CSS.escape) {
+      const nodes = document.querySelectorAll(`.chat-reply-quote[data-reply-id="${CSS.escape(String(id))}"]`);
+      const layers = [...nodes].map((node) => shatterElement(node)).filter(Boolean);
+      window.setTimeout(() => layers.forEach((layer) => layer.remove()), SHATTER_MS);
+    }
+    dropQuotedReply(id);
+  };
+  flyQuotesAwayRef.current = flyQuotesAway;
+
   flyMessageAwayRef.current = (id, after) => {
     const finish = () => {
       setMessages((current) => current.filter((row) => row.id !== id));
@@ -381,6 +402,7 @@ const Chat = ({ userId }) => {
         if (closed || !item?.id) return;
         const id = item.id;
         const held = holdRef.current?.id === id;
+        flyQuotesAwayRef.current(id);
         flyMessageAwayRef.current(id, () => {
           if (held) closeHoldRef.current();
         });
@@ -489,21 +511,28 @@ const Chat = ({ userId }) => {
     const id = hold?.id;
     if (!id || deleteBusy) return;
     const kept = messages.find((row) => row.id === id) || pending.find((row) => row.id === id) || null;
+    const quoted = [...messages, ...pending].filter((row) => sameId(row?.replyTo?.id, id));
     setDeleteBusy(true);
     setDeleteOpen(false);
     let failed = false;
     const request = deleteChatMessage(id, forPeer).catch(() => {
       failed = true;
     }).finally(() => setDeleteBusy(false));
+    if (forPeer) flyQuotesAway(id);
     flyMessageAwayRef.current(id, () => {
       releaseAll();
       request.then(() => {
         if (!failed || !kept) return;
-        setMessages((current) => (
-          current.some((row) => row.id === id)
+        setMessages((current) => {
+          const restored = current.some((row) => row.id === id)
             ? current
-            : [...current, kept].sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0))
-        ));
+            : [...current, kept].sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+          if (!forPeer || !quoted.length) return restored;
+          return restored.map((row) => {
+            const previous = quoted.find((item) => item.id === row.id);
+            return previous ? { ...row, replyTo: previous.replyTo } : row;
+          });
+        });
       });
     });
   };

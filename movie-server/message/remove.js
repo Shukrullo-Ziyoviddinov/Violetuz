@@ -13,16 +13,21 @@ const removeChatMessage = async (meId, messageId, forPeer) => {
   const id = normalizeId(messageId);
   if (!isUserId(me)) throw badRequest('Hisob topilmadi');
   if (!isUserId(id)) throw notFound('Xabar topilmadi');
-  const row = await ChatMessage.findById(id).select('senderId recipientId').lean();
+  const row = await ChatMessage.findById(id).select('conversationId senderId recipientId').lean();
   if (!row) throw notFound('Xabar topilmadi');
   const sender = normalizeId(row.senderId);
   const recipient = normalizeId(row.recipientId);
   if (me !== sender && me !== recipient) throw notFound('Xabar topilmadi');
   if (forPeer) {
+    const goneId = String(row._id);
+    await ChatMessage.updateMany(
+      { conversationId: row.conversationId, 'replyTo.messageId': goneId },
+      { $unset: { replyTo: 1 } }
+    );
     const other = me === sender ? recipient : sender;
-    publishDelete(other, { id: String(row._id) });
+    publishDelete(other, { id: goneId });
     await ChatMessage.deleteOne({ _id: row._id });
-    return { id: String(row._id), forPeer: true };
+    return { id: goneId, forPeer: true };
   }
   await ChatMessage.updateOne(
     { _id: row._id },
