@@ -5,7 +5,7 @@ import ChatMessageBlock from './ChatMessageBlock';
 
 const QUICK = ['1f44d', '2764', '1f602', '1f62e', '1f37f', '1f525'];
 const MOVE_MS = 340;
-const REVEAL_MS = 320;
+const PANEL_MS = 170;
 
 const MenuIcon = ({ children }) => (
   <svg className="chat-hold-menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -89,15 +89,15 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
       const gap = stage
         ? Math.abs(bubble.getBoundingClientRect().top - stage.getBoundingClientRect().top)
         : 0;
-      if (gap > 6 && tries < 40) {
+      if (gap > 22 && tries < 50) {
         tries += 1;
-        retry = window.setTimeout(reveal, 40);
+        retry = window.requestAnimationFrame(reveal);
         return;
       }
       revealed = true;
       openedRef.current = true;
       bubble.removeEventListener('transitionend', onEnd);
-      window.clearTimeout(retry);
+      window.cancelAnimationFrame(retry);
       setShown(true);
     };
     const onEnd = (event) => {
@@ -107,12 +107,15 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     bubble.addEventListener('transitionend', onEnd);
     const arm = window.requestAnimationFrame(() => {
       setReady(true);
-      window.requestAnimationFrame(() => setMoved(true));
+      window.requestAnimationFrame(() => {
+        setMoved(true);
+        retry = window.requestAnimationFrame(reveal);
+      });
     });
     return () => {
       window.cancelAnimationFrame(arm);
+      window.cancelAnimationFrame(retry);
       bubble.removeEventListener('transitionend', onEnd);
-      window.clearTimeout(retry);
     };
   }, [spot]);
 
@@ -150,7 +153,18 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     }
     shownRef.current = false;
     setShown(false);
-    window.setTimeout(flyBack, REVEAL_MS);
+    const panels = stageRef.current?.querySelector('.chat-hold-reactions');
+    let started = false;
+    const go = (event) => {
+      if (event && (event.target !== panels || event.propertyName !== 'opacity')) return;
+      if (started) return;
+      started = true;
+      panels?.removeEventListener('transitionend', go);
+      window.clearTimeout(backup);
+      flyBack();
+    };
+    const backup = window.setTimeout(go, PANEL_MS);
+    panels?.addEventListener('transitionend', go);
   };
 
   useImperativeHandle(ref, () => ({

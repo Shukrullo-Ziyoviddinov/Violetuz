@@ -979,7 +979,7 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
   opacity: 0;
   pointer-events: none;
   transform: translateY(8px);
-  transition: opacity 0.26s ease, transform 0.26s cubic-bezier(0.22, 0.8, 0.24, 1);
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
 .chat-hold-stage.is-shown .chat-hold-reactions,
@@ -1001,8 +1001,8 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
 }
 
 .chat-hold-stage.is-shown .chat-hold-reactions button {
-  animation: chat-hold-pop 0.38s cubic-bezier(0.2, 0.9, 0.2, 1.2) both;
-  animation-delay: calc(var(--i) * 55ms);
+  animation: chat-hold-pop 0.22s cubic-bezier(0.2, 0.9, 0.2, 1.2) both;
+  animation-delay: calc(var(--i) * 32ms);
 }
 
 .chat-hold-reactions .is-more {
@@ -1023,7 +1023,7 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
   opacity: 0;
   pointer-events: none;
   transform: translateY(10px);
-  transition: opacity 0.26s ease, transform 0.26s cubic-bezier(0.22, 0.8, 0.24, 1);
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
 .chat-hold-stage.is-flip .chat-hold-menu {
