@@ -91,6 +91,32 @@ const publishRead = (userId, payload) => {
   return sent;
 };
 
+const publishEdit = (userId, payload) => {
+  const key = streamKey(userId);
+  const bucket = clients.get(key);
+  const id = String(payload?.id || '').trim();
+  const text = String(payload?.text || '').trim();
+  if (!bucket?.size || !id || !text) return 0;
+  const body = {
+    id,
+    text,
+    replyTo: payload?.replyTo || null,
+    related: Array.isArray(payload?.related) ? payload.related : [],
+  };
+  const data = `event: edit\ndata: ${JSON.stringify(body)}\n\n`;
+  let sent = 0;
+  for (const res of [...bucket]) {
+    try {
+      res.write(data);
+      sent += 1;
+    } catch (_err) {
+      bucket.delete(res);
+    }
+  }
+  if (!bucket.size) clients.delete(key);
+  return sent;
+};
+
 const publishDelete = (userId, payload) => {
   const key = streamKey(userId);
   const bucket = clients.get(key);

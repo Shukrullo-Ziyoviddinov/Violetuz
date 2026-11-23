@@ -23,9 +23,10 @@ const mediaMessage = (message) => Boolean(
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, onCopy, onDelete, onPick, onMore }, ref) => {
+const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, onEdit, onCopy, onDelete, onPick, onMore }, ref) => {
   const ru = lang === 'ru';
   const mine = message.mine === true;
+  const canEdit = mine && !message.gif && !message.animationId && message.animated !== true && String(message.text || '').trim();
   const quick = QUICK.map((id) => emojiFromId(id)).filter(Boolean);
   const stageRef = useRef(null);
   const closingRef = useRef(false);
@@ -251,6 +252,15 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
             </MenuIcon>
             <span>{ru ? 'Ответить' : 'Javob berish'}</span>
           </button>
+          {canEdit ? (
+            <button type="button" role="menuitem" onClick={() => settle(onEdit)}>
+              <MenuIcon>
+                <path d="M4 20h4.2L19 9.2a1.6 1.6 0 0 0 0-2.3l-1.9-1.9a1.6 1.6 0 0 0-2.3 0L4 15.8V20Z" strokeLinejoin="round" />
+                <path d="M12.6 6.4l5 5" strokeLinecap="round" />
+              </MenuIcon>
+              <span>{ru ? 'Изменить' : 'Tahrirlash'}</span>
+            </button>
+          ) : null}
           <button type="button" role="menuitem" onClick={() => settle(onCopy)}>
             <MenuIcon>
               <rect x="8" y="8" width="12" height="12" rx="2.2" />

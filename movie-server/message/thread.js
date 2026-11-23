@@ -198,4 +198,5 @@ module.exports = {
   toInboxCard,
   listInbox,
   cleanText,
+  toReply,
 };

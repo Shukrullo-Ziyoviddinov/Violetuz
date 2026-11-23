@@ -8,6 +8,7 @@ const { toMessageSelf } = require('./self');
 const { listInbox, openThread, isUserId, loadPeer } = require('./thread');
 const { sendChatMessage } = require('./send');
 const { removeChatMessage } = require('./remove');
+const { editChatMessage } = require('./edit');
 const { attachStream, publishTyping } = require('./live');
 const { badRequest } = require('../utils/errors');
 const { listBackgrounds, getMyBackground, saveMyBackground } = require('./background');
@@ -62,6 +63,16 @@ router.post('/with/:userId/typing', asyncHandler(async (req, res) => {
   const typing = req.body?.typing === true;
   publishTyping(peer, { userId: me, typing });
   return sendSuccess(res, { data: { typing } });
+}));
+
+router.post('/:messageId/edit', asyncHandler(async (req, res) => {
+  const result = await editChatMessage(
+    req.authUser._id,
+    req.params.messageId,
+    req.body?.text,
+    req.body?.quoteText
+  );
+  return sendSuccess(res, { data: result });
 }));
 
 router.post('/:messageId/hide', asyncHandler(async (req, res) => {

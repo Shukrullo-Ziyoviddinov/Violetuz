@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AnimationEmojModal from './AnimationEmojModal';
 
-const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disabled = false, reply = null, onCancelReply, selfId = '', peerName = '' }) => {
+const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disabled = false, reply = null, onCancelReply, edit = null, onCancelEdit, onCommitEdit, selfId = '', peerName = '' }) => {
   const inputRef = useRef(null);
   const emojiRef = useRef(null);
   const [text, setText] = useState('');
+  const [quoteDraft, setQuoteDraft] = useState('');
   const [open, setOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const placeholder = lang === 'ru' ? 'Сообщение' : 'Xabar';
@@ -14,12 +15,30 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
   const replyName = String(peerName || '').trim();
   const selfReplyLabel = lang === 'ru' ? 'Ответ себе' : 'O‘zingizga javob';
   const replySuffix = lang === 'ru' ? 'ответ' : 'ga javob';
-  const sendLabel = lang === 'ru' ? 'Отправить' : 'Yuborish';
+  const sendLabel = edit?.id
+    ? (lang === 'ru' ? 'Сохранить' : 'Saqlash')
+    : (lang === 'ru' ? 'Отправить' : 'Yuborish');
+  const editLabel = lang === 'ru' ? 'Изменить' : 'Tahrirlash';
   const canSend = text.trim().length > 0;
 
   useEffect(() => {
-    if (reply?.id && !disabled) inputRef.current?.focus();
-  }, [reply?.id, disabled]);
+    if ((reply?.id || edit?.id) && !disabled) inputRef.current?.focus();
+  }, [reply?.id, edit?.id, disabled]);
+
+  const editWas = useRef(false);
+
+  useEffect(() => {
+    if (edit?.id) {
+      editWas.current = true;
+      setText(String(edit.text || ''));
+      setQuoteDraft(String(edit.quoteText || ''));
+      return;
+    }
+    setQuoteDraft('');
+    if (!editWas.current) return;
+    editWas.current = false;
+    setText('');
+  }, [edit?.id, edit?.text, edit?.quoteText]);
 
   const sentGuard = useRef(0);
 
@@ -37,7 +56,16 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
       return;
     }
     const value = text.trim();
-    if (!value || disabled || !onSend) return;
+    if (!value || disabled) return;
+    if (edit?.id) {
+      if (!onCommitEdit) return;
+      sentGuard.current = now;
+      onCommitEdit(value, quoteDraft.trim());
+      keepKeyboard();
+      requestAnimationFrame(keepKeyboard);
+      return;
+    }
+    if (!onSend) return;
     sentGuard.current = now;
     setText('');
     onTyping?.(false);
@@ -87,7 +115,36 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
 
   return (
     <div className="chat-composer-wrap">
-      {reply?.text ? (
+      {edit?.id ? (
+        <div className="chat-reply-draft is-edit">
+          <div className="chat-reply-draft-main">
+            <p className="chat-reply-draft-who">
+              <strong>{editLabel}</strong>
+            </p>
+            <div className="chat-reply-draft-body">
+              <svg className="chat-reply-draft-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <path d="M4 20h4.2L19 9.2a1.6 1.6 0 0 0 0-2.3l-1.9-1.9a1.6 1.6 0 0 0-2.3 0L4 15.8V20Z" strokeLinejoin="round" />
+                <path d="M12.6 6.4l5 5" strokeLinecap="round" />
+              </svg>
+              {edit.quoteEditable ? (
+                <input
+                  className="chat-reply-draft-text"
+                  value={quoteDraft}
+                  maxLength={2000}
+                  aria-label={editLabel}
+                  onChange={(event) => setQuoteDraft(event.target.value)}
+                />
+              ) : (
+                <span className="chat-reply-draft-text">{String(edit.preview || edit.text || '').replace(/\s+/g, ' ').trim()}</span>
+              )}
+            </div>
+          </div>
+          <button type="button" className="chat-reply-draft-x" aria-label={closeLabel} onClick={onCancelEdit}>
+            ×
+          </button>
+        </div>
+      ) : null}
+      {!edit?.id && reply?.text ? (
         <div className="chat-reply-draft">
           <div className="chat-reply-draft-main">
             <p className="chat-reply-draft-who">
@@ -176,9 +233,15 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
               onMouseDown={holdKeyboard}
               onPointerUp={submit}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M3.4 11.2 20.4 3.6c.7-.3 1.4.4 1.1 1.1l-7.6 17c-.3.8-1.5.7-1.7-.1l-2.1-7.2-7.2-2.1c-.8-.2-.9-1.4-.1-1.7Z" />
-              </svg>
+              {edit?.id ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+                  <path d="M5 12.5 9.2 17 19 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M3.4 11.2 20.4 3.6c.7-.3 1.4.4 1.1 1.1l-7.6 17c-.3.8-1.5.7-1.7-.1l-2.1-7.2-7.2-2.1c-.8-.2-.9-1.4-.1-1.7Z" />
+                </svg>
+              )}
             </button>
           </span>
         </div>

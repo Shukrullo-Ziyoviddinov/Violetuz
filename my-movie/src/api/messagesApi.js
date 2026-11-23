@@ -72,6 +72,19 @@ export const saveChatBackground = async (backgroundId) => {
   return parseJson(response);
 };
 
+export const editChatMessage = async (messageId, text, quoteText) => {
+  const response = await fetch(`${API_BASE_URL}/messages/${encodeURIComponent(messageId)}/edit`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text,
+      ...(typeof quoteText === 'string' ? { quoteText } : {}),
+    }),
+  });
+  return parseJson(response);
+};
+
 export const deleteChatMessage = async (messageId, forPeer = false) => {
   const response = await fetch(`${API_BASE_URL}/messages/${encodeURIComponent(messageId)}/hide`, {
     method: 'POST',
@@ -99,7 +112,7 @@ export const signalChatTyping = async (userId, typing) => {
   return parseJson(response);
 };
 
-export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onReconnect }) => {
+export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onEdit, onReconnect }) => {
   const source = new EventSource(`${API_BASE_URL}/messages/stream`, { withCredentials: true });
   source.onopen = () => {
     onReconnect?.();
@@ -116,6 +129,14 @@ export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onReconnect
     try {
       const item = JSON.parse(event.data);
       if (item?.userId) onTyping?.(item);
+    } catch {
+      // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
+    }
+  });
+  source.addEventListener('edit', (event) => {
+    try {
+      const item = JSON.parse(event.data);
+      if (item?.id) onEdit?.(item);
     } catch {
       // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
     }

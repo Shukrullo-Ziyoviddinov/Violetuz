@@ -552,6 +552,21 @@
   height: 28px;
 }
 
+.chat-reply-draft-pen {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+input.chat-reply-draft-text {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0;
+  font: inherit;
+}
+
 .chat-reply-draft-text {
   display: block;
   flex: 1;

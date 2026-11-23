@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
-import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage } from '../../../api/messagesApi';
+import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage } from '../../../api/messagesApi';
 import { unwatchPresence, watchPresence } from '../../../api/presenceApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
@@ -85,6 +85,7 @@ const Chat = ({ userId }) => {
   const [peerOnline, setPeerOnline] = useState(false);
   const [pending, setPending] = useState([]);
   const [replyTarget, setReplyTarget] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
   const [hold, setHold] = useState(null);
   const [reactionOpen, setReactionOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -105,6 +106,7 @@ const Chat = ({ userId }) => {
   const flyMessageAwayRef = useRef(() => {});
   const flyQuotesAwayRef = useRef(() => {});
   pendingRef.current = pending;
+  const paintEditRef = useRef(() => {});
   holdRef.current = hold;
 
   const closeHoldUi = () => {
@@ -147,6 +149,44 @@ const Chat = ({ userId }) => {
     rememberReply(shown.id, replyOf(shown));
     return shown;
   };
+
+  const paintEdit = (payload) => {
+    const id = String(payload?.id || '');
+    const text = String(payload?.text || '');
+    if (!id || !text) return;
+    const related = Array.isArray(payload?.related) ? payload.related : [];
+    const relatedText = (value) => {
+      const hit = related.find((item) => sameId(item?.id, value));
+      return hit ? String(hit.text || '') : '';
+    };
+    const quotePlain = (replyTo) => replyTo?.text && !replyTo.gif && !replyTo.animationId && replyTo.animated !== true;
+    const mapRow = (row) => {
+      let next = row;
+      const relatedBody = relatedText(row.id);
+      if (sameId(row.id, id)) {
+        next = { ...next, text };
+        if (Object.prototype.hasOwnProperty.call(payload, 'replyTo')) next = { ...next, replyTo: payload.replyTo || null };
+      } else if (relatedBody) {
+        next = { ...next, text: relatedBody };
+      }
+      if (quotePlain(next.replyTo)) {
+        if (sameId(next.replyTo.id, id)) next = { ...next, replyTo: { ...next.replyTo, text } };
+        const quotedBody = relatedText(next.replyTo.id);
+        if (quotedBody) next = { ...next, replyTo: { ...next.replyTo, text: quotedBody } };
+      }
+      if (next.replyTo?.text) rememberReply(next.id, next.replyTo);
+      return next;
+    };
+    repliesRef.current.forEach((value, key) => {
+      if (!value) return;
+      if (sameId(value.id, id)) repliesRef.current.set(key, { ...value, text });
+      const quotedBody = relatedText(value.id);
+      if (quotedBody) repliesRef.current.set(key, { ...value, text: quotedBody });
+    });
+    setMessages((current) => current.map(mapRow));
+    setPending((current) => current.map(mapRow));
+  };
+  paintEditRef.current = paintEdit;
 
   useLayoutEffect(() => {
     const root = chatRef.current;
@@ -206,12 +246,14 @@ const Chat = ({ userId }) => {
       setMessages([]);
       setPending([]);
       setReplyTarget(null);
+      setEditTarget(null);
       setReady(true);
       return undefined;
     }
     let cancelled = false;
     setPending([]);
     setReplyTarget(null);
+    setEditTarget(null);
     setReady(false);
     load()
       .catch((err) => {
@@ -398,6 +440,10 @@ const Chat = ({ userId }) => {
         setPending((current) => dropMatchedPending(current, [shown]));
         setMessages((current) => upsertMessage(current, shown));
       },
+      onEdit: (item) => {
+        if (closed || !item?.id) return;
+        paintEditRef.current(item);
+      },
       onDelete: (item) => {
         if (closed || !item?.id) return;
         const id = item.id;
@@ -459,6 +505,7 @@ const Chat = ({ userId }) => {
   const beginReply = (item) => {
     const text = String(item?.text || '').trim();
     if (!item?.id || !text || String(item.id).startsWith('local-')) return false;
+    setEditTarget(null);
     setReplyTarget({
       id: item.id,
       senderId: item.senderId,
@@ -468,6 +515,61 @@ const Chat = ({ userId }) => {
       ...(item.animated || item.animationId ? { animated: true } : {}),
     });
     return true;
+  };
+
+  const beginEdit = (item) => {
+    const text = String(item?.text || '').trim();
+    if (!item?.id || !item?.mine || !text || String(item.id).startsWith('local-')) return false;
+    if (item.gif || item.animationId || item.animated) return false;
+    const quotePlain = Boolean(String(item.quote || '').trim())
+      && !item.quoteGif
+      && !item.quoteAnimationId
+      && item.quoteAnimated !== true;
+    setReplyTarget(null);
+    setEditTarget({
+      id: item.id,
+      text,
+      preview: text,
+      quoteText: quotePlain ? String(item.quote) : '',
+      quoteEditable: quotePlain,
+      quoteId: quotePlain ? item.replyId || '' : '',
+      quoteMine: quotePlain && sameId(item.quoteSenderId, profile?.id),
+    });
+    return true;
+  };
+
+  const commitEdit = (text, quoteText) => {
+    const target = editTarget;
+    if (!target?.id) return;
+    const before = messages;
+    const cachedReplies = new Map(repliesRef.current);
+    const nextQuote = String(quoteText || '').trim();
+    const replyTo = target.quoteEditable
+      ? {
+        ...(messages.find((row) => row.id === target.id)?.replyTo || {}),
+        text: nextQuote || target.quoteText,
+      }
+      : undefined;
+    const related = target.quoteMine && target.quoteId && nextQuote && nextQuote !== target.quoteText
+      ? [{ id: target.quoteId, text: nextQuote }]
+      : [];
+    paintEdit({
+      id: target.id,
+      text,
+      ...(replyTo ? { replyTo } : {}),
+      related,
+    });
+    setEditTarget(null);
+    reportTyping(false);
+    editChatMessage(target.id, text, target.quoteEditable ? quoteText : undefined)
+      .then((saved) => {
+        if (saved?.id) paintEdit(saved);
+      })
+      .catch(() => {
+        repliesRef.current = cachedReplies;
+        setMessages(before);
+        setEditTarget(target);
+      });
   };
 
   const openHold = ({ item, mine, quote, anchor }) => {
@@ -488,6 +590,7 @@ const Chat = ({ userId }) => {
       quoteAnimationId: item.replyTo?.animationId || '',
       quoteGif: item.replyTo?.gif || '',
       anchor,
+      quoteSenderId: item.replyTo?.senderId || '',
     });
   };
 
@@ -718,10 +821,13 @@ const Chat = ({ userId }) => {
         onSend={sendNow}
         onSendAnimation={sendAnimation}
         onSendGif={sendGif}
-        reply={replyTarget}
+        reply={editTarget ? null : replyTarget}
+        edit={editTarget}
         selfId={profile?.id}
         peerName={peer?.name}
         onCancelReply={() => setReplyTarget(null)}
+        onCancelEdit={() => setEditTarget(null)}
+        onCommitEdit={commitEdit}
       />
       {hold ? (
         <ChatMessageHold
@@ -735,6 +841,10 @@ const Chat = ({ userId }) => {
             releaseAll();
           }}
           onCopy={copyHold}
+          onEdit={() => {
+            beginEdit(hold);
+            releaseAll();
+          }}
           onDelete={() => setDeleteOpen(true)}
           onPick={(emoji) => {
             if (emoji?.id) rememberEmoji(emoji.id);
