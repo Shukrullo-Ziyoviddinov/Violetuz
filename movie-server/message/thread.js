@@ -89,6 +89,25 @@ const listMessages = async (conversationId, meId) => {
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
     .select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo')
+    .lean();
+  const replyIds = [...new Set(rows
+    .map((row) => String(row.replyTo?.messageId || '').trim())
+    .filter((id) => isUserId(id)))];
+  if (replyIds.length) {
+    const alive = await ChatMessage.find({ _id: { $in: replyIds } }).select('_id').lean();
+    const aliveIds = new Set(alive.map((row) => String(row._id).toLowerCase()));
+    const missing = replyIds.filter((id) => !aliveIds.has(id.toLowerCase()));
+    if (missing.length) {
+      await ChatMessage.updateMany(
+        { conversationId, 'replyTo.messageId': { $in: missing } },
+        { $unset: { replyTo: 1 } }
+      );
+      rows.forEach((row) => {
+        const quotedId = String(row.replyTo?.messageId || '').trim().toLowerCase();
+        if (quotedId && !aliveIds.has(quotedId)) row.replyTo = undefined;
+      });
+    }
+  }
   return rows.reverse().map(toClientMessage);
 };
 

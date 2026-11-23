@@ -21,7 +21,10 @@ const removeChatMessage = async (meId, messageId, forPeer) => {
   if (forPeer) {
     const goneId = String(row._id);
     await ChatMessage.updateMany(
-      { conversationId: row.conversationId, 'replyTo.messageId': goneId },
+      {
+        conversationId: row.conversationId,
+        'replyTo.messageId': { $regex: `^${goneId}$`, $options: 'i' },
+      },
       { $unset: { replyTo: 1 } }
     );
     const other = me === sender ? recipient : sender;
