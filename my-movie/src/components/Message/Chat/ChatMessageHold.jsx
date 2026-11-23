@@ -88,7 +88,8 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     }
     closingRef.current = true;
     const node = stageRef.current;
-    if (!node || reducedMotion()) {
+    const bubble = node?.querySelector('.chat-hold-bubble');
+    if (!bubble || reducedMotion()) {
       done?.();
       return;
     }
@@ -96,16 +97,16 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     const finish = () => {
       if (settled) return;
       settled = true;
-      node.removeEventListener('transitionend', onEnd);
+      bubble.removeEventListener('transitionend', onEnd);
       window.clearTimeout(timer);
       done?.();
     };
     const onEnd = (event) => {
-      if (event.target !== node || event.propertyName !== 'transform') return;
+      if (event.target !== bubble || event.propertyName !== 'transform') return;
       finish();
     };
     const timer = window.setTimeout(finish, MOVE_MS + 80);
-    node.addEventListener('transitionend', onEnd);
+    bubble.addEventListener('transitionend', onEnd);
     setMoved(false);
   };
 
@@ -117,13 +118,8 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     <div className="chat-hold" role="presentation" onClick={() => settle(onClose)}>
       <div
         ref={stageRef}
-        className={`chat-hold-stage${mine ? ' is-mine' : ''}${mediaMessage(message) ? ' is-compact' : ''}${ready ? ' is-set' : ''}`}
-        style={spot ? {
-          left: spot.left,
-          top: spot.top,
-          '--chat-hold-x': moved ? '0px' : `${spot.fromX}px`,
-          '--chat-hold-y': moved ? '0px' : `${spot.fromY}px`,
-        } : { visibility: 'hidden' }}
+        className={`chat-hold-stage${mine ? ' is-mine' : ''}${mediaMessage(message) ? ' is-compact' : ''}${ready ? ' is-set' : ''}${moved ? ' is-moved' : ''}`}
+        style={spot ? { left: spot.left, top: spot.top } : { visibility: 'hidden' }}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="chat-hold-reactions" role="toolbar" aria-label={ru ? 'Реакции' : 'Reaksiyalar'}>
@@ -139,7 +135,14 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
           ))}
           <button type="button" className="is-more" style={{ '--i': quick.length }} onClick={onMore} aria-label={ru ? 'Ещё' : 'Yana'}>+</button>
         </div>
-        <div className="chat-hold-bubble">
+        <div
+          className="chat-hold-bubble"
+          style={spot ? {
+            transform: moved
+              ? 'translate(0px, 0px)'
+              : `translate(${spot.fromX}px, ${spot.fromY}px)`,
+          } : undefined}
+        >
           <ChatMessageBlock
             text={message.text}
             mine={mine}
