@@ -5,6 +5,7 @@ import ChatMessageBlock from './ChatMessageBlock';
 
 const QUICK = ['1f44d', '2764', '1f602', '1f62e', '1f37f', '1f525'];
 const MOVE_MS = 340;
+const REVEAL_MS = 320;
 
 const MenuIcon = ({ children }) => (
   <svg className="chat-hold-menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -32,7 +33,10 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
   const [spot, setSpot] = useState(null);
   const [ready, setReady] = useState(false);
   const [moved, setMoved] = useState(false);
+  const [shown, setShown] = useState(false);
+  const shownRef = useRef(false);
   onCloseRef.current = onClose;
+  shownRef.current = shown;
 
   useLayoutEffect(() => {
     const node = stageRef.current;
@@ -45,12 +49,18 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     const bubbleH = bubble?.offsetHeight || node.offsetHeight || 48;
     const groupW = Math.max(node.offsetWidth, menu?.offsetWidth || 228, reactions?.offsetWidth || 0);
     const total = above + bubbleH + below;
-    const room = Math.max(12, window.innerHeight - total - 12);
-    const visualTop = Math.max(12, Math.min(room, Math.round((window.innerHeight - total) / 2)));
+    const page = document.querySelector('.chat')?.getBoundingClientRect();
+    const pageLeft = page?.left || 0;
+    const pageTop = page?.top || 0;
+    const pageWidth = page?.width || window.innerWidth;
+    const pageHeight = page?.height || window.innerHeight;
+    const inset = 16;
+    const visualTop = pageTop + Math.max(inset, Math.round((pageHeight - total) / 2));
     const top = visualTop + above;
-    const centerX = window.innerWidth * 0.36;
-    const maxLeft = Math.max(16, window.innerWidth - groupW - 16);
-    const left = Math.min(maxLeft, Math.max(16, Math.round(centerX - groupW / 2)));
+    const centerX = pageLeft + pageWidth / 4;
+    const minLeft = pageLeft + inset;
+    const maxLeft = Math.max(minLeft, pageLeft + pageWidth - groupW - inset);
+    const left = Math.min(maxLeft, Math.max(minLeft, Math.round(centerX - groupW / 2)));
     setSpot({
       left,
       top,
@@ -61,25 +71,50 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
   }, [anchor]);
 
   useEffect(() => {
-    if (!spot || ready) return undefined;
-    if (reducedMotion()) {
+    if (!spot || openedRef.current) return undefined;
+    const bubble = stageRef.current?.querySelector('.chat-hold-bubble');
+    if (!bubble || reducedMotion()) {
       openedRef.current = true;
       setReady(true);
       setMoved(true);
+      setShown(true);
       return undefined;
     }
-    const id = window.requestAnimationFrame(() => setReady(true));
-    return () => window.cancelAnimationFrame(id);
-  }, [spot, ready]);
-
-  useEffect(() => {
-    if (!ready || openedRef.current) return undefined;
-    const id = window.requestAnimationFrame(() => {
+    let revealed = false;
+    let tries = 0;
+    let retry = 0;
+    const reveal = () => {
+      if (revealed || closingRef.current) return;
+      const stage = stageRef.current;
+      const gap = stage
+        ? Math.abs(bubble.getBoundingClientRect().top - stage.getBoundingClientRect().top)
+        : 0;
+      if (gap > 6 && tries < 40) {
+        tries += 1;
+        retry = window.setTimeout(reveal, 40);
+        return;
+      }
+      revealed = true;
       openedRef.current = true;
-      setMoved(true);
+      bubble.removeEventListener('transitionend', onEnd);
+      window.clearTimeout(retry);
+      setShown(true);
+    };
+    const onEnd = (event) => {
+      if (event.target !== bubble || event.propertyName !== 'transform') return;
+      reveal();
+    };
+    bubble.addEventListener('transitionend', onEnd);
+    const arm = window.requestAnimationFrame(() => {
+      setReady(true);
+      window.requestAnimationFrame(() => setMoved(true));
     });
-    return () => window.cancelAnimationFrame(id);
-  }, [ready]);
+    return () => {
+      window.cancelAnimationFrame(arm);
+      bubble.removeEventListener('transitionend', onEnd);
+      window.clearTimeout(retry);
+    };
+  }, [spot]);
 
   const settle = (done) => {
     if (closingRef.current) {
@@ -87,27 +122,35 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
       return;
     }
     closingRef.current = true;
-    const node = stageRef.current;
-    const bubble = node?.querySelector('.chat-hold-bubble');
+    const bubble = stageRef.current?.querySelector('.chat-hold-bubble');
     if (!bubble || reducedMotion()) {
       done?.();
       return;
     }
-    let settled = false;
-    const finish = () => {
-      if (settled) return;
-      settled = true;
-      bubble.removeEventListener('transitionend', onEnd);
-      window.clearTimeout(timer);
-      done?.();
+    const flyBack = () => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        bubble.removeEventListener('transitionend', onEnd);
+        window.clearTimeout(timer);
+        done?.();
+      };
+      const onEnd = (event) => {
+        if (event.target !== bubble || event.propertyName !== 'transform') return;
+        finish();
+      };
+      const timer = window.setTimeout(finish, MOVE_MS + 80);
+      bubble.addEventListener('transitionend', onEnd);
+      setMoved(false);
     };
-    const onEnd = (event) => {
-      if (event.target !== bubble || event.propertyName !== 'transform') return;
-      finish();
-    };
-    const timer = window.setTimeout(finish, MOVE_MS + 80);
-    bubble.addEventListener('transitionend', onEnd);
-    setMoved(false);
+    if (!shownRef.current) {
+      flyBack();
+      return;
+    }
+    shownRef.current = false;
+    setShown(false);
+    window.setTimeout(flyBack, REVEAL_MS);
   };
 
   useImperativeHandle(ref, () => ({
@@ -118,7 +161,7 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
     <div className="chat-hold" role="presentation" onClick={() => settle(onClose)}>
       <div
         ref={stageRef}
-        className={`chat-hold-stage${mine ? ' is-mine' : ''}${mediaMessage(message) ? ' is-compact' : ''}${ready ? ' is-set' : ''}${moved ? ' is-moved' : ''}`}
+        className={`chat-hold-stage${mine ? ' is-mine' : ''}${mediaMessage(message) ? ' is-compact' : ''}${ready ? ' is-set' : ''}${shown ? ' is-shown' : ''}`}
         style={spot ? { left: spot.left, top: spot.top } : { visibility: 'hidden' }}
         onClick={(event) => event.stopPropagation()}
       >
