@@ -13,7 +13,7 @@
   width: min(100%, 360px);
   padding: 1.15rem 1.15rem 1rem;
   border-radius: 18px;
-  background: #2a2238;
+  background: #0a0a0a;
   color: #fff;
   box-sizing: border-box;
 }
@@ -35,6 +35,11 @@
   gap: 0.55rem;
   margin: 0.9rem 0 1rem;
   cursor: pointer;
+  font-weight: 400;
+}
+
+.chat-delete-name {
+  font-weight: 700;
 }
 
 .chat-delete-actions {

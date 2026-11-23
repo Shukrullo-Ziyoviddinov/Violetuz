@@ -97,7 +97,9 @@ const Chat = ({ userId }) => {
   const pendingRef = useRef(pending);
   const repliesRef = useRef(new Map());
   const holdRef = useRef(null);
+  const holdUiRef = useRef(null);
   const closeHoldRef = useRef(() => {});
+  const dismissHoldRef = useRef(() => {});
   pendingRef.current = pending;
   holdRef.current = hold;
 
@@ -108,6 +110,14 @@ const Chat = ({ userId }) => {
     setDeleteBusy(false);
   };
 
+  dismissHoldRef.current = (after) => {
+    if (holdUiRef.current?.close) {
+      holdUiRef.current.close(after);
+      return;
+    }
+    after?.();
+  };
+
   const { releaseAll } = useModalHardwareBack({
     historyKey: 'violetChatHold',
     isOpen: Boolean(hold),
@@ -116,9 +126,9 @@ const Chat = ({ userId }) => {
       setReactionOpen(false);
       setDeleteOpen(false);
     },
-    onCloseFromHardware: closeHoldUi,
+    onCloseFromHardware: () => dismissHoldRef.current(closeHoldUi),
   });
-  closeHoldRef.current = releaseAll;
+  closeHoldRef.current = () => dismissHoldRef.current(releaseAll);
 
   const rememberReply = (messageId, replyTo) => {
     if (messageId && replyTo?.text) repliesRef.current.set(messageId, replyTo);
@@ -435,7 +445,7 @@ const Chat = ({ userId }) => {
       document.execCommand('copy');
       area.remove();
     }
-    releaseAll();
+    dismissHoldRef.current(releaseAll);
   };
 
   const confirmDelete = async (forPeer) => {
@@ -447,7 +457,8 @@ const Chat = ({ userId }) => {
       setMessages((current) => current.filter((row) => row.id !== id));
       setPending((current) => current.filter((row) => row.id !== id));
       setDeleteBusy(false);
-      releaseAll();
+      setDeleteOpen(false);
+      dismissHoldRef.current(releaseAll);
     } catch {
       setDeleteBusy(false);
     }
@@ -462,7 +473,7 @@ const Chat = ({ userId }) => {
         setDeleteOpen(false);
         return;
       }
-      releaseAll();
+      dismissHoldRef.current(releaseAll);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -614,6 +625,7 @@ const Chat = ({ userId }) => {
         onRetry={retrySend}
         onReply={beginReply}
         onHold={openHold}
+        heldId={hold?.id || ''}
         peer={peer}
       />
       {peerTyping ? (
@@ -635,6 +647,7 @@ const Chat = ({ userId }) => {
       />
       {hold ? (
         <ChatMessageHold
+          ref={holdUiRef}
           message={hold}
           anchor={hold.anchor}
           lang={lang}
@@ -656,7 +669,7 @@ const Chat = ({ userId }) => {
         <ChatReactionModal
           lang={lang}
           onClose={() => setReactionOpen(false)}
-          onPick={() => releaseAll()}
+          onPick={() => dismissHoldRef.current(releaseAll)}
         />
       ) : null}
       {hold && deleteOpen ? (

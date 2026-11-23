@@ -150,7 +150,7 @@ const revealRepliedMessage = (thread, messageId) => {
   block.addEventListener('animationend', done);
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, peer }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer }) => {
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
@@ -197,7 +197,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
         return (
           <div
             key={item.id}
-            className={`chat-item${mine ? ' is-mine' : ''}`}
+            className={`chat-item${mine ? ' is-mine' : ''}${heldId && heldId === item.id ? ' is-held' : ''}`}
             data-message-id={item.id}
             onContextMenu={(event) => event.preventDefault()}
             onPointerDown={(event) => {

@@ -24,7 +24,11 @@ const ChatDeleteMessageModal = ({ peerName, lang, busy, onClose, onConfirm }) =>
             checked={forPeer}
             onChange={(event) => setForPeer(event.target.checked)}
           />
-          <span>{ru ? `Удалить и для ${name}` : `${name} uchun ham o‘chirilsin`}</span>
+          <span>
+            {ru ? 'Удалить и для ' : null}
+            <strong className="chat-delete-name">{name}</strong>
+            {ru ? null : ' uchun ham o‘chirilsin'}
+          </span>
         </label>
         <div className="chat-delete-actions">
           <button type="button" onClick={onClose} disabled={busy}>{ru ? 'Отмена' : 'Bekor qilish'}</button>
