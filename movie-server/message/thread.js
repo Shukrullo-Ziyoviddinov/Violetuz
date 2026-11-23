@@ -80,9 +80,12 @@ const ensureConversation = async (meId, peerId) => {
   }
 };
 
-const listMessages = async (conversationId) => {
+const listMessages = async (conversationId, meId) => {
   if (!conversationId) return [];
-  const rows = await ChatMessage.find({ conversationId })
+  const rows = await ChatMessage.find({
+    conversationId,
+    hiddenFor: { $nin: [meId] },
+  })
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
     .select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo')
@@ -107,7 +110,7 @@ const openThread = async (meId, peerId) => {
   if (me === peer) throw badRequest('O‘zingiz bilan suhbat ochilmaydi');
   const person = await loadPeer(peer);
   const conversation = await findConversation(me, peer);
-  const messages = await listMessages(conversation?._id);
+  const messages = await listMessages(conversation?._id, me);
   const readAt = await markThreadRead(me, conversation?._id);
   if (readAt) publishRead(peer, { userId: me, readAt });
   return {
@@ -136,7 +139,10 @@ const listInbox = async (meId) => {
     if (!peerId) continue;
     const person = await User.findById(peerId).select('name username avatar').lean();
     if (!person) continue;
-    const last = await ChatMessage.findOne({ conversationId: conversation._id })
+    const last = await ChatMessage.findOne({
+      conversationId: conversation._id,
+      hiddenFor: { $nin: [me] },
+    })
       .sort({ createdAt: -1 })
       .select('text createdAt')
       .lean();
@@ -144,6 +150,7 @@ const listInbox = async (meId) => {
       conversationId: conversation._id,
       recipientId: me,
       readAt: null,
+      hiddenFor: { $nin: [me] },
     });
     cards.push(toInboxCard(conversation, person, last, unread));
   }

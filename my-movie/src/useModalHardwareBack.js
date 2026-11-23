@@ -36,6 +36,16 @@ export function useModalHardwareBack({
     window.history.back();
   };
 
+  const releaseAll = () => {
+    nestedRef.current = false;
+    if (!ownedRef.current) {
+      onCloseRef.current?.();
+      return;
+    }
+    ownedRef.current = false;
+    window.history.back();
+  };
+
   const abandonHistory = () => {
     ownedRef.current = false;
   };
@@ -72,5 +82,6 @@ export function useModalHardwareBack({
   return {
     releaseHistory,
     abandonHistory,
+    releaseAll,
   };
 }

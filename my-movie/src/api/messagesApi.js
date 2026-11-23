@@ -72,6 +72,16 @@ export const saveChatBackground = async (backgroundId) => {
   return parseJson(response);
 };
 
+export const deleteChatMessage = async (messageId, forPeer = false) => {
+  const response = await fetch(`${API_BASE_URL}/messages/${encodeURIComponent(messageId)}/hide`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ forPeer: forPeer === true }),
+  });
+  return parseJson(response);
+};
+
 export const fetchChatThread = async (userId) => {
   const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}`, {
     credentials: 'include',
@@ -89,7 +99,7 @@ export const signalChatTyping = async (userId, typing) => {
   return parseJson(response);
 };
 
-export const openChatStream = ({ onItem, onTyping, onRead, onReconnect }) => {
+export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onReconnect }) => {
   const source = new EventSource(`${API_BASE_URL}/messages/stream`, { withCredentials: true });
   source.onopen = () => {
     onReconnect?.();
@@ -106,6 +116,14 @@ export const openChatStream = ({ onItem, onTyping, onRead, onReconnect }) => {
     try {
       const item = JSON.parse(event.data);
       if (item?.userId) onTyping?.(item);
+    } catch {
+      // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
+    }
+  });
+  source.addEventListener('delete', (event) => {
+    try {
+      const item = JSON.parse(event.data);
+      if (item?.id) onDelete?.(item);
     } catch {
       // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
     }

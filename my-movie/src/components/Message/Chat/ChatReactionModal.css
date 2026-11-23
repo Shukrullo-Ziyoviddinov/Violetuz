@@ -1,0 +1,150 @@
+.chat-react-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(8, 6, 16, 0.46);
+}
+
+.chat-react-sheet {
+  width: min(100%, 520px);
+  height: min(78vh, 640px);
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0.85rem 1rem;
+  border-radius: 22px 22px 0 0;
+  background: #241c33;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.chat-react-grab {
+  width: 42px;
+  height: 4px;
+  margin: 0.35rem auto 0.7rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.chat-react-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.chat-react-head h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.chat-react-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chat-react-search {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.85rem 0 0.7rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.chat-react-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+}
+
+.chat-react-cats {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  overflow-x: auto;
+  padding-bottom: 0.45rem;
+}
+
+.chat-react-cats button,
+.chat-react-cell,
+.chat-react-recent button {
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.chat-react-cats button {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+}
+
+.chat-react-cats button.is-on {
+  background: rgba(109, 40, 217, 0.45);
+}
+
+.chat-react-split {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 22px;
+  margin: 0 0.2rem;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.chat-react-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.chat-react-label {
+  margin: 0.85rem 0 0.45rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chat-react-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+}
+
+.chat-react-cell {
+  aspect-ratio: 1;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 1.8rem;
+}
+
+.chat-react-recent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chat-react-recent button {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 1.35rem;
+}

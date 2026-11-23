@@ -150,7 +150,7 @@ const revealRepliedMessage = (thread, messageId) => {
   block.addEventListener('animationend', done);
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, peer }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, peer }) => {
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
@@ -195,7 +195,50 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
         const clock = formatClock(item.createdAt);
         const quote = String(item.replyTo?.text || '').trim();
         return (
-          <div key={item.id} className={`chat-item${mine ? ' is-mine' : ''}`} data-message-id={item.id}>
+          <div
+            key={item.id}
+            className={`chat-item${mine ? ' is-mine' : ''}`}
+            data-message-id={item.id}
+            onContextMenu={(event) => event.preventDefault()}
+            onPointerDown={(event) => {
+              if (event.button != null && event.button !== 0) return;
+              if (String(item.id || '').startsWith('local-')) return;
+              const node = event.currentTarget;
+              const startX = event.clientX;
+              const startY = event.clientY;
+              const timer = window.setTimeout(() => {
+                if (!node.isConnected) return;
+                const block = node.querySelector('.chat-block') || node;
+                const rect = block.getBoundingClientRect();
+                onHold?.({
+                  item,
+                  mine,
+                  quote,
+                  anchor: {
+                    top: rect.top,
+                    left: rect.left,
+                    right: rect.right,
+                    bottom: rect.bottom,
+                    width: rect.width,
+                  },
+                });
+              }, 420);
+              const move = (ev) => {
+                if (Math.hypot(ev.clientX - startX, ev.clientY - startY) <= 10) return;
+                window.clearTimeout(timer);
+                end();
+              };
+              const end = () => {
+                window.clearTimeout(timer);
+                window.removeEventListener('pointermove', move);
+                window.removeEventListener('pointerup', end);
+                window.removeEventListener('pointercancel', end);
+              };
+              window.addEventListener('pointermove', move);
+              window.addEventListener('pointerup', end);
+              window.addEventListener('pointercancel', end);
+            }}
+          >
             {quote ? <p className="chat-reply-label">{replyLabel(item, mine, selfId, lang)}</p> : null}
             <ChatReplySwipe
               mine={mine}

@@ -2,14 +2,19 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
-import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping } from '../../../api/messagesApi';
+import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage } from '../../../api/messagesApi';
 import { unwatchPresence, watchPresence } from '../../../api/presenceApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
 import { readTextChoice, textLookClass, textVars } from './chatTextFont';
+import { rememberEmoji } from './chatEmojis';
+import { useModalHardwareBack } from '../../../useModalHardwareBack';
 import ChatHeader from './ChatHeader';
 import ChatThread from './ChatThread';
 import ChatComposer from './ChatComposer';
+import ChatMessageHold from './ChatMessageHold';
+import ChatReactionModal from './ChatReactionModal';
+import ChatDeleteMessageModal from './ChatDeleteMessageModal';
 import { gifByFile } from './chatGifs';
 import './Chat.css';
 
@@ -79,6 +84,10 @@ const Chat = ({ userId }) => {
   const [peerOnline, setPeerOnline] = useState(false);
   const [pending, setPending] = useState([]);
   const [replyTarget, setReplyTarget] = useState(null);
+  const [hold, setHold] = useState(null);
+  const [reactionOpen, setReactionOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const loadToken = useRef(0);
   const typingIdleRef = useRef(null);
   const typingSentRef = useRef(false);
@@ -87,7 +96,29 @@ const Chat = ({ userId }) => {
   const chatRef = useRef(null);
   const pendingRef = useRef(pending);
   const repliesRef = useRef(new Map());
+  const holdRef = useRef(null);
+  const closeHoldRef = useRef(() => {});
   pendingRef.current = pending;
+  holdRef.current = hold;
+
+  const closeHoldUi = () => {
+    setHold(null);
+    setReactionOpen(false);
+    setDeleteOpen(false);
+    setDeleteBusy(false);
+  };
+
+  const { releaseAll } = useModalHardwareBack({
+    historyKey: 'violetChatHold',
+    isOpen: Boolean(hold),
+    hasNested: reactionOpen || deleteOpen,
+    onNestedBack: () => {
+      setReactionOpen(false);
+      setDeleteOpen(false);
+    },
+    onCloseFromHardware: closeHoldUi,
+  });
+  closeHoldRef.current = releaseAll;
 
   const rememberReply = (messageId, replyTo) => {
     if (messageId && replyTo?.text) repliesRef.current.set(messageId, replyTo);
@@ -301,6 +332,12 @@ const Chat = ({ userId }) => {
         setPending((current) => dropMatchedPending(current, [shown]));
         setMessages((current) => upsertMessage(current, shown));
       },
+      onDelete: (item) => {
+        if (closed || !item?.id) return;
+        setMessages((current) => current.filter((row) => row.id !== item.id));
+        setPending((current) => current.filter((row) => row.id !== item.id));
+        if (holdRef.current?.id === item.id) closeHoldRef.current();
+      },
       onReconnect: () => {
         if (!closed) load().catch(() => {});
       },
@@ -363,6 +400,73 @@ const Chat = ({ userId }) => {
     });
     return true;
   };
+
+  const openHold = ({ item, mine, quote, anchor }) => {
+    if (!item?.id || String(item.id).startsWith('local-')) return;
+    setReactionOpen(false);
+    setDeleteOpen(false);
+    setHold({
+      id: item.id,
+      text: item.text,
+      senderId: item.senderId,
+      mine,
+      quote,
+      replyId: item.replyTo?.id || '',
+      animated: item.animated === true,
+      animationId: item.animationId || '',
+      gif: item.gif || '',
+      quoteAnimated: item.replyTo?.animated === true,
+      quoteAnimationId: item.replyTo?.animationId || '',
+      quoteGif: item.replyTo?.gif || '',
+      anchor,
+    });
+  };
+
+  const copyHold = async () => {
+    const text = String(hold?.text || '');
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      area.remove();
+    }
+    releaseAll();
+  };
+
+  const confirmDelete = async (forPeer) => {
+    const id = hold?.id;
+    if (!id || deleteBusy) return;
+    setDeleteBusy(true);
+    try {
+      await deleteChatMessage(id, forPeer);
+      setMessages((current) => current.filter((row) => row.id !== id));
+      setPending((current) => current.filter((row) => row.id !== id));
+      setDeleteBusy(false);
+      releaseAll();
+    } catch {
+      setDeleteBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!hold) return undefined;
+    const onKey = (event) => {
+      if (event.key !== 'Escape') return;
+      if (reactionOpen || deleteOpen) {
+        setReactionOpen(false);
+        setDeleteOpen(false);
+        return;
+      }
+      releaseAll();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [hold, reactionOpen, deleteOpen, releaseAll]);
 
   const sendNow = (text) => {
     const replyTo = replyTarget;
@@ -509,6 +613,7 @@ const Chat = ({ userId }) => {
         lang={lang}
         onRetry={retrySend}
         onReply={beginReply}
+        onHold={openHold}
         peer={peer}
       />
       {peerTyping ? (
@@ -528,6 +633,41 @@ const Chat = ({ userId }) => {
         reply={replyTarget}
         onCancelReply={() => setReplyTarget(null)}
       />
+      {hold ? (
+        <ChatMessageHold
+          message={hold}
+          anchor={hold.anchor}
+          lang={lang}
+          onClose={releaseAll}
+          onReply={() => {
+            beginReply(hold);
+            releaseAll();
+          }}
+          onCopy={copyHold}
+          onDelete={() => setDeleteOpen(true)}
+          onPick={(emoji) => {
+            if (emoji?.id) rememberEmoji(emoji.id);
+            releaseAll();
+          }}
+          onMore={() => setReactionOpen(true)}
+        />
+      ) : null}
+      {hold && reactionOpen ? (
+        <ChatReactionModal
+          lang={lang}
+          onClose={() => setReactionOpen(false)}
+          onPick={() => releaseAll()}
+        />
+      ) : null}
+      {hold && deleteOpen ? (
+        <ChatDeleteMessageModal
+          peerName={peer?.name}
+          lang={lang}
+          busy={deleteBusy}
+          onClose={() => setDeleteOpen(false)}
+          onConfirm={confirmDelete}
+        />
+      ) : null}
     </section>
   );
 };

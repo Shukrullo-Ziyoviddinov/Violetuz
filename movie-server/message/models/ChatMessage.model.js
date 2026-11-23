@@ -47,6 +47,10 @@ const chatMessageSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    hiddenFor: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
     replyTo: {
       messageId: { type: String, trim: true, maxlength: 64 },
       senderId: { type: String, trim: true, maxlength: 64 },
