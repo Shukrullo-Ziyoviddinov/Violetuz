@@ -974,6 +974,8 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
   position: fixed;
   margin: 0;
   pointer-events: none;
+  background-repeat: no-repeat;
+  overflow: hidden;
 }
 
 .chat-hold-stage {
