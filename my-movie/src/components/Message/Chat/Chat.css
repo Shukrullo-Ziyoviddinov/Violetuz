@@ -382,7 +382,7 @@
 }
 
 .chat-reply-film {
-  width: 14px;
+  width: 10px;
   min-height: 32px;
   flex-shrink: 0;
   align-self: stretch;
@@ -505,6 +505,46 @@
   background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
 }
 
+.chat-reply-draft-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chat-reply-draft-who {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0;
+  min-width: 0;
+  color: #fff;
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+.chat-reply-draft-who strong {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chat-reply-draft-who span {
+  flex-shrink: 0;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.chat-reply-draft-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .chat-reply-draft .chat-reply-film {
   height: 28px;
 }
@@ -513,6 +553,7 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  font-weight: 400;
   white-space: nowrap;
   text-overflow: ellipsis;
   color: rgba(255, 255, 255, 0.88);

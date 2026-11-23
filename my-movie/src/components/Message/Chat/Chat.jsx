@@ -719,6 +719,8 @@ const Chat = ({ userId }) => {
         onSendAnimation={sendAnimation}
         onSendGif={sendGif}
         reply={replyTarget}
+        selfId={profile?.id}
+        peerName={peer?.name}
         onCancelReply={() => setReplyTarget(null)}
       />
       {hold ? (

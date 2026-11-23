@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AnimationEmojModal from './AnimationEmojModal';
 
-const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disabled = false, reply = null, onCancelReply }) => {
+const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disabled = false, reply = null, onCancelReply, selfId = '', peerName = '' }) => {
   const inputRef = useRef(null);
   const emojiRef = useRef(null);
   const [text, setText] = useState('');
@@ -10,6 +10,10 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
   const placeholder = lang === 'ru' ? 'Сообщение' : 'Xabar';
   const backLabel = lang === 'ru' ? 'Назад' : 'Orqaga';
   const closeLabel = lang === 'ru' ? 'Закрыть' : 'Yopish';
+  const replyMine = String(reply?.senderId || '').trim().toLowerCase() === String(selfId || '').trim().toLowerCase();
+  const replyName = String(peerName || '').trim();
+  const selfReplyLabel = lang === 'ru' ? 'Ответ себе' : 'O‘zingizga javob';
+  const replySuffix = lang === 'ru' ? 'ответ' : 'ga javob';
 
   useEffect(() => {
     if (reply?.id && !disabled) inputRef.current?.focus();
@@ -61,8 +65,22 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
     <div className="chat-composer-wrap">
       {reply?.text ? (
         <div className="chat-reply-draft">
-          <span className="chat-reply-film" aria-hidden="true" />
-          <span className="chat-reply-draft-text">{reply.text}</span>
+          <div className="chat-reply-draft-main">
+            <p className="chat-reply-draft-who">
+              {replyMine ? (
+                <strong>{selfReplyLabel}</strong>
+              ) : (
+                <>
+                  {replyName ? <strong>{replyName}</strong> : null}
+                  <span>{replySuffix}</span>
+                </>
+              )}
+            </p>
+            <div className="chat-reply-draft-body">
+              <span className="chat-reply-film" aria-hidden="true" />
+              <span className="chat-reply-draft-text">{reply.text}</span>
+            </div>
+          </div>
           <button type="button" className="chat-reply-draft-x" aria-label={closeLabel} onClick={onCancelReply}>
             ×
           </button>
