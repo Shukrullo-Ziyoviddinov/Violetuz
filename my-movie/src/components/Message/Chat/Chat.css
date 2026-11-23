@@ -23,7 +23,7 @@
   gap: 0.5rem;
   min-height: 64px;
   padding: 0.45rem 0.7rem;
-  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
+  background: rgba(var(--chat-header-rgb, 20, 16, 31), 0.66);
 }
 
 .chat-header::before {
@@ -32,30 +32,14 @@
   left: 0;
   right: 0;
   top: 100%;
-  height: 12px;
+  height: 14px;
   z-index: 0;
   pointer-events: none;
-  background: var(--chat-header-fill, rgba(20, 16, 31, 0.8));
-  -webkit-mask-mode: alpha;
-  mask-mode: alpha;
-  -webkit-mask-image:
-    radial-gradient(ellipse 24% 160% at 4% -30%, #000 0 42%, transparent 78%),
-    radial-gradient(ellipse 14% 110% at 24% -40%, #000 0 30%, transparent 70%),
-    radial-gradient(ellipse 22% 180% at 44% -20%, #000 0 40%, transparent 76%),
-    radial-gradient(ellipse 12% 90% at 62% -50%, #000 0 26%, transparent 68%),
-    radial-gradient(ellipse 20% 150% at 80% -24%, #000 0 38%, transparent 74%),
-    radial-gradient(ellipse 16% 120% at 98% -36%, #000 0 32%, transparent 72%);
-  mask-image:
-    radial-gradient(ellipse 24% 160% at 4% -30%, #000 0 42%, transparent 78%),
-    radial-gradient(ellipse 14% 110% at 24% -40%, #000 0 30%, transparent 70%),
-    radial-gradient(ellipse 22% 180% at 44% -20%, #000 0 40%, transparent 76%),
-    radial-gradient(ellipse 12% 90% at 62% -50%, #000 0 26%, transparent 68%),
-    radial-gradient(ellipse 20% 150% at 80% -24%, #000 0 38%, transparent 74%),
-    radial-gradient(ellipse 16% 120% at 98% -36%, #000 0 32%, transparent 72%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-composite: source-over;
-  mask-composite: add;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--chat-header-rgb, 20, 16, 31), 0.66),
+    rgba(var(--chat-header-rgb, 20, 16, 31), 0)
+  );
 }
 
 .chat-header > * {
