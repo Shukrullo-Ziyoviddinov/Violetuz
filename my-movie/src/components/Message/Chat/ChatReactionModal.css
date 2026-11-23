@@ -39,11 +39,12 @@
 }
 
 .chat-react-grab {
+  display: block;
   width: 42px;
   height: 4px;
-  margin: 0.35rem auto 0.7rem;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.28);
+  margin: 0.55rem auto 0.35rem;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .chat-react-head {
