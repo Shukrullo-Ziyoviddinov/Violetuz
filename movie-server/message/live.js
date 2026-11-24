@@ -191,6 +191,7 @@ module.exports = {
   publishChatMessage,
   publishTyping,
   publishRead,
+  publishEdit,
   publishDelete,
   attachStream,
 };

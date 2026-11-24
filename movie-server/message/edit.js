@@ -60,7 +60,11 @@ const editChatMessage = async (meId, messageId, rawText, rawQuote) => {
     replyTo: toReply(saved?.replyTo),
     related,
   };
-  publishEdit(recipient, payload);
+  try {
+    publishEdit(recipient, payload);
+  } catch (_err) {
+    // Saqlangan matn qoladi. Jonli yuborish yiqilsa ham javob qaytadi.
+  }
   return payload;
 };
 
