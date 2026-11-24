@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import UserAvatar from '../../UserAvatar/UserAvatar';
 import ChatMessageBlock from './ChatMessageBlock';
 import ChatReplySwipe from './ChatReplySwipe';
@@ -162,10 +162,59 @@ export const revealRepliedMessage = (thread, messageId) => {
   block.addEventListener('animationend', done);
 };
 
+const reactionMap = (rows) => {
+  const next = new Map();
+  rows.forEach((item) => {
+    const mine = new Map();
+    (item.reactions || []).forEach((reaction) => {
+      if (!reaction?.emoji) return;
+      mine.set(String(reaction.userId || ''), reaction.emoji);
+    });
+    next.set(String(item.id), mine);
+  });
+  return next;
+};
+
 const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [], selfName = '', selfAvatar = '', onClearReaction }) => {
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
+  const knownReactionsRef = useRef(null);
+  const primedRef = useRef(false);
+  const [pop, setPop] = useState(null);
+  const [buzzId, setBuzzId] = useState('');
+
+  useEffect(() => {
+    if (!messages.length) {
+      primedRef.current = false;
+      knownReactionsRef.current = new Map();
+      return undefined;
+    }
+    const next = reactionMap(messages);
+    if (!primedRef.current) {
+      primedRef.current = true;
+      knownReactionsRef.current = next;
+      return undefined;
+    }
+    let landed = null;
+    next.forEach((mine, id) => {
+      mine.forEach((emoji, userKey) => {
+        const prev = knownReactionsRef.current?.get(id)?.get(userKey);
+        if (prev !== emoji) landed = { id, userKey, emoji };
+      });
+    });
+    knownReactionsRef.current = next;
+    if (!landed) return undefined;
+    setPop({ ...landed, token: `${landed.id}:${landed.userKey}:${landed.emoji}:${Date.now()}` });
+    setBuzzId(landed.id);
+    try {
+      navigator.vibrate?.(18);
+    } catch (_err) {
+      // Qurilma tebranishni qo‘llamasa emoji animatsiyasi baribir yuradi.
+    }
+    const timer = window.setTimeout(() => setBuzzId(''), 320);
+    return () => window.clearTimeout(timer);
+  }, [messages]);
 
   const pinBottom = () => {
     const node = threadRef.current;
@@ -213,7 +262,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
         return (
           <div
             key={item.id}
-            className={`chat-item${mine ? ' is-mine' : ''}${heldId && heldId === item.id ? ' is-held' : ''}`}
+            className={`chat-item${mine ? ' is-mine' : ''}${heldId && heldId === item.id ? ' is-held' : ''}${buzzId === String(item.id) ? ' is-react-buzz' : ''}`}
             data-message-id={item.id}
             onContextMenu={(event) => event.preventDefault()}
             onPointerDown={(event) => {
@@ -293,6 +342,10 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                   const person = self
                     ? { name: selfName, avatar: selfAvatar }
                     : { name: peer?.name, avatar: peer?.avatar };
+                  const popping = pop
+                    && pop.id === String(item.id)
+                    && sameId(pop.userKey, reaction.userId)
+                    && pop.emoji === reaction.emoji;
                   const body = (
                     <>
                       <span className="chat-react-avatar">
@@ -303,7 +356,12 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                           fallback={<span>{initialsOf(person.name)}</span>}
                         />
                       </span>
-                      <span className="chat-react-emoji">{reaction.emoji}</span>
+                      <span
+                        key={popping ? pop.token : 'emoji'}
+                        className={`chat-react-emoji${popping ? ' is-pop' : ''}`}
+                      >
+                        {reaction.emoji}
+                      </span>
                     </>
                   );
                   if (!self) {

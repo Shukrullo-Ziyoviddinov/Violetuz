@@ -223,6 +223,7 @@
   position: relative;
   z-index: 1;
   max-width: 100%;
+  overflow: visible;
 }
 
 .chat-react {
@@ -239,6 +240,7 @@
   color: inherit;
   cursor: default;
   position: relative;
+  overflow: visible;
   background:
     linear-gradient(#140e22, #140e22) padding-box,
     linear-gradient(120deg, #8b5cf6, #e879f9) border-box;
@@ -295,8 +297,45 @@ button.chat-react.is-self {
 }
 
 .chat-react-emoji {
+  display: inline-block;
   font-size: 15px;
   line-height: 1;
+  transform-origin: center bottom;
+}
+
+.chat-react-emoji.is-pop {
+  position: relative;
+  z-index: 3;
+  animation: chat-react-emoji-pop 0.78s cubic-bezier(0.22, 0.82, 0.24, 1);
+}
+
+.chat-item.is-react-buzz .chat-block {
+  animation: chat-react-buzz 0.28s linear;
+}
+
+@keyframes chat-react-emoji-pop {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  16% { transform: translate3d(0, -16px, 0) rotate(-11deg); }
+  30% { transform: translate3d(-1px, -18px, 0) rotate(12deg); }
+  44% { transform: translate3d(1px, -15px, 0) rotate(-10deg); }
+  58% { transform: translate3d(-1px, -17px, 0) rotate(8deg); }
+  74% { transform: translate3d(0, -7px, 0) rotate(-3deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+
+@keyframes chat-react-buzz {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1.5px); }
+  80% { transform: translateX(1.5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-react-emoji.is-pop,
+  .chat-item.is-react-buzz .chat-block {
+    animation: none;
+  }
 }
 
 .chat-item .chat-block {
