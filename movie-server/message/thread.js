@@ -48,6 +48,12 @@ const toClientMessage = (row) => ({
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
   replyTo: toReply(row.replyTo),
+  reactions: (row.reactions || []).map((item) => ({
+    userId: String(item.userId || ''),
+    emoji: String(item.emoji || ''),
+    ...(item.emojiId ? { emojiId: String(item.emojiId) } : {}),
+    at: item.at || null,
+  })).filter((item) => item.userId && item.emoji),
 });
 
 const loadPeer = async (peerId) => {
@@ -88,7 +94,7 @@ const listMessages = async (conversationId, meId) => {
   })
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
-    .select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo')
+    .select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo reactions')
     .lean();
   const replyIds = [...new Set(rows
     .map((row) => String(row.replyTo?.messageId || '').trim())
@@ -165,7 +171,7 @@ const openThread = async (meId, peerId) => {
     const extra = await ChatMessage.find({
       _id: { $in: missing },
       hiddenFor: { $nin: [me] },
-    }).select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo').lean();
+    }).select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo reactions').lean();
     messages.push(...extra.map(toClientMessage));
   }
   const readAt = await markThreadRead(me, conversation?._id);

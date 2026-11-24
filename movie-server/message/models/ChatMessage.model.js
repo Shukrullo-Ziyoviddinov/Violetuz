@@ -61,6 +61,27 @@ const chatMessageSchema = new mongoose.Schema(
         default: Date.now,
       },
     }],
+    reactions: [{
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      emoji: {
+        type: String,
+        trim: true,
+        maxlength: 32,
+      },
+      emojiId: {
+        type: String,
+        trim: true,
+        maxlength: 32,
+        default: '',
+      },
+      at: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
     replyTo: {
       messageId: { type: String, trim: true, maxlength: 64 },
       senderId: { type: String, trim: true, maxlength: 64 },

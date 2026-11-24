@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
-import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage, pinChatMessage, unpinChatMessage } from '../../../api/messagesApi';
+import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage, pinChatMessage, unpinChatMessage, reactChatMessage } from '../../../api/messagesApi';
 import { unwatchPresence, watchPresence } from '../../../api/presenceApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
@@ -484,6 +484,25 @@ const Chat = ({ userId }) => {
         }
         setPins((current) => current.filter((row) => !sameId(row.id, item.id)));
       },
+      onReact: (item) => {
+        if (closed || !item?.id || !item?.userId) return;
+        const apply = (rows) => rows.map((row) => {
+          if (!sameId(row.id, item.id)) return row;
+          const rest = (row.reactions || []).filter((reaction) => !sameId(reaction.userId, item.userId));
+          if (!item.emoji) return { ...row, reactions: rest };
+          return {
+            ...row,
+            reactions: [...rest, {
+              userId: item.userId,
+              emoji: item.emoji,
+              ...(item.emojiId ? { emojiId: item.emojiId } : {}),
+              at: item.at,
+            }],
+          };
+        });
+        setMessages(apply);
+        setPending(apply);
+      },
       onDelete: (item) => {
         if (closed || !item?.id) return;
         const id = item.id;
@@ -650,6 +669,41 @@ const Chat = ({ userId }) => {
       area.remove();
     }
     dismissHoldRef.current(releaseAll);
+  };
+
+  const reactToHold = (emoji) => {
+    const id = hold?.id;
+    const char = String(emoji?.char || '').trim();
+    if (!id || !char || String(id).startsWith('local-')) return;
+    if (emoji?.id) rememberEmoji(emoji.id);
+    const me = String(profile?.id || '');
+    const source = messages.find((row) => sameId(row.id, id)) || pending.find((row) => sameId(row.id, id));
+    const before = source?.reactions || [];
+    const mine = before.find((row) => sameId(row.userId, me));
+    const remove = mine?.emoji === char;
+    const paint = (reactions) => {
+      const apply = (rows) => rows.map((row) => (sameId(row.id, id) ? { ...row, reactions } : row));
+      setMessages(apply);
+      setPending(apply);
+    };
+    const kept = before.filter((row) => !sameId(row.userId, me));
+    paint(remove ? kept : [...kept, {
+      userId: me,
+      emoji: char,
+      ...(emoji?.id ? { emojiId: emoji.id } : {}),
+      at: new Date().toISOString(),
+    }]);
+    reactChatMessage(id, remove ? '' : char, emoji?.id || '')
+      .then((saved) => {
+        if (!saved?.id) return;
+        paint(saved.emoji ? [...kept, {
+          userId: saved.userId || me,
+          emoji: saved.emoji,
+          ...(saved.emojiId ? { emojiId: saved.emojiId } : {}),
+          at: saved.at,
+        }] : kept);
+      })
+      .catch(() => paint(before));
   };
 
   const confirmPin = (forPeer) => {
@@ -889,6 +943,8 @@ const Chat = ({ userId }) => {
         heldId={hold?.id || ''}
         peer={peer}
         pins={pins}
+        selfName={profile?.name || ''}
+        selfAvatar={profile?.avatar || ''}
       />
       {peerTyping ? (
         <div className="chat-typing" role="status" aria-label={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}>
@@ -932,7 +988,7 @@ const Chat = ({ userId }) => {
           }}
           onDelete={() => setDeleteOpen(true)}
           onPick={(emoji) => {
-            if (emoji?.id) rememberEmoji(emoji.id);
+            reactToHold(emoji);
             releaseAll();
           }}
           onMore={() => setReactionOpen(true)}
@@ -943,7 +999,10 @@ const Chat = ({ userId }) => {
           ref={reactionUiRef}
           lang={lang}
           onClose={() => setReactionOpen(false)}
-          onPick={() => dismissHoldRef.current(releaseAll)}
+          onPick={(emoji) => {
+            reactToHold(emoji);
+            dismissHoldRef.current(releaseAll);
+          }}
         />
       ) : null}
       {hold && pinOpen ? (

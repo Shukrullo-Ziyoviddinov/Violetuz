@@ -162,7 +162,7 @@ export const revealRepliedMessage = (thread, messageId) => {
   block.addEventListener('animationend', done);
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [] }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [], selfName = '', selfAvatar = '' }) => {
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
@@ -207,6 +207,9 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
         const clock = formatClock(item.createdAt);
         const quote = String(item.replyTo?.text || '').trim();
         const pinned = pins.some((pin) => sameId(pin.id, item.id));
+        const reactions = [...(item.reactions || [])]
+          .filter((reaction) => reaction?.emoji)
+          .sort((left, right) => new Date(left.at || 0) - new Date(right.at || 0));
         return (
           <div
             key={item.id}
@@ -283,6 +286,29 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                   : (clock || pinned ? <p className="chat-send-status is-in">{pinned ? pinMark : null}{clock}</p> : null)}
               />
             </ChatReplySwipe>
+            {reactions.length ? (
+              <span className="chat-reacts">
+                {reactions.map((reaction) => {
+                  const self = sameId(reaction.userId, selfId);
+                  const person = self
+                    ? { name: selfName, avatar: selfAvatar }
+                    : { name: peer?.name, avatar: peer?.avatar };
+                  return (
+                    <span key={reaction.userId} className={`chat-react${self ? ' is-self' : ' is-peer'}`}>
+                      <span className="chat-react-avatar">
+                        <UserAvatar
+                          src={person.avatar}
+                          className="chat-react-avatar-img"
+                          alt=""
+                          fallback={<span>{initialsOf(person.name)}</span>}
+                        />
+                      </span>
+                      <span className="chat-react-emoji">{reaction.emoji}</span>
+                    </span>
+                  );
+                })}
+              </span>
+            ) : null}
           </div>
         );
       })}

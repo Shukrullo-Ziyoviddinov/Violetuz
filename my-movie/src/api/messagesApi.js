@@ -132,7 +132,20 @@ export const unpinChatMessage = async (messageId) => {
   return parseJson(response);
 };
 
-export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onEdit, onPin, onReconnect }) => {
+export const reactChatMessage = async (messageId, emoji, emojiId = '') => {
+  const response = await fetch(`${API_BASE_URL}/messages/${encodeURIComponent(messageId)}/react`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      emoji: String(emoji || ''),
+      ...(emojiId ? { emojiId: String(emojiId) } : {}),
+    }),
+  });
+  return parseJson(response);
+};
+
+export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onEdit, onPin, onReact, onReconnect }) => {
   const source = new EventSource(`${API_BASE_URL}/messages/stream`, { withCredentials: true });
   source.onopen = () => {
     onReconnect?.();
@@ -165,6 +178,14 @@ export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onEdit, onP
     try {
       const item = JSON.parse(event.data);
       if (item?.id) onPin?.(item);
+    } catch {
+      // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
+    }
+  });
+  source.addEventListener('react', (event) => {
+    try {
+      const item = JSON.parse(event.data);
+      if (item?.id) onReact?.(item);
     } catch {
       // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
     }
