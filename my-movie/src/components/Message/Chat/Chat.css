@@ -236,6 +236,12 @@
   cursor: default;
 }
 
+.chat-send-pin {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
 .chat-send-status.is-failed {
   color: #ff6b6b;
   cursor: pointer;

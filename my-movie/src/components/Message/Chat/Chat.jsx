@@ -888,6 +888,7 @@ const Chat = ({ userId }) => {
         onHold={openHold}
         heldId={hold?.id || ''}
         peer={peer}
+        pins={pins}
       />
       {peerTyping ? (
         <div className="chat-typing" role="status" aria-label={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}>

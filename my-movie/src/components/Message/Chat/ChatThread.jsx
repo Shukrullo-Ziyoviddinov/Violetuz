@@ -31,6 +31,13 @@ const readIcon = (
   </svg>
 );
 
+const pinMark = (
+  <svg className="chat-send-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+    <path d="M9 4.2h6l-.8 5.2 2.6 2.4H7.2L9.8 9.4 9 4.2Z" strokeLinejoin="round" />
+    <path d="M12 11.8V20" strokeLinecap="round" />
+  </svg>
+);
+
 const initialsOf = (name) => {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return '';
@@ -66,12 +73,14 @@ const sendCopy = (lang) => (lang === 'ru'
   ? { sending: 'Отправляется', failed: 'Не отправлено', retry: 'Повторить', delivered: 'Доставлено', read: 'Прочитано' }
   : { sending: 'Yuborilmoqda', failed: 'Yuborilmadi', retry: 'Qayta urinish', delivered: 'Yetkazildi', read: 'O‘qildi' });
 
-const ChatSendStatus = ({ item, lang, onRetry, peer }) => {
+const ChatSendStatus = ({ item, lang, onRetry, peer, pinned = false }) => {
   const copy = sendCopy(lang);
   const status = item.status || 'sent';
+  const mark = pinned ? pinMark : null;
   if (status === 'sending') {
     return (
       <p className="chat-send-status">
+        {mark}
         <span>{copy.sending}</span>
         {clockIcon}
       </p>
@@ -80,6 +89,7 @@ const ChatSendStatus = ({ item, lang, onRetry, peer }) => {
   if (status === 'failed') {
     return (
       <button type="button" className="chat-send-status is-failed" onClick={() => onRetry?.(item.id)}>
+        {mark}
         <span>{`${copy.failed} · ${copy.retry}`}</span>
         {alertIcon}
       </button>
@@ -89,6 +99,7 @@ const ChatSendStatus = ({ item, lang, onRetry, peer }) => {
   if (item.readAt) {
     return (
       <p className="chat-send-status is-read">
+        {mark}
         {readIcon}
         <span>{clock ? `${clock} · ${copy.read}` : copy.read}</span>
         <span className="chat-send-avatar">
@@ -104,6 +115,7 @@ const ChatSendStatus = ({ item, lang, onRetry, peer }) => {
   }
   return (
     <p className="chat-send-status">
+      {mark}
       <span>{clock ? `${clock} · ${copy.delivered}` : copy.delivered}</span>
       {checkIcon}
     </p>
@@ -150,7 +162,7 @@ export const revealRepliedMessage = (thread, messageId) => {
   block.addEventListener('animationend', done);
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [] }) => {
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
@@ -194,6 +206,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
         const mine = String(item.senderId || '').trim().toLowerCase() === String(selfId || '').trim().toLowerCase();
         const clock = formatClock(item.createdAt);
         const quote = String(item.replyTo?.text || '').trim();
+        const pinned = pins.some((pin) => sameId(pin.id, item.id));
         return (
           <div
             key={item.id}
@@ -266,8 +279,8 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                 quoteAnimationId={item.replyTo?.animationId || ''}
                 quoteGif={item.replyTo?.gif || ''}
                 status={mine
-                  ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} />
-                  : (clock ? <p className="chat-send-status is-in">{clock}</p> : null)}
+                  ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} pinned={pinned} />
+                  : (clock || pinned ? <p className="chat-send-status is-in">{pinned ? pinMark : null}{clock}</p> : null)}
               />
             </ChatReplySwipe>
           </div>
