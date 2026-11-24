@@ -23,7 +23,7 @@ const mediaMessage = (message) => Boolean(
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, onEdit, onCopy, onDelete, onPick, onMore }, ref) => {
+const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, onEdit, onCopy, onPin, onUnpin, onDelete, onPick, onMore }, ref) => {
   const ru = lang === 'ru';
   const mine = message.mine === true;
   const canEdit = mine && !message.gif && !message.animationId && message.animated !== true && String(message.text || '').trim();
@@ -268,6 +268,24 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
             </MenuIcon>
             <span>{ru ? 'Копировать' : 'Nusxa olish'}</span>
           </button>
+          {message.pinned ? (
+            <button type="button" role="menuitem" onClick={() => settle(onUnpin)}>
+              <MenuIcon>
+                <path d="M9 4.2h6l-.8 5.2 2.6 2.4H7.2L9.8 9.4 9 4.2Z" strokeLinejoin="round" />
+                <path d="M12 11.8V20" strokeLinecap="round" />
+                <path d="M5 19 19 5" strokeLinecap="round" />
+              </MenuIcon>
+              <span>{ru ? 'Открепить' : 'Yechib olish'}</span>
+            </button>
+          ) : (
+            <button type="button" role="menuitem" onClick={onPin}>
+              <MenuIcon>
+                <path d="M9 4.2h6l-.8 5.2 2.6 2.4H7.2L9.8 9.4 9 4.2Z" strokeLinejoin="round" />
+                <path d="M12 11.8V20" strokeLinecap="round" />
+              </MenuIcon>
+              <span>{ru ? 'Закрепить' : 'Qadash'}</span>
+            </button>
+          )}
           <button type="button" role="menuitem" className="is-danger" onClick={onDelete}>
             <MenuIcon>
               <path d="M4.5 7h15" strokeLinecap="round" />

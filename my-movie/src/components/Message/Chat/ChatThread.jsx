@@ -115,7 +115,7 @@ const overlaySpace = (node, name) => {
   return Number.isFinite(value) ? value : 0;
 };
 
-const revealRepliedMessage = (thread, messageId) => {
+export const revealRepliedMessage = (thread, messageId) => {
   const id = String(messageId || '').trim();
   if (!thread || !id) return;
   const escaped = window.CSS?.escape ? CSS.escape(id) : id.replace(/"/g, '');

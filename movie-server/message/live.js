@@ -117,6 +117,25 @@ const publishEdit = (userId, payload) => {
   return sent;
 };
 
+const publishPin = (userId, payload) => {
+  const key = streamKey(userId);
+  const bucket = clients.get(key);
+  const id = String(payload?.id || '').trim();
+  if (!bucket?.size || !id) return 0;
+  const data = `event: pin\ndata: ${JSON.stringify(payload)}\n\n`;
+  let sent = 0;
+  for (const res of [...bucket]) {
+    try {
+      res.write(data);
+      sent += 1;
+    } catch (_err) {
+      bucket.delete(res);
+    }
+  }
+  if (!bucket.size) clients.delete(key);
+  return sent;
+};
+
 const publishDelete = (userId, payload) => {
   const key = streamKey(userId);
   const bucket = clients.get(key);
@@ -192,6 +211,7 @@ module.exports = {
   publishTyping,
   publishRead,
   publishEdit,
+  publishPin,
   publishDelete,
   attachStream,
 };

@@ -9,6 +9,7 @@ const { listInbox, openThread, isUserId, loadPeer } = require('./thread');
 const { sendChatMessage } = require('./send');
 const { removeChatMessage } = require('./remove');
 const { editChatMessage } = require('./edit');
+const { pinChatMessage, unpinChatMessage } = require('./pin');
 const { attachStream, publishTyping } = require('./live');
 const { badRequest } = require('../utils/errors');
 const { listBackgrounds, getMyBackground, saveMyBackground } = require('./background');
@@ -72,6 +73,20 @@ router.post('/:messageId/edit', asyncHandler(async (req, res) => {
     req.body?.text,
     req.body?.quoteText
   );
+  return sendSuccess(res, { data: result });
+}));
+
+router.post('/:messageId/pin', asyncHandler(async (req, res) => {
+  const result = await pinChatMessage(
+    req.authUser._id,
+    req.params.messageId,
+    req.body?.forPeer === true
+  );
+  return sendSuccess(res, { data: result });
+}));
+
+router.post('/:messageId/unpin', asyncHandler(async (req, res) => {
+  const result = await unpinChatMessage(req.authUser._id, req.params.messageId);
   return sendSuccess(res, { data: result });
 }));
 

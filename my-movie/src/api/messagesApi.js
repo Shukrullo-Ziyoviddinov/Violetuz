@@ -112,7 +112,27 @@ export const signalChatTyping = async (userId, typing) => {
   return parseJson(response);
 };
 
-export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onEdit, onReconnect }) => {
+export const pinChatMessage = async (messageId, forPeer = false) => {
+  const response = await fetch(`${API_BASE_URL}/messages/${encodeURIComponent(messageId)}/pin`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ forPeer: forPeer === true }),
+  });
+  return parseJson(response);
+};
+
+export const unpinChatMessage = async (messageId) => {
+  const response = await fetch(`${API_BASE_URL}/messages/${encodeURIComponent(messageId)}/unpin`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  return parseJson(response);
+};
+
+export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onEdit, onPin, onReconnect }) => {
   const source = new EventSource(`${API_BASE_URL}/messages/stream`, { withCredentials: true });
   source.onopen = () => {
     onReconnect?.();
@@ -137,6 +157,14 @@ export const openChatStream = ({ onItem, onTyping, onRead, onDelete, onEdit, onR
     try {
       const item = JSON.parse(event.data);
       if (item?.id) onEdit?.(item);
+    } catch {
+      // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
+    }
+  });
+  source.addEventListener('pin', (event) => {
+    try {
+      const item = JSON.parse(event.data);
+      if (item?.id) onPin?.(item);
     } catch {
       // Buzilgan qator tushib qoladi, ulanish ochiq qoladi.
     }

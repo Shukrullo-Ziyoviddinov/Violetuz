@@ -1,0 +1,67 @@
+.chat-pin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(8, 6, 16, 0.55);
+}
+
+.chat-pin-card {
+  width: min(100%, 360px);
+  padding: 1.15rem 1.15rem 1rem;
+  border-radius: 18px;
+  background: #161616;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.chat-pin-card h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.15rem;
+}
+
+.chat-pin-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.4;
+}
+
+.chat-pin-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.9rem 0 1rem;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.chat-pin-name {
+  font-weight: 700;
+}
+
+.chat-pin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.chat-pin-actions button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 0.9rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+}
+
+.chat-pin-actions .is-pin {
+  background: #9b4fe7;
+}
+
+.chat-pin-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

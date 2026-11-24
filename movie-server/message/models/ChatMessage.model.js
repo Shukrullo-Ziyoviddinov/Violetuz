@@ -51,6 +51,16 @@ const chatMessageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     }],
+    pinnedFor: [{
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      at: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
     replyTo: {
       messageId: { type: String, trim: true, maxlength: 64 },
       senderId: { type: String, trim: true, maxlength: 64 },

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
-import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage } from '../../../api/messagesApi';
+import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage, pinChatMessage, unpinChatMessage } from '../../../api/messagesApi';
 import { unwatchPresence, watchPresence } from '../../../api/presenceApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
@@ -10,11 +10,13 @@ import { readTextChoice, textLookClass, textVars } from './chatTextFont';
 import { rememberEmoji } from './chatEmojis';
 import { useModalHardwareBack } from '../../../useModalHardwareBack';
 import ChatHeader from './ChatHeader';
-import ChatThread from './ChatThread';
+import ChatThread, { revealRepliedMessage } from './ChatThread';
 import ChatComposer from './ChatComposer';
 import ChatMessageHold from './ChatMessageHold';
 import ChatReactionModal from './ChatReactionModal';
 import ChatDeleteMessageModal from './ChatDeleteMessageModal';
+import ChatPinMessageModal from './ChatPinMessageModal';
+import ChatPinnedBar from './ChatPinnedBar';
 import { gifByFile } from './chatGifs';
 import { shatterElement, SHATTER_MS } from './chatShatter';
 import './Chat.css';
@@ -86,10 +88,13 @@ const Chat = ({ userId }) => {
   const [pending, setPending] = useState([]);
   const [replyTarget, setReplyTarget] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
+  const [pins, setPins] = useState([]);
   const [hold, setHold] = useState(null);
   const [reactionOpen, setReactionOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [pinBusy, setPinBusy] = useState(false);
   const loadToken = useRef(0);
   const typingIdleRef = useRef(null);
   const typingSentRef = useRef(false);
@@ -114,6 +119,8 @@ const Chat = ({ userId }) => {
     setReactionOpen(false);
     setDeleteOpen(false);
     setDeleteBusy(false);
+    setPinOpen(false);
+    setPinBusy(false);
   };
 
   dismissHoldRef.current = (after) => {
@@ -127,10 +134,14 @@ const Chat = ({ userId }) => {
   const { releaseAll } = useModalHardwareBack({
     historyKey: 'violetChatHold',
     isOpen: Boolean(hold),
-    hasNested: reactionOpen || deleteOpen,
+    hasNested: reactionOpen || deleteOpen || pinOpen,
     onNestedBack: () => {
       if (reactionUiRef.current?.close) {
         reactionUiRef.current.close();
+        return;
+      }
+      if (pinOpen) {
+        setPinOpen(false);
         return;
       }
       setReactionOpen(false);
@@ -185,18 +196,23 @@ const Chat = ({ userId }) => {
     });
     setMessages((current) => current.map(mapRow));
     setPending((current) => current.map(mapRow));
+    setPins((current) => current.map((pin) => (
+      sameId(pin.id, id) ? { ...pin, text } : pin
+    )));
   };
   paintEditRef.current = paintEdit;
 
   useLayoutEffect(() => {
     const root = chatRef.current;
     if (!root) return undefined;
-    const header = root.querySelector('.chat-header');
-    const composer = root.querySelector('.chat-composer-wrap');
-    const apply = () => {
-      const typing = root.querySelector('.chat-typing');
-      const top = header?.offsetHeight || 0;
-      const bottom = (composer?.offsetHeight || 0) + (typing ? typing.offsetHeight + 12 : 0);
+      const header = root.querySelector('.chat-header');
+      const composer = root.querySelector('.chat-composer-wrap');
+      const apply = () => {
+        const typing = root.querySelector('.chat-typing');
+        const pin = root.querySelector('.chat-pin');
+        const pinSpace = pin ? pin.offsetHeight + 16 : 0;
+        const top = (header?.offsetHeight || 0) + pinSpace;
+        const bottom = (composer?.offsetHeight || 0) + (typing ? typing.offsetHeight + 12 : 0);
       root.style.setProperty('--chat-overlay-top', `${top}px`);
       root.style.setProperty('--chat-overlay-bottom', `${bottom}px`);
     };
@@ -205,8 +221,10 @@ const Chat = ({ userId }) => {
     const observer = new ResizeObserver(apply);
     if (header) observer.observe(header);
     if (composer) observer.observe(composer);
+    const pin = root.querySelector('.chat-pin');
+    if (pin) observer.observe(pin);
     return () => observer.disconnect();
-  }, [peerTyping]);
+  }, [peerTyping, pins.length]);
 
   const load = useCallback(() => {
     const token = ++loadToken.current;
@@ -228,6 +246,7 @@ const Chat = ({ userId }) => {
             return keepReply(withGif, local);
           });
           setMessages(kept);
+          setPins(Array.isArray(data?.pins) ? data.pins : []);
           setPending((current) => dropMatchedPending(current, kept));
         }
         return { stale };
@@ -244,6 +263,7 @@ const Chat = ({ userId }) => {
     if (!isLoggedIn) {
       setPeer(null);
       setMessages([]);
+      setPins([]);
       setPending([]);
       setReplyTarget(null);
       setEditTarget(null);
@@ -252,6 +272,7 @@ const Chat = ({ userId }) => {
     }
     let cancelled = false;
     setPending([]);
+    setPins([]);
     setReplyTarget(null);
     setEditTarget(null);
     setReady(false);
@@ -371,9 +392,10 @@ const Chat = ({ userId }) => {
   flyQuotesAwayRef.current = flyQuotesAway;
 
   flyMessageAwayRef.current = (id, after) => {
-    const finish = () => {
+      const finish = () => {
       setMessages((current) => current.filter((row) => row.id !== id));
       setPending((current) => current.filter((row) => row.id !== id));
+      setPins((current) => current.filter((row) => !sameId(row.id, id)));
       after?.();
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -443,6 +465,24 @@ const Chat = ({ userId }) => {
       onEdit: (item) => {
         if (closed || !item?.id) return;
         paintEditRef.current(item);
+      },
+      onPin: (item) => {
+        if (closed || !item?.id) return;
+        if (item.pinned) {
+          setPins((current) => [
+            {
+              id: item.id,
+              text: String(item.text || ''),
+              animated: item.animated === true,
+              ...(item.animationId ? { animationId: item.animationId } : {}),
+              ...(item.gif ? { gif: item.gif } : {}),
+              at: item.at || new Date().toISOString(),
+            },
+            ...current.filter((row) => !sameId(row.id, item.id)),
+          ].sort((left, right) => new Date(right.at || 0) - new Date(left.at || 0)));
+          return;
+        }
+        setPins((current) => current.filter((row) => !sameId(row.id, item.id)));
       },
       onDelete: (item) => {
         if (closed || !item?.id) return;
@@ -576,6 +616,7 @@ const Chat = ({ userId }) => {
     if (!item?.id || String(item.id).startsWith('local-')) return;
     setReactionOpen(false);
     setDeleteOpen(false);
+    setPinOpen(false);
     setHold({
       id: item.id,
       text: item.text,
@@ -591,6 +632,7 @@ const Chat = ({ userId }) => {
       quoteGif: item.replyTo?.gif || '',
       anchor,
       quoteSenderId: item.replyTo?.senderId || '',
+      pinned: pins.some((pin) => sameId(pin.id, item.id)),
     });
   };
 
@@ -608,6 +650,37 @@ const Chat = ({ userId }) => {
       area.remove();
     }
     dismissHoldRef.current(releaseAll);
+  };
+
+  const confirmPin = (forPeer) => {
+    const item = hold;
+    if (!item?.id || pinBusy) return;
+    const previous = pins;
+    const next = {
+      id: item.id,
+      text: String(item.text || ''),
+      animated: item.animated === true,
+      ...(item.animationId ? { animationId: item.animationId } : {}),
+      ...(item.gif ? { gif: item.gif } : {}),
+      at: new Date().toISOString(),
+    };
+    setPins((current) => [next, ...current.filter((row) => !sameId(row.id, next.id))]
+      .sort((left, right) => new Date(right.at || 0) - new Date(left.at || 0)));
+    setPinOpen(false);
+    setPinBusy(true);
+    dismissHoldRef.current(releaseAll);
+    pinChatMessage(item.id, forPeer)
+      .catch(() => setPins(previous))
+      .finally(() => setPinBusy(false));
+  };
+
+  const unpinHold = () => {
+    const id = hold?.id;
+    if (!id) return;
+    const previous = pins;
+    setPins((current) => current.filter((row) => !sameId(row.id, id)));
+    unpinChatMessage(id).catch(() => setPins(previous));
+    releaseAll();
   };
 
   const confirmDelete = (forPeer) => {
@@ -648,6 +721,10 @@ const Chat = ({ userId }) => {
         reactionUiRef.current.close();
         return;
       }
+      if (pinOpen) {
+        setPinOpen(false);
+        return;
+      }
       if (deleteOpen) {
         setDeleteOpen(false);
         return;
@@ -656,7 +733,7 @@ const Chat = ({ userId }) => {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [hold, deleteOpen, releaseAll]);
+  }, [hold, deleteOpen, pinOpen, releaseAll]);
 
   const sendNow = (text) => {
     const replyTo = replyTarget;
@@ -795,6 +872,11 @@ const Chat = ({ userId }) => {
         onBack={() => navigate(-1)}
         online={peerOnline}
       />
+      <ChatPinnedBar
+        pins={pins}
+        lang={lang}
+        onJump={(id) => revealRepliedMessage(chatRef.current?.querySelector('.chat-thread'), id)}
+      />
       <ChatThread
         messages={shownMessages}
         selfId={profile?.id}
@@ -841,6 +923,8 @@ const Chat = ({ userId }) => {
             releaseAll();
           }}
           onCopy={copyHold}
+          onPin={() => setPinOpen(true)}
+          onUnpin={unpinHold}
           onEdit={() => {
             beginEdit(hold);
             releaseAll();
@@ -859,6 +943,15 @@ const Chat = ({ userId }) => {
           lang={lang}
           onClose={() => setReactionOpen(false)}
           onPick={() => dismissHoldRef.current(releaseAll)}
+        />
+      ) : null}
+      {hold && pinOpen ? (
+        <ChatPinMessageModal
+          peerName={peer?.name}
+          lang={lang}
+          busy={pinBusy}
+          onClose={() => setPinOpen(false)}
+          onConfirm={confirmPin}
         />
       ) : null}
       {hold && deleteOpen ? (

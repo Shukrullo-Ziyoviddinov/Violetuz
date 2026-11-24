@@ -122,6 +122,34 @@ const markThreadRead = async (meId, conversationId) => {
   return readAt;
 };
 
+const pinMoment = (row, meId) => {
+  const me = normalizeId(meId);
+  const hit = (row.pinnedFor || []).find((item) => normalizeId(item?.userId) === me);
+  return hit?.at || null;
+};
+
+const toPin = (row, meId) => ({
+  id: String(row._id),
+  text: String(row.text || ''),
+  animated: row.animated === true || Boolean(row.animationId),
+  ...(row.animationId ? { animationId: String(row.animationId) } : {}),
+  ...(row.gif ? { gif: String(row.gif) } : {}),
+  at: pinMoment(row, meId),
+});
+
+const listPins = async (conversationId, meId) => {
+  if (!conversationId) return [];
+  const rows = await ChatMessage.find({
+    conversationId,
+    hiddenFor: { $nin: [meId] },
+    'pinnedFor.userId': meId,
+  }).select('text animated animationId gif pinnedFor').lean();
+  return rows
+    .map((row) => toPin(row, meId))
+    .filter((item) => item.at)
+    .sort((left, right) => new Date(right.at) - new Date(left.at));
+};
+
 const openThread = async (meId, peerId) => {
   const me = normalizeId(meId);
   const peer = normalizeId(peerId);
@@ -130,11 +158,22 @@ const openThread = async (meId, peerId) => {
   const person = await loadPeer(peer);
   const conversation = await findConversation(me, peer);
   const messages = await listMessages(conversation?._id, me);
+  const pins = await listPins(conversation?._id, me);
+  const seen = new Set(messages.map((item) => item.id));
+  const missing = pins.filter((item) => !seen.has(item.id)).map((item) => item.id);
+  if (missing.length) {
+    const extra = await ChatMessage.find({
+      _id: { $in: missing },
+      hiddenFor: { $nin: [me] },
+    }).select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo').lean();
+    messages.push(...extra.map(toClientMessage));
+  }
   const readAt = await markThreadRead(me, conversation?._id);
   if (readAt) publishRead(peer, { userId: me, readAt });
   return {
     peer: toPublicPeer(person),
     messages,
+    pins,
   };
 };
 
