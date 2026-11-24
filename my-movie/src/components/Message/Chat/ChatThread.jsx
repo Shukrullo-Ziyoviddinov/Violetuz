@@ -182,7 +182,6 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
   const knownReactionsRef = useRef(null);
   const primedRef = useRef(false);
   const [pop, setPop] = useState(null);
-  const [buzzId, setBuzzId] = useState('');
 
   useEffect(() => {
     if (!messages.length) {
@@ -206,14 +205,12 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
     knownReactionsRef.current = next;
     if (!landed) return undefined;
     setPop({ ...landed, token: `${landed.id}:${landed.userKey}:${landed.emoji}:${Date.now()}` });
-    setBuzzId(landed.id);
     try {
       navigator.vibrate?.(18);
     } catch (_err) {
       // Qurilma tebranishni qo‘llamasa emoji animatsiyasi baribir yuradi.
     }
-    const timer = window.setTimeout(() => setBuzzId(''), 320);
-    return () => window.clearTimeout(timer);
+    return undefined;
   }, [messages]);
 
   const pinBottom = () => {
@@ -262,7 +259,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
         return (
           <div
             key={item.id}
-            className={`chat-item${mine ? ' is-mine' : ''}${heldId && heldId === item.id ? ' is-held' : ''}${buzzId === String(item.id) ? ' is-react-buzz' : ''}`}
+            className={`chat-item${mine ? ' is-mine' : ''}${heldId && heldId === item.id ? ' is-held' : ''}`}
             data-message-id={item.id}
             onContextMenu={(event) => event.preventDefault()}
             onPointerDown={(event) => {
