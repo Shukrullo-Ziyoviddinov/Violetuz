@@ -162,7 +162,7 @@ export const revealRepliedMessage = (thread, messageId) => {
   block.addEventListener('animationend', done);
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [], selfName = '', selfAvatar = '' }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [], selfName = '', selfAvatar = '', onClearReaction }) => {
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
@@ -293,8 +293,8 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                   const person = self
                     ? { name: selfName, avatar: selfAvatar }
                     : { name: peer?.name, avatar: peer?.avatar };
-                  return (
-                    <span key={reaction.userId} className={`chat-react${self ? ' is-self' : ' is-peer'}`}>
+                  const body = (
+                    <>
                       <span className="chat-react-avatar">
                         <UserAvatar
                           src={person.avatar}
@@ -304,7 +304,29 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                         />
                       </span>
                       <span className="chat-react-emoji">{reaction.emoji}</span>
-                    </span>
+                    </>
+                  );
+                  if (!self) {
+                    return (
+                      <span key={reaction.userId} className="chat-react is-peer">
+                        {body}
+                      </span>
+                    );
+                  }
+                  return (
+                    <button
+                      key={reaction.userId}
+                      type="button"
+                      className="chat-react is-self"
+                      aria-label={lang === 'ru' ? 'Убрать реакцию' : 'Reaksiyani olish'}
+                      onPointerDown={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onClearReaction?.(item);
+                      }}
+                    >
+                      {body}
+                    </button>
                   );
                 })}
               </span>

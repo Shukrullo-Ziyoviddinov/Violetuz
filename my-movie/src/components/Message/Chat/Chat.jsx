@@ -680,20 +680,47 @@ const Chat = ({ userId }) => {
     const source = messages.find((row) => sameId(row.id, id)) || pending.find((row) => sameId(row.id, id));
     const before = source?.reactions || [];
     const mine = before.find((row) => sameId(row.userId, me));
-    const remove = mine?.emoji === char;
+    if (mine?.emoji === char) return;
     const paint = (reactions) => {
       const apply = (rows) => rows.map((row) => (sameId(row.id, id) ? { ...row, reactions } : row));
       setMessages(apply);
       setPending(apply);
     };
     const kept = before.filter((row) => !sameId(row.userId, me));
-    paint(remove ? kept : [...kept, {
+    paint([...kept, {
       userId: me,
       emoji: char,
       ...(emoji?.id ? { emojiId: emoji.id } : {}),
       at: new Date().toISOString(),
     }]);
-    reactChatMessage(id, remove ? '' : char, emoji?.id || '')
+    reactChatMessage(id, char, emoji?.id || '')
+      .then((saved) => {
+        if (!saved?.id) return;
+        paint(saved.emoji ? [...kept, {
+          userId: saved.userId || me,
+          emoji: saved.emoji,
+          ...(saved.emojiId ? { emojiId: saved.emojiId } : {}),
+          at: saved.at,
+        }] : kept);
+      })
+      .catch(() => paint(before));
+  };
+
+  const clearReaction = (item) => {
+    const id = item?.id;
+    if (!id || String(id).startsWith('local-')) return;
+    const me = String(profile?.id || '');
+    const source = messages.find((row) => sameId(row.id, id)) || pending.find((row) => sameId(row.id, id)) || item;
+    const before = source?.reactions || [];
+    const kept = before.filter((row) => !sameId(row.userId, me));
+    if (kept.length === before.length) return;
+    const paint = (reactions) => {
+      const apply = (rows) => rows.map((row) => (sameId(row.id, id) ? { ...row, reactions } : row));
+      setMessages(apply);
+      setPending(apply);
+    };
+    paint(kept);
+    reactChatMessage(id, '')
       .then((saved) => {
         if (!saved?.id) return;
         paint(saved.emoji ? [...kept, {
@@ -945,6 +972,7 @@ const Chat = ({ userId }) => {
         pins={pins}
         selfName={profile?.name || ''}
         selfAvatar={profile?.avatar || ''}
+        onClearReaction={clearReaction}
       />
       {peerTyping ? (
         <div className="chat-typing" role="status" aria-label={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}>

@@ -38,7 +38,16 @@ const reactChatMessage = async (meId, messageId, rawEmoji, rawEmojiId) => {
   const emoji = cleanEmoji(rawEmoji);
   const emojiId = String(rawEmojiId || '').trim().slice(0, 32);
   const mine = (row.reactions || []).find((item) => normalizeId(item.userId) === me);
-  const remove = !emoji || mine?.emoji === emoji;
+  if (emoji && mine?.emoji === emoji) {
+    return {
+      id: String(row._id),
+      userId: me,
+      emoji: mine.emoji,
+      ...(mine.emojiId ? { emojiId: String(mine.emojiId) } : {}),
+      at: mine.at ? new Date(mine.at).toISOString() : null,
+    };
+  }
+  const remove = !emoji;
   const user = asObjectId(me);
   await ChatMessage.updateOne({ _id: row._id }, { $pull: { reactions: { userId: user } } });
   const at = new Date();

@@ -218,8 +218,7 @@
 
 .chat-reacts {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-wrap: nowrap;
   margin-top: -10px;
   position: relative;
   z-index: 1;
@@ -235,10 +234,31 @@
   box-sizing: border-box;
   border-radius: 999px;
   border: 1.5px solid transparent;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+  position: relative;
   background:
     linear-gradient(#140e22, #140e22) padding-box,
     linear-gradient(120deg, #8b5cf6, #e879f9) border-box;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+}
+
+.chat-react + .chat-react {
+  margin-left: -10px;
+}
+
+.chat-reacts > :nth-child(1) {
+  z-index: 1;
+}
+
+.chat-reacts > :nth-child(2) {
+  z-index: 2;
+}
+
+button.chat-react.is-self {
+  cursor: pointer;
 }
 
 .chat-item.is-mine .chat-react {
