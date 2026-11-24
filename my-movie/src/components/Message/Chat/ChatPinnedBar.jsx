@@ -38,14 +38,13 @@ const ChatPinnedBar = ({ pins, lang, onJump }) => {
 
   return (
     <button type="button" className="chat-pin" onClick={jump}>
-      <span className="chat-pin-head">
-        <svg className="chat-pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <path d="M9 4.2h6l-.8 5.2 2.6 2.4H7.2L9.8 9.4 9 4.2Z" strokeLinejoin="round" />
-          <path d="M12 11.8V20" strokeLinecap="round" />
-        </svg>
-        <strong>{label}</strong>
-      </span>
-      <span className="chat-pin-body">
+      <svg className="chat-pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+        <path d="M9 4.2h6l-.8 5.2 2.6 2.4H7.2L9.8 9.4 9 4.2Z" strokeLinejoin="round" />
+        <path d="M12 11.8V20" strokeLinecap="round" />
+      </svg>
+      <span className="chat-pin-main">
+        <strong className="chat-pin-label">{label}</strong>
+        <span className="chat-pin-body">
         {kind === 'gif' ? (
           <ChatGif className="chat-pin-gif" file={current.gif} label={text} fit max={40} />
         ) : null}
@@ -56,13 +55,14 @@ const ChatPinnedBar = ({ pins, lang, onJump }) => {
           <span className={`chat-pin-text${kind === 'emoji' ? ' is-emoji' : ''}`}>{text}</span>
         ) : null}
       </span>
-      {items.length > 1 ? (
-        <span className="chat-pin-dots" aria-hidden="true">
-          {items.map((item, dot) => (
-            <span key={item.id} className={`chat-pin-dot${dot === index ? ' is-active' : ''}`} />
-          ))}
-        </span>
-      ) : null}
+        {items.length > 1 ? (
+          <span className="chat-pin-dots" aria-hidden="true">
+            {items.map((item, dot) => (
+              <span key={item.id} className={`chat-pin-dot${dot === index ? ' is-active' : ''}`} />
+            ))}
+          </span>
+        ) : null}
+      </span>
     </button>
   );
 };

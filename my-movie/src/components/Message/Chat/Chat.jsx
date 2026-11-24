@@ -210,7 +210,7 @@ const Chat = ({ userId }) => {
       const apply = () => {
         const typing = root.querySelector('.chat-typing');
         const pin = root.querySelector('.chat-pin');
-        const pinSpace = pin ? pin.offsetHeight + 16 : 0;
+        const pinSpace = pin ? pin.offsetHeight + 5 : 0;
         const top = (header?.offsetHeight || 0) + pinSpace;
         const bottom = (composer?.offsetHeight || 0) + (typing ? typing.offsetHeight + 12 : 0);
       root.style.setProperty('--chat-overlay-top', `${top}px`);
