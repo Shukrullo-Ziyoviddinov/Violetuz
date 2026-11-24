@@ -6,12 +6,12 @@
   align-items: center;
   gap: 10px;
   width: auto;
-  margin: 5px 0 0;
+  margin: 5px 0.85rem 0;
   padding: 8px 14px;
   box-sizing: border-box;
   border: none;
   border-radius: 20px;
-  background: rgba(var(--chat-header-rgb, 20, 16, 31), 0.52);
+  background: var(--chat-header-pill, rgba(20, 16, 31, 0.92));
   color: #fff;
   text-align: left;
   cursor: pointer;
