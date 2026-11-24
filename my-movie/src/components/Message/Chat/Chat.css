@@ -226,6 +226,12 @@
   overflow: visible;
 }
 
+.chat-item:has(.chat-block.is-emoji) .chat-reacts,
+.chat-item:has(.chat-block.is-anim) .chat-reacts,
+.chat-item:has(.chat-block.is-gif) .chat-reacts {
+  margin-top: 4px;
+}
+
 .chat-react {
   display: inline-flex;
   align-items: center;
