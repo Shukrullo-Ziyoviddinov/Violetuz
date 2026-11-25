@@ -248,8 +248,8 @@
 }
 
 .chat-video-play svg {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   fill: currentColor;
 }
 
@@ -305,7 +305,7 @@
   padding: 0;
   border: none;
   border-radius: 8px;
-  background: #8b7cff;
+  background: #7c6bff;
   transform: translateX(-50%);
   cursor: ew-resize;
 }

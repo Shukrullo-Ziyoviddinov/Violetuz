@@ -214,10 +214,8 @@ const ChatVideoReview = ({ lang, peerName, clip, onBack, onSend }) => {
       <div className="chat-video-actions">
         <button type="button" className="chat-video-again" onClick={onBack}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 8H5.2A6.8 6.8 0 0 1 17 6.2" />
-            <path d="M16 4.2 17.4 7 14.6 7.6" />
-            <path d="M16 16h2.8A6.8 6.8 0 0 1 7 17.8" />
-            <path d="M8 19.8 6.6 17l2.8-.6" />
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
           </svg>
           {ru ? 'Переснять' : 'Qayta olish'}
         </button>
