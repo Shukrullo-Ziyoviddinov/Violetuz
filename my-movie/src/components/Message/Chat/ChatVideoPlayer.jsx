@@ -39,8 +39,9 @@ const ChatVideoPlayer = ({
   const onWatchedRef = useRef(onWatched);
   const onCoverBackRef = useRef(onCoverBack);
   const [needTap, setNeedTap] = useState(false);
-  const [paused, setPaused] = useState(false);
   const [controlsOn, setControlsOn] = useState(false);
+  const [mark, setMark] = useState('play');
+  const controlTimer = useRef(0);
   const [progress, setProgress] = useState(0);
   const openedBurst = useRef(burst?.token || 0);
   const [draft, setDraft] = useState('');
@@ -170,19 +171,23 @@ const ChatVideoPlayer = ({
     node.play().then(() => setNeedTap(false)).catch(() => setNeedTap(true));
   };
 
-  const revealControls = () => setControlsOn(true);
-
-  const onControl = (event) => {
-    event.stopPropagation();
+  const togglePlayback = (event) => {
+    event?.stopPropagation?.();
     const node = videoRef.current;
     if (!node) return;
-    if (node.paused || needTap) {
-      begin();
-      setControlsOn(false);
-      return;
-    }
-    node.pause();
+    const willPlay = node.paused || needTap;
+    if (willPlay) begin();
+    else node.pause();
+    setMark(willPlay ? 'play' : 'pause');
+    setControlsOn(true);
+    window.clearTimeout(controlTimer.current);
+    controlTimer.current = window.setTimeout(() => setControlsOn(false), 680);
   };
+  const onPlayerClick = (event) => {
+    if (event.target.closest('.chat-video-player-reply, .chat-video-player-top')) return;
+    togglePlayback(event);
+  };
+  useEffect(() => () => window.clearTimeout(controlTimer.current), []);
 
   const sendReply = (event) => {
     event?.preventDefault?.();
@@ -193,7 +198,7 @@ const ChatVideoPlayer = ({
   };
 
   return (
-    <div className="chat-video-player" role="dialog" aria-modal="true" aria-label="Video">
+    <div className="chat-video-player" role="dialog" aria-modal="true" aria-label="Video" onClick={onPlayerClick}>
       <video
         ref={backdropRef}
         className="chat-video-player-backdrop"
@@ -229,9 +234,6 @@ const ChatVideoPlayer = ({
         src={url}
         autoPlay
         playsInline
-        onClick={revealControls}
-        onPlay={() => setPaused(false)}
-        onPause={() => setPaused(true)}
         onEnded={() => {
           if (viewOnce && !mine) finish();
         }}
@@ -240,10 +242,9 @@ const ChatVideoPlayer = ({
         <button
           type="button"
           className="chat-video-player-play"
-          onClick={onControl}
-          aria-label={paused || needTap ? (ru ? 'Смотреть' : 'Ko‘rish') : (ru ? 'Пауза' : 'Pauza')}
+          aria-label={mark === 'play' ? (ru ? 'Смотреть' : 'Ko‘rish') : (ru ? 'Пауза' : 'Pauza')}
         >
-          {paused || needTap ? (
+          {mark === 'play' ? (
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 7.5v9l8-4.5-8-4.5Z" />
             </svg>
