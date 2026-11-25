@@ -12,31 +12,49 @@ const Holes = () => (
   </span>
 );
 
-const ChatVideoNote = ({ url, poster = '', duration = 0, start = 0, uploading = false, failed = false, progress = 0, fetching = false, downloadProgress = null, onCancel, onDownload, onOpen }) => {
+const ChatVideoNote = ({ url, poster = '', preview = '', duration = 0, start = 0, uploading = false, failed = false, progress = 0, fetching = false, downloadProgress = null, onCancel, onDownload, onOpen }) => {
   const videoRef = useRef(null);
+  const source = url || preview;
 
   useEffect(() => {
     const node = videoRef.current;
-    if (!node) return undefined;
-    const place = () => {
-      const at = Math.min(Math.max(0, Number(start) || 0), Math.max(0, (node.duration || duration) - 0.05));
-      if (Number.isFinite(at)) {
-        try {
-          node.currentTime = at;
-        } catch {
-          /* Kadr hali tayyor emas. */
+    if (!node || !source) return undefined;
+    let gone = false;
+    const paint = () => {
+      if (gone) return;
+      const length = Number.isFinite(node.duration) ? node.duration : Number(duration) || 0;
+      const at = Math.min(Math.max(0.08, Number(start) || 0), Math.max(0.08, length - 0.05));
+      const draw = () => {
+        if (gone) return;
+        const kick = node.play();
+        if (kick && typeof kick.then === 'function') {
+          kick.then(() => { if (!gone) node.pause(); }).catch(() => {});
         }
+      };
+      if (node.readyState >= 2 && Math.abs((node.currentTime || 0) - at) < 0.04) {
+        draw();
+        return;
+      }
+      node.addEventListener('seeked', draw, { once: true });
+      try {
+        node.currentTime = at;
+      } catch {
+        draw();
       }
     };
-    node.addEventListener('loadeddata', place);
-    return () => node.removeEventListener('loadeddata', place);
-  }, [duration, start, url]);
+    if (node.readyState >= 2) paint();
+    node.addEventListener('loadeddata', paint);
+    return () => {
+      gone = true;
+      node.removeEventListener('loadeddata', paint);
+    };
+  }, [duration, source, start]);
 
   return (
     <div className={`chat-video-note${uploading || failed ? ' is-uploading' : ''}${failed ? ' is-failed' : ''}`}>
       <Holes />
       <span className="chat-video-note-face">
-        {url ? <video ref={videoRef} src={url} muted playsInline preload="metadata" /> : poster ? <img className="chat-video-note-still" src={poster} alt="" /> : null}
+        {source ? <video ref={videoRef} src={source} muted playsInline preload={url ? 'metadata' : 'auto'} /> : poster ? <img className="chat-video-note-still" src={poster} alt="" /> : null}
         {uploading || failed ? (
           <span className="chat-video-note-progress">
             <strong>{failed ? 'Xatolik' : `${Math.max(0, Math.min(100, Math.round(progress)))}%`}</strong>

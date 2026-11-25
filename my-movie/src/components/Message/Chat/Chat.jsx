@@ -22,7 +22,7 @@ import ChatVideoRecorder from './ChatVideoRecorder';
 import ChatVideoPlayer from './ChatVideoPlayer';
 import { gifByFile } from './chatGifs';
 import { shatterElement, SHATTER_MS } from './chatShatter';
-import { saveChatVideoFile, readChatVideoFile, dropChatVideoFile, captureChatPoster, readChatVideoStill, saveChatVideoStill, stillWasMissed, rememberStillMiss, captureRemoteStill } from './chatVideoFile';
+import { saveChatVideoFile, readChatVideoFile, dropChatVideoFile, captureChatPoster, readChatVideoStill, saveChatVideoStill, dropChatVideoStill, frameLooksBlank, stillWasMissed, rememberStillMiss, captureRemoteStill } from './chatVideoFile';
 import './Chat.css';
 
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
@@ -269,10 +269,11 @@ const Chat = ({ userId }) => {
       return;
     }
     const savedStill = await readChatVideoStill(key);
-    if (savedStill?.size) {
+    if (savedStill?.size && !(await frameLooksBlank(savedStill))) {
       putVideoLocal(key, 'still', URL.createObjectURL(savedStill));
       return;
     }
+    if (savedStill?.size) dropChatVideoStill(key);
     const row = messagesRef.current.find((item) => item.id === key);
     const poster = String(row?.video?.poster || '');
     if (poster) {
@@ -291,7 +292,7 @@ const Chat = ({ userId }) => {
     const remote = String(row?.video?.url || '');
     if (!remote || remote.startsWith('blob:') || stillWasMissed(key)) return;
     const shot = await captureRemoteStill(remote, row?.video?.start || 0);
-    if (!shot?.size) {
+    if (!shot?.size || await frameLooksBlank(shot)) {
       rememberStillMiss(key);
       return;
     }
