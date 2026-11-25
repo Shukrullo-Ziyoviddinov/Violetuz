@@ -273,12 +273,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       <p className="chat-video-limit">{ru ? 'Не дольше 1 минуты' : 'Eng ko‘pi bilan 1 daqiqa'}</p>
       <div className="chat-video-controls">
         <button type="button" className="chat-video-side" onClick={flipCamera} disabled={recording} aria-label={ru ? 'Сменить камеру' : 'Kamerani almashtirish'}>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 8H5.2A6.8 6.8 0 0 1 17 6.2" />
-            <path d="M16 4.2 17.4 7 14.6 7.6" />
-            <path d="M16 16h2.8A6.8 6.8 0 0 1 7 17.8" />
-            <path d="M8 19.8 6.6 17l2.8-.6" />
-          </svg>
+          <i className="fa-solid fa-camera-rotate" aria-hidden="true" />
         </button>
         <button
           type="button"

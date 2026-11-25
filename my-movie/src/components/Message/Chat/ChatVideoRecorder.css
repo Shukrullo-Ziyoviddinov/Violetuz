@@ -52,6 +52,12 @@
   stroke-linecap: round;
 }
 
+.chat-video-side i {
+  font-size: 22px;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .chat-video-icon.is-on,
 .chat-video-side.is-on {
   color: #f5d76e;
