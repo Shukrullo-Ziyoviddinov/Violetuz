@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import UserAvatar from '../../UserAvatar/UserAvatar';
 import { useModalHardwareBack } from '../../../useModalHardwareBack';
+import { emojiFromId } from './chatEmojis';
 import './ChatVideoPlayer.css';
+
+const QUICK = ['1f44d', '2764', '1f602'];
 
 const initialsOf = (name) => {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -19,6 +22,11 @@ const ChatVideoPlayer = ({
   senderName = '',
   senderAvatar = '',
   lang = 'uz',
+  burst = null,
+  onSendReply,
+  onReact,
+  onMoreEmoji,
+  onRecord,
   onClose,
   onWatched,
 }) => {
@@ -30,6 +38,8 @@ const ChatVideoPlayer = ({
   const [needTap, setNeedTap] = useState(false);
   const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [draft, setDraft] = useState('');
+  const [floatEmoji, setFloatEmoji] = useState(null);
   onCloseRef.current = onClose;
   onWatchedRef.current = onWatched;
   const { releaseHistory } = useModalHardwareBack({
@@ -45,6 +55,23 @@ const ChatVideoPlayer = ({
   const who = mine
     ? (ru ? 'Вы' : 'Siz')
     : (ru ? `от ${senderName || '…'}` : `${senderName || '…'} dan`);
+  const quick = QUICK.map((id) => emojiFromId(id)).filter(Boolean);
+
+  useEffect(() => {
+    if (!burst?.token || !burst.char) return undefined;
+    const token = burst.token;
+    setFloatEmoji({ char: burst.char, token, phase: 'in' });
+    const holdTimer = window.setTimeout(() => {
+      setFloatEmoji((current) => (current?.token === token ? { ...current, phase: 'out' } : current));
+    }, 860);
+    const endTimer = window.setTimeout(() => {
+      setFloatEmoji((current) => (current?.token === token ? null : current));
+    }, 1180);
+    return () => {
+      window.clearTimeout(holdTimer);
+      window.clearTimeout(endTimer);
+    };
+  }, [burst]);
 
   const close = () => {
     releaseRef.current();
@@ -139,6 +166,14 @@ const ChatVideoPlayer = ({
     else node.pause();
   };
 
+  const sendReply = (event) => {
+    event?.preventDefault?.();
+    const text = draft.trim();
+    if (!text) return;
+    onSendReply?.(text);
+    setDraft('');
+  };
+
   return (
     <div className="chat-video-player" role="dialog" aria-modal="true" aria-label="Video">
       <video
@@ -203,6 +238,35 @@ const ChatVideoPlayer = ({
           </svg>
         )}
       </button>
+      {floatEmoji ? (
+        <span className={`chat-video-player-float is-${floatEmoji.phase}`} aria-hidden="true">{floatEmoji.char}</span>
+      ) : null}
+      <form className="chat-video-player-reply" onSubmit={sendReply} onClick={(event) => event.stopPropagation()}>
+        <button type="button" className="chat-video-player-cam" aria-label={ru ? 'Видео' : 'Video'} onClick={() => onRecord?.()}>
+          <i className="fa-solid fa-video" aria-hidden="true" />
+        </button>
+        <label className="chat-video-player-field">
+          <input
+            value={draft}
+            placeholder={ru ? 'Ответить' : 'Javob berish'}
+            enterKeyHint="send"
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' || event.shiftKey) return;
+              event.preventDefault();
+              sendReply(event);
+            }}
+          />
+          <span className="chat-video-player-emojis">
+            {quick.map((item) => (
+              <button key={item.id} type="button" onClick={() => onReact?.(item)} aria-label={item.char}>
+                {item.char}
+              </button>
+            ))}
+            <button type="button" className="is-more" onClick={() => onMoreEmoji?.()} aria-label={ru ? 'Ещё' : 'Yana'}>+</button>
+          </span>
+        </label>
+      </form>
     </div>
   );
 };

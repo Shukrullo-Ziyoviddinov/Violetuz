@@ -107,6 +107,8 @@ const Chat = ({ userId }) => {
   const [pins, setPins] = useState([]);
   const [hold, setHold] = useState(null);
   const [reactionOpen, setReactionOpen] = useState(false);
+  const [videoEmojiOpen, setVideoEmojiOpen] = useState(false);
+  const [videoBurst, setVideoBurst] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
@@ -776,8 +778,7 @@ const Chat = ({ userId }) => {
     dismissHoldRef.current(releaseAll);
   };
 
-  const reactToHold = (emoji) => {
-    const id = hold?.id;
+  const reactToMessage = (id, emoji) => {
     const char = String(emoji?.char || '').trim();
     if (!id || !char || String(id).startsWith('local-')) return;
     if (emoji?.id) rememberEmoji(emoji.id);
@@ -809,6 +810,10 @@ const Chat = ({ userId }) => {
         }] : kept);
       })
       .catch(() => paint(before));
+  };
+
+  const reactToHold = (emoji) => {
+    reactToMessage(hold?.id, emoji);
   };
 
   const clearReaction = (item) => {
@@ -925,11 +930,11 @@ const Chat = ({ userId }) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [hold, deleteOpen, pinOpen, releaseAll]);
 
-  const sendNow = (text) => {
-    const replyTo = replyTarget;
+  const sendNow = (text, replyOverride = undefined) => {
+    const replyTo = replyOverride === undefined ? replyTarget : replyOverride;
     const localId = `local-${Date.now()}-${localSeq.current + 1}`;
     localSeq.current += 1;
-    setReplyTarget(null);
+    if (replyOverride === undefined) setReplyTarget(null);
     setPending((current) => [...current, {
       id: localId,
       senderId: profile?.id,
@@ -1257,6 +1262,8 @@ const Chat = ({ userId }) => {
             duration: Number(item.video.duration) || 0,
             viewOnce: item.video.viewOnce === true,
             mine,
+            text: item.text || '',
+            senderId: item.senderId,
           });
         }}
       />
@@ -1293,7 +1300,27 @@ const Chat = ({ userId }) => {
           senderName={playing.mine ? '' : (peer?.name || '')}
           senderAvatar={playing.mine ? '' : (peer?.avatar || '')}
           lang={lang}
-          onClose={() => setPlaying(null)}
+          burst={videoBurst}
+          onSendReply={(text) => {
+            const body = String(text || '').trim();
+            if (!body || !playing?.id || String(playing.id).startsWith('local-')) return;
+            sendNow(body, {
+              id: playing.id,
+              senderId: playing.senderId,
+              text: String(playing.text || '').trim() || (lang === 'ru' ? 'Видео' : 'Video'),
+            });
+          }}
+          onReact={(emoji) => {
+            if (!playing?.id) return;
+            reactToMessage(playing.id, emoji);
+            setVideoBurst({ char: String(emoji?.char || ''), token: Date.now() });
+          }}
+          onMoreEmoji={() => setVideoEmojiOpen(true)}
+          onRecord={() => setVideoOpen(true)}
+          onClose={() => {
+            setVideoEmojiOpen(false);
+            setPlaying(null);
+          }}
           onWatched={() => {
             const id = playing.id;
             if (!id || String(id).startsWith('local-')) return;
@@ -1352,12 +1379,21 @@ const Chat = ({ userId }) => {
           onMore={() => setReactionOpen(true)}
         />
       ) : null}
-      {hold && reactionOpen ? (
+      {(hold && reactionOpen) || videoEmojiOpen ? (
         <ChatReactionModal
           ref={reactionUiRef}
           lang={lang}
-          onClose={() => setReactionOpen(false)}
+          onClose={() => {
+            setReactionOpen(false);
+            setVideoEmojiOpen(false);
+          }}
           onPick={(emoji) => {
+            if (videoEmojiOpen && playing?.id) {
+              reactToMessage(playing.id, emoji);
+              setVideoBurst({ char: String(emoji?.char || ''), token: Date.now() });
+              setVideoEmojiOpen(false);
+              return;
+            }
             reactToHold(emoji);
             dismissHoldRef.current(releaseAll);
           }}

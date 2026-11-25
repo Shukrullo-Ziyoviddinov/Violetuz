@@ -17,8 +17,8 @@ const loadReply = async (conversationId, rawReply) => {
   const source = await ChatMessage.findOne({
     _id: replyId,
     conversationId,
-  }).select('senderId text animated animationId gif').lean();
-  const sourceText = clip(source?.text, 2000);
+  }).select('senderId text animated animationId gif video').lean();
+  const sourceText = clip(source?.text, 2000) || (source?.video?.url ? 'Video' : '');
   if (!sourceText) return null;
   const sourceAnimationId = animationIdOf(source?.animationId);
   const sourceGif = gifOf(source?.gif);
