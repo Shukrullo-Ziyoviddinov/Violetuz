@@ -56,7 +56,7 @@ const MIME_TO_EXT = Object.freeze({
 const CLIENT_UPLOAD_FOLDERS = Object.freeze(['avatars', 'chatVideos']);
 
 const FOLDER_CONTENT_TYPES = Object.freeze({
-  chatVideos: Object.freeze(['video/mp4', 'video/webm', 'video/quicktime']),
+  chatVideos: Object.freeze(['video/mp4', 'video/webm', 'video/quicktime', 'image/jpeg']),
 });
 
 /**

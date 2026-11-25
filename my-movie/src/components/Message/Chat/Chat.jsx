@@ -22,6 +22,7 @@ import ChatVideoRecorder from './ChatVideoRecorder';
 import ChatVideoPlayer from './ChatVideoPlayer';
 import { gifByFile } from './chatGifs';
 import { shatterElement, SHATTER_MS } from './chatShatter';
+import { saveChatVideoFile, readChatVideoFile, dropChatVideoFile, captureChatPoster } from './chatVideoFile';
 import './Chat.css';
 
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
@@ -119,6 +120,7 @@ const Chat = ({ userId }) => {
   const messagesRef = useRef(messages);
   const videoUploadsRef = useRef(new Map());
   const videoFetchesRef = useRef(new Set());
+  const videoHydrateRef = useRef(new Set());
   const repliesRef = useRef(new Map());
   const holdRef = useRef(null);
   const holdUiRef = useRef(null);
@@ -244,6 +246,25 @@ const Chat = ({ userId }) => {
     return () => observer.disconnect();
   }, [peerTyping, pins.length]);
 
+  const attachSavedVideo = async (id) => {
+    const key = String(id || '').trim();
+    if (!key || videoHydrateRef.current.has(key)) return;
+    videoHydrateRef.current.add(key);
+    const blob = await readChatVideoFile(key);
+    if (!blob?.size) {
+      videoHydrateRef.current.delete(key);
+      return;
+    }
+    const playback = URL.createObjectURL(blob);
+    setMessages((current) => current.map((row) => {
+      if (row.id !== key || !row.video?.url || row.video.playback) {
+        if (row.id === key && row.video?.playback) URL.revokeObjectURL(playback);
+        return row;
+      }
+      return { ...row, video: { ...row.video, playback } };
+    }));
+  };
+
   const load = useCallback(() => {
     const token = ++loadToken.current;
     if (!userId) return Promise.resolve({ stale: true });
@@ -273,6 +294,9 @@ const Chat = ({ userId }) => {
             return keepReply(withVideo, local);
           });
           setMessages(kept);
+          kept.forEach((item) => {
+            if (item.video?.url && !item.video.playback) attachSavedVideo(item.id);
+          });
           setPins(Array.isArray(data?.pins) ? data.pins : []);
           setPending((current) => dropMatchedPending(current, kept));
         }
@@ -481,6 +505,7 @@ const Chat = ({ userId }) => {
           if (typingIdleRef.current) window.clearTimeout(typingIdleRef.current);
           setPeerTyping(false);
           setMessages((current) => upsertMessage(current, item));
+          attachSavedVideo(item.id);
           load().catch(() => {});
           return;
         }
@@ -495,6 +520,7 @@ const Chat = ({ userId }) => {
         const shown = keepReply(item, local);
         setPending((current) => dropMatchedPending(current, [shown]));
         setMessages((current) => upsertMessage(current, shown));
+        if (shown.video?.url && !shown.video.playback) attachSavedVideo(shown.id);
       },
       onEdit: (item) => {
         if (closed || !item?.id) return;
@@ -539,6 +565,9 @@ const Chat = ({ userId }) => {
       },
       onDelete: (item) => {
         if (closed || !item?.id) return;
+        const kept = messagesRef.current.find((row) => row.id === item.id);
+        if (String(kept?.video?.playback || '').startsWith('blob:')) URL.revokeObjectURL(kept.video.playback);
+        dropChatVideoFile(item.id);
         const id = item.id;
         const held = holdRef.current?.id === id;
         flyQuotesAwayRef.current(id);
@@ -814,7 +843,11 @@ const Chat = ({ userId }) => {
     flyMessageAwayRef.current(id, () => {
       releaseAll();
       request.then(() => {
-        if (!failed || !kept) return;
+        if (!failed) {
+          dropChatVideoFile(id);
+          return;
+        }
+        if (!kept) return;
         setMessages((current) => {
           const restored = current.some((row) => row.id === id)
             ? current
@@ -931,6 +964,7 @@ const Chat = ({ userId }) => {
         },
       });
       if (!(blob instanceof Blob) || !blob.size) throw new Error('Yuklab bo‘lmadi');
+      await saveChatVideoFile(id, blob);
       const playback = URL.createObjectURL(blob);
       setMessages((current) => current.map((row) => (
         row.id === id && row.video?.url
@@ -952,6 +986,7 @@ const Chat = ({ userId }) => {
     job.controller.abort();
     if (job.preview) URL.revokeObjectURL(job.preview);
     if (job.publicUrl) deleteUpload({ url: job.publicUrl }).catch(() => {});
+    if (job.posterUrl) deleteUpload({ url: job.posterUrl }).catch(() => {});
     videoUploadsRef.current.delete(localId);
     setPending((current) => current.filter((row) => row.id !== localId));
   };
@@ -967,6 +1002,7 @@ const Chat = ({ userId }) => {
     let duration = Math.min(60, Math.max(0.1, Number(clip.duration) || 1));
     if (start + duration > 60) duration = Math.max(0.1, 60 - start);
     const viewOnce = clip.viewOnce === true;
+    const posterTask = captureChatPoster(blob, start);
     const preview = URL.createObjectURL(blob);
     const localId = `local-${Date.now()}-${localSeq.current + 1}`;
     localSeq.current += 1;
@@ -1009,19 +1045,44 @@ const Chat = ({ userId }) => {
       setPending((current) => current.map((row) => (
         row.id === localId ? { ...row, progress: 100 } : row
       )));
+      let poster = '';
+      const posterBlob = await posterTask;
+      if (posterBlob && !controller.signal.aborted && videoUploadsRef.current.has(localId)) {
+        try {
+          const shot = new File([posterBlob], 'chat.jpg', { type: 'image/jpeg' });
+          const signed = await requestPresign({
+            folder: 'chatVideos',
+            contentType: 'image/jpeg',
+            filename: 'chat.jpg',
+          });
+          await putFileToR2(signed.uploadUrl, shot, signed.headers || { 'Content-Type': 'image/jpeg' }, {
+            signal: controller.signal,
+          });
+          poster = signed.publicUrl;
+          job.posterUrl = poster;
+        } catch (err) {
+          if (err?.name === 'AbortError' || controller.signal.aborted) throw err;
+          poster = '';
+        }
+      }
+      if (controller.signal.aborted || !videoUploadsRef.current.has(localId)) return;
       job.saving = true;
       const saved = await sendChatMessage(userId, '', null, '', '', {
         url: presign.publicUrl,
         duration,
         start,
         viewOnce,
+        ...(poster ? { poster } : {}),
       });
       if (!saved?.id) throw new Error('Video saqlanmadi');
-      URL.revokeObjectURL(preview);
+      saveChatVideoFile(saved.id, blob);
       videoUploadsRef.current.delete(localId);
-      const shown = saved.video?.url ? saved : {
+      const shown = saved.video?.url ? {
         ...saved,
-        video: { url: presign.publicUrl, duration, start, viewOnce },
+        video: { ...saved.video, playback: preview },
+      } : {
+        ...saved,
+        video: { url: presign.publicUrl, duration, start, viewOnce, ...(poster ? { poster } : {}), playback: preview },
       };
       setPending((current) => current.filter((row) => row.id !== localId));
       setMessages((current) => upsertMessage(current, shown));
@@ -1036,6 +1097,7 @@ const Chat = ({ userId }) => {
       }
       if (err?.name === 'AbortError' || controller.signal.aborted) return;
       if (job?.uploaded && job.publicUrl) deleteUpload({ url: job.publicUrl }).catch(() => {});
+      if (job?.posterUrl) deleteUpload({ url: job.posterUrl }).catch(() => {});
       if (job) job.saving = false;
       setPending((current) => current.map((row) => (
         row.id === localId ? { ...row, uploading: false, failed: true } : row
@@ -1193,9 +1255,15 @@ const Chat = ({ userId }) => {
             if (!id || String(id).startsWith('local-')) return;
             window.requestAnimationFrame(() => {
               viewChatVideo(id)
-                .then(() => flyMessageAwayRef.current(id))
+                .then(() => {
+                  dropChatVideoFile(id);
+                  flyMessageAwayRef.current(id);
+                })
                 .catch((err) => {
-                  if (err?.status === 404) flyMessageAwayRef.current(id);
+                  if (err?.status === 404) {
+                    dropChatVideoFile(id);
+                    flyMessageAwayRef.current(id);
+                  }
                 });
             });
           }}

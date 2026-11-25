@@ -49,23 +49,27 @@ const gifOf = (value) => {
 
 const VIDEO_MAX_SECONDS = 60;
 
+const chatVideoKey = (url, base) => {
+  if (!base || !url.startsWith(`${base}/`) || url.includes('?') || url.includes('#')) return '';
+  try {
+    const key = decodeURIComponent(url.slice(base.length + 1));
+    if (!key.startsWith('chatVideos/') || key.includes('..') || key.includes('\\') || key.includes('//')) return '';
+    return key;
+  } catch {
+    return '';
+  }
+};
+
 const videoOf = (raw) => {
   if (raw == null || raw === false) return null;
   if (typeof raw !== 'object') throw badRequest('Video noto‘g‘ri');
   const url = String(raw.url || '').trim();
   const base = String(R2_PUBLIC_URL || '').replace(/\/+$/, '');
-  if (!base || !url.startsWith(`${base}/`) || url.includes('?') || url.includes('#')) {
-    throw badRequest('Video manzili noto‘g‘ri');
-  }
-  let key = '';
-  try {
-    key = decodeURIComponent(url.slice(base.length + 1));
-  } catch {
-    throw badRequest('Video manzili noto‘g‘ri');
-  }
-  if (!key.startsWith('chatVideos/') || key.includes('..') || key.includes('\\') || key.includes('//')) {
-    throw badRequest('Video manzili noto‘g‘ri');
-  }
+  const key = chatVideoKey(url, base);
+  if (!key || !/\.(mp4|webm|mov)$/i.test(key)) throw badRequest('Video manzili noto‘g‘ri');
+  const posterUrl = String(raw.poster || '').trim();
+  const posterKey = posterUrl ? chatVideoKey(posterUrl, base) : '';
+  if (posterUrl && (!posterKey || !/\.jpe?g$/i.test(posterKey))) throw badRequest('Video manzili noto‘g‘ri');
   const duration = Number(raw.duration);
   const start = Number(raw.start) || 0;
   if (!Number.isFinite(duration) || duration <= 0 || duration > VIDEO_MAX_SECONDS) {
@@ -79,6 +83,7 @@ const videoOf = (raw) => {
     duration: Math.round(duration * 10) / 10,
     start: Math.round(start * 10) / 10,
     viewOnce: raw.viewOnce === true,
+    ...(posterUrl ? { poster: posterUrl } : {}),
   };
 };
 

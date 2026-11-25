@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { ChatMessage } = require('./models');
 const { isUserId } = require('./thread');
 const { publishDelete } = require('./live');
+const { dropStoredVideo } = require('./view');
 const { badRequest, notFound } = require('../utils/errors');
 
 const normalizeId = (value) => String(value || '').trim().toLowerCase();
@@ -13,7 +14,7 @@ const removeChatMessage = async (meId, messageId, forPeer) => {
   const id = normalizeId(messageId);
   if (!isUserId(me)) throw badRequest('Hisob topilmadi');
   if (!isUserId(id)) throw notFound('Xabar topilmadi');
-  const row = await ChatMessage.findById(id).select('conversationId senderId recipientId').lean();
+  const row = await ChatMessage.findById(id).select('conversationId senderId recipientId video').lean();
   if (!row) throw notFound('Xabar topilmadi');
   const sender = normalizeId(row.senderId);
   const recipient = normalizeId(row.recipientId);
@@ -29,6 +30,7 @@ const removeChatMessage = async (meId, messageId, forPeer) => {
     );
     const other = me === sender ? recipient : sender;
     publishDelete(other, { id: goneId });
+    await dropStoredVideo(row.video);
     await ChatMessage.deleteOne({ _id: row._id });
     return { id: goneId, forPeer: true };
   }

@@ -49,6 +49,7 @@ export const sendChatMessage = async (userId, text, replyTo = null, animationId 
           duration: Number(video.duration) || 0,
           start: Number(video.start) || 0,
           viewOnce: video.viewOnce === true,
+          ...(video.poster ? { poster: String(video.poster) } : {}),
         },
       } : {}),
       ...(replyTo?.id ? { replyTo: { id: String(replyTo.id) } } : {}),

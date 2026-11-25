@@ -50,6 +50,12 @@ const chatMessageSchema = new mongoose.Schema(
         type: Boolean,
         default: false,
       },
+      poster: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: '',
+      },
     },
     animated: {
       type: Boolean,

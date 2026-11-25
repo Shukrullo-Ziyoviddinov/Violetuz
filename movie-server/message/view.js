@@ -18,6 +18,11 @@ const dropVideoFile = async (url) => {
   }
 };
 
+const dropStoredVideo = async (video) => {
+  await dropVideoFile(video?.url);
+  await dropVideoFile(video?.poster);
+};
+
 const viewChatVideo = async (meId, messageId) => {
   const me = normalizeId(meId);
   const id = normalizeId(messageId);
@@ -31,7 +36,7 @@ const viewChatVideo = async (meId, messageId) => {
   const recipient = normalizeId(row.recipientId);
   if (me !== recipient || me === sender) throw notFound('Xabar topilmadi');
   const goneId = String(row._id);
-  await dropVideoFile(row.video.url);
+  await dropStoredVideo(row.video);
   await ChatMessage.updateMany(
     {
       conversationId: row.conversationId,
@@ -44,4 +49,4 @@ const viewChatVideo = async (meId, messageId) => {
   return { id: goneId };
 };
 
-module.exports = { viewChatVideo };
+module.exports = { viewChatVideo, dropStoredVideo };

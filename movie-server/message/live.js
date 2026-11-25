@@ -35,6 +35,7 @@ const toLiveMessage = (row) => ({
       duration: Number(row.video.duration) || 0,
       start: Number(row.video.start) || 0,
       viewOnce: row.video.viewOnce === true,
+      ...(row.video.poster ? { poster: String(row.video.poster) } : {}),
     },
   } : {}),
   createdAt: row.createdAt || null,

@@ -12,7 +12,7 @@ const Holes = () => (
   </span>
 );
 
-const ChatVideoNote = ({ url, duration = 0, start = 0, uploading = false, failed = false, progress = 0, fetching = false, downloadProgress = null, onCancel, onDownload, onOpen }) => {
+const ChatVideoNote = ({ url, poster = '', preview = '', duration = 0, start = 0, uploading = false, failed = false, progress = 0, fetching = false, downloadProgress = null, onCancel, onDownload, onOpen }) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const ChatVideoNote = ({ url, duration = 0, start = 0, uploading = false, failed
     <div className={`chat-video-note${uploading || failed ? ' is-uploading' : ''}${failed ? ' is-failed' : ''}`}>
       <Holes />
       <span className="chat-video-note-face">
-        {url ? <video ref={videoRef} src={url} muted playsInline preload="metadata" /> : null}
+        {url || preview ? <video ref={videoRef} src={url || preview} muted playsInline preload="metadata" /> : poster ? <img className="chat-video-note-still" src={poster} alt="" /> : null}
         {uploading || failed ? (
           <span className="chat-video-note-progress">
             <strong>{failed ? 'Xatolik' : `${Math.max(0, Math.min(100, Math.round(progress)))}%`}</strong>
