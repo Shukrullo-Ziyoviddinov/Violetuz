@@ -15,46 +15,45 @@ const Holes = () => (
 const ChatVideoNote = ({ url, poster = '', preview = '', duration = 0, start = 0, uploading = false, failed = false, progress = 0, fetching = false, downloadProgress = null, onCancel, onDownload, onOpen }) => {
   const videoRef = useRef(null);
   const source = url || preview;
+  const frameSource = !source || source.startsWith('blob:') || source.includes('#')
+    ? source
+    : `${source}#t=${Math.max(0.25, Number(start) || 0).toFixed(1)}`;
 
   useEffect(() => {
     const node = videoRef.current;
     if (!node || !source) return undefined;
     let gone = false;
-    const paint = () => {
-      if (gone) return;
-      const length = Number.isFinite(node.duration) ? node.duration : Number(duration) || 0;
-      const at = Math.min(Math.max(0.08, Number(start) || 0), Math.max(0.08, length - 0.05));
-      const draw = () => {
-        if (gone) return;
-        const kick = node.play();
-        if (kick && typeof kick.then === 'function') {
-          kick.then(() => { if (!gone) node.pause(); }).catch(() => {});
-        }
-      };
-      if (node.readyState >= 2 && Math.abs((node.currentTime || 0) - at) < 0.04) {
-        draw();
-        return;
-      }
-      node.addEventListener('seeked', draw, { once: true });
-      try {
-        node.currentTime = at;
-      } catch {
-        draw();
-      }
+    let armed = false;
+    node.muted = true;
+    node.defaultMuted = true;
+    const stop = () => {
+      if (!gone) node.pause();
     };
-    if (node.readyState >= 2) paint();
-    node.addEventListener('loadeddata', paint);
+    const afterFrame = () => {
+      if (gone || armed) return;
+      armed = true;
+      if (typeof node.requestVideoFrameCallback === 'function') node.requestVideoFrameCallback(() => stop());
+      else window.setTimeout(stop, 240);
+    };
+    const kick = () => {
+      if (gone) return;
+      const pending = node.play();
+      if (pending && typeof pending.then === 'function') pending.then(afterFrame).catch(() => {});
+      else afterFrame();
+    };
+    node.addEventListener('loadeddata', kick);
+    if (node.readyState >= 2) kick();
     return () => {
       gone = true;
-      node.removeEventListener('loadeddata', paint);
+      node.removeEventListener('loadeddata', kick);
     };
-  }, [duration, source, start]);
+  }, [source]);
 
   return (
     <div className={`chat-video-note${uploading || failed ? ' is-uploading' : ''}${failed ? ' is-failed' : ''}`}>
       <Holes />
       <span className="chat-video-note-face">
-        {source ? <video ref={videoRef} src={source} muted playsInline preload={url ? 'metadata' : 'auto'} /> : poster ? <img className="chat-video-note-still" src={poster} alt="" /> : null}
+        {source ? <video ref={videoRef} src={frameSource} poster={url ? undefined : poster || undefined} muted playsInline preload={url ? 'metadata' : 'auto'} /> : poster ? <img className="chat-video-note-still" src={poster} alt="" /> : null}
         {uploading || failed ? (
           <span className="chat-video-note-progress">
             <strong>{failed ? 'Xatolik' : `${Math.max(0, Math.min(100, Math.round(progress)))}%`}</strong>

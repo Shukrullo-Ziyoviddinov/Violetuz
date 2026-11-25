@@ -114,8 +114,8 @@ const ChatMessageBlock = ({
         {mineVideo ? (
           <ChatVideoNote
             url={video.playback || (String(video.url || '').startsWith('blob:') ? video.url : '')}
-            poster={video.playback || String(video.url || '').startsWith('blob:') ? '' : (video.still || video.poster || '')}
-            preview={!video.playback && !String(video.url || '').startsWith('blob:') && !(video.still || video.poster) ? video.url : ''}
+            poster={video.playback || String(video.url || '').startsWith('blob:') ? '' : (video.still || '')}
+            preview={!video.playback && !String(video.url || '').startsWith('blob:') && !video.still ? video.url : ''}
             duration={video.duration}
             start={video.start}
             uploading={uploading}
