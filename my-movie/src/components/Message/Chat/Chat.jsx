@@ -22,7 +22,7 @@ import ChatVideoRecorder from './ChatVideoRecorder';
 import ChatVideoPlayer from './ChatVideoPlayer';
 import { gifByFile } from './chatGifs';
 import { shatterElement, SHATTER_MS } from './chatShatter';
-import { saveChatVideoFile, readChatVideoFile, dropChatVideoFile, captureChatPoster } from './chatVideoFile';
+import { saveChatVideoFile, readChatVideoFile, dropChatVideoFile, captureChatPoster, readChatVideoStill, saveChatVideoStill, stillWasMissed, rememberStillMiss, captureRemoteStill } from './chatVideoFile';
 import './Chat.css';
 
 const DEFAULT_CHAT_BG = '/img/chat-backgrounds/chat-bg-1.jpg';
@@ -50,6 +50,9 @@ const upsertMessage = (current, item) => {
       ...item.video,
       ...(item.video.playback || current[index].video?.playback
         ? { playback: item.video.playback || current[index].video.playback }
+        : {}),
+      ...(item.video.still || current[index].video?.still
+        ? { still: item.video.still || current[index].video.still }
         : {}),
     }
     : item.video;
@@ -246,23 +249,54 @@ const Chat = ({ userId }) => {
     return () => observer.disconnect();
   }, [peerTyping, pins.length]);
 
+  const putVideoLocal = (key, patch, url) => {
+    setMessages((current) => current.map((row) => {
+      if (row.id !== key || !row.video?.url || row.video[patch]) {
+        if (row.id === key && row.video?.[patch]) URL.revokeObjectURL(url);
+        return row;
+      }
+      return { ...row, video: { ...row.video, [patch]: url } };
+    }));
+  };
+
   const attachSavedVideo = async (id) => {
     const key = String(id || '').trim();
     if (!key || videoHydrateRef.current.has(key)) return;
     videoHydrateRef.current.add(key);
     const blob = await readChatVideoFile(key);
-    if (!blob?.size) {
-      videoHydrateRef.current.delete(key);
+    if (blob?.size) {
+      putVideoLocal(key, 'playback', URL.createObjectURL(blob));
       return;
     }
-    const playback = URL.createObjectURL(blob);
-    setMessages((current) => current.map((row) => {
-      if (row.id !== key || !row.video?.url || row.video.playback) {
-        if (row.id === key && row.video?.playback) URL.revokeObjectURL(playback);
-        return row;
+    const savedStill = await readChatVideoStill(key);
+    if (savedStill?.size) {
+      putVideoLocal(key, 'still', URL.createObjectURL(savedStill));
+      return;
+    }
+    const row = messagesRef.current.find((item) => item.id === key);
+    const poster = String(row?.video?.poster || '');
+    if (poster) {
+      try {
+        const response = await fetch(poster);
+        const shot = response.ok ? await response.blob() : null;
+        if (shot?.size && String(shot.type || '').startsWith('image/')) {
+          await saveChatVideoStill(key, shot);
+          putVideoLocal(key, 'still', URL.createObjectURL(shot));
+        }
+      } catch {
+        /* Kadr manzili rasmda qoladi. */
       }
-      return { ...row, video: { ...row.video, playback } };
-    }));
+      return;
+    }
+    const remote = String(row?.video?.url || '');
+    if (!remote || remote.startsWith('blob:') || stillWasMissed(key)) return;
+    const shot = await captureRemoteStill(remote, row?.video?.start || 0);
+    if (!shot?.size) {
+      rememberStillMiss(key);
+      return;
+    }
+    await saveChatVideoStill(key, shot);
+    putVideoLocal(key, 'still', URL.createObjectURL(shot));
   };
 
   const load = useCallback(() => {
@@ -284,11 +318,16 @@ const Chat = ({ userId }) => {
               : { ...withAnim, gif: local.gif };
             const previous = messagesRef.current.find((row) => row.id === item.id);
             const playback = previous?.video?.playback;
+            const still = previous?.video?.still;
             const withVideo = withGif.video?.url
               ? {
                 ...withGif,
                 ...(previous?.downloadProgress != null ? { downloadProgress: previous.downloadProgress } : {}),
-                video: { ...withGif.video, ...(playback ? { playback } : {}) },
+                video: {
+                  ...withGif.video,
+                  ...(playback ? { playback } : {}),
+                  ...(still ? { still } : {}),
+                },
               }
               : withGif;
             return keepReply(withVideo, local);
@@ -567,6 +606,7 @@ const Chat = ({ userId }) => {
         if (closed || !item?.id) return;
         const kept = messagesRef.current.find((row) => row.id === item.id);
         if (String(kept?.video?.playback || '').startsWith('blob:')) URL.revokeObjectURL(kept.video.playback);
+        if (String(kept?.video?.still || '').startsWith('blob:')) URL.revokeObjectURL(kept.video.still);
         dropChatVideoFile(item.id);
         const id = item.id;
         const held = holdRef.current?.id === id;

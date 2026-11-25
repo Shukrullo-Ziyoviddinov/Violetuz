@@ -113,15 +113,14 @@ const ChatMessageBlock = ({
       <div className="chat-block-main">
         {mineVideo ? (
           <ChatVideoNote
-            url={video.playback || (!mine ? '' : video.url)}
-            poster={video.poster || ''}
-            preview={!video.playback && !video.poster && !mine && !String(video.url).startsWith('blob:') ? video.url : ''}
+            url={video.playback || (String(video.url || '').startsWith('blob:') ? video.url : '')}
+            poster={video.playback || String(video.url || '').startsWith('blob:') ? '' : (video.still || video.poster || '')}
             duration={video.duration}
             start={video.start}
             uploading={uploading}
             failed={failed}
             progress={progress}
-            fetching={!mine && !video.playback && !String(video.url).startsWith('blob:')}
+            fetching={!mine && !video.playback && !String(video.url || '').startsWith('blob:')}
             downloadProgress={downloadProgress}
             onCancel={onCancelUpload}
             onDownload={held ? undefined : onDownload}

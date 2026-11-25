@@ -58,12 +58,42 @@ export const readChatVideoFile = async (id) => {
   }
 };
 
+const stillKey = (id) => `still:${id}`;
+const MISS_KEY = 'violet-chat-still-miss';
+
+export const saveChatVideoStill = (id, blob) => saveChatVideoFile(stillKey(id), blob);
+
+export const readChatVideoStill = (id) => readChatVideoFile(stillKey(id));
+
 export const dropChatVideoFile = (id) => {
   const key = String(id || '').trim();
   if (!key) return Promise.resolve();
   return run('readwrite', (store) => {
     store.delete(key);
+    store.delete(stillKey(key));
   }).catch(() => {});
+};
+
+export const stillWasMissed = (id) => {
+  try {
+    const list = JSON.parse(localStorage.getItem(MISS_KEY) || '[]');
+    return Array.isArray(list) && list.includes(String(id || ''));
+  } catch {
+    return false;
+  }
+};
+
+export const rememberStillMiss = (id) => {
+  const key = String(id || '').trim();
+  if (!key) return;
+  try {
+    const list = JSON.parse(localStorage.getItem(MISS_KEY) || '[]');
+    const next = Array.isArray(list) ? list.filter((item) => item !== key) : [];
+    next.push(key);
+    localStorage.setItem(MISS_KEY, JSON.stringify(next.slice(-200)));
+  } catch {
+    /* Kadr belgisi saqlanmasa, keyingi kirish yana bir marta urunadi. */
+  }
 };
 
 export const captureChatPoster = (blob, at = 0) => new Promise((resolve) => {
@@ -121,3 +151,69 @@ export const captureChatPoster = (blob, at = 0) => new Promise((resolve) => {
   };
   video.src = url;
 });
+
+let stillQueue = Promise.resolve();
+
+const shootRemoteStill = (url, at = 0) => new Promise((resolve) => {
+  const video = document.createElement('video');
+  let settled = false;
+  const finish = (value) => {
+    if (settled) return;
+    settled = true;
+    window.clearTimeout(timer);
+    video.removeAttribute('src');
+    video.load();
+    resolve(value);
+  };
+  const timer = window.setTimeout(() => finish(null), 8000);
+  const shoot = () => {
+    const width = video.videoWidth || 0;
+    const height = video.videoHeight || 0;
+    if (!width || !height) {
+      finish(null);
+      return;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      finish(null);
+      return;
+    }
+    try {
+      ctx.drawImage(video, 0, 0, width, height);
+    } catch {
+      finish(null);
+      return;
+    }
+    canvas.toBlob((jpeg) => finish(jpeg && jpeg.size ? jpeg : null), 'image/jpeg', 0.72);
+  };
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = 'metadata';
+  video.crossOrigin = 'anonymous';
+  video.onerror = () => finish(null);
+  video.onloadeddata = () => {
+    const target = Math.max(0, Number(at) || 0);
+    if (target <= 0.05) {
+      shoot();
+      return;
+    }
+    video.addEventListener('seeked', () => shoot(), { once: true });
+    try {
+      video.currentTime = target;
+    } catch {
+      shoot();
+    }
+  };
+  video.src = url;
+});
+
+export const captureRemoteStill = (url, at = 0) => {
+  const source = String(url || '').trim();
+  if (!source || source.startsWith('blob:')) return Promise.resolve(null);
+  const job = stillQueue.then(() => shootRemoteStill(source, at));
+  stillQueue = job.then(() => {}, () => {});
+  return job;
+};
