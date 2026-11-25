@@ -300,14 +300,23 @@
 .chat-video-handle {
   position: absolute;
   top: 0;
-  width: 14px;
+  width: 26px;
   height: 100%;
   padding: 0;
   border: none;
   border-radius: 8px;
-  background: #7c6bff;
+  background: #9b4fe7;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transform: translateX(-50%);
   cursor: ew-resize;
+  font-size: 14px;
+}
+
+.chat-video-handle i {
+  pointer-events: none;
 }
 
 .chat-video-once {
@@ -394,7 +403,7 @@
 }
 
 .chat-video-send {
-  background: #7c6bff;
+  background: #9b4fe7;
 }
 
 .chat-video-again svg,

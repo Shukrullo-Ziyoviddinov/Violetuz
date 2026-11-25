@@ -190,14 +190,18 @@ const ChatVideoReview = ({ lang, peerName, clip, onBack, onSend }) => {
           style={{ left: `${trim.start * 100}%` }}
           aria-label={ru ? 'Начало' : 'Boshlanish'}
           onPointerDown={(event) => drag('start', event)}
-        />
+        >
+          <i className="fa-solid fa-chevron-left" aria-hidden="true" />
+        </button>
         <button
           type="button"
           className="chat-video-handle is-end"
           style={{ left: `${trim.end * 100}%` }}
           aria-label={ru ? 'Конец' : 'Tugash'}
           onPointerDown={(event) => drag('end', event)}
-        />
+        >
+          <i className="fa-solid fa-chevron-right" aria-hidden="true" />
+        </button>
       </div>
       <div className="chat-video-once">
         <span>
