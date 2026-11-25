@@ -179,6 +179,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
+  const openedRef = useRef(false);
   const knownReactionsRef = useRef(null);
   const primedRef = useRef(false);
   const [pop, setPop] = useState(null);
@@ -228,7 +229,14 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
   };
 
   useLayoutEffect(() => {
-    pinBottom();
+    if (!messages.length) {
+      openedRef.current = false;
+      return undefined;
+    }
+    if (!openedRef.current || stickRef.current) {
+      openedRef.current = true;
+      pinBottom();
+    }
     const list = listRef.current;
     if (!list || typeof ResizeObserver !== 'function') return undefined;
     const observer = new ResizeObserver(() => {
