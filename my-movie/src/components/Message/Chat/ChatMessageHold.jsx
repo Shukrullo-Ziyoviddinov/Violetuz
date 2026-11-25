@@ -16,6 +16,7 @@ const MenuIcon = ({ children }) => (
 
 const mediaMessage = (message) => Boolean(
   message?.gif
+  || message?.video?.url
   || message?.animationId
   || message?.animated
   || emojiOnlyCount(message?.text)
@@ -26,7 +27,7 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, onEdit, onCopy, onPin, onUnpin, onDelete, onPick, onMore }, ref) => {
   const ru = lang === 'ru';
   const mine = message.mine === true;
-  const canEdit = mine && !message.gif && !message.animationId && message.animated !== true && String(message.text || '').trim();
+  const canEdit = mine && !message.gif && !message.video?.url && !message.animationId && message.animated !== true && String(message.text || '').trim();
   const quick = QUICK.map((id) => emojiFromId(id)).filter(Boolean);
   const stageRef = useRef(null);
   const closingRef = useRef(false);
@@ -239,6 +240,7 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
             animated={message.animated === true}
             animationId={message.animationId || ''}
             gif={message.gif || ''}
+            video={message.video?.url ? message.video : null}
             quoteAnimated={message.quoteAnimated === true}
             quoteAnimationId={message.quoteAnimationId || ''}
             quoteGif={message.quoteGif || ''}

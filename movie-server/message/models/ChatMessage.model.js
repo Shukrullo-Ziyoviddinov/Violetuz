@@ -23,9 +23,33 @@ const chatMessageSchema = new mongoose.Schema(
     },
     text: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 2000,
+      default: '',
+    },
+    video: {
+      url: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: '',
+      },
+      duration: {
+        type: Number,
+        min: 0,
+        max: 60,
+        default: 0,
+      },
+      start: {
+        type: Number,
+        min: 0,
+        max: 60,
+        default: 0,
+      },
+      viewOnce: {
+        type: Boolean,
+        default: false,
+      },
     },
     animated: {
       type: Boolean,

@@ -4,6 +4,7 @@ const { ChatMessage } = require('./models');
 const { cleanText, ensureConversation, isUserId, loadPeer, toClientMessage } = require('./thread');
 const { publishChatMessage, toLiveMessage } = require('./live');
 const { badRequest } = require('../utils/errors');
+const { R2_PUBLIC_URL } = require('../config/env');
 
 /**
  * Xabarni saqlaydi, keyin ikkala ochiq sahifaga yuboradi.
@@ -46,15 +47,51 @@ const gifOf = (value) => {
   return name;
 };
 
-const sendChatMessage = async (meId, peerId, rawText, rawReply = null, rawAnimated = false, rawAnimationId = '', rawGif = '') => {
+const VIDEO_MAX_SECONDS = 60;
+
+const videoOf = (raw) => {
+  if (raw == null || raw === false) return null;
+  if (typeof raw !== 'object') throw badRequest('Video noto‘g‘ri');
+  const url = String(raw.url || '').trim();
+  const base = String(R2_PUBLIC_URL || '').replace(/\/+$/, '');
+  if (!base || !url.startsWith(`${base}/`) || url.includes('?') || url.includes('#')) {
+    throw badRequest('Video manzili noto‘g‘ri');
+  }
+  let key = '';
+  try {
+    key = decodeURIComponent(url.slice(base.length + 1));
+  } catch {
+    throw badRequest('Video manzili noto‘g‘ri');
+  }
+  if (!key.startsWith('chatVideos/') || key.includes('..') || key.includes('\\') || key.includes('//')) {
+    throw badRequest('Video manzili noto‘g‘ri');
+  }
+  const duration = Number(raw.duration);
+  const start = Number(raw.start) || 0;
+  if (!Number.isFinite(duration) || duration <= 0 || duration > VIDEO_MAX_SECONDS) {
+    throw badRequest('Video 1 daqiqadan oshmasligi kerak');
+  }
+  if (!Number.isFinite(start) || start < 0 || start + duration > VIDEO_MAX_SECONDS + 0.05) {
+    throw badRequest('Video 1 daqiqadan oshmasligi kerak');
+  }
+  return {
+    url,
+    duration: Math.round(duration * 10) / 10,
+    start: Math.round(start * 10) / 10,
+    viewOnce: raw.viewOnce === true,
+  };
+};
+
+const sendChatMessage = async (meId, peerId, rawText, rawReply = null, rawAnimated = false, rawAnimationId = '', rawGif = '', rawVideo = null) => {
   const me = String(meId || '').trim().toLowerCase();
   const peer = String(peerId || '').trim().toLowerCase();
   if (!isUserId(me)) throw badRequest('Hisob topilmadi');
   if (me === peer) throw badRequest('O‘zingizga xabar yozilmaydi');
   await loadPeer(peer);
-  const text = cleanText(rawText);
-  const animationId = animationIdOf(rawAnimationId);
-  const gif = animationId ? '' : gifOf(rawGif);
+  const video = videoOf(rawVideo);
+  const text = video && !String(rawText || '').trim() ? '' : cleanText(rawText);
+  const animationId = video ? '' : animationIdOf(rawAnimationId);
+  const gif = animationId || video ? '' : gifOf(rawGif);
   const animated = Boolean(animationId) || (rawAnimated === true && text.length <= 32 && !/\p{L}/u.test(text));
   const conversation = await ensureConversation(me, peer);
   const replyTo = await loadReply(conversation._id, rawReply);
@@ -66,6 +103,7 @@ const sendChatMessage = async (meId, peerId, rawText, rawReply = null, rawAnimat
     ...(animated ? { animated: true } : {}),
     ...(animationId ? { animationId } : {}),
     ...(gif ? { gif } : {}),
+    ...(video ? { video } : {}),
     ...(replyTo ? { replyTo } : {}),
   });
   if (replyTo && !clip(row.replyTo?.text, 2000)) {

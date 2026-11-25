@@ -52,8 +52,12 @@ const MIME_TO_EXT = Object.freeze({
   'audio/aac': '.aac',
 });
 
-/** Folders any logged-in client may use (profile avatar) */
-const CLIENT_UPLOAD_FOLDERS = Object.freeze(['avatars']);
+/** Folders any logged-in client may use (profile avatar, chat video) */
+const CLIENT_UPLOAD_FOLDERS = Object.freeze(['avatars', 'chatVideos']);
+
+const FOLDER_CONTENT_TYPES = Object.freeze({
+  chatVideos: Object.freeze(['video/mp4', 'video/webm', 'video/quicktime']),
+});
 
 /**
  * Catalog media layout (single rule):
@@ -72,6 +76,7 @@ const R2_FOLDERS = Object.freeze({
   video: 'video',
   music: 'music',
   avatars: 'avatars',
+  chatVideos: 'chatVideos',
   /** Optional typed prefixes (future); catalog admin uses img|video|music above */
   actors: 'actors',
   ads: 'ads',
@@ -355,6 +360,13 @@ const createPresignedUpload = async ({
 
   const safeFolder = assertUploadFolderAccess(folder, { isAdmin });
   const safeContentType = normalizeContentType(contentType);
+  const folderTypes = FOLDER_CONTENT_TYPES[safeFolder];
+  if (folderTypes && !folderTypes.includes(safeContentType)) {
+    throw badRequest('Bu papkaga faqat video yuklanadi', {
+      folder: safeFolder,
+      allowedContentTypes: [...folderTypes],
+    });
+  }
   const ttl = Math.min(Math.max(Number(expiresIn) || DEFAULT_PRESIGN_EXPIRES_IN, 60), 3600);
 
   const nameHint = filename || MIME_TO_EXT[safeContentType] || '';

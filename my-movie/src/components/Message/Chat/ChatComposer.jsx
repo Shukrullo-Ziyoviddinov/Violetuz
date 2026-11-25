@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AnimationEmojModal from './AnimationEmojModal';
 
-const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disabled = false, reply = null, onCancelReply, edit = null, onCancelEdit, onCommitEdit, selfId = '', peerName = '' }) => {
+const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disabled = false, reply = null, onCancelReply, edit = null, onCancelEdit, onCommitEdit, selfId = '', peerName = '', onOpenVideo }) => {
   const inputRef = useRef(null);
   const emojiRef = useRef(null);
   const [text, setText] = useState('');
@@ -257,13 +257,19 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
           >
             ‹
           </button>
-          <div className="chat-composer-media" aria-hidden="true">
-            <span className="chat-composer-cam">
+          <div className="chat-composer-media">
+            <button
+              type="button"
+              className="chat-composer-cam"
+              aria-label={lang === 'ru' ? 'Видео' : 'Video'}
+              disabled={disabled}
+              onClick={() => onOpenVideo?.()}
+            >
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
                 <rect x="3" y="7" width="11" height="10" rx="2" />
                 <path d="M14 11.2l6.2-3.2v8.2L14 13" strokeLinejoin="round" />
               </svg>
-            </span>
+            </button>
             <span className="chat-composer-mic">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="9" y="3" width="6" height="11" rx="3" />

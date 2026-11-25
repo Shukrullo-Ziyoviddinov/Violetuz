@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
-import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage, pinChatMessage, unpinChatMessage, reactChatMessage } from '../../../api/messagesApi';
+import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage, pinChatMessage, unpinChatMessage, reactChatMessage, viewChatVideo } from '../../../api/messagesApi';
+import { requestPresign, putFileToR2, deleteUpload } from '../../../api/uploadsApi';
 import { unwatchPresence, watchPresence } from '../../../api/presenceApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
@@ -17,6 +18,8 @@ import ChatReactionModal from './ChatReactionModal';
 import ChatDeleteMessageModal from './ChatDeleteMessageModal';
 import ChatPinMessageModal from './ChatPinMessageModal';
 import ChatPinnedBar from './ChatPinnedBar';
+import ChatVideoRecorder from './ChatVideoRecorder';
+import ChatVideoPlayer from './ChatVideoPlayer';
 import { gifByFile } from './chatGifs';
 import { shatterElement, SHATTER_MS } from './chatShatter';
 import './Chat.css';
@@ -94,6 +97,8 @@ const Chat = ({ userId }) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [playing, setPlaying] = useState(null);
   const [pinBusy, setPinBusy] = useState(false);
   const loadToken = useRef(0);
   const typingIdleRef = useRef(null);
@@ -102,6 +107,8 @@ const Chat = ({ userId }) => {
   const localSeq = useRef(0);
   const chatRef = useRef(null);
   const pendingRef = useRef(pending);
+  const messagesRef = useRef(messages);
+  const videoUploadsRef = useRef(new Map());
   const repliesRef = useRef(new Map());
   const holdRef = useRef(null);
   const holdUiRef = useRef(null);
@@ -111,6 +118,7 @@ const Chat = ({ userId }) => {
   const flyMessageAwayRef = useRef(() => {});
   const flyQuotesAwayRef = useRef(() => {});
   pendingRef.current = pending;
+  messagesRef.current = messages;
   const paintEditRef = useRef(() => {});
   holdRef.current = hold;
 
@@ -267,6 +275,8 @@ const Chat = ({ userId }) => {
       setPending([]);
       setReplyTarget(null);
       setEditTarget(null);
+      setVideoOpen(false);
+      setPlaying(null);
       setReady(true);
       return undefined;
     }
@@ -275,6 +285,8 @@ const Chat = ({ userId }) => {
     setPins([]);
     setReplyTarget(null);
     setEditTarget(null);
+    setVideoOpen(false);
+    setPlaying(null);
     setReady(false);
     load()
       .catch((err) => {
@@ -449,15 +461,18 @@ const Chat = ({ userId }) => {
         if (fromPeer) {
           if (typingIdleRef.current) window.clearTimeout(typingIdleRef.current);
           setPeerTyping(false);
-          load().catch(() => {
-            if (closed) return;
-            setMessages((current) => (
-              current.some((row) => row.id === item.id) ? current : [...current, item]
-            ));
-          });
+          setMessages((current) => upsertMessage(current, item));
+          load().catch(() => {});
           return;
         }
-        const local = pendingRef.current.find((row) => pendingMatch(row, item));
+        const remoteUrl = String(item.video?.url || '');
+        const videoLocal = remoteUrl
+          ? pendingRef.current.find((row) => row.remoteUrl === remoteUrl)
+          : null;
+        if (videoLocal) {
+          setPending((current) => current.filter((row) => row.id !== videoLocal.id));
+        }
+        const local = videoLocal || pendingRef.current.find((row) => pendingMatch(row, item));
         const shown = keepReply(item, local);
         setPending((current) => dropMatchedPending(current, [shown]));
         setMessages((current) => upsertMessage(current, shown));
@@ -646,6 +661,7 @@ const Chat = ({ userId }) => {
       animated: item.animated === true,
       animationId: item.animationId || '',
       gif: item.gif || '',
+      video: item.video?.url ? item.video : null,
       quoteAnimated: item.replyTo?.animated === true,
       quoteAnimationId: item.replyTo?.animationId || '',
       quoteGif: item.replyTo?.gif || '',
@@ -877,6 +893,103 @@ const Chat = ({ userId }) => {
     deliver(localId, name, replyTo, '', file);
   };
 
+  const cancelVideo = (localId) => {
+    const job = videoUploadsRef.current.get(localId);
+    if (!job || job.saving) return;
+    job.controller.abort();
+    if (job.preview) URL.revokeObjectURL(job.preview);
+    if (job.publicUrl) deleteUpload({ url: job.publicUrl }).catch(() => {});
+    videoUploadsRef.current.delete(localId);
+    setPending((current) => current.filter((row) => row.id !== localId));
+  };
+
+  const sendVideo = async (clip) => {
+    const blob = clip?.blob;
+    if (!blob || !isLoggedIn) return;
+    const rawType = String(clip.type || blob.type || 'video/webm').split(';')[0].trim().toLowerCase();
+    const contentType = ['video/mp4', 'video/webm', 'video/quicktime'].includes(rawType) ? rawType : 'video/webm';
+    const ext = contentType === 'video/mp4' ? 'mp4' : contentType === 'video/quicktime' ? 'mov' : 'webm';
+    const file = new File([blob], `chat.${ext}`, { type: contentType });
+    const start = Math.min(60, Math.max(0, Number(clip.start) || 0));
+    let duration = Math.min(60, Math.max(0.1, Number(clip.duration) || 1));
+    if (start + duration > 60) duration = Math.max(0.1, 60 - start);
+    const viewOnce = clip.viewOnce === true;
+    const preview = URL.createObjectURL(blob);
+    const localId = `local-${Date.now()}-${localSeq.current + 1}`;
+    localSeq.current += 1;
+    const controller = new AbortController();
+    videoUploadsRef.current.set(localId, { controller, preview, publicUrl: '', uploaded: false });
+    setVideoOpen(false);
+    setPending((current) => [...current, {
+      id: localId,
+      senderId: profile?.id,
+      recipientId: userId,
+      text: '',
+      createdAt: new Date().toISOString(),
+      video: { url: preview, duration, viewOnce, start },
+      uploading: true,
+      progress: 0,
+    }]);
+    try {
+      const presign = await requestPresign({
+        folder: 'chatVideos',
+        contentType,
+        filename: `chat.${ext}`,
+      });
+      const job = videoUploadsRef.current.get(localId);
+      if (!job || controller.signal.aborted) return;
+      job.publicUrl = presign.publicUrl;
+      setPending((current) => current.map((row) => (
+        row.id === localId ? { ...row, remoteUrl: presign.publicUrl } : row
+      )));
+      await putFileToR2(presign.uploadUrl, file, presign.headers || { 'Content-Type': contentType }, {
+        signal: controller.signal,
+        onProgress: (ratio) => {
+          const progress = Math.min(99, Math.round((Number(ratio) || 0) * 100));
+          setPending((current) => current.map((row) => (
+            row.id === localId ? { ...row, progress } : row
+          )));
+        },
+      });
+      if (controller.signal.aborted || !videoUploadsRef.current.has(localId)) return;
+      job.uploaded = true;
+      setPending((current) => current.map((row) => (
+        row.id === localId ? { ...row, progress: 100 } : row
+      )));
+      job.saving = true;
+      const saved = await sendChatMessage(userId, '', null, '', '', {
+        url: presign.publicUrl,
+        duration,
+        start,
+        viewOnce,
+      });
+      if (!saved?.id) throw new Error('Video saqlanmadi');
+      URL.revokeObjectURL(preview);
+      videoUploadsRef.current.delete(localId);
+      const shown = saved.video?.url ? saved : {
+        ...saved,
+        video: { url: presign.publicUrl, duration, start, viewOnce },
+      };
+      setPending((current) => current.filter((row) => row.id !== localId));
+      setMessages((current) => upsertMessage(current, shown));
+    } catch (err) {
+      const job = videoUploadsRef.current.get(localId);
+      const savedAlready = messagesRef.current.some((row) => row.video?.url && row.video.url === job?.publicUrl);
+      if (savedAlready) {
+        if (job?.preview) URL.revokeObjectURL(job.preview);
+        videoUploadsRef.current.delete(localId);
+        setPending((current) => current.filter((row) => row.id !== localId));
+        return;
+      }
+      if (err?.name === 'AbortError' || controller.signal.aborted) return;
+      if (job?.uploaded && job.publicUrl) deleteUpload({ url: job.publicUrl }).catch(() => {});
+      if (job) job.saving = false;
+      setPending((current) => current.map((row) => (
+        row.id === localId ? { ...row, uploading: false, failed: true } : row
+      )));
+    }
+  };
+
   const retrySend = (localId) => {
     let text = '';
     let replyTo = null;
@@ -973,6 +1086,18 @@ const Chat = ({ userId }) => {
         selfName={profile?.name || ''}
         selfAvatar={profile?.avatar || ''}
         onClearReaction={clearReaction}
+        onCancelUpload={cancelVideo}
+        onOpenVideo={(item) => {
+          if (!item?.video?.url || item.uploading) return;
+          setPlaying({
+            id: item.id,
+            url: item.video.url,
+            start: Number(item.video.start) || 0,
+            duration: Number(item.video.duration) || 0,
+            viewOnce: item.video.viewOnce === true,
+            mine: sameId(item.senderId, profile?.id),
+          });
+        }}
       />
       {peerTyping ? (
         <div className="chat-typing" role="status" aria-label={lang === 'ru' ? 'Печатает' : 'Yozmoqda'}>
@@ -995,7 +1120,37 @@ const Chat = ({ userId }) => {
         onCancelReply={() => setReplyTarget(null)}
         onCancelEdit={() => setEditTarget(null)}
         onCommitEdit={commitEdit}
+        onOpenVideo={() => setVideoOpen(true)}
       />
+      {playing?.url ? (
+        <ChatVideoPlayer
+          url={playing.url}
+          start={playing.start}
+          duration={playing.duration}
+          viewOnce={playing.viewOnce}
+          mine={playing.mine}
+          onClose={() => setPlaying(null)}
+          onWatched={() => {
+            const id = playing.id;
+            if (!id || String(id).startsWith('local-')) return;
+            window.requestAnimationFrame(() => {
+              viewChatVideo(id)
+                .then(() => flyMessageAwayRef.current(id))
+                .catch((err) => {
+                  if (err?.status === 404) flyMessageAwayRef.current(id);
+                });
+            });
+          }}
+        />
+      ) : null}
+      {videoOpen ? (
+        <ChatVideoRecorder
+          lang={lang}
+          peerName={peer?.name || ''}
+          onClose={() => setVideoOpen(false)}
+          onSend={sendVideo}
+        />
+      ) : null}
       {hold ? (
         <ChatMessageHold
           ref={holdUiRef}

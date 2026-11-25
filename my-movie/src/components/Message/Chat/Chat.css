@@ -228,7 +228,8 @@
 
 .chat-item:has(.chat-block.is-emoji) .chat-reacts,
 .chat-item:has(.chat-block.is-anim) .chat-reacts,
-.chat-item:has(.chat-block.is-gif) .chat-reacts {
+.chat-item:has(.chat-block.is-gif) .chat-reacts,
+.chat-item:has(.chat-block.is-video) .chat-reacts {
   margin-top: 1px;
 }
 
@@ -783,6 +784,22 @@ input.chat-reply-draft-text {
   align-self: flex-end;
 }
 
+.chat-item .chat-block.is-video,
+.chat-item .chat-block.is-video.is-mine {
+  align-self: flex-start;
+  background: transparent;
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+  box-shadow: none;
+  width: max-content;
+  max-width: 100%;
+}
+
+.chat-item.is-mine .chat-block.is-video {
+  align-self: flex-end;
+}
+
 .chat-block.is-gif .chat-block-main {
   display: flow-root;
   width: fit-content;
@@ -1134,6 +1151,14 @@ html:has(.anim-emoji-modal) .chat-composer-cam {
 .chat-composer-cam {
   background: var(--chat-header-pill, rgba(20, 16, 31, 0.92));
   color: #d4ceea;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.chat-composer-cam:disabled {
+  cursor: default;
+  opacity: 0.55;
 }
 
 .chat-composer-mic {

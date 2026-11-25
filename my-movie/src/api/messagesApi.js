@@ -31,9 +31,10 @@ export const fetchChatInbox = async () => {
   return parseJson(response);
 };
 
-export const sendChatMessage = async (userId, text, replyTo = null, animationId = '', gif = '') => {
+export const sendChatMessage = async (userId, text, replyTo = null, animationId = '', gif = '', video = null) => {
   const id = String(animationId || '').trim();
   const gifFile = String(gif || '').trim();
+  const videoUrl = String(video?.url || '').trim();
   const response = await fetch(`${API_BASE_URL}/messages/with/${encodeURIComponent(userId)}`, {
     method: 'POST',
     credentials: 'include',
@@ -42,6 +43,14 @@ export const sendChatMessage = async (userId, text, replyTo = null, animationId 
       text,
       ...(id ? { animationId: id, animated: true } : {}),
       ...(gifFile ? { gif: gifFile } : {}),
+      ...(videoUrl ? {
+        video: {
+          url: videoUrl,
+          duration: Number(video.duration) || 0,
+          start: Number(video.start) || 0,
+          viewOnce: video.viewOnce === true,
+        },
+      } : {}),
       ...(replyTo?.id ? { replyTo: { id: String(replyTo.id) } } : {}),
     }),
   });
@@ -81,6 +90,16 @@ export const editChatMessage = async (messageId, text, quoteText) => {
       text,
       ...(typeof quoteText === 'string' ? { quoteText } : {}),
     }),
+  });
+  return parseJson(response);
+};
+
+export const viewChatVideo = async (messageId) => {
+  const response = await fetch(`${API_BASE_URL}/messages/${encodeURIComponent(messageId)}/view`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
   });
   return parseJson(response);
 };

@@ -11,6 +11,7 @@ const { removeChatMessage } = require('./remove');
 const { editChatMessage } = require('./edit');
 const { pinChatMessage, unpinChatMessage } = require('./pin');
 const { reactChatMessage } = require('./react');
+const { viewChatVideo } = require('./view');
 const { attachStream, publishTyping } = require('./live');
 const { badRequest } = require('../utils/errors');
 const { listBackgrounds, getMyBackground, saveMyBackground } = require('./background');
@@ -101,6 +102,11 @@ router.post('/:messageId/react', asyncHandler(async (req, res) => {
   return sendSuccess(res, { data: result });
 }));
 
+router.post('/:messageId/view', asyncHandler(async (req, res) => {
+  const result = await viewChatVideo(req.authUser._id, req.params.messageId);
+  return sendSuccess(res, { data: result });
+}));
+
 router.post('/:messageId/hide', asyncHandler(async (req, res) => {
   const result = await removeChatMessage(
     req.authUser._id,
@@ -118,7 +124,8 @@ router.post('/with/:userId', asyncHandler(async (req, res) => {
     req.body?.replyTo,
     req.body?.animated === true,
     req.body?.animationId,
-    req.body?.gif
+    req.body?.gif,
+    req.body?.video
   );
   return sendSuccess(res, { data: message }, 201);
 }));

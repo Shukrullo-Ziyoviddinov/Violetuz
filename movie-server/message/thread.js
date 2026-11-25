@@ -45,6 +45,14 @@ const toClientMessage = (row) => ({
   animated: row.animated === true || Boolean(row.animationId),
   ...(row.animationId ? { animationId: String(row.animationId) } : {}),
   ...(row.gif ? { gif: String(row.gif) } : {}),
+  ...(row.video?.url ? {
+    video: {
+      url: String(row.video.url),
+      duration: Number(row.video.duration) || 0,
+      start: Number(row.video.start) || 0,
+      viewOnce: row.video.viewOnce === true,
+    },
+  } : {}),
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
   replyTo: toReply(row.replyTo),
@@ -94,7 +102,7 @@ const listMessages = async (conversationId, meId) => {
   })
     .sort({ createdAt: -1, _id: -1 })
     .limit(50)
-    .select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo reactions')
+    .select('conversationId senderId recipientId text animated animationId gif video createdAt readAt replyTo reactions')
     .lean();
   const replyIds = [...new Set(rows
     .map((row) => String(row.replyTo?.messageId || '').trim())
@@ -171,7 +179,7 @@ const openThread = async (meId, peerId) => {
     const extra = await ChatMessage.find({
       _id: { $in: missing },
       hiddenFor: { $nin: [me] },
-    }).select('conversationId senderId recipientId text animated animationId gif createdAt readAt replyTo reactions').lean();
+    }).select('conversationId senderId recipientId text animated animationId gif video createdAt readAt replyTo reactions').lean();
     messages.push(...extra.map(toClientMessage));
   }
   const readAt = await markThreadRead(me, conversation?._id);

@@ -29,6 +29,14 @@ const toLiveMessage = (row) => ({
   animated: row.animated === true || Boolean(row.animationId),
   ...(row.animationId ? { animationId: String(row.animationId) } : {}),
   ...(row.gif ? { gif: String(row.gif) } : {}),
+  ...(row.video?.url ? {
+    video: {
+      url: String(row.video.url),
+      duration: Number(row.video.duration) || 0,
+      start: Number(row.video.start) || 0,
+      viewOnce: row.video.viewOnce === true,
+    },
+  } : {}),
   createdAt: row.createdAt || null,
   readAt: row.readAt || null,
   replyTo: toLiveReply(row.replyTo),

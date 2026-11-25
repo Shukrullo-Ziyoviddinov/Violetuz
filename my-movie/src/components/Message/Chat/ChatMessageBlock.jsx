@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { emojiMotion, emojiMotionId, emojiOnlyCount } from './chatEmojis';
 import ChatLottie from './ChatLottie';
 import ChatGif from './ChatGif';
+import ChatVideoNote from './ChatVideoNote';
 
 const PLAY_MS = 1800;
 
@@ -74,17 +75,24 @@ const ChatMessageBlock = ({
   animated = false,
   animationId = '',
   gif = '',
+  video = null,
+  uploading = false,
+  failed = false,
+  progress = 0,
+  onCancelUpload,
+  onOpen,
   quoteAnimated = false,
   quoteAnimationId = '',
   quoteGif = '',
 }) => {
-  const mineGif = Boolean(gif);
+  const mineVideo = Boolean(video?.url);
+  const mineGif = Boolean(gif) && !mineVideo;
   const quoteGifOn = Boolean(quoteGif);
   const mineAnim = Boolean(animationId);
   const quoteAnim = Boolean(quoteAnimationId);
   const emojiCount = mineGif ? 0 : (mineAnim || animated ? 1 : emojiOnlyCount(text));
   const quoteEmoji = quoteGifOn ? 0 : (quoteAnim || quoteAnimated ? 1 : emojiOnlyCount(quote));
-  const emojiClass = `${mineGif ? ' is-gif' : ''}${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${!mineGif && (mineAnim || animated) ? ' is-anim' : ''}`;
+  const emojiClass = `${mineVideo ? ' is-video' : ''}${mineGif ? ' is-gif' : ''}${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${!mineGif && !mineVideo && (mineAnim || animated) ? ' is-anim' : ''}`;
   const quoteClass = `${quoteGifOn ? ' is-gif' : ''}${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${!quoteGifOn && (quoteAnim || quoteAnimated) ? ' is-anim' : ''}`;
   return (
     <div className={`chat-block${mine ? ' is-mine' : ''}${status ? ' has-status' : ''}${quote ? ' has-quote' : ''}${emojiClass}`}>
@@ -101,7 +109,18 @@ const ChatMessageBlock = ({
         </button>
       ) : null}
       <div className="chat-block-main">
-        {mineGif ? <ChatGif file={gif} fit label={text} /> : mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} held={held} /> : <span className="chat-block-text">{text}</span>}
+        {mineVideo ? (
+          <ChatVideoNote
+            url={video.url}
+            duration={video.duration}
+            start={video.start}
+            uploading={uploading}
+            failed={failed}
+            progress={progress}
+            onCancel={onCancelUpload}
+            onOpen={onOpen}
+          />
+        ) : mineGif ? <ChatGif file={gif} fit label={text} /> : mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} held={held} /> : <span className="chat-block-text">{text}</span>}
         {status}
       </div>
     </div>

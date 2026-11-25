@@ -41,22 +41,40 @@ export const requestPresign = async ({ folder, contentType, filename }) => {
 };
 
 /** PUT file bytes directly to Cloudflare R2 (presigned URL). */
-export const putFileToR2 = async (uploadUrl, file, headers = {}) => {
-  const res = await fetch(uploadUrl, {
-    method: 'PUT',
-    body: file,
-    headers: {
-      ...headers,
-      'Content-Type': headers['Content-Type'] || file.type || 'application/octet-stream',
-    },
-  });
-
-  if (!res.ok) {
+export const putFileToR2 = async (uploadUrl, file, headers = {}, { onProgress, signal } = {}) => new Promise((resolve, reject) => {
+  const xhr = new XMLHttpRequest();
+  const fail = (status) => {
     const err = new Error('R2 ga yuklash muvaffaqiyatsiz');
-    err.status = res.status;
-    throw err;
+    err.status = status || 0;
+    reject(err);
+  };
+  xhr.open('PUT', uploadUrl);
+  Object.entries(headers).forEach(([name, value]) => {
+    if (value) xhr.setRequestHeader(name, value);
+  });
+  if (!headers['Content-Type'] && file.type) xhr.setRequestHeader('Content-Type', file.type);
+  xhr.upload.onprogress = (event) => {
+    if (!event.lengthComputable) return;
+    onProgress?.(event.total ? event.loaded / event.total : 0);
+  };
+  xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : fail(xhr.status));
+  xhr.onerror = () => fail(xhr.status);
+  xhr.onabort = () => {
+    const err = new Error('Yuklash to‘xtatildi');
+    err.name = 'AbortError';
+    reject(err);
+  };
+  if (signal) {
+    if (signal.aborted) {
+      const err = new Error('Yuklash to‘xtatildi');
+      err.name = 'AbortError';
+      reject(err);
+      return;
+    }
+    signal.addEventListener('abort', () => xhr.abort(), { once: true });
   }
-};
+  xhr.send(file);
+});
 
 export const deleteUpload = async ({ key, url } = {}) => {
   const res = await uploadsFetch('/uploads/delete', {
