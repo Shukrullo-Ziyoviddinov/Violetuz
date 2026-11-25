@@ -52,7 +52,7 @@
 }
 
 .chat-video-player-back {
-  width: 42px;
+  width: 0;
   height: 42px;
   flex-shrink: 0;
   border: none;
@@ -178,15 +178,26 @@
 }
 
 .chat-video-player-cam {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 46px;
   height: 46px;
   flex-shrink: 0;
+  padding: 0;
   border: none;
   border-radius: 50%;
   background: #9b4fe7;
   color: #fff;
   font-size: 18px;
+  line-height: 1;
   cursor: pointer;
+}
+
+.chat-video-player-cam i {
+  display: block;
+  line-height: 1;
+  transform: translateY(1.5px);
 }
 
 .chat-video-player-field {
@@ -238,7 +249,7 @@
 }
 
 .chat-video-player-emojis .is-more {
-  font-size: 1.35rem;
+  font-size: 1.8rem;
   font-weight: 500;
 }
 

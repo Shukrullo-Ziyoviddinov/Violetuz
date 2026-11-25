@@ -1255,6 +1255,7 @@ const Chat = ({ userId }) => {
           const local = String(source || '').startsWith('blob:');
           if (!source || item.uploading || item.downloadProgress != null) return;
           if (!mine && !item.video?.playback && !local) return;
+          setVideoBurst(null);
           setPlaying({
             id: item.id,
             url: source,
@@ -1297,8 +1298,8 @@ const Chat = ({ userId }) => {
           duration={playing.duration}
           viewOnce={playing.viewOnce}
           mine={playing.mine}
-          senderName={playing.mine ? '' : (peer?.name || '')}
-          senderAvatar={playing.mine ? '' : (peer?.avatar || '')}
+          senderName={playing.mine ? (profile?.name || '') : (peer?.name || '')}
+          senderAvatar={playing.mine ? (profile?.avatar || '') : (peer?.avatar || '')}
           lang={lang}
           burst={videoBurst}
           onSendReply={(text) => {
@@ -1319,6 +1320,7 @@ const Chat = ({ userId }) => {
           onRecord={() => setVideoOpen(true)}
           onClose={() => {
             setVideoEmojiOpen(false);
+            setVideoBurst(null);
             setPlaying(null);
           }}
           onWatched={() => {

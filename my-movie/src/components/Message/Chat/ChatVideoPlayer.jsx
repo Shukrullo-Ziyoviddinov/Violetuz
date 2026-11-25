@@ -38,6 +38,7 @@ const ChatVideoPlayer = ({
   const [needTap, setNeedTap] = useState(false);
   const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(0);
+  const openedBurst = useRef(burst?.token || 0);
   const [draft, setDraft] = useState('');
   const [floatEmoji, setFloatEmoji] = useState(null);
   onCloseRef.current = onClose;
@@ -58,7 +59,10 @@ const ChatVideoPlayer = ({
   const quick = QUICK.map((id) => emojiFromId(id)).filter(Boolean);
 
   useEffect(() => {
-    if (!burst?.token || !burst.char) return undefined;
+    if (!burst?.token || !burst.char || burst.token === openedBurst.current) {
+      setFloatEmoji(null);
+      return undefined;
+    }
     const token = burst.token;
     setFloatEmoji({ char: burst.char, token, phase: 'in' });
     const holdTimer = window.setTimeout(() => {
@@ -193,20 +197,16 @@ const ChatVideoPlayer = ({
         <button type="button" className="chat-video-player-back" aria-label={ru ? 'Назад' : 'Orqaga'} onClick={close}>
           ‹
         </button>
-        {mine ? (
-          <span className="chat-video-player-who">{who}</span>
-        ) : (
-          <span className="chat-video-player-who">
-            <span className="chat-video-player-avatar" aria-hidden="true">
-              <UserAvatar
-                src={senderAvatar}
-                className="chat-video-player-avatar-img"
-                fallback={<span>{initialsOf(senderName)}</span>}
-              />
-            </span>
-            <span>{who}</span>
+        <span className="chat-video-player-who">
+          <span className="chat-video-player-avatar" aria-hidden="true">
+            <UserAvatar
+              src={senderAvatar}
+              className="chat-video-player-avatar-img"
+              fallback={<span>{initialsOf(senderName)}</span>}
+            />
           </span>
-        )}
+          <span>{who}</span>
+        </span>
         </header>
       </div>
       <video
