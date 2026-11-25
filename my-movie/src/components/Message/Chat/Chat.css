@@ -800,6 +800,12 @@ input.chat-reply-draft-text {
   align-self: flex-end;
 }
 
+.chat-block.is-video .chat-block-main {
+  display: flow-root;
+  width: fit-content;
+  max-width: 100%;
+}
+
 .chat-block.is-gif .chat-block-main {
   display: flow-root;
   width: fit-content;

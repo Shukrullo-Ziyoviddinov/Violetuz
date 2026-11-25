@@ -343,7 +343,7 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                 quoteAnimated={item.replyTo?.animated === true}
                 quoteAnimationId={item.replyTo?.animationId || ''}
                 quoteGif={item.replyTo?.gif || ''}
-                status={item.video?.url ? null : (mine
+                status={item.video?.url && (item.uploading || item.failed) ? null : (mine
                   ? <ChatSendStatus item={item} lang={lang} onRetry={onRetry} peer={peer} pinned={pinned} />
                   : (clock || pinned ? <p className="chat-send-status is-in">{pinned ? pinMark : null}{clock}</p> : null))}
               />
