@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
 import { fetchChatThread, fetchMyChatBackground, openChatStream, sendChatMessage, signalChatTyping, deleteChatMessage, editChatMessage, pinChatMessage, unpinChatMessage, reactChatMessage, viewChatVideo } from '../../../api/messagesApi';
-import { requestPresign, putFileToR2, deleteUpload } from '../../../api/uploadsApi';
+import { requestPresign, putFileToR2, deleteUpload, downloadRemoteFile } from '../../../api/uploadsApi';
 import { unwatchPresence, watchPresence } from '../../../api/presenceApi';
 import { getDominantColor } from '../../../utils/dominantColor';
 import { bubbleVars, readBubbleChoice } from './chatBubbles';
@@ -44,10 +44,19 @@ const upsertMessage = (current, item) => {
   const replyTo = replyOf(item) || replyOf(current[index]);
   const animationId = item.animationId || current[index].animationId || '';
   const gif = item.gif || current[index].gif || '';
+  const video = item.video?.url
+    ? {
+      ...item.video,
+      ...(item.video.playback || current[index].video?.playback
+        ? { playback: item.video.playback || current[index].video.playback }
+        : {}),
+    }
+    : item.video;
   const next = current.slice();
   next[index] = {
     ...current[index],
     ...item,
+    ...(video ? { video } : {}),
     replyTo,
     ...(animationId ? { animationId, animated: true } : {}),
     ...(gif ? { gif } : {}),
@@ -109,6 +118,7 @@ const Chat = ({ userId }) => {
   const pendingRef = useRef(pending);
   const messagesRef = useRef(messages);
   const videoUploadsRef = useRef(new Map());
+  const videoFetchesRef = useRef(new Set());
   const repliesRef = useRef(new Map());
   const holdRef = useRef(null);
   const holdUiRef = useRef(null);
@@ -251,7 +261,16 @@ const Chat = ({ userId }) => {
             const withGif = withAnim.gif || !local?.gif
               ? withAnim
               : { ...withAnim, gif: local.gif };
-            return keepReply(withGif, local);
+            const previous = messagesRef.current.find((row) => row.id === item.id);
+            const playback = previous?.video?.playback;
+            const withVideo = withGif.video?.url
+              ? {
+                ...withGif,
+                ...(previous?.downloadProgress != null ? { downloadProgress: previous.downloadProgress } : {}),
+                video: { ...withGif.video, ...(playback ? { playback } : {}) },
+              }
+              : withGif;
+            return keepReply(withVideo, local);
           });
           setMessages(kept);
           setPins(Array.isArray(data?.pins) ? data.pins : []);
@@ -893,6 +912,40 @@ const Chat = ({ userId }) => {
     deliver(localId, name, replyTo, '', file);
   };
 
+  const downloadVideo = async (item) => {
+    const id = item?.id;
+    const source = String(item?.video?.url || '');
+    if (!id || !source || videoFetchesRef.current.has(id)) return;
+    if (item.video?.playback || source.startsWith('blob:')) return;
+    videoFetchesRef.current.add(id);
+    setMessages((current) => current.map((row) => (
+      row.id === id ? { ...row, downloadProgress: 0 } : row
+    )));
+    try {
+      const blob = await downloadRemoteFile(source, {
+        onProgress: (ratio) => {
+          const downloadProgress = Math.max(0, Math.min(99, Math.round((Number(ratio) || 0) * 100)));
+          setMessages((current) => current.map((row) => (
+            row.id === id ? { ...row, downloadProgress } : row
+          )));
+        },
+      });
+      if (!(blob instanceof Blob) || !blob.size) throw new Error('Yuklab bo‘lmadi');
+      const playback = URL.createObjectURL(blob);
+      setMessages((current) => current.map((row) => (
+        row.id === id && row.video?.url
+          ? { ...row, downloadProgress: undefined, video: { ...row.video, playback } }
+          : row
+      )));
+    } catch {
+      setMessages((current) => current.map((row) => (
+        row.id === id ? { ...row, downloadProgress: undefined } : row
+      )));
+    } finally {
+      videoFetchesRef.current.delete(id);
+    }
+  };
+
   const cancelVideo = (localId) => {
     const job = videoUploadsRef.current.get(localId);
     if (!job || job.saving) return;
@@ -1087,15 +1140,20 @@ const Chat = ({ userId }) => {
         selfAvatar={profile?.avatar || ''}
         onClearReaction={clearReaction}
         onCancelUpload={cancelVideo}
+        onDownloadVideo={downloadVideo}
         onOpenVideo={(item) => {
-          if (!item?.video?.url || item.uploading) return;
+          const source = item?.video?.playback || item?.video?.url;
+          const mine = sameId(item?.senderId, profile?.id);
+          const local = String(source || '').startsWith('blob:');
+          if (!source || item.uploading || item.downloadProgress != null) return;
+          if (!mine && !item.video?.playback && !local) return;
           setPlaying({
             id: item.id,
-            url: item.video.url,
+            url: source,
             start: Number(item.video.start) || 0,
             duration: Number(item.video.duration) || 0,
             viewOnce: item.video.viewOnce === true,
-            mine: sameId(item.senderId, profile?.id),
+            mine,
           });
         }}
       />
@@ -1154,10 +1212,15 @@ const Chat = ({ userId }) => {
       {hold ? (
         <ChatMessageHold
           ref={holdUiRef}
-          message={hold}
+          message={{
+            ...hold,
+            ...(messages.find((row) => row.id === hold.id)?.video ? { video: messages.find((row) => row.id === hold.id).video } : {}),
+            downloadProgress: messages.find((row) => row.id === hold.id)?.downloadProgress,
+          }}
           anchor={hold.anchor}
           lang={lang}
           onClose={releaseAll}
+          onDownloadVideo={downloadVideo}
           onReply={() => {
             beginReply(hold);
             releaseAll();

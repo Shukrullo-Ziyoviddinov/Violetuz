@@ -12,7 +12,7 @@ const Holes = () => (
   </span>
 );
 
-const ChatVideoNote = ({ url, duration = 0, start = 0, uploading = false, failed = false, progress = 0, onCancel, onOpen }) => {
+const ChatVideoNote = ({ url, duration = 0, start = 0, uploading = false, failed = false, progress = 0, fetching = false, downloadProgress = null, onCancel, onDownload, onOpen }) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -56,7 +56,28 @@ const ChatVideoNote = ({ url, duration = 0, start = 0, uploading = false, failed
         ) : (
           <span className="chat-video-note-length">{clockOf(duration)}</span>
         )}
-        {!uploading && !failed && onOpen ? (
+        {!uploading && !failed && fetching ? (
+          <button
+            type="button"
+            className="chat-video-note-fetch"
+            disabled={downloadProgress != null}
+            aria-label={downloadProgress != null ? `${Math.round(downloadProgress)}%` : 'Yuklab olish'}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              if (downloadProgress == null) onDownload?.();
+            }}
+          >
+            {downloadProgress != null ? <strong>{Math.round(downloadProgress)}%</strong> : (
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 4v10" />
+                <path d="m8 10 4 4 4-4" />
+                <path d="M6 19h12" />
+              </svg>
+            )}
+          </button>
+        ) : null}
+        {!uploading && !failed && !fetching && onOpen ? (
           <button
             type="button"
             className="chat-video-note-open"

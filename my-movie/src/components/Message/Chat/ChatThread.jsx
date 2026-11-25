@@ -175,7 +175,7 @@ const reactionMap = (rows) => {
   return next;
 };
 
-const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [], selfName = '', selfAvatar = '', onClearReaction, onCancelUpload, onOpenVideo }) => {
+const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, onHold, heldId, peer, pins = [], selfName = '', selfAvatar = '', onClearReaction, onCancelUpload, onOpenVideo, onDownloadVideo }) => {
   const threadRef = useRef(null);
   const listRef = useRef(null);
   const stickRef = useRef(true);
@@ -336,8 +336,10 @@ const ChatThread = ({ messages, selfId, notice, typing, lang, onRetry, onReply, 
                 uploading={item.uploading === true}
                 failed={item.failed === true}
                 progress={item.progress || 0}
+                downloadProgress={item.downloadProgress}
                 onCancelUpload={item.uploading || item.failed ? () => onCancelUpload?.(item.id) : undefined}
-                onOpen={!item.uploading && !item.failed && item.video?.url ? () => onOpenVideo?.(item) : undefined}
+                onDownload={!mine && item.video?.url && !item.video.playback && !String(item.video.url).startsWith('blob:') && item.downloadProgress == null && !item.uploading && !item.failed ? () => onDownloadVideo?.(item) : undefined}
+                onOpen={!item.uploading && !item.failed && item.video?.url && (mine || item.video.playback || String(item.video.url).startsWith('blob:')) ? () => onOpenVideo?.(item) : undefined}
                 quoteAnimated={item.replyTo?.animated === true}
                 quoteAnimationId={item.replyTo?.animationId || ''}
                 quoteGif={item.replyTo?.gif || ''}

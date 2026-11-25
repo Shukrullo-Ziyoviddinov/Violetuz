@@ -79,7 +79,9 @@ const ChatMessageBlock = ({
   uploading = false,
   failed = false,
   progress = 0,
+  downloadProgress = null,
   onCancelUpload,
+  onDownload,
   onOpen,
   quoteAnimated = false,
   quoteAnimationId = '',
@@ -111,13 +113,16 @@ const ChatMessageBlock = ({
       <div className="chat-block-main">
         {mineVideo ? (
           <ChatVideoNote
-            url={video.url}
+            url={video.playback || (!mine ? '' : video.url)}
             duration={video.duration}
             start={video.start}
             uploading={uploading}
             failed={failed}
             progress={progress}
+            fetching={!mine && !video.playback && !String(video.url).startsWith('blob:')}
+            downloadProgress={downloadProgress}
             onCancel={onCancelUpload}
+            onDownload={held ? undefined : onDownload}
             onOpen={onOpen}
           />
         ) : mineGif ? <ChatGif file={gif} fit label={text} /> : mineAnim ? <ChatLottie id={animationId} className="chat-anim" label={text} /> : animated ? <LoopEmoji text={text} /> : emojiCount === 1 ? <SoloEmoji text={text} held={held} /> : <span className="chat-block-text">{text}</span>}

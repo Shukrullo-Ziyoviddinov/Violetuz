@@ -24,7 +24,7 @@ const mediaMessage = (message) => Boolean(
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, onEdit, onCopy, onPin, onUnpin, onDelete, onPick, onMore }, ref) => {
+const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, onEdit, onCopy, onPin, onUnpin, onDelete, onPick, onMore, onDownloadVideo }, ref) => {
   const ru = lang === 'ru';
   const mine = message.mine === true;
   const canEdit = mine && !message.gif && !message.video?.url && !message.animationId && message.animated !== true && String(message.text || '').trim();
@@ -241,6 +241,10 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
             animationId={message.animationId || ''}
             gif={message.gif || ''}
             video={message.video?.url ? message.video : null}
+            downloadProgress={message.downloadProgress}
+            onDownload={!mine && message.video?.url && !message.video.playback && !String(message.video.url).startsWith('blob:') && message.downloadProgress == null
+              ? () => onDownloadVideo?.(message)
+              : undefined}
             quoteAnimated={message.quoteAnimated === true}
             quoteAnimationId={message.quoteAnimationId || ''}
             quoteGif={message.quoteGif || ''}

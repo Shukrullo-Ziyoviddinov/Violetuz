@@ -76,6 +76,35 @@ export const putFileToR2 = async (uploadUrl, file, headers = {}, { onProgress, s
   xhr.send(file);
 });
 
+/** GET a remote file and report real download progress. */
+export const downloadRemoteFile = (url, { onProgress, signal } = {}) => new Promise((resolve, reject) => {
+  const xhr = new XMLHttpRequest();
+  const fail = () => reject(new Error('Yuklab bo‘lmadi'));
+  xhr.open('GET', url);
+  xhr.responseType = 'blob';
+  xhr.onprogress = (event) => {
+    if (!event.lengthComputable || !event.total) return;
+    onProgress?.(event.loaded / event.total);
+  };
+  xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve(xhr.response) : fail());
+  xhr.onerror = fail;
+  xhr.onabort = () => {
+    const err = new Error('Yuklash to‘xtatildi');
+    err.name = 'AbortError';
+    reject(err);
+  };
+  if (signal) {
+    if (signal.aborted) {
+      const err = new Error('Yuklash to‘xtatildi');
+      err.name = 'AbortError';
+      reject(err);
+      return;
+    }
+    signal.addEventListener('abort', () => xhr.abort(), { once: true });
+  }
+  xhr.send();
+});
+
 export const deleteUpload = async ({ key, url } = {}) => {
   const res = await uploadsFetch('/uploads/delete', {
     method: 'POST',

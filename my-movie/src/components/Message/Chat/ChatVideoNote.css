@@ -103,3 +103,42 @@
   background: transparent;
   cursor: pointer;
 }
+
+.chat-video-note-fetch {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 58px;
+  height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(12, 10, 16, 0.72);
+  color: #fff;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.chat-video-note-fetch:disabled {
+  cursor: default;
+}
+
+.chat-video-note-fetch svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chat-video-note-fetch strong {
+  font-size: 0.92rem;
+  font-weight: 760;
+  line-height: 1;
+}
