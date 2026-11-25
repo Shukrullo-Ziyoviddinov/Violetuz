@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AnimationEmojModal from './AnimationEmojModal';
+import { ChatReplyVideo } from './ChatMessageBlock';
 
 const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disabled = false, reply = null, onCancelReply, edit = null, onCancelEdit, onCommitEdit, selfId = '', peerName = '', onOpenVideo }) => {
   const inputRef = useRef(null);
@@ -22,7 +23,7 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
   const canSend = text.trim().length > 0;
 
   useEffect(() => {
-    if ((reply?.id || edit?.id) && !disabled) inputRef.current?.focus();
+    if ((reply?.id || edit?.id) && !disabled && !document.querySelector('.chat-video-player')) inputRef.current?.focus();
   }, [reply?.id, edit?.id, disabled]);
 
   const editWas = useRef(false);
@@ -159,7 +160,11 @@ const ChatComposer = ({ lang, onSend, onSendAnimation, onSendGif, onTyping, disa
             </p>
             <div className="chat-reply-draft-body">
               <span className="chat-reply-film" aria-hidden="true" />
-              <span className="chat-reply-draft-text">{String(reply.text).replace(/\s+/g, ' ').trim()}</span>
+              {reply.video?.url ? (
+                <ChatReplyVideo video={reply.video} draft />
+              ) : (
+                <span className="chat-reply-draft-text">{String(reply.text).replace(/\s+/g, ' ').trim()}</span>
+              )}
             </div>
           </div>
           <button type="button" className="chat-reply-draft-x" aria-label={closeLabel} onClick={onCancelReply}>

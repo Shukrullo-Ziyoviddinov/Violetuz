@@ -654,6 +654,9 @@ const Chat = ({ userId }) => {
         if (mergedBase.replyTo && replyTo?.gif && !mergedBase.replyTo.gif) {
           mergedBase = { ...mergedBase, replyTo: { ...mergedBase.replyTo, gif: replyTo.gif } };
         }
+        if (mergedBase.replyTo && replyTo?.video?.url && !mergedBase.replyTo.video?.url) {
+          mergedBase = { ...mergedBase, replyTo: { ...mergedBase.replyTo, video: replyTo.video } };
+        }
         const merged = mergedBase;
         const shown = keepReply(withKeptReply(merged, replyTo), replyTo);
         rememberReply(localId, replyOf(shown));
@@ -667,18 +670,35 @@ const Chat = ({ userId }) => {
       });
   };
 
-  const beginReply = (item) => {
-    const text = String(item?.text || '').trim();
-    if (!item?.id || !text || String(item.id).startsWith('local-')) return false;
-    setEditTarget(null);
-    setReplyTarget({
+  const replyFrom = (item) => {
+    if (!item?.id || String(item.id).startsWith('local-')) return null;
+    const sourceVideo = item.video?.url ? item.video : null;
+    const video = sourceVideo ? {
+      url: sourceVideo.url,
+      ...(sourceVideo.still ? { still: sourceVideo.still } : {}),
+      ...(sourceVideo.poster ? { poster: sourceVideo.poster } : {}),
+      ...(sourceVideo.playback ? { playback: sourceVideo.playback } : {}),
+      start: Number(sourceVideo.start) || 0,
+      duration: Number(sourceVideo.duration) || 0,
+    } : null;
+    const text = String(item.text || '').trim() || (video ? (lang === 'ru' ? 'Видео' : 'Video') : '');
+    if (!text) return null;
+    return {
       id: item.id,
       senderId: item.senderId,
       text,
+      ...(video ? { video } : {}),
       ...(item.animationId ? { animationId: item.animationId } : {}),
       ...(item.gif ? { gif: item.gif } : {}),
       ...(item.animated || item.animationId ? { animated: true } : {}),
-    });
+    };
+  };
+
+  const beginReply = (item) => {
+    const reply = replyFrom(item);
+    if (!reply) return false;
+    setEditTarget(null);
+    setReplyTarget(reply);
     return true;
   };
 
@@ -756,6 +776,7 @@ const Chat = ({ userId }) => {
       quoteAnimated: item.replyTo?.animated === true,
       quoteAnimationId: item.replyTo?.animationId || '',
       quoteGif: item.replyTo?.gif || '',
+      quoteVideo: messages.find((row) => sameId(row.id, item.replyTo?.id))?.video || item.replyTo?.video || null,
       anchor,
       quoteSenderId: item.replyTo?.senderId || '',
       pinned: pins.some((pin) => sameId(pin.id, item.id)),
@@ -1302,14 +1323,29 @@ const Chat = ({ userId }) => {
           senderAvatar={playing.mine ? (profile?.avatar || '') : (peer?.avatar || '')}
           lang={lang}
           burst={videoBurst}
+          onMarkReply={() => {
+            if (!playing?.id || String(playing.id).startsWith('local-')) return;
+            const source = messages.find((row) => sameId(row.id, playing.id)) || {
+              id: playing.id,
+              senderId: playing.senderId,
+              text: playing.text,
+              video: { url: playing.url, start: playing.start, duration: playing.duration },
+            };
+            beginReply(source);
+          }}
           onSendReply={(text) => {
             const body = String(text || '').trim();
             if (!body || !playing?.id || String(playing.id).startsWith('local-')) return;
-            sendNow(body, {
+            const source = messages.find((row) => sameId(row.id, playing.id)) || {
               id: playing.id,
               senderId: playing.senderId,
-              text: String(playing.text || '').trim() || (lang === 'ru' ? 'Видео' : 'Video'),
-            });
+              text: playing.text,
+              video: { url: playing.url, start: playing.start, duration: playing.duration },
+            };
+            const reply = replyFrom(source);
+            if (!reply) return;
+            sendNow(body, reply);
+            setReplyTarget(null);
           }}
           onReact={(emoji) => {
             if (!playing?.id) return;

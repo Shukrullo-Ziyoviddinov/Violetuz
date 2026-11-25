@@ -248,6 +248,7 @@ const ChatMessageHold = forwardRef(({ message, anchor, lang, onClose, onReply, o
             quoteAnimated={message.quoteAnimated === true}
             quoteAnimationId={message.quoteAnimationId || ''}
             quoteGif={message.quoteGif || ''}
+            quoteVideo={message.quoteVideo?.url ? message.quoteVideo : null}
           />
         </div>
         <div className="chat-hold-menu" role="menu">

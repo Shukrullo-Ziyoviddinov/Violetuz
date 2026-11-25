@@ -24,6 +24,7 @@ const ChatVideoPlayer = ({
   lang = 'uz',
   burst = null,
   onSendReply,
+  onMarkReply,
   onReact,
   onMoreEmoji,
   onRecord,
@@ -262,25 +263,36 @@ const ChatVideoPlayer = ({
         <button type="button" className="chat-video-player-cam" aria-label={ru ? 'Видео' : 'Video'} onClick={() => onRecord?.()}>
           <i className="fa-solid fa-video" aria-hidden="true" />
         </button>
-        <label className="chat-video-player-field">
+        <label className={`chat-video-player-field${draft.trim() ? ' has-text' : ''}`}>
           <input
             value={draft}
             placeholder={ru ? 'Ответить' : 'Javob berish'}
             enterKeyHint="send"
-            onChange={(event) => setDraft(event.target.value)}
+            onChange={(event) => {
+              setDraft(event.target.value);
+              onMarkReply?.();
+            }}
+            onFocus={() => onMarkReply?.()}
             onKeyDown={(event) => {
               if (event.key !== 'Enter' || event.shiftKey) return;
               event.preventDefault();
               sendReply(event);
             }}
           />
-          <span className="chat-video-player-emojis">
-            {quick.map((item) => (
-              <button key={item.id} type="button" onClick={() => onReact?.(item)} aria-label={item.char}>
-                {item.char}
-              </button>
-            ))}
-            <button type="button" className="is-more" onClick={() => onMoreEmoji?.()} aria-label={ru ? 'Ещё' : 'Yana'}>+</button>
+          <span className="chat-video-player-field-end">
+            <span className="chat-video-player-emojis">
+              {quick.map((item) => (
+                <button key={item.id} type="button" onClick={() => onReact?.(item)} aria-label={item.char}>
+                  {item.char}
+                </button>
+              ))}
+              <button type="button" className="is-more" onClick={() => onMoreEmoji?.()} aria-label={ru ? 'Ещё' : 'Yana'}>+</button>
+            </span>
+            <button type="submit" className="chat-video-player-send" aria-label={ru ? 'Отправить' : 'Yuborish'} tabIndex={draft.trim() ? 0 : -1}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3.2 11.1 20.6 3.4c.8-.4 1.6.4 1.2 1.2l-8.2 17.2c-.4.8-1.6.7-1.8-.2l-2-6.6-6.6-2c-.9-.2-1-1.4-.2-1.9Z" />
+              </svg>
+            </button>
           </span>
         </label>
       </form>

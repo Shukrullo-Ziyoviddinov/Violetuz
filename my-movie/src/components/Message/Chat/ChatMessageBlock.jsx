@@ -65,6 +65,44 @@ const LoopEmoji = ({ text }) => {
   return <img className="chat-anim" src={emojiMotion(motionId)} alt={text} draggable="false" />;
 };
 
+const ChatReplyVideo = ({ video, draft = false }) => {
+  const nodeRef = useRef(null);
+  const still = String(video?.still || '').trim();
+  const remote = String(video?.playback || video?.url || '').trim();
+  const poster = String(video?.poster || '').trim();
+  const image = still || (!remote ? poster : '');
+  const source = !remote || remote.startsWith('blob:') || remote.includes('#')
+    ? remote
+    : `${remote}#t=${Math.max(0.25, Number(video?.start) || 0).toFixed(1)}`;
+
+  useEffect(() => {
+    const node = nodeRef.current;
+    if (!node || image) return undefined;
+    let gone = false;
+    node.muted = true;
+    node.defaultMuted = true;
+    const stop = () => {
+      if (!gone) node.pause();
+    };
+    const pending = node.play();
+    if (pending && typeof pending.then === 'function') pending.then(() => {
+      if (typeof node.requestVideoFrameCallback === 'function') node.requestVideoFrameCallback(stop);
+      else window.setTimeout(stop, 240);
+    }).catch(() => {});
+    else window.setTimeout(stop, 240);
+    return () => {
+      gone = true;
+      node.pause();
+    };
+  }, [image, source]);
+
+  return (
+    <span className={`chat-reply-video${draft ? ' is-draft' : ''}`}>
+      {image ? <img src={image} alt="" /> : source ? <video ref={nodeRef} src={source} muted playsInline preload="auto" /> : null}
+    </span>
+  );
+};
+
 const ChatMessageBlock = ({
   text,
   mine,
@@ -86,16 +124,18 @@ const ChatMessageBlock = ({
   quoteAnimated = false,
   quoteAnimationId = '',
   quoteGif = '',
+  quoteVideo = null,
 }) => {
   const mineVideo = Boolean(video?.url);
   const mineGif = Boolean(gif) && !mineVideo;
-  const quoteGifOn = Boolean(quoteGif);
+  const quoteVideoOn = Boolean(quoteVideo?.url || quoteVideo?.still || quoteVideo?.poster);
+  const quoteGifOn = Boolean(quoteGif) && !quoteVideoOn;
   const mineAnim = Boolean(animationId);
   const quoteAnim = Boolean(quoteAnimationId);
   const emojiCount = mineGif ? 0 : (mineAnim || animated ? 1 : emojiOnlyCount(text));
-  const quoteEmoji = quoteGifOn ? 0 : (quoteAnim || quoteAnimated ? 1 : emojiOnlyCount(quote));
+  const quoteEmoji = quoteGifOn || quoteVideoOn ? 0 : (quoteAnim || quoteAnimated ? 1 : emojiOnlyCount(quote));
   const emojiClass = `${mineVideo ? ' is-video' : ''}${mineGif ? ' is-gif' : ''}${emojiCount > 1 ? ' is-emoji is-emoji-row' : emojiCount === 1 ? ' is-emoji' : ''}${!mineGif && !mineVideo && (mineAnim || animated) ? ' is-anim' : ''}`;
-  const quoteClass = `${quoteGifOn ? ' is-gif' : ''}${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${!quoteGifOn && (quoteAnim || quoteAnimated) ? ' is-anim' : ''}`;
+  const quoteClass = `${quoteVideoOn ? ' is-video' : ''}${quoteGifOn ? ' is-gif' : ''}${quoteEmoji > 1 ? ' is-emoji-quote is-emoji-row' : quoteEmoji === 1 ? ' is-emoji-quote' : ''}${!quoteGifOn && !quoteVideoOn && (quoteAnim || quoteAnimated) ? ' is-anim' : ''}`;
   return (
     <div className={`chat-block${mine ? ' is-mine' : ''}${status ? ' has-status' : ''}${quote ? ' has-quote' : ''}${emojiClass}`}>
       {quote ? (
@@ -106,7 +146,7 @@ const ChatMessageBlock = ({
         >
           <span className="chat-reply-film" aria-hidden="true" />
           <span className="chat-reply-quote-text">
-            {quoteGifOn ? <ChatGif file={quoteGif} fit max={106} label={quote} /> : quoteAnim ? <ChatLottie id={quoteAnimationId} className="chat-anim" label={quote} /> : quoteAnimated ? <LoopEmoji text={quote} /> : quote}
+            {quoteVideoOn ? <ChatReplyVideo video={quoteVideo} /> : quoteGifOn ? <ChatGif file={quoteGif} fit max={106} label={quote} /> : quoteAnim ? <ChatLottie id={quoteAnimationId} className="chat-anim" label={quote} /> : quoteAnimated ? <LoopEmoji text={quote} /> : quote}
           </span>
         </button>
       ) : null}
@@ -134,4 +174,5 @@ const ChatMessageBlock = ({
   );
 };
 
+export { ChatReplyVideo };
 export default ChatMessageBlock;

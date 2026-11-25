@@ -830,10 +830,38 @@ input.chat-reply-draft-text {
   border-radius: 20px;
 }
 
-.chat-reply-quote.is-gif .chat-reply-quote-text {
+.chat-reply-quote.is-gif .chat-reply-quote-text,
+.chat-reply-quote.is-video .chat-reply-quote-text {
   display: block;
   overflow: visible;
   -webkit-line-clamp: unset;
+}
+
+.chat-reply-video {
+  display: block;
+  width: 80px;
+  height: 140px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #6d28d9;
+  line-height: 0;
+}
+
+.chat-reply-video img,
+.chat-reply-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  background: transparent;
+}
+
+.chat-reply-video.is-draft {
+  width: 36px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 10px;
 }
 
 .chat-emoji-solo {

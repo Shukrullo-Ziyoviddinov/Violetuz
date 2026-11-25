@@ -239,11 +239,39 @@
   color: rgba(255, 255, 255, 0.62);
 }
 
+.chat-video-player-field.has-text {
+  padding-right: 0;
+}
+
+.chat-video-player-field-end {
+  position: relative;
+  height: 100%;
+  max-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: max-width 0.22s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.chat-video-player-field.has-text .chat-video-player-field-end {
+  max-width: 46px;
+}
+
 .chat-video-player-emojis {
   display: inline-flex;
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
+  transform-origin: right center;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.chat-video-player-field.has-text .chat-video-player-emojis {
+  opacity: 0;
+  transform: scale(0.72);
+  pointer-events: none;
 }
 
 .chat-video-player-emojis button {
@@ -263,10 +291,54 @@
   font-weight: 500;
 }
 
+.chat-video-player-send {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.72);
+  transform-origin: right center;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.chat-video-player-field.has-text .chat-video-player-send {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.chat-video-player-send svg {
+  width: 46px;
+  height: 46px;
+  display: block;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chat-video-player-float.is-in,
   .chat-video-player-float.is-out {
     animation: none;
     transform: translate(-50%, -50%);
+  }
+
+  .chat-video-player-field-end,
+  .chat-video-player-emojis,
+  .chat-video-player-send {
+    transition: none;
   }
 }
