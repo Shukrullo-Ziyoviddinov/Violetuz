@@ -1,13 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 import { useModalHardwareBack } from '../../../useModalHardwareBack';
 import './ChatVideoPlayer.css';
 
-const ChatVideoPlayer = ({ url, start = 0, duration = 0, viewOnce = false, mine = false, onClose, onWatched }) => {
+const initialsOf = (name) => {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+};
+
+const ChatVideoPlayer = ({
+  url,
+  start = 0,
+  duration = 0,
+  viewOnce = false,
+  mine = false,
+  senderName = '',
+  senderAvatar = '',
+  lang = 'uz',
+  onClose,
+  onWatched,
+}) => {
   const videoRef = useRef(null);
+  const backdropRef = useRef(null);
   const watchedRef = useRef(false);
   const onCloseRef = useRef(onClose);
   const onWatchedRef = useRef(onWatched);
   const [needTap, setNeedTap] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
   onCloseRef.current = onClose;
   onWatchedRef.current = onWatched;
   const { releaseHistory } = useModalHardwareBack({
@@ -19,6 +41,10 @@ const ChatVideoPlayer = ({ url, start = 0, duration = 0, viewOnce = false, mine 
   releaseRef.current = releaseHistory;
   const startAt = Math.max(0, Number(start) || 0);
   const endAt = startAt + Math.max(0.1, Number(duration) || 0);
+  const ru = lang === 'ru';
+  const who = mine
+    ? (ru ? 'Вы' : 'Siz')
+    : (ru ? `от ${senderName || '…'}` : `${senderName || '…'} dan`);
 
   const close = () => {
     releaseRef.current();
@@ -38,25 +64,40 @@ const ChatVideoPlayer = ({ url, start = 0, duration = 0, viewOnce = false, mine 
 
   useEffect(() => {
     const node = videoRef.current;
+    const backdrop = backdropRef.current;
     const place = () => {
       const range = rangeRef.current;
       if (node && node.currentTime < range.startAt) node.currentTime = range.startAt;
+      if (backdrop && backdrop.currentTime < range.startAt) backdrop.currentTime = range.startAt;
+    };
+    const syncBackdrop = () => {
+      if (!node || !backdrop) return;
+      if (Math.abs((backdrop.currentTime || 0) - (node.currentTime || 0)) > 0.35) {
+        try { backdrop.currentTime = node.currentTime; } catch { /* Kadr hali tayyor emas. */ }
+      }
+      if (node.paused) backdrop.pause();
+      else backdrop.play?.().catch(() => {});
     };
     const watch = () => {
       const range = rangeRef.current;
       if (!node || watchedRef.current) return;
       if (node.currentTime < range.startAt - 0.08) node.currentTime = range.startAt;
+      const span = Math.max(0.1, range.endAt - range.startAt);
+      const ratio = Math.min(1, Math.max(0, (node.currentTime - range.startAt) / span));
+      setProgress(ratio);
       if (node.currentTime < range.endAt - 0.05) return;
-      node.pause();
-      if (!(range.viewOnce && !range.mine)) {
-        node.currentTime = range.startAt;
+      if (range.viewOnce && !range.mine) {
+        node.pause();
+        if (watchedRef.current) return;
+        watchedRef.current = true;
+        releaseRef.current();
+        onCloseRef.current?.();
+        onWatchedRef.current?.();
         return;
       }
-      if (watchedRef.current) return;
-      watchedRef.current = true;
-      releaseRef.current();
-      onCloseRef.current?.();
-      onWatchedRef.current?.();
+      setProgress(0);
+      node.currentTime = range.startAt;
+      node.play?.().catch(() => setNeedTap(true));
     };
     const onKey = (event) => {
       if (event.key !== 'Escape') return;
@@ -64,12 +105,22 @@ const ChatVideoPlayer = ({ url, start = 0, duration = 0, viewOnce = false, mine 
       onCloseRef.current?.();
     };
     node?.addEventListener('loadedmetadata', place);
+    backdrop?.addEventListener('loadedmetadata', place);
     node?.addEventListener('timeupdate', watch);
+    node?.addEventListener('timeupdate', syncBackdrop);
+    node?.addEventListener('play', syncBackdrop);
+    node?.addEventListener('pause', syncBackdrop);
+    node?.addEventListener('seeked', syncBackdrop);
     window.addEventListener('keydown', onKey);
     node?.play?.().then(() => setNeedTap(false)).catch(() => setNeedTap(true));
     return () => {
       node?.removeEventListener('loadedmetadata', place);
+      backdrop?.removeEventListener('loadedmetadata', place);
       node?.removeEventListener('timeupdate', watch);
+      node?.removeEventListener('timeupdate', syncBackdrop);
+      node?.removeEventListener('play', syncBackdrop);
+      node?.removeEventListener('pause', syncBackdrop);
+      node?.removeEventListener('seeked', syncBackdrop);
       window.removeEventListener('keydown', onKey);
     };
   }, []);
@@ -81,26 +132,77 @@ const ChatVideoPlayer = ({ url, start = 0, duration = 0, viewOnce = false, mine 
     node.play().then(() => setNeedTap(false)).catch(() => setNeedTap(true));
   };
 
+  const toggle = () => {
+    const node = videoRef.current;
+    if (!node) return;
+    if (node.paused) begin();
+    else node.pause();
+  };
+
   return (
     <div className="chat-video-player" role="dialog" aria-modal="true" aria-label="Video">
-      <button type="button" className="chat-video-player-close" aria-label="Yopish" onClick={close}>
-        ×
-      </button>
+      <video
+        ref={backdropRef}
+        className="chat-video-player-backdrop"
+        src={url}
+        muted
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
+      <div className="chat-video-player-top">
+        <div className="chat-video-player-progress" aria-hidden="true">
+          <span style={{ width: `${progress * 100}%` }} />
+        </div>
+        <header className="chat-video-player-bar">
+        <button type="button" className="chat-video-player-back" aria-label={ru ? 'Назад' : 'Orqaga'} onClick={close}>
+          ‹
+        </button>
+        {mine ? (
+          <span className="chat-video-player-who">{who}</span>
+        ) : (
+          <span className="chat-video-player-who">
+            <span className="chat-video-player-avatar" aria-hidden="true">
+              <UserAvatar
+                src={senderAvatar}
+                className="chat-video-player-avatar-img"
+                fallback={<span>{initialsOf(senderName)}</span>}
+              />
+            </span>
+            <span>{who}</span>
+          </span>
+        )}
+        </header>
+      </div>
       <video
         ref={videoRef}
+        className="chat-video-player-film"
         src={url}
         autoPlay
         playsInline
-        controls={!viewOnce}
+        onClick={toggle}
+        onPlay={() => setPaused(false)}
+        onPause={() => setPaused(true)}
         onEnded={() => {
           if (viewOnce && !mine) finish();
         }}
       />
-      {needTap ? (
-        <button type="button" className="chat-video-player-play" onClick={begin} aria-label="Ko‘rish">
-          ▶
-        </button>
-      ) : null}
+      <button
+        type="button"
+        className="chat-video-player-play"
+        onClick={toggle}
+        aria-label={paused || needTap ? (ru ? 'Смотреть' : 'Ko‘rish') : (ru ? 'Пауза' : 'Pauza')}
+      >
+        {paused || needTap ? (
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 7.5v9l8-4.5-8-4.5Z" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 6h3v12H8zM13 6h3v12h-3z" />
+          </svg>
+        )}
+      </button>
     </div>
   );
 };

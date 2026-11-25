@@ -1290,6 +1290,9 @@ const Chat = ({ userId }) => {
           duration={playing.duration}
           viewOnce={playing.viewOnce}
           mine={playing.mine}
+          senderName={playing.mine ? '' : (peer?.name || '')}
+          senderAvatar={playing.mine ? '' : (peer?.avatar || '')}
+          lang={lang}
           onClose={() => setPlaying(null)}
           onWatched={() => {
             const id = playing.id;
