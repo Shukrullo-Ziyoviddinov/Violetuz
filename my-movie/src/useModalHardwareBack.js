@@ -26,6 +26,10 @@ export function useModalHardwareBack({
 
   const markOpen = () => {
     if (ownedRef.current) return;
+    if (window.history.state?.[key]) {
+      ownedRef.current = true;
+      return;
+    }
     window.history.pushState({ [key]: true }, '');
     ownedRef.current = true;
   };
@@ -60,6 +64,8 @@ export function useModalHardwareBack({
         ownedRef.current = false;
         return;
       }
+
+      if (window.history.state?.[key]) return;
 
       if (nestedRef.current) {
         onNestedRef.current?.();

@@ -1318,6 +1318,14 @@ const Chat = ({ userId }) => {
           }}
           onMoreEmoji={() => setVideoEmojiOpen(true)}
           onRecord={() => setVideoOpen(true)}
+          coverOpen={videoEmojiOpen}
+          onCoverBack={() => {
+            if (reactionUiRef.current?.close) {
+              reactionUiRef.current.close();
+              return;
+            }
+            setVideoEmojiOpen(false);
+          }}
           onClose={() => {
             setVideoEmojiOpen(false);
             setVideoBurst(null);

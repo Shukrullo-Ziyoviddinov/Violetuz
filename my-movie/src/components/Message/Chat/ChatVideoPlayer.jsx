@@ -27,6 +27,8 @@ const ChatVideoPlayer = ({
   onReact,
   onMoreEmoji,
   onRecord,
+  coverOpen = false,
+  onCoverBack,
   onClose,
   onWatched,
 }) => {
@@ -35,17 +37,22 @@ const ChatVideoPlayer = ({
   const watchedRef = useRef(false);
   const onCloseRef = useRef(onClose);
   const onWatchedRef = useRef(onWatched);
+  const onCoverBackRef = useRef(onCoverBack);
   const [needTap, setNeedTap] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [controlsOn, setControlsOn] = useState(false);
   const [progress, setProgress] = useState(0);
   const openedBurst = useRef(burst?.token || 0);
   const [draft, setDraft] = useState('');
   const [floatEmoji, setFloatEmoji] = useState(null);
   onCloseRef.current = onClose;
   onWatchedRef.current = onWatched;
+  onCoverBackRef.current = onCoverBack;
   const { releaseHistory } = useModalHardwareBack({
     historyKey: 'violetChatVideoPlay',
     isOpen: true,
+    hasNested: coverOpen,
+    onNestedBack: () => onCoverBackRef.current?.(),
     onCloseFromHardware: () => onCloseRef.current?.(),
   });
   const releaseRef = useRef(releaseHistory);
@@ -163,11 +170,18 @@ const ChatVideoPlayer = ({
     node.play().then(() => setNeedTap(false)).catch(() => setNeedTap(true));
   };
 
-  const toggle = () => {
+  const revealControls = () => setControlsOn(true);
+
+  const onControl = (event) => {
+    event.stopPropagation();
     const node = videoRef.current;
     if (!node) return;
-    if (node.paused) begin();
-    else node.pause();
+    if (node.paused || needTap) {
+      begin();
+      setControlsOn(false);
+      return;
+    }
+    node.pause();
   };
 
   const sendReply = (event) => {
@@ -215,29 +229,31 @@ const ChatVideoPlayer = ({
         src={url}
         autoPlay
         playsInline
-        onClick={toggle}
+        onClick={revealControls}
         onPlay={() => setPaused(false)}
         onPause={() => setPaused(true)}
         onEnded={() => {
           if (viewOnce && !mine) finish();
         }}
       />
-      <button
-        type="button"
-        className="chat-video-player-play"
-        onClick={toggle}
-        aria-label={paused || needTap ? (ru ? 'Смотреть' : 'Ko‘rish') : (ru ? 'Пауза' : 'Pauza')}
-      >
-        {paused || needTap ? (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 7.5v9l8-4.5-8-4.5Z" />
-          </svg>
-        ) : (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 6h3v12H8zM13 6h3v12h-3z" />
-          </svg>
-        )}
-      </button>
+      {controlsOn ? (
+        <button
+          type="button"
+          className="chat-video-player-play"
+          onClick={onControl}
+          aria-label={paused || needTap ? (ru ? 'Смотреть' : 'Ko‘rish') : (ru ? 'Пауза' : 'Pauza')}
+        >
+          {paused || needTap ? (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 7.5v9l8-4.5-8-4.5Z" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 6h3v12H8zM13 6h3v12h-3z" />
+            </svg>
+          )}
+        </button>
+      ) : null}
       {floatEmoji ? (
         <span className={`chat-video-player-float is-${floatEmoji.phase}`} aria-hidden="true">{floatEmoji.char}</span>
       ) : null}
