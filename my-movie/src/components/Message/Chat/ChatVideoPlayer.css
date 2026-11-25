@@ -184,6 +184,7 @@
   align-items: center;
   gap: 8px;
   padding: 0.7rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+  transform: translateY(calc(-1 * var(--chat-input-lift, 0px)));
 }
 
 .chat-video-player-cam {
