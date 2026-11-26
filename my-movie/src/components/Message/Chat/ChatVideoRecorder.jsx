@@ -19,6 +19,8 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const recorderRef = useRef(null);
   const ringRef = useRef(null);
   const frameRef = useRef(0);
+  const fullRef = useRef(false);
+  const drawRef = useRef(0);
   const startedRef = useRef(0);
   const reviewRef = useRef(false);
   const stopRef = useRef(() => {});
@@ -30,6 +32,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const [error, setError] = useState('');
   const [recording, setRecording] = useState(false);
   const [flash, setFlash] = useState(false);
+  const [full, setFull] = useState(false);
   const [phase, setPhase] = useState('record');
   const [clip, setClip] = useState(null);
   const ru = lang === 'ru';
@@ -53,6 +56,8 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
     reviewRef.current = review === true;
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     frameRef.current = 0;
+    if (drawRef.current) cancelAnimationFrame(drawRef.current);
+    drawRef.current = 0;
     const recorder = recorderRef.current;
     recorderRef.current = null;
     if (recorder && recorder.state !== 'inactive') recorder.stop();
@@ -102,6 +107,8 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
     return () => {
       cancelled = true;
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      if (drawRef.current) cancelAnimationFrame(drawRef.current);
+      drawRef.current = 0;
       const recorder = recorderRef.current;
       recorderRef.current = null;
       if (recorder && recorder.state !== 'inactive') recorder.stop();
@@ -127,11 +134,14 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const startRecording = () => {
     const stream = streamRef.current;
     if (!stream || recorderRef.current) return;
+    const source = fullRef.current ? framedStream(stream) : stream;
     let recorder;
     try {
       const type = mimeType();
-      recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+      recorder = new MediaRecorder(source, type ? { mimeType: type } : undefined);
     } catch {
+      if (drawRef.current) cancelAnimationFrame(drawRef.current);
+      drawRef.current = 0;
       setError(ru ? 'Запись недоступна' : 'Yozib bo‘lmadi');
       return;
     }
@@ -152,6 +162,8 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       recorder.start(200);
     } catch {
       recorderRef.current = null;
+      if (drawRef.current) cancelAnimationFrame(drawRef.current);
+      drawRef.current = 0;
       setError(ru ? 'Запись недоступна' : 'Yozib bo‘lmadi');
       return;
     }
@@ -186,6 +198,11 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
     setFacing((current) => (current === 'user' ? 'environment' : 'user'));
   };
 
+  const toggleFull = () => {
+    if (recording) return;
+    setFull((current) => !current);
+  };
+
   const toggleFlash = async () => {
     const track = streamRef.current?.getVideoTracks?.()[0];
     const next = !flash;
@@ -216,6 +233,36 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
 
   const clipRef = useRef(null);
   clipRef.current = clip;
+  fullRef.current = full;
+
+  const framedStream = (stream) => {
+    const video = videoRef.current;
+    const stage = video?.closest('.chat-video-stage');
+    if (!video?.videoWidth || !stage || typeof HTMLCanvasElement.prototype.captureStream !== 'function') return stream;
+    const rect = stage.getBoundingClientRect();
+    const aspect = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : 9 / 16;
+    const height = 1280;
+    const width = Math.max(2, Math.round(height * aspect));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    const paint = () => {
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      if (vw && vh) {
+        const scale = Math.max(width / vw, height / vh);
+        const dw = vw * scale;
+        const dh = vh * scale;
+        ctx.drawImage(video, (width - dw) / 2, (height - dh) / 2, dw, dh);
+      }
+      drawRef.current = requestAnimationFrame(paint);
+    };
+    paint();
+    const captured = canvas.captureStream(30);
+    stream.getAudioTracks().forEach((track) => captured.addTrack(track));
+    return captured;
+  };
 
   useEffect(() => () => {
     if (clipRef.current?.url) URL.revokeObjectURL(clipRef.current.url);
@@ -236,7 +283,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   }
 
   return (
-    <div className="chat-video" role="dialog" aria-modal="true" aria-label={ru ? 'Видеосообщение' : 'Video xabar'}>
+    <div className={`chat-video${full ? ' is-full' : ''}`} role="dialog" aria-modal="true" aria-label={ru ? 'Видеосообщение' : 'Video xabar'}>
       <header className="chat-video-bar">
         <button type="button" className="chat-video-icon" onClick={close} aria-label={ru ? 'Закрыть' : 'Yopish'}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -269,45 +316,52 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
         <span className="chat-video-dash" aria-hidden="true" />
         {error ? <p className="chat-video-error">{error}</p> : null}
       </div>
-      <p className="chat-video-hint">{ru ? 'Удерживайте для записи и отпустите, чтобы остановить' : 'Bosib turib yozing, qo‘yib yuborsangiz yuboriladi'}</p>
-      <p className="chat-video-limit">{ru ? 'Не дольше 1 минуты' : 'Eng ko‘pi bilan 1 daqiqa'}</p>
-      <div className="chat-video-controls">
-        <button type="button" className="chat-video-side" onClick={flipCamera} disabled={recording} aria-label={ru ? 'Сменить камеру' : 'Kamerani almashtirish'}>
-          <i className="fa-solid fa-camera-rotate" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          className={`chat-video-record${recording ? ' is-recording' : ''}`}
-          aria-label={ru ? 'Запись' : 'Yozish'}
-          onPointerDown={holdStart}
-          onPointerUp={holdEnd}
-          onPointerCancel={holdEnd}
-          onContextMenu={(event) => event.preventDefault()}
-        >
-          <svg className="chat-video-ring" viewBox="0 0 84 84" aria-hidden="true">
-            <circle className="chat-video-ring-track" cx="42" cy="42" r={RING_R} />
-            <circle
-              ref={ringRef}
-              className="chat-video-ring-fill"
-              cx="42"
-              cy="42"
-              r={RING_R}
-              style={{ strokeDasharray: RING, strokeDashoffset: RING }}
-            />
-          </svg>
-          <span className="chat-video-core" />
-        </button>
-        <button
-          type="button"
-          className={`chat-video-side${flash ? ' is-on' : ''}`}
-          onClick={toggleFlash}
-          aria-pressed={flash}
-          aria-label={ru ? 'Вспышка' : 'Chaqnoq'}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M13 3 6 13h6l-1 8 7-10h-6l1-8Z" />
-          </svg>
-        </button>
+      <div className="chat-video-dock">
+        <p className="chat-video-hint">{ru ? 'Удерживайте для записи и отпустите, чтобы остановить' : 'Bosib turib yozing, qo‘yib yuborsangiz yuboriladi'}</p>
+        <p className="chat-video-limit">{ru ? 'Не дольше 1 минуты' : 'Eng ko‘pi bilan 1 daqiqa'}</p>
+        <div className="chat-video-controls">
+          <button type="button" className="chat-video-side" onClick={flipCamera} disabled={recording} aria-label={ru ? 'Сменить камеру' : 'Kamerani almashtirish'}>
+            <i className="fa-solid fa-camera-rotate" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={`chat-video-record${recording ? ' is-recording' : ''}`}
+            aria-label={ru ? 'Запись' : 'Yozish'}
+            onPointerDown={holdStart}
+            onPointerUp={holdEnd}
+            onPointerCancel={holdEnd}
+            onContextMenu={(event) => event.preventDefault()}
+          >
+            <svg className="chat-video-ring" viewBox="0 0 84 84" aria-hidden="true">
+              <circle className="chat-video-ring-track" cx="42" cy="42" r={RING_R} />
+              <circle
+                ref={ringRef}
+                className="chat-video-ring-fill"
+                cx="42"
+                cy="42"
+                r={RING_R}
+                style={{ strokeDasharray: RING, strokeDashoffset: RING }}
+              />
+            </svg>
+            <span className="chat-video-core" />
+          </button>
+          <button
+            type="button"
+            className="chat-video-side"
+            onClick={toggleFull}
+            disabled={recording}
+            aria-pressed={full}
+            aria-label={full ? (ru ? 'Обычный размер' : 'Oddiy o‘lcham') : (ru ? 'На весь экран' : 'To‘liq ekran')}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              {full ? (
+                <path d="M9 9H4M9 9V4M15 9h5M15 9V4M9 15H4M9 15v5M15 15h5M15 15v5" />
+              ) : (
+                <path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
