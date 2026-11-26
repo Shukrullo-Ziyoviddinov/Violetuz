@@ -244,15 +244,15 @@
 }
 
 .chat-video-player-field.has-text .chat-video-player-field-end {
-  max-width: 32px;
+  max-width: 37px;
 }
 
 .chat-video-player-field.has-text .chat-video-player-send {
   position: relative;
   top: auto;
   right: auto;
-  width: 32px;
-  height: 32px;
+  width: 37px;
+  height: 37px;
   flex-shrink: 0;
   border-radius: 50%;
   background: rgba(18, 12, 24, 0.72);
@@ -263,8 +263,8 @@
 }
 
 .chat-video-player-send svg {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   display: block;
   fill: currentColor;
   stroke: currentColor;
