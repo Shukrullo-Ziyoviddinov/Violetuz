@@ -839,10 +839,10 @@ input.chat-reply-draft-text {
 
 .chat-reply-video {
   display: block;
-  width: 80px;
-  height: 140px;
+  width: 50px;
+  height: 70px;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 10px;
   background: #6d28d9;
   line-height: 0;
 }
@@ -858,8 +858,8 @@ input.chat-reply-draft-text {
 }
 
 .chat-reply-video.is-draft {
-  width: 36px;
-  height: 52px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
   border-radius: 10px;
 }
