@@ -100,9 +100,10 @@
 .chat-video:not(.is-review) .chat-video-stage {
   flex: none;
   margin-top: 0;
-  width: min(100cqw, 26rem, calc(100cqh * 9 / 16));
-  aspect-ratio: 9 / 16;
+  width: min(100cqw, calc(100cqh * var(--cam-ratio, 1.7778)));
+  aspect-ratio: var(--cam-ratio, 1.7778);
   height: auto;
+  touch-action: none;
 }
 
 .chat-video.is-full .chat-video-fit {
@@ -119,7 +120,7 @@
 }
 
 .chat-video.is-full .chat-video-stage {
-  width: min(100cqw, calc(100cqh * 9 / 16));
+  width: min(100cqw, calc(100cqh * var(--cam-ratio, 1.7778)));
   max-height: none;
 }
 
@@ -135,9 +136,9 @@
   position: absolute;
   left: 50%;
   z-index: 2;
-  width: min(100cqw, calc(100cqh * 9 / 16));
+  width: min(100cqw, calc(100cqh * var(--cam-ratio, 1.7778)));
   margin: 0;
-  bottom: calc(100cqh - min(100cqh, calc(100cqw * 16 / 9)) + 0.85rem);
+  bottom: calc(100cqh - min(100cqh, calc(100cqw / var(--cam-ratio, 1.7778))) + 0.85rem);
   transform: translateX(-50%);
 }
 
@@ -155,6 +156,10 @@
   height: 100%;
   object-fit: cover;
   background: transparent;
+}
+
+.chat-video:not(.is-review) .chat-video-preview {
+  object-fit: contain;
 }
 
 .chat-video-stage.is-mirror .chat-video-preview {

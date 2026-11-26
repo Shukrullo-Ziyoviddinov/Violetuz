@@ -19,8 +19,9 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const recorderRef = useRef(null);
   const ringRef = useRef(null);
   const frameRef = useRef(0);
-  const fullRef = useRef(false);
-  const drawRef = useRef(0);
+  const zoomRef = useRef(null);
+  const pointersRef = useRef(new Map());
+  const pinchRef = useRef(null);
   const startedRef = useRef(0);
   const reviewRef = useRef(false);
   const stopRef = useRef(() => {});
@@ -33,6 +34,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const [recording, setRecording] = useState(false);
   const [flash, setFlash] = useState(false);
   const [full, setFull] = useState(false);
+  const [frameRatio, setFrameRatio] = useState(16 / 9);
   const [phase, setPhase] = useState('record');
   const [clip, setClip] = useState(null);
   const ru = lang === 'ru';
@@ -56,8 +58,6 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
     reviewRef.current = review === true;
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     frameRef.current = 0;
-    if (drawRef.current) cancelAnimationFrame(drawRef.current);
-    drawRef.current = 0;
     const recorder = recorderRef.current;
     recorderRef.current = null;
     if (recorder && recorder.state !== 'inactive') recorder.stop();
@@ -82,7 +82,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
-          video: { facingMode: facing, width: { ideal: 720 }, height: { ideal: 1280 } },
+          video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 } },
         });
       } catch {
         try {
@@ -101,13 +101,19 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       }
       streamRef.current = stream;
       const track = stream.getVideoTracks()[0];
-      const zoom = track?.getCapabilities?.().zoom;
-      if (zoom && track.applyConstraints) {
+      const caps = track?.getCapabilities?.() || {};
+      const settings = track?.getSettings?.() || {};
+      if (settings.width > 0 && settings.height > 0) setFrameRatio(settings.width / settings.height);
+      if (caps.zoom && track.applyConstraints) {
+        const min = caps.zoom.min ?? 1;
+        zoomRef.current = { min, max: caps.zoom.max ?? min, step: caps.zoom.step || 0.1, value: min };
         try {
-          await track.applyConstraints({ advanced: [{ zoom: zoom.min ?? 1 }] });
+          await track.applyConstraints({ advanced: [{ zoom: min }] });
         } catch {
-          /* keng kadr qoladi */
+          zoomRef.current = null;
         }
+      } else {
+        zoomRef.current = null;
       }
       if (videoRef.current) videoRef.current.srcObject = stream;
       setReady(true);
@@ -116,8 +122,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
     return () => {
       cancelled = true;
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      if (drawRef.current) cancelAnimationFrame(drawRef.current);
-      drawRef.current = 0;
+      zoomRef.current = null;
       const recorder = recorderRef.current;
       recorderRef.current = null;
       if (recorder && recorder.state !== 'inactive') recorder.stop();
@@ -143,14 +148,11 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const startRecording = () => {
     const stream = streamRef.current;
     if (!stream || recorderRef.current) return;
-    const source = framedStream(stream);
     let recorder;
     try {
       const type = mimeType();
-      recorder = new MediaRecorder(source, type ? { mimeType: type } : undefined);
+      recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
     } catch {
-      if (drawRef.current) cancelAnimationFrame(drawRef.current);
-      drawRef.current = 0;
       setError(ru ? 'Запись недоступна' : 'Yozib bo‘lmadi');
       return;
     }
@@ -171,8 +173,6 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       recorder.start(200);
     } catch {
       recorderRef.current = null;
-      if (drawRef.current) cancelAnimationFrame(drawRef.current);
-      drawRef.current = 0;
       setError(ru ? 'Запись недоступна' : 'Yozib bo‘lmadi');
       return;
     }
@@ -242,35 +242,52 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
 
   const clipRef = useRef(null);
   clipRef.current = clip;
-  fullRef.current = full;
 
-  const framedStream = (stream) => {
+  const syncFrame = () => {
     const video = videoRef.current;
-    const stage = video?.closest('.chat-video-stage');
-    if (!video?.videoWidth || !stage || typeof HTMLCanvasElement.prototype.captureStream !== 'function') return stream;
-    const rect = stage.getBoundingClientRect();
-    const aspect = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : 9 / 16;
-    const height = 1280;
-    const width = Math.max(2, Math.round(height * aspect));
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    const paint = () => {
-      const vw = video.videoWidth;
-      const vh = video.videoHeight;
-      if (vw && vh) {
-        const scale = Math.max(width / vw, height / vh);
-        const dw = vw * scale;
-        const dh = vh * scale;
-        ctx.drawImage(video, (width - dw) / 2, (height - dh) / 2, dw, dh);
-      }
-      drawRef.current = requestAnimationFrame(paint);
-    };
-    paint();
-    const captured = canvas.captureStream(30);
-    stream.getAudioTracks().forEach((track) => captured.addTrack(track));
-    return captured;
+    if (!video?.videoWidth || !video.videoHeight) return;
+    setFrameRatio(video.videoWidth / video.videoHeight);
+  };
+
+  const applyZoom = (value) => {
+    const range = zoomRef.current;
+    const track = streamRef.current?.getVideoTracks?.()[0];
+    if (!range || !track?.applyConstraints) return;
+    const next = Math.min(range.max, Math.max(range.min, value));
+    if (Math.abs(next - range.value) < range.step / 2) return;
+    range.value = next;
+    track.applyConstraints({ advanced: [{ zoom: next }] }).catch(() => {});
+  };
+
+  const onStagePointerDown = (event) => {
+    if (!zoomRef.current) return;
+    pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointersRef.current.size === 2) {
+      const [a, b] = [...pointersRef.current.values()];
+      pinchRef.current = { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, zoom: zoomRef.current.value };
+    }
+  };
+
+  const onStagePointerMove = (event) => {
+    if (!pointersRef.current.has(event.pointerId)) return;
+    pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (!pinchRef.current || pointersRef.current.size < 2) return;
+    const [a, b] = [...pointersRef.current.values()];
+    const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    applyZoom(pinchRef.current.zoom * (dist / pinchRef.current.dist));
+  };
+
+  const onStagePointerEnd = (event) => {
+    pointersRef.current.delete(event.pointerId);
+    if (pointersRef.current.size < 2) pinchRef.current = null;
+  };
+
+  const onStageWheel = (event) => {
+    const range = zoomRef.current;
+    if (!range) return;
+    event.preventDefault();
+    const step = range.step * (event.deltaY > 0 ? -2 : 2);
+    applyZoom(range.value + step);
   };
 
   useEffect(() => () => {
@@ -292,7 +309,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   }
 
   return (
-    <div className={`chat-video${full ? ' is-full' : ''}`} role="dialog" aria-modal="true" aria-label={ru ? 'Видеосообщение' : 'Video xabar'}>
+    <div className={`chat-video${full ? ' is-full' : ''}`} style={{ '--cam-ratio': frameRatio }} role="dialog" aria-modal="true" aria-label={ru ? 'Видеосообщение' : 'Video xabar'}>
       <header className="chat-video-bar">
         <button type="button" className="chat-video-icon" onClick={close} aria-label={ru ? 'Закрыть' : 'Yopish'}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -314,8 +331,15 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       </header>
       <div className="chat-video-fit">
         <div className="chat-video-slot">
-          <div className={`chat-video-stage${facing === 'user' ? ' is-mirror' : ''}`}>
-            <video ref={videoRef} className="chat-video-preview" playsInline muted autoPlay />
+          <div
+            className={`chat-video-stage${facing === 'user' ? ' is-mirror' : ''}`}
+            onPointerDown={onStagePointerDown}
+            onPointerMove={onStagePointerMove}
+            onPointerUp={onStagePointerEnd}
+            onPointerCancel={onStagePointerEnd}
+            onWheel={onStageWheel}
+          >
+            <video ref={videoRef} className="chat-video-preview" playsInline muted autoPlay onLoadedMetadata={syncFrame} />
             {ready ? null : (
               <span className="chat-video-person" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
