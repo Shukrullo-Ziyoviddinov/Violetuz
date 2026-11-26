@@ -68,7 +68,6 @@
   width: min(100%, 26rem);
   flex: 1 1 auto;
   min-height: 0;
-  max-height: 62vh;
   margin-top: 0.85rem;
   border-radius: 28px;
   overflow: hidden;
@@ -86,6 +85,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .chat-video.is-full .chat-video-dock {
