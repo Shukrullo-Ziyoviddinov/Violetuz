@@ -100,6 +100,15 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
         return;
       }
       streamRef.current = stream;
+      const track = stream.getVideoTracks()[0];
+      const zoom = track?.getCapabilities?.().zoom;
+      if (zoom && track.applyConstraints) {
+        try {
+          await track.applyConstraints({ advanced: [{ zoom: zoom.min ?? 1 }] });
+        } catch {
+          /* keng kadr qoladi */
+        }
+      }
       if (videoRef.current) videoRef.current.srcObject = stream;
       setReady(true);
     };
@@ -134,7 +143,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const startRecording = () => {
     const stream = streamRef.current;
     if (!stream || recorderRef.current) return;
-    const source = fullRef.current ? framedStream(stream) : stream;
+    const source = framedStream(stream);
     let recorder;
     try {
       const type = mimeType();
@@ -303,20 +312,23 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
           </svg>
         </button>
       </header>
-      <div className={`chat-video-stage${facing === 'user' ? ' is-mirror' : ''}`}>
-        <video ref={videoRef} className="chat-video-preview" playsInline muted autoPlay />
-        {ready ? null : (
-          <span className="chat-video-person" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="8" r="3.2" />
-              <path d="M5.5 19.2c1.2-3 3.4-4.5 6.5-4.5s5.3 1.5 6.5 4.5" />
-            </svg>
-          </span>
-        )}
-        <span className="chat-video-dash" aria-hidden="true" />
-        {error ? <p className="chat-video-error">{error}</p> : null}
-      </div>
-      <div className="chat-video-dock">
+      <div className="chat-video-fit">
+        <div className="chat-video-slot">
+          <div className={`chat-video-stage${facing === 'user' ? ' is-mirror' : ''}`}>
+            <video ref={videoRef} className="chat-video-preview" playsInline muted autoPlay />
+            {ready ? null : (
+              <span className="chat-video-person" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="8" r="3.2" />
+                  <path d="M5.5 19.2c1.2-3 3.4-4.5 6.5-4.5s5.3 1.5 6.5 4.5" />
+                </svg>
+              </span>
+            )}
+            <span className="chat-video-dash" aria-hidden="true" />
+            {error ? <p className="chat-video-error">{error}</p> : null}
+          </div>
+        </div>
+        <div className="chat-video-dock">
         <p className="chat-video-hint">{ru ? 'Удерживайте для записи и отпустите, чтобы остановить' : 'Bosib turib yozing, qo‘yib yuborsangiz yuboriladi'}</p>
         <p className="chat-video-limit">{ru ? 'Не дольше 1 минуты' : 'Eng ko‘pi bilan 1 daqiqa'}</p>
         <div className="chat-video-controls">
@@ -363,6 +375,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 };
