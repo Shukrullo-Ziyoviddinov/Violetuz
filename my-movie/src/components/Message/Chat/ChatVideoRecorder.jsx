@@ -33,7 +33,9 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const [error, setError] = useState('');
   const [recording, setRecording] = useState(false);
   const [flash, setFlash] = useState(false);
-  const [frameRatio, setFrameRatio] = useState(16 / 9);
+  const [frameRatio, setFrameRatio] = useState(() => (
+    window.innerHeight > window.innerWidth ? 9 / 16 : 16 / 9
+  ));
   const [phase, setPhase] = useState('record');
   const [clip, setClip] = useState(null);
   const ru = lang === 'ru';
@@ -101,8 +103,6 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       streamRef.current = stream;
       const track = stream.getVideoTracks()[0];
       const caps = track?.getCapabilities?.() || {};
-      const settings = track?.getSettings?.() || {};
-      if (settings.width > 0 && settings.height > 0) setFrameRatio(settings.width / settings.height);
       if (caps.zoom && track.applyConstraints) {
         const min = caps.zoom.min ?? 1;
         zoomRef.current = { min, max: caps.zoom.max ?? min, step: caps.zoom.step || 0.1, value: min };
@@ -344,9 +344,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
             )}
             <span className="chat-video-dash" aria-hidden="true" />
             {error ? <p className="chat-video-error">{error}</p> : null}
-          </div>
-        </div>
-        <div className="chat-video-dock">
+            <div className="chat-video-dock">
         <p className="chat-video-hint">{ru ? 'Удерживайте для записи и отпустите, чтобы остановить' : 'Bosib turib yozing, qo‘yib yuborsangiz yuboriladi'}</p>
         <p className="chat-video-limit">{ru ? 'Не дольше 1 минуты' : 'Eng ko‘pi bilan 1 daqiqa'}</p>
         <div className="chat-video-controls">
@@ -384,8 +382,10 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
             <i className="fa-solid fa-images" aria-hidden="true" />
           </button>
         </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     </div>
   );
 };

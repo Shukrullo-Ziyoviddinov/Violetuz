@@ -144,12 +144,13 @@
 
 .chat-video.is-full .chat-video-dock {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
+  bottom: 0.85rem;
   z-index: 4;
-  width: min(100cqw, calc(100cqh * var(--cam-ratio, 1.7778)));
+  width: auto;
   margin: 0;
-  bottom: calc(100cqh - min(100cqh, calc(100cqw / var(--cam-ratio, 1.7778))) + 0.85rem);
-  transform: translateX(-50%);
+  transform: none;
 }
 
 .chat-video.is-full .chat-video-hint,
@@ -169,6 +170,8 @@
 }
 
 .chat-video:not(.is-review) .chat-video-preview {
+  position: absolute;
+  inset: 0;
   object-fit: contain;
 }
 
