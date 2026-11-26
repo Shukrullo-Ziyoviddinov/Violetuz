@@ -33,7 +33,6 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const [error, setError] = useState('');
   const [recording, setRecording] = useState(false);
   const [flash, setFlash] = useState(false);
-  const [full, setFull] = useState(false);
   const [frameRatio, setFrameRatio] = useState(16 / 9);
   const [phase, setPhase] = useState('record');
   const [clip, setClip] = useState(null);
@@ -207,11 +206,6 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
     setFacing((current) => (current === 'user' ? 'environment' : 'user'));
   };
 
-  const toggleFull = () => {
-    if (recording) return;
-    setFull((current) => !current);
-  };
-
   const toggleFlash = async () => {
     const track = streamRef.current?.getVideoTracks?.()[0];
     const next = !flash;
@@ -309,7 +303,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   }
 
   return (
-    <div className={`chat-video${full ? ' is-full' : ''}`} style={{ '--cam-ratio': frameRatio }} role="dialog" aria-modal="true" aria-label={ru ? 'Видеосообщение' : 'Video xabar'}>
+    <div className="chat-video is-full" style={{ '--cam-ratio': frameRatio }} role="dialog" aria-modal="true" aria-label={ru ? 'Видеосообщение' : 'Video xabar'}>
       <header className="chat-video-bar">
         <button type="button" className="chat-video-icon" onClick={close} aria-label={ru ? 'Закрыть' : 'Yopish'}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -384,18 +378,10 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
           <button
             type="button"
             className="chat-video-side"
-            onClick={toggleFull}
             disabled={recording}
-            aria-pressed={full}
-            aria-label={full ? (ru ? 'Обычный размер' : 'Oddiy o‘lcham') : (ru ? 'На весь экран' : 'To‘liq ekran')}
+            aria-label={ru ? 'Галерея' : 'Galereya'}
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              {full ? (
-                <path d="M9 9H4M9 9V4M15 9h5M15 9V4M9 15H4M9 15v5M15 15h5M15 15v5" />
-              ) : (
-                <path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
-              )}
-            </svg>
+            <i className="fa-solid fa-images" aria-hidden="true" />
           </button>
         </div>
       </div>
