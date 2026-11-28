@@ -22,7 +22,7 @@ void main() {
   float weight = 0.0;
   for (int y = -1; y <= 1; y++) {
     for (int x = -1; x <= 1; x++) {
-      vec3 sampleColor = texture2D(uTex, vUv + vec2(float(x), float(y)) * uTexel * 2.0).rgb;
+      vec3 sampleColor = texture2D(uTex, vUv + vec2(float(x), float(y)) * uTexel * (3.0 + uRetouch * 14.0)).rgb;
       float sampleWeight = exp(-float(x * x + y * y) * 0.55);
       sum += sampleColor * sampleWeight;
       weight += sampleWeight;
@@ -31,7 +31,7 @@ void main() {
   vec3 even = mix(center, sum / max(weight, 0.0001), uRetouch);
   float luma = dot(even, vec3(0.299, 0.587, 0.114));
   vec3 warm = vec3(luma * 1.04, luma * 0.9, luma * 0.8);
-  vec3 toned = mix(even, warm, uTone * 0.42);
+  vec3 toned = mix(even, warm, uTone * 0.9);
   gl_FragColor = vec4(mix(center, toned, protect()), 1.0);
 }
 `;

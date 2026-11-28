@@ -83,6 +83,11 @@ export function createFrameOutput() {
   let windowStarted = 0;
   let frameMs = 0;
 
+  const present = () => {
+    const track = stream?.getVideoTracks?.()[0];
+    if (typeof track?.requestFrame === 'function') track.requestFrame();
+  };
+
   const noteFrame = (started) => {
     frames += 1;
     frameMs = performance.now() - started;
@@ -93,6 +98,7 @@ export function createFrameOutput() {
       frames = 0;
       windowStarted = now;
     }
+    present();
   };
 
   return {

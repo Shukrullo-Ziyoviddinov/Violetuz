@@ -128,10 +128,9 @@ export function createEffectPipeline(gl) {
   const blurTarget = makeTarget(gl);
   const hold = makeTarget(gl);
   const stage = makeTarget(gl);
-  const emptyPerson = new Uint8Array([0]);
   let width = 0;
   let height = 0;
-  const emptyHair = new Uint8Array([0]);
+  let maskBytes = new Uint8Array(4);
 
   const bindQuad = () => {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -147,14 +146,25 @@ export function createEffectPipeline(gl) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
   };
 
-  const uploadHair = (packed) => {
-    const data = packed?.data || emptyHair;
-    const hairWidth = packed?.width || 1;
-    const hairHeight = packed?.height || 1;
-    gl.bindTexture(gl.TEXTURE_2D, hair);
+  const uploadMask = (texture, packed) => {
+    const maskWidth = Math.max(1, packed?.width || 1);
+    const maskHeight = Math.max(1, packed?.height || 1);
+    const count = maskWidth * maskHeight;
+    if (maskBytes.length !== count * 4) maskBytes = new Uint8Array(count * 4);
+    else maskBytes.fill(0);
+    const data = packed?.data;
+    if (data) {
+      const limit = Math.min(data.length, count);
+      for (let index = 0; index < limit; index += 1) {
+        const offset = index * 4;
+        maskBytes[offset] = data[index];
+        maskBytes[offset + 3] = 255;
+      }
+    }
+    gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, hairWidth, hairHeight, 0, gl.RED, gl.UNSIGNED_BYTE, data);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, maskWidth, maskHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, maskBytes);
   };
 
   const drawPass = (program, input, uniforms) => {
@@ -187,21 +197,7 @@ export function createEffectPipeline(gl) {
   };
 
   const uploadPerson = (packed) => {
-    const data = packed?.data || emptyPerson;
-    gl.bindTexture(gl.TEXTURE_2D, personTexture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.R8,
-      packed?.width || 1,
-      packed?.height || 1,
-      0,
-      gl.RED,
-      gl.UNSIGNED_BYTE,
-      data,
-    );
+    uploadMask(personTexture, packed);
   };
 
   const drawFilter = (input, grade) => {
@@ -294,7 +290,11 @@ export function createEffectPipeline(gl) {
       const nose = featureMask?.paint(width, height, landmarks) || null;
       uploadImage(source, video);
       if (featureMask) uploadImage(mask, featureMask.canvas);
-      uploadHair(hairPack);
+      try {
+        uploadMask(hair, hairPack);
+      } catch {
+        uploadMask(hair, null);
+      }
 
       const passes = [
         programs.smooth && smoothAmount(beauty) > 0 ? { program: programs.smooth, amount: smoothAmount(beauty) } : null,

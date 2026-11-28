@@ -14,7 +14,7 @@ float protect() {
 
 void main() {
   vec3 current = texture2D(uTex, vUv).rgb;
-  vec3 lifted = current + vec3(0.16, 0.14, 0.1) * uAmount;
+  vec3 lifted = current + vec3(0.55, 0.46, 0.32) * uAmount;
   lifted = lifted / (vec3(1.0) + lifted * 0.18);
   gl_FragColor = vec4(mix(current, lifted, protect()), 1.0);
 }

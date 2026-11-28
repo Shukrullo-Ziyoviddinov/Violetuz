@@ -20,7 +20,7 @@ const trace = (ctx, points, width, height) => {
   ctx.beginPath();
   points.forEach((point, index) => {
     const x = point.x * width;
-    const y = point.y * height;
+    const y = (1 - point.y) * height;
     if (index === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
@@ -94,8 +94,12 @@ export function hairBuffer(categoryMask) {
   const source = categoryMask.getAsUint8Array();
   if (!source?.length || !categoryMask.width || !categoryMask.height) return null;
   const data = new Uint8Array(source.length);
+  let hairPixels = 0;
   for (let index = 0; index < source.length; index += 1) {
-    data[index] = source[index] === HAIR_CLASS ? 255 : 0;
+    if (source[index] !== HAIR_CLASS) continue;
+    data[index] = 255;
+    hairPixels += 1;
   }
+  if (!hairPixels || hairPixels > source.length * 0.7) return null;
   return { data, width: categoryMask.width, height: categoryMask.height };
 }

@@ -51,6 +51,9 @@ export function createBeautyEngine() {
   let hairStamp = 0;
   let personStamp = 0;
   let stableFace = null;
+  let faceCount = 0;
+  let faceCpu = false;
+  let faceMisses = 0;
   let mode = 'passthrough';
   let destroyed = false;
   let initToken = 0;
@@ -98,7 +101,26 @@ export function createBeautyEngine() {
     if (!playback) return;
     playback.pause();
     playback.srcObject = null;
+    playback.remove?.();
     playback = null;
+  };
+
+  const switchFaceToCpu = () => {
+    if (faceCpu) return;
+    faceCpu = true;
+    faceMisses = 0;
+    faceStamp = 0;
+    const token = initToken;
+    const dying = landmarker;
+    landmarker = null;
+    closeVisionTask(dying);
+    loadFaceLandmarker('CPU').then((model) => {
+      if (!live() || token !== initToken) {
+        closeVisionTask(model);
+        return;
+      }
+      landmarker = model;
+    }).catch(() => {});
   };
 
   const closeModel = () => {
@@ -159,16 +181,25 @@ export function createBeautyEngine() {
     if (!playback) {
       playback = document.createElement('video');
       playback.muted = true;
+      playback.defaultMuted = true;
       playback.playsInline = true;
       playback.autoplay = true;
+      playback.setAttribute('playsinline', '');
+      playback.setAttribute('muted', '');
+      playback.setAttribute('aria-hidden', 'true');
+      playback.style.cssText = 'position:fixed;left:0;top:0;width:8px;height:8px;opacity:0.02;pointer-events:none';
     }
+    if (!playback.isConnected && document.body) document.body.appendChild(playback);
     if (playback.srcObject !== inputStream) playback.srcObject = inputStream;
-    const pending = playback.play?.();
-    pending?.catch?.(() => {
-      if (!live()) return;
-      dropOutput();
-      notify();
-    });
+    try {
+      const pending = playback.play?.();
+      pending?.catch?.(() => {
+        if (!live()) return;
+        playback?.play?.().catch?.(() => {});
+      });
+    } catch {
+      // avtoijro rad etilsa ham qayta ishlash kanvasi saqlanadi
+    }
     return playback;
   };
 
@@ -191,27 +222,57 @@ export function createBeautyEngine() {
       if (effects && (needsFace || needsBackground || needsGrade)) {
         if (effectsActive(beauty)) ensureSegmenter();
         if (needsBackground) ensurePerson();
-        try {
-          let landmarks = null;
-          if (needsFace && landmarker) {
+        let landmarks = null;
+        if (needsFace && landmarker) {
+          try {
             faceStamp = bumpStamp(faceStamp);
             landmarks = landmarker.detectForVideo(video, faceStamp)?.faceLandmarks?.[0] || null;
+            faceCount = landmarks?.length || 0;
+            if (faceCount) faceMisses = 0;
+            else {
+              faceMisses += 1;
+              if (!faceCpu && faceMisses >= 12) switchFaceToCpu();
+            }
+          } catch {
+            faceCount = 0;
+            landmarks = null;
+            switchFaceToCpu();
           }
-          stableFace = needsFace ? followFace(stableFace, landmarks) : null;
-          let hair = null;
-          if (effectsActive(beauty) && segmenter) {
+        } else {
+          faceCount = 0;
+        }
+        stableFace = needsFace ? followFace(stableFace, landmarks) : null;
+        let hair = null;
+        if (effectsActive(beauty) && segmenter) {
+          try {
             hairStamp = bumpStamp(hairStamp);
             const result = segmenter.segmentForVideo(video, hairStamp);
             hair = hairBuffer(result?.categoryMask);
             result?.categoryMask?.close?.();
+          } catch {
+            hair = null;
+            segmenterFailed = true;
+            closeVisionTask(segmenter);
+            segmenter = null;
+            segmenterPromise = null;
           }
-          let person = null;
-          if (needsBackground && personSegmenter) {
+        }
+        let person = null;
+        if (needsBackground && personSegmenter) {
+          try {
             personStamp = bumpStamp(personStamp);
             const result = personSegmenter.segmentForVideo(video, personStamp);
             person = personBuffer(result?.categoryMask);
             result?.categoryMask?.close?.();
+          } catch {
+            person = null;
+            personFailed = true;
+            closeVisionTask(personSegmenter);
+            personSegmenter = null;
+            personPromise = null;
           }
+        }
+        try {
           const size = output.size();
           effects.resize(size.width, size.height);
           const started = performance.now();
@@ -219,7 +280,11 @@ export function createBeautyEngine() {
           else output.draw(video);
         } catch {
           stableFace = null;
-          output.draw(video);
+          try {
+            output.draw(video);
+          } catch {
+            // bitta yomon kadr yozuvni to‘xtatmaydi
+          }
         }
       } else {
         stableFace = null;
@@ -231,12 +296,6 @@ export function createBeautyEngine() {
 
   const schedule = () => {
     if (!live() || mode !== 'webgl' || loopHandle) return;
-    const video = sourceVideo();
-    if (video?.requestVideoFrameCallback) {
-      loopKind = 'video';
-      loopHandle = video.requestVideoFrameCallback(() => tick());
-      return;
-    }
     loopKind = 'frame';
     loopHandle = requestAnimationFrame(() => tick());
   };
@@ -272,6 +331,10 @@ export function createBeautyEngine() {
     initialize() {
       const token = ++initToken;
       destroyed = false;
+      faceCpu = false;
+      faceMisses = 0;
+      faceCount = 0;
+      faceStamp = 0;
       const saved = readBeautySettings();
       if (saved) settings = saved;
       dropOutput();
@@ -395,6 +458,7 @@ export function createBeautyEngine() {
         frameMs: frame.frameMs,
         hasVideo: Boolean(sourceVideo()),
         model: Boolean(landmarker),
+        faces: faceCount,
       };
     },
 
