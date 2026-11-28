@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { BeautyEffectStrip, getBeautyPresetStrip, useBeautyEngine } from '../../../features/beauty-engine';
 import { useModalHardwareBack } from '../../../useModalHardwareBack';
 import ChatVideoReview from './ChatVideoReview';
 import './ChatVideoRecorder.css';
@@ -11,6 +12,18 @@ const mimeType = () => {
   if (typeof MediaRecorder === 'undefined') return '';
   const types = ['video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'];
   return types.find((type) => MediaRecorder.isTypeSupported(type)) || '';
+};
+
+const recordingStream = (camera, processedTrack) => {
+  if (!camera) return null;
+  const cameraVideo = camera.getVideoTracks?.()[0] || null;
+  const audioTracks = camera.getAudioTracks?.() || [];
+  if (!processedTrack || processedTrack === cameraVideo || processedTrack.readyState === 'ended') return camera;
+  try {
+    return new MediaStream([processedTrack, ...audioTracks]);
+  } catch {
+    return camera;
+  }
 };
 
 const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
@@ -32,13 +45,21 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
   const [recording, setRecording] = useState(false);
+  const [holding, setHolding] = useState(false);
   const [flash, setFlash] = useState(false);
   const [frameRatio, setFrameRatio] = useState(() => (
     window.innerHeight > window.innerWidth ? 9 / 16 : 16 / 9
   ));
   const [phase, setPhase] = useState('record');
   const [clip, setClip] = useState(null);
+  const [cameraStream, setCameraStream] = useState(null);
   const ru = lang === 'ru';
+  const { settings, setPreset, processedStream, processedVideoTrack } = useBeautyEngine({
+    inputStream: cameraStream,
+  });
+  const processedTrackRef = useRef(null);
+  processedTrackRef.current = processedVideoTrack;
+  const presets = getBeautyPresetStrip(ru ? 'ru' : 'uz');
   phaseRef.current = phase;
 
   const { releaseHistory } = useModalHardwareBack({
@@ -101,6 +122,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
         return;
       }
       streamRef.current = stream;
+      setCameraStream(stream);
       const track = stream.getVideoTracks()[0];
       const caps = track?.getCapabilities?.() || {};
       if (caps.zoom && track.applyConstraints) {
@@ -114,7 +136,6 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       } else {
         zoomRef.current = null;
       }
-      if (videoRef.current) videoRef.current.srcObject = stream;
       setReady(true);
     };
     openCamera();
@@ -127,8 +148,21 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
       if (recorder && recorder.state !== 'inactive') recorder.stop();
       stream?.getTracks().forEach((track) => track.stop());
       if (streamRef.current === stream) streamRef.current = null;
+      setCameraStream((current) => (current === stream ? null : current));
     };
   }, [facing, phase, ru]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || phase !== 'record') return undefined;
+    const next = processedStream || cameraStream || null;
+    if (video.srcObject === next) return undefined;
+    video.srcObject = next;
+    if (!next) return undefined;
+    const pending = video.play?.();
+    pending?.catch?.(() => {});
+    return undefined;
+  }, [processedStream, cameraStream, phase]);
 
   useEffect(() => {
     const onKey = (event) => {
@@ -145,7 +179,7 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
   }, []);
 
   const startRecording = () => {
-    const stream = streamRef.current;
+    const stream = recordingStream(streamRef.current, processedTrackRef.current);
     if (!stream || recorderRef.current) return;
     let recorder;
     try {
@@ -193,11 +227,13 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
     if (event.button != null && event.button !== 0) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture?.(event.pointerId);
+    setHolding(true);
     startRecording();
   };
 
   const holdEnd = (event) => {
     event.preventDefault();
+    setHolding(false);
     stopRecording(true);
   };
 
@@ -345,8 +381,15 @@ const ChatVideoRecorder = ({ lang, peerName = '', onClose, onSend }) => {
             <span className="chat-video-dash" aria-hidden="true" />
             {error ? <p className="chat-video-error">{error}</p> : null}
             <div className="chat-video-dock">
-        <p className="chat-video-hint">{ru ? 'Удерживайте для записи и отпустите, чтобы остановить' : 'Bosib turib yozing, qo‘yib yuborsangiz yuboriladi'}</p>
-        <p className="chat-video-limit">{ru ? 'Не дольше 1 минуты' : 'Eng ko‘pi bilan 1 daqiqa'}</p>
+        <div className="chat-video-effects">
+          <BeautyEffectStrip
+            effects={presets}
+            value={settings.preset}
+            onChange={setPreset}
+            locked={holding || recording}
+            ariaLabel={ru ? 'Эффекты' : 'Effektlar'}
+          />
+        </div>
         <div className="chat-video-controls">
           <button type="button" className="chat-video-side" onClick={flipCamera} disabled={recording} aria-label={ru ? 'Сменить камеру' : 'Kamerani almashtirish'}>
             <i className="fa-solid fa-camera-rotate" aria-hidden="true" />

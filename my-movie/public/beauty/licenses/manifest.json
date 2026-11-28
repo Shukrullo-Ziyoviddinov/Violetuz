@@ -1,0 +1,63 @@
+{
+  "package": "@mediapipe/tasks-vision",
+  "packageVersion": "1.2.3",
+  "license": "Apache-2.0",
+  "runtime": "local",
+  "models": [
+    {
+      "file": "face_landmarker.task",
+      "path": "/beauty/models/face_landmarker.task",
+      "source": "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+      "version": "float16/1",
+      "license": "Apache-2.0",
+      "modelCard": "https://storage.googleapis.com/mediapipe-assets/Model%20Card%20MediaPipe%20Face%20Mesh%20V2.pdf",
+      "note": "478 ta yuz nuqtasi. Shaxsni aniqlash va kuzatuv uchun emas.",
+      "sha256": "64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff",
+      "bytes": 3758596
+    },
+    {
+      "file": "selfie_segmenter.tflite",
+      "path": "/beauty/models/selfie_segmenter.tflite",
+      "source": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/1/selfie_segmenter.tflite",
+      "version": "float16/1",
+      "license": "Apache-2.0",
+      "modelCard": "https://storage.googleapis.com/mediapipe-assets/Model%20Card%20MediaPipe%20Selfie%20Segmentation.pdf",
+      "note": "Odam va fon. Piksel-aniq niqob talab qiladigan ish uchun emas.",
+      "sha256": "191ac9529ae506ee0beefa6b2c945a172dab9d07d1e802a290a4e4038226658b",
+      "bytes": 249537
+    },
+    {
+      "file": "selfie_multiclass_256x256.tflite",
+      "path": "/beauty/models/selfie_multiclass_256x256.tflite",
+      "source": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/1/selfie_multiclass_256x256.tflite",
+      "version": "float32/1",
+      "license": "Apache-2.0",
+      "modelCard": "https://storage.googleapis.com/mediapipe-assets/Model%20Card%20Multiclass%20Segmentation.pdf",
+      "note": "Fon, soch, tana, yuz, kiyim. Shaxsni aniqlash va kuzatuv uchun emas.",
+      "sha256": "c6748b1253a99067ef71f7e26ca71096cd449baefa8f101900ea23016507e0e0",
+      "bytes": 16371837
+    }
+  ],
+  "wasm": [
+    {
+      "file": "vision_wasm_internal.js",
+      "sha256": "2aa5fd3fdd3d8208cd7587df0bb19fb6925c4ea16a76dd025aedc1f64d6a6309",
+      "bytes": 336624
+    },
+    {
+      "file": "vision_wasm_internal.wasm",
+      "sha256": "225bc06c0f51a9cf31fea0e9e0b0243e9e01fb5ef332cc1a7fa6656dbdfdaabf",
+      "bytes": 14665716
+    },
+    {
+      "file": "vision_wasm_module_internal.js",
+      "sha256": "d29996249490361715c769c6a49b43ad47e6ac9a28a8e8bce8d02b238e897851",
+      "bytes": 336662
+    },
+    {
+      "file": "vision_wasm_module_internal.wasm",
+      "sha256": "a269e84b12aefc93c9d6a4d62b01f41e5434a9fa941533bb8e75b1e3d1669e46",
+      "bytes": 14665738
+    }
+  ]
+}
